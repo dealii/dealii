@@ -77,8 +77,10 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -152,8 +154,9 @@ test()
             }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, sparse_matrix);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               local_dof_indices,
+                                               sparse_matrix);
       }
   }
 

@@ -70,8 +70,9 @@ main()
                                       dof_handler.n_dofs(),
                                       dof_handler.max_couplings_between_dofs());
   sparsity_pattern.block(0, 1).reinit(dof_handler.n_dofs(), 1, 1);
-  sparsity_pattern.block(1, 0).reinit(
-    1, dof_handler.n_dofs(), dof_handler.n_dofs());
+  sparsity_pattern.block(1, 0).reinit(1,
+                                      dof_handler.n_dofs(),
+                                      dof_handler.n_dofs());
   sparsity_pattern.block(1, 1).reinit(1, 1, 1);
   sparsity_pattern.collect_sizes();
 

@@ -118,7 +118,9 @@ double coefficient(const Point<dim> &p)
 
 // This function is as before.
 template <int dim>
-Step5<dim>::Step5() : fe(1), dof_handler(triangulation)
+Step5<dim>::Step5()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -214,8 +216,9 @@ void Step5<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -223,10 +226,14 @@ void Step5<dim>::assemble_system()
 
   // With the matrix so built, we use zero boundary values again:
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

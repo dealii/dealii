@@ -1410,16 +1410,16 @@ namespace Patterns
 namespace Patterns
 {
   template <class... PatternTypes>
-  Tuple::Tuple(const char *separator, const PatternTypes &... ps) :
-    // forward to the version with std::string argument
+  Tuple::Tuple(const char *separator, const PatternTypes &... ps)
+    : // forward to the version with std::string argument
     Tuple(std::string(separator), ps...)
   {}
 
 
 
   template <class... PatternTypes>
-  Tuple::Tuple(const std::string &separator, const PatternTypes &... ps) :
-    separator(separator)
+  Tuple::Tuple(const std::string &separator, const PatternTypes &... ps)
+    : separator(separator)
   {
     static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
                   "Not all of the input arguments of this function "
@@ -1434,8 +1434,8 @@ namespace Patterns
 
 
   template <class... PatternTypes>
-  Tuple::Tuple(const PatternTypes &... ps) :
-    // forward to the version with the separator argument
+  Tuple::Tuple(const PatternTypes &... ps)
+    : // forward to the version with the separator argument
     Tuple(std::string(":"), ps...)
   {}
 

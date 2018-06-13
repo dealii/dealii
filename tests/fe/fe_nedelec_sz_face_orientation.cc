@@ -39,8 +39,10 @@ void create_reference_triangulation(Triangulation<3> &tria)
   std::vector<unsigned int> repetitions(3, 1);
 
   repetitions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    tria, repetitions, Point<3>(-1.0, 0.0, 0.0), Point<3>(1.0, 1.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(tria,
+                                            repetitions,
+                                            Point<3>(-1.0, 0.0, 0.0),
+                                            Point<3>(1.0, 1.0, 1.0));
 }
 
 void create_triangulation(Triangulation<3> &tria,

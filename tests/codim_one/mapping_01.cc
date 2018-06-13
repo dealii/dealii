@@ -56,8 +56,10 @@ test()
   MappingQGeneric<dim - 1, dim> mapping(1);
   FE_Q<dim - 1, dim>            fe(1);
 
-  FEValues<dim - 1, dim> fe_values(
-    mapping, fe, quadrature, update_normal_vectors);
+  FEValues<dim - 1, dim> fe_values(mapping,
+                                   fe,
+                                   quadrature,
+                                   update_normal_vectors);
 
   for (typename Triangulation<dim - 1, dim>::active_cell_iterator cell =
          boundary_mesh.begin_active();

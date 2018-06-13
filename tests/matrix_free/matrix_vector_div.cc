@@ -64,7 +64,8 @@ public:
   typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
   typedef double                                         Number;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   local_apply(const MatrixFree<dim, Number> &              data,
@@ -96,8 +97,10 @@ public:
     AssertDimension(dst.size(), dim);
     for (unsigned int d = 0; d < dim; ++d)
       dst[d] = 0;
-    data.cell_loop(
-      &MatrixFreeTest<dim, degree, VectorType>::local_apply, this, dst, src);
+    data.cell_loop(&MatrixFreeTest<dim, degree, VectorType>::local_apply,
+                   this,
+                   dst,
+                   src);
   };
 
 private:
@@ -234,8 +237,9 @@ test()
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
   }
 

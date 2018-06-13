@@ -117,9 +117,9 @@ namespace Step55
     template <class Matrix, class Preconditioner>
     InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
       const Matrix &        m,
-      const Preconditioner &preconditioner) :
-      matrix(&m),
-      preconditioner(preconditioner)
+      const Preconditioner &preconditioner)
+      : matrix(&m)
+      , preconditioner(preconditioner)
     {}
 
 
@@ -165,9 +165,9 @@ namespace Step55
     template <class PreconditionerA, class PreconditionerS>
     BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::
       BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
-                                  const PreconditionerS &preconditioner_S) :
-      preconditioner_A(preconditioner_A),
-      preconditioner_S(preconditioner_S)
+                                  const PreconditionerS &preconditioner_S)
+      : preconditioner_A(preconditioner_A)
+      , preconditioner_S(preconditioner_S)
     {}
 
 
@@ -191,7 +191,8 @@ namespace Step55
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     virtual void vector_value(const Point<dim> &p,
@@ -227,7 +228,8 @@ namespace Step55
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution() : Function<dim>(dim + 1)
+    ExactSolution()
+      : Function<dim>(dim + 1)
     {}
 
     virtual void vector_value(const Point<dim> &p,
@@ -314,21 +316,22 @@ namespace Step55
 
 
   template <int dim>
-  StokesProblem<dim>::StokesProblem(unsigned int velocity_degree) :
-    velocity_degree(velocity_degree),
-    viscosity(0.1),
-    mpi_communicator(MPI_COMM_WORLD),
-    fe(FE_Q<dim>(velocity_degree), dim, FE_Q<dim>(velocity_degree - 1), 1),
-    triangulation(mpi_communicator,
-                  typename Triangulation<dim>::MeshSmoothing(
-                    Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
-    dof_handler(triangulation),
-    pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-    computing_timer(mpi_communicator,
-                    pcout,
-                    TimerOutput::summary,
-                    TimerOutput::wall_times)
+  StokesProblem<dim>::StokesProblem(unsigned int velocity_degree)
+    : velocity_degree(velocity_degree)
+    , viscosity(0.1)
+    , mpi_communicator(MPI_COMM_WORLD)
+    , fe(FE_Q<dim>(velocity_degree), dim, FE_Q<dim>(velocity_degree - 1), 1)
+    , triangulation(mpi_communicator,
+                    typename Triangulation<dim>::MeshSmoothing(
+                      Triangulation<dim>::smoothing_on_refinement |
+                      Triangulation<dim>::smoothing_on_coarsening))
+    , dof_handler(triangulation)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(mpi_communicator,
+                      pcout,
+                      TimerOutput::summary,
+                      TimerOutput::wall_times)
   {}
 
 
@@ -361,8 +364,9 @@ namespace Step55
     DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, stokes_sub_blocks);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   stokes_sub_blocks);
 
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
@@ -466,8 +470,9 @@ namespace Step55
     // Finally, we construct the block vectors with the right sizes. The
     // function call with two std::vector<IndexSet> will create a ghosted
     // vector.
-    locally_relevant_solution.reinit(
-      owned_partitioning, relevant_partitioning, mpi_communicator);
+    locally_relevant_solution.reinit(owned_partitioning,
+                                     relevant_partitioning,
+                                     mpi_communicator);
     system_rhs.reinit(owned_partitioning, mpi_communicator);
   }
 
@@ -562,8 +567,9 @@ namespace Step55
                                                  system_matrix,
                                                  system_rhs);
 
-          constraints.distribute_local_to_global(
-            cell_matrix2, local_dof_indices, preconditioner_matrix);
+          constraints.distribute_local_to_global(cell_matrix2,
+                                                 local_dof_indices,
+                                                 preconditioner_matrix);
         }
 
     system_matrix.compress(VectorOperation::add);
@@ -641,8 +647,10 @@ namespace Step55
 
     constraints.set_zero(distributed_solution);
 
-    solver.solve(
-      system_matrix, distributed_solution, system_rhs, preconditioner);
+    solver.solve(system_matrix,
+                 distributed_solution,
+                 system_rhs,
+                 preconditioner);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
@@ -715,8 +723,10 @@ namespace Step55
                                         VectorTools::L2_norm,
                                         &velocity_mask);
 
-      const double error_u_l2 = VectorTools::compute_global_error(
-        triangulation, cellwise_errors, VectorTools::L2_norm);
+      const double error_u_l2 =
+        VectorTools::compute_global_error(triangulation,
+                                          cellwise_errors,
+                                          VectorTools::L2_norm);
 
       VectorTools::integrate_difference(dof_handler,
                                         locally_relevant_solution,
@@ -726,8 +736,10 @@ namespace Step55
                                         VectorTools::L2_norm,
                                         &pressure_mask);
 
-      const double error_p_l2 = VectorTools::compute_global_error(
-        triangulation, cellwise_errors, VectorTools::L2_norm);
+      const double error_p_l2 =
+        VectorTools::compute_global_error(triangulation,
+                                          cellwise_errors,
+                                          VectorTools::L2_norm);
 
       pcout << "error: u_0: " << error_u_l2 << " p_0: " << error_p_l2
             << std::endl;
@@ -753,8 +765,9 @@ namespace Step55
     interpolated.reinit(owned_partitioning, MPI_COMM_WORLD);
     VectorTools::interpolate(dof_handler, ExactSolution<dim>(), interpolated);
 
-    LA::MPI::BlockVector interpolated_relevant(
-      owned_partitioning, relevant_partitioning, MPI_COMM_WORLD);
+    LA::MPI::BlockVector interpolated_relevant(owned_partitioning,
+                                               relevant_partitioning,
+                                               MPI_COMM_WORLD);
     interpolated_relevant = interpolated;
     {
       std::vector<std::string> solution_names(dim, "ref_u");

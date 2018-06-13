@@ -134,24 +134,24 @@ namespace internal
 
 /* ------------------------------------------------ */
 
-TableHandler::Column::Column(const std::string &tex_caption) :
-  tex_caption(tex_caption),
-  tex_format("c"),
-  precision(4),
-  scientific(false),
-  flag(0),
-  max_length(0)
+TableHandler::Column::Column(const std::string &tex_caption)
+  : tex_caption(tex_caption)
+  , tex_format("c")
+  , precision(4)
+  , scientific(false)
+  , flag(0)
+  , max_length(0)
 {}
 
 
 
-TableHandler::Column::Column() :
-  tex_caption(),
-  tex_format("c"),
-  precision(4),
-  scientific(false),
-  flag(0),
-  max_length(0)
+TableHandler::Column::Column()
+  : tex_caption()
+  , tex_format("c")
+  , precision(4)
+  , scientific(false)
+  , flag(0)
+  , max_length(0)
 {}
 
 
@@ -196,7 +196,8 @@ TableHandler::Column::invalidate_cache()
 /*---------------------------------------------------------------------*/
 
 
-TableHandler::TableHandler() : auto_fill_mode(false)
+TableHandler::TableHandler()
+  : auto_fill_mode(false)
 {}
 
 
@@ -223,8 +224,9 @@ TableHandler::start_new_row()
   for (std::map<std::string, Column>::iterator p = columns.begin();
        p != columns.end();
        ++p)
-    max_col_length = std::max(
-      max_col_length, static_cast<unsigned int>(p->second.entries.size()));
+    max_col_length =
+      std::max(max_col_length,
+               static_cast<unsigned int>(p->second.entries.size()));
 
 
   // then pad all columns to that length with empty strings
@@ -236,9 +238,10 @@ TableHandler::start_new_row()
         col->second.entries.emplace_back("");
         internal::TableEntry &entry = col->second.entries.back();
         entry.cache_string(col->second.scientific, col->second.precision);
-        col->second.max_length = std::max(
-          col->second.max_length,
-          static_cast<unsigned int>(entry.get_cached_string().length()));
+        col->second.max_length =
+          std::max(col->second.max_length,
+                   static_cast<unsigned int>(
+                     entry.get_cached_string().length()));
       }
 }
 

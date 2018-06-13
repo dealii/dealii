@@ -62,8 +62,9 @@ test(const unsigned int degree)
 
       QTrapez<dim - 1> quadrature;
 
-      FESubfaceValues<dim> fe_values(
-        fe_rt_bubbles, quadrature, update_gradients);
+      FESubfaceValues<dim> fe_values(fe_rt_bubbles,
+                                     quadrature,
+                                     update_gradients);
       fe_values.reinit(dof.begin_active(), 0, 0);
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {

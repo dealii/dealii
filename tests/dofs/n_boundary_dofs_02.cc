@@ -50,8 +50,9 @@ test()
   GridGenerator::hyper_cube(triangulation_2, 2, 3);
 
   Triangulation<1, spacedim> triangulation;
-  GridGenerator::merge_triangulations(
-    triangulation_1, triangulation_2, triangulation);
+  GridGenerator::merge_triangulations(triangulation_1,
+                                      triangulation_2,
+                                      triangulation);
 
 
   FESystem<1, spacedim> fe(FE_Q<1, spacedim>(1), 1, FE_DGQ<1, spacedim>(1), 1);

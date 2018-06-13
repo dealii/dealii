@@ -939,10 +939,10 @@ template <typename MatrixType, typename inverse_type>
 inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
   Accessor::Accessor(
     const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
-    const size_type                                          row) :
-  matrix(matrix),
-  b_iterator(&matrix->inverse(0), 0, 0),
-  b_end(&matrix->inverse(0), 0, 0)
+    const size_type                                          row)
+  : matrix(matrix)
+  , b_iterator(&matrix->inverse(0), 0, 0)
+  , b_end(&matrix->inverse(0), 0, 0)
 {
   bs      = matrix->block_size();
   a_block = row / bs;
@@ -998,8 +998,8 @@ template <typename MatrixType, typename inverse_type>
 inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
   const_iterator(
     const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
-    const size_type                                          row) :
-  accessor(matrix, row)
+    const size_type                                          row)
+  : accessor(matrix, row)
 {}
 
 

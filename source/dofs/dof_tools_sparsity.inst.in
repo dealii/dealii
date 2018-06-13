@@ -319,12 +319,11 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
       const std::vector<types::global_dof_index> &,
       SP &);
 
-    template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
-                                             SP>(
-      const hp::DoFHandler<deal_II_dimension> &dof,
-      const std::vector<types::global_dof_index> &,
-      SP &);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension>,
+      SP>(const hp::DoFHandler<deal_II_dimension> &dof,
+          const std::vector<types::global_dof_index> &,
+          SP &);
 
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(

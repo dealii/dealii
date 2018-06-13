@@ -21,15 +21,15 @@ DEAL_II_NAMESPACE_OPEN
 
 // Constructor:
 template <int dim>
-FE_NedelecSZ<dim>::FE_NedelecSZ(const unsigned int degree) :
-  FiniteElement<dim, dim>(
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           dim,
-                           degree + 1,
-                           FiniteElementData<dim>::Hcurl),
-    std::vector<bool>(compute_num_dofs(degree), true),
-    std::vector<ComponentMask>(compute_num_dofs(degree),
-                               std::vector<bool>(dim, true)))
+FE_NedelecSZ<dim>::FE_NedelecSZ(const unsigned int degree)
+  : FiniteElement<dim, dim>(
+      FiniteElementData<dim>(get_dpo_vector(degree),
+                             dim,
+                             degree + 1,
+                             FiniteElementData<dim>::Hcurl),
+      std::vector<bool>(compute_num_dofs(degree), true),
+      std::vector<ComponentMask>(compute_num_dofs(degree),
+                                 std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
@@ -165,9 +165,9 @@ FE_NedelecSZ<dim>::get_data(
 
   if (flags & update_gradients)
     {
-      data->shape_grads.resize(
-        this->dofs_per_cell,
-        std::vector<DerivativeForm<1, dim, dim>>(n_q_points));
+      data->shape_grads.resize(this->dofs_per_cell,
+                               std::vector<DerivativeForm<1, dim, dim>>(
+                                 n_q_points));
     }
   // Not implementing second derivatives yet:
   if (flags & update_hessians)
@@ -275,8 +275,10 @@ FE_NedelecSZ<dim>::get_data(
 
           // Fill the values for edge lambda and edge sigma:
           const unsigned int
-            edge_sigma_direction[GeometryInfo<2>::lines_per_cell] = {
-              1, 1, 0, 0};
+            edge_sigma_direction[GeometryInfo<2>::lines_per_cell] = {1,
+                                                                     1,
+                                                                     0,
+                                                                     0};
 
           data->edge_lambda_values.resize(lines_per_cell,
                                           std::vector<double>(n_q_points));
@@ -1116,10 +1118,10 @@ FE_NedelecSZ<dim>::fill_edge_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(
-    !(flags & update_values) ||
-      fe_data.shape_values.size() == this->dofs_per_cell,
-    ExcDimensionMismatch(fe_data.shape_values.size(), this->dofs_per_cell));
+  Assert(!(flags & update_values) ||
+           fe_data.shape_values.size() == this->dofs_per_cell,
+         ExcDimensionMismatch(fe_data.shape_values.size(),
+                              this->dofs_per_cell));
   Assert(!(flags & update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
@@ -1555,10 +1557,10 @@ FE_NedelecSZ<dim>::fill_face_values(
                    fe_data.shape_values.size() == this->dofs_per_cell,
                  ExcDimensionMismatch(fe_data.shape_values.size(),
                                       this->dofs_per_cell));
-          Assert(
-            !(flags & update_values) ||
-              fe_data.shape_values[0].size() == n_q_points,
-            ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
+          Assert(!(flags & update_values) ||
+                   fe_data.shape_values[0].size() == n_q_points,
+                 ExcDimensionMismatch(fe_data.shape_values[0].size(),
+                                      n_q_points));
 
           // Useful geometry info:
           const unsigned int vertices_per_face(
@@ -1574,8 +1576,10 @@ FE_NedelecSZ<dim>::fill_face_values(
             faces_per_cell, std::vector<unsigned int>(vertices_per_face));
 
           const unsigned int
-            vertex_opposite_on_face[GeometryInfo<3>::vertices_per_face] = {
-              3, 2, 1, 0};
+            vertex_opposite_on_face[GeometryInfo<3>::vertices_per_face] = {3,
+                                                                           2,
+                                                                           1,
+                                                                           0};
 
           const unsigned int
             vertices_adjacent_on_face[GeometryInfo<3>::vertices_per_face][2] = {
@@ -1921,10 +1925,10 @@ FE_NedelecSZ<dim>::fill_fe_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(
-    !(flags & update_values) ||
-      fe_data.shape_values.size() == this->dofs_per_cell,
-    ExcDimensionMismatch(fe_data.shape_values.size(), this->dofs_per_cell));
+  Assert(!(flags & update_values) ||
+           fe_data.shape_values.size() == this->dofs_per_cell,
+         ExcDimensionMismatch(fe_data.shape_values.size(),
+                              this->dofs_per_cell));
   Assert(!(flags & update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
@@ -2036,12 +2040,14 @@ FE_NedelecSZ<dim>::fill_fe_face_values(
   // Now update the edge-based DoFs, which depend on the cell.
   // This will fill in the missing items in the InternalData
   // (fe_internal/fe_data) which was not filled in by get_data.
-  fill_edge_values(
-    cell, QProjector<dim>::project_to_all_faces(quadrature), fe_data);
+  fill_edge_values(cell,
+                   QProjector<dim>::project_to_all_faces(quadrature),
+                   fe_data);
   if (dim == 3 && this->degree > 1)
     {
-      fill_face_values(
-        cell, QProjector<dim>::project_to_all_faces(quadrature), fe_data);
+      fill_face_values(cell,
+                       QProjector<dim>::project_to_all_faces(quadrature),
+                       fe_data);
     }
 
   const UpdateFlags  flags(fe_data.update_each);
@@ -2060,11 +2066,12 @@ FE_NedelecSZ<dim>::fill_fe_face_values(
       std::vector<Tensor<1, dim>> transformed_shape_values(n_q_points);
       for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
         {
-          mapping.transform(
-            make_array_view(fe_data.shape_values[dof], offset, n_q_points),
-            mapping_covariant,
-            mapping_internal,
-            make_array_view(transformed_shape_values));
+          mapping.transform(make_array_view(fe_data.shape_values[dof],
+                                            offset,
+                                            n_q_points),
+                            mapping_covariant,
+                            mapping_internal,
+                            make_array_view(transformed_shape_values));
 
           const unsigned int first =
             data.shape_function_to_row_table[dof * this->n_components() +
@@ -2088,11 +2095,12 @@ FE_NedelecSZ<dim>::fill_fe_face_values(
       std::vector<Tensor<2, dim>> transformed_shape_grads(n_q_points);
       for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
         {
-          mapping.transform(
-            make_array_view(fe_data.shape_grads[dof], offset, n_q_points),
-            mapping_covariant_gradient,
-            mapping_internal,
-            make_array_view(transformed_shape_grads));
+          mapping.transform(make_array_view(fe_data.shape_grads[dof],
+                                            offset,
+                                            n_q_points),
+                            mapping_covariant_gradient,
+                            mapping_internal,
+                            make_array_view(transformed_shape_grads));
 
           const unsigned int first =
             data.shape_function_to_row_table[dof * this->n_components() +

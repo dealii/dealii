@@ -143,7 +143,9 @@ private:
 
 
 template <int dim>
-Step4<dim>::Step4() : fe(1), dof_handler(triangulation)
+Step4<dim>::Step4()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 

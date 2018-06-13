@@ -1572,10 +1572,10 @@ private:
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
-  const IndexSet &local_constraints) :
-  lines(),
-  local_lines(local_constraints),
-  sorted(false)
+  const IndexSet &local_constraints)
+  : lines()
+  , local_lines(local_constraints)
+  , sorted(false)
 {
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
@@ -1585,12 +1585,12 @@ inline AffineConstraints<number>::AffineConstraints(
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
-  const AffineConstraints &affine_constraints) :
-  Subscriptor(),
-  lines(affine_constraints.lines),
-  lines_cache(affine_constraints.lines_cache),
-  local_lines(affine_constraints.local_lines),
-  sorted(affine_constraints.sorted)
+  const AffineConstraints &affine_constraints)
+  : Subscriptor()
+  , lines(affine_constraints.lines)
+  , lines_cache(affine_constraints.lines_cache)
+  , local_lines(affine_constraints.local_lines)
+  , sorted(affine_constraints.sorted)
 {}
 
 template <typename number>
@@ -1612,9 +1612,9 @@ AffineConstraints<number>::add_line(const size_type line)
 
   // if necessary enlarge vector of existing entries for cache
   if (line_index >= lines_cache.size())
-    lines_cache.resize(
-      std::max(2 * static_cast<size_type>(lines_cache.size()), line_index + 1),
-      numbers::invalid_size_type);
+    lines_cache.resize(std::max(2 * static_cast<size_type>(lines_cache.size()),
+                                line_index + 1),
+                       numbers::invalid_size_type);
 
   // push a new line to the end of the list
   lines.emplace_back();
@@ -1803,8 +1803,9 @@ AffineConstraints<number>::distribute_local_to_global(
        ++local_vector_begin, ++local_indices_begin)
     {
       if (is_constrained(*local_indices_begin) == false)
-        internal::ElementAccess<VectorType>::add(
-          *local_vector_begin, *local_indices_begin, global_vector);
+        internal::ElementAccess<VectorType>::add(*local_vector_begin,
+                                                 *local_indices_begin,
+                                                 global_vector);
       else
         {
           const ConstraintLine &position =

@@ -702,12 +702,15 @@ namespace Physics
           else
             {
               Assert((component_n < Tensor<2, 2>::n_independent_components),
-                     ExcIndexRange(
-                       component_n, 0, Tensor<2, 2>::n_independent_components));
+                     ExcIndexRange(component_n,
+                                   0,
+                                   Tensor<2, 2>::n_independent_components));
             }
 
-          static const unsigned int indices[4][2] = {
-            {0, 0}, {1, 1}, {0, 1}, {1, 0}};
+          static const unsigned int indices[4][2] = {{0, 0},
+                                                     {1, 1},
+                                                     {0, 1},
+                                                     {1, 0}};
           return std::make_pair(indices[component_n][0],
                                 indices[component_n][1]);
         }
@@ -729,8 +732,9 @@ namespace Physics
           else
             {
               Assert((component_n < Tensor<2, 3>::n_independent_components),
-                     ExcIndexRange(
-                       component_n, 0, Tensor<2, 3>::n_independent_components));
+                     ExcIndexRange(component_n,
+                                   0,
+                                   Tensor<2, 3>::n_independent_components));
             }
 
           static const unsigned int indices[9][2] = {{0, 0},
@@ -1258,9 +1262,9 @@ namespace Physics
       {
         Assert(mtrx.m() == dim, ExcDimensionMismatch(mtrx.m(), dim));
         Assert(mtrx.n() == 1, ExcDimensionMismatch(mtrx.n(), 1));
-        Assert(
-          mtrx.n_elements() == v.n_independent_components,
-          ExcDimensionMismatch(mtrx.n_elements(), v.n_independent_components));
+        Assert(mtrx.n_elements() == v.n_independent_components,
+               ExcDimensionMismatch(mtrx.n_elements(),
+                                    v.n_independent_components));
 
         const unsigned int n_rows = mtrx.m();
         const unsigned int n_cols = mtrx.n();
@@ -1287,9 +1291,9 @@ namespace Physics
       {
         Assert(mtrx.m() == dim, ExcDimensionMismatch(mtrx.m(), dim));
         Assert(mtrx.n() == dim, ExcDimensionMismatch(mtrx.n(), dim));
-        Assert(
-          mtrx.n_elements() == t.n_independent_components,
-          ExcDimensionMismatch(mtrx.n_elements(), t.n_independent_components));
+        Assert(mtrx.n_elements() == t.n_independent_components,
+               ExcDimensionMismatch(mtrx.n_elements(),
+                                    t.n_independent_components));
 
         const unsigned int n_rows = mtrx.m();
         const unsigned int n_cols = mtrx.n();
@@ -1345,26 +1349,26 @@ namespace Physics
       void
       to_tensor(const FullMatrix<Number> &mtrx, Tensor<3, dim, Number> &t)
       {
-        Assert(
-          (mtrx.m() == Tensor<1, dim, Number>::n_independent_components) ||
-            (mtrx.m() == Tensor<2, dim, Number>::n_independent_components) ||
-            (mtrx.m() ==
-             SymmetricTensor<2, dim, Number>::n_independent_components),
-          ExcNotationExcFullMatrixToTensorColSize3(
-            mtrx.m(),
-            Tensor<1, dim, Number>::n_independent_components,
-            Tensor<2, dim, Number>::n_independent_components,
-            SymmetricTensor<2, dim, Number>::n_independent_components));
-        Assert(
-          (mtrx.n() == Tensor<1, dim, Number>::n_independent_components) ||
-            (mtrx.n() == Tensor<2, dim, Number>::n_independent_components) ||
-            (mtrx.n() ==
-             SymmetricTensor<2, dim, Number>::n_independent_components),
-          ExcNotationExcFullMatrixToTensorColSize3(
-            mtrx.n(),
-            Tensor<1, dim, Number>::n_independent_components,
-            Tensor<2, dim, Number>::n_independent_components,
-            SymmetricTensor<2, dim, Number>::n_independent_components));
+        Assert((mtrx.m() == Tensor<1, dim, Number>::n_independent_components) ||
+                 (mtrx.m() ==
+                  Tensor<2, dim, Number>::n_independent_components) ||
+                 (mtrx.m() ==
+                  SymmetricTensor<2, dim, Number>::n_independent_components),
+               ExcNotationExcFullMatrixToTensorColSize3(
+                 mtrx.m(),
+                 Tensor<1, dim, Number>::n_independent_components,
+                 Tensor<2, dim, Number>::n_independent_components,
+                 SymmetricTensor<2, dim, Number>::n_independent_components));
+        Assert((mtrx.n() == Tensor<1, dim, Number>::n_independent_components) ||
+                 (mtrx.n() ==
+                  Tensor<2, dim, Number>::n_independent_components) ||
+                 (mtrx.n() ==
+                  SymmetricTensor<2, dim, Number>::n_independent_components),
+               ExcNotationExcFullMatrixToTensorColSize3(
+                 mtrx.n(),
+                 Tensor<1, dim, Number>::n_independent_components,
+                 Tensor<2, dim, Number>::n_independent_components,
+                 SymmetricTensor<2, dim, Number>::n_independent_components));
 
         const unsigned int n_rows = mtrx.m();
         const unsigned int n_cols = mtrx.n();
@@ -1486,9 +1490,9 @@ namespace Physics
         Assert((mtrx.n() == Tensor<2, dim, Number>::n_independent_components),
                ExcDimensionMismatch(
                  mtrx.n(), Tensor<2, dim, Number>::n_independent_components));
-        Assert(
-          mtrx.n_elements() == t.n_independent_components,
-          ExcDimensionMismatch(mtrx.n_elements(), t.n_independent_components));
+        Assert(mtrx.n_elements() == t.n_independent_components,
+               ExcDimensionMismatch(mtrx.n_elements(),
+                                    t.n_independent_components));
 
         const unsigned int n_rows = mtrx.m();
         const unsigned int n_cols = mtrx.n();
@@ -1531,9 +1535,9 @@ namespace Physics
                ExcDimensionMismatch(
                  mtrx.n(),
                  SymmetricTensor<2, dim, Number>::n_independent_components));
-        Assert(
-          mtrx.n_elements() == st.n_independent_components,
-          ExcDimensionMismatch(mtrx.n_elements(), st.n_independent_components));
+        Assert(mtrx.n_elements() == st.n_independent_components,
+               ExcDimensionMismatch(mtrx.n_elements(),
+                                    st.n_independent_components));
 
         const unsigned int n_rows = mtrx.m();
         const unsigned int n_cols = mtrx.n();

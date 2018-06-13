@@ -85,8 +85,9 @@ main()
   VectorTools::interpolate(dof_handler, F(), phi_solution);
 
   gradient_phi.reinit(triangulation.n_active_cells());
-  DerivativeApproximation::approximate_gradient(
-    dof_handler, phi_solution, gradient_phi);
+  DerivativeApproximation::approximate_gradient(dof_handler,
+                                                phi_solution,
+                                                gradient_phi);
 
   gradient_phi_min = 1e30;
   gradient_phi_max = -1;

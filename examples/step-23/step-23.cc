@@ -163,7 +163,8 @@ namespace Step23
   class InitialValuesU : public Function<dim>
   {
   public:
-    InitialValuesU() : Function<dim>()
+    InitialValuesU()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -175,7 +176,8 @@ namespace Step23
   class InitialValuesV : public Function<dim>
   {
   public:
-    InitialValuesV() : Function<dim>()
+    InitialValuesV()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -212,7 +214,8 @@ namespace Step23
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -238,7 +241,8 @@ namespace Step23
   class BoundaryValuesU : public Function<dim>
   {
   public:
-    BoundaryValuesU() : Function<dim>()
+    BoundaryValuesU()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -251,7 +255,8 @@ namespace Step23
   class BoundaryValuesV : public Function<dim>
   {
   public:
-    BoundaryValuesV() : Function<dim>()
+    BoundaryValuesV()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -305,13 +310,13 @@ namespace Step23
   // time step, see the section on Courant, Friedrichs, and Lewy in the
   // introduction):
   template <int dim>
-  WaveEquation<dim>::WaveEquation() :
-    fe(1),
-    dof_handler(triangulation),
-    time_step(1. / 64),
-    time(time_step),
-    timestep_number(1),
-    theta(0.5)
+  WaveEquation<dim>::WaveEquation()
+    : fe(1)
+    , dof_handler(triangulation)
+    , time_step(1. / 64)
+    , time(time_step)
+    , timestep_number(1)
+    , theta(0.5)
   {}
 
 
@@ -369,8 +374,9 @@ namespace Step23
     matrix_v.reinit(sparsity_pattern);
 
     MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(3), laplace_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler,
+                                         QGauss<dim>(3),
+                                         laplace_matrix);
 
     // The rest of the function is spent on setting vector sizes to the
     // correct value. The final line closes the hanging node constraints
@@ -521,14 +527,18 @@ namespace Step23
 
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
-        VectorTools::create_right_hand_side(
-          dof_handler, QGauss<dim>(2), rhs_function, tmp);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(2),
+                                            rhs_function,
+                                            tmp);
         forcing_terms = tmp;
         forcing_terms *= theta * time_step;
 
         rhs_function.set_time(time - time_step);
-        VectorTools::create_right_hand_side(
-          dof_handler, QGauss<dim>(2), rhs_function, tmp);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(2),
+                                            rhs_function,
+                                            tmp);
 
         forcing_terms.add((1 - theta) * time_step, tmp);
 
@@ -546,8 +556,10 @@ namespace Step23
           boundary_values_u_function.set_time(time);
 
           std::map<types::global_dof_index, double> boundary_values;
-          VectorTools::interpolate_boundary_values(
-            dof_handler, 0, boundary_values_u_function, boundary_values);
+          VectorTools::interpolate_boundary_values(dof_handler,
+                                                   0,
+                                                   boundary_values_u_function,
+                                                   boundary_values);
 
           // The matrix for solve_u() is the same in every time steps, so one
           // could think that it is enough to do this only once at the
@@ -559,8 +571,10 @@ namespace Step23
           // it is the sum of the mass matrix and a weighted Laplace matrix:
           matrix_u.copy_from(mass_matrix);
           matrix_u.add(theta * theta * time_step * time_step, laplace_matrix);
-          MatrixTools::apply_boundary_values(
-            boundary_values, matrix_u, solution_u, system_rhs);
+          MatrixTools::apply_boundary_values(boundary_values,
+                                             matrix_u,
+                                             solution_u,
+                                             system_rhs);
         }
         solve_u();
 
@@ -588,11 +602,15 @@ namespace Step23
           boundary_values_v_function.set_time(time);
 
           std::map<types::global_dof_index, double> boundary_values;
-          VectorTools::interpolate_boundary_values(
-            dof_handler, 0, boundary_values_v_function, boundary_values);
+          VectorTools::interpolate_boundary_values(dof_handler,
+                                                   0,
+                                                   boundary_values_v_function,
+                                                   boundary_values);
           matrix_v.copy_from(mass_matrix);
-          MatrixTools::apply_boundary_values(
-            boundary_values, matrix_v, solution_v, system_rhs);
+          MatrixTools::apply_boundary_values(boundary_values,
+                                             matrix_v,
+                                             solution_v,
+                                             system_rhs);
         }
         solve_v();
 

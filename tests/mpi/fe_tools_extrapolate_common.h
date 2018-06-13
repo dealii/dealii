@@ -49,7 +49,9 @@ template <int dim>
 class TestFunction : public Function<dim>
 {
 public:
-  TestFunction(unsigned int deg) : Function<dim>(), degree(deg)
+  TestFunction(unsigned int deg)
+    : Function<dim>()
+    , degree(deg)
   {}
 
   virtual double
@@ -141,8 +143,9 @@ build_ghosted(const IndexSet &owned_indices, const IndexSet &ghosted_indices)
 {
   std::vector<IndexSet> owned_indices_vector(1, owned_indices);
   std::vector<IndexSet> ghosted_indices_vector(1, ghosted_indices);
-  return VectorType(
-    owned_indices_vector, ghosted_indices_vector, MPI_COMM_WORLD);
+  return VectorType(owned_indices_vector,
+                    ghosted_indices_vector,
+                    MPI_COMM_WORLD);
 }
 
 

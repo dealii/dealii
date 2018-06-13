@@ -57,8 +57,10 @@ test()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 1, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           1,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   do_test<dim, fe_degree, float>(dof, constraints);

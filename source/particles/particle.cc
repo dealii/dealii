@@ -20,12 +20,12 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   template <int dim, int spacedim>
-  Particle<dim, spacedim>::Particle() :
-    location(),
-    reference_location(),
-    id(0),
-    property_pool(nullptr),
-    properties(PropertyPool::invalid_handle)
+  Particle<dim, spacedim>::Particle()
+    : location()
+    , reference_location()
+    , id(0)
+    , property_pool(nullptr)
+    , properties(PropertyPool::invalid_handle)
   {}
 
 
@@ -33,25 +33,25 @@ namespace Particles
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle(const Point<spacedim> &location,
                                     const Point<dim> &     reference_location,
-                                    const types::particle_index id) :
-    location(location),
-    reference_location(reference_location),
-    id(id),
-    property_pool(nullptr),
-    properties(PropertyPool::invalid_handle)
+                                    const types::particle_index id)
+    : location(location)
+    , reference_location(reference_location)
+    , id(id)
+    , property_pool(nullptr)
+    , properties(PropertyPool::invalid_handle)
   {}
 
 
 
   template <int dim, int spacedim>
-  Particle<dim, spacedim>::Particle(const Particle<dim, spacedim> &particle) :
-    location(particle.get_location()),
-    reference_location(particle.get_reference_location()),
-    id(particle.get_id()),
-    property_pool(particle.property_pool),
-    properties((particle.has_properties()) ?
-                 property_pool->allocate_properties_array() :
-                 PropertyPool::invalid_handle)
+  Particle<dim, spacedim>::Particle(const Particle<dim, spacedim> &particle)
+    : location(particle.get_location())
+    , reference_location(particle.get_reference_location())
+    , id(particle.get_id())
+    , property_pool(particle.property_pool)
+    , properties((particle.has_properties()) ?
+                   property_pool->allocate_properties_array() :
+                   PropertyPool::invalid_handle)
   {
     if (particle.has_properties())
       {
@@ -105,13 +105,12 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  Particle<dim, spacedim>::Particle(
-    Particle<dim, spacedim> &&particle) noexcept :
-    location(std::move(particle.location)),
-    reference_location(std::move(particle.reference_location)),
-    id(std::move(particle.id)),
-    property_pool(std::move(particle.property_pool)),
-    properties(std::move(particle.properties))
+  Particle<dim, spacedim>::Particle(Particle<dim, spacedim> &&particle) noexcept
+    : location(std::move(particle.location))
+    , reference_location(std::move(particle.reference_location))
+    , id(std::move(particle.id))
+    , property_pool(std::move(particle.property_pool))
+    , properties(std::move(particle.properties))
   {
     particle.properties = PropertyPool::invalid_handle;
   }
@@ -303,8 +302,9 @@ namespace Particles
         "This is not allowed."));
 
     if (old_properties.size() > 0)
-      std::copy(
-        new_properties.begin(), new_properties.end(), old_properties.begin());
+      std::copy(new_properties.begin(),
+                new_properties.end(),
+                old_properties.begin());
   }
 
 

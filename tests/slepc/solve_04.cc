@@ -72,25 +72,35 @@ check_solve(SolverType &              solver,
         check_solver_within_range((void)true, solver_control.last_step(), 5, 5);
         break;
       case 2:
-        check_solver_within_range(
-          (void)true, solver_control.last_step(), 24, 24);
+        check_solver_within_range((void)true,
+                                  solver_control.last_step(),
+                                  24,
+                                  24);
         break;
       case 3:
-        check_solver_within_range(
-          (void)true, solver_control.last_step(), 21, 21);
+        check_solver_within_range((void)true,
+                                  solver_control.last_step(),
+                                  21,
+                                  21);
         break;
       // below the spread is bigger since Slepc 3.8:
       case 4:
-        check_solver_within_range(
-          (void)true, solver_control.last_step(), 119, 128);
+        check_solver_within_range((void)true,
+                                  solver_control.last_step(),
+                                  119,
+                                  128);
         break;
       case 5:
-        check_solver_within_range(
-          (void)true, solver_control.last_step(), 127, 138);
+        check_solver_within_range((void)true,
+                                  solver_control.last_step(),
+                                  127,
+                                  138);
         break;
       case 6:
-        check_solver_within_range(
-          (void)true, solver_control.last_step(), 44, 51);
+        check_solver_within_range((void)true,
+                                  solver_control.last_step(),
+                                  44,
+                                  51);
         break;
       default:
         Assert(false, ExcNotImplemented());
@@ -115,8 +125,10 @@ main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
-    SolverControl control(
-      500, 1e-12 /*1000*PETSC_MACHINE_EPSILON*/, false, false);
+    SolverControl control(500,
+                          1e-12 /*1000*PETSC_MACHINE_EPSILON*/,
+                          false,
+                          false);
 
 
     const unsigned int size = 31;
@@ -158,8 +170,9 @@ main(int argc, char **argv)
 
     {
       SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
-      SLEPcWrappers::SolverGeneralizedDavidson                 solver(
-        control, PETSC_COMM_SELF, data);
+      SLEPcWrappers::SolverGeneralizedDavidson                 solver(control,
+                                                      PETSC_COMM_SELF,
+                                                      data);
       check_solve(solver, 5, control, A, u, v);
     }
 

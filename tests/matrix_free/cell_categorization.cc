@@ -124,9 +124,10 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc,
+                                            argv,
+                                            testing_max_num_threads());
+  MPILogInitAll                    log;
   test<2>();
   test<3>();
 }

@@ -46,8 +46,9 @@ void check(Triangulation<3> &tria)
 
   QGauss<2> q_face(3);
 
-  FEFaceValues<3> fe_face_values(
-    fe, q_face, update_normal_vectors | update_JxW_values);
+  FEFaceValues<3>    fe_face_values(fe,
+                                 q_face,
+                                 update_normal_vectors | update_JxW_values);
   FESubfaceValues<3> fe_subface_values(
     fe, q_face, update_normal_vectors | update_JxW_values);
 

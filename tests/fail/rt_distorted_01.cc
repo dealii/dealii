@@ -66,7 +66,8 @@ template <int dim>
 class TestMap1 : public Function<dim>
 {
 public:
-  TestMap1(const unsigned int n_components) : Function<dim>(n_components)
+  TestMap1(const unsigned int n_components)
+    : Function<dim>(n_components)
   {}
 
   virtual ~TestMap1()
@@ -112,9 +113,9 @@ private:
   const double phi;
 
 public:
-  TestDef1(const unsigned int n_components, const double ph) :
-    Function<dim>(n_components),
-    phi(ph)
+  TestDef1(const unsigned int n_components, const double ph)
+    : Function<dim>(n_components)
+    , phi(ph)
   {}
 
   virtual ~TestDef1()
@@ -168,9 +169,9 @@ private:
   const double scale;
 
 public:
-  TestDef2(const unsigned int n_components, const double sc) :
-    Function<dim>(n_components),
-    scale(sc)
+  TestDef2(const unsigned int n_components, const double sc)
+    : Function<dim>(n_components)
+    , scale(sc)
   {}
 
   virtual ~TestDef2()
@@ -220,9 +221,9 @@ private:
   const double scale;
 
 public:
-  TestDef3(const unsigned int n_components, const double sc) :
-    Function<dim>(n_components),
-    scale(sc)
+  TestDef3(const unsigned int n_components, const double sc)
+    : Function<dim>(n_components)
+    , scale(sc)
   {}
 
   virtual ~TestDef3()
@@ -272,11 +273,11 @@ double EvaluateArea(Mapping<2> &    mapping,
 {
   // Use a high order quadrature.
   QGauss<2>   quad(6);
-  FEValues<2> fe_values(
-    mapping,
-    dof_handler->get_fe(),
-    quad,
-    UpdateFlags(update_values | update_quadrature_points | update_JxW_values));
+  FEValues<2> fe_values(mapping,
+                        dof_handler->get_fe(),
+                        quad,
+                        UpdateFlags(update_values | update_quadrature_points |
+                                    update_JxW_values));
 
   const unsigned int n_q_points   = quad.size();
   const unsigned int n_components = dof_handler->get_fe().n_components();

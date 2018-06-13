@@ -22,9 +22,9 @@ namespace NonMatching
   ImmersedSurfaceQuadrature<dim>::ImmersedSurfaceQuadrature(
     const std::vector<Point<dim>> &    points,
     const std::vector<double> &        weights,
-    const std::vector<Tensor<1, dim>> &normals) :
-    Quadrature<dim>(points, weights),
-    normals(normals)
+    const std::vector<Tensor<1, dim>> &normals)
+    : Quadrature<dim>(points, weights)
+    , normals(normals)
   {
     AssertDimension(weights.size(), points.size());
     AssertDimension(normals.size(), points.size());

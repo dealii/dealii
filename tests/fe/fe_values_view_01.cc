@@ -48,8 +48,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(
-    fe, quadrature, update_values | update_gradients | update_hessians);
+  FEValues<dim>     fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_hessians);
   fe_values.reinit(dof.begin_active());
 
   for (unsigned int c = 0; c < fe.n_components(); ++c)

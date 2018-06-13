@@ -26,11 +26,11 @@ template <int dim>
 AutoDerivativeFunction<dim>::AutoDerivativeFunction(
   const double       hh,
   const unsigned int n_components,
-  const double       initial_time) :
-  Function<dim>(n_components, initial_time),
-  h(1),
-  ht(dim),
-  formula(Euler)
+  const double       initial_time)
+  : Function<dim>(n_components, initial_time)
+  , h(1)
+  , ht(dim)
+  , formula(Euler)
 {
   set_h(hh);
   set_formula();

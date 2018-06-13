@@ -52,8 +52,9 @@ test()
   local_relevant.add_range(min_index + 38, min_index + 40);
   local_relevant.add_range(min_index + 41, min_index + 43);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
 
   deallog << "Local range of proc 0: " << v.local_range().first << " "
           << v.local_range().second << std::endl;

@@ -51,8 +51,9 @@ test()
 
     std::vector<double> properties = {0.15, 0.45, 0.75};
 
-    Particles::Particle<dim, spacedim> particle(
-      position, reference_position, index);
+    Particles::Particle<dim, spacedim> particle(position,
+                                                reference_position,
+                                                index);
     particle.set_property_pool(pool);
     particle.set_properties(
       ArrayView<double>(&properties[0], properties.size()));

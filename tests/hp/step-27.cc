@@ -117,7 +117,8 @@ namespace Step27
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double
@@ -145,9 +146,9 @@ namespace Step27
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    dof_handler(triangulation),
-    max_degree(dim <= 2 ? 7 : 5)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : dof_handler(triangulation)
+    , max_degree(dim <= 2 ? 7 : 5)
   {
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
       {
@@ -163,8 +164,9 @@ namespace Step27
     for (unsigned int i = 0; i < fe_collection.size(); i++)
       fourier_q_collection.push_back(quadrature);
 
-    fourier = std::make_shared<FESeries::Fourier<dim>>(
-      N, fe_collection, fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim>>(N,
+                                                       fe_collection,
+                                                       fourier_q_collection);
     resize(fourier_coefficients, N);
   }
 
@@ -188,8 +190,10 @@ namespace Step27
 
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -323,8 +327,10 @@ namespace Step27
       }
 
     {
-      GridRefinement::refine_and_coarsen_fixed_number(
-        triangulation, estimated_error_per_cell, 0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                      estimated_error_per_cell,
+                                                      0.3,
+                                                      0.03);
 
       float max_smoothness = *std::min_element(smoothness_indicators.begin(),
                                                smoothness_indicators.end()),
@@ -608,12 +614,14 @@ namespace Step27
         local_dof_values.reinit(cell->get_fe().dofs_per_cell);
         cell->get_dof_values(solution, local_dof_values);
 
-        fourier->calculate(
-          local_dof_values, cell->active_fe_index(), fourier_coefficients);
+        fourier->calculate(local_dof_values,
+                           cell->active_fe_index(),
+                           fourier_coefficients);
 
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
-          FESeries::process_coefficients<dim>(
-            fourier_coefficients, predicate_ind<dim>, VectorTools::Linfty_norm);
+          FESeries::process_coefficients<dim>(fourier_coefficients,
+                                              predicate_ind<dim>,
+                                              VectorTools::Linfty_norm);
 
         Assert(res.first.size() == res.second.size(), ExcInternalError());
 

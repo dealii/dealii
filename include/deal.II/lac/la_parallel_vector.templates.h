@@ -64,13 +64,14 @@ namespace LinearAlgebra
     {
       if (new_alloc_size > allocated_size)
         {
-          Assert(
-            ((allocated_size > 0 && values != nullptr) || values == nullptr),
-            ExcInternalError());
+          Assert(((allocated_size > 0 && values != nullptr) ||
+                  values == nullptr),
+                 ExcInternalError());
 
           Number *new_val;
-          Utilities::System::posix_memalign(
-            (void **)&new_val, 64, sizeof(Number) * new_alloc_size);
+          Utilities::System::posix_memalign((void **)&new_val,
+                                            64,
+                                            sizeof(Number) * new_alloc_size);
           values.reset(new_val);
 
           allocated_size = new_alloc_size;
@@ -156,8 +157,9 @@ namespace LinearAlgebra
     {
       // set up parallel partitioner with index sets and communicator
       std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner(
-        new Utilities::MPI::Partitioner(
-          locally_owned_indices, ghost_indices, communicator));
+        new Utilities::MPI::Partitioner(locally_owned_indices,
+                                        ghost_indices,
+                                        communicator));
       reinit(new_partitioner);
     }
 
@@ -205,10 +207,10 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number>::Vector() :
-      partitioner(new Utilities::MPI::Partitioner()),
-      allocated_size(0),
-      values(nullptr, &free)
+    Vector<Number>::Vector()
+      : partitioner(new Utilities::MPI::Partitioner())
+      , allocated_size(0)
+      , values(nullptr, &free)
     {
       reinit(0);
     }
@@ -216,11 +218,11 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number>::Vector(const Vector<Number> &v) :
-      Subscriptor(),
-      allocated_size(0),
-      values(nullptr, &free),
-      vector_is_ghosted(false)
+    Vector<Number>::Vector(const Vector<Number> &v)
+      : Subscriptor()
+      , allocated_size(0)
+      , values(nullptr, &free)
+      , vector_is_ghosted(false)
     {
       reinit(v, true);
 
@@ -231,8 +233,10 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::Vector_copy<Number, Number>
             copier(v.values.get(), values.get());
-          internal::VectorOperations::parallel_for(
-            copier, 0, partitioner->local_size(), thread_loop_partitioner);
+          internal::VectorOperations::parallel_for(copier,
+                                                   0,
+                                                   partitioner->local_size(),
+                                                   thread_loop_partitioner);
         }
     }
 
@@ -241,10 +245,10 @@ namespace LinearAlgebra
     template <typename Number>
     Vector<Number>::Vector(const IndexSet &local_range,
                            const IndexSet &ghost_indices,
-                           const MPI_Comm  communicator) :
-      allocated_size(0),
-      values(nullptr, &free),
-      vector_is_ghosted(false)
+                           const MPI_Comm  communicator)
+      : allocated_size(0)
+      , values(nullptr, &free)
+      , vector_is_ghosted(false)
     {
       reinit(local_range, ghost_indices, communicator);
     }
@@ -253,10 +257,10 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::Vector(const IndexSet &local_range,
-                           const MPI_Comm  communicator) :
-      allocated_size(0),
-      values(nullptr, &free),
-      vector_is_ghosted(false)
+                           const MPI_Comm  communicator)
+      : allocated_size(0)
+      , values(nullptr, &free)
+      , vector_is_ghosted(false)
     {
       reinit(local_range, communicator);
     }
@@ -264,10 +268,10 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number>::Vector(const size_type size) :
-      allocated_size(0),
-      values(nullptr, &free),
-      vector_is_ghosted(false)
+    Vector<Number>::Vector(const size_type size)
+      : allocated_size(0)
+      , values(nullptr, &free)
+      , vector_is_ghosted(false)
     {
       reinit(size, false);
     }
@@ -276,10 +280,10 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::Vector(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner) :
-      allocated_size(0),
-      values(nullptr, &free),
-      vector_is_ghosted(false)
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
+      : allocated_size(0)
+      , values(nullptr, &free)
+      , vector_is_ghosted(false)
     {
       reinit(partitioner);
     }
@@ -368,8 +372,10 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::Vector_copy<Number, Number2>
             copier(c.values.get(), values.get());
-          internal::VectorOperations::parallel_for(
-            copier, 0, this_size, thread_loop_partitioner);
+          internal::VectorOperations::parallel_for(copier,
+                                                   0,
+                                                   this_size,
+                                                   thread_loop_partitioner);
         }
 
       if (must_update_ghost_values)
@@ -391,8 +397,10 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::Vector_copy<Number, Number2>
             copier(src.values.get(), values.get());
-          internal::VectorOperations::parallel_for(
-            copier, 0, partitioner->local_size(), thread_loop_partitioner);
+          internal::VectorOperations::parallel_for(copier,
+                                                   0,
+                                                   partitioner->local_size(),
+                                                   thread_loop_partitioner);
         }
     }
 
@@ -449,8 +457,9 @@ namespace LinearAlgebra
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       const size_type vec_size = local_size();
-      petsc_helpers::copy_petsc_vector(
-        start_ptr, start_ptr + vec_size, begin());
+      petsc_helpers::copy_petsc_vector(start_ptr,
+                                       start_ptr + vec_size,
+                                       begin());
 
       // restore the representation of the vector
       ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
@@ -722,10 +731,10 @@ namespace LinearAlgebra
                                            &flag,
                                            MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
-              Assert(
-                flag == 1,
-                ExcMessage("MPI found unfinished update_ghost_values() requests"
-                           "when calling swap, which is not allowed"));
+              Assert(flag == 1,
+                     ExcMessage(
+                       "MPI found unfinished update_ghost_values() requests"
+                       "when calling swap, which is not allowed"));
             }
           if (compress_requests.size() > 0)
             {
@@ -765,8 +774,10 @@ namespace LinearAlgebra
           internal::VectorOperations::Vector_set<Number> setter(s,
                                                                 values.get());
 
-          internal::VectorOperations::parallel_for(
-            setter, 0, this_size, thread_loop_partitioner);
+          internal::VectorOperations::parallel_for(setter,
+                                                   0,
+                                                   this_size,
+                                                   thread_loop_partitioner);
         }
 
       // if we call Vector::operator=0, we want to zero out all the entries
@@ -807,8 +818,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_add_v<Number> vector_add(
         values.get(), v.values.get());
-      internal::VectorOperations::parallel_for(
-        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_add,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -831,8 +844,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_subtract_v<Number>
         vector_subtract(values.get(), v.values.get());
-      internal::VectorOperations::parallel_for(
-        vector_subtract, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_subtract,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -850,8 +865,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_add_factor<Number> vector_add(
         values.get(), a);
-      internal::VectorOperations::parallel_for(
-        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_add,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -878,8 +895,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_add_av<Number> vector_add(
         values.get(), v.values.get(), a);
-      internal::VectorOperations::parallel_for(
-        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_add,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
     }
 
 
@@ -919,8 +938,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(
         values.get(), v.values.get(), w.values.get(), a, b);
-      internal::VectorOperations::parallel_for(
-        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_add,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -950,8 +971,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(
         values.get(), v.values.get(), x);
-      internal::VectorOperations::parallel_for(
-        vector_sadd, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_sadd,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -976,8 +999,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd(
         values.get(), v.values.get(), a, x);
-      internal::VectorOperations::parallel_for(
-        vector_sadd, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_sadd,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
     }
 
 
@@ -1013,8 +1038,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_sadd_xavbw<Number> vector_sadd(
         values.get(), v.values.get(), w.values.get(), x, a, b);
-      internal::VectorOperations::parallel_for(
-        vector_sadd, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_sadd,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1030,8 +1057,10 @@ namespace LinearAlgebra
       internal::VectorOperations::Vectorization_multiply_factor<Number>
         vector_multiply(values.get(), factor);
 
-      internal::VectorOperations::parallel_for(
-        vector_multiply, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_multiply,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1064,8 +1093,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_scale<Number> vector_scale(
         values.get(), v.values.get());
-      internal::VectorOperations::parallel_for(
-        vector_scale, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_scale,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1087,8 +1118,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
         values.get(), v.values.get(), a);
-      internal::VectorOperations::parallel_for(
-        vector_equ, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_equ,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1111,8 +1144,10 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_equ_aubv<Number> vector_equ(
         values.get(), v.values.get(), w.values.get(), a, b);
-      internal::VectorOperations::parallel_for(
-        vector_equ, 0, partitioner->local_size(), thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_equ,
+                                               0,
+                                               partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1363,8 +1398,10 @@ namespace LinearAlgebra
       AssertDimension(vec_size, w.local_size());
 
       Number                                        sum;
-      internal::VectorOperations::AddAndDot<Number> adder(
-        this->values.get(), v.values.get(), w.values.get(), a);
+      internal::VectorOperations::AddAndDot<Number> adder(this->values.get(),
+                                                          v.values.get(),
+                                                          w.values.get(),
+                                                          a);
       internal::VectorOperations::parallel_reduce(
         adder, 0, vec_size, sum, thread_loop_partitioner);
       AssertIsFinite(sum);

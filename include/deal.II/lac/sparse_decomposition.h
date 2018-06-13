@@ -420,11 +420,11 @@ SparseLUDecomposition<number>::AdditionalData::AdditionalData(
   const double           strengthen_diag,
   const unsigned int     extra_off_diag,
   const bool             use_prev_sparsity,
-  const SparsityPattern *use_this_spars) :
-  strengthen_diagonal(strengthen_diag),
-  extra_off_diagonals(extra_off_diag),
-  use_previous_sparsity(use_prev_sparsity),
-  use_this_sparsity(use_this_spars)
+  const SparsityPattern *use_this_spars)
+  : strengthen_diagonal(strengthen_diag)
+  , extra_off_diagonals(extra_off_diag)
+  , use_previous_sparsity(use_prev_sparsity)
+  , use_this_sparsity(use_this_spars)
 {}
 
 

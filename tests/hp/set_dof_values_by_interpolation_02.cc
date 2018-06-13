@@ -93,8 +93,9 @@ test()
       cell->set_dof_values_by_interpolation(local, solution1);
 
       // then do the same with the "correct", local fe_index
-      cell->set_dof_values_by_interpolation(
-        local, solution2, cell->active_fe_index());
+      cell->set_dof_values_by_interpolation(local,
+                                            solution2,
+                                            cell->active_fe_index());
 
       // now verify correctness
       AssertThrow(solution1 == solution2, ExcInternalError());

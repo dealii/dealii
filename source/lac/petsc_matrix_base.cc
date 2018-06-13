@@ -73,9 +73,9 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::MatrixBase() :
-    matrix(nullptr),
-    last_action(VectorOperation::unknown)
+  MatrixBase::MatrixBase()
+    : matrix(nullptr)
+    , last_action(VectorOperation::unknown)
   {}
 
 

@@ -38,9 +38,9 @@ class DataOutX : public DataOutInterface<dim, spacedim>
 {
 public:
   DataOutX(const std::vector<::DataOutBase::Patch<dim, spacedim>> &patches,
-           const std::vector<std::string> &                        names) :
-    patches(patches),
-    names(names)
+           const std::vector<std::string> &                        names)
+    : patches(patches)
+    , names(names)
   {}
 
   virtual const std::vector<::DataOutBase::Patch<dim, spacedim>> &

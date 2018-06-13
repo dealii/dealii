@@ -103,8 +103,10 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping, dummy, quad, update_inverse_jacobians);
-    FESubfaceValues<dim> fe_sub_val(
-      mapping, dummy, quad, update_inverse_jacobians);
+    FESubfaceValues<dim> fe_sub_val(mapping,
+                                    dummy,
+                                    quad,
+                                    update_inverse_jacobians);
 
     deallog << dim << "D inverse Jacobians:" << std::endl;
     typename Triangulation<dim>::active_cell_iterator cell =
@@ -139,8 +141,10 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping, dummy, quad, update_jacobian_grads);
-    FESubfaceValues<dim> fe_sub_val(
-      mapping, dummy, quad, update_jacobian_grads);
+    FESubfaceValues<dim> fe_sub_val(mapping,
+                                    dummy,
+                                    quad,
+                                    update_jacobian_grads);
 
     deallog << dim << "D Jacobian gradients:" << std::endl;
     typename Triangulation<dim>::active_cell_iterator cell =
@@ -176,10 +180,14 @@ test()
   }
 
   {
-    FEFaceValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_grads);
-    FESubfaceValues<dim> fe_sub_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_grads);
+    FEFaceValues<dim>    fe_val(mapping,
+                             dummy,
+                             quad,
+                             update_jacobian_pushed_forward_grads);
+    FESubfaceValues<dim> fe_sub_val(mapping,
+                                    dummy,
+                                    quad,
+                                    update_jacobian_pushed_forward_grads);
 
     deallog << dim << "D Jacobian pushed forward gradients:" << std::endl;
     typename Triangulation<dim>::active_cell_iterator cell =
@@ -218,10 +226,14 @@ test()
   }
 
   {
-    FEFaceValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_2nd_derivatives);
-    FESubfaceValues<dim> fe_sub_val(
-      mapping, dummy, quad, update_jacobian_2nd_derivatives);
+    FEFaceValues<dim>    fe_val(mapping,
+                             dummy,
+                             quad,
+                             update_jacobian_2nd_derivatives);
+    FESubfaceValues<dim> fe_sub_val(mapping,
+                                    dummy,
+                                    quad,
+                                    update_jacobian_2nd_derivatives);
 
     deallog << dim << "D Jacobian hessians:" << std::endl;
     typename Triangulation<dim>::active_cell_iterator cell =
@@ -262,8 +274,10 @@ test()
   }
 
   {
-    FEFaceValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
+    FEFaceValues<dim>    fe_val(mapping,
+                             dummy,
+                             quad,
+                             update_jacobian_pushed_forward_2nd_derivatives);
     FESubfaceValues<dim> fe_sub_val(
       mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
 
@@ -308,10 +322,14 @@ test()
   }
 
   {
-    FEFaceValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_3rd_derivatives);
-    FESubfaceValues<dim> fe_sub_val(
-      mapping, dummy, quad, update_jacobian_3rd_derivatives);
+    FEFaceValues<dim>    fe_val(mapping,
+                             dummy,
+                             quad,
+                             update_jacobian_3rd_derivatives);
+    FESubfaceValues<dim> fe_sub_val(mapping,
+                                    dummy,
+                                    quad,
+                                    update_jacobian_3rd_derivatives);
 
     deallog << dim << "D Jacobian hessian gradients:" << std::endl;
     typename Triangulation<dim>::active_cell_iterator cell =
@@ -354,8 +372,10 @@ test()
   }
 
   {
-    FEFaceValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
+    FEFaceValues<dim>    fe_val(mapping,
+                             dummy,
+                             quad,
+                             update_jacobian_pushed_forward_3rd_derivatives);
     FESubfaceValues<dim> fe_sub_val(
       mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
 

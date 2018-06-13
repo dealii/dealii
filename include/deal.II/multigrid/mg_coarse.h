@@ -333,14 +333,14 @@ private:
 #ifndef DOXYGEN
 /* ------------------ Functions for MGCoarseGridApplySmoother -----------*/
 template <class VectorType>
-MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother() :
-  coarse_smooth(nullptr)
+MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother()
+  : coarse_smooth(nullptr)
 {}
 
 template <class VectorType>
 MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother(
-  const MGSmootherBase<VectorType> &coarse_smooth) :
-  coarse_smooth(nullptr)
+  const MGSmootherBase<VectorType> &coarse_smooth)
+  : coarse_smooth(nullptr)
 {
   initialize(coarse_smooth);
 }
@@ -351,9 +351,10 @@ void
 MGCoarseGridApplySmoother<VectorType>::initialize(
   const MGSmootherBase<VectorType> &coarse_smooth_)
 {
-  coarse_smooth = SmartPointer<const MGSmootherBase<VectorType>,
-                               MGCoarseGridApplySmoother<VectorType>>(
-    &coarse_smooth_, typeid(*this).name());
+  coarse_smooth =
+    SmartPointer<const MGSmootherBase<VectorType>,
+                 MGCoarseGridApplySmoother<VectorType>>(&coarse_smooth_,
+                                                        typeid(*this).name());
 }
 
 
@@ -378,10 +379,10 @@ MGCoarseGridApplySmoother<VectorType>::operator()(const unsigned int level,
 
 
 template <typename SolverType, class VectorType>
-MGCoarseGridLACIteration<SolverType, VectorType>::MGCoarseGridLACIteration() :
-  solver(0, typeid(*this).name()),
-  matrix(0),
-  precondition(0)
+MGCoarseGridLACIteration<SolverType, VectorType>::MGCoarseGridLACIteration()
+  : solver(0, typeid(*this).name())
+  , matrix(0)
+  , precondition(0)
 {}
 
 
@@ -390,8 +391,8 @@ template <typename MatrixType, typename PreconditionerType>
 MGCoarseGridLACIteration<SolverType, VectorType>::MGCoarseGridLACIteration(
   SolverType &              s,
   const MatrixType &        m,
-  const PreconditionerType &p) :
-  solver(&s, typeid(*this).name())
+  const PreconditionerType &p)
+  : solver(&s, typeid(*this).name())
 {
   // Workaround: Unfortunately, not every "m" object has a rich enough
   // interface to populate reinit_(domain|range)_vector. Thus, supply an
@@ -470,10 +471,10 @@ template <class VectorType,
 MGCoarseGridIterativeSolver<VectorType,
                             SolverType,
                             MatrixType,
-                            PreconditionerType>::MGCoarseGridIterativeSolver() :
-  solver(0, typeid(*this).name()),
-  matrix(0, typeid(*this).name()),
-  preconditioner(0, typeid(*this).name())
+                            PreconditionerType>::MGCoarseGridIterativeSolver()
+  : solver(0, typeid(*this).name())
+  , matrix(0, typeid(*this).name())
+  , preconditioner(0, typeid(*this).name())
 {}
 
 
@@ -488,10 +489,10 @@ MGCoarseGridIterativeSolver<VectorType,
                             PreconditionerType>::
   MGCoarseGridIterativeSolver(SolverType &              solver,
                               const MatrixType &        matrix,
-                              const PreconditionerType &preconditioner) :
-  solver(&solver, typeid(*this).name()),
-  matrix(&matrix, typeid(*this).name()),
-  preconditioner(&preconditioner, typeid(*this).name())
+                              const PreconditionerType &preconditioner)
+  : solver(&solver, typeid(*this).name())
+  , matrix(&matrix, typeid(*this).name())
+  , preconditioner(&preconditioner, typeid(*this).name())
 {}
 
 

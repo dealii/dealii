@@ -88,7 +88,8 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  Coefficient() : Function<dim>()
+  Coefficient()
+    : Function<dim>()
   {}
 
   virtual double
@@ -136,7 +137,9 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() : fe(1), dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -151,14 +154,18 @@ LaplaceProblem<dim>::setup_system()
           << std::endl;
 
   constraints.clear();
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ConstantFunction<dim>(1), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ConstantFunction<dim>(1),
+                                           constraints);
   constraints.close();
   sparsity_pattern.reinit(dof_handler.n_dofs(),
                           dof_handler.n_dofs(),
                           dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern(
-    dof_handler, sparsity_pattern, constraints, false);
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  sparsity_pattern,
+                                  constraints,
+                                  false);
   sparsity_pattern.compress();
 
   system_matrix.reinit(sparsity_pattern);
@@ -231,8 +238,10 @@ LaplaceProblem<dim>::assemble_system()
       // now do just the right hand side (with
       // local matrix for eliminating
       // inhomogeneities)
-      constraints.distribute_local_to_global(
-        cell_rhs, local_dof_indices, test, cell_matrix);
+      constraints.distribute_local_to_global(cell_rhs,
+                                             local_dof_indices,
+                                             test,
+                                             cell_matrix);
     }
 
   // and compare whether we really got the

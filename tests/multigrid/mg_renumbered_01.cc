@@ -195,12 +195,12 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const unsigned int deg) :
-  triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-  fe(FE_Q<dim>(deg), 2, FE_Q<dim>(deg), 2),
-  mg_dof_handler(triangulation),
-  mg_dof_handler_renumbered(triangulation),
-  degree(deg)
+LaplaceProblem<dim>::LaplaceProblem(const unsigned int deg)
+  : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+  , fe(FE_Q<dim>(deg), 2, FE_Q<dim>(deg), 2)
+  , mg_dof_handler(triangulation)
+  , mg_dof_handler_renumbered(triangulation)
+  , degree(deg)
 {}
 
 
@@ -224,8 +224,9 @@ LaplaceProblem<dim>::setup_system()
   // DoFRenumbering::Cuthill_McKee (dof);
   for (unsigned int level = 0; level < nlevels; ++level)
     {
-      DoFRenumbering::component_wise(
-        mg_dof_handler_renumbered, level, block_component);
+      DoFRenumbering::component_wise(mg_dof_handler_renumbered,
+                                     level,
+                                     block_component);
       // DoFRenumbering::Cuthill_McKee (mg_dof_handler_renumbered, level);
     }
 
@@ -261,8 +262,9 @@ LaplaceProblem<dim>::setup_system()
         mg_dof_handler_renumbered.n_dofs(level),
         mg_dof_handler_renumbered.max_couplings_between_dofs());
       MGTools::make_sparsity_pattern(mg_dof_handler, mg_sparsity[level], level);
-      MGTools::make_sparsity_pattern(
-        mg_dof_handler_renumbered, mg_sparsity_renumbered[level], level);
+      MGTools::make_sparsity_pattern(mg_dof_handler_renumbered,
+                                     mg_sparsity_renumbered[level],
+                                     level);
       mg_sparsity[level].compress();
       mg_sparsity_renumbered[level].compress();
       mg_matrices[level].reinit(mg_sparsity[level]);
@@ -284,15 +286,17 @@ LaplaceProblem<dim>::test_interface_dofs()
       boundary_interface_dofs.push_back(tmp);
     }
 
-  MGTools::extract_inner_interface_dofs(
-    mg_dof_handler_renumbered, interface_dofs, boundary_interface_dofs);
+  MGTools::extract_inner_interface_dofs(mg_dof_handler_renumbered,
+                                        interface_dofs,
+                                        boundary_interface_dofs);
   deallog << "1. Test" << std::endl;
   print(mg_dof_handler_renumbered, interface_dofs);
 
   deallog << std::endl;
 
-  MGTools::extract_inner_interface_dofs(
-    mg_dof_handler, interface_dofs, boundary_interface_dofs);
+  MGTools::extract_inner_interface_dofs(mg_dof_handler,
+                                        interface_dofs,
+                                        boundary_interface_dofs);
 
   deallog << "2. Test" << std::endl;
   print(mg_dof_handler, interface_dofs);
@@ -406,8 +410,9 @@ LaplaceProblem<dim>::test()
     preconditioner(mg_dof_handler, mg, mg_transfer);
 
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
-    preconditioner_renumbered(
-      mg_dof_handler_renumbered, mg_renumbered, mg_transfer_renumbered);
+    preconditioner_renumbered(mg_dof_handler_renumbered,
+                              mg_renumbered,
+                              mg_transfer_renumbered);
 
   Vector<double> test, dst, dst_renumbered;
   test.reinit(mg_dof_handler.n_dofs());

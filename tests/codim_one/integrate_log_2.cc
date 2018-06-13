@@ -93,8 +93,10 @@ main()
               for (unsigned int nq = 2; nq < 13; ++nq)
                 {
                   QGaussLogR<1> quad(nq, origins[nos], alphas[nas]);
-                  QGaussLogR<1> factored_quad(
-                    nq, origins[nos], alphas[nas], true);
+                  QGaussLogR<1> factored_quad(nq,
+                                              origins[nos],
+                                              alphas[nas],
+                                              true);
 
                   double approx_integral          = 0;
                   double approx_integral_factored = 0;

@@ -147,8 +147,9 @@ private:
 
 
 template <int dim>
-TestPointValueHistory<dim>::TestPointValueHistory() :
-  finite_element(FE_Q<dim>(1 + 1), dim, FE_Q<dim>(1), 1),
+TestPointValueHistory<dim>::TestPointValueHistory()
+  : finite_element(FE_Q<dim>(1 + 1), dim, FE_Q<dim>(1), 1)
+  ,
 
   dof_handler(triangulation)
 {}
@@ -353,8 +354,10 @@ TestPointValueHistory<dim>::run()
       std::vector<std::string> names;
       names.emplace_back("Vector_out");
       names.emplace_back("Scalar_out");
-      node_monitor.evaluate_field(
-        names, solution, postprocessor, postprocess_quadrature);
+      node_monitor.evaluate_field(names,
+                                  solution,
+                                  postprocessor,
+                                  postprocess_quadrature);
       //         output_results (step, solution);
       step++;
 

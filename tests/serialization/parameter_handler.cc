@@ -45,11 +45,15 @@ test()
   // things with strange characters
   prm1.enter_subsection("Testing%testing");
   {
-    prm1.declare_entry(
-      "string&list", "< & > ; /", Patterns::Anything(), "docs 1");
+    prm1.declare_entry("string&list",
+                       "< & > ; /",
+                       Patterns::Anything(),
+                       "docs 1");
     prm1.declare_entry("int*int", "2", Patterns::Integer());
-    prm1.declare_entry(
-      "double+double", "6.1415926", Patterns::Double(), "docs 3");
+    prm1.declare_entry("double+double",
+                       "6.1415926",
+                       Patterns::Double(),
+                       "docs 3");
   }
   prm1.leave_subsection();
 
@@ -70,8 +74,10 @@ test()
   prm2.enter_subsection("Testing%testing");
   {
     prm2.declare_entry("int*int", "2", Patterns::Integer());
-    prm2.declare_entry(
-      "string&list", "< & > ; /", Patterns::Anything(), "docs 1");
+    prm2.declare_entry("string&list",
+                       "< & > ; /",
+                       Patterns::Anything(),
+                       "docs 1");
   }
   prm2.leave_subsection();
 

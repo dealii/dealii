@@ -88,8 +88,10 @@ test()
 
   MappingQGeneric<dim> mapping(1);
   Vector<float>        indicators(tr.n_active_cells());
-  DerivativeApproximation::approximate_gradient(
-    mapping, dofh, vec_rel, indicators);
+  DerivativeApproximation::approximate_gradient(mapping,
+                                                dofh,
+                                                vec_rel,
+                                                indicators);
 
   // we got here, so no exception.
   if (myid == 0)

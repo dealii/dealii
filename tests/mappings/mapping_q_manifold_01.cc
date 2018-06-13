@@ -113,7 +113,8 @@ template <int dim>
 class VectorFunction : public Function<dim>
 {
 public:
-  VectorFunction(unsigned n_components) : Function<dim>(n_components)
+  VectorFunction(unsigned n_components)
+    : Function<dim>(n_components)
   {}
   virtual double
   value(const Point<dim> &p, const unsigned int component) const;

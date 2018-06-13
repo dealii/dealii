@@ -409,11 +409,11 @@ private:
 template <int dim, typename PolynomialType>
 template <class Pol>
 inline TensorProductPolynomials<dim, PolynomialType>::TensorProductPolynomials(
-  const std::vector<Pol> &pols) :
-  polynomials(pols.begin(), pols.end()),
-  n_tensor_pols(Utilities::fixed_power<dim>(pols.size())),
-  index_map(n_tensor_pols),
-  index_map_inverse(n_tensor_pols)
+  const std::vector<Pol> &pols)
+  : polynomials(pols.begin(), pols.end())
+  , n_tensor_pols(Utilities::fixed_power<dim>(pols.size()))
+  , index_map(n_tensor_pols)
+  , index_map_inverse(n_tensor_pols)
 {
   // per default set this index map to identity. This map can be changed by
   // the user through the set_numbering() function

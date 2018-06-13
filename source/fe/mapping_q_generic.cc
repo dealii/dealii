@@ -648,11 +648,11 @@ namespace internal
 
 template <int dim, int spacedim>
 MappingQGeneric<dim, spacedim>::InternalData::InternalData(
-  const unsigned int polynomial_degree) :
-  polynomial_degree(polynomial_degree),
-  n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1)),
-  line_support_points(QGaussLobatto<1>(polynomial_degree + 1)),
-  tensor_product_quadrature(false)
+  const unsigned int polynomial_degree)
+  : polynomial_degree(polynomial_degree)
+  , n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1))
+  , line_support_points(QGaussLobatto<1>(polynomial_degree + 1))
+  , tensor_product_quadrature(false)
 {}
 
 
@@ -1133,8 +1133,9 @@ namespace internal
                          GeometryInfo<1>::vertices_per_cell);
         for (unsigned int q = 0; q < polynomial_degree - 1; ++q)
           for (unsigned int i = 0; i < GeometryInfo<1>::vertices_per_cell; ++i)
-            output[0](q, i) = GeometryInfo<1>::d_linear_shape_function(
-              quadrature.point(q + 1), i);
+            output[0](q, i) =
+              GeometryInfo<1>::d_linear_shape_function(quadrature.point(q + 1),
+                                                       i);
 
         if (dim > 1)
           output[1] = compute_support_point_weights_on_quad(polynomial_degree);
@@ -2254,18 +2255,18 @@ namespace internal
 
 
 template <int dim, int spacedim>
-MappingQGeneric<dim, spacedim>::MappingQGeneric(const unsigned int p) :
-  polynomial_degree(p),
-  line_support_points(this->polynomial_degree + 1),
-  fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : nullptr),
-  support_point_weights_perimeter_to_interior(
-    internal::MappingQGenericImplementation::
-      compute_support_point_weights_perimeter_to_interior(
-        this->polynomial_degree,
-        dim)),
-  support_point_weights_cell(
-    internal::MappingQGenericImplementation::compute_support_point_weights_cell<
-      dim>(this->polynomial_degree))
+MappingQGeneric<dim, spacedim>::MappingQGeneric(const unsigned int p)
+  : polynomial_degree(p)
+  , line_support_points(this->polynomial_degree + 1)
+  , fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : nullptr)
+  , support_point_weights_perimeter_to_interior(
+      internal::MappingQGenericImplementation::
+        compute_support_point_weights_perimeter_to_interior(
+          this->polynomial_degree,
+          dim))
+  , support_point_weights_cell(
+      internal::MappingQGenericImplementation::
+        compute_support_point_weights_cell<dim>(this->polynomial_degree))
 {
   Assert(p >= 1,
          ExcMessage("It only makes sense to create polynomial mappings "
@@ -2276,13 +2277,13 @@ MappingQGeneric<dim, spacedim>::MappingQGeneric(const unsigned int p) :
 
 template <int dim, int spacedim>
 MappingQGeneric<dim, spacedim>::MappingQGeneric(
-  const MappingQGeneric<dim, spacedim> &mapping) :
-  polynomial_degree(mapping.polynomial_degree),
-  line_support_points(mapping.line_support_points),
-  fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : nullptr),
-  support_point_weights_perimeter_to_interior(
-    mapping.support_point_weights_perimeter_to_interior),
-  support_point_weights_cell(mapping.support_point_weights_cell)
+  const MappingQGeneric<dim, spacedim> &mapping)
+  : polynomial_degree(mapping.polynomial_degree)
+  , line_support_points(mapping.line_support_points)
+  , fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : nullptr)
+  , support_point_weights_perimeter_to_interior(
+      mapping.support_point_weights_perimeter_to_interior)
+  , support_point_weights_cell(mapping.support_point_weights_cell)
 {}
 
 
@@ -2473,8 +2474,10 @@ MappingQGeneric<1, 2>::transform_real_to_unit_cell_internal(
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::
-    do_transform_real_to_unit_cell_internal_codim1<1>(
-      cell, p, initial_p_unit, *mdata);
+    do_transform_real_to_unit_cell_internal_codim1<1>(cell,
+                                                      p,
+                                                      initial_p_unit,
+                                                      *mdata);
 }
 
 
@@ -2502,8 +2505,10 @@ MappingQGeneric<2, 3>::transform_real_to_unit_cell_internal(
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::
-    do_transform_real_to_unit_cell_internal_codim1<2>(
-      cell, p, initial_p_unit, *mdata);
+    do_transform_real_to_unit_cell_internal_codim1<2>(cell,
+                                                      p,
+                                                      initial_p_unit,
+                                                      *mdata);
 }
 
 template <>
@@ -2647,8 +2652,9 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell(
       // perform the Newton iteration and return the result. note that this
       // statement may throw an exception, which we simply pass up to the
       // caller
-      return this->transform_real_to_unit_cell_internal(
-        cell, p, initial_p_unit);
+      return this->transform_real_to_unit_cell_internal(cell,
+                                                        p,
+                                                        initial_p_unit);
     }
 }
 
@@ -2816,12 +2822,12 @@ MappingQGeneric<dim, spacedim>::fill_fe_values(
         QProjector<dim>::DataSetDescriptor::cell(),
         data);
 
-      internal::MappingQGenericImplementation::
-        maybe_update_jacobian_grads<dim, spacedim>(
-          computed_cell_similarity,
-          QProjector<dim>::DataSetDescriptor::cell(),
-          data,
-          output_data.jacobian_grads);
+      internal::MappingQGenericImplementation::maybe_update_jacobian_grads<
+        dim,
+        spacedim>(computed_cell_similarity,
+                  QProjector<dim>::DataSetDescriptor::cell(),
+                  data,
+                  output_data.jacobian_grads);
     }
 
   internal::MappingQGenericImplementation::
@@ -2869,10 +2875,10 @@ MappingQGeneric<dim, spacedim>::fill_fe_values(
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(
-        !(update_flags & update_normal_vectors) ||
-          (output_data.normal_vectors.size() == n_q_points),
-        ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
+      Assert(!(update_flags & update_normal_vectors) ||
+               (output_data.normal_vectors.size() == n_q_points),
+             ExcDimensionMismatch(output_data.normal_vectors.size(),
+                                  n_q_points));
 
 
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -3190,8 +3196,9 @@ namespace internal
           {
             maybe_compute_q_points<dim, spacedim>(
               data_set, data, output_data.quadrature_points);
-            maybe_update_Jacobians<dim, spacedim>(
-              CellSimilarity::none, data_set, data);
+            maybe_update_Jacobians<dim, spacedim>(CellSimilarity::none,
+                                                  data_set,
+                                                  data);
             maybe_update_jacobian_grads<dim, spacedim>(
               CellSimilarity::none, data_set, data, output_data.jacobian_grads);
           }
@@ -3344,10 +3351,10 @@ namespace internal
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingQGeneric<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
@@ -3422,10 +3429,10 @@ namespace internal
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingQGeneric<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
@@ -3447,8 +3454,9 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A = apply_transformation(
-                      data.contravariant[i], transpose(input[i]));
+                    DerivativeForm<1, spacedim, dim> A =
+                      apply_transformation(data.contravariant[i],
+                                           transpose(input[i]));
                     output[i] =
                       apply_transformation(data.covariant[i], A.transpose());
                   }
@@ -3466,8 +3474,9 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A = apply_transformation(
-                      data.covariant[i], transpose(input[i]));
+                    DerivativeForm<1, spacedim, dim> A =
+                      apply_transformation(data.covariant[i],
+                                           transpose(input[i]));
                     output[i] =
                       apply_transformation(data.covariant[i], A.transpose());
                   }
@@ -3495,8 +3504,9 @@ namespace internal
                   {
                     DerivativeForm<1, spacedim, dim> A =
                       apply_transformation(data.covariant[i], input[i]);
-                    Tensor<2, spacedim> T = apply_transformation(
-                      data.contravariant[i], A.transpose());
+                    Tensor<2, spacedim> T =
+                      apply_transformation(data.contravariant[i],
+                                           A.transpose());
 
                     output[i] = transpose(T);
                     output[i] /= data.volume_elements[i];
@@ -3521,10 +3531,10 @@ namespace internal
         const ArrayView<Tensor<3, spacedim>> &                   output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingQGeneric<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
@@ -3690,10 +3700,10 @@ namespace internal
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingQGeneric<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
@@ -3731,8 +3741,10 @@ MappingQGeneric<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
-  internal::MappingQGenericImplementation::transform_fields(
-    input, mapping_type, mapping_data, output);
+  internal::MappingQGenericImplementation::transform_fields(input,
+                                                            mapping_type,
+                                                            mapping_data,
+                                                            output);
 }
 
 
@@ -3762,8 +3774,10 @@ MappingQGeneric<dim, spacedim>::transform(
   switch (mapping_type)
     {
       case mapping_contravariant:
-        internal::MappingQGenericImplementation::transform_fields(
-          input, mapping_type, mapping_data, output);
+        internal::MappingQGenericImplementation::transform_fields(input,
+                                                                  mapping_type,
+                                                                  mapping_data,
+                                                                  output);
         return;
 
       case mapping_piola_gradient:
@@ -4066,10 +4080,10 @@ MappingQGeneric<dim, spacedim>::compute_mapping_support_points(
           const std::size_t n_rows = support_point_weights_cell.size(0);
           a.resize(a.size() + n_rows);
           auto a_view = make_array_view(a.end() - n_rows, a.end());
-          cell->get_manifold().get_new_points(
-            make_array_view(a.begin(), a.end() - n_rows),
-            support_point_weights_cell,
-            a_view);
+          cell->get_manifold().get_new_points(make_array_view(a.begin(),
+                                                              a.end() - n_rows),
+                                              support_point_weights_cell,
+                                              a_view);
         }
       else
         switch (dim)

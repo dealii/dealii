@@ -126,15 +126,16 @@ test()
       std::vector<bool> selected_dofs(dof_handler.n_dofs());
       for (unsigned int subdomain = 0; subdomain < (1 << dim); ++subdomain)
         {
-          DoFTools::extract_subdomain_dofs(
-            dof_handler, subdomain, selected_dofs);
-          AssertThrow(
-            static_cast<unsigned int>(
-              std::count(selected_dofs.begin(), selected_dofs.end(), true)) ==
-              dof_handler.n_dofs() / (1 << dim),
-            ExcNumberMismatch(
-              std::count(selected_dofs.begin(), selected_dofs.end(), true),
-              dof_handler.n_dofs() / (1 << dim)));
+          DoFTools::extract_subdomain_dofs(dof_handler,
+                                           subdomain,
+                                           selected_dofs);
+          AssertThrow(static_cast<unsigned int>(std::count(
+                        selected_dofs.begin(), selected_dofs.end(), true)) ==
+                        dof_handler.n_dofs() / (1 << dim),
+                      ExcNumberMismatch(std::count(selected_dofs.begin(),
+                                                   selected_dofs.end(),
+                                                   true),
+                                        dof_handler.n_dofs() / (1 << dim)));
         }
       deallog << "Check 3 (dim=" << dim << ") ok" << std::endl;
     };
@@ -157,8 +158,9 @@ test()
       std::vector<bool> selected_dofs(dof_handler.n_dofs());
       for (unsigned int subdomain = 0; subdomain < (1 << dim); ++subdomain)
         {
-          DoFTools::extract_subdomain_dofs(
-            dof_handler, subdomain, selected_dofs);
+          DoFTools::extract_subdomain_dofs(dof_handler,
+                                           subdomain,
+                                           selected_dofs);
           AssertThrow(
             static_cast<unsigned int>(
               std::count(selected_dofs.begin(), selected_dofs.end(), true)) ==

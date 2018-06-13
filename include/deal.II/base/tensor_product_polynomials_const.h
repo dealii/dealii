@@ -163,8 +163,8 @@ public:
 template <int dim>
 template <class Pol>
 inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
-  const std::vector<Pol> &pols) :
-  TensorProductPolynomials<dim>(pols)
+  const std::vector<Pol> &pols)
+  : TensorProductPolynomials<dim>(pols)
 {
   // append index for renumbering
   this->index_map.push_back(this->n_tensor_pols);

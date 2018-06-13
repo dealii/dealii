@@ -54,8 +54,10 @@ check()
   Triangulation<dim>        tr;
   std::vector<unsigned int> sub(3, 1U);
   sub[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    tr, sub, Point<dim>(), Point<dim>(2, 1, 1));
+  GridGenerator::subdivided_hyper_rectangle(tr,
+                                            sub,
+                                            Point<dim>(),
+                                            Point<dim>(2, 1, 1));
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim>(2));

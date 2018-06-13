@@ -326,8 +326,10 @@ namespace TrilinosWrappers
       const MPI_Comm &             communicator,
       const bool                   vector_writable)
     {
-      reinit(
-        parallel_partitioning, ghost_values, communicator, vector_writable);
+      reinit(parallel_partitioning,
+             ghost_values,
+             communicator,
+             vector_writable);
     }
 
 
@@ -339,8 +341,8 @@ namespace TrilinosWrappers
 
 
 
-    inline BlockVector::BlockVector(const BlockVector &v) :
-      dealii::BlockVectorBase<MPI::Vector>()
+    inline BlockVector::BlockVector(const BlockVector &v)
+      : dealii::BlockVectorBase<MPI::Vector>()
     {
       this->components.resize(v.n_blocks());
       this->block_indices = v.block_indices;

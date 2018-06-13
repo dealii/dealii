@@ -22,33 +22,33 @@ namespace Utilities
 {
   namespace MPI
   {
-    Partitioner::Partitioner() :
-      global_size(0),
-      local_range_data(
-        std::pair<types::global_dof_index, types::global_dof_index>(0, 0)),
-      n_ghost_indices_data(0),
-      n_import_indices_data(0),
-      n_ghost_indices_in_larger_set(0),
-      my_pid(0),
-      n_procs(1),
-      communicator(MPI_COMM_SELF),
-      have_ghost_indices(false)
+    Partitioner::Partitioner()
+      : global_size(0)
+      , local_range_data(
+          std::pair<types::global_dof_index, types::global_dof_index>(0, 0))
+      , n_ghost_indices_data(0)
+      , n_import_indices_data(0)
+      , n_ghost_indices_in_larger_set(0)
+      , my_pid(0)
+      , n_procs(1)
+      , communicator(MPI_COMM_SELF)
+      , have_ghost_indices(false)
     {}
 
 
 
-    Partitioner::Partitioner(const unsigned int size) :
-      global_size(size),
-      locally_owned_range_data(size),
-      local_range_data(
-        std::pair<types::global_dof_index, types::global_dof_index>(0, size)),
-      n_ghost_indices_data(0),
-      n_import_indices_data(0),
-      n_ghost_indices_in_larger_set(0),
-      my_pid(0),
-      n_procs(1),
-      communicator(MPI_COMM_SELF),
-      have_ghost_indices(false)
+    Partitioner::Partitioner(const unsigned int size)
+      : global_size(size)
+      , locally_owned_range_data(size)
+      , local_range_data(
+          std::pair<types::global_dof_index, types::global_dof_index>(0, size))
+      , n_ghost_indices_data(0)
+      , n_import_indices_data(0)
+      , n_ghost_indices_in_larger_set(0)
+      , my_pid(0)
+      , n_procs(1)
+      , communicator(MPI_COMM_SELF)
+      , have_ghost_indices(false)
     {
       locally_owned_range_data.add_range(0, size);
       locally_owned_range_data.compress();
@@ -59,16 +59,16 @@ namespace Utilities
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
                              const IndexSet &ghost_indices_in,
-                             const MPI_Comm  communicator_in) :
-      global_size(
-        static_cast<types::global_dof_index>(locally_owned_indices.size())),
-      n_ghost_indices_data(0),
-      n_import_indices_data(0),
-      n_ghost_indices_in_larger_set(0),
-      my_pid(0),
-      n_procs(1),
-      communicator(communicator_in),
-      have_ghost_indices(false)
+                             const MPI_Comm  communicator_in)
+      : global_size(
+          static_cast<types::global_dof_index>(locally_owned_indices.size()))
+      , n_ghost_indices_data(0)
+      , n_import_indices_data(0)
+      , n_ghost_indices_in_larger_set(0)
+      , my_pid(0)
+      , n_procs(1)
+      , communicator(communicator_in)
+      , have_ghost_indices(false)
     {
       set_owned_indices(locally_owned_indices);
       set_ghost_indices(ghost_indices_in);
@@ -77,16 +77,16 @@ namespace Utilities
 
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
-                             const MPI_Comm  communicator_in) :
-      global_size(
-        static_cast<types::global_dof_index>(locally_owned_indices.size())),
-      n_ghost_indices_data(0),
-      n_import_indices_data(0),
-      n_ghost_indices_in_larger_set(0),
-      my_pid(0),
-      n_procs(1),
-      communicator(communicator_in),
-      have_ghost_indices(false)
+                             const MPI_Comm  communicator_in)
+      : global_size(
+          static_cast<types::global_dof_index>(locally_owned_indices.size()))
+      , n_ghost_indices_data(0)
+      , n_import_indices_data(0)
+      , n_ghost_indices_in_larger_set(0)
+      , my_pid(0)
+      , n_procs(1)
+      , communicator(communicator_in)
+      , have_ghost_indices(false)
     {
       set_owned_indices(locally_owned_indices);
     }
@@ -409,8 +409,9 @@ namespace Utilities
       if (larger_ghost_index_set.size() == 0)
         {
           ghost_indices_subset_chunks_by_rank_data.clear();
-          ghost_indices_subset_data.emplace_back(
-            local_size(), local_size() + n_ghost_indices());
+          ghost_indices_subset_data.emplace_back(local_size(),
+                                                 local_size() +
+                                                   n_ghost_indices());
           n_ghost_indices_in_larger_set = n_ghost_indices_data;
         }
       else
@@ -455,8 +456,9 @@ namespace Utilities
                   if (expanded_numbering[i] == last_index + 1)
                     ghost_indices_subset.back().second++;
                   else
-                    ghost_indices_subset.emplace_back(
-                      expanded_numbering[i], expanded_numbering[i] + 1);
+                    ghost_indices_subset.emplace_back(expanded_numbering[i],
+                                                      expanded_numbering[i] +
+                                                        1);
                   last_index = expanded_numbering[i];
                 }
               shift += ghost_targets_data[p].second;
@@ -480,8 +482,9 @@ namespace Utilities
       if (Utilities::MPI::job_supports_mpi())
         {
           int       communicators_same = 0;
-          const int ierr               = MPI_Comm_compare(
-            part.communicator, communicator, &communicators_same);
+          const int ierr               = MPI_Comm_compare(part.communicator,
+                                            communicator,
+                                            &communicators_same);
           AssertThrowMPI(ierr);
           if (!(communicators_same == MPI_IDENT ||
                 communicators_same == MPI_CONGRUENT))

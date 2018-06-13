@@ -48,7 +48,8 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeBlock
 {
 public:
-  MatrixFreeBlock(const MatrixFree<dim, Number> &data_in) : data(data_in)
+  MatrixFreeBlock(const MatrixFree<dim, Number> &data_in)
+    : data(data_in)
   {}
 
   void
@@ -133,8 +134,10 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;

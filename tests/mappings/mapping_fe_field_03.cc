@@ -67,8 +67,9 @@ test()
 
   IndexSet locally_relevant_euler;
   DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_euler);
-  map_vector.reinit(
-    dh.locally_owned_dofs(), locally_relevant_euler, MPI_COMM_WORLD);
+  map_vector.reinit(dh.locally_owned_dofs(),
+                    locally_relevant_euler,
+                    MPI_COMM_WORLD);
 
   VectorTools::get_position_vector(dh, map_vector);
 

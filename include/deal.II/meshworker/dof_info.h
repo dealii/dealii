@@ -282,20 +282,20 @@ namespace MeshWorker
   //----------------------------------------------------------------------//
 
   template <int dim, int spacedim, typename number>
-  DoFInfo<dim, spacedim, number>::DoFInfo() :
-    face_number(numbers::invalid_unsigned_int),
-    sub_number(numbers::invalid_unsigned_int),
-    level_cell(false)
+  DoFInfo<dim, spacedim, number>::DoFInfo()
+    : face_number(numbers::invalid_unsigned_int)
+    , sub_number(numbers::invalid_unsigned_int)
+    , level_cell(false)
   {}
 
 
 
   template <int dim, int spacedim, typename number>
   DoFInfo<dim, spacedim, number>::DoFInfo(
-    const DoFHandler<dim, spacedim> &dof_handler) :
-    face_number(numbers::invalid_unsigned_int),
-    sub_number(numbers::invalid_unsigned_int),
-    level_cell(false)
+    const DoFHandler<dim, spacedim> &dof_handler)
+    : face_number(numbers::invalid_unsigned_int)
+    , sub_number(numbers::invalid_unsigned_int)
+    , level_cell(false)
   {
     std::vector<types::global_dof_index> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;
@@ -421,9 +421,9 @@ namespace MeshWorker
   //----------------------------------------------------------------------//
 
   template <int dim, class DOFINFO>
-  inline DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO &seed) :
-    cell(seed),
-    cell_valid(true)
+  inline DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO &seed)
+    : cell(seed)
+    , cell_valid(true)
   {
     for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
       {
@@ -437,9 +437,9 @@ namespace MeshWorker
 
   template <int dim, class DOFINFO>
   inline DoFInfoBox<dim, DOFINFO>::DoFInfoBox(
-    const DoFInfoBox<dim, DOFINFO> &other) :
-    cell(other.cell),
-    cell_valid(other.cell_valid)
+    const DoFInfoBox<dim, DOFINFO> &other)
+    : cell(other.cell)
+    , cell_valid(other.cell_valid)
   {
     for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
       {

@@ -80,7 +80,8 @@ namespace parallel
       /**
        * Constructor. Take and package the given function object.
        */
-      Body(const F &f) : f(f)
+      Body(const F &f)
+        : f(f)
       {}
 
       template <typename Range>
@@ -187,10 +188,11 @@ namespace parallel
     typedef SynchronousIterators<Iterators>           SyncIterators;
     Iterators                                         x_begin(begin_in, out);
     Iterators x_end(end_in, OutputIterator());
-    tbb::parallel_for(
-      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
-      internal::make_body(predicate),
-      tbb::auto_partitioner());
+    tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin,
+                                                        x_end,
+                                                        grainsize),
+                      internal::make_body(predicate),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -244,10 +246,11 @@ namespace parallel
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators                               x_begin(begin_in1, in2, out);
     Iterators x_end(end_in1, InputIterator2(), OutputIterator());
-    tbb::parallel_for(
-      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
-      internal::make_body(predicate),
-      tbb::auto_partitioner());
+    tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin,
+                                                        x_end,
+                                                        grainsize),
+                      internal::make_body(predicate),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -303,12 +306,15 @@ namespace parallel
                                             Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators                               x_begin(begin_in1, in2, in3, out);
-    Iterators                               x_end(
-      end_in1, InputIterator2(), InputIterator3(), OutputIterator());
-    tbb::parallel_for(
-      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
-      internal::make_body(predicate),
-      tbb::auto_partitioner());
+    Iterators                               x_end(end_in1,
+                    InputIterator2(),
+                    InputIterator3(),
+                    OutputIterator());
+    tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin,
+                                                        x_end,
+                                                        grainsize),
+                      internal::make_body(predicate),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -523,21 +529,21 @@ namespace parallel
       template <typename Reductor>
       ReductionOnSubranges(const Function & f,
                            const Reductor & reductor,
-                           const ResultType neutral_element = ResultType()) :
-        result(neutral_element),
-        f(f),
-        neutral_element(neutral_element),
-        reductor(reductor)
+                           const ResultType neutral_element = ResultType())
+        : result(neutral_element)
+        , f(f)
+        , neutral_element(neutral_element)
+        , reductor(reductor)
       {}
 
       /**
        * Splitting constructor. See the TBB book for more details about this.
        */
-      ReductionOnSubranges(const ReductionOnSubranges &r, tbb::split) :
-        result(r.neutral_element),
-        f(r.f),
-        neutral_element(r.neutral_element),
-        reductor(r.reductor)
+      ReductionOnSubranges(const ReductionOnSubranges &r, tbb::split)
+        : result(r.neutral_element)
+        , f(r.f)
+        , neutral_element(r.neutral_element)
+        , reductor(r.reductor)
       {}
 
       /**
@@ -790,8 +796,8 @@ namespace parallel
      */
     struct ParallelForWrapper
     {
-      ParallelForWrapper(const parallel::ParallelForInteger &worker) :
-        worker_(worker)
+      ParallelForWrapper(const parallel::ParallelForInteger &worker)
+        : worker_(worker)
       {}
 
       void

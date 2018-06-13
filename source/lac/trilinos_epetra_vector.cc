@@ -40,24 +40,24 @@ namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
-    Vector::Vector() :
-      vector(new Epetra_FEVector(
-        Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
+    Vector::Vector()
+      : vector(new Epetra_FEVector(
+          Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
 
 
-    Vector::Vector(const Vector &V) :
-      Subscriptor(),
-      vector(new Epetra_FEVector(V.trilinos_vector()))
+    Vector::Vector(const Vector &V)
+      : Subscriptor()
+      , vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
 
 
     Vector::Vector(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator) :
-      vector(new Epetra_FEVector(
-        parallel_partitioner.make_trilinos_map(communicator, false)))
+                   const MPI_Comm &communicator)
+      : vector(new Epetra_FEVector(
+          parallel_partitioner.make_trilinos_map(communicator, false)))
     {}
 
 
@@ -240,8 +240,9 @@ namespace LinearAlgebra
 #    if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
           Epetra_Import data_exchange(vector->Map(),
                                       down_V.trilinos_vector().Map());
-          const int     ierr = vector->Import(
-            down_V.trilinos_vector(), data_exchange, Epetra_AddLocalAlso);
+          const int     ierr = vector->Import(down_V.trilinos_vector(),
+                                          data_exchange,
+                                          Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
           (void)ierr;
 #    else
@@ -395,8 +396,10 @@ namespace LinearAlgebra
       Assert(vector->Map().SameAs(down_scaling_factors.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
-      const int ierr = vector->Multiply(
-        1.0, down_scaling_factors.trilinos_vector(), *vector, 0.0);
+      const int ierr = vector->Multiply(1.0,
+                                        down_scaling_factors.trilinos_vector(),
+                                        *vector,
+                                        0.0);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
@@ -646,8 +649,10 @@ namespace LinearAlgebra
                                        const MPI_Comm &mpi_comm)
     {
       source_stored_elements = source_index_set;
-      epetra_comm_pattern    = std::make_shared<CommunicationPattern>(
-        locally_owned_elements(), source_index_set, mpi_comm);
+      epetra_comm_pattern =
+        std::make_shared<CommunicationPattern>(locally_owned_elements(),
+                                               source_index_set,
+                                               mpi_comm);
     }
   } // namespace EpetraWrappers
 } // namespace LinearAlgebra

@@ -235,14 +235,13 @@ operator<<(std::ostream &out, const BlockMask &mask);
 
 // -------------------- inline functions ---------------------
 
-inline BlockMask::BlockMask(const std::vector<bool> &block_mask) :
-  block_mask(block_mask)
+inline BlockMask::BlockMask(const std::vector<bool> &block_mask)
+  : block_mask(block_mask)
 {}
 
 
-inline BlockMask::BlockMask(const unsigned int n_blocks,
-                            const bool         initializer) :
-  block_mask(n_blocks, initializer)
+inline BlockMask::BlockMask(const unsigned int n_blocks, const bool initializer)
+  : block_mask(n_blocks, initializer)
 {}
 
 

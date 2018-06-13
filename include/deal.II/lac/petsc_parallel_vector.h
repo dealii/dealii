@@ -441,8 +441,8 @@ namespace PETScWrappers
     template <typename number>
     Vector::Vector(const MPI_Comm &              communicator,
                    const dealii::Vector<number> &v,
-                   const size_type               local_size) :
-      communicator(communicator)
+                   const size_type               local_size)
+      : communicator(communicator)
     {
       Vector::create_vector(v.size(), local_size);
 

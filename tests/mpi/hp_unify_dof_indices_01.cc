@@ -54,8 +54,10 @@ test()
   Point<dim> top_right;
   for (unsigned int d = 0; d < dim; ++d)
     top_right[d] = (d == 0 ? 2 : 1);
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, reps, Point<dim>(), top_right);
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            reps,
+                                            Point<dim>(),
+                                            top_right);
   Assert(triangulation.n_global_active_cells() == 2, ExcInternalError());
   Assert(triangulation.n_active_cells() == 2, ExcInternalError());
 

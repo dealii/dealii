@@ -257,8 +257,9 @@ test_extractor(const FEType &fe, const ExtractorType &extractor)
     cell->get_dof_indices(local_dof_indices);
 
     std::vector<double> local_dof_values(fe.dofs_per_cell);
-    cell->get_dof_values(
-      solution, local_dof_values.begin(), local_dof_values.end());
+    cell->get_dof_values(solution,
+                         local_dof_values.begin(),
+                         local_dof_values.end());
 
     // Convert the DoF values so that they are potentially of
     // a different number type

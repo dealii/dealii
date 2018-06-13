@@ -48,7 +48,8 @@ template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
-  MyFunction() : Function<dim>(1)
+  MyFunction()
+    : Function<dim>(1)
   {}
 
   virtual double
@@ -70,7 +71,8 @@ template <int dim>
 class MyNormalDerivative : public Function<dim>
 {
 public:
-  MyNormalDerivative() : Function<dim>(1)
+  MyNormalDerivative()
+    : Function<dim>(1)
   {}
 
   virtual double

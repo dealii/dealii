@@ -24,12 +24,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number, typename BlockVectorType>
-BlockMatrixArray<number, BlockVectorType>::Entry::Entry(const Entry &e) :
-  row(e.row),
-  col(e.col),
-  prefix(e.prefix),
-  transpose(e.transpose),
-  matrix(e.matrix)
+BlockMatrixArray<number, BlockVectorType>::Entry::Entry(const Entry &e)
+  : row(e.row)
+  , col(e.col)
+  , prefix(e.prefix)
+  , transpose(e.transpose)
+  , matrix(e.matrix)
 {
   Entry &e2 = const_cast<Entry &>(e);
   e2.matrix = nullptr;
@@ -46,9 +46,9 @@ BlockMatrixArray<number, BlockVectorType>::Entry::~Entry()
 
 
 template <typename number, typename BlockVectorType>
-BlockMatrixArray<number, BlockVectorType>::BlockMatrixArray() :
-  block_rows(0),
-  block_cols(0)
+BlockMatrixArray<number, BlockVectorType>::BlockMatrixArray()
+  : block_rows(0)
+  , block_cols(0)
 {}
 
 
@@ -56,9 +56,9 @@ BlockMatrixArray<number, BlockVectorType>::BlockMatrixArray() :
 template <typename number, typename BlockVectorType>
 BlockMatrixArray<number, BlockVectorType>::BlockMatrixArray(
   const unsigned int n_block_rows,
-  const unsigned int n_block_cols) :
-  block_rows(n_block_rows),
-  block_cols(n_block_cols)
+  const unsigned int n_block_cols)
+  : block_rows(n_block_rows)
+  , block_cols(n_block_cols)
 {}
 
 
@@ -255,18 +255,17 @@ BlockMatrixArray<number, BlockVectorType>::n_block_cols() const
 //---------------------------------------------------------------------------
 
 template <typename number, typename BlockVectorType>
-BlockTrianglePrecondition<number,
-                          BlockVectorType>::BlockTrianglePrecondition() :
-  BlockMatrixArray<number, BlockVectorType>(),
-  backward(false)
+BlockTrianglePrecondition<number, BlockVectorType>::BlockTrianglePrecondition()
+  : BlockMatrixArray<number, BlockVectorType>()
+  , backward(false)
 {}
 
 
 template <typename number, typename BlockVectorType>
 BlockTrianglePrecondition<number, BlockVectorType>::BlockTrianglePrecondition(
-  const unsigned int block_rows) :
-  BlockMatrixArray<number, BlockVectorType>(block_rows, block_rows),
-  backward(false)
+  const unsigned int block_rows)
+  : BlockMatrixArray<number, BlockVectorType>(block_rows, block_rows)
+  , backward(false)
 {}
 
 

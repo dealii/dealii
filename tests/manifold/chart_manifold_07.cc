@@ -32,7 +32,8 @@ public:
   static const int spacedim = 3;
   static const int chartdim = 3;
 
-  MyCylinderManifold() : ChartManifold<dim, spacedim, spacedim>(periodicity)
+  MyCylinderManifold()
+    : ChartManifold<dim, spacedim, spacedim>(periodicity)
   {}
 
 

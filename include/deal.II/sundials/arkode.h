@@ -357,19 +357,19 @@ namespace SUNDIALS
         const bool          implicit_function_is_time_independent = false,
         // Error parameters
         const double &absolute_tolerance = 1e-6,
-        const double &relative_tolerance = 1e-5) :
-        initial_time(initial_time),
-        final_time(final_time),
-        initial_step_size(initial_step_size),
-        minimum_step_size(minimum_step_size),
-        absolute_tolerance(absolute_tolerance),
-        relative_tolerance(relative_tolerance),
-        maximum_order(maximum_order),
-        output_period(output_period),
-        maximum_non_linear_iterations(maximum_non_linear_iterations),
-        implicit_function_is_linear(implicit_function_is_linear),
-        implicit_function_is_time_independent(
-          implicit_function_is_time_independent)
+        const double &relative_tolerance = 1e-5)
+        : initial_time(initial_time)
+        , final_time(final_time)
+        , initial_step_size(initial_step_size)
+        , minimum_step_size(minimum_step_size)
+        , absolute_tolerance(absolute_tolerance)
+        , relative_tolerance(relative_tolerance)
+        , maximum_order(maximum_order)
+        , output_period(output_period)
+        , maximum_non_linear_iterations(maximum_non_linear_iterations)
+        , implicit_function_is_linear(implicit_function_is_linear)
+        , implicit_function_is_time_independent(
+            implicit_function_is_time_independent)
       {}
 
       /**

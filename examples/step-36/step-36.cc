@@ -118,9 +118,9 @@ namespace Step36
   // their values from the input file whose name is specified as an argument
   // to this function:
   template <int dim>
-  EigenvalueProblem<dim>::EigenvalueProblem(const std::string &prm_file) :
-    fe(1),
-    dof_handler(triangulation)
+  EigenvalueProblem<dim>::EigenvalueProblem(const std::string &prm_file)
+    : fe(1)
+    , dof_handler(triangulation)
   {
     // TODO investigate why the minimum number of refinement steps required to
     // obtain the correct eigenvalue degeneracies is 6
@@ -293,10 +293,12 @@ namespace Step36
         // into the global objects and take care of zero boundary constraints:
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_stiffness_matrix,
+                                               local_dof_indices,
+                                               stiffness_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix,
+                                               local_dof_indices,
+                                               mass_matrix);
       }
 
     // At the end of the function, we tell PETSc that the matrices have now
@@ -479,9 +481,9 @@ int main(int argc, char **argv)
 
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(
-        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-        ExcMessage("This program can only be run in serial, use ./step-36"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+                  ExcMessage(
+                    "This program can only be run in serial, use ./step-36"));
 
       EigenvalueProblem<2> problem("step-36.prm");
       problem.run();

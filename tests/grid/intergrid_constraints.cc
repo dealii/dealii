@@ -171,8 +171,10 @@ check()
                 // refined if that
                 // has not yet
                 // happened
-                typename DoFHandler<dim>::cell_iterator cell2(
-                  &tria_2, cell->level(), cell->index(), &dof_2);
+                typename DoFHandler<dim>::cell_iterator cell2(&tria_2,
+                                                              cell->level(),
+                                                              cell->index(),
+                                                              &dof_2);
                 if (!cell2->has_children())
                   cell2->set_refine_flag();
               };

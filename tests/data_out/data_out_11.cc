@@ -61,8 +61,10 @@ test()
     DataOut<dim> data_out;
     try
       {
-        data_out.add_data_vector(
-          dof_handler, vec, names, component_interpretation);
+        data_out.add_data_vector(dof_handler,
+                                 vec,
+                                 names,
+                                 component_interpretation);
         data_out.build_patches(mapping, 2);
       }
     catch (ExceptionBase &exc)
@@ -77,8 +79,10 @@ test()
     data_out.attach_dof_handler(dof_handler);
     try
       {
-        data_out.add_data_vector(
-          vec, names, DataOut<dim>::type_automatic, component_interpretation);
+        data_out.add_data_vector(vec,
+                                 names,
+                                 DataOut<dim>::type_automatic,
+                                 component_interpretation);
         data_out.build_patches(mapping, 2);
       }
     catch (ExceptionBase &exc)

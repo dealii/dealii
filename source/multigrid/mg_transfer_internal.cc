@@ -41,16 +41,16 @@ namespace internal
 
       DoFPair(const unsigned int            level,
               const types::global_dof_index global_dof_index,
-              const types::global_dof_index level_dof_index) :
-        level(level),
-        global_dof_index(global_dof_index),
-        level_dof_index(level_dof_index)
+              const types::global_dof_index level_dof_index)
+        : level(level)
+        , global_dof_index(global_dof_index)
+        , level_dof_index(level_dof_index)
       {}
 
-      DoFPair() :
-        level(numbers::invalid_unsigned_int),
-        global_dof_index(numbers::invalid_dof_index),
-        level_dof_index(numbers::invalid_dof_index)
+      DoFPair()
+        : level(numbers::invalid_unsigned_int)
+        , global_dof_index(numbers::invalid_dof_index)
+        , level_dof_index(numbers::invalid_dof_index)
       {}
     };
 
@@ -157,8 +157,9 @@ namespace internal
                         global_dof_indices[i], level_dof_indices[i]);
 
                       // send this to the owner of the level_dof:
-                      send_data_temp.emplace_back(
-                        level, global_dof_indices[i], level_dof_indices[i]);
+                      send_data_temp.emplace_back(level,
+                                                  global_dof_indices[i],
+                                                  level_dof_indices[i]);
                     }
                   else
                     {
@@ -262,8 +263,10 @@ namespace internal
               {
                 MPI_Status status;
                 int        len;
-                int        ierr = MPI_Probe(
-                  MPI_ANY_SOURCE, 71, tria->get_communicator(), &status);
+                int        ierr = MPI_Probe(MPI_ANY_SOURCE,
+                                     71,
+                                     tria->get_communicator(),
+                                     &status);
                 AssertThrowMPI(ierr);
                 ierr = MPI_Get_count(&status, MPI_BYTE, &len);
                 AssertThrowMPI(ierr);
@@ -308,8 +311,9 @@ namespace internal
           // * wait for all MPI_Isend to complete
           if (requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(
-                requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(requests.size(),
+                                           requests.data(),
+                                           MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
               requests.clear();
             }
@@ -329,8 +333,9 @@ namespace internal
       std::less<std::pair<types::global_dof_index, types::global_dof_index>>
         compare;
       for (unsigned int level = 0; level < copy_indices.size(); ++level)
-        std::sort(
-          copy_indices[level].begin(), copy_indices[level].end(), compare);
+        std::sort(copy_indices[level].begin(),
+                  copy_indices[level].end(),
+                  compare);
       for (unsigned int level = 0; level < copy_indices_level_mine.size();
            ++level)
         std::sort(copy_indices_level_mine[level].begin(),
@@ -359,9 +364,9 @@ namespace internal
     {
       std::sort(ghosted_level_dofs.begin(), ghosted_level_dofs.end());
       IndexSet ghosted_dofs(locally_owned.size());
-      ghosted_dofs.add_indices(
-        ghosted_level_dofs.begin(),
-        std::unique(ghosted_level_dofs.begin(), ghosted_level_dofs.end()));
+      ghosted_dofs.add_indices(ghosted_level_dofs.begin(),
+                               std::unique(ghosted_level_dofs.begin(),
+                                           ghosted_level_dofs.end()));
       ghosted_dofs.compress();
 
       // Add possible ghosts from the previous content in the vector

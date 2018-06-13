@@ -89,8 +89,10 @@ check()
     mapping.push_back(MappingQ<dim>(i + 1));
 
   Vector<double> rhs(dof.n_dofs());
-  VectorTools::create_point_source_vector(
-    mapping, dof, tr.begin()->center(), rhs);
+  VectorTools::create_point_source_vector(mapping,
+                                          dof,
+                                          tr.begin()->center(),
+                                          rhs);
   for (unsigned int i = 0; i < rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }

@@ -131,7 +131,9 @@ namespace Step50
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient(int K) : Function<dim>(), K(K)
+    Coefficient(int K)
+      : Function<dim>()
+      , K(K)
     {}
 
     virtual double
@@ -182,15 +184,15 @@ namespace Step50
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    fe(degree),
-    mg_dof_handler(triangulation),
-    degree(degree),
-    K(3)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
+    , fe(degree)
+    , mg_dof_handler(triangulation)
+    , degree(degree)
+    , K(3)
   {}
 
 
@@ -212,15 +214,18 @@ namespace Step50
     typename FunctionMap<dim>::type  dirichlet_boundary;
     Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(0.0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values(
-      mg_dof_handler, dirichlet_boundary, constraints);
+    VectorTools::interpolate_boundary_values(mg_dof_handler,
+                                             dirichlet_boundary,
+                                             constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(),
                                mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(mg_dof_handler, dsp, constraints);
-    system_matrix.reinit(
-      mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
+    system_matrix.reinit(mg_dof_handler.locally_owned_dofs(),
+                         dsp,
+                         MPI_COMM_WORLD,
+                         true);
 
 
     mg_constrained_dofs.clear();
@@ -345,8 +350,9 @@ namespace Step50
          ++level)
       {
         IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(
-          mg_dof_handler, level, dofset);
+        DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler,
+                                                      level,
+                                                      dofset);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));
@@ -429,10 +435,9 @@ namespace Step50
   class MGCoarseAMG : public MGCoarseGridBase<VECTOR>
   {
   public:
-    MGCoarseAMG(
-      const LA::MPI::SparseMatrix &                  coarse_matrix,
-      const LA::MPI::PreconditionAMG::AdditionalData additional_data) :
-      count(0)
+    MGCoarseAMG(const LA::MPI::SparseMatrix &                  coarse_matrix,
+                const LA::MPI::PreconditionAMG::AdditionalData additional_data)
+      : count(0)
     {
       precondition_amg.initialize(coarse_matrix, additional_data);
     }
@@ -582,12 +587,12 @@ namespace Step50
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
-    KellyErrorEstimator<dim>::estimate(
-      static_cast<DoFHandler<dim> &>(mg_dof_handler),
-      QGauss<dim - 1>(degree + 1),
-      typename FunctionMap<dim>::type(),
-      temp_solution,
-      estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(
+                                         mg_dof_handler),
+                                       QGauss<dim - 1>(degree + 1),
+                                       typename FunctionMap<dim>::type(),
+                                       temp_solution,
+                                       estimated_error_per_cell);
 
     parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
       triangulation, estimated_error_per_cell, 0.3, 0.0);

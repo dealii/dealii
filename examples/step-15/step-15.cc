@@ -141,7 +141,8 @@ namespace Step15
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>()
+    BoundaryValues()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -164,9 +165,9 @@ namespace Step15
   // few tutorials.
 
   template <int dim>
-  MinimalSurfaceProblem<dim>::MinimalSurfaceProblem() :
-    dof_handler(triangulation),
-    fe(2)
+  MinimalSurfaceProblem<dim>::MinimalSurfaceProblem()
+    : dof_handler(triangulation)
+    , fe(2)
   {}
 
 
@@ -314,8 +315,9 @@ namespace Step15
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(
-                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+              system_matrix.add(local_dof_indices[i],
+                                local_dof_indices[j],
+                                cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -328,10 +330,14 @@ namespace Step15
     hanging_node_constraints.condense(system_rhs);
 
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, newton_update, system_rhs);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       newton_update,
+                                       system_rhs);
   }
 
 
@@ -377,8 +383,10 @@ namespace Step15
                                        present_solution,
                                        estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
 
     // Then we need an additional step: if, for example, you flag a cell that
     // is once more refined than its neighbor, and that neighbor is not
@@ -463,8 +471,10 @@ namespace Step15
   void MinimalSurfaceProblem<dim>::set_boundary_values()
   {
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, BoundaryValues<dim>(), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             boundary_values);
     for (std::map<types::global_dof_index, double>::const_iterator p =
            boundary_values.begin();
          p != boundary_values.end();
@@ -562,8 +572,9 @@ namespace Step15
     hanging_node_constraints.condense(residual);
 
     std::vector<bool> boundary_dofs(dof_handler.n_dofs());
-    DoFTools::extract_boundary_dofs(
-      dof_handler, ComponentMask(), boundary_dofs);
+    DoFTools::extract_boundary_dofs(dof_handler,
+                                    ComponentMask(),
+                                    boundary_dofs);
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (boundary_dofs[i] == true)
         residual(i) = 0;

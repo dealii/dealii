@@ -40,8 +40,9 @@ test()
   ghost_set.add_index(0);
   ghost_set.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    locally_owned, ghost_set, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(locally_owned,
+                                               ghost_set,
+                                               MPI_COMM_WORLD);
 
   // create vector without actually setting the entries since they will be
   // overwritten soon anyway

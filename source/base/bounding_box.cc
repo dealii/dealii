@@ -44,10 +44,12 @@ BoundingBox<spacedim, Number>::merge_with(
 {
   for (unsigned int i = 0; i < spacedim; ++i)
     {
-      this->boundary_points.first[i] = std::min(
-        this->boundary_points.first[i], other_bbox.boundary_points.first[i]);
-      this->boundary_points.second[i] = std::max(
-        this->boundary_points.second[i], other_bbox.boundary_points.second[i]);
+      this->boundary_points.first[i] =
+        std::min(this->boundary_points.first[i],
+                 other_bbox.boundary_points.first[i]);
+      this->boundary_points.second[i] =
+        std::max(this->boundary_points.second[i],
+                 other_bbox.boundary_points.second[i]);
     }
 }
 

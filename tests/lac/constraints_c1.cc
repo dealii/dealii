@@ -118,8 +118,9 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
                 GeometryInfo<dim>::unit_normal_direction[other_face];
 
               std::vector<std::pair<types::global_dof_index, double>> rhs;
-              const unsigned int constrained = fe.face_to_cell_index(
-                (fvertex == 0) ? 2 : fe.dofs_per_face - 1, face);
+              const unsigned int constrained =
+                fe.face_to_cell_index((fvertex == 0) ? 2 : fe.dofs_per_face - 1,
+                                      face);
               double constrained_weight = 0.;
 
               for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -127,8 +128,9 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
                   if (i == constrained)
                     constrained_weight = vertex_constraints[vertex][d][i];
                   else if (vertex_constraints[vertex][d][i] != 0.)
-                    rhs.push_back(std::make_pair(
-                      cell_indices[i], -vertex_constraints[vertex][d][i]));
+                    rhs.push_back(
+                      std::make_pair(cell_indices[i],
+                                     -vertex_constraints[vertex][d][i]));
                   if (vertex_constraints[neighbor_vertex][d][i] != 0.)
                     rhs.push_back(std::make_pair(
                       neighbor_indices[i],

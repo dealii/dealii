@@ -86,9 +86,9 @@ test()
                       << "Halo " << cell_2->level() << " " << cell_2->index()
                       << " " << cell_2->id() << " " << cell_2->id().to_string()
                       << std::endl;
-              AssertThrow(
-                cell_2 == cell_1,
-                ExcMessage("Halo cell is not identical to ghost cell."));
+              AssertThrow(cell_2 == cell_1,
+                          ExcMessage(
+                            "Halo cell is not identical to ghost cell."));
             }
         }
     }

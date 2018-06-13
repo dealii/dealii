@@ -69,8 +69,10 @@ main()
   Triangulation<3>          triangulation;
   std::vector<unsigned int> subdivisions(3, 2);
   subdivisions[2] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, subdivisions, Point<3>(), Point<3>(2, 2, 1));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            subdivisions,
+                                            Point<3>(),
+                                            Point<3>(2, 2, 1));
 
   hp::FECollection<3> fe;
   fe.push_back(FE_Q<3>(1));

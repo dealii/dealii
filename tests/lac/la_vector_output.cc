@@ -70,9 +70,9 @@ test()
   }
   // Check the vector
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(
-      std::abs(vec[i] - (double)i) < eps,
-      ExcMessage("Value in the vector has been changed by boost archive"));
+    AssertThrow(std::abs(vec[i] - (double)i) < eps,
+                ExcMessage(
+                  "Value in the vector has been changed by boost archive"));
 }
 
 

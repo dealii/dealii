@@ -113,8 +113,8 @@ namespace Step16
 
 
   template <int dim>
-  LaplaceIntegrator<dim>::LaplaceIntegrator() :
-    MeshWorker::LocalIntegrator<dim>(true, false, false)
+  LaplaceIntegrator<dim>::LaplaceIntegrator()
+    : MeshWorker::LocalIntegrator<dim>(true, false, false)
   {}
 
 
@@ -156,14 +156,16 @@ namespace Step16
     AssertDimension(dinfo.n_matrices(), 1);
     const double coefficient = (dinfo.cell->center()(0) > 0.) ? .1 : 1.;
 
-    LocalIntegrators::Laplace::cell_matrix(
-      dinfo.matrix(0, false).matrix, info.fe_values(0), coefficient);
+    LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
+                                           info.fe_values(0),
+                                           coefficient);
 
     if (dinfo.n_vectors() > 0)
       {
         std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
-        LocalIntegrators::L2::L2(
-          dinfo.vector(0).block(0), info.fe_values(0), rhs);
+        LocalIntegrators::L2::L2(dinfo.vector(0).block(0),
+                                 info.fe_values(0),
+                                 rhs);
       }
   }
 
@@ -242,11 +244,11 @@ namespace Step16
   // Triangulation::limit_level_difference_at_vertices flag to the constructor
   // of the triangulation class.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-    fe(degree),
-    dof_handler(triangulation),
-    degree(degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+    : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+    , fe(degree)
+    , dof_handler(triangulation)
+    , degree(degree)
   {}
 
 
@@ -578,8 +580,10 @@ namespace Step16
                                        typename FunctionMap<dim>::type(),
                                        solution,
                                        estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
     triangulation.execute_coarsening_and_refinement();
   }
 

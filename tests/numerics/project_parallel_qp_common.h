@@ -57,9 +57,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components)
+    : Function<dim>(n_components)
+    , q(q)
   {}
 
   virtual double
@@ -132,8 +132,9 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
                         QData>
           qp_manager;
         {
-          FEValues<dim> fe_values(
-            fe, quadrature_formula, update_quadrature_points);
+          FEValues<dim> fe_values(fe,
+                                  quadrature_formula,
+                                  update_quadrature_points);
 
           const unsigned int n_q_points = quadrature_formula.size();
 

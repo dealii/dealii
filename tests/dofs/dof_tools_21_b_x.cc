@@ -123,8 +123,9 @@ print_matching(DoFHandler<dim> &dof_handler)
 
   ConstraintMatrix        constraint_matrix;
   std::vector<Point<dim>> support_points(dof_handler.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim>(
-    mapping, dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points<dim>(mapping,
+                                            dof_handler,
+                                            support_points);
 
   // Look for the two outermost faces:
   typename DoFHandler<dim>::face_iterator face_1 =

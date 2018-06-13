@@ -56,8 +56,9 @@ main()
           sparse_matrix.set(i, j, static_cast<signed int>(i - j));
 
       MatrixOut matrix_out;
-      matrix_out.build_patches(
-        sparse_matrix, "sparse_matrix", MatrixOut::Options(true));
+      matrix_out.build_patches(sparse_matrix,
+                               "sparse_matrix",
+                               MatrixOut::Options(true));
       matrix_out.write_eps(logfile);
     };
 
@@ -71,8 +72,9 @@ main()
             (1. * i * i / 20 / 20 - 1. * j * j * j / 20 / 20 / 20);
 
       MatrixOut matrix_out;
-      matrix_out.build_patches(
-        full_matrix, "collated_matrix", MatrixOut::Options(false, 4));
+      matrix_out.build_patches(full_matrix,
+                               "collated_matrix",
+                               MatrixOut::Options(false, 4));
       matrix_out.write_gmv(logfile);
     };
 }

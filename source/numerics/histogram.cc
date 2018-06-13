@@ -35,11 +35,10 @@ Histogram::logarithmic_less(const number n1, const number n2)
 
 
 
-Histogram::Interval::Interval(const double left_point,
-                              const double right_point) :
-  left_point(left_point),
-  right_point(right_point),
-  content(0)
+Histogram::Interval::Interval(const double left_point, const double right_point)
+  : left_point(left_point)
+  , right_point(right_point)
+  , content(0)
 {}
 
 
@@ -59,9 +58,9 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
                     const unsigned int                 n_intervals,
                     const IntervalSpacing              interval_spacing)
 {
-  Assert(
-    values.size() > 0,
-    ExcMessage("Your input data needs to contain at least one input vector."));
+  Assert(values.size() > 0,
+         ExcMessage(
+           "Your input data needs to contain at least one input vector."));
   Assert(n_intervals > 0,
          ExcMessage("The number of intervals needs to be at least one."));
   for (unsigned int i = 0; i < values.size(); ++i)
@@ -101,11 +100,13 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
           const comparator logarithmic_less_function =
             &Histogram::template logarithmic_less<number>;
 
-          min_value = *std::min_element(
-            values[0].begin(), values[0].end(), logarithmic_less_function);
+          min_value = *std::min_element(values[0].begin(),
+                                        values[0].end(),
+                                        logarithmic_less_function);
 
-          max_value = *std::max_element(
-            values[0].begin(), values[0].end(), logarithmic_less_function);
+          max_value = *std::max_element(values[0].begin(),
+                                        values[0].end(),
+                                        logarithmic_less_function);
 
           for (unsigned int i = 1; i < values.size(); ++i)
             {
@@ -167,9 +168,9 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
             (std::log(max_value) - std::log(min_value)) / n_intervals;
 
           for (unsigned int n = 0; n < n_intervals; ++n)
-            intervals[0].emplace_back(
-              std::exp(std::log(min_value) + n * delta),
-              std::exp(std::log(min_value) + (n + 1) * delta));
+            intervals[0].emplace_back(std::exp(std::log(min_value) + n * delta),
+                                      std::exp(std::log(min_value) +
+                                               (n + 1) * delta));
 
           break;
         };
@@ -213,8 +214,10 @@ Histogram::evaluate(const Vector<number> &values,
                     const IntervalSpacing interval_spacing)
 {
   std::vector<Vector<number>> values_list(1, values);
-  evaluate(
-    values_list, std::vector<double>(1, 0.), n_intervals, interval_spacing);
+  evaluate(values_list,
+           std::vector<double>(1, 0.),
+           n_intervals,
+           interval_spacing);
 }
 
 

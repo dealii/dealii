@@ -117,10 +117,10 @@ class PETScInverse
 public:
   PETScInverse(const dealii::PETScWrappers::MatrixBase &A,
                dealii::SolverControl &                  cn,
-               const MPI_Comm &mpi_communicator = PETSC_COMM_SELF) :
-    solver(cn, mpi_communicator),
-    matrix(A),
-    preconditioner(matrix)
+               const MPI_Comm &mpi_communicator = PETSC_COMM_SELF)
+    : solver(cn, mpi_communicator)
+    , matrix(A)
+    , preconditioner(matrix)
   {}
 
   void
@@ -213,15 +213,21 @@ test()
   for (unsigned int i = 0; i < n_mpi_processes; i++)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
-  dealii::SparsityTools::distribute_sparsity_pattern(
-    csp, n_locally_owned_dofs, mpi_communicator, locally_relevant_dofs);
+  dealii::SparsityTools::distribute_sparsity_pattern(csp,
+                                                     n_locally_owned_dofs,
+                                                     mpi_communicator,
+                                                     locally_relevant_dofs);
 
   // Initialise the stiffness and mass matrices
-  stiffness_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  stiffness_matrix.reinit(locally_owned_dofs,
+                          locally_owned_dofs,
+                          csp,
+                          mpi_communicator);
 
-  mass_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  mass_matrix.reinit(locally_owned_dofs,
+                     locally_owned_dofs,
+                     csp,
+                     mpi_communicator);
 
   eigenfunctions.resize(5);
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
@@ -236,11 +242,12 @@ test()
   mass_matrix      = 0;
 
   dealii::QGauss<dim>   quadrature_formula(2);
-  dealii::FEValues<dim> fe_values(
-    fe,
-    quadrature_formula,
-    dealii::update_values | dealii::update_gradients |
-      dealii::update_quadrature_points | dealii::update_JxW_values);
+  dealii::FEValues<dim> fe_values(fe,
+                                  quadrature_formula,
+                                  dealii::update_values |
+                                    dealii::update_gradients |
+                                    dealii::update_quadrature_points |
+                                    dealii::update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -277,10 +284,12 @@ test()
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_stiffness_matrix,
+                                               local_dof_indices,
+                                               stiffness_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix,
+                                               local_dof_indices,
+                                               mass_matrix);
       }
 
   stiffness_matrix.compress(dealii::VectorOperation::add);
@@ -293,8 +302,10 @@ test()
     for (unsigned int i = 0; i < eigenvalues.size(); i++)
       eigenfunctions[i] = PetscScalar();
 
-    dealii::SolverControl solver_control(
-      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
+    dealii::SolverControl solver_control(dof_handler.n_dofs(),
+                                         1e-9,
+                                         /*log_history*/ false,
+                                         /*log_results*/ false);
     PETScInverse inverse(stiffness_matrix, solver_control, mpi_communicator);
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
 
@@ -360,8 +371,9 @@ main(int argc, char **argv)
 
   try
     {
-      dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(
-        argc, argv, 1);
+      dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc,
+                                                                  argv,
+                                                                  1);
       {
         test();
       }

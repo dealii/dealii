@@ -1931,7 +1931,8 @@ private:
     /**
      * Constructor
      */
-    Entry() : type(array)
+    Entry()
+      : type(array)
     {}
 
     /**

@@ -82,10 +82,12 @@ test()
   dof_handler.distribute_dofs(fe_collection);
 
   deallog << "Coarse mesh:" << std::endl;
-  print_dofs<spacedim>(
-    dof_handler.begin_active()->face(0), 0, fe1.dofs_per_face);
-  print_dofs<spacedim>(
-    dof_handler.begin_active()->face(1), 0, fe1.dofs_per_face);
+  print_dofs<spacedim>(dof_handler.begin_active()->face(0),
+                       0,
+                       fe1.dofs_per_face);
+  print_dofs<spacedim>(dof_handler.begin_active()->face(1),
+                       0,
+                       fe1.dofs_per_face);
 
   tria.refine_global(2);
   {
@@ -107,10 +109,12 @@ test()
               << ", active_fe_index=" << cell->active_fe_index() << std::endl;
 
       print_dofs<spacedim>(cell, cell->get_fe().dofs_per_cell);
-      print_dofs<spacedim>(
-        cell->face(0), cell->active_fe_index(), cell->get_fe().dofs_per_face);
-      print_dofs<spacedim>(
-        cell->face(1), cell->active_fe_index(), cell->get_fe().dofs_per_face);
+      print_dofs<spacedim>(cell->face(0),
+                           cell->active_fe_index(),
+                           cell->get_fe().dofs_per_face);
+      print_dofs<spacedim>(cell->face(1),
+                           cell->active_fe_index(),
+                           cell->get_fe().dofs_per_face);
     }
 }
 

@@ -213,10 +213,12 @@ MGTransferPrebuilt<VectorType>::build_matrices(
       // increment dofs_per_cell since a useless diagonal element will be
       // stored
       IndexSet level_p1_relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(
-        mg_dof, level + 1, level_p1_relevant_dofs);
-      DynamicSparsityPattern dsp(
-        this->sizes[level + 1], this->sizes[level], level_p1_relevant_dofs);
+      DoFTools::extract_locally_relevant_level_dofs(mg_dof,
+                                                    level + 1,
+                                                    level_p1_relevant_dofs);
+      DynamicSparsityPattern                  dsp(this->sizes[level + 1],
+                                 this->sizes[level],
+                                 level_p1_relevant_dofs);
       typename DoFHandler<dim>::cell_iterator cell, endc = mg_dof.end(level);
       for (cell = mg_dof.begin(level); cell != endc; ++cell)
         if (cell->has_children() &&
@@ -243,8 +245,9 @@ MGTransferPrebuilt<VectorType>::build_matrices(
 
                 cell->child(child)->get_mg_dof_indices(dof_indices_child);
 
-                replace(
-                  this->mg_constrained_dofs, level + 1, dof_indices_child);
+                replace(this->mg_constrained_dofs,
+                        level + 1,
+                        dof_indices_child);
 
                 // now tag the entries in the
                 // matrix which will be used
@@ -255,8 +258,9 @@ MGTransferPrebuilt<VectorType>::build_matrices(
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       if (prolongation(i, j) != 0)
                         entries.push_back(dof_indices_parent[j]);
-                    dsp.add_entries(
-                      dof_indices_child[i], entries.begin(), entries.end());
+                    dsp.add_entries(dof_indices_child[i],
+                                    entries.begin(),
+                                    entries.end());
                   }
               }
           }
@@ -352,8 +356,9 @@ MGTransferPrebuilt<VectorType>::build_matrices(
 
                 cell->child(child)->get_mg_dof_indices(dof_indices_child);
 
-                replace(
-                  this->mg_constrained_dofs, level + 1, dof_indices_child);
+                replace(this->mg_constrained_dofs,
+                        level + 1,
+                        dof_indices_child);
 
                 // now set the entries in the matrix
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)

@@ -2083,29 +2083,28 @@ SparseMatrix<number>::copy_from(const ForwardIterator begin,
 namespace SparseMatrixIterators
 {
   template <typename number>
-  inline Accessor<number, true>::Accessor(
-    const MatrixType *matrix,
-    const std::size_t index_within_matrix) :
-    SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
-                                       index_within_matrix),
-    matrix(matrix)
+  inline Accessor<number, true>::Accessor(const MatrixType *matrix,
+                                          const std::size_t index_within_matrix)
+    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
+                                         index_within_matrix)
+    , matrix(matrix)
   {}
 
 
 
   template <typename number>
-  inline Accessor<number, true>::Accessor(const MatrixType *matrix) :
-    SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern()),
-    matrix(matrix)
+  inline Accessor<number, true>::Accessor(const MatrixType *matrix)
+    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern())
+    , matrix(matrix)
   {}
 
 
 
   template <typename number>
   inline Accessor<number, true>::Accessor(
-    const SparseMatrixIterators::Accessor<number, false> &a) :
-    SparsityPatternIterators::Accessor(a),
-    matrix(&a.get_matrix())
+    const SparseMatrixIterators::Accessor<number, false> &a)
+    : SparsityPatternIterators::Accessor(a)
+    , matrix(&a.get_matrix())
   {}
 
 
@@ -2131,8 +2130,8 @@ namespace SparseMatrixIterators
 
   template <typename number>
   inline Accessor<number, false>::Reference::Reference(const Accessor *accessor,
-                                                       const bool) :
-    accessor(accessor)
+                                                       const bool)
+    : accessor(accessor)
   {}
 
 
@@ -2208,17 +2207,17 @@ namespace SparseMatrixIterators
 
   template <typename number>
   inline Accessor<number, false>::Accessor(MatrixType *      matrix,
-                                           const std::size_t index) :
-    SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(), index),
-    matrix(matrix)
+                                           const std::size_t index)
+    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(), index)
+    , matrix(matrix)
   {}
 
 
 
   template <typename number>
-  inline Accessor<number, false>::Accessor(MatrixType *matrix) :
-    SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern()),
-    matrix(matrix)
+  inline Accessor<number, false>::Accessor(MatrixType *matrix)
+    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern())
+    , matrix(matrix)
   {}
 
 
@@ -2243,23 +2242,23 @@ namespace SparseMatrixIterators
 
   template <typename number, bool Constness>
   inline Iterator<number, Constness>::Iterator(MatrixType *      matrix,
-                                               const std::size_t index) :
-    accessor(matrix, index)
+                                               const std::size_t index)
+    : accessor(matrix, index)
   {}
 
 
 
   template <typename number, bool Constness>
-  inline Iterator<number, Constness>::Iterator(MatrixType *matrix) :
-    accessor(matrix)
+  inline Iterator<number, Constness>::Iterator(MatrixType *matrix)
+    : accessor(matrix)
   {}
 
 
 
   template <typename number, bool Constness>
   inline Iterator<number, Constness>::Iterator(
-    const SparseMatrixIterators::Iterator<number, false> &i) :
-    accessor(*i)
+    const SparseMatrixIterators::Iterator<number, false> &i)
+    : accessor(*i)
   {}
 
 

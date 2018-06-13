@@ -57,10 +57,10 @@ test()
   // t_times_1 should be a multiple of the
   // unit tensor, given the structure we have
   // given to it
-  AssertThrow(
-    (t_times_1 - (dim * 10000 + 2 * 100) * unit_symmetric_tensor<dim>())
-        .norm() < 1e-14 * t_times_1.norm(),
-    ExcInternalError());
+  AssertThrow((t_times_1 -
+               (dim * 10000 + 2 * 100) * unit_symmetric_tensor<dim>())
+                  .norm() < 1e-14 * t_times_1.norm(),
+              ExcInternalError());
 }
 
 

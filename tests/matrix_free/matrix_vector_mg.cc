@@ -57,8 +57,10 @@ test()
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
   ConstraintMatrix constraints;
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   // std::cout << "Number of cells: " <<
@@ -74,8 +76,10 @@ test()
   SparseMatrix<double> system_matrix;
   {
     DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
-    DoFTools::make_sparsity_pattern(
-      static_cast<const DoFHandler<dim> &>(dof), csp, constraints, false);
+    DoFTools::make_sparsity_pattern(static_cast<const DoFHandler<dim> &>(dof),
+                                    csp,
+                                    constraints,
+                                    false);
     sparsity.copy_from(csp);
   }
   system_matrix.reinit(sparsity);
@@ -146,8 +150,9 @@ test()
                                       fe_values.JxW(q_point));
             }
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
 
     // now to the MG assembly

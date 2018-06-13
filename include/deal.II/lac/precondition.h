@@ -1207,7 +1207,9 @@ private:
 
 #ifndef DOXYGEN
 
-inline PreconditionIdentity::PreconditionIdentity() : n_rows(0), n_columns(0)
+inline PreconditionIdentity::PreconditionIdentity()
+  : n_rows(0)
+  , n_columns(0)
 {}
 
 template <typename MatrixType>
@@ -1269,15 +1271,15 @@ PreconditionIdentity::n() const
 //---------------------------------------------------------------------------
 
 inline PreconditionRichardson::AdditionalData::AdditionalData(
-  const double relaxation) :
-  relaxation(relaxation)
+  const double relaxation)
+  : relaxation(relaxation)
 {}
 
 
-inline PreconditionRichardson::PreconditionRichardson() :
-  relaxation(0),
-  n_rows(0),
-  n_columns(0)
+inline PreconditionRichardson::PreconditionRichardson()
+  : relaxation(0)
+  , n_rows(0)
+  , n_columns(0)
 {
   AdditionalData add_data;
   relaxation = add_data.relaxation;
@@ -1706,11 +1708,10 @@ template <typename MatrixType>
 PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData(
   const std::vector<size_type> &permutation,
   const std::vector<size_type> &inverse_permutation,
-  const typename PreconditionRelaxation<MatrixType>::AdditionalData
-    &parameters) :
-  permutation(permutation),
-  inverse_permutation(inverse_permutation),
-  parameters(parameters)
+  const typename PreconditionRelaxation<MatrixType>::AdditionalData &parameters)
+  : permutation(permutation)
+  , inverse_permutation(inverse_permutation)
+  , parameters(parameters)
 {}
 
 
@@ -1720,9 +1721,9 @@ PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData(
 template <typename MatrixType, class VectorType>
 PreconditionUseMatrix<MatrixType, VectorType>::PreconditionUseMatrix(
   const MatrixType & M,
-  const function_ptr method) :
-  matrix(M),
-  precondition(method)
+  const function_ptr method)
+  : matrix(M)
+  , precondition(method)
 {}
 
 
@@ -1740,8 +1741,8 @@ PreconditionUseMatrix<MatrixType, VectorType>::vmult(
 
 template <typename MatrixType>
 inline PreconditionRelaxation<MatrixType>::AdditionalData::AdditionalData(
-  const double relaxation) :
-  relaxation(relaxation)
+  const double relaxation)
+  : relaxation(relaxation)
 {}
 
 
@@ -1802,16 +1803,16 @@ namespace internal
                     const Number  factor2,
                     Number *      update1,
                     Number *      update2,
-                    Number *      dst) :
-        src(src),
-        matrix_diagonal_inverse(matrix_diagonal_inverse),
-        do_startup(factor1 == Number()),
-        start_zero(start_zero),
-        factor1(factor1),
-        factor2(factor2),
-        update1(update1),
-        update2(update2),
-        dst(dst)
+                    Number *      dst)
+        : src(src)
+        , matrix_diagonal_inverse(matrix_diagonal_inverse)
+        , do_startup(factor1 == Number())
+        , start_zero(start_zero)
+        , factor1(factor1)
+        , factor2(factor2)
+        , update1(update1)
+        , update2(update2)
+        , dst(dst)
       {}
 
       void
@@ -1867,8 +1868,8 @@ namespace internal
     struct VectorUpdatesRange : public parallel::ParallelForInteger
     {
       VectorUpdatesRange(const VectorUpdater<Number> &updater,
-                         const std::size_t            size) :
-        updater(updater)
+                         const std::size_t            size)
+        : updater(updater)
       {
         if (size < internal::VectorImplementation::minimum_parallel_grain_size)
           apply_to_subrange(0, size);
@@ -2059,23 +2060,23 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
                                  const bool         nonzero_starting,
                                  const unsigned int eig_cg_n_iterations,
                                  const double       eig_cg_residual,
-                                 const double       max_eigenvalue) :
-  degree(degree),
-  smoothing_range(smoothing_range),
-  nonzero_starting(nonzero_starting),
-  eig_cg_n_iterations(eig_cg_n_iterations),
-  eig_cg_residual(eig_cg_residual),
-  max_eigenvalue(max_eigenvalue)
+                                 const double       max_eigenvalue)
+  : degree(degree)
+  , smoothing_range(smoothing_range)
+  , nonzero_starting(nonzero_starting)
+  , eig_cg_n_iterations(eig_cg_n_iterations)
+  , eig_cg_residual(eig_cg_residual)
+  , max_eigenvalue(max_eigenvalue)
 {}
 
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  PreconditionChebyshev() :
-  theta(1.),
-  delta(1.),
-  eigenvalues_are_initialized(false)
+  PreconditionChebyshev()
+  : theta(1.)
+  , delta(1.)
+  , eigenvalues_are_initialized(false)
 {
   static_assert(
     std::is_same<size_type, typename VectorType::size_type>::value,
@@ -2137,9 +2138,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   double max_eigenvalue, min_eigenvalue;
   if (data.eig_cg_n_iterations > 0)
     {
-      Assert(
-        data.eig_cg_n_iterations > 2,
-        ExcMessage("Need to set at least two iterations to find eigenvalues."));
+      Assert(data.eig_cg_n_iterations > 2,
+             ExcMessage(
+               "Need to set at least two iterations to find eigenvalues."));
 
       // set a very strict tolerance to force at least two iterations
       ReductionControl control(

@@ -54,19 +54,19 @@ namespace parallel
   namespace internal
   {
 #ifdef DEAL_II_WITH_THREADS
-    TBBPartitioner::TBBPartitioner() :
-      my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
-      in_use(false)
+    TBBPartitioner::TBBPartitioner()
+      : my_partitioner(std::make_shared<tbb::affinity_partitioner>())
+      , in_use(false)
     {}
 
 
 
     TBBPartitioner::~TBBPartitioner()
     {
-      AssertNothrow(
-        in_use == false,
-        ExcInternalError("A vector partitioner goes out of scope, but "
-                         "it appears to be still in use."));
+      AssertNothrow(in_use == false,
+                    ExcInternalError(
+                      "A vector partitioner goes out of scope, but "
+                      "it appears to be still in use."));
     }
 
 

@@ -203,8 +203,10 @@ GridRefinement::refine_and_coarsen_fixed_number(
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   const std::pair<double, double> adjusted_fractions =
-    adjust_refine_and_coarsen_number_fraction<dim>(
-      criteria.size(), max_n_cells, top_fraction, bottom_fraction);
+    adjust_refine_and_coarsen_number_fraction<dim>(criteria.size(),
+                                                   max_n_cells,
+                                                   top_fraction,
+                                                   bottom_fraction);
 
   const int refine_cells =
     static_cast<int>(adjusted_fractions.first * criteria.size());
@@ -238,8 +240,9 @@ GridRefinement::refine_and_coarsen_fixed_number(
                                tmp.begin() + tmp.size() - coarsen_cells,
                                tmp.end(),
                                std::greater<double>());
-              coarsen(
-                tria, criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
+              coarsen(tria,
+                      criteria,
+                      *(tmp.begin() + tmp.size() - coarsen_cells));
             }
         }
     }

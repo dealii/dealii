@@ -126,15 +126,21 @@ test(std::string solver_name, std::string preconditioner_name)
   for (unsigned int i = 0; i < n_mpi_processes; i++)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
-  dealii::SparsityTools::distribute_sparsity_pattern(
-    csp, n_locally_owned_dofs, mpi_communicator, locally_relevant_dofs);
+  dealii::SparsityTools::distribute_sparsity_pattern(csp,
+                                                     n_locally_owned_dofs,
+                                                     mpi_communicator,
+                                                     locally_relevant_dofs);
 
   // initialize the stiffness and mass matrices
-  stiffness_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  stiffness_matrix.reinit(locally_owned_dofs,
+                          locally_owned_dofs,
+                          csp,
+                          mpi_communicator);
 
-  mass_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  mass_matrix.reinit(locally_owned_dofs,
+                     locally_owned_dofs,
+                     csp,
+                     mpi_communicator);
 
   eigenfunctions.resize(5);
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
@@ -156,11 +162,12 @@ test(std::string solver_name, std::string preconditioner_name)
   mass_matrix      = 0;
 
   dealii::QGauss<dim>   quadrature_formula(2);
-  dealii::FEValues<dim> fe_values(
-    fe,
-    quadrature_formula,
-    dealii::update_values | dealii::update_gradients |
-      dealii::update_quadrature_points | dealii::update_JxW_values);
+  dealii::FEValues<dim> fe_values(fe,
+                                  quadrature_formula,
+                                  dealii::update_values |
+                                    dealii::update_gradients |
+                                    dealii::update_quadrature_points |
+                                    dealii::update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -197,10 +204,12 @@ test(std::string solver_name, std::string preconditioner_name)
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_stiffness_matrix,
+                                               local_dof_indices,
+                                               stiffness_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix,
+                                               local_dof_indices,
+                                               mass_matrix);
       }
 
   stiffness_matrix.compress(dealii::VectorOperation::add);
@@ -246,8 +255,10 @@ test(std::string solver_name, std::string preconditioner_name)
                                           mpi_communicator);
     linear_solver.initialize(*preconditioner);
 
-    dealii::SolverControl solver_control(
-      100, 1e-11, /*log_history*/ false, /*log_results*/ false);
+    dealii::SolverControl solver_control(100,
+                                         1e-11,
+                                         /*log_history*/ false,
+                                         /*log_results*/ false);
 
     dealii::SLEPcWrappers::SolverBase *eigensolver;
 
@@ -255,8 +266,9 @@ test(std::string solver_name, std::string preconditioner_name)
     // Get a handle on the wanted eigenspectrum solver
     if (solver_name == "KrylovSchur")
       {
-        eigensolver = new dealii::SLEPcWrappers::SolverKrylovSchur(
-          solver_control, mpi_communicator);
+        eigensolver =
+          new dealii::SLEPcWrappers::SolverKrylovSchur(solver_control,
+                                                       mpi_communicator);
       }
 
     else if (solver_name == "GeneralizedDavidson")
@@ -266,13 +278,15 @@ test(std::string solver_name, std::string preconditioner_name)
       }
     else if (solver_name == "JacobiDavidson")
       {
-        eigensolver = new dealii::SLEPcWrappers::SolverJacobiDavidson(
-          solver_control, mpi_communicator);
+        eigensolver =
+          new dealii::SLEPcWrappers::SolverJacobiDavidson(solver_control,
+                                                          mpi_communicator);
       }
     else if (solver_name == "Lanczos")
       {
-        eigensolver = new dealii::SLEPcWrappers::SolverLanczos(
-          solver_control, mpi_communicator);
+        eigensolver =
+          new dealii::SLEPcWrappers::SolverLanczos(solver_control,
+                                                   mpi_communicator);
       }
     else
       {
@@ -280,8 +294,9 @@ test(std::string solver_name, std::string preconditioner_name)
 
         // Make compiler happy and not complaining about non
         // uninitialized variables
-        eigensolver = new dealii::SLEPcWrappers::SolverKrylovSchur(
-          solver_control, mpi_communicator);
+        eigensolver =
+          new dealii::SLEPcWrappers::SolverKrylovSchur(solver_control,
+                                                       mpi_communicator);
       }
 
     PETScWrappers::set_option_value("-st_pc_factor_mat_solver_package",
@@ -350,8 +365,9 @@ main(int argc, char **argv)
 
   try
     {
-      dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(
-        argc, argv, 1);
+      dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc,
+                                                                  argv,
+                                                                  1);
       {
         test("KrylovSchur", "Jacobi");
         test("KrylovSchur", "BlockJacobi");

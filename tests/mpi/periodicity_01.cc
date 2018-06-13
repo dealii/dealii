@@ -115,15 +115,15 @@ namespace Step40
   };
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    mpi_communicator(MPI_COMM_WORLD),
-    triangulation(mpi_communicator),
-    dof_handler(triangulation),
-    fe(2),
-    pcout(Utilities::MPI::this_mpi_process(mpi_communicator) == 0 ?
-            deallog.get_file_stream() :
-            std::cout,
-          (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+  LaplaceProblem<dim>::LaplaceProblem()
+    : mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator)
+    , dof_handler(triangulation)
+    , fe(2)
+    , pcout(Utilities::MPI::this_mpi_process(mpi_communicator) == 0 ?
+              deallog.get_file_stream() :
+              std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
   {}
 
 
@@ -142,8 +142,9 @@ namespace Step40
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-    locally_relevant_solution.reinit(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    locally_relevant_solution.reinit(locally_owned_dofs,
+                                     locally_relevant_dofs,
+                                     mpi_communicator);
     system_rhs.reinit(mpi_communicator,
                       dof_handler.n_dofs(),
                       dof_handler.n_locally_owned_dofs());
@@ -160,12 +161,15 @@ namespace Step40
                                              /*direction*/ i,
                                              constraints);
 
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
-    DynamicSparsityPattern csp(
-      dof_handler.n_dofs(), dof_handler.n_dofs(), locally_relevant_dofs);
+    DynamicSparsityPattern csp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs(),
+                               locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     SparsityTools::distribute_sparsity_pattern(
       csp,
@@ -313,8 +317,10 @@ namespace Step40
       GridTools::find_active_cell_around_point(dof_handler, point);
 
     if (cell->is_locally_owned())
-      VectorTools::point_value(
-        dof_handler, locally_relevant_solution, point, value);
+      VectorTools::point_value(dof_handler,
+                               locally_relevant_solution,
+                               point,
+                               value);
 
     std::vector<double> tmp(value.size());
     std::vector<double> tmp2(value.size());

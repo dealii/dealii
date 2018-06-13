@@ -67,8 +67,10 @@ check_subdivided_parallelepiped(bool colorize, bool log)
   const unsigned int n_subdivisions = (2 * dim + 1);
 
   Triangulation<dim> triangulation;
-  GridGenerator::subdivided_parallelepiped(
-    triangulation, n_subdivisions, corners, colorize);
+  GridGenerator::subdivided_parallelepiped(triangulation,
+                                           n_subdivisions,
+                                           corners,
+                                           colorize);
 
   GridOut grid_out;
 

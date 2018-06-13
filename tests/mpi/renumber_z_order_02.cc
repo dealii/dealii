@@ -116,8 +116,9 @@ test()
                                      fe_values.JxW(q);
                 }
             }
-          cm.distribute_local_to_global(
-            local_vector, local_dof_indices, vector);
+          cm.distribute_local_to_global(local_vector,
+                                        local_dof_indices,
+                                        vector);
         }
     vector.compress(VectorOperation::add);
   }

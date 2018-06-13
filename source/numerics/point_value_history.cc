@@ -56,8 +56,8 @@ namespace internal
 
 template <int dim>
 PointValueHistory<dim>::PointValueHistory(
-  const unsigned int n_independent_variables) :
-  n_indep(n_independent_variables)
+  const unsigned int n_independent_variables)
+  : n_indep(n_independent_variables)
 {
   closed                = false;
   cleared               = false;
@@ -78,9 +78,9 @@ PointValueHistory<dim>::PointValueHistory(
 template <int dim>
 PointValueHistory<dim>::PointValueHistory(
   const DoFHandler<dim> &dof_handler,
-  const unsigned int     n_independent_variables) :
-  dof_handler(&dof_handler),
-  n_indep(n_independent_variables)
+  const unsigned int     n_independent_variables)
+  : dof_handler(&dof_handler)
+  , n_indep(n_independent_variables)
 {
   closed                = false;
   cleared               = false;
@@ -127,8 +127,9 @@ PointValueHistory<dim>::PointValueHistory(
   if (have_dof_handler)
     {
       tria_listener =
-        dof_handler->get_triangulation().signals.any_change.connect(std::bind(
-          &PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
+        dof_handler->get_triangulation().signals.any_change.connect(
+          std::bind(&PointValueHistory<dim>::tria_change_listener,
+                    std::ref(*this)));
     }
 }
 
@@ -160,8 +161,9 @@ PointValueHistory<dim>::operator=(const PointValueHistory &point_value_history)
   if (have_dof_handler)
     {
       tria_listener =
-        dof_handler->get_triangulation().signals.any_change.connect(std::bind(
-          &PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
+        dof_handler->get_triangulation().signals.any_change.connect(
+          std::bind(&PointValueHistory<dim>::tria_change_listener,
+                    std::ref(*this)));
     }
 
   return *this;
@@ -202,9 +204,10 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // FE.
   Quadrature<dim> support_point_quadrature(
     dof_handler->get_fe().get_unit_support_points());
-  FEValues<dim> fe_values(
-    dof_handler->get_fe(), support_point_quadrature, update_quadrature_points);
-  unsigned int n_support_points =
+  FEValues<dim> fe_values(dof_handler->get_fe(),
+                          support_point_quadrature,
+                          update_quadrature_points);
+  unsigned int  n_support_points =
     dof_handler->get_fe().get_unit_support_points().size();
   unsigned int n_components = dof_handler->get_fe(0).n_components();
 
@@ -346,9 +349,10 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
   // FE.
   Quadrature<dim> support_point_quadrature(
     dof_handler->get_fe().get_unit_support_points());
-  FEValues<dim> fe_values(
-    dof_handler->get_fe(), support_point_quadrature, update_quadrature_points);
-  unsigned int n_support_points =
+  FEValues<dim> fe_values(dof_handler->get_fe(),
+                          support_point_quadrature,
+                          update_quadrature_points);
+  unsigned int  n_support_points =
     dof_handler->get_fe().get_unit_support_points().size();
   unsigned int n_components = dof_handler->get_fe(0).n_components();
 
@@ -436,8 +440,9 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
         }
 
       internal::PointValueHistoryImplementation::PointGeometryData<dim>
-        new_point_geometry_data(
-          locations[point], current_points[point], new_solution_indices);
+        new_point_geometry_data(locations[point],
+                                current_points[point],
+                                new_solution_indices);
 
       point_geometry_data.push_back(new_point_geometry_data);
 
@@ -636,8 +641,9 @@ PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
               unsigned int solution_index = point->solution_indices[comp];
               data_store_field
                 ->second[data_store_index * n_stored + store_index]
-                .push_back(internal::ElementAccess<VectorType>::get(
-                  solution, solution_index));
+                .push_back(
+                  internal::ElementAccess<VectorType>::get(solution,
+                                                           solution_index));
               store_index++;
             }
         }
@@ -717,8 +723,9 @@ PointValueHistory<dim>::evaluate_field(
       // we now have a point to query, need to know what cell it is in
       const Point<dim> requested_location = point->requested_location;
       const typename DoFHandler<dim>::active_cell_iterator cell =
-        GridTools::find_active_cell_around_point(
-          StaticMappingQ1<dim>::mapping, *dof_handler, requested_location)
+        GridTools::find_active_cell_around_point(StaticMappingQ1<dim>::mapping,
+                                                 *dof_handler,
+                                                 requested_location)
           .first;
 
 
@@ -936,8 +943,10 @@ PointValueHistory<dim>::evaluate_field_at_requested_location(
       // Make a Vector <double> for the value
       // at the point. It will have as many
       // components as there are in the fe.
-      VectorTools::point_value(
-        *dof_handler, solution, point->requested_location, value);
+      VectorTools::point_value(*dof_handler,
+                               solution,
+                               point->requested_location,
+                               value);
 
       // Look up the component_mask and add
       // in components according to that mask
@@ -1276,8 +1285,9 @@ PointValueHistory<dim>::get_postprocessor_locations(
 
   locations = std::vector<Point<dim>>();
 
-  FEValues<dim> fe_values(
-    dof_handler->get_fe(), quadrature, update_quadrature_points);
+  FEValues<dim>           fe_values(dof_handler->get_fe(),
+                          quadrature,
+                          update_quadrature_points);
   unsigned int            n_quadrature_points = quadrature.size();
   std::vector<Point<dim>> evaluation_points;
 
@@ -1292,8 +1302,9 @@ PointValueHistory<dim>::get_postprocessor_locations(
       // need to know what cell it is in
       Point<dim> requested_location = point->requested_location;
       typename DoFHandler<dim>::active_cell_iterator cell =
-        GridTools::find_active_cell_around_point(
-          StaticMappingQ1<dim>::mapping, *dof_handler, requested_location)
+        GridTools::find_active_cell_around_point(StaticMappingQ1<dim>::mapping,
+                                                 *dof_handler,
+                                                 requested_location)
           .first;
       fe_values.reinit(cell);
 

@@ -31,28 +31,28 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
-SparseVanka<number>::SparseVanka() :
-  matrix(),
-  conserve_mem(false),
-  selected(),
-  n_threads(0),
-  inverses(),
-  _m(0),
-  _n(0)
+SparseVanka<number>::SparseVanka()
+  : matrix()
+  , conserve_mem(false)
+  , selected()
+  , n_threads(0)
+  , inverses()
+  , _m(0)
+  , _n(0)
 {}
 
 template <typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
                                  const std::vector<bool> &   selected_dofs,
                                  const bool                  conserve_mem,
-                                 const unsigned int          n_threads) :
-  matrix(&M, typeid(*this).name()),
-  conserve_mem(conserve_mem),
-  selected(&selected_dofs),
-  n_threads(n_threads),
-  inverses(M.m(), nullptr),
-  _m(M.m()),
-  _n(M.n())
+                                 const unsigned int          n_threads)
+  : matrix(&M, typeid(*this).name())
+  , conserve_mem(conserve_mem)
+  , selected(&selected_dofs)
+  , n_threads(n_threads)
+  , inverses(M.m(), nullptr)
+  , _m(M.m())
+  , _n(M.n())
 {
   Assert(M.m() == M.n(), ExcNotQuadratic());
   Assert(M.m() == selected->size(),
@@ -158,8 +158,10 @@ SparseVanka<number>::compute_inverses()
   // Now spawn the threads
   Threads::ThreadGroup<> threads;
   for (unsigned int i = 0; i < n_threads; ++i)
-    threads += Threads::new_thread(
-      fun_ptr, *this, blocking[i].first, blocking[i].second);
+    threads += Threads::new_thread(fun_ptr,
+                                   *this,
+                                   blocking[i].first,
+                                   blocking[i].second);
   threads.join_all();
 #endif
 }
@@ -308,8 +310,9 @@ SparseVanka<number>::apply_preconditioner(
         // couple with @p row.
         local_index.clear();
         for (size_type i = 0; i < row_length; ++i)
-          local_index.insert(std::pair<size_type, size_type>(
-            structure.column_number(row, i), i));
+          local_index.insert(
+            std::pair<size_type, size_type>(structure.column_number(row, i),
+                                            i));
 
         // Build local matrix and rhs
         for (std::map<size_type, size_type>::const_iterator is =
@@ -412,10 +415,10 @@ template <typename number>
 SparseVanka<number>::AdditionalData::AdditionalData(
   const std::vector<bool> &selected,
   const bool               conserve_mem,
-  const unsigned int       n_threads) :
-  selected(selected),
-  conserve_mem(conserve_mem),
-  n_threads(n_threads)
+  const unsigned int       n_threads)
+  : selected(selected)
+  , conserve_mem(conserve_mem)
+  , n_threads(n_threads)
 {}
 
 
@@ -429,10 +432,10 @@ SparseBlockVanka<number>::SparseBlockVanka(
   const unsigned int          n_blocks,
   const BlockingStrategy      blocking_strategy,
   const bool                  conserve_memory,
-  const unsigned int          n_threads) :
-  SparseVanka<number>(M, selected, conserve_memory, n_threads),
-  n_blocks(n_blocks),
-  dof_masks(n_blocks, std::vector<bool>(M.m(), false))
+  const unsigned int          n_threads)
+  : SparseVanka<number>(M, selected, conserve_memory, n_threads)
+  , n_blocks(n_blocks)
+  , dof_masks(n_blocks, std::vector<bool>(M.m(), false))
 {
   compute_dof_masks(M, selected, blocking_strategy);
 }
@@ -630,10 +633,10 @@ SparseBlockVanka<number>::vmult(Vector<number2> &      dst,
       // simpler for the compiler
       // by giving it the correct
       // type right away:
-      typedef void (SparseVanka<number>::*mem_fun_p)(
-        Vector<number2> &,
-        const Vector<number2> &,
-        const std::vector<bool> *const) const;
+      typedef void (
+        SparseVanka<number>::*mem_fun_p)(Vector<number2> &,
+                                         const Vector<number2> &,
+                                         const std::vector<bool> *const) const;
       const mem_fun_p comp =
         &SparseVanka<number>::template apply_preconditioner<number2>;
       Threads::ThreadGroup<> threads;

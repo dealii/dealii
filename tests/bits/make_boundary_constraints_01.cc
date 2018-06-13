@@ -87,8 +87,10 @@ test()
   // boundary values and boundary
   // constraints
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ConstantFunction<dim>(1.), boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ConstantFunction<dim>(1.),
+                                           boundary_values);
   ConstraintMatrix constraints;
   constraints.clear();
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints);

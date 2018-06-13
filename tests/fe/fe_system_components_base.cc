@@ -84,8 +84,9 @@ test(const bool renumber = false)
     {
       std::map<types::global_dof_index, Point<dim>> support_points;
       MappingQ1<dim>                                mapping;
-      DoFTools::map_dofs_to_support_points(
-        mapping, dof_handler, support_points);
+      DoFTools::map_dofs_to_support_points(mapping,
+                                           dof_handler,
+                                           support_points);
 
       const std::string filename = "grid" + Utilities::int_to_string(dim) +
                                    Utilities::int_to_string(renumber) + ".gp";

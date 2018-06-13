@@ -75,7 +75,8 @@ public:
   typedef typename BlockVectorType::value_type value_type;
   typedef typename BlockVectorType::size_type  size_type;
 
-  BlockLaplace() : Subscriptor()
+  BlockLaplace()
+    : Subscriptor()
   {}
 
   void
@@ -90,10 +91,14 @@ public:
              const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
              const unsigned int                    level)
   {
-    laplace1.initialize(
-      data, mg_constrained_dofs[0], level, std::vector<unsigned int>(1, 0));
-    laplace2.initialize(
-      data, mg_constrained_dofs[1], level, std::vector<unsigned int>(1, 1));
+    laplace1.initialize(data,
+                        mg_constrained_dofs[0],
+                        level,
+                        std::vector<unsigned int>(1, 0));
+    laplace2.initialize(data,
+                        mg_constrained_dofs[1],
+                        level,
+                        std::vector<unsigned int>(1, 1));
   }
 
   void
@@ -249,8 +254,9 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
     {
       constraints[i].reinit(locally_relevant_dofs[i]);
       DoFTools::make_hanging_node_constraints(*dof[i], constraints[i]);
-      VectorTools::interpolate_boundary_values(
-        *dof[i], dirichlet_boundary, constraints[i]);
+      VectorTools::interpolate_boundary_values(*dof[i],
+                                               dirichlet_boundary,
+                                               constraints[i]);
       constraints[i].close();
       constraints_ptrs[i] = &constraints[i];
     }
@@ -339,8 +345,9 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
       for (unsigned int i = 0; i < dof.size(); ++i)
         {
           IndexSet relevant_dofs;
-          DoFTools::extract_locally_relevant_level_dofs(
-            *dof[i], level, relevant_dofs);
+          DoFTools::extract_locally_relevant_level_dofs(*dof[i],
+                                                        level,
+                                                        relevant_dofs);
           level_constraints[i].reinit(relevant_dofs);
           level_constraints[i].add_lines(
             mg_constrained_dofs[i].get_boundary_indices(level));
@@ -350,16 +357,17 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
 
       mg_level_data[level].reinit(
         mapping, dof, level_constraints_ptrs, quad, mg_additional_data);
-      mg_matrices[level].initialize(
-        std::make_shared<MatrixFree<dim, number>>(mg_level_data[level]),
-        mg_constrained_dofs,
-        level);
+      mg_matrices[level].initialize(std::make_shared<MatrixFree<dim, number>>(
+                                      mg_level_data[level]),
+                                    mg_constrained_dofs,
+                                    level);
       mg_matrices[level].compute_diagonal();
     }
 
   MGLevelObject<MGInterfaceOperator<LevelMatrixType>> mg_interface_matrices;
-  mg_interface_matrices.resize(
-    0, dof[0]->get_triangulation().n_global_levels() - 1);
+  mg_interface_matrices.resize(0,
+                               dof[0]->get_triangulation().n_global_levels() -
+                                 1);
   for (unsigned int level = 0;
        level < dof[0]->get_triangulation().n_global_levels();
        ++level)

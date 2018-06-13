@@ -156,12 +156,13 @@ namespace FETools
         for (unsigned int m = 0; m < multiplicities[base]; ++m)
           block_indices.push_back(fes[base]->dofs_per_cell);
 
-      return FiniteElementData<dim>(
-        dpo,
-        (do_tensor_product ? multiplied_n_components : n_components),
-        degree,
-        total_conformity,
-        block_indices);
+      return FiniteElementData<dim>(dpo,
+                                    (do_tensor_product ?
+                                       multiplied_n_components :
+                                       n_components),
+                                    degree,
+                                    total_conformity,
+                                    block_indices);
     }
 
 
@@ -396,14 +397,15 @@ namespace FETools
           // Now check that all FEs have the same number of components:
           for (unsigned int i = 0; i < fes.size(); ++i)
             if (multiplicities[i] > 0) // needed because fe might be NULL
-              Assert(
-                n_components == fes[i]->n_components(),
-                ExcDimensionMismatch(n_components, fes[i]->n_components()));
+              Assert(n_components == fes[i]->n_components(),
+                     ExcDimensionMismatch(n_components,
+                                          fes[i]->n_components()));
         }
 
       // generate the array that will hold the output
-      std::vector<std::vector<bool>> retval(
-        n_shape_functions, std::vector<bool>(n_components, false));
+      std::vector<std::vector<bool>> retval(n_shape_functions,
+                                            std::vector<bool>(n_components,
+                                                              false));
 
       // finally go through all the shape functions of the base elements, and
       // copy their flags. this somehow copies the code in build_cell_table,
@@ -601,8 +603,9 @@ namespace FETools
       fe_list.push_back(fe5);
       multiplicities.push_back(N5);
 
-      return compute_nonzero_components(
-        fe_list, multiplicities, do_tensor_product);
+      return compute_nonzero_components(fe_list,
+                                        multiplicities,
+                                        do_tensor_product);
     }
 
 
@@ -934,8 +937,9 @@ namespace FETools
                        fe.base_element(base).dofs_per_line * line_number +
                        local_index);
 
-                    face_system_to_base_table[total_index] = std::make_pair(
-                      std::make_pair(base, m), face_index_in_base);
+                    face_system_to_base_table[total_index] =
+                      std::make_pair(std::make_pair(base, m),
+                                     face_index_in_base);
 
                     if (fe.base_element(base).is_primitive(index_in_base))
                       {
@@ -984,8 +988,9 @@ namespace FETools
                        fe.base_element(base).dofs_per_quad * quad_number +
                        local_index);
 
-                    face_system_to_base_table[total_index] = std::make_pair(
-                      std::make_pair(base, m), face_index_in_base);
+                    face_system_to_base_table[total_index] =
+                      std::make_pair(std::make_pair(base, m),
+                                     face_index_in_base);
 
                     if (fe.base_element(base).is_primitive(index_in_base))
                       {
@@ -2118,8 +2123,10 @@ namespace FETools
          cell_number < GeometryInfo<dim>::max_children_per_face;
          ++cell_number)
       {
-        const Quadrature<dim> q_coarse = QProjector<dim>::project_to_subface(
-          q_gauss, face_coarse, cell_number);
+        const Quadrature<dim> q_coarse =
+          QProjector<dim>::project_to_subface(q_gauss,
+                                              face_coarse,
+                                              cell_number);
         FEValues<dim> coarse(mapping, fe, q_coarse, update_values);
 
         typename Triangulation<dim, spacedim>::active_cell_iterator fine_cell =
@@ -2206,8 +2213,9 @@ namespace FETools
       Triangulation<dim, spacedim> tr;
       GridGenerator::hyper_cube(tr, 0, 1);
 
-      FEValues<dim, spacedim> coarse(
-        fe, q_fine, update_JxW_values | update_values);
+      FEValues<dim, spacedim> coarse(fe,
+                                     q_fine,
+                                     update_JxW_values | update_values);
 
       typename Triangulation<dim, spacedim>::cell_iterator coarse_cell =
         tr.begin(0);
@@ -2581,10 +2589,10 @@ namespace FETools
                     // find sub-quadrature
                     position = name.find('(');
                     const std::string subquadrature_name(name, 0, position);
-                    AssertThrow(
-                      subquadrature_name.compare("QTrapez") == 0,
-                      ExcNotImplemented("Could not detect quadrature of name " +
-                                        subquadrature_name));
+                    AssertThrow(subquadrature_name.compare("QTrapez") == 0,
+                                ExcNotImplemented(
+                                  "Could not detect quadrature of name " +
+                                  subquadrature_name));
                     // delete "QTrapez(),"
                     name.erase(0, position + 3);
                     const std::pair<int, unsigned int> tmp =
@@ -2717,9 +2725,9 @@ namespace FETools
       }
     catch (const std::string &errline)
       {
-        AssertThrow(
-          false,
-          ExcInvalidFEName(parameter_name + std::string(" at ") + errline));
+        AssertThrow(false,
+                    ExcInvalidFEName(parameter_name + std::string(" at ") +
+                                     errline));
         return nullptr;
       }
   }
@@ -3043,17 +3051,19 @@ namespace FETools
           double_support_point_values_imag.get()[i].reinit(
             finite_element.n_components(), false);
 
-          std::transform(
-            std::begin(support_point_values[i]),
-            std::end(support_point_values[i]),
-            std::begin(double_support_point_values_real.get()[i]),
-            [](std::complex<number> c) -> double { return c.real(); });
+          std::transform(std::begin(support_point_values[i]),
+                         std::end(support_point_values[i]),
+                         std::begin(double_support_point_values_real.get()[i]),
+                         [](std::complex<number> c) -> double {
+                           return c.real();
+                         });
 
-          std::transform(
-            std::begin(support_point_values[i]),
-            std::end(support_point_values[i]),
-            std::begin(double_support_point_values_imag.get()[i]),
-            [](std::complex<number> c) -> double { return c.imag(); });
+          std::transform(std::begin(support_point_values[i]),
+                         std::end(support_point_values[i]),
+                         std::begin(double_support_point_values_imag.get()[i]),
+                         [](std::complex<number> c) -> double {
+                           return c.imag();
+                         });
         }
 
       finite_element.convert_generalized_support_point_values_to_dof_values(
@@ -3096,8 +3106,9 @@ namespace FETools
                     finite_element.get_generalized_support_points().size());
     AssertDimension(dof_values.size(), finite_element.dofs_per_cell);
 
-    convert_helper<dim, spacedim>(
-      finite_element, support_point_values, dof_values);
+    convert_helper<dim, spacedim>(finite_element,
+                                  support_point_values,
+                                  dof_values);
   }
 
 

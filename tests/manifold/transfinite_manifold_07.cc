@@ -227,8 +227,9 @@ void concentric_disks(Triangulation<2> &         tria,
       cell_idx++;
     }
 
-  tria.create_triangulation(
-    vertices, cells, SubCellData()); // no boundary information
+  tria.create_triangulation(vertices,
+                            cells,
+                            SubCellData()); // no boundary information
 
   double       eps   = 1e-5 * x[0];
   unsigned int label = 100;
@@ -290,7 +291,8 @@ private:
 };
 
 template <int dim>
-Mygrid<dim>::Mygrid(unsigned int r) : refinement(r)
+Mygrid<dim>::Mygrid(unsigned int r)
+  : refinement(r)
 {}
 
 template <int dim>

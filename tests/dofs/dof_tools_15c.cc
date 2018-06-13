@@ -39,9 +39,9 @@ check_this(const DoFHandler<dim> &dof_handler)
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
   DoFTools::map_dof_to_boundary_indices(dof_handler, map);
 
-  const unsigned int n_blocks = std::min(
-    static_cast<types::global_dof_index>(dof_handler.get_fe().n_components()),
-    dof_handler.n_boundary_dofs());
+  const unsigned int   n_blocks = std::min(static_cast<types::global_dof_index>(
+                                           dof_handler.get_fe().n_components()),
+                                         dof_handler.n_boundary_dofs());
   BlockSparsityPattern sp(n_blocks, n_blocks);
   // split dofs almost arbitrarily to
   // blocks

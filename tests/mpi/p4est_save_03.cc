@@ -81,10 +81,12 @@ test()
 
     PETScWrappers::MPI::Vector x(locally_owned_dofs, MPI_COMM_WORLD);
     PETScWrappers::MPI::Vector x2(locally_owned_dofs, MPI_COMM_WORLD);
-    PETScWrappers::MPI::Vector solution(
-      locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
-    PETScWrappers::MPI::Vector solution2(
-      locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
+    PETScWrappers::MPI::Vector solution(locally_owned_dofs,
+                                        locally_relevant_dofs,
+                                        MPI_COMM_WORLD);
+    PETScWrappers::MPI::Vector solution2(locally_owned_dofs,
+                                         locally_relevant_dofs,
+                                         MPI_COMM_WORLD);
 
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
       soltrans(dh);

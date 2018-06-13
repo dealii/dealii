@@ -153,7 +153,9 @@ double coefficient(const Point<dim> &p)
 // constructor argument (which was <code>1</code> in all previous examples) by
 // the desired polynomial degree (here <code>2</code>):
 template <int dim>
-Step6<dim>::Step6() : fe(2), dof_handler(triangulation)
+Step6<dim>::Step6()
+  : fe(2)
+  , dof_handler(triangulation)
 {}
 
 
@@ -263,8 +265,10 @@ void Step6<dim>::setup_system()
   // can add constraints to the ConstraintMatrix in either order: if two
   // constraints conflict then the constraint matrix either abort or throw an
   // exception via the Assert macro.
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
 
   // After all constraints have been added, they need to be sorted and
   // rearranged to perform some actions more efficiently. This postprocessing
@@ -516,8 +520,10 @@ void Step6<dim>::refine_grid()
   // method described above. It is from a class that implements several
   // different algorithms to refine a triangulation based on cell-wise error
   // indicators.
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
 
   // After the previous function has exited, some cells are flagged for
   // refinement, and some other for coarsening. The refinement or coarsening

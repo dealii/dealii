@@ -206,8 +206,9 @@ namespace
 
     IndexSet index_set(mg_dof.locally_owned_dofs().size());
     std::vector<types::global_dof_index> accessed_indices;
-    ghosted_level_vector.resize(
-      0, mg_dof.get_triangulation().n_global_levels() - 1);
+    ghosted_level_vector.resize(0,
+                                mg_dof.get_triangulation().n_global_levels() -
+                                  1);
     std::vector<IndexSet> level_index_set(
       mg_dof.get_triangulation().n_global_levels());
     for (unsigned int l = 0; l < mg_dof.get_triangulation().n_global_levels();
@@ -231,8 +232,9 @@ namespace
     std::sort(accessed_indices.begin(), accessed_indices.end());
     index_set.add_indices(accessed_indices.begin(), accessed_indices.end());
     index_set.compress();
-    ghosted_global_vector.reinit(
-      mg_dof.locally_owned_dofs(), index_set, mpi_communicator);
+    ghosted_global_vector.reinit(mg_dof.locally_owned_dofs(),
+                                 index_set,
+                                 mpi_communicator);
 
     // localize the copy indices for faster access. Since all access will be
     // through the ghosted vector in 'data', we can use this (much faster)
@@ -344,10 +346,12 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
 
   // now do a global reduction over all processors to see what operation
   // they can agree upon
-  perform_plain_copy = Utilities::MPI::min(
-    static_cast<int>(my_perform_plain_copy), mpi_communicator);
-  perform_renumbered_plain_copy = Utilities::MPI::min(
-    static_cast<int>(my_perform_renumbered_plain_copy), mpi_communicator);
+  perform_plain_copy =
+    Utilities::MPI::min(static_cast<int>(my_perform_plain_copy),
+                        mpi_communicator);
+  perform_renumbered_plain_copy =
+    Utilities::MPI::min(static_cast<int>(my_perform_renumbered_plain_copy),
+                        mpi_communicator);
 
   // if we do a plain copy, no need to hold additional ghosted vectors
   if (perform_renumbered_plain_copy)

@@ -91,10 +91,10 @@ check_complex_norms()
                     acc * size * std::abs(value),
                   ExcInternalError());
       const number l2_norma = vec.l2_norm();
-      AssertThrow(
-        std::abs(l2_norma - std::abs(value) * std::sqrt((number)size)) <
-          acc * std::sqrt((number)size) * std::abs(value),
-        ExcInternalError());
+      AssertThrow(std::abs(l2_norma -
+                           std::abs(value) * std::sqrt((number)size)) <
+                    acc * std::sqrt((number)size) * std::abs(value),
+                  ExcInternalError());
     }
 }
 

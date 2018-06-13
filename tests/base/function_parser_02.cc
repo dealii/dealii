@@ -49,8 +49,9 @@ main()
   // initialized with units
   FunctionParser<2> fp;
   function[0] = "x * cm + y * m + PI";
-  fp.initialize(
-    FunctionParser<2>::default_variable_names(), function, constants);
+  fp.initialize(FunctionParser<2>::default_variable_names(),
+                function,
+                constants);
 
   deallog << "Function "
           << "[" << function[0] << "]"
@@ -63,8 +64,9 @@ main()
   // that's a string, not vector of
   // strings
   FunctionParser<2> fp4;
-  fp4.initialize(
-    FunctionParser<2>::default_variable_names(), function[0], constants);
+  fp4.initialize(FunctionParser<2>::default_variable_names(),
+                 function[0],
+                 constants);
 
   deallog << "Function "
           << "[" << function[0] << "]"
@@ -78,8 +80,9 @@ main()
   // compatibility
   FunctionParser<2> fp2;
   function[0] = "x + y + PI";
-  fp2.initialize(
-    FunctionParser<2>::default_variable_names(), function, constants);
+  fp2.initialize(FunctionParser<2>::default_variable_names(),
+                 function,
+                 constants);
   deallog << "Function "
           << "[" << function[0] << "]"
           << " @point "
@@ -92,8 +95,9 @@ main()
   // same as above but the function is
   // a string, not a vector
   FunctionParser<2> fp3;
-  fp3.initialize(
-    FunctionParser<2>::default_variable_names(), function[0], constants);
+  fp3.initialize(FunctionParser<2>::default_variable_names(),
+                 function[0],
+                 constants);
 
   deallog << "Function "
           << "[" << function[0] << "]"

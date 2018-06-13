@@ -98,8 +98,8 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in) :
-    data(data_in){};
+  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   vmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,

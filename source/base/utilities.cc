@@ -216,9 +216,9 @@ namespace Utilities
     char *p;
     errno       = 0;
     const int i = std::strtol(s.c_str(), &p, 10);
-    AssertThrow(
-      !((errno != 0) || (s.size() == 0) || ((s.size() > 0) && (*p != '\0'))),
-      ExcMessage("Can't convert <" + s + "> to an integer."));
+    AssertThrow(!((errno != 0) || (s.size() == 0) ||
+                  ((s.size() > 0) && (*p != '\0'))),
+                ExcMessage("Can't convert <" + s + "> to an integer."));
 
     return i;
   }
@@ -255,9 +255,9 @@ namespace Utilities
     char *p;
     errno          = 0;
     const double d = std::strtod(s.c_str(), &p);
-    AssertThrow(
-      !((errno != 0) || (s.size() == 0) || ((s.size() > 0) && (*p != '\0'))),
-      ExcMessage("Can't convert <" + s + "> to a double."));
+    AssertThrow(!((errno != 0) || (s.size() == 0) ||
+                  ((s.size() > 0) && (*p != '\0'))),
+                ExcMessage("Can't convert <" + s + "> to a double."));
 
     return d;
   }

@@ -84,13 +84,14 @@ do_test()
   auto subtract_and_assign =
     [](AlignedVector<VectorizedArray<float>> &      lhs,
        const AlignedVector<VectorizedArray<float>> &rhs) {
-      std::transform(
-        lhs.begin(),
-        lhs.end(),
-        rhs.begin(),
-        lhs.begin(),
-        [](const VectorizedArray<float> lval,
-           const VectorizedArray<float> rval) { return lval - rval; });
+      std::transform(lhs.begin(),
+                     lhs.end(),
+                     rhs.begin(),
+                     lhs.begin(),
+                     [](const VectorizedArray<float> lval,
+                        const VectorizedArray<float> rval) {
+                       return lval - rval;
+                     });
     };
 
   const ArrayView<VectorizedArray<float>> view1(v1.begin(), v1.size());

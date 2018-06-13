@@ -59,8 +59,9 @@ test()
   if (numproc > 2)
     local_relevant0.add_index(8);
 
-  LinearAlgebra::distributed::Vector<double> v0(
-    local_owned0, local_relevant0, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v0(local_owned0,
+                                                local_relevant0,
+                                                MPI_COMM_WORLD);
 
   // vector1: local size 4
   const unsigned int local_size1  = 4;
@@ -81,8 +82,9 @@ test()
       local_relevant1.add_index(10);
     }
 
-  LinearAlgebra::distributed::Vector<double> v1(
-    local_owned1, local_relevant1, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v1(local_owned1,
+                                                local_relevant1,
+                                                MPI_COMM_WORLD);
 
   v0 = 1;
   v1 = 2;

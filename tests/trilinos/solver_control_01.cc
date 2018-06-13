@@ -75,8 +75,10 @@ main(int argc, char **argv)
       // Expects success
       SolverControl              control(2000, 1.e-3);
       TrilinosWrappers::SolverCG solver(control);
-      check_solver_within_range(
-        solver.solve(A, u, f, preconditioner), control.last_step(), 42, 44);
+      check_solver_within_range(solver.solve(A, u, f, preconditioner),
+                                control.last_step(),
+                                42,
+                                44);
     }
     deallog.pop();
 
@@ -86,8 +88,10 @@ main(int argc, char **argv)
       // Expects failure
       SolverControl              control(20, 1.e-3);
       TrilinosWrappers::SolverCG solver(control);
-      check_solver_within_range(
-        solver.solve(A, u, f, preconditioner), control.last_step(), 0, 19);
+      check_solver_within_range(solver.solve(A, u, f, preconditioner),
+                                control.last_step(),
+                                0,
+                                19);
     }
     deallog.pop();
   }

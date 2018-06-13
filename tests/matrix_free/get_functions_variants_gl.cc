@@ -47,7 +47,8 @@ class MatrixFreeTest
 public:
   typedef Vector<Number> VectorType;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   operator()(const MatrixFree<dim, Number> &              data,

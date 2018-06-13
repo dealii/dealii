@@ -53,8 +53,10 @@ test()
   dealii::parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD);
 
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<dim>(0, 0), Point<dim>(1, 1), true);
+  GridGenerator::hyper_rectangle(triangulation,
+                                 Point<dim>(0, 0),
+                                 Point<dim>(1, 1),
+                                 true);
 
   triangulation.refine_global(1);
   // Extra refinement to generate hanging nodes
@@ -102,14 +104,14 @@ test()
 
   // Generate sparsity pattern
   DynamicSparsityPattern sp(relevant_partitioning);
-  DoFTools::make_flux_sparsity_pattern(
-    dh,
-    sp,
-    constraints,
-    false,
-    coupling,
-    flux_coupling,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_flux_sparsity_pattern(dh,
+                                       sp,
+                                       constraints,
+                                       false,
+                                       coupling,
+                                       flux_coupling,
+                                       Utilities::MPI::this_mpi_process(
+                                         MPI_COMM_WORLD));
   SparsityTools::distribute_sparsity_pattern(
     sp,
     dh.n_locally_owned_dofs_per_processor(),

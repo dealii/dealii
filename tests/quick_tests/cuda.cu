@@ -44,8 +44,10 @@ main()
   AssertCuda(cuda_error);
   cuda_error = cudaMalloc(&device_y, n * sizeof(double));
   AssertCuda(cuda_error);
-  cuda_error = cudaMemcpy(
-    device_x, host_x.data(), n * sizeof(double), cudaMemcpyHostToDevice);
+  cuda_error = cudaMemcpy(device_x,
+                          host_x.data(),
+                          n * sizeof(double),
+                          cudaMemcpyHostToDevice);
   AssertCuda(cuda_error);
 
   // Launch the kernel.
@@ -54,8 +56,10 @@ main()
   // Copy output data to host.
   cuda_error = cudaDeviceSynchronize();
   AssertCuda(cuda_error);
-  cuda_error = cudaMemcpy(
-    host_y.data(), device_y, n * sizeof(double), cudaMemcpyDeviceToHost);
+  cuda_error = cudaMemcpy(host_y.data(),
+                          device_y,
+                          n * sizeof(double),
+                          cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error);
 
   // Print the results and test

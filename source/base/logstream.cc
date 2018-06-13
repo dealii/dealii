@@ -37,14 +37,16 @@ LogStream deallog;
 
 
 
-LogStream::Prefix::Prefix(const std::string &text) : stream(&deallog)
+LogStream::Prefix::Prefix(const std::string &text)
+  : stream(&deallog)
 {
   stream->push(text);
 }
 
 
 
-LogStream::Prefix::Prefix(const std::string &text, LogStream &s) : stream(&s)
+LogStream::Prefix::Prefix(const std::string &text, LogStream &s)
+  : stream(&s)
 {
   stream->push(text);
 }
@@ -61,21 +63,21 @@ LogStream::Prefix::~Prefix()
     }
   catch (...)
     {
-      AssertNothrow(
-        false,
-        ExcMessage("An exception occurred in LogStream::Prefix::~Prefix."));
+      AssertNothrow(false,
+                    ExcMessage(
+                      "An exception occurred in LogStream::Prefix::~Prefix."));
     }
 }
 
 
 
-LogStream::LogStream() :
-  std_out(&std::cout),
-  file(nullptr),
-  std_depth(0),
-  file_depth(10000),
-  print_thread_id(false),
-  at_newline(true)
+LogStream::LogStream()
+  : std_out(&std::cout)
+  , file(nullptr)
+  , std_depth(0)
+  , file_depth(10000)
+  , print_thread_id(false)
+  , at_newline(true)
 {
   get_prefixes().push("DEAL:");
 }
@@ -149,7 +151,9 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
     // Implement a minimalistic stream buffer that only stores the fact
     // whether overflow or sync was called
   public:
-    QueryStreambuf() : flushed_(false), newline_written_(false)
+    QueryStreambuf()
+      : flushed_(false)
+      , newline_written_(false)
     {}
     bool
     flushed()

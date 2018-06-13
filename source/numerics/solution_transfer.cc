@@ -43,10 +43,10 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, typename VectorType, typename DoFHandlerType>
 SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer(
-  const DoFHandlerType &dof) :
-  dof_handler(&dof, typeid(*this).name()),
-  n_dofs_old(0),
-  prepared_for(none)
+  const DoFHandlerType &dof)
+  : dof_handler(&dof, typeid(*this).name())
+  , n_dofs_old(0)
+  , prepared_for(none)
 {
   Assert((dynamic_cast<const parallel::distributed::Triangulation<
             DoFHandlerType::dimension,
@@ -172,8 +172,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             local_values(i) = internal::ElementAccess<VectorType>::get(
               in, (*pointerstruct->second.indices_ptr)[i]);
-          cell->set_dof_values_by_interpolation(
-            local_values, out, this_fe_index);
+          cell->set_dof_values_by_interpolation(local_values,
+                                                out,
+                                                this_fe_index);
         }
     }
 }
@@ -405,8 +406,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           // cell->get_interpolated_dof_values already does all of the
           // interpolations between spaces
           for (unsigned int j = 0; j < in_size; ++j)
-            cell->get_interpolated_dof_values(
-              all_in[j], dof_values_on_cell[n_cf][j], target_fe_index);
+            cell->get_interpolated_dof_values(all_in[j],
+                                              dof_values_on_cell[n_cf][j],
+                                              target_fe_index);
           cell_map[std::make_pair(cell->level(), cell->index())] =
             Pointerstruct(&dof_values_on_cell[n_cf], target_fe_index);
           ++n_cf;
@@ -496,11 +498,13 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                 {
                   tmp.reinit(in_size, true);
                   for (unsigned int i = 0; i < in_size; ++i)
-                    tmp(i) = internal::ElementAccess<VectorType>::get(
-                      all_in[j], (*indexptr)[i]);
+                    tmp(i) =
+                      internal::ElementAccess<VectorType>::get(all_in[j],
+                                                               (*indexptr)[i]);
 
-                  cell->set_dof_values_by_interpolation(
-                    tmp, all_out[j], old_fe_index);
+                  cell->set_dof_values_by_interpolation(tmp,
+                                                        all_out[j],
+                                                        old_fe_index);
                 }
             }
           else if (valuesptr)
@@ -553,8 +557,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
 
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                    internal::ElementAccess<VectorType>::set(
-                      (*data)(i), dofs[i], all_out[j]);
+                    internal::ElementAccess<VectorType>::set((*data)(i),
+                                                             dofs[i],
+                                                             all_out[j]);
                 }
             }
           // undefined status

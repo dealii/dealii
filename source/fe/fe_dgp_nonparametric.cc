@@ -34,19 +34,19 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGPNonparametric<dim, spacedim>::FE_DGPNonparametric(
-  const unsigned int degree) :
-  FiniteElement<dim, spacedim>(
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      true),
-    std::vector<ComponentMask>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      std::vector<bool>(1, true))),
-  polynomial_space(Polynomials::Legendre::generate_complete_basis(degree))
+  const unsigned int degree)
+  : FiniteElement<dim, spacedim>(
+      FiniteElementData<dim>(get_dpo_vector(degree),
+                             1,
+                             degree,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        true),
+      std::vector<ComponentMask>(
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        std::vector<bool>(1, true)))
+  , polynomial_space(Polynomials::Legendre::generate_complete_basis(degree))
 {
   const unsigned int n_dofs = this->dofs_per_cell;
   for (unsigned int ref_case = RefinementCase<dim>::cut_x;

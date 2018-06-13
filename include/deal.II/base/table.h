@@ -1943,7 +1943,8 @@ TableBase<N, T>::TableBase(const TableIndices<N> &sizes,
 
 
 template <int N, typename T>
-TableBase<N, T>::TableBase(const TableBase<N, T> &src) : Subscriptor()
+TableBase<N, T>::TableBase(const TableBase<N, T> &src)
+  : Subscriptor()
 {
   reinit(src.table_size, true);
   values = src.values;
@@ -1963,10 +1964,10 @@ TableBase<N, T>::TableBase(const TableBase<N, T2> &src)
 
 
 template <int N, typename T>
-TableBase<N, T>::TableBase(TableBase<N, T> &&src) noexcept :
-  Subscriptor(std::move(src)),
-  values(std::move(src.values)),
-  table_size(src.table_size)
+TableBase<N, T>::TableBase(TableBase<N, T> &&src) noexcept
+  : Subscriptor(std::move(src))
+  , values(std::move(src.values))
+  , table_size(src.table_size)
 {
   src.table_size = TableIndices<N>();
 }
@@ -1991,17 +1992,17 @@ namespace internal
   {
     template <int N, typename T, bool C, unsigned int P>
     inline Accessor<N, T, C, P>::Accessor(const TableType &table,
-                                          const iterator   data) :
-      table(table),
-      data(data)
+                                          const iterator   data)
+      : table(table)
+      , data(data)
     {}
 
 
 
     template <int N, typename T, bool C, unsigned int P>
-    inline Accessor<N, T, C, P>::Accessor(const Accessor &a) :
-      table(a.table),
-      data(a.data)
+    inline Accessor<N, T, C, P>::Accessor(const Accessor &a)
+      : table(a.table)
+      , data(a.data)
     {}
 
 
@@ -2034,17 +2035,17 @@ namespace internal
 
     template <int N, typename T, bool C>
     inline Accessor<N, T, C, 1>::Accessor(const TableType &table,
-                                          const iterator   data) :
-      table(table),
-      data(data)
+                                          const iterator   data)
+      : table(table)
+      , data(data)
     {}
 
 
 
     template <int N, typename T, bool C>
-    inline Accessor<N, T, C, 1>::Accessor(const Accessor &a) :
-      table(a.table),
-      data(a.data)
+    inline Accessor<N, T, C, 1>::Accessor(const Accessor &a)
+      : table(a.table)
+      , data(a.data)
     {}
 
 
@@ -2108,8 +2109,9 @@ TableBase<N, T>::operator=(const TableBase<N, T2> &m)
 {
   reinit(m.size(), true);
   if (!empty())
-    std::copy(
-      m.values.begin(), m.values.begin() + n_elements(), values.begin());
+    std::copy(m.values.begin(),
+              m.values.begin() + n_elements(),
+              values.begin());
 
   return *this;
 }
@@ -2401,8 +2403,8 @@ TableBase<N, T>::el(const TableIndices<N> &indices)
 
 
 template <typename T>
-inline Table<1, T>::Table(const size_type size) :
-  TableBase<1, T>(TableIndices<1>(size))
+inline Table<1, T>::Table(const size_type size)
+  : TableBase<1, T>(TableIndices<1>(size))
 {}
 
 
@@ -2411,8 +2413,8 @@ template <typename T>
 template <typename InputIterator>
 inline Table<1, T>::Table(const size_type size,
                           InputIterator   entries,
-                          const bool      C_style_indexing) :
-  TableBase<1, T>(TableIndices<1>(size), entries, C_style_indexing)
+                          const bool      C_style_indexing)
+  : TableBase<1, T>(TableIndices<1>(size), entries, C_style_indexing)
 {}
 
 
@@ -2479,8 +2481,8 @@ Table<1, T>::operator()(const TableIndices<1> &indices)
 
 
 template <typename T>
-inline Table<2, T>::Table(const size_type size1, const size_type size2) :
-  TableBase<2, T>(TableIndices<2>(size1, size2))
+inline Table<2, T>::Table(const size_type size1, const size_type size2)
+  : TableBase<2, T>(TableIndices<2>(size1, size2))
 {}
 
 
@@ -2490,8 +2492,8 @@ template <typename InputIterator>
 inline Table<2, T>::Table(const size_type size1,
                           const size_type size2,
                           InputIterator   entries,
-                          const bool      C_style_indexing) :
-  TableBase<2, T>(TableIndices<2>(size1, size2), entries, C_style_indexing)
+                          const bool      C_style_indexing)
+  : TableBase<2, T>(TableIndices<2>(size1, size2), entries, C_style_indexing)
 {}
 
 
@@ -2610,27 +2612,27 @@ Table<2, T>::n_cols() const
 namespace TransposeTableIterators
 {
   template <typename T, bool Constness>
-  inline AccessorBase<T, Constness>::AccessorBase() :
-    container(nullptr),
-    linear_index(std::numeric_limits<decltype(linear_index)>::max())
+  inline AccessorBase<T, Constness>::AccessorBase()
+    : container(nullptr)
+    , linear_index(std::numeric_limits<decltype(linear_index)>::max())
   {}
 
 
 
   template <typename T, bool Constness>
   inline AccessorBase<T, Constness>::AccessorBase(
-    const container_pointer_type table) :
-    container(table),
-    linear_index(container->values.size())
+    const container_pointer_type table)
+    : container(table)
+    , linear_index(container->values.size())
   {}
 
 
 
   template <typename T, bool Constness>
   inline AccessorBase<T, Constness>::AccessorBase(
-    const AccessorBase<T, false> &a) :
-    container(a.container),
-    linear_index(a.linear_index)
+    const AccessorBase<T, false> &a)
+    : container(a.container)
+    , linear_index(a.linear_index)
   {}
 
 
@@ -2638,9 +2640,9 @@ namespace TransposeTableIterators
   template <typename T, bool Constness>
   inline AccessorBase<T, Constness>::AccessorBase(
     const container_pointer_type table,
-    const std::ptrdiff_t         index) :
-    container(table),
-    linear_index(index)
+    const std::ptrdiff_t         index)
+    : container(table)
+    , linear_index(index)
   {
     Assert(0 <= linear_index && linear_index < container->values.size() + 1,
            ExcMessage("The current iterator points outside of the table and is "
@@ -2726,23 +2728,23 @@ namespace TransposeTableIterators
 
 
   template <typename T, bool Constness>
-  Iterator<T, Constness>::Iterator(const Accessor<T, Constness> &a) :
-    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(a)
+  Iterator<T, Constness>::Iterator(const Accessor<T, Constness> &a)
+    : LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(a)
   {}
 
 
 
   template <typename T, bool Constness>
-  Iterator<T, Constness>::Iterator(const container_pointer_type table) :
-    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(
-      Accessor<T, Constness>(table))
+  Iterator<T, Constness>::Iterator(const container_pointer_type table)
+    : LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(
+        Accessor<T, Constness>(table))
   {}
 
 
 
   template <typename T, bool Constness>
-  Iterator<T, Constness>::Iterator(const Iterator<T, false> &i) :
-    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(*i)
+  Iterator<T, Constness>::Iterator(const Iterator<T, false> &i)
+    : LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(*i)
   {}
 
 
@@ -2750,17 +2752,17 @@ namespace TransposeTableIterators
   template <typename T, bool Constness>
   Iterator<T, Constness>::Iterator(const container_pointer_type table,
                                    const size_type              row_n,
-                                   const size_type              col_n) :
-    Iterator(table, table->n_rows() * col_n + row_n)
+                                   const size_type              col_n)
+    : Iterator(table, table->n_rows() * col_n + row_n)
   {}
 
 
 
   template <typename T, bool Constness>
   Iterator<T, Constness>::Iterator(const container_pointer_type table,
-                                   const std::ptrdiff_t         linear_index) :
-    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(
-      Accessor<T, Constness>(table, linear_index))
+                                   const std::ptrdiff_t         linear_index)
+    : LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(
+        Accessor<T, Constness>(table, linear_index))
   {}
 } // namespace TransposeTableIterators
 
@@ -2769,8 +2771,8 @@ namespace TransposeTableIterators
 //---------------------------------------------------------------------------
 template <typename T>
 inline TransposeTable<T>::TransposeTable(const size_type size1,
-                                         const size_type size2) :
-  TableBase<2, T>(TableIndices<2>(size2, size1))
+                                         const size_type size2)
+  : TableBase<2, T>(TableIndices<2>(size2, size1))
 {}
 
 
@@ -2885,8 +2887,8 @@ TransposeTable<T>::end() const
 template <typename T>
 inline Table<3, T>::Table(const size_type size1,
                           const size_type size2,
-                          const size_type size3) :
-  TableBase<3, T>(TableIndices<3>(size1, size2, size3))
+                          const size_type size3)
+  : TableBase<3, T>(TableIndices<3>(size1, size2, size3))
 {}
 
 
@@ -2897,10 +2899,10 @@ inline Table<3, T>::Table(const size_type size1,
                           const size_type size2,
                           const size_type size3,
                           InputIterator   entries,
-                          const bool      C_style_indexing) :
-  TableBase<3, T>(TableIndices<3>(size1, size2, size3),
-                  entries,
-                  C_style_indexing)
+                          const bool      C_style_indexing)
+  : TableBase<3, T>(TableIndices<3>(size1, size2, size3),
+                    entries,
+                    C_style_indexing)
 {}
 
 
@@ -2982,8 +2984,8 @@ template <typename T>
 inline Table<4, T>::Table(const size_type size1,
                           const size_type size2,
                           const size_type size3,
-                          const size_type size4) :
-  TableBase<4, T>(TableIndices<4>(size1, size2, size3, size4))
+                          const size_type size4)
+  : TableBase<4, T>(TableIndices<4>(size1, size2, size3, size4))
 {}
 
 
@@ -3077,8 +3079,8 @@ inline Table<5, T>::Table(const size_type size1,
                           const size_type size2,
                           const size_type size3,
                           const size_type size4,
-                          const size_type size5) :
-  TableBase<5, T>(TableIndices<5>(size1, size2, size3, size4, size5))
+                          const size_type size5)
+  : TableBase<5, T>(TableIndices<5>(size1, size2, size3, size4, size5))
 {}
 
 
@@ -3183,8 +3185,8 @@ inline Table<6, T>::Table(const size_type size1,
                           const size_type size3,
                           const size_type size4,
                           const size_type size5,
-                          const size_type size6) :
-  TableBase<6, T>()
+                          const size_type size6)
+  : TableBase<6, T>()
 {
   TableIndices<6> table_indices;
   table_indices[0] = size1;
@@ -3308,8 +3310,8 @@ inline Table<7, T>::Table(const size_type size1,
                           const size_type size4,
                           const size_type size5,
                           const size_type size6,
-                          const size_type size7) :
-  TableBase<7, T>()
+                          const size_type size7)
+  : TableBase<7, T>()
 {
   TableIndices<7> table_indices;
   table_indices[0] = size1;

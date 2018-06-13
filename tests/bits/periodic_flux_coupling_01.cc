@@ -62,7 +62,9 @@ private:
 };
 
 template <int dim>
-MakeFlux<dim>::MakeFlux() : fe(1), dof_handler(triangulation)
+MakeFlux<dim>::MakeFlux()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 

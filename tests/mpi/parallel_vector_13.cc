@@ -48,8 +48,9 @@ test()
   local_relevant.add_range(1, 2);
   local_relevant.add_range(4, 5);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
 
   // set local values and check them
   v(myid * 2)     = myid * 2.0;

@@ -21,11 +21,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-FE_P1NC::FE_P1NC() :
-  FiniteElement<2, 2>(
-    FiniteElementData<2>(get_dpo_vector(), 1, 1, FiniteElementData<2>::L2),
-    std::vector<bool>(1, false),
-    std::vector<ComponentMask>(4, ComponentMask(1, true)))
+FE_P1NC::FE_P1NC()
+  : FiniteElement<2, 2>(
+      FiniteElementData<2>(get_dpo_vector(), 1, 1, FiniteElementData<2>::L2),
+      std::vector<bool>(1, false),
+      std::vector<ComponentMask>(4, ComponentMask(1, true)))
 {
   // face support points: 2 end vertices
   unit_face_support_points.resize(2);
@@ -268,8 +268,9 @@ FE_P1NC::fill_fe_face_values(
     for (unsigned int i = 0; i < quadrature_on_face.size(); ++i)
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
         {
-          const Point<2> quadrature_point = mapping.transform_unit_to_real_cell(
-            cell, quadrature_on_face.point(i));
+          const Point<2> quadrature_point =
+            mapping.transform_unit_to_real_cell(cell,
+                                                quadrature_on_face.point(i));
 
           output_data.shape_values[k][i] =
             (coeffs[k][0] * quadrature_point(0) +

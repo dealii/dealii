@@ -50,7 +50,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q) : Function<dim>(3), q(q)
+  F(const unsigned int q)
+    : Function<dim>(3)
+    , q(q)
   {}
 
   virtual void
@@ -96,13 +98,13 @@ test()
           VectorTools::interpolate(dof_handler, F<dim>(q), interpolant);
 
           // then compute the interpolation error
-          VectorTools::integrate_difference(
-            dof_handler,
-            interpolant,
-            F<dim>(q),
-            error,
-            hp::QCollection<dim>(QGauss<dim>(q + 2)),
-            VectorTools::L2_norm);
+          VectorTools::integrate_difference(dof_handler,
+                                            interpolant,
+                                            F<dim>(q),
+                                            error,
+                                            hp::QCollection<dim>(
+                                              QGauss<dim>(q + 2)),
+                                            VectorTools::L2_norm);
           if (q <= p)
             Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
                    ExcInternalError());

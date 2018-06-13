@@ -36,23 +36,23 @@ PreconditionBlock<MatrixType, inverse_type>::AdditionalData::AdditionalData(
   const size_type block_size,
   const double    relaxation,
   const bool      invert_diagonal,
-  const bool      same_diagonal) :
-  relaxation(relaxation),
-  block_size(block_size),
-  invert_diagonal(invert_diagonal),
-  same_diagonal(same_diagonal),
-  inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
-  threshold(0.)
+  const bool      same_diagonal)
+  : relaxation(relaxation)
+  , block_size(block_size)
+  , invert_diagonal(invert_diagonal)
+  , same_diagonal(same_diagonal)
+  , inversion(PreconditionBlockBase<inverse_type>::gauss_jordan)
+  , threshold(0.)
 {}
 
 
 
 template <typename MatrixType, typename inverse_type>
-PreconditionBlock<MatrixType, inverse_type>::PreconditionBlock(bool store) :
-  PreconditionBlockBase<inverse_type>(store),
-  blocksize(0),
-  A(nullptr, typeid(*this).name()),
-  relaxation(1.0)
+PreconditionBlock<MatrixType, inverse_type>::PreconditionBlock(bool store)
+  : PreconditionBlockBase<inverse_type>(store)
+  , blocksize(0)
+  , A(nullptr, typeid(*this).name())
+  , relaxation(1.0)
 {}
 
 
@@ -83,8 +83,10 @@ PreconditionBlock<MatrixType, inverse_type>::initialize(
   blocksize                  = bsize;
   relaxation                 = parameters.relaxation;
   const unsigned int nblocks = A->m() / bsize;
-  this->reinit(
-    nblocks, blocksize, parameters.same_diagonal, parameters.inversion);
+  this->reinit(nblocks,
+               blocksize,
+               parameters.same_diagonal,
+               parameters.inversion);
 
   if (parameters.invert_diagonal)
     {
@@ -698,15 +700,14 @@ PreconditionBlockJacobi<MatrixType, inverse_type>::Tstep(
 
 
 template <typename MatrixType, typename inverse_type>
-PreconditionBlockSOR<MatrixType, inverse_type>::PreconditionBlockSOR() :
-  PreconditionBlock<MatrixType, inverse_type>(false)
+PreconditionBlockSOR<MatrixType, inverse_type>::PreconditionBlockSOR()
+  : PreconditionBlock<MatrixType, inverse_type>(false)
 
 {}
 
 template <typename MatrixType, typename inverse_type>
-PreconditionBlockSOR<MatrixType, inverse_type>::PreconditionBlockSOR(
-  bool store) :
-  PreconditionBlock<MatrixType, inverse_type>(store)
+PreconditionBlockSOR<MatrixType, inverse_type>::PreconditionBlockSOR(bool store)
+  : PreconditionBlock<MatrixType, inverse_type>(store)
 
 {}
 
@@ -966,8 +967,8 @@ PreconditionBlockSOR<MatrixType, inverse_type>::Tstep(
 
 
 template <typename MatrixType, typename inverse_type>
-PreconditionBlockSSOR<MatrixType, inverse_type>::PreconditionBlockSSOR() :
-  PreconditionBlockSOR<MatrixType, inverse_type>(true)
+PreconditionBlockSSOR<MatrixType, inverse_type>::PreconditionBlockSSOR()
+  : PreconditionBlockSOR<MatrixType, inverse_type>(true)
 
 {}
 

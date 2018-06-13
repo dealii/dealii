@@ -285,10 +285,10 @@ public:
     /**
      * Constructor.
      */
-    Shift(const MatrixType &A, const MatrixType &B, const double sigma) :
-      A(A),
-      B(B),
-      sigma(sigma)
+    Shift(const MatrixType &A, const MatrixType &B, const double sigma)
+      : A(A)
+      , B(B)
+      , sigma(sigma)
     {}
 
     /**
@@ -655,11 +655,11 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
   const unsigned int     number_of_arnoldi_vectors,
   const WhichEigenvalues eigenvalue_of_interest,
   const bool             symmetric,
-  const int              mode) :
-  number_of_arnoldi_vectors(number_of_arnoldi_vectors),
-  eigenvalue_of_interest(eigenvalue_of_interest),
-  symmetric(symmetric),
-  mode(mode)
+  const int              mode)
+  : number_of_arnoldi_vectors(number_of_arnoldi_vectors)
+  , eigenvalue_of_interest(eigenvalue_of_interest)
+  , symmetric(symmetric)
+  , mode(mode)
 {
   // Check for possible options for symmetric problems
   if (symmetric)
@@ -690,20 +690,20 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
 template <typename VectorType>
 PArpackSolver<VectorType>::PArpackSolver(SolverControl &       control,
                                          const MPI_Comm &      mpi_communicator,
-                                         const AdditionalData &data) :
-  solver_control(control),
-  additional_data(data),
-  mpi_communicator(mpi_communicator),
-  mpi_communicator_fortran(MPI_Comm_c2f(mpi_communicator)),
-  lworkl(0),
-  nloc(0),
-  ncv(0),
-  ldv(0),
-  initial_vector_provided(false),
-  ldz(0),
-  lworkev(0),
-  sigmar(0.0),
-  sigmai(0.0)
+                                         const AdditionalData &data)
+  : solver_control(control)
+  , additional_data(data)
+  , mpi_communicator(mpi_communicator)
+  , mpi_communicator_fortran(MPI_Comm_c2f(mpi_communicator))
+  , lworkl(0)
+  , nloc(0)
+  , ncv(0)
+  , ldv(0)
+  , initial_vector_provided(false)
+  , ldz(0)
+  , lworkev(0)
+  , sigmar(0.0)
+  , sigmai(0.0)
 {}
 
 
@@ -725,8 +725,9 @@ PArpackSolver<VectorType>::set_initial_vector(const VectorType &vec)
   initial_vector_provided = true;
   Assert(resid.size() == local_indices.size(),
          ExcDimensionMismatch(resid.size(), local_indices.size()));
-  vec.extract_subvector_to(
-    local_indices.begin(), local_indices.end(), resid.data());
+  vec.extract_subvector_to(local_indices.begin(),
+                           local_indices.end(),
+                           resid.data());
 }
 
 
@@ -844,9 +845,9 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
 {
   if (additional_data.symmetric)
     {
-      Assert(
-        n_eigenvalues <= eigenvectors.size(),
-        PArpackExcInvalidEigenvectorSize(n_eigenvalues, eigenvectors.size()));
+      Assert(n_eigenvalues <= eigenvectors.size(),
+             PArpackExcInvalidEigenvectorSize(n_eigenvalues,
+                                              eigenvectors.size()));
     }
   else
     Assert(n_eigenvalues + 1 <= eigenvectors.size(),
@@ -1091,8 +1092,9 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
       // implemented modes
 
       // store the result
-      dst.extract_subvector_to(
-        local_indices.begin(), local_indices.end(), workd.data() + shift_y);
+      dst.extract_subvector_to(local_indices.begin(),
+                               local_indices.end(),
+                               workd.data() + shift_y);
     } // end of pd*aupd_ loop
 
   // 1 - compute eigenvectors,

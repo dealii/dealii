@@ -84,9 +84,10 @@ test()
   SparseDirectUMFPACK inverse;
   inverse.initialize(A);
   const unsigned int           num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
-  ArpackSolver::AdditionalData additional_data(
-    num_arnoldi_vectors, ArpackSolver::largest_magnitude, true);
-  ArpackSolver eigensolver(solver_control, additional_data);
+  ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors,
+                                               ArpackSolver::largest_magnitude,
+                                               true);
+  ArpackSolver                 eigensolver(solver_control, additional_data);
   eigensolver.solve(
     A, B, inverse, eigenvalues, eigenvectors, eigenvalues.size());
 

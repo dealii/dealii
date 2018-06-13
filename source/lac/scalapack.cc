@@ -82,12 +82,13 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
   const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
   const size_type                                           row_block_size_,
   const size_type                                           column_block_size_,
-  const LAPACKSupport::Property                             property_) :
-  uplo('L'), // for non-symmetric matrices this is not needed
-  first_process_row(0),
-  first_process_column(0),
-  submatrix_row(1),
-  submatrix_column(1)
+  const LAPACKSupport::Property                             property_)
+  : uplo('L')
+  , // for non-symmetric matrices this is not needed
+  first_process_row(0)
+  , first_process_column(0)
+  , submatrix_row(1)
+  , submatrix_column(1)
 {
   reinit(n_rows_,
          n_columns_,
@@ -104,13 +105,13 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
   const size_type                                          size,
   const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
   const size_type                                          block_size,
-  const LAPACKSupport::Property                            property) :
-  ScaLAPACKMatrix<NumberType>(size,
-                              size,
-                              process_grid,
-                              block_size,
-                              block_size,
-                              property)
+  const LAPACKSupport::Property                            property)
+  : ScaLAPACKMatrix<NumberType>(size,
+                                size,
+                                process_grid,
+                                block_size,
+                                block_size,
+                                property)
 {}
 
 
@@ -383,8 +384,9 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   // Currently, copying of matrices will only be supported if A and B share the
   // same MPI communicator
   int ierr, comparison;
-  ierr = MPI_Comm_compare(
-    grid->mpi_communicator, B.grid->mpi_communicator, &comparison);
+  ierr = MPI_Comm_compare(grid->mpi_communicator,
+                          B.grid->mpi_communicator,
+                          &comparison);
   AssertThrowMPI(ierr);
   Assert(comparison == MPI_IDENT,
          ExcMessage("Matrix A and B must have a common MPI Communicator"));
@@ -400,8 +402,10 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   int         union_n_process_rows =
     Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator);
   int union_n_process_columns = 1;
-  Cblacs_gridinit(
-    &union_blacs_context, order, union_n_process_rows, union_n_process_columns);
+  Cblacs_gridinit(&union_blacs_context,
+                  order,
+                  union_n_process_rows,
+                  union_n_process_columns);
 
   int n_grid_rows_A, n_grid_columns_A, my_row_A, my_column_A;
   Cblacs_gridinfo(this->grid->blacs_context,
@@ -540,8 +544,10 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       // first argument, even if the program we are currently running
       // and that is calling this function only works on a subset of
       // processes. the same holds for the wrapper/fallback we are using here.
-      ierr = Utilities::MPI::create_group(
-        MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
+      ierr = Utilities::MPI::create_group(MPI_COMM_WORLD,
+                                          group_union,
+                                          5,
+                                          &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
       /*
@@ -755,9 +761,9 @@ ScaLAPACKMatrix<NumberType>::mult(const NumberType                   b,
              ExcDimensionMismatch(B.n_rows, C.n_columns));
       Assert(this->row_block_size == C.row_block_size,
              ExcDimensionMismatch(this->row_block_size, C.row_block_size));
-      Assert(
-        this->column_block_size == B.column_block_size,
-        ExcDimensionMismatch(this->column_block_size, B.column_block_size));
+      Assert(this->column_block_size == B.column_block_size,
+             ExcDimensionMismatch(this->column_block_size,
+                                  B.column_block_size));
       Assert(B.row_block_size == C.column_block_size,
              ExcDimensionMismatch(B.row_block_size, C.column_block_size));
     }
@@ -1098,8 +1104,9 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_value(
   Assert(!std::isnan(value_limits.second),
          ExcMessage("value_limits.second is NaN"));
 
-  std::pair<unsigned int, unsigned int> indices = std::make_pair(
-    numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
+  std::pair<unsigned int, unsigned int> indices =
+    std::make_pair(numbers::invalid_unsigned_int,
+                   numbers::invalid_unsigned_int);
 
   return eigenpairs_symmetric(compute_eigenvectors, indices, value_limits);
 }
@@ -1140,8 +1147,9 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   // distributed matrix
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
-        n_rows, grid, row_block_size) :
+      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                          grid,
+                                                          row_block_size) :
       std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
@@ -1427,8 +1435,9 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_value_MRRR(
   AssertIsFinite(value_limits.first);
   AssertIsFinite(value_limits.second);
 
-  const std::pair<unsigned int, unsigned int> indices = std::make_pair(
-    numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
+  const std::pair<unsigned int, unsigned int> indices =
+    std::make_pair(numbers::invalid_unsigned_int,
+                   numbers::invalid_unsigned_int);
 
   return eigenpairs_symmetric_MRRR(compute_eigenvectors, indices, value_limits);
 }
@@ -1469,8 +1478,9 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   // distributed matrix.
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
-        n_rows, grid, row_block_size) :
+      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                          grid,
+                                                          row_block_size) :
       std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
@@ -1680,9 +1690,9 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              ExcDimensionMismatch(row_block_size, VT->row_block_size));
       Assert(column_block_size == VT->column_block_size,
              ExcDimensionMismatch(column_block_size, VT->column_block_size));
-      Assert(
-        grid->blacs_context == VT->grid->blacs_context,
-        ExcDimensionMismatch(grid->blacs_context, VT->grid->blacs_context));
+      Assert(grid->blacs_context == VT->grid->blacs_context,
+             ExcDimensionMismatch(grid->blacs_context,
+                                  VT->grid->blacs_context));
     }
   Threads::Mutex::ScopedLock lock(mutex);
 
@@ -1789,15 +1799,15 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
 
   // see
   // https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
-  Assert(
-    row_block_size == column_block_size,
-    ExcMessage("Use identical block sizes for rows and columns of matrix A"));
-  Assert(
-    B.row_block_size == B.column_block_size,
-    ExcMessage("Use identical block sizes for rows and columns of matrix B"));
-  Assert(
-    row_block_size == B.row_block_size,
-    ExcMessage("Use identical block-cyclic distribution for matrices A and B"));
+  Assert(row_block_size == column_block_size,
+         ExcMessage(
+           "Use identical block sizes for rows and columns of matrix A"));
+  Assert(B.row_block_size == B.column_block_size,
+         ExcMessage(
+           "Use identical block sizes for rows and columns of matrix B"));
+  Assert(row_block_size == B.row_block_size,
+         ExcMessage(
+           "Use identical block-cyclic distribution for matrices A and B"));
 
   Threads::Mutex::ScopedLock lock(mutex);
 
@@ -1863,9 +1873,9 @@ ScaLAPACKMatrix<NumberType>::pseudoinverse(const NumberType ratio)
   Assert(state == LAPACKSupport::matrix,
          ExcMessage(
            "Matrix has to be in Matrix state before calling this function."));
-  Assert(
-    row_block_size == column_block_size,
-    ExcMessage("Use identical block sizes for rows and columns of matrix A"));
+  Assert(row_block_size == column_block_size,
+         ExcMessage(
+           "Use identical block sizes for rows and columns of matrix A"));
   Assert(
     ratio > 0. && ratio < 1.,
     ExcMessage(
@@ -2304,8 +2314,10 @@ ScaLAPACKMatrix<NumberType>::save_serial(
    * an effectively serial ScaLAPACK matrix to gather the contents from the
    * current object
    */
-  const auto column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(
-    this->grid->mpi_communicator, 1, 1);
+  const auto column_grid =
+    std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,
+                                                  1,
+                                                  1);
 
   const int                   MB = n_rows, NB = n_columns;
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
@@ -2460,8 +2472,10 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
    *
    * Create a 1xn_processes column grid
    */
-  const auto column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(
-    this->grid->mpi_communicator, 1, n_mpi_processes);
+  const auto column_grid =
+    std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,
+                                                  1,
+                                                  n_mpi_processes);
 
   const int MB = n_rows, NB = std::ceil(n_columns / n_mpi_processes);
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
@@ -2690,8 +2704,10 @@ ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
    * file
    */
   // create a 1xP column grid with P being the number of MPI processes
-  const auto one_grid = std::make_shared<Utilities::MPI::ProcessGrid>(
-    this->grid->mpi_communicator, 1, 1);
+  const auto one_grid =
+    std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,
+                                                  1,
+                                                  1);
 
   const int                   MB = n_rows, NB = n_columns;
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, one_grid, MB, NB);
@@ -2872,8 +2888,10 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
    * of the matrix, which they can write to the file
    */
   // create a 1xP column grid with P being the number of MPI processes
-  const auto column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(
-    this->grid->mpi_communicator, 1, n_mpi_processes);
+  const auto column_grid =
+    std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,
+                                                  1,
+                                                  n_mpi_processes);
 
   const int MB = n_rows, NB = std::ceil(n_columns / n_mpi_processes);
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);

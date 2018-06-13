@@ -87,7 +87,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -100,7 +101,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -133,9 +135,9 @@ BoundaryValues<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  fe(FE_Q<dim>(1)),
-  dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem()
+  : fe(FE_Q<dim>(1))
+  , dof_handler(triangulation)
 {}
 
 
@@ -222,8 +224,9 @@ LaplaceProblem<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -231,10 +234,14 @@ LaplaceProblem<dim>::assemble_system()
 
 
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

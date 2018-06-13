@@ -91,7 +91,8 @@ private:
 };
 
 
-LaplaceProblem::LaplaceProblem() : dof_handler(triangulation)
+LaplaceProblem::LaplaceProblem()
+  : dof_handler(triangulation)
 {}
 
 
@@ -198,8 +199,9 @@ LaplaceProblem::assemble_system()
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i],
+                            local_dof_indices[j],
+                            cell_matrix(i, j));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
@@ -214,10 +216,14 @@ LaplaceProblem::assemble_system()
   std::map<types::boundary_id, const Function<2> *> b_v_functions{
     {types::boundary_id(0), &zero}};
 
-  VectorTools::interpolate_boundary_values(
-    mappings, dof_handler, b_v_functions, boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(mappings,
+                                           dof_handler,
+                                           b_v_functions,
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

@@ -130,8 +130,10 @@ main()
     set<types::boundary_id> boundary_ids;
     boundary_ids.insert(1);
 
-    surface_to_volume_mapping = GridGenerator::extract_boundary_mesh(
-      volume_mesh, boundary_mesh, boundary_ids);
+    surface_to_volume_mapping =
+      GridGenerator::extract_boundary_mesh(volume_mesh,
+                                           boundary_mesh,
+                                           boundary_ids);
 
     deallog << volume_mesh.n_active_cells() << std::endl;
     deallog << boundary_mesh.n_active_cells() << std::endl;

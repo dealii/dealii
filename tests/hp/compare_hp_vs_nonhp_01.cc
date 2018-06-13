@@ -69,7 +69,8 @@ ExactSolution<dim>::value(const Point<dim> &p, const unsigned int) const
 }
 
 template <int dim>
-ExactSolution<dim>::ExactSolution() : Function<dim>()
+ExactSolution<dim>::ExactSolution()
+  : Function<dim>()
 {}
 
 
@@ -106,7 +107,8 @@ namespace with_hp
   };
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() : dof_handler(triangulation)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : dof_handler(triangulation)
   {
     fe.push_back(FE_Q<dim>(1));
     quadrature.push_back(QGauss<dim>(2));
@@ -187,8 +189,9 @@ namespace with_hp
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
@@ -196,12 +199,18 @@ namespace with_hp
 
 
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, exact_solution, boundary_values);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, exact_solution, boundary_values);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             exact_solution,
+                                             boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             exact_solution,
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
   }
 
   template <int dim>
@@ -259,7 +268,9 @@ namespace without_hp
   };
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() : fe(1), dof_handler(triangulation)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : fe(1)
+    , dof_handler(triangulation)
   {}
 
   template <int dim>
@@ -333,8 +344,9 @@ namespace without_hp
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
@@ -342,12 +354,18 @@ namespace without_hp
 
 
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, exact_solution, boundary_values);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, exact_solution, boundary_values);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             exact_solution,
+                                             boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             exact_solution,
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
   }
 
   template <int dim>

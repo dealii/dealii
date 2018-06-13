@@ -209,7 +209,8 @@ namespace Step18
                       std::vector<Vector<double>> &  value_list) const;
   };
   template <int dim>
-  BodyForce<dim>::BodyForce() : Function<dim>(dim)
+  BodyForce<dim>::BodyForce()
+    : Function<dim>(dim)
   {}
   template <int dim>
   inline void
@@ -254,11 +255,11 @@ namespace Step18
   template <int dim>
   IncrementalBoundaryValues<dim>::IncrementalBoundaryValues(
     const double present_time,
-    const double present_timestep) :
-    Function<dim>(dim),
-    velocity(.1),
-    present_time(present_time),
-    present_timestep(present_timestep)
+    const double present_timestep)
+    : Function<dim>(dim)
+    , velocity(.1)
+    , present_time(present_time)
+    , present_timestep(present_timestep)
   {}
   template <int dim>
   void
@@ -286,19 +287,19 @@ namespace Step18
     get_stress_strain_tensor<dim>(/*lambda = */ 9.695e10,
                                   /*mu     = */ 7.617e10);
   template <int dim>
-  TopLevel<dim>::TopLevel() :
-    triangulation(MPI_COMM_WORLD,
-                  ::Triangulation<dim>::none,
-                  false,
-                  parallel::shared::Triangulation<dim>::partition_zorder),
-    fe(FE_Q<dim>(1), dim),
-    dof_handler(triangulation),
-    quadrature_formula(2),
-    mpi_communicator(MPI_COMM_WORLD),
-    n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout(std::cout, this_mpi_process == 0),
-    monitored_vertex_first_dof(0)
+  TopLevel<dim>::TopLevel()
+    : triangulation(MPI_COMM_WORLD,
+                    ::Triangulation<dim>::none,
+                    false,
+                    parallel::shared::Triangulation<dim>::partition_zorder)
+    , fe(FE_Q<dim>(1), dim)
+    , dof_handler(triangulation)
+    , quadrature_formula(2)
+    , mpi_communicator(MPI_COMM_WORLD)
+    , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
+    , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
+    , pcout(std::cout, this_mpi_process == 0)
+    , monitored_vertex_first_dof(0)
   {}
   template <int dim>
   TopLevel<dim>::~TopLevel()
@@ -409,10 +410,9 @@ namespace Step18
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 {
-                  const SymmetricTensor<2, dim> eps_phi_i = get_strain(
-                                                  fe_values, i, q_point),
-                                                eps_phi_j = get_strain(
-                                                  fe_values, j, q_point);
+                  const SymmetricTensor<2, dim>
+                    eps_phi_i = get_strain(fe_values, i, q_point),
+                    eps_phi_j = get_strain(fe_values, j, q_point);
                   cell_matrix(i, j) += (eps_phi_i * stress_strain_tensor *
                                         eps_phi_j * fe_values.JxW(q_point));
                 }
@@ -446,8 +446,10 @@ namespace Step18
     system_rhs.compress(VectorOperation::add);
     FEValuesExtractors::Scalar                z_component(dim - 1);
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(dim), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
     VectorTools::interpolate_boundary_values(
       dof_handler,
       1,
@@ -480,8 +482,10 @@ namespace Step18
     PETScWrappers::MPI::Vector distributed_incremental_displacement(
       locally_owned_dofs, mpi_communicator);
     distributed_incremental_displacement = incremental_displacement;
-    SolverControl solver_control(
-      dof_handler.n_dofs(), 1e-16 * system_rhs.l2_norm(), false, false);
+    SolverControl                          solver_control(dof_handler.n_dofs(),
+                                 1e-16 * system_rhs.l2_norm(),
+                                 false,
+                                 false);
     PETScWrappers::SolverCG                cg(solver_control, mpi_communicator);
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
     cg.solve(system_matrix,
@@ -671,8 +675,10 @@ namespace Step18
         distributed_error_per_cell(i) = error_per_cell(i);
     distributed_error_per_cell.compress(VectorOperation::insert);
     error_per_cell = distributed_error_per_cell;
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, error_per_cell, 0.25, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    error_per_cell,
+                                                    0.25,
+                                                    0.03);
     triangulation.execute_coarsening_and_refinement();
     setup_quadrature_point_history();
   }
@@ -731,8 +737,9 @@ namespace Step18
   void
   TopLevel<dim>::update_quadrature_point_history()
   {
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_gradients);
+    FEValues<dim>                            fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients);
     std::vector<std::vector<Tensor<1, dim>>> displacement_increment_grads(
       quadrature_formula.size(), std::vector<Tensor<1, dim>>(dim));
     for (typename DoFHandler<dim>::active_cell_iterator cell =

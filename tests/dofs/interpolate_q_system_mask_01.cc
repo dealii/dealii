@@ -49,7 +49,10 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const double adj) : Function<dim>(3), q(q), adj(adj)
+  F(const unsigned int q, const double adj)
+    : Function<dim>(3)
+    , q(q)
+    , adj(adj)
   {}
 
   virtual void
@@ -104,12 +107,16 @@ test()
       for (unsigned int q = 0; q <= p + 2; ++q)
         {
           // interpolate the function with mask 1
-          VectorTools::interpolate(
-            dof_handler, F<dim>(q, adj1), interpolant, mask1);
+          VectorTools::interpolate(dof_handler,
+                                   F<dim>(q, adj1),
+                                   interpolant,
+                                   mask1);
 
           // interpolate the function with mask 2
-          VectorTools::interpolate(
-            dof_handler, F<dim>(q, adj2), interpolant, mask2);
+          VectorTools::interpolate(dof_handler,
+                                   F<dim>(q, adj2),
+                                   interpolant,
+                                   mask2);
 
           // then compute the interpolation error for mask 1
           VectorTools::integrate_difference(dof_handler,

@@ -186,8 +186,9 @@ namespace VectorTools
                   destination;
 
                 // value[m] <- sum inverse_jacobians[m][n] * old_value[n]:
-                TensorAccessors::contract<1, 2, 1, dim>(
-                  destination, inverse_jacobians[i], source);
+                TensorAccessors::contract<1, 2, 1, dim>(destination,
+                                                        inverse_jacobians[i],
+                                                        source);
                 destination *= jacobians[i].determinant();
 
                 // now copy things back into the input=output vector
@@ -255,8 +256,10 @@ namespace VectorTools
         }
       else
         {
-          transform<dim, spacedim>(
-            fe.conforming_space, offset, fe_values_jacobians, function_values);
+          transform<dim, spacedim>(fe.conforming_space,
+                                   offset,
+                                   fe_values_jacobians,
+                                   function_values);
           return (offset + fe.n_components());
         }
     }
@@ -279,12 +282,12 @@ namespace VectorTools
                 VectorType &                         vec,
                 const ComponentMask &                component_mask)
     {
-      Assert(
-        component_mask.represents_n_components(
-          dof_handler.get_fe().n_components()),
-        ExcMessage("The number of components in the mask has to be either "
-                   "zero or equal to the number of components in the finite "
-                   "element."));
+      Assert(component_mask.represents_n_components(
+               dof_handler.get_fe().n_components()),
+             ExcMessage(
+               "The number of components in the mask has to be either "
+               "zero or equal to the number of components in the finite "
+               "element."));
 
       Assert(vec.size() == dof_handler.n_dofs(),
              ExcDimensionMismatch(vec.size(), dof_handler.n_dofs()));
@@ -372,11 +375,12 @@ namespace VectorTools
       // locations as well as Jacobians and their inverses.
       // the latter are only needed for Hcurl or Hdiv conforming elements,
       // but we'll just always include them.
-      hp::FEValues<dim, spacedim> fe_values(
-        mapping_collection,
-        fe,
-        support_quadrature,
-        update_quadrature_points | update_jacobians | update_inverse_jacobians);
+      hp::FEValues<dim, spacedim> fe_values(mapping_collection,
+                                            fe,
+                                            support_quadrature,
+                                            update_quadrature_points |
+                                              update_jacobians |
+                                              update_inverse_jacobians);
 
       //
       // Now loop over all locally owned, active cells.
@@ -511,12 +515,14 @@ namespace VectorTools
 
       for (const auto i : interpolation.locally_owned_elements())
         {
-          const auto value = ::dealii::internal::ElementAccess<VectorType>::get(
-            interpolation, i);
+          const auto value =
+            ::dealii::internal::ElementAccess<VectorType>::get(interpolation,
+                                                               i);
           const auto weight =
             ::dealii::internal::ElementAccess<VectorType>::get(weights, i);
-          ::dealii::internal::ElementAccess<VectorType>::set(
-            value / weight, i, vec);
+          ::dealii::internal::ElementAccess<VectorType>::set(value / weight,
+                                                             i,
+                                                             vec);
         }
       vec.compress(VectorOperation::insert);
     }
@@ -1036,8 +1042,10 @@ namespace VectorTools
       SparsityPattern sparsity;
       {
         DynamicSparsityPattern dsp(dof.n_dofs(), dof.n_dofs());
-        DoFTools::make_sparsity_pattern(
-          dof, dsp, constraints, !constraints_are_compatible);
+        DoFTools::make_sparsity_pattern(dof,
+                                        dsp,
+                                        constraints,
+                                        !constraints_are_compatible);
 
         sparsity.copy_from(dsp);
       }
@@ -1081,8 +1089,9 @@ namespace VectorTools
       // it may be of another type than Vector<double> and that wouldn't
       // necessarily go together with the matrix and other functions
       for (unsigned int i = 0; i < vec.size(); ++i)
-        ::dealii::internal::ElementAccess<VectorType>::set(
-          vec(i), i, vec_result);
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(i),
+                                                           i,
+                                                           vec_result);
     }
 
 
@@ -1382,8 +1391,9 @@ namespace VectorTools
       const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
       for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(
-          work_result(*it), *it, vec_result);
+        ::dealii::internal::ElementAccess<VectorType>::set(work_result(*it),
+                                                           *it,
+                                                           vec_result);
       vec_result.compress(VectorOperation::insert);
     }
 
@@ -1504,8 +1514,10 @@ namespace VectorTools
 
       // assemble right hand side:
       {
-        FEValues<dim> fe_values(
-          mapping, dof.get_fe(), quadrature, update_values | update_JxW_values);
+        FEValues<dim> fe_values(mapping,
+                                dof.get_fe(),
+                                quadrature,
+                                update_values | update_JxW_values);
 
         const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
         const unsigned int n_q_points    = quadrature.size();
@@ -1528,8 +1540,9 @@ namespace VectorTools
                 }
 
               cell->get_dof_indices(local_dof_indices);
-              constraints.distribute_local_to_global(
-                cell_rhs, local_dof_indices, rhs);
+              constraints.distribute_local_to_global(cell_rhs,
+                                                     local_dof_indices,
+                                                     rhs);
             }
         rhs.compress(VectorOperation::add);
       }
@@ -1554,8 +1567,9 @@ namespace VectorTools
       const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
       for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(
-          vec(*it), *it, vec_result);
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(*it),
+                                                           *it,
+                                                           vec_result);
       vec_result.compress(VectorOperation::insert);
     }
 
@@ -1647,8 +1661,9 @@ namespace VectorTools
       const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
       for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(
-          vec(*it), *it, vec_result);
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(*it),
+                                                           *it,
+                                                           vec_result);
       vec_result.compress(VectorOperation::insert);
     }
   } // namespace
@@ -1941,8 +1956,9 @@ namespace VectorTools
 
               cell->get_dof_indices(dofs);
 
-              constraints.distribute_local_to_global(
-                cell_vector, dofs, rhs_vector);
+              constraints.distribute_local_to_global(cell_vector,
+                                                     dofs,
+                                                     rhs_vector);
             }
       }
     else
@@ -1986,16 +2002,19 @@ namespace VectorTools
                            ++comp_i)
                         if (fe.get_nonzero_components(i)[comp_i])
                           {
-                            cell_vector(i) += rhs_values[point](comp_i) *
-                                              fe_values.shape_value_component(
-                                                i, point, comp_i) *
-                                              weights[point];
+                            cell_vector(i) +=
+                              rhs_values[point](comp_i) *
+                              fe_values.shape_value_component(i,
+                                                              point,
+                                                              comp_i) *
+                              weights[point];
                           }
                 }
               cell->get_dof_indices(dofs);
 
-              constraints.distribute_local_to_global(
-                cell_vector, dofs, rhs_vector);
+              constraints.distribute_local_to_global(cell_vector,
+                                                     dofs,
+                                                     rhs_vector);
             }
       }
   }
@@ -2042,8 +2061,10 @@ namespace VectorTools
 
     UpdateFlags update_flags =
       UpdateFlags(update_values | update_quadrature_points | update_JxW_values);
-    hp::FEValues<dim, spacedim> x_fe_values(
-      mapping, fe, quadrature, update_flags);
+    hp::FEValues<dim, spacedim> x_fe_values(mapping,
+                                            fe,
+                                            quadrature,
+                                            update_flags);
 
     const unsigned int n_components = fe.n_components();
 
@@ -2085,8 +2106,9 @@ namespace VectorTools
 
               cell->get_dof_indices(dofs);
 
-              constraints.distribute_local_to_global(
-                cell_vector, dofs, rhs_vector);
+              constraints.distribute_local_to_global(cell_vector,
+                                                     dofs,
+                                                     rhs_vector);
             }
       }
     else
@@ -2138,17 +2160,20 @@ namespace VectorTools
                            ++comp_i)
                         if (cell->get_fe().get_nonzero_components(i)[comp_i])
                           {
-                            cell_vector(i) += rhs_values[point](comp_i) *
-                                              fe_values.shape_value_component(
-                                                i, point, comp_i) *
-                                              weights[point];
+                            cell_vector(i) +=
+                              rhs_values[point](comp_i) *
+                              fe_values.shape_value_component(i,
+                                                              point,
+                                                              comp_i) *
+                              weights[point];
                           }
                 }
 
               cell->get_dof_indices(dofs);
 
-              constraints.distribute_local_to_global(
-                cell_vector, dofs, rhs_vector);
+              constraints.distribute_local_to_global(cell_vector,
+                                                     dofs,
+                                                     rhs_vector);
             }
       }
   }
@@ -2197,8 +2222,10 @@ namespace VectorTools
     Quadrature<dim> q(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
 
-    FEValues<dim, spacedim> fe_values(
-      mapping, dof_handler.get_fe(), q, UpdateFlags(update_values));
+    FEValues<dim, spacedim> fe_values(mapping,
+                                      dof_handler.get_fe(),
+                                      q,
+                                      UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
@@ -2218,8 +2245,10 @@ namespace VectorTools
                              const Point<spacedim> &          p,
                              Vector<double> &                 rhs_vector)
   {
-    create_point_source_vector(
-      StaticMappingQ1<dim, spacedim>::mapping, dof_handler, p, rhs_vector);
+    create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
+                               dof_handler,
+                               p,
+                               rhs_vector);
   }
 
 
@@ -2269,8 +2298,10 @@ namespace VectorTools
                              const Point<spacedim> &              p,
                              Vector<double> &                     rhs_vector)
   {
-    create_point_source_vector(
-      hp::StaticMappingQ1<dim>::mapping_collection, dof_handler, p, rhs_vector);
+    create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
+                               dof_handler,
+                               p,
+                               rhs_vector);
   }
 
 
@@ -2300,8 +2331,10 @@ namespace VectorTools
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
 
     const FEValuesExtractors::Vector vec(0);
-    FEValues<dim, spacedim>          fe_values(
-      mapping, dof_handler.get_fe(), q, UpdateFlags(update_values));
+    FEValues<dim, spacedim>          fe_values(mapping,
+                                      dof_handler.get_fe(),
+                                      q,
+                                      UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
@@ -2502,10 +2535,12 @@ namespace VectorTools
                              ++comp_i)
                           if (fe.get_nonzero_components(i)[comp_i])
                             {
-                              cell_vector(i) += rhs_values[point](comp_i) *
-                                                fe_values.shape_value_component(
-                                                  i, point, comp_i) *
-                                                weights[point];
+                              cell_vector(i) +=
+                                rhs_values[point](comp_i) *
+                                fe_values.shape_value_component(i,
+                                                                point,
+                                                                comp_i) *
+                                weights[point];
                             }
                   }
 
@@ -2661,10 +2696,12 @@ namespace VectorTools
                              ++comp_i)
                           if (cell->get_fe().get_nonzero_components(i)[comp_i])
                             {
-                              cell_vector(i) += rhs_values[point](comp_i) *
-                                                fe_values.shape_value_component(
-                                                  i, point, comp_i) *
-                                                weights[point];
+                              cell_vector(i) +=
+                                rhs_values[point](comp_i) *
+                                fe_values.shape_value_component(i,
+                                                                point,
+                                                                comp_i) *
+                                weights[point];
                             }
                   }
                 dofs.resize(dofs_per_cell);
@@ -2770,9 +2807,9 @@ namespace VectorTools
                          ExcDimensionMismatch(fe.n_components(),
                                               boundary_function.n_components));
 
-                  Assert(
-                    component_mask.n_selected_components(fe.n_components()) > 0,
-                    ComponentMask::ExcNoComponentSelected());
+                  Assert(component_mask.n_selected_components(
+                           fe.n_components()) > 0,
+                         ComponentMask::ExcNoComponentSelected());
 
                   // now set the value of the vertex degree of
                   // freedom. setting also creates the entry in the
@@ -2939,9 +2976,9 @@ namespace VectorTools
                           // resize array. avoid construction of a memory
                           // allocating temporary if possible
                           if (dof_values_system.size() < fe.dofs_per_face)
-                            dof_values_system.resize(
-                              fe.dofs_per_face,
-                              Vector<number>(fe.n_components()));
+                            dof_values_system.resize(fe.dofs_per_face,
+                                                     Vector<number>(
+                                                       fe.n_components()));
                           else
                             dof_values_system.resize(fe.dofs_per_face);
 
@@ -3016,8 +3053,9 @@ namespace VectorTools
                           // get only the one component that this function has
                           dof_values_scalar.resize(fe.dofs_per_face);
                           function_map.find(boundary_component)
-                            ->second->value_list(
-                              dof_locations, dof_values_scalar, 0);
+                            ->second->value_list(dof_locations,
+                                                 dof_values_scalar,
+                                                 0);
 
                           // enter into list
 
@@ -3417,8 +3455,9 @@ namespace VectorTools
            ++i)
         selected_boundary_components.insert(i->first);
 
-      DoFTools::map_dof_to_boundary_indices(
-        dof, selected_boundary_components, dof_to_boundary_mapping);
+      DoFTools::map_dof_to_boundary_indices(dof,
+                                            selected_boundary_components,
+                                            dof_to_boundary_mapping);
 
       // Done if no degrees of freedom on the boundary
       if (dof.n_boundary_dofs(boundary_functions) == 0)
@@ -3427,8 +3466,10 @@ namespace VectorTools
       // set up sparsity structure
       DynamicSparsityPattern dsp(dof.n_boundary_dofs(boundary_functions),
                                  dof.n_boundary_dofs(boundary_functions));
-      DoFTools::make_boundary_sparsity_pattern(
-        dof, boundary_functions, dof_to_boundary_mapping, dsp);
+      DoFTools::make_boundary_sparsity_pattern(dof,
+                                               boundary_functions,
+                                               dof_to_boundary_mapping,
+                                               dsp);
       SparsityPattern sparsity;
       sparsity.copy_from(dsp);
 
@@ -4325,9 +4366,10 @@ namespace VectorTools
       std::vector<bool> &  dofs_processed)
     {
       const unsigned int spacedim = dim;
-      hp_fe_values.reinit(
-        cell,
-        cell->active_fe_index() * GeometryInfo<dim>::faces_per_cell + face);
+      hp_fe_values.reinit(cell,
+                          cell->active_fe_index() *
+                              GeometryInfo<dim>::faces_per_cell +
+                            face);
       // Initialize the required
       // objects.
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
@@ -4510,9 +4552,10 @@ namespace VectorTools
                         ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
                           nullptr) &&
                          (2 * fe.degree <= i) && (i < 4 * fe.degree)))
-                      tmp -= dof_values[i] *
-                             fe_values[vec].value(
-                               fe.face_to_cell_index(i, face), q_point);
+                      tmp -=
+                        dof_values[i] *
+                        fe_values[vec].value(fe.face_to_cell_index(i, face),
+                                             q_point);
 
                   const double JxW = std::sqrt(
                     fe_values.JxW(q_point) /
@@ -4584,8 +4627,9 @@ namespace VectorTools
                                 fe.degree)))
                       {
                         const Tensor<1, dim> shape_value =
-                          (JxW * fe_values[vec].value(
-                                   fe.face_to_cell_index(i, face), q_point));
+                          (JxW *
+                           fe_values[vec].value(fe.face_to_cell_index(i, face),
+                                                q_point));
 
                         for (unsigned int d = 0; d < dim; ++d)
                           assembling_matrix(index, dim * q_point + d) =
@@ -4667,9 +4711,10 @@ namespace VectorTools
                         ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
                           nullptr) &&
                          (i < 2 * fe.degree)))
-                      tmp -= dof_values[i] *
-                             fe_values[vec].value(
-                               fe.face_to_cell_index(i, face), q_point);
+                      tmp -=
+                        dof_values[i] *
+                        fe_values[vec].value(fe.face_to_cell_index(i, face),
+                                             q_point);
 
                   const double JxW = std::sqrt(
                     fe_values.JxW(q_point) /
@@ -4725,8 +4770,9 @@ namespace VectorTools
                           i)))
                       {
                         const Tensor<1, dim> shape_value =
-                          JxW * fe_values[vec].value(
-                                  fe.face_to_cell_index(i, face), q_point);
+                          JxW *
+                          fe_values[vec].value(fe.face_to_cell_index(i, face),
+                                               q_point);
 
                         for (unsigned int d = 0; d < dim; ++d)
                           assembling_matrix(index, dim * q_point + d) =
@@ -4920,12 +4966,13 @@ namespace VectorTools
                       reference_edge_quadrature, line),
                     face));
 
-            hp::FEValues<dim> fe_edge_values(
-              mapping_collection,
-              fe_collection,
-              edge_quadrature_collection,
-              update_jacobians | update_JxW_values | update_quadrature_points |
-                update_values);
+            hp::FEValues<dim> fe_edge_values(mapping_collection,
+                                             fe_collection,
+                                             edge_quadrature_collection,
+                                             update_jacobians |
+                                               update_JxW_values |
+                                               update_quadrature_points |
+                                               update_values);
 
             for (; cell != dof_handler.end(); ++cell)
               if (cell->at_boundary() && cell->is_locally_owned())
@@ -5151,12 +5198,13 @@ namespace VectorTools
                         face));
               }
 
-            hp::FEValues<dim> fe_edge_values(
-              mapping_collection,
-              fe_collection,
-              edge_quadrature_collection,
-              update_jacobians | update_JxW_values | update_quadrature_points |
-                update_values);
+            hp::FEValues<dim> fe_edge_values(mapping_collection,
+                                             fe_collection,
+                                             edge_quadrature_collection,
+                                             update_jacobians |
+                                               update_JxW_values |
+                                               update_quadrature_points |
+                                               update_values);
 
             for (; cell != dof_handler.end(); ++cell)
               if (cell->at_boundary() && cell->is_locally_owned())
@@ -5729,8 +5777,9 @@ namespace VectorTools
               const unsigned int lines_per_face =
                 GeometryInfo<dim>::lines_per_face;
               std::vector<std::vector<unsigned int>>
-              associated_edge_dof_to_face_dof(
-                lines_per_face, std::vector<unsigned int>(degree + 1));
+                                        associated_edge_dof_to_face_dof(lines_per_face,
+                                                                        std::vector<unsigned int>(degree +
+                                                                        1));
               std::vector<unsigned int> associated_edge_dofs(lines_per_face);
 
               for (unsigned int line = 0; line < lines_per_face; ++line)
@@ -5775,9 +5824,9 @@ namespace VectorTools
                     }
                   // Sanity check:
                   associated_edge_dofs[line] = associated_edge_dof_index;
-                  Assert(
-                    associated_edge_dofs[line] == degree + 1,
-                    ExcMessage("Error: Unexpected number of 3D edge DoFs"));
+                  Assert(associated_edge_dofs[line] == degree + 1,
+                         ExcMessage(
+                           "Error: Unexpected number of 3D edge DoFs"));
                 }
 
               // Next find the face DoFs associated with the vector components
@@ -5901,9 +5950,10 @@ namespace VectorTools
                       const unsigned int cell_j =
                         fe.face_to_cell_index(j_face_idx, face);
 
-                      cross_product_j = cross_product_3d(
-                        normal_vector,
-                        fe_face_values[vec].value(cell_j, q_point));
+                      cross_product_j =
+                        cross_product_3d(normal_vector,
+                                         fe_face_values[vec].value(cell_j,
+                                                                   q_point));
 
                       for (unsigned int i = 0; i < associated_face_dofs; ++i)
                         {
@@ -6002,12 +6052,13 @@ namespace VectorTools
           face_quadrature_collection.push_back(reference_face_quadrature);
         }
 
-      hp::FEFaceValues<dim> fe_face_values(
-        mapping_collection,
-        fe_collection,
-        face_quadrature_collection,
-        update_values | update_quadrature_points | update_normal_vectors |
-          update_JxW_values);
+      hp::FEFaceValues<dim> fe_face_values(mapping_collection,
+                                           fe_collection,
+                                           face_quadrature_collection,
+                                           update_values |
+                                             update_quadrature_points |
+                                             update_normal_vectors |
+                                             update_JxW_values);
 
       // Storage for dof values found and whether they have been processed:
       std::vector<bool>                             dofs_processed;
@@ -6138,12 +6189,13 @@ namespace VectorTools
                     }
                 }
 
-              hp::FEValues<dim> fe_edge_values(
-                mapping_collection,
-                fe_collection,
-                edge_quadrature_collection,
-                update_jacobians | update_JxW_values |
-                  update_quadrature_points | update_values);
+              hp::FEValues<dim> fe_edge_values(mapping_collection,
+                                               fe_collection,
+                                               edge_quadrature_collection,
+                                               update_jacobians |
+                                                 update_JxW_values |
+                                                 update_quadrature_points |
+                                                 update_values);
 
               for (; cell != dof_handler.end(); ++cell)
                 {
@@ -6333,8 +6385,10 @@ namespace VectorTools
       const std::vector<Tensor<1, 2>> &normals =
         fe_values.get_all_normal_vectors();
       const unsigned int
-        face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {
-          1, 1, 0, 0};
+                                  face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1,
+                                                                      1,
+                                                                      0,
+                                                                      0};
       std::vector<Vector<double>> values(fe_values.n_quadrature_points,
                                          Vector<double>(2));
       Vector<double>              dof_values(fe.dofs_per_face);
@@ -6712,13 +6766,14 @@ namespace VectorTools
             QProjector<dim>::project_to_face(quadrature, face));
       }
 
-    hp::FEFaceValues<dim> fe_face_values(
-      mapping_collection,
-      fe_collection,
-      face_quadrature_collection,
-      update_JxW_values | update_normal_vectors | update_quadrature_points |
-        update_values);
-    hp::FEValues<dim> fe_values(mapping_collection,
+    hp::FEFaceValues<dim> fe_face_values(mapping_collection,
+                                         fe_collection,
+                                         face_quadrature_collection,
+                                         update_JxW_values |
+                                           update_normal_vectors |
+                                           update_quadrature_points |
+                                           update_values);
+    hp::FEValues<dim>     fe_values(mapping_collection,
                                 fe_collection,
                                 quadrature_collection,
                                 update_jacobians);
@@ -7066,8 +7121,9 @@ namespace VectorTools
 
                     // now enter the (dofs,(normal_vector,cell)) entry into
                     // the map
-                    dof_to_normals_map.insert(std::make_pair(
-                      vector_dofs, std::make_pair(normal_vector, cell)));
+                    dof_to_normals_map.insert(
+                      std::make_pair(vector_dofs,
+                                     std::make_pair(normal_vector, cell)));
                     dof_vector_to_b_values.insert(
                       std::make_pair(vector_dofs, b_values));
 
@@ -7142,9 +7198,10 @@ namespace VectorTools
 
               // in the same entry, store again the now averaged normal vector
               // and the new count
-              cell_to_normals_map[q->second.second] = std::make_pair(
-                (old_normal * old_count + q->second.first) / (old_count + 1),
-                old_count + 1);
+              cell_to_normals_map[q->second.second] =
+                std::make_pair((old_normal * old_count + q->second.first) /
+                                 (old_count + 1),
+                               old_count + 1);
             }
         Assert(cell_to_normals_map.size() >= 1, ExcInternalError());
 
@@ -7213,8 +7270,10 @@ namespace VectorTools
                   dof_vector_to_b_values[dof_indices];
                 for (unsigned int i = 0; i < dim; ++i)
                   normal_value += b_values[i] * normal[i];
-                internal::add_constraint(
-                  dof_indices, normal, constraints, normal_value);
+                internal::add_constraint(dof_indices,
+                                         normal,
+                                         constraints,
+                                         normal_value);
 
                 break;
               }
@@ -7430,8 +7489,10 @@ namespace VectorTools
                   same_dof_range[0]->first;
                 const Vector<double> b_values =
                   dof_vector_to_b_values[dof_indices];
-                internal::add_tangentiality_constraints(
-                  dof_indices, average_tangent, constraints, b_values);
+                internal::add_tangentiality_constraints(dof_indices,
+                                                        average_tangent,
+                                                        constraints,
+                                                        b_values);
               }
           }
       }
@@ -7577,9 +7638,10 @@ namespace VectorTools
                       const unsigned int component =
                         fe.face_system_to_component_index(i).first -
                         first_vector_component;
-                      n_scalar_indices = std::max(
-                        n_scalar_indices,
-                        fe.face_system_to_component_index(i).second + 1);
+                      n_scalar_indices =
+                        std::max(n_scalar_indices,
+                                 fe.face_system_to_component_index(i).second +
+                                   1);
                       cell_vector_dofs[fe.face_system_to_component_index(i)
                                          .second][component] = face_dofs[i];
 
@@ -7681,8 +7743,9 @@ namespace VectorTools
                   {
                     constraints.add_line(new_index);
                     if (std::abs(normal[d]) > 1e-13)
-                      constraints.add_entry(
-                        new_index, (*it)[constrained_index], -normal[d]);
+                      constraints.add_entry(new_index,
+                                            (*it)[constrained_index],
+                                            -normal[d]);
                     constraints.set_inhomogeneity(new_index, boundary_value[d]);
                   }
               }
@@ -7733,17 +7796,17 @@ namespace VectorTools
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const dealii::hp::FECollection<dim, spacedim> &     fe,
       const dealii::hp::QCollection<dim> &                q,
-      const UpdateFlags                                   update_flags) :
-      x_fe_values(mapping, fe, q, update_flags)
+      const UpdateFlags                                   update_flags)
+      : x_fe_values(mapping, fe, q, update_flags)
     {}
 
     template <int dim, int spacedim, typename Number>
     IDScratchData<dim, spacedim, Number>::IDScratchData(
-      const IDScratchData &data) :
-      x_fe_values(data.x_fe_values.get_mapping_collection(),
-                  data.x_fe_values.get_fe_collection(),
-                  data.x_fe_values.get_quadrature_collection(),
-                  data.x_fe_values.get_update_flags())
+      const IDScratchData &data)
+      : x_fe_values(data.x_fe_values.get_mapping_collection(),
+                    data.x_fe_values.get_fe_collection(),
+                    data.x_fe_values.get_quadrature_collection(),
+                    data.x_fe_values.get_update_flags())
     {}
 
     template <int dim, int spacedim, typename Number>
@@ -8170,8 +8233,10 @@ namespace VectorTools
 
       const dealii::hp::FECollection<dim, spacedim> &fe_collection =
         dof.get_fe_collection();
-      IDScratchData<dim, spacedim, Number> data(
-        mapping, fe_collection, q, update_flags);
+      IDScratchData<dim, spacedim, Number> data(mapping,
+                                                fe_collection,
+                                                q,
+                                                update_flags);
 
       // loop over all cells
       for (typename DoFHandlerType::active_cell_iterator cell =
@@ -8225,16 +8290,16 @@ namespace VectorTools
                        const Function<spacedim> *       weight,
                        const double                     exponent)
   {
-    internal ::do_integrate_difference(
-      hp::MappingCollection<dim, spacedim>(mapping),
-      dof,
-      fe_function,
-      exact_solution,
-      difference,
-      hp::QCollection<dim>(q),
-      norm,
-      weight,
-      exponent);
+    internal ::do_integrate_difference(hp::MappingCollection<dim, spacedim>(
+                                         mapping),
+                                       dof,
+                                       fe_function,
+                                       exact_solution,
+                                       difference,
+                                       hp::QCollection<dim>(q),
+                                       norm,
+                                       weight,
+                                       exponent);
   }
 
 
@@ -8276,16 +8341,16 @@ namespace VectorTools
     const Function<spacedim> *                          weight,
     const double                                        exponent)
   {
-    internal ::do_integrate_difference(
-      hp::MappingCollection<dim, spacedim>(mapping),
-      dof,
-      fe_function,
-      exact_solution,
-      difference,
-      q,
-      norm,
-      weight,
-      exponent);
+    internal ::do_integrate_difference(hp::MappingCollection<dim, spacedim>(
+                                         mapping),
+                                       dof,
+                                       fe_function,
+                                       exact_solution,
+                                       difference,
+                                       q,
+                                       norm,
+                                       weight,
+                                       exponent);
   }
 
 
@@ -8370,11 +8435,11 @@ namespace VectorTools
 
         case W1infty_norm:
           {
-            AssertThrow(
-              false,
-              ExcMessage("compute_global_error() is impossible for "
-                         "the W1infty_norm. See the documentation for "
-                         "NormType::W1infty_norm for more information."));
+            AssertThrow(false,
+                        ExcMessage(
+                          "compute_global_error() is impossible for "
+                          "the W1infty_norm. See the documentation for "
+                          "NormType::W1infty_norm for more information."));
             return std::numeric_limits<double>::infinity();
           }
 
@@ -8510,8 +8575,10 @@ namespace VectorTools
               const VectorType &               fe_function,
               const Point<spacedim> &          point)
   {
-    return point_value(
-      StaticMappingQ1<dim, spacedim>::mapping, dof, fe_function, point);
+    return point_value(StaticMappingQ1<dim, spacedim>::mapping,
+                       dof,
+                       fe_function,
+                       point);
   }
 
 
@@ -8600,8 +8667,10 @@ namespace VectorTools
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
-    hp::FEValues<dim, spacedim> hp_fe_values(
-      mapping, fe, hp::QCollection<dim>(quadrature), update_values);
+    hp::FEValues<dim, spacedim> hp_fe_values(mapping,
+                                             fe,
+                                             hp::QCollection<dim>(quadrature),
+                                             update_values);
     hp_fe_values.reinit(cell_point.first);
     const FEValues<dim, spacedim> &fe_values =
       hp_fe_values.get_present_fe_values();
@@ -8692,8 +8761,10 @@ namespace VectorTools
                  const VectorType &               fe_function,
                  const Point<spacedim> &          point)
   {
-    return point_gradient(
-      StaticMappingQ1<dim, spacedim>::mapping, dof, fe_function, point);
+    return point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
+                          dof,
+                          fe_function,
+                          point);
   }
 
 
@@ -8786,8 +8857,10 @@ namespace VectorTools
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
-    hp::FEValues<dim, spacedim> hp_fe_values(
-      mapping, fe, hp::QCollection<dim>(quadrature), update_gradients);
+    hp::FEValues<dim, spacedim> hp_fe_values(mapping,
+                                             fe,
+                                             hp::QCollection<dim>(quadrature),
+                                             update_gradients);
     hp_fe_values.reinit(cell_point.first);
     const FEValues<dim, spacedim> &fe_values =
       hp_fe_values.get_present_fe_values();

@@ -136,10 +136,10 @@ CPUClock::now() noexcept
 
 
 template <typename clock_type_>
-Timer::ClockMeasurements<clock_type_>::ClockMeasurements() :
-  current_lap_start_time(clock_type::now()),
-  accumulated_time(duration_type::zero()),
-  last_lap_time(duration_type::zero())
+Timer::ClockMeasurements<clock_type_>::ClockMeasurements()
+  : current_lap_start_time(clock_type::now())
+  , accumulated_time(duration_type::zero())
+  , last_lap_time(duration_type::zero())
 {}
 
 
@@ -155,15 +155,16 @@ Timer::ClockMeasurements<clock_type_>::reset()
 
 
 
-Timer::Timer() : Timer(MPI_COMM_SELF, /*sync_lap_times=*/false)
+Timer::Timer()
+  : Timer(MPI_COMM_SELF, /*sync_lap_times=*/false)
 {}
 
 
 
-Timer::Timer(MPI_Comm mpi_communicator, const bool sync_lap_times_) :
-  running(false),
-  mpi_communicator(mpi_communicator),
-  sync_lap_times(sync_lap_times_)
+Timer::Timer(MPI_Comm mpi_communicator, const bool sync_lap_times_)
+  : running(false)
+  , mpi_communicator(mpi_communicator)
+  , sync_lap_times(sync_lap_times_)
 {
   reset();
   start();
@@ -200,9 +201,10 @@ Timer::stop()
       cpu_times.last_lap_time =
         cpu_clock_type::now() - cpu_times.current_lap_start_time;
 
-      last_lap_wall_time_data = Utilities::MPI::min_max_avg(
-        internal::TimerImplementation::to_seconds(wall_times.last_lap_time),
-        mpi_communicator);
+      last_lap_wall_time_data =
+        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                      wall_times.last_lap_time),
+                                    mpi_communicator);
       if (sync_lap_times)
         {
           wall_times.last_lap_time =
@@ -219,9 +221,10 @@ Timer::stop()
         }
       wall_times.accumulated_time += wall_times.last_lap_time;
       cpu_times.accumulated_time += cpu_times.last_lap_time;
-      accumulated_wall_time_data = Utilities::MPI::min_max_avg(
-        internal::TimerImplementation::to_seconds(wall_times.accumulated_time),
-        mpi_communicator);
+      accumulated_wall_time_data =
+        Utilities::MPI::min_max_avg(internal::TimerImplementation::to_seconds(
+                                      wall_times.accumulated_time),
+                                    mpi_communicator);
     }
   return internal::TimerImplementation::to_seconds(cpu_times.accumulated_time);
 }
@@ -240,9 +243,9 @@ Timer::cpu_time() const
     }
   else
     {
-      return Utilities::MPI::sum(
-        internal::TimerImplementation::to_seconds(cpu_times.accumulated_time),
-        mpi_communicator);
+      return Utilities::MPI::sum(internal::TimerImplementation::to_seconds(
+                                   cpu_times.accumulated_time),
+                                 mpi_communicator);
     }
 }
 
@@ -312,24 +315,24 @@ Timer::reset()
 
 TimerOutput::TimerOutput(std::ostream &        stream,
                          const OutputFrequency output_frequency,
-                         const OutputType      output_type) :
-  output_frequency(output_frequency),
-  output_type(output_type),
-  out_stream(stream, true),
-  output_is_enabled(true),
-  mpi_communicator(MPI_COMM_SELF)
+                         const OutputType      output_type)
+  : output_frequency(output_frequency)
+  , output_type(output_type)
+  , out_stream(stream, true)
+  , output_is_enabled(true)
+  , mpi_communicator(MPI_COMM_SELF)
 {}
 
 
 
 TimerOutput::TimerOutput(ConditionalOStream &  stream,
                          const OutputFrequency output_frequency,
-                         const OutputType      output_type) :
-  output_frequency(output_frequency),
-  output_type(output_type),
-  out_stream(stream),
-  output_is_enabled(true),
-  mpi_communicator(MPI_COMM_SELF)
+                         const OutputType      output_type)
+  : output_frequency(output_frequency)
+  , output_type(output_type)
+  , out_stream(stream)
+  , output_is_enabled(true)
+  , mpi_communicator(MPI_COMM_SELF)
 {}
 
 
@@ -337,12 +340,12 @@ TimerOutput::TimerOutput(ConditionalOStream &  stream,
 TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
                          std::ostream &        stream,
                          const OutputFrequency output_frequency,
-                         const OutputType      output_type) :
-  output_frequency(output_frequency),
-  output_type(output_type),
-  out_stream(stream, true),
-  output_is_enabled(true),
-  mpi_communicator(mpi_communicator)
+                         const OutputType      output_type)
+  : output_frequency(output_frequency)
+  , output_type(output_type)
+  , out_stream(stream, true)
+  , output_is_enabled(true)
+  , mpi_communicator(mpi_communicator)
 {}
 
 
@@ -350,12 +353,12 @@ TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
 TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
                          ConditionalOStream &  stream,
                          const OutputFrequency output_frequency,
-                         const OutputType      output_type) :
-  output_frequency(output_frequency),
-  output_type(output_type),
-  out_stream(stream),
-  output_is_enabled(true),
-  mpi_communicator(mpi_communicator)
+                         const OutputType      output_type)
+  : output_frequency(output_frequency)
+  , output_type(output_type)
+  , out_stream(stream)
+  , output_is_enabled(true)
+  , mpi_communicator(mpi_communicator)
 {}
 
 
@@ -505,8 +508,9 @@ TimerOutput::leave_subsection(const std::string &section_name)
 
   // delete the index from the list of
   // active ones
-  active_sections.erase(std::find(
-    active_sections.begin(), active_sections.end(), actual_section_name));
+  active_sections.erase(std::find(active_sections.begin(),
+                                  active_sections.end(),
+                                  actual_section_name));
 }
 
 

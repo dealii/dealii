@@ -139,9 +139,9 @@ private:
 
 
 template <int dim>
-TestPointValueHistory<dim>::TestPointValueHistory() :
-  finite_element(2),
-  dof_handler(triangulation)
+TestPointValueHistory<dim>::TestPointValueHistory()
+  : finite_element(2)
+  , dof_handler(triangulation)
 {}
 
 
@@ -312,8 +312,10 @@ TestPointValueHistory<dim>::run()
       std::vector<std::string> names;
       names.push_back("X_gradient");
       names.push_back("X_hessian");
-      node_monitor.evaluate_field(
-        names, solution, postprocessor, postprocess_quadrature);
+      node_monitor.evaluate_field(names,
+                                  solution,
+                                  postprocessor,
+                                  postprocess_quadrature);
 
       //        output_results (step, solution);
       step++;

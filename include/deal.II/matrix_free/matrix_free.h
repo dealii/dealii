@@ -217,20 +217,21 @@ public:
       const bool         initialize_mapping  = true,
       const bool         overlap_communication_computation    = true,
       const bool         hold_all_faces_to_owned_cells        = false,
-      const bool         cell_vectorization_categories_strict = false) :
-      tasks_parallel_scheme(tasks_parallel_scheme),
-      tasks_block_size(tasks_block_size),
-      mapping_update_flags(mapping_update_flags),
-      mapping_update_flags_boundary_faces(mapping_update_flags_boundary_faces),
-      mapping_update_flags_inner_faces(mapping_update_flags_inner_faces),
-      mapping_update_flags_faces_by_cells(mapping_update_flags_faces_by_cells),
-      level_mg_handler(level_mg_handler),
-      store_plain_indices(store_plain_indices),
-      initialize_indices(initialize_indices),
-      initialize_mapping(initialize_mapping),
-      overlap_communication_computation(overlap_communication_computation),
-      hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells),
-      cell_vectorization_categories_strict(cell_vectorization_categories_strict)
+      const bool         cell_vectorization_categories_strict = false)
+      : tasks_parallel_scheme(tasks_parallel_scheme)
+      , tasks_block_size(tasks_block_size)
+      , mapping_update_flags(mapping_update_flags)
+      , mapping_update_flags_boundary_faces(mapping_update_flags_boundary_faces)
+      , mapping_update_flags_inner_faces(mapping_update_flags_inner_faces)
+      , mapping_update_flags_faces_by_cells(mapping_update_flags_faces_by_cells)
+      , level_mg_handler(level_mg_handler)
+      , store_plain_indices(store_plain_indices)
+      , initialize_indices(initialize_indices)
+      , initialize_mapping(initialize_mapping)
+      , overlap_communication_computation(overlap_communication_computation)
+      , hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells)
+      , cell_vectorization_categories_strict(
+          cell_vectorization_categories_strict)
     {}
 
     /**
@@ -1645,10 +1646,10 @@ private:
    */
   struct DoFHandlers
   {
-    DoFHandlers() :
-      active_dof_handler(usual),
-      n_dof_handlers(0),
-      level(numbers::invalid_unsigned_int)
+    DoFHandlers()
+      : active_dof_handler(usual)
+      , n_dof_handlers(0)
+      , level(numbers::invalid_unsigned_int)
     {}
 
     std::vector<SmartPointer<const DoFHandler<dim>>>     dof_handler;
@@ -2040,8 +2041,9 @@ MatrixFree<dim, Number>::create_cell_subrange_hp(
   if (fe_index >= dof_info[dof_handler_component].max_fe_index)
     return std::pair<unsigned int, unsigned int>(range.second, range.second);
   else
-    return create_cell_subrange_hp_by_index(
-      range, fe_index, dof_handler_component);
+    return create_cell_subrange_hp_by_index(range,
+                                            fe_index,
+                                            dof_handler_component);
 }
 
 
@@ -2644,17 +2646,16 @@ namespace internal
       const dealii::MatrixFree<dim, Number> &matrix_free,
       const typename dealii::MatrixFree<dim, Number>::DataAccessOnFaces
                          vector_face_access,
-      const unsigned int n_components) :
-      matrix_free(matrix_free),
-      vector_face_access(
-        matrix_free.get_task_info().face_partition_data.empty() ?
-          dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified :
-          vector_face_access),
-      ghosts_were_set(false)
+      const unsigned int n_components)
+      : matrix_free(matrix_free)
+      , vector_face_access(
+          matrix_free.get_task_info().face_partition_data.empty() ?
+            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified :
+            vector_face_access)
+      , ghosts_were_set(false)
 #  ifdef DEAL_II_WITH_MPI
-      ,
-      tmp_data(n_components),
-      requests(n_components)
+      , tmp_data(n_components)
+      , requests(n_components)
 #  endif
     {
       (void)n_components;
@@ -3658,22 +3659,23 @@ namespace internal
              const typename MF::DataAccessOnFaces src_vector_face_access =
                MF::DataAccessOnFaces::none,
              const typename MF::DataAccessOnFaces dst_vector_face_access =
-               MF::DataAccessOnFaces::none) :
-      matrix_free(matrix_free),
-      container(const_cast<Container &>(container)),
-      cell_function(cell_function),
-      face_function(face_function),
-      boundary_function(boundary_function),
-      src(src),
-      dst(dst),
-      src_data_exchanger(matrix_free,
-                         src_vector_face_access,
-                         n_components(src)),
-      dst_data_exchanger(matrix_free,
-                         dst_vector_face_access,
-                         n_components(dst)),
-      src_and_dst_are_same(PointerComparison::equal(&src, &dst)),
-      zero_dst_vector_setting(zero_dst_vector_setting && !src_and_dst_are_same)
+               MF::DataAccessOnFaces::none)
+      : matrix_free(matrix_free)
+      , container(const_cast<Container &>(container))
+      , cell_function(cell_function)
+      , face_function(face_function)
+      , boundary_function(boundary_function)
+      , src(src)
+      , dst(dst)
+      , src_data_exchanger(matrix_free,
+                           src_vector_face_access,
+                           n_components(src))
+      , dst_data_exchanger(matrix_free,
+                           dst_vector_face_access,
+                           n_components(dst))
+      , src_and_dst_are_same(PointerComparison::equal(&src, &dst))
+      , zero_dst_vector_setting(zero_dst_vector_setting &&
+                                !src_and_dst_are_same)
     {}
 
     // Runs the cell work. If no function is given, nothing is done
@@ -3784,10 +3786,10 @@ namespace internal
 
     MFClassWrapper(const function_type cell,
                    const function_type face,
-                   const function_type boundary) :
-      cell(cell),
-      face(face),
-      boundary(boundary)
+                   const function_type boundary)
+      : cell(cell)
+      , face(face)
+      , boundary(boundary)
     {}
 
     void

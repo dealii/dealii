@@ -71,11 +71,11 @@ check(parallel::distributed::Triangulation<dim> &tria)
       ConstantFunction<dim>(static_cast<double>(id) + 42.0, dim),
       constraints);
 
-  VectorTools::compute_no_normal_flux_constraints(
-    dof_handler,
-    0, /*first component*/
-    std::set<types::boundary_id>{2},
-    constraints);
+  VectorTools::compute_no_normal_flux_constraints(dof_handler,
+                                                  0, /*first component*/
+                                                  std::set<types::boundary_id>{
+                                                    2},
+                                                  constraints);
 
   constraints.close();
   deallog << "LocallyOwned = " << std::flush;

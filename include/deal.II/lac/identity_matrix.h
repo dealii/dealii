@@ -156,12 +156,14 @@ private:
 #ifndef DOXYGEN
 
 
-inline IdentityMatrix::IdentityMatrix() : size(0)
+inline IdentityMatrix::IdentityMatrix()
+  : size(0)
 {}
 
 
 
-inline IdentityMatrix::IdentityMatrix(const size_type n) : size(n)
+inline IdentityMatrix::IdentityMatrix(const size_type n)
+  : size(n)
 {}
 
 

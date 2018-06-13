@@ -55,9 +55,11 @@ test()
       FE_Q<dim, spacedim>            fe(1);
       const QGauss<dim - 1>          quad(3);
 
-      FEFaceValues<dim, spacedim> fe_v(
-        map_manifold, fe, quad, update_JxW_values);
-      double area = 0;
+      FEFaceValues<dim, spacedim> fe_v(map_manifold,
+                                       fe,
+                                       quad,
+                                       update_JxW_values);
+      double                      area = 0;
 
       for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
              triangulation.begin_active();

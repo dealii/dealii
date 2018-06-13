@@ -48,7 +48,8 @@ template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
-  MyFunction() : Function<dim>()
+  MyFunction()
+    : Function<dim>()
   {}
 
   virtual double
@@ -86,10 +87,14 @@ exact_third(Point<dim> &p, Tensor<3, dim> &third)
 {
   double x = p[0], y = p[1];
   // array of function and its derivatives
-  double dx[4] = {
-    sin(a * x), a * cos(a * x), -a * a * sin(a * x), -a * a * a * cos(a * x)};
-  double dy[4] = {
-    cos(b * y), -b * sin(b * y), -b * b * cos(b * y), b * b * b * sin(b * y)};
+  double dx[4] = {sin(a * x),
+                  a * cos(a * x),
+                  -a * a * sin(a * x),
+                  -a * a * a * cos(a * x)};
+  double dy[4] = {cos(b * y),
+                  -b * sin(b * y),
+                  -b * b * cos(b * y),
+                  b * b * b * sin(b * y)};
 
   for (int i = 0; i < dim; ++i)
     for (int j = 0; j < dim; ++j)

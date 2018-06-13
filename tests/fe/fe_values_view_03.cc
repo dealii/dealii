@@ -50,8 +50,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(
-    fe, quadrature, update_values | update_gradients | update_hessians);
+  FEValues<dim>     fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_hessians);
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)

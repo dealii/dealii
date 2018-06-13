@@ -63,7 +63,8 @@ namespace Step37
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient() : Function<dim>()
+    Coefficient()
+      : Function<dim>()
     {}
 
     virtual double
@@ -172,7 +173,8 @@ namespace Step37
 
 
   template <int dim, int fe_degree, typename number>
-  LaplaceOperator<dim, fe_degree, number>::LaplaceOperator() : Subscriptor()
+  LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
+    : Subscriptor()
   {}
 
 
@@ -219,8 +221,10 @@ namespace Step37
     additional_data.level_mg_handler = level;
     additional_data.mapping_update_flags =
       (update_gradients | update_JxW_values | update_quadrature_points);
-    data.reinit(
-      dof_handler, constraints, QGauss<1>(fe_degree + 1), additional_data);
+    data.reinit(dof_handler,
+                constraints,
+                QGauss<1>(fe_degree + 1),
+                additional_data);
     evaluate_coefficient(Coefficient<dim>());
   }
 
@@ -262,8 +266,9 @@ namespace Step37
         phi.read_dof_values(src);
         phi.evaluate(false, true, false);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          phi.submit_gradient(
-            coefficient[cell * phi.n_q_points + q] * phi.get_gradient(q), q);
+          phi.submit_gradient(coefficient[cell * phi.n_q_points + q] *
+                                phi.get_gradient(q),
+                              q);
         phi.integrate(false, true);
         phi.distribute_local_to_global(dst);
       }
@@ -394,10 +399,10 @@ namespace Step37
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-    fe(degree_finite_element),
-    dof_handler(triangulation)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+    , fe(degree_finite_element)
+    , dof_handler(triangulation)
   {}
 
 
@@ -417,8 +422,10 @@ namespace Step37
             << std::endl;
 
     constraints.clear();
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
     system_matrix.reinit(dof_handler, constraints);
@@ -434,8 +441,9 @@ namespace Step37
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     std::vector<std::set<types::global_dof_index>> boundary_indices(
       triangulation.n_levels());
-    MGTools::make_boundary_list(
-      dof_handler, dirichlet_boundary, boundary_indices);
+    MGTools::make_boundary_list(dof_handler,
+                                dirichlet_boundary,
+                                boundary_indices);
     for (unsigned int level = 0; level < nlevels; ++level)
       {
         std::set<types::global_dof_index>::iterator bc_it =
@@ -456,8 +464,9 @@ namespace Step37
   LaplaceProblem<dim>::assemble_system()
   {
     QGauss<dim>   quadrature_formula(fe.degree + 1);
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -531,8 +540,9 @@ namespace Step37
                  coefficient_values[q] * fe_values.JxW(q));
             local_diagonal(i) = local_diag;
           }
-        mg_constraints[level].distribute_local_to_global(
-          local_diagonal, local_dof_indices, diagonals[level]);
+        mg_constraints[level].distribute_local_to_global(local_diagonal,
+                                                         local_dof_indices,
+                                                         diagonals[level]);
 
         if (level == 0)
           {
@@ -548,8 +558,9 @@ namespace Step37
                        coefficient_values[q] * fe_values.JxW(q));
                   local_matrix(i, j) = add_value;
                 }
-            mg_constraints[0].distribute_local_to_global(
-              local_matrix, local_dof_indices, coarse_matrix);
+            mg_constraints[0].distribute_local_to_global(local_matrix,
+                                                         local_dof_indices,
+                                                         coarse_matrix);
           }
       }
 

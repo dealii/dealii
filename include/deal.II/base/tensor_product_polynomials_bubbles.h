@@ -157,8 +157,8 @@ public:
 template <int dim>
 template <class Pol>
 inline TensorProductPolynomialsBubbles<dim>::TensorProductPolynomialsBubbles(
-  const std::vector<Pol> &pols) :
-  TensorProductPolynomials<dim>(pols)
+  const std::vector<Pol> &pols)
+  : TensorProductPolynomials<dim>(pols)
 {
   const unsigned int q_degree  = this->polynomials.size() - 1;
   const unsigned int n_bubbles = ((q_degree <= 1) ? 1 : dim);

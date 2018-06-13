@@ -28,9 +28,11 @@
 
 struct X
 {
-  X() : i(0)
+  X()
+    : i(0)
   {}
-  X(const X &x) : i(x.i + 1)
+  X(const X &x)
+    : i(x.i + 1)
   {}
   X &
   operator=(const X &x)

@@ -18,8 +18,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-IntegratedLegendreSZ::IntegratedLegendreSZ(const unsigned int k) :
-  Polynomials::Polynomial<double>(get_coefficients(k))
+IntegratedLegendreSZ::IntegratedLegendreSZ(const unsigned int k)
+  : Polynomials::Polynomial<double>(get_coefficients(k))
 {}
 
 

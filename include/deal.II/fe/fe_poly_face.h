@@ -162,11 +162,11 @@ protected:
                                                                        spacedim>
       &output_data) const override
   {
-    return get_face_data(
-      update_flags,
-      mapping,
-      QProjector<dim - 1>::project_to_all_children(quadrature),
-      output_data);
+    return get_face_data(update_flags,
+                         mapping,
+                         QProjector<dim - 1>::project_to_all_children(
+                           quadrature),
+                         output_data);
   }
 
   virtual void

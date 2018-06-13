@@ -128,9 +128,9 @@ namespace Step8
 
 
   template <int dim>
-  ElasticProblem<dim>::ElasticProblem() :
-    dof_handler(triangulation),
-    fe(FE_Q<dim>(1), dim)
+  ElasticProblem<dim>::ElasticProblem()
+    : dof_handler(triangulation)
+    , fe(FE_Q<dim>(1), dim)
   {}
 
 
@@ -252,8 +252,9 @@ namespace Step8
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(
-                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+              system_matrix.add(local_dof_indices[i],
+                                local_dof_indices[j],
+                                cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -263,10 +264,14 @@ namespace Step8
     hanging_node_constraints.condense(system_rhs);
 
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(dim), boundary_values);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
   }
 
 
@@ -300,8 +305,10 @@ namespace Step8
                                        solution,
                                        estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
 
     triangulation.execute_coarsening_and_refinement();
   }
@@ -312,8 +319,8 @@ namespace Step8
   class StrainPostprocessor : public DataPostprocessorTensor<dim>
   {
   public:
-    StrainPostprocessor() :
-      DataPostprocessorTensor<dim>("strain", update_gradients)
+    StrainPostprocessor()
+      : DataPostprocessorTensor<dim>("strain", update_gradients)
     {}
 
     virtual void

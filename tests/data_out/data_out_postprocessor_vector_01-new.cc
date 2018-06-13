@@ -74,9 +74,9 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  fe(FE_Q<dim>(1), 2),
-  dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem()
+  : fe(FE_Q<dim>(1), 2)
+  , dof_handler(triangulation)
 {}
 
 
@@ -100,7 +100,8 @@ template <int dim>
 class SinesAndCosines : public Function<dim>
 {
 public:
-  SinesAndCosines() : Function<dim>(2)
+  SinesAndCosines()
+    : Function<dim>(2)
   {}
 
   double
@@ -136,8 +137,8 @@ template <int dim>
 class MyPostprocessor : public DataPostprocessorVector<dim>
 {
 public:
-  MyPostprocessor() :
-    DataPostprocessorVector<dim>("magnitude_times_d", update_values)
+  MyPostprocessor()
+    : DataPostprocessorVector<dim>("magnitude_times_d", update_values)
   {}
 
   virtual void

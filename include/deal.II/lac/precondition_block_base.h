@@ -301,12 +301,12 @@ private:
 
 template <typename number>
 inline PreconditionBlockBase<number>::PreconditionBlockBase(bool      store,
-                                                            Inversion method) :
-  inversion(method),
-  n_diagonal_blocks(0),
-  var_store_diagonals(store),
-  var_same_diagonal(false),
-  var_inverses_ready(false)
+                                                            Inversion method)
+  : inversion(method)
+  , n_diagonal_blocks(0)
+  , var_store_diagonals(store)
+  , var_same_diagonal(false)
+  , var_inverses_ready(false)
 {}
 
 

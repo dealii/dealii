@@ -29,10 +29,10 @@ ChunkSparsityPattern::ChunkSparsityPattern()
 
 
 
-ChunkSparsityPattern::ChunkSparsityPattern(const ChunkSparsityPattern &s) :
-  Subscriptor(),
-  chunk_size(s.chunk_size),
-  sparsity_pattern(s.sparsity_pattern)
+ChunkSparsityPattern::ChunkSparsityPattern(const ChunkSparsityPattern &s)
+  : Subscriptor()
+  , chunk_size(s.chunk_size)
+  , sparsity_pattern(s.sparsity_pattern)
 {
   Assert(s.rows == 0 && s.cols == 0,
          ExcMessage(
@@ -94,11 +94,11 @@ ChunkSparsityPattern::ChunkSparsityPattern(
 ChunkSparsityPattern &
 ChunkSparsityPattern::operator=(const ChunkSparsityPattern &s)
 {
-  Assert(
-    s.rows == 0 && s.cols == 0,
-    ExcMessage("This operator can only be called if the provided argument "
-               "is the sparsity pattern for an empty matrix. This operator can "
-               "not be used to copy a non-empty sparsity pattern."));
+  Assert(s.rows == 0 && s.cols == 0,
+         ExcMessage(
+           "This operator can only be called if the provided argument "
+           "is the sparsity pattern for an empty matrix. This operator can "
+           "not be used to copy a non-empty sparsity pattern."));
 
   Assert(rows == 0 && cols == 0,
          ExcMessage("This operator can only be called if the current object is "
@@ -303,11 +303,11 @@ ChunkSparsityPattern::create_from(const unsigned int m,
            m <= sparsity_pattern_for_chunks.n_rows() * chunk_size_in,
          ExcMessage("Number of rows m is not compatible with chunk size "
                     "and number of rows in sparsity pattern for the chunks."));
-  Assert(
-    n > (sparsity_pattern_for_chunks.n_cols() - 1) * chunk_size_in &&
-      n <= sparsity_pattern_for_chunks.n_cols() * chunk_size_in,
-    ExcMessage("Number of columns m is not compatible with chunk size "
-               "and number of columns in sparsity pattern for the chunks."));
+  Assert(n > (sparsity_pattern_for_chunks.n_cols() - 1) * chunk_size_in &&
+           n <= sparsity_pattern_for_chunks.n_cols() * chunk_size_in,
+         ExcMessage(
+           "Number of columns m is not compatible with chunk size "
+           "and number of columns in sparsity pattern for the chunks."));
 
   internal::copy_sparsity(sparsity_pattern_for_chunks, sparsity_pattern);
   chunk_size = chunk_size_in;

@@ -30,10 +30,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
-SparseLUDecomposition<number>::SparseLUDecomposition() :
-  SparseMatrix<number>(),
-  strengthen_diagonal(0),
-  own_sparsity(nullptr)
+SparseLUDecomposition<number>::SparseLUDecomposition()
+  : SparseMatrix<number>()
+  , strengthen_diagonal(0)
+  , own_sparsity(nullptr)
 {}
 
 
@@ -123,10 +123,10 @@ SparseLUDecomposition<number>::initialize(
     }
 
   // now use this sparsity pattern
-  Assert(
-    sparsity_pattern_to_use->n_rows() == sparsity_pattern_to_use->n_cols(),
-    ExcMessage("It is not possible to compute this matrix decomposition for "
-               "matrices that are not square."));
+  Assert(sparsity_pattern_to_use->n_rows() == sparsity_pattern_to_use->n_cols(),
+         ExcMessage(
+           "It is not possible to compute this matrix decomposition for "
+           "matrices that are not square."));
   {
     std::vector<const size_type *> tmp;
     tmp.swap(prebuilt_lower_bound);
@@ -170,8 +170,9 @@ SparseLUDecomposition<number>::copy_from(const SparseMatrix<somenumber> &matrix)
       number *            this_ptr  = this->val.get();
       const number *const end_ptr   = this_ptr + this->n_nonzero_elements();
       if (std::is_same<somenumber, number>::value == true)
-        std::memcpy(
-          this_ptr, input_ptr, this->n_nonzero_elements() * sizeof(number));
+        std::memcpy(this_ptr,
+                    input_ptr,
+                    this->n_nonzero_elements() * sizeof(number));
       else
         for (; this_ptr != end_ptr; ++input_ptr, ++this_ptr)
           *this_ptr = *input_ptr;

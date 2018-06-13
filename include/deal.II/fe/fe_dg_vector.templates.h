@@ -32,16 +32,16 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class PolynomialType, int dim, int spacedim>
 FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
-                                                        MappingType map) :
-  FE_PolyTensor<PolynomialType, dim, spacedim>(
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 1,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(PolynomialType::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
-                               ComponentMask(dim, true)))
+                                                        MappingType        map)
+  : FE_PolyTensor<PolynomialType, dim, spacedim>(
+      deg,
+      FiniteElementData<dim>(get_dpo_vector(deg),
+                             dim,
+                             deg + 1,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(PolynomialType::compute_n_pols(deg), true),
+      std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
+                                 ComponentMask(dim, true)))
 {
   this->mapping_type                   = map;
   const unsigned int polynomial_degree = this->tensor_degree();

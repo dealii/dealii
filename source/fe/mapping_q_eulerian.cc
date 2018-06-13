@@ -47,13 +47,13 @@ template <int dim, class VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   MappingQEulerianGeneric(
     const unsigned int                                 degree,
-    const MappingQEulerian<dim, VectorType, spacedim> &mapping_q_eulerian) :
-  MappingQGeneric<dim, spacedim>(degree),
-  mapping_q_eulerian(mapping_q_eulerian),
-  support_quadrature(degree),
-  fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
-            support_quadrature,
-            update_values | update_quadrature_points)
+    const MappingQEulerian<dim, VectorType, spacedim> &mapping_q_eulerian)
+  : MappingQGeneric<dim, spacedim>(degree)
+  , mapping_q_eulerian(mapping_q_eulerian)
+  , support_quadrature(degree)
+  , fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
+              support_quadrature,
+              update_values | update_quadrature_points)
 {}
 
 
@@ -63,11 +63,11 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const unsigned int               degree,
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const VectorType &               euler_vector,
-  const unsigned int               level) :
-  MappingQ<dim, spacedim>(degree, true),
-  euler_vector(&euler_vector),
-  euler_dof_handler(&euler_dof_handler),
-  level(level)
+  const unsigned int               level)
+  : MappingQ<dim, spacedim>(degree, true)
+  , euler_vector(&euler_vector)
+  , euler_dof_handler(&euler_dof_handler)
+  , level(level)
 {
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
@@ -96,8 +96,8 @@ MappingQEulerian<dim, VectorType, spacedim>::clone() const
 
 template <int dim, class VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
-  SupportQuadrature::SupportQuadrature(const unsigned int map_degree) :
-  Quadrature<dim>(Utilities::fixed_power<dim>(map_degree + 1))
+  SupportQuadrature::SupportQuadrature(const unsigned int map_degree)
+  : Quadrature<dim>(Utilities::fixed_power<dim>(map_degree + 1))
 {
   // first we determine the support points on the unit cell in lexicographic
   // order, which are (in accordance with MappingQ) the support points of
@@ -226,8 +226,9 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   if (mg_vector)
     {
       dof_cell->get_mg_dof_indices(dof_indices);
-      fe_values.get_function_values(
-        *mapping_q_eulerian.euler_vector, dof_indices, shift_vector);
+      fe_values.get_function_values(*mapping_q_eulerian.euler_vector,
+                                    dof_indices,
+                                    shift_vector);
     }
   else
     fe_values.get_function_values(*mapping_q_eulerian.euler_vector,

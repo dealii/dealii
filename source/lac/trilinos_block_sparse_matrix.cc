@@ -197,11 +197,11 @@ namespace TrilinosWrappers
     for (size_type r = 0; r < this->n_block_rows(); ++r)
       for (size_type c = 0; c < this->n_block_cols(); ++c)
         {
-          this->sub_objects[r][c]->reinit(
-            parallel_partitioning[r],
-            parallel_partitioning[c],
-            dealii_block_sparse_matrix.block(r, c),
-            drop_tolerance);
+          this->sub_objects[r][c]->reinit(parallel_partitioning[r],
+                                          parallel_partitioning[c],
+                                          dealii_block_sparse_matrix.block(r,
+                                                                           c),
+                                          drop_tolerance);
         }
 
     collect_sizes();

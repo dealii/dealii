@@ -53,7 +53,8 @@ template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
-  MySquareFunction() : Function<dim>(2)
+  MySquareFunction()
+    : Function<dim>(2)
   {}
 
   virtual double
@@ -89,8 +90,10 @@ check_boundary(const hp::DoFHandler<dim> &       dof,
 
   SparsityPattern sparsity(dof.n_boundary_dofs(function_map),
                            dof.max_couplings_between_boundary_dofs());
-  DoFTools::make_boundary_sparsity_pattern(
-    dof, function_map, dof_to_boundary_mapping, sparsity);
+  DoFTools::make_boundary_sparsity_pattern(dof,
+                                           function_map,
+                                           dof_to_boundary_mapping,
+                                           sparsity);
   sparsity.compress();
 
   SparseMatrix<double> matrix;

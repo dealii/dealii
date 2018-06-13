@@ -106,8 +106,9 @@ namespace mg
             DynamicSparsityPattern ci_sparsity;
             ci_sparsity.reinit(dof_handler.n_dofs(level - 1),
                                dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(
-              dof_handler, ci_sparsity, level);
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler,
+                                                     ci_sparsity,
+                                                     level);
             sparsity_edge[level].copy_from(ci_sparsity);
             matrix_up[level].reinit(sparsity_edge[level]);
             matrix_down[level].reinit(sparsity_edge[level]);

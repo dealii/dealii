@@ -80,9 +80,9 @@ namespace OpenCASCADE
   template <int dim, int spacedim>
   NormalProjectionManifold<dim, spacedim>::NormalProjectionManifold(
     const TopoDS_Shape &sh,
-    const double        tolerance) :
-    sh(sh),
-    tolerance(tolerance)
+    const double        tolerance)
+    : sh(sh)
+    , tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
   }
@@ -123,10 +123,10 @@ namespace OpenCASCADE
   DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold(
     const TopoDS_Shape &       sh,
     const Tensor<1, spacedim> &direction,
-    const double               tolerance) :
-    sh(sh),
-    direction(direction),
-    tolerance(tolerance)
+    const double               tolerance)
+    : sh(sh)
+    , direction(direction)
+    , tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
   }
@@ -167,9 +167,9 @@ namespace OpenCASCADE
   template <int dim, int spacedim>
   NormalToMeshProjectionManifold<dim, spacedim>::NormalToMeshProjectionManifold(
     const TopoDS_Shape &sh,
-    const double        tolerance) :
-    sh(sh),
-    tolerance(tolerance)
+    const double        tolerance)
+    : sh(sh)
+    , tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
     Assert(
@@ -212,8 +212,10 @@ namespace OpenCASCADE
             for (unsigned int i = 0; i < surrounding_points.size(); ++i)
               {
                 std::tuple<Point<3>, Tensor<1, 3>, double, double>
-                  p_and_diff_forms = closest_point_and_differential_forms(
-                    sh, surrounding_points[i], tolerance);
+                  p_and_diff_forms =
+                    closest_point_and_differential_forms(sh,
+                                                         surrounding_points[i],
+                                                         tolerance);
                 average_normal += std::get<1>(p_and_diff_forms);
               }
 
@@ -314,14 +316,15 @@ namespace OpenCASCADE
   template <int dim, int spacedim>
   ArclengthProjectionLineManifold<dim, spacedim>::
     ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
-                                    const double        tolerance) :
+                                    const double        tolerance)
+    :
 
     ChartManifold<dim, spacedim, 1>(sh.Closed() ? Point<1>(shape_length(sh)) :
-                                                  Point<1>()),
-    sh(sh),
-    curve(curve_adaptor(sh)),
-    tolerance(tolerance),
-    length(shape_length(sh))
+                                                  Point<1>())
+    , sh(sh)
+    , curve(curve_adaptor(sh))
+    , tolerance(tolerance)
+    , length(shape_length(sh))
   {
     Assert(spacedim >= 2, ExcImpossibleInDimSpacedim(dim, spacedim));
   }
@@ -362,18 +365,18 @@ namespace OpenCASCADE
   ArclengthProjectionLineManifold<dim, spacedim>::push_forward(
     const Point<1> &chart_point) const
   {
-    GCPnts_AbscissaPoint AP(
-      curve->GetCurve(), chart_point[0], curve->GetCurve().FirstParameter());
-    gp_Pnt P = curve->GetCurve().Value(AP.Parameter());
+    GCPnts_AbscissaPoint AP(curve->GetCurve(),
+                            chart_point[0],
+                            curve->GetCurve().FirstParameter());
+    gp_Pnt               P = curve->GetCurve().Value(AP.Parameter());
     return point<spacedim>(P);
   }
 
   template <int dim, int spacedim>
-  NURBSPatchManifold<dim, spacedim>::NURBSPatchManifold(
-    const TopoDS_Face &face,
-    const double       tolerance) :
-    face(face),
-    tolerance(tolerance)
+  NURBSPatchManifold<dim, spacedim>::NURBSPatchManifold(const TopoDS_Face &face,
+                                                        const double tolerance)
+    : face(face)
+    , tolerance(tolerance)
   {}
 
 
@@ -409,8 +412,9 @@ namespace OpenCASCADE
   NURBSPatchManifold<dim, spacedim>::push_forward(
     const Point<2> &chart_point) const
   {
-    return ::dealii::OpenCASCADE::push_forward<spacedim>(
-      face, chart_point[0], chart_point[1]);
+    return ::dealii::OpenCASCADE::push_forward<spacedim>(face,
+                                                         chart_point[0],
+                                                         chart_point[1]);
   }
 
   template <int dim, int spacedim>
@@ -430,17 +434,17 @@ namespace OpenCASCADE
     if (spacedim > 2)
       DX[2][0] = Du.Z();
     else
-      Assert(
-        std::abs(Du.Z()) < tolerance,
-        ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
+      Assert(std::abs(Du.Z()) < tolerance,
+             ExcMessage(
+               "Expecting derivative along Z to be zero! Bailing out."));
     DX[0][1] = Dv.X();
     DX[1][1] = Dv.Y();
     if (spacedim > 2)
       DX[2][1] = Dv.Z();
     else
-      Assert(
-        std::abs(Dv.Z()) < tolerance,
-        ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
+      Assert(std::abs(Dv.Z()) < tolerance,
+             ExcMessage(
+               "Expecting derivative along Z to be zero! Bailing out."));
     return DX;
   }
 

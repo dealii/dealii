@@ -20,7 +20,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   template <int dim, int spacedim>
-  ParticleAccessor<dim, spacedim>::ParticleAccessor() : map(nullptr), particle()
+  ParticleAccessor<dim, spacedim>::ParticleAccessor()
+    : map(nullptr)
+    , particle()
   {}
 
 
@@ -29,11 +31,10 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::ParticleAccessor(
     const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
     const typename std::multimap<internal::LevelInd,
-                                 Particle<dim, spacedim>>::iterator &particle) :
-    map(
-      const_cast<std::multimap<internal::LevelInd, Particle<dim, spacedim>> *>(
-        &map)),
-    particle(particle)
+                                 Particle<dim, spacedim>>::iterator & particle)
+    : map(const_cast<
+          std::multimap<internal::LevelInd, Particle<dim, spacedim>> *>(&map))
+    , particle(particle)
   {}
 
 

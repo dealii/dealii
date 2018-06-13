@@ -78,7 +78,9 @@ private:
 
 // --------------- inline and template functions -----------------
 
-inline FDMatrix::FDMatrix(unsigned int nx, unsigned int ny) : nx(nx), ny(ny)
+inline FDMatrix::FDMatrix(unsigned int nx, unsigned int ny)
+  : nx(nx)
+  , ny(ny)
 {}
 
 

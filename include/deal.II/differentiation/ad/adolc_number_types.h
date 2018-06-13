@@ -209,11 +209,11 @@ namespace Differentiation
           // Violating this condition when will result in an Adol-C internal
           // error. We could rather always throw here in order to provide a
           // less cryptic message.
-          AssertThrow(
-            index < adtl::getNumDir(),
-            ExcMessage("The index number of the independent variable being "
-                       "marked is greater than the number of independent "
-                       "variables that have been declared."));
+          AssertThrow(index < adtl::getNumDir(),
+                      ExcMessage(
+                        "The index number of the independent variable being "
+                        "marked is greater than the number of independent "
+                        "variables that have been declared."));
           out.setADValue(index, 1 /*seed value for first derivative*/);
         }
 
@@ -272,10 +272,10 @@ namespace Differentiation
         static double
         directional_derivative(const adouble &, const unsigned int)
         {
-          AssertThrow(
-            false,
-            ExcMessage("The derivative values for taped Adol-C numbers must be"
-                       "computed through the ::gradient function."));
+          AssertThrow(false,
+                      ExcMessage(
+                        "The derivative values for taped Adol-C numbers must be"
+                        "computed through the ::gradient function."));
           return 0.0;
         }
       };

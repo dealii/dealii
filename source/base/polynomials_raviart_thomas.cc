@@ -34,10 +34,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(const unsigned int k) :
-  my_degree(k),
-  polynomial_space(create_polynomials(k)),
-  n_pols(compute_n_pols(k))
+PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(const unsigned int k)
+  : my_degree(k)
+  , polynomial_space(create_polynomials(k))
+  , n_pols(compute_n_pols(k))
 {}
 
 

@@ -286,7 +286,8 @@ namespace Threads
       /**
        * Constructor. Lock the mutex.
        */
-      ScopedLock(Mutex &m) : mutex(m)
+      ScopedLock(Mutex &m)
+        : mutex(m)
       {
         mutex.acquire();
       }
@@ -316,7 +317,8 @@ namespace Threads
      * Copy constructor. As discussed in this class's documentation, no state
      * is copied from the object given as argument.
      */
-    Mutex(const Mutex &) : mutex()
+    Mutex(const Mutex &)
+      : mutex()
     {}
 
 
@@ -724,7 +726,8 @@ namespace Threads
     public:
       typedef RT &reference_type;
 
-      inline return_value() : value()
+      inline return_value()
+        : value()
       {}
 
       inline reference_type
@@ -759,7 +762,8 @@ namespace Threads
     public:
       typedef RT &reference_type;
 
-      inline return_value() : value(nullptr)
+      inline return_value()
+        : value(nullptr)
       {}
 
       inline reference_type
@@ -890,7 +894,8 @@ namespace Threads
       /**
        * Default constructor.
        */
-      ThreadDescriptor() : thread_is_active(false)
+      ThreadDescriptor()
+        : thread_is_active(false)
       {}
 
       ~ThreadDescriptor()
@@ -1035,8 +1040,8 @@ namespace Threads
     /**
      * Construct a thread object with a function object.
      */
-    Thread(const std::function<RT()> &function) :
-      thread_descriptor(new internal::ThreadDescriptor<RT>())
+    Thread(const std::function<RT()> &function)
+      : thread_descriptor(new internal::ThreadDescriptor<RT>())
     {
       // in a second step, start the thread.
       thread_descriptor->start(function);
@@ -1052,7 +1057,8 @@ namespace Threads
     /**
      * Copy constructor.
      */
-    Thread(const Thread<RT> &t) : thread_descriptor(t.thread_descriptor)
+    Thread(const Thread<RT> &t)
+      : thread_descriptor(t.thread_descriptor)
     {}
 
     /**
@@ -1392,8 +1398,8 @@ namespace Threads
     template <typename RT>
     struct TaskEntryPoint : public tbb::task
     {
-      TaskEntryPoint(TaskDescriptor<RT> &task_descriptor) :
-        task_descriptor(task_descriptor)
+      TaskEntryPoint(TaskDescriptor<RT> &task_descriptor)
+        : task_descriptor(task_descriptor)
       {}
 
       virtual tbb::task *
@@ -1530,10 +1536,10 @@ namespace Threads
 
     template <typename RT>
     inline TaskDescriptor<RT>::TaskDescriptor(
-      const std::function<RT()> &function) :
-      function(function),
-      task(nullptr),
-      task_is_done(false)
+      const std::function<RT()> &function)
+      : function(function)
+      , task(nullptr)
+      , task_is_done(false)
     {}
 
 
@@ -1564,7 +1570,8 @@ namespace Threads
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor() : task_is_done(false)
+    TaskDescriptor<RT>::TaskDescriptor()
+      : task_is_done(false)
     {
       Assert(false, ExcInternalError());
     }
@@ -1572,8 +1579,8 @@ namespace Threads
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &) :
-      task_is_done(false)
+    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &)
+      : task_is_done(false)
     {
       // we shouldn't be getting here -- task descriptors
       // can't be copied
@@ -1721,7 +1728,8 @@ namespace Threads
      * @post Using this constructor automatically makes the task object
      * joinable().
      */
-    Task(const Task<RT> &t) : task_descriptor(t.task_descriptor)
+    Task(const Task<RT> &t)
+      : task_descriptor(t.task_descriptor)
     {}
 
 

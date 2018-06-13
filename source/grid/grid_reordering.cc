@@ -41,7 +41,9 @@ namespace
     /**
      * Construct an edge from the global indices of its two vertices.
      */
-    CheapEdge(const unsigned int v0, const unsigned int v1) : v0(v0), v1(v1)
+    CheapEdge(const unsigned int v0, const unsigned int v1)
+      : v0(v0)
+      , v1(v1)
     {}
 
     /**
@@ -170,18 +172,18 @@ namespace
     /**
      * Default constructor. Initialize the fields with invalid values.
      */
-    AdjacentCell() :
-      cell_index(numbers::invalid_unsigned_int),
-      edge_within_cell(numbers::invalid_unsigned_int)
+    AdjacentCell()
+      : cell_index(numbers::invalid_unsigned_int)
+      , edge_within_cell(numbers::invalid_unsigned_int)
     {}
 
     /**
      * Constructor. Initialize the fields with the given values.
      */
     AdjacentCell(const unsigned int cell_index,
-                 const unsigned int edge_within_cell) :
-      cell_index(cell_index),
-      edge_within_cell(edge_within_cell)
+                 const unsigned int edge_within_cell)
+      : cell_index(cell_index)
+      , edge_within_cell(edge_within_cell)
     {}
 
 
@@ -303,8 +305,8 @@ namespace
      * in @p cell, and selecting the edge with number @p edge_number
      * within this cell. Initialize the edge as unoriented.
      */
-    Edge(const CellData<dim> &cell, const unsigned int edge_number) :
-      orientation_status(not_oriented)
+    Edge(const CellData<dim> &cell, const unsigned int edge_number)
+      : orientation_status(not_oriented)
     {
       Assert(edge_number < GeometryInfo<dim>::lines_per_cell,
              ExcInternalError());
@@ -811,10 +813,9 @@ namespace
     unsigned int starting_vertex_of_edge[GeometryInfo<dim>::lines_per_cell];
     for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
       {
-        Assert(
-          edge_list[cell_list[cell_index].edge_indices[e]].orientation_status !=
-            Edge<dim>::not_oriented,
-          ExcInternalError());
+        Assert(edge_list[cell_list[cell_index].edge_indices[e]]
+                   .orientation_status != Edge<dim>::not_oriented,
+               ExcInternalError());
         if (edge_list[cell_list[cell_index].edge_indices[e]]
               .orientation_status == Edge<dim>::forward)
           starting_vertex_of_edge[e] =
@@ -1187,10 +1188,10 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
   // might work also on single cells, grids
   // with both kind of cells are very likely to
   // be broken. Check for this here.
-  AssertThrow(
-    n_negative_cells == 0 || n_negative_cells == cells.size(),
-    ExcMessage(
-      std::string("This class assumes that either all cells have positive "
+  AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
+              ExcMessage(
+                std::string(
+                  "This class assumes that either all cells have positive "
                   "volume, or that all cells have been specified in an "
                   "inverted vertex order so that their volume is negative. "
                   "(In the latter case, this class automatically inverts "
@@ -1199,9 +1200,9 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
                   "negative volume. You need to check your mesh which "
                   "cells these are and how they got there.\n"
                   "As a hint, of the total ") +
-      Utilities::to_string(cells.size()) + " cells in the mesh, " +
-      Utilities::to_string(n_negative_cells) +
-      " appear to have a negative volume."));
+                Utilities::to_string(cells.size()) + " cells in the mesh, " +
+                Utilities::to_string(n_negative_cells) +
+                " appear to have a negative volume."));
 }
 
 

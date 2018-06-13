@@ -90,8 +90,10 @@ test()
   ConstraintMatrix constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   std::shared_ptr<MatrixFree<dim, double>> mf_data(
@@ -140,19 +142,22 @@ test()
     typedef LinearAlgebra::distributed::Vector<double> VectorType;
     SolverCG<VectorType> solver_c(inner_control_c);
     PreconditionIdentity preconditioner;
-    const auto           shift_and_invert = inverse_operator(
-      linear_operator<VectorType>(laplace), solver_c, preconditioner);
+    const auto           shift_and_invert =
+      inverse_operator(linear_operator<VectorType>(laplace),
+                       solver_c,
+                       preconditioner);
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
     PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-    additional_data(
-      num_arnoldi_vectors,
-      PArpackSolver<
-        LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
-      true);
+    additional_data(num_arnoldi_vectors,
+                    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::
+                      largest_magnitude,
+                    true);
 
-    SolverControl solver_control(
-      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
+    SolverControl solver_control(dof_handler.n_dofs(),
+                                 1e-9,
+                                 /*log_history*/ false,
+                                 /*log_results*/ false);
 
     PArpackSolver<LinearAlgebra::distributed::Vector<double>> eigensolver(
       solver_control, mpi_communicator, additional_data);

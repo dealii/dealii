@@ -27,18 +27,18 @@ TimestepControl::TimestepControl(double start,
                                  double tolerance,
                                  double start_step,
                                  double print_step,
-                                 double max_step) :
-  start_val(start),
-  final_val(final),
-  tolerance_val(tolerance),
-  strategy_val(uniform),
-  start_step_val(start_step),
-  max_step_val(max_step),
-  min_step_val(0),
-  current_step_val(start_step),
-  step_val(start_step),
-  print_step(print_step),
-  next_print_val(print_step > 0. ? start_val + print_step : start_val - 1.)
+                                 double max_step)
+  : start_val(start)
+  , final_val(final)
+  , tolerance_val(tolerance)
+  , strategy_val(uniform)
+  , start_step_val(start_step)
+  , max_step_val(max_step)
+  , min_step_val(0)
+  , current_step_val(start_step)
+  , step_val(start_step)
+  , print_step(print_step)
+  , next_print_val(print_step > 0. ? start_val + print_step : start_val - 1.)
 {
   now_val = start_val;
   strcpy(format, "T.%06.3f");
@@ -58,8 +58,9 @@ TimestepControl::declare_parameters(ParameterHandler &param)
   param.declare_entry("Max step", "1.", Patterns::Double());
   param.declare_entry("Tolerance", "1.e-2", Patterns::Double());
   param.declare_entry("Print step", "-1.", Patterns::Double());
-  param.declare_entry(
-    "Strategy", "uniform", Patterns::Selection("uniform|doubling"));
+  param.declare_entry("Strategy",
+                      "uniform",
+                      Patterns::Selection("uniform|doubling"));
 }
 
 

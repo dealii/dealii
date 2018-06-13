@@ -78,12 +78,12 @@ test()
 
   // interpolate a linear function
   Vector<double> vec(dof_handler.n_dofs());
-  VectorTools::interpolate(
-    dof_handler,
-    Functions::Monomial<dim>(
-      dim == 1 ? Point<dim>(1.) :
-                 (dim == 2 ? Point<dim>(1., 0.) : Point<dim>(1., 0., 0.))),
-    vec);
+  VectorTools::interpolate(dof_handler,
+                           Functions::Monomial<dim>(
+                             dim == 1 ? Point<dim>(1.) :
+                                        (dim == 2 ? Point<dim>(1., 0.) :
+                                                    Point<dim>(1., 0., 0.))),
+                           vec);
 
   Vector<float> diff(tria.n_active_cells());
 

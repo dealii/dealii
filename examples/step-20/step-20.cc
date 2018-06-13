@@ -125,7 +125,8 @@ namespace Step20
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(1)
+    RightHandSide()
+      : Function<dim>(1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -138,7 +139,8 @@ namespace Step20
   class PressureBoundaryValues : public Function<dim>
   {
   public:
-    PressureBoundaryValues() : Function<dim>(1)
+    PressureBoundaryValues()
+      : Function<dim>(1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -150,7 +152,8 @@ namespace Step20
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution() : Function<dim>(dim + 1)
+    ExactSolution()
+      : Function<dim>(dim + 1)
     {}
 
     virtual void vector_value(const Point<dim> &p,
@@ -231,7 +234,8 @@ namespace Step20
   class KInverse : public TensorFunction<2, dim>
   {
   public:
-    KInverse() : TensorFunction<2, dim>()
+    KInverse()
+      : TensorFunction<2, dim>()
     {}
 
     virtual void value_list(const std::vector<Point<dim>> &points,
@@ -295,10 +299,10 @@ namespace Step20
   // used <code>dim</code> copies of the <code>FE_Q(1)</code> element, one
   // copy for the displacement in each coordinate direction.
   template <int dim>
-  MixedLaplaceProblem<dim>::MixedLaplaceProblem(const unsigned int degree) :
-    degree(degree),
-    fe(FE_RaviartThomas<dim>(degree), 1, FE_DGQ<dim>(degree), 1),
-    dof_handler(triangulation)
+  MixedLaplaceProblem<dim>::MixedLaplaceProblem(const unsigned int degree)
+    : degree(degree)
+    , fe(FE_RaviartThomas<dim>(degree), 1, FE_DGQ<dim>(degree), 1)
+    , dof_handler(triangulation)
   {}
 
 
@@ -540,8 +544,9 @@ namespace Step20
         cell->get_dof_indices(local_dof_indices);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], local_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              local_matrix(i, j));
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           system_rhs(local_dof_indices[i]) += local_rhs(i);
       }
@@ -581,7 +586,8 @@ namespace Step20
 
 
   template <class MatrixType>
-  InverseMatrix<MatrixType>::InverseMatrix(const MatrixType &m) : matrix(&m)
+  InverseMatrix<MatrixType>::InverseMatrix(const MatrixType &m)
+    : matrix(&m)
   {}
 
 
@@ -643,11 +649,11 @@ namespace Step20
 
   SchurComplement ::SchurComplement(
     const BlockSparseMatrix<double> &          A,
-    const InverseMatrix<SparseMatrix<double>> &Minv) :
-    system_matrix(&A),
-    m_inverse(&Minv),
-    tmp1(A.block(0, 0).m()),
-    tmp2(A.block(0, 0).m())
+    const InverseMatrix<SparseMatrix<double>> &Minv)
+    : system_matrix(&A)
+    , m_inverse(&Minv)
+    , tmp1(A.block(0, 0).m())
+    , tmp2(A.block(0, 0).m())
   {}
 
 
@@ -682,10 +688,10 @@ namespace Step20
 
 
   ApproximateSchurComplement::ApproximateSchurComplement(
-    const BlockSparseMatrix<double> &A) :
-    system_matrix(&A),
-    tmp1(A.block(0, 0).m()),
-    tmp2(A.block(0, 0).m())
+    const BlockSparseMatrix<double> &A)
+    : system_matrix(&A)
+    , tmp1(A.block(0, 0).m())
+    , tmp2(A.block(0, 0).m())
   {}
 
 
@@ -728,8 +734,10 @@ namespace Step20
       ApproximateSchurComplement approximate_schur(system_matrix);
       InverseMatrix<ApproximateSchurComplement> approximate_inverse(
         approximate_schur);
-      cg.solve(
-        schur_complement, solution.block(1), schur_rhs, approximate_inverse);
+      cg.solve(schur_complement,
+               solution.block(1),
+               schur_rhs,
+               approximate_inverse);
 
       std::cout << solver_control.last_step()
                 << " CG Schur complement iterations to obtain convergence."
@@ -822,8 +830,10 @@ namespace Step20
                                       quadrature,
                                       VectorTools::L2_norm,
                                       &pressure_mask);
-    const double p_l2_error = VectorTools::compute_global_error(
-      triangulation, cellwise_errors, VectorTools::L2_norm);
+    const double p_l2_error =
+      VectorTools::compute_global_error(triangulation,
+                                        cellwise_errors,
+                                        VectorTools::L2_norm);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
@@ -832,8 +842,10 @@ namespace Step20
                                       quadrature,
                                       VectorTools::L2_norm,
                                       &velocity_mask);
-    const double u_l2_error = VectorTools::compute_global_error(
-      triangulation, cellwise_errors, VectorTools::L2_norm);
+    const double u_l2_error =
+      VectorTools::compute_global_error(triangulation,
+                                        cellwise_errors,
+                                        VectorTools::L2_norm);
 
     std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
               << ",   ||e_u||_L2 = " << u_l2_error << std::endl;
@@ -867,8 +879,10 @@ namespace Step20
     interpretation.push_back(DataComponentInterpretation::component_is_scalar);
 
     DataOut<dim> data_out;
-    data_out.add_data_vector(
-      dof_handler, solution, solution_names, interpretation);
+    data_out.add_data_vector(dof_handler,
+                             solution,
+                             solution_names,
+                             interpretation);
 
     data_out.build_patches(degree + 1);
 

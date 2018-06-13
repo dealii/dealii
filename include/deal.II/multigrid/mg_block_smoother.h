@@ -156,10 +156,10 @@ inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
   const bool                         variable,
   const bool                         symmetric,
   const bool                         transpose,
-  const bool                         reverse) :
-  MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose),
-  reverse(reverse),
-  mem(&mem)
+  const bool                         reverse)
+  : MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose)
+  , reverse(reverse)
+  , mem(&mem)
 {}
 
 template <typename MatrixType, class RelaxationType, typename number>
@@ -168,10 +168,10 @@ inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
   const bool         variable,
   const bool         symmetric,
   const bool         transpose,
-  const bool         reverse) :
-  MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose),
-  reverse(reverse),
-  mem(&this->vector_memory)
+  const bool         reverse)
+  : MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose)
+  , reverse(reverse)
+  , mem(&this->vector_memory)
 {}
 
 

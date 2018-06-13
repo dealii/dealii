@@ -241,17 +241,17 @@ protected:
 template <typename VectorType>
 SolverCG<VectorType>::SolverCG(SolverControl &           cn,
                                VectorMemory<VectorType> &mem,
-                               const AdditionalData &    data) :
-  Solver<VectorType>(cn, mem),
-  additional_data(data)
+                               const AdditionalData &    data)
+  : Solver<VectorType>(cn, mem)
+  , additional_data(data)
 {}
 
 
 
 template <typename VectorType>
-SolverCG<VectorType>::SolverCG(SolverControl &cn, const AdditionalData &data) :
-  Solver<VectorType>(cn),
-  additional_data(data)
+SolverCG<VectorType>::SolverCG(SolverControl &cn, const AdditionalData &data)
+  : Solver<VectorType>(cn)
+  , additional_data(data)
 {}
 
 
@@ -445,8 +445,10 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
                             all_condition_numbers_signal);
     }
 
-  compute_eigs_and_cond(
-    diagonal, offdiagonal, eigenvalues_signal, condition_number_signal);
+  compute_eigs_and_cond(diagonal,
+                        offdiagonal,
+                        eigenvalues_signal,
+                        condition_number_signal);
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)

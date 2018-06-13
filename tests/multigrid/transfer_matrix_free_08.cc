@@ -59,8 +59,9 @@ check(const FiniteElement<dim> &fe)
     exponents_monomial[d] = 1;
   LinearAlgebra::distributed::Vector<double> vrefcoarse;
   vrefcoarse.reinit(dofcoarse.n_dofs());
-  VectorTools::interpolate(
-    dofcoarse, Functions::Monomial<dim>(exponents_monomial), vrefcoarse);
+  VectorTools::interpolate(dofcoarse,
+                           Functions::Monomial<dim>(exponents_monomial),
+                           vrefcoarse);
 
   deallog << "no. cells: " << tr.n_global_active_cells() << std::endl;
 
@@ -76,8 +77,9 @@ check(const FiniteElement<dim> &fe)
   LinearAlgebra::distributed::Vector<Number> vref;
   AssertDimension(mgdof.n_dofs(tr.n_global_levels() - 1), mgdof.n_dofs());
   vrefdouble.reinit(mgdof.n_dofs());
-  VectorTools::interpolate(
-    mgdof, Functions::Monomial<dim>(exponents_monomial), vrefdouble);
+  VectorTools::interpolate(mgdof,
+                           Functions::Monomial<dim>(exponents_monomial),
+                           vrefdouble);
 
   vref.reinit(mgdof.n_dofs());
   vref = vrefdouble;

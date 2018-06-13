@@ -927,25 +927,16 @@ public:
 
 
 template <typename Accessor>
-inline TriaRawIterator<Accessor>::TriaRawIterator(const Accessor &a) :
-  accessor(a)
+inline TriaRawIterator<Accessor>::TriaRawIterator(const Accessor &a)
+  : accessor(a)
 {}
 
 
 
 template <typename Accessor>
 template <typename OtherAccessor>
-inline TriaRawIterator<Accessor>::TriaRawIterator(const OtherAccessor &a) :
-  accessor(a)
-{}
-
-
-
-template <typename Accessor>
-template <typename OtherAccessor>
-inline TriaRawIterator<Accessor>::TriaRawIterator(
-  const TriaRawIterator<OtherAccessor> &i) :
-  accessor(i.accessor)
+inline TriaRawIterator<Accessor>::TriaRawIterator(const OtherAccessor &a)
+  : accessor(a)
 {}
 
 
@@ -953,8 +944,8 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaRawIterator<Accessor>::TriaRawIterator(
-  const TriaIterator<OtherAccessor> &i) :
-  accessor(i.accessor)
+  const TriaRawIterator<OtherAccessor> &i)
+  : accessor(i.accessor)
 {}
 
 
@@ -962,8 +953,17 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaRawIterator<Accessor>::TriaRawIterator(
-  const TriaActiveIterator<OtherAccessor> &i) :
-  accessor(i.accessor)
+  const TriaIterator<OtherAccessor> &i)
+  : accessor(i.accessor)
+{}
+
+
+
+template <typename Accessor>
+template <typename OtherAccessor>
+inline TriaRawIterator<Accessor>::TriaRawIterator(
+  const TriaActiveIterator<OtherAccessor> &i)
+  : accessor(i.accessor)
 {}
 
 
@@ -1115,8 +1115,8 @@ TriaRawIterator<Accessor>::memory_consumption() const
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaIterator<Accessor>::TriaIterator(
-  const TriaIterator<OtherAccessor> &i) :
-  TriaRawIterator<Accessor>(i.accessor)
+  const TriaIterator<OtherAccessor> &i)
+  : TriaRawIterator<Accessor>(i.accessor)
 {}
 
 
@@ -1124,8 +1124,8 @@ inline TriaIterator<Accessor>::TriaIterator(
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaIterator<Accessor>::TriaIterator(
-  const TriaActiveIterator<OtherAccessor> &i) :
-  TriaRawIterator<Accessor>(i.accessor)
+  const TriaActiveIterator<OtherAccessor> &i)
+  : TriaRawIterator<Accessor>(i.accessor)
 {}
 
 
@@ -1133,8 +1133,8 @@ inline TriaIterator<Accessor>::TriaIterator(
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaIterator<Accessor>::TriaIterator(
-  const TriaRawIterator<OtherAccessor> &i) :
-  TriaRawIterator<Accessor>(i.accessor)
+  const TriaRawIterator<OtherAccessor> &i)
+  : TriaRawIterator<Accessor>(i.accessor)
 {
 #  ifdef DEBUG
   // do this like this, because:
@@ -1150,8 +1150,8 @@ inline TriaIterator<Accessor>::TriaIterator(
 
 template <typename Accessor>
 template <typename OtherAccessor>
-TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a) :
-  TriaRawIterator<Accessor>(a)
+TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a)
+  : TriaRawIterator<Accessor>(a)
 {
 #  ifdef DEBUG
   // do this like this, because:
@@ -1168,8 +1168,8 @@ TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a) :
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaActiveIterator<Accessor>::TriaActiveIterator(
-  const TriaActiveIterator<OtherAccessor> &i) :
-  TriaIterator<Accessor>(i.accessor)
+  const TriaActiveIterator<OtherAccessor> &i)
+  : TriaIterator<Accessor>(i.accessor)
 {}
 
 
@@ -1177,8 +1177,8 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
 template <typename Accessor>
 template <typename OtherAccessor>
 inline TriaActiveIterator<Accessor>::TriaActiveIterator(
-  const TriaRawIterator<OtherAccessor> &i) :
-  TriaIterator<Accessor>(i)
+  const TriaRawIterator<OtherAccessor> &i)
+  : TriaIterator<Accessor>(i)
 {
 #  ifdef DEBUG
   // do this like this, because:

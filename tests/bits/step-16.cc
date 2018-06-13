@@ -94,10 +94,10 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-  fe(1),
-  mg_dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem()
+  : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+  , fe(1)
+  , mg_dof_handler(triangulation)
 {}
 
 
@@ -187,8 +187,9 @@ LaplaceProblem<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         };
@@ -240,8 +241,9 @@ LaplaceProblem<dim>::assemble_multigrid()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            mg_matrices[level].add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            mg_matrices[level].add(local_dof_indices[i],
+                                   local_dof_indices[j],
+                                   cell_matrix(i, j));
         };
     };
 }

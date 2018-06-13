@@ -99,7 +99,8 @@ namespace Step29
   class DirichletBoundaryValues : public Function<dim>
   {
   public:
-    DirichletBoundaryValues() : Function<dim>(2){};
+    DirichletBoundaryValues()
+      : Function<dim>(2){};
 
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  values) const override;
@@ -154,8 +155,8 @@ namespace Step29
 
   // The constructor stores a reference to the ParameterHandler object that is
   // passed to it:
-  ParameterReader::ParameterReader(ParameterHandler &paramhandler) :
-    prm(paramhandler)
+  ParameterReader::ParameterReader(ParameterHandler &paramhandler)
+    : prm(paramhandler)
   {}
 
   // @sect4{<code>ParameterReader::declare_parameters</code>}
@@ -318,8 +319,8 @@ namespace Step29
   // In our case, only the function values of $v$ and $w$ are needed to
   // compute $|u|$, so we're good with the update_values flag.
   template <int dim>
-  ComputeIntensity<dim>::ComputeIntensity() :
-    DataPostprocessorScalar<dim>("Intensity", update_values)
+  ComputeIntensity<dim>::ComputeIntensity()
+    : DataPostprocessorScalar<dim>("Intensity", update_values)
   {}
 
 
@@ -403,10 +404,10 @@ namespace Step29
   // system, which consists of two copies of the scalar Q1 field, one for $v$
   // and one for $w$:
   template <int dim>
-  UltrasoundProblem<dim>::UltrasoundProblem(ParameterHandler &param) :
-    prm(param),
-    dof_handler(triangulation),
-    fe(FE_Q<dim>(1), 2)
+  UltrasoundProblem<dim>::UltrasoundProblem(ParameterHandler &param)
+    : prm(param)
+    , dof_handler(triangulation)
+    , fe(FE_Q<dim>(1), 2)
   {}
 
 
@@ -569,8 +570,9 @@ namespace Step29
                             update_values | update_gradients |
                               update_JxW_values);
 
-    FEFaceValues<dim> fe_face_values(
-      fe, face_quadrature_formula, update_values | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(fe,
+                                     face_quadrature_formula,
+                                     update_values | update_JxW_values);
 
     // As usual, the system matrix is assembled cell by cell, and we need a
     // matrix for storing the local cell contributions as well as an index
@@ -732,8 +734,9 @@ namespace Step29
         // ...and then add the entries to the system matrix one by one:
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
       }
 
 
@@ -742,11 +745,15 @@ namespace Step29
     // values are provided by the <code>DirichletBoundaryValues</code> class
     // we defined above:
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, DirichletBoundaryValues<dim>(), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             DirichletBoundaryValues<dim>(),
+                                             boundary_values);
 
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
 
     timer.stop();
     deallog << "done (" << timer.cpu_time() << "s)" << std::endl;

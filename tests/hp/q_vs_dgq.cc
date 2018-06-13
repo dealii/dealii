@@ -52,7 +52,8 @@ namespace Step27
   };
 
   template <int dim>
-  MixedFECollection<dim>::MixedFECollection() : dof_handler(triangulation)
+  MixedFECollection<dim>::MixedFECollection()
+    : dof_handler(triangulation)
   {}
 
   template <int dim>

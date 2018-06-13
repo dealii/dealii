@@ -354,23 +354,25 @@ namespace Utilities
 #    ifndef DEBUG
       if (vector_operation == VectorOperation::insert)
         {
-          Assert(
-            requests.empty(),
-            ExcInternalError("Did not expect a non-empty communication "
-                             "request when inserting. Check that the same "
-                             "vector_operation argument was passed to "
-                             "import_from_ghosted_array_start as is passed "
-                             "to import_from_ghosted_array_finish."));
+          Assert(requests.empty(),
+                 ExcInternalError(
+                   "Did not expect a non-empty communication "
+                   "request when inserting. Check that the same "
+                   "vector_operation argument was passed to "
+                   "import_from_ghosted_array_start as is passed "
+                   "to import_from_ghosted_array_finish."));
 #      ifdef DEAL_II_WITH_CXX17
           if constexpr (std::is_trivial<Number>::value)
 #      else
           if (std::is_trivial<Number>::value)
 #      endif
-            std::memset(
-              ghost_array.data(), 0, sizeof(Number) * ghost_array.size());
+            std::memset(ghost_array.data(),
+                        0,
+                        sizeof(Number) * ghost_array.size());
           else
-            std::fill(
-              ghost_array.data(), ghost_array.data() + ghost_array.size(), 0);
+            std::fill(ghost_array.data(),
+                      ghost_array.data() + ghost_array.size(),
+                      0);
           return;
         }
 #    endif
@@ -435,8 +437,9 @@ namespace Utilities
       // wait for the send operations to complete
       if (requests.size() > 0 && n_ghost_targets > 0)
         {
-          const int ierr = MPI_Waitall(
-            n_ghost_targets, &requests[n_import_targets], MPI_STATUSES_IGNORE);
+          const int ierr = MPI_Waitall(n_ghost_targets,
+                                       &requests[n_import_targets],
+                                       MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
       else
@@ -452,11 +455,13 @@ namespace Utilities
 #    else
           if (std::is_trivial<Number>::value)
 #    endif
-            std::memset(
-              ghost_array.data(), 0, sizeof(Number) * n_ghost_indices());
+            std::memset(ghost_array.data(),
+                        0,
+                        sizeof(Number) * n_ghost_indices());
           else
-            std::fill(
-              ghost_array.data(), ghost_array.data() + n_ghost_indices(), 0);
+            std::fill(ghost_array.data(),
+                      ghost_array.data() + n_ghost_indices(),
+                      0);
         }
 
       // clear the compress requests

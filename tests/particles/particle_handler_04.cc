@@ -55,15 +55,19 @@ test()
             position[1](i) = 0.525;
           }
 
-        Particles::Particle<dim, spacedim> particle1(
-          position[0], reference_position[0], 0);
-        Particles::Particle<dim, spacedim> particle2(
-          position[1], reference_position[1], 1);
+        Particles::Particle<dim, spacedim> particle1(position[0],
+                                                     reference_position[0],
+                                                     0);
+        Particles::Particle<dim, spacedim> particle2(position[1],
+                                                     reference_position[1],
+                                                     1);
 
-        typename Triangulation<dim, spacedim>::active_cell_iterator cell1(
-          &tr, 2, 0);
-        typename Triangulation<dim, spacedim>::active_cell_iterator cell2(
-          &tr, 2, 0);
+        typename Triangulation<dim, spacedim>::active_cell_iterator cell1(&tr,
+                                                                          2,
+                                                                          0);
+        typename Triangulation<dim, spacedim>::active_cell_iterator cell2(&tr,
+                                                                          2,
+                                                                          0);
 
         particle_handler.insert_particle(particle1, cell1);
         particle_handler.insert_particle(particle2, cell2);

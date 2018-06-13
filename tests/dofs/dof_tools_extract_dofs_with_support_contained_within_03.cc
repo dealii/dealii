@@ -69,8 +69,9 @@ test(const bool left = true)
   // Setup system
   Triangulation<dim> triangulation;
 
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<dim>(0, 0), Point<dim>(1, 1));
+  GridGenerator::hyper_rectangle(triangulation,
+                                 Point<dim>(0, 0),
+                                 Point<dim>(1, 1));
 
   triangulation.refine_global(1);
 

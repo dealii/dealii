@@ -50,15 +50,15 @@ namespace internal
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &                                           finite_elements,
       const UpdateFlags                             update_flags,
-      const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map) :
-      ParallelDataBase<dim, spacedim>(n_datasets,
-                                      n_subdivisions,
-                                      n_postprocessor_outputs,
-                                      mapping,
-                                      finite_elements,
-                                      update_flags,
-                                      false),
-      cell_to_patch_index_map(&cell_to_patch_index_map)
+      const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map)
+      : ParallelDataBase<dim, spacedim>(n_datasets,
+                                        n_subdivisions,
+                                        n_postprocessor_outputs,
+                                        mapping,
+                                        finite_elements,
+                                        update_flags,
+                                        false)
+      , cell_to_patch_index_map(&cell_to_patch_index_map)
     {}
   } // namespace DataOutImplementation
 } // namespace internal
@@ -127,8 +127,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
       const std::vector<Point<DoFHandlerType::space_dimension>> &q_points =
         fe_patch_values.get_quadrature_points();
 
-      patch.data.reinit(
-        scratch_data.n_datasets + DoFHandlerType::space_dimension, n_q_points);
+      patch.data.reinit(scratch_data.n_datasets +
+                          DoFHandlerType::space_dimension,
+                        n_q_points);
       for (unsigned int i = 0; i < DoFHandlerType::space_dimension; ++i)
         for (unsigned int q = 0; q < n_q_points; ++q)
           patch.data(patch.data.size(0) - DoFHandlerType::space_dimension + i,

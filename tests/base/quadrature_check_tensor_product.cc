@@ -51,10 +51,10 @@ check_tensor_product(const std::vector<Quadrature<1>> &quadratures,
             {
               std::cout << q_points[q] << " " << q_basis[0].get_points()[q]
                         << std::endl;
-              AssertThrow(
-                std::abs((q_points[q] - q_basis[0].get_points()[q]).norm()) <
-                  1.e-10,
-                ExcInternalError());
+              AssertThrow(std::abs(
+                            (q_points[q] - q_basis[0].get_points()[q]).norm()) <
+                            1.e-10,
+                          ExcInternalError());
               AssertThrow(std::abs(q_weights[q] - q_basis[0].get_weights()[q]) <
                             1.e-10,
                           ExcInternalError());

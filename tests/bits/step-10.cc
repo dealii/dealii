@@ -76,8 +76,9 @@ gnuplot_output()
           GridOutFlags::Gnuplot gnuplot_flags(false, 30);
           grid_out.set_flags(gnuplot_flags);
 
-          grid_out.write_gnuplot(
-            triangulation, deallog.get_file_stream(), &mapping);
+          grid_out.write_gnuplot(triangulation,
+                                 deallog.get_file_stream(),
+                                 &mapping);
         }
       deallog << std::endl;
     }
@@ -108,8 +109,10 @@ compute_pi_by_area()
 
       DoFHandler<dim> dof_handler(triangulation);
 
-      FEValues<dim> x_fe_values(
-        mapping, dummy_fe, quadrature, update_JxW_values);
+      FEValues<dim> x_fe_values(mapping,
+                                dummy_fe,
+                                quadrature,
+                                update_JxW_values);
 
       ConvergenceTable table;
 
@@ -172,9 +175,11 @@ compute_pi_by_perimeter()
 
       DoFHandler<dim> dof_handler(triangulation);
 
-      FEFaceValues<dim> x_fe_face_values(
-        mapping, fe, quadrature, update_JxW_values);
-      ConvergenceTable table;
+      FEFaceValues<dim> x_fe_face_values(mapping,
+                                         fe,
+                                         quadrature,
+                                         update_JxW_values);
+      ConvergenceTable  table;
 
       for (unsigned int refinement = 0; refinement < (degree != 4 ? 6 : 4);
            ++refinement, triangulation.refine_global(1))

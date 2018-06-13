@@ -25,10 +25,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-PolynomialsNedelec<dim>::PolynomialsNedelec(const unsigned int k) :
-  my_degree(k),
-  polynomial_space(create_polynomials(k)),
-  n_pols(compute_n_pols(k))
+PolynomialsNedelec<dim>::PolynomialsNedelec(const unsigned int k)
+  : my_degree(k)
+  , polynomial_space(create_polynomials(k))
+  , n_pols(compute_n_pols(k))
 {}
 
 template <int dim>

@@ -54,8 +54,9 @@ plot_shape_functions(const unsigned int degree)
   QTrapez<1>         q_trapez;
   const unsigned int div = 10;
   QIterated<dim>     q(q_trapez, div);
-  FEValues<dim>      fe(
-    fe_rt, q, update_values | update_gradients | update_quadrature_points);
+  FEValues<dim>      fe(fe_rt,
+                   q,
+                   update_values | update_gradients | update_quadrature_points);
   fe.reinit(c);
 
   Assert(fe.get_fe().n_components() == dim, ExcInternalError());

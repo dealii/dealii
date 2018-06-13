@@ -38,9 +38,9 @@ template <int dim, int spacedim>
 class SignalListener
 {
 public:
-  SignalListener(Triangulation<dim, spacedim> &tria_in) :
-    n_active_cells(tria_in.n_active_cells()),
-    tria(tria_in)
+  SignalListener(Triangulation<dim, spacedim> &tria_in)
+    : n_active_cells(tria_in.n_active_cells())
+    , tria(tria_in)
   {
     // tria_in.signals.post_refinement_on_cell.connect
     // (std::bind (&SignalListener<dim, spacedim>::count_on_refine,

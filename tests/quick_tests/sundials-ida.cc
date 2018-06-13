@@ -57,14 +57,14 @@ using namespace dealii;
 class HarmonicOscillator
 {
 public:
-  HarmonicOscillator(double _kappa = 1.0) :
-    y(2),
-    y_dot(2),
-    diff(2),
-    J(2, 2),
-    A(2, 2),
-    Jinv(2, 2),
-    kappa(_kappa)
+  HarmonicOscillator(double _kappa = 1.0)
+    : y(2)
+    , y_dot(2)
+    , diff(2)
+    , J(2, 2)
+    , A(2, 2)
+    , Jinv(2, 2)
+    , kappa(_kappa)
   {
     diff[0] = 1.0;
     diff[1] = 1.0;

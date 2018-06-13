@@ -74,8 +74,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   {
     DoFHandler<dim> dof_scalar(tr);
     dof_scalar.distribute_dofs(fe_scalar);
-    FEValues<dim> fe_values_scalar(
-      fe_scalar, quadrature, update_values | update_gradients);
+    FEValues<dim> fe_values_scalar(fe_scalar,
+                                   quadrature,
+                                   update_values | update_gradients);
     fe_values_scalar.reinit(dof_scalar.begin_active());
 
     for (unsigned int i = 0; i < fe_scalar.dofs_per_cell; ++i)
@@ -166,9 +167,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                 {
                   AssertThrow(val_q[ind_k] == scalar_values[i_node][q],
                               ExcInternalError());
-                  AssertThrow(
-                    (grad_q[ind_k[0]][ind_k[1]] == scalar_gradients[i_node][q]),
-                    ExcInternalError());
+                  AssertThrow((grad_q[ind_k[0]][ind_k[1]] ==
+                               scalar_gradients[i_node][q]),
+                              ExcInternalError());
                 }
               else
                 {

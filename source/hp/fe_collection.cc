@@ -52,9 +52,10 @@ namespace hp
              it != fes.end();
              ++it)
           {
-            Assert(
-              *it < fe_collection.size(),
-              ExcIndexRangeType<unsigned int>(*it, 0, fe_collection.size()));
+            Assert(*it < fe_collection.size(),
+                   ExcIndexRangeType<unsigned int>(*it,
+                                                   0,
+                                                   fe_collection.size()));
             domination =
               domination & fe_collection[cur_fe].compare_for_face_domination(
                              fe_collection[*it]);

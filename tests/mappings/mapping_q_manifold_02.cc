@@ -83,13 +83,13 @@ template <int dim>
 class PushForward : public Function<dim>
 {
 public:
-  PushForward() :
-    Function<dim>(dim, 0.),
-    h(0.028),
-    x_max(4.5 * h),
-    y_max(2.036 * h),
-    z_max(4.5 * h),
-    y_FoR(h)
+  PushForward()
+    : Function<dim>(dim, 0.)
+    , h(0.028)
+    , x_max(4.5 * h)
+    , y_max(2.036 * h)
+    , z_max(4.5 * h)
+    , y_FoR(h)
   {}
 
   virtual ~PushForward(){};
@@ -140,13 +140,13 @@ template <int dim>
 class PullBack : public Function<dim>
 {
 public:
-  PullBack() :
-    Function<dim>(dim, 0.),
-    h(0.028),
-    x_max(4.5 * h),
-    y_max(2.036 * h),
-    z_max(4.5 * h),
-    y_FoR(h)
+  PullBack()
+    : Function<dim>(dim, 0.)
+    , h(0.028)
+    , x_max(4.5 * h)
+    , y_max(2.036 * h)
+    , z_max(4.5 * h)
+    , y_FoR(h)
   {}
 
   virtual ~PullBack(){};

@@ -89,10 +89,10 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree) :
-  fe(FE_Q<dim>(1)),
-  dof_handler(triangulation),
-  mapping(MappingQ<dim>(mapping_degree))
+LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
+  : fe(FE_Q<dim>(1))
+  , dof_handler(triangulation)
+  , mapping(MappingQ<dim>(mapping_degree))
 {
   deallog << "Using mapping with degree " << mapping_degree << ":" << std::endl
           << "============================" << std::endl;
@@ -109,8 +109,9 @@ LaplaceProblem<dim>::setup_system()
   system_rhs.reinit(dof_handler.n_dofs());
 
   std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-  DoFTools::extract_boundary_dofs(
-    dof_handler, std::vector<bool>(1, true), boundary_dofs);
+  DoFTools::extract_boundary_dofs(dof_handler,
+                                  std::vector<bool>(1, true),
+                                  boundary_dofs);
 
   const unsigned int first_boundary_dof =
     std::distance(boundary_dofs.begin(),
@@ -142,17 +143,17 @@ LaplaceProblem<dim>::assemble_and_solve()
       1. * (static_cast<const MappingQ<dim> &>(mapping[0]).get_degree() + 1) /
       2)),
     2U);
-  MatrixTools::create_laplace_matrix(
-    mapping,
-    dof_handler,
-    hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
-    system_matrix);
-  VectorTools::create_right_hand_side(
-    mapping,
-    dof_handler,
-    hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
-    Functions::ConstantFunction<dim>(-2),
-    system_rhs);
+  MatrixTools::create_laplace_matrix(mapping,
+                                     dof_handler,
+                                     hp::QCollection<dim>(
+                                       QGauss<dim>(gauss_degree)),
+                                     system_matrix);
+  VectorTools::create_right_hand_side(mapping,
+                                      dof_handler,
+                                      hp::QCollection<dim>(
+                                        QGauss<dim>(gauss_degree)),
+                                      Functions::ConstantFunction<dim>(-2),
+                                      system_rhs);
   Vector<double> tmp(system_rhs.size());
   VectorTools::create_boundary_right_hand_side(
     mapping,
@@ -169,14 +170,14 @@ LaplaceProblem<dim>::assemble_and_solve()
   mean_value_constraints.distribute(solution);
 
   Vector<float> norm_per_cell(triangulation.n_active_cells());
-  VectorTools::integrate_difference(
-    mapping,
-    dof_handler,
-    solution,
-    Functions::ZeroFunction<dim>(),
-    norm_per_cell,
-    hp::QCollection<dim>(QGauss<dim>(gauss_degree + 1)),
-    VectorTools::H1_seminorm);
+  VectorTools::integrate_difference(mapping,
+                                    dof_handler,
+                                    solution,
+                                    Functions::ZeroFunction<dim>(),
+                                    norm_per_cell,
+                                    hp::QCollection<dim>(
+                                      QGauss<dim>(gauss_degree + 1)),
+                                    VectorTools::H1_seminorm);
   const double norm = norm_per_cell.l2_norm();
 
   output_table.add_value("cells", triangulation.n_active_cells());

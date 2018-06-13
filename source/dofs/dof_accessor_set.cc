@@ -87,17 +87,17 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
   else
     // otherwise distribute them to the children
     {
-      Assert(
-        (dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension> *>(
-           this->dof_handler) != nullptr) ||
-          (fe_index != DoFHandlerType::default_fe_index),
-        ExcMessage("You cannot call this function on non-active cells "
-                   "of hp::DoFHandler objects unless you provide an explicit "
-                   "finite element index because they do not have naturally "
-                   "associated finite element spaces associated: degrees "
-                   "of freedom are only distributed on active cells for which "
-                   "the active_fe_index has been set."));
+      Assert((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
+                                      DoFHandlerType::space_dimension> *>(
+                this->dof_handler) != nullptr) ||
+               (fe_index != DoFHandlerType::default_fe_index),
+             ExcMessage(
+               "You cannot call this function on non-active cells "
+               "of hp::DoFHandler objects unless you provide an explicit "
+               "finite element index because they do not have naturally "
+               "associated finite element spaces associated: degrees "
+               "of freedom are only distributed on active cells for which "
+               "the active_fe_index has been set."));
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);
@@ -117,8 +117,9 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
           if (tmp.size() > 0)
             fe.get_prolongation_matrix(child, this->refinement_case())
               .vmult(tmp, local_values);
-          this->child(child)->set_dof_values_by_interpolation(
-            tmp, values, fe_index);
+          this->child(child)->set_dof_values_by_interpolation(tmp,
+                                                              values,
+                                                              fe_index);
         }
     }
 }

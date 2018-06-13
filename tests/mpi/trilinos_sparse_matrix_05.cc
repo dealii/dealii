@@ -71,8 +71,9 @@ test()
   else
     Assert(false, ExcNotImplemented());
 
-  TrilinosWrappers::SparsityPattern sp(
-    row_partitioning, col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning,
+                                       col_partitioning,
+                                       MPI_COMM_WORLD);
   if (my_id == 0)
     {
       sp.add(0, 0);

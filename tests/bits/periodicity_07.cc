@@ -95,8 +95,9 @@ make_constraint_matrix(const DoFHandler<3> &dof_handler, int version)
 
   constraints.close();
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    MappingQ<dim, dim>(1), dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points(MappingQ<dim, dim>(1),
+                                       dof_handler,
+                                       support_points);
   for (const auto &line : constraints.get_lines())
     for (const auto &entry : line.entries)
       deallog << "DoF " << line.index << " at " << support_points[line.index]
@@ -110,7 +111,8 @@ template <int dim>
 class PeriodicReference : public Function<dim>
 {
 public:
-  PeriodicReference() : Function<dim>()
+  PeriodicReference()
+    : Function<dim>()
   {}
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const override

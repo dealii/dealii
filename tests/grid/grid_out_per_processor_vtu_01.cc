@@ -47,8 +47,10 @@ output(const parallel::distributed::Triangulation<dim> &tr,
        const bool                                       include_artificial)
 {
   GridOut out;
-  out.write_mesh_per_processor_as_vtu(
-    tr, filename, view_levels, include_artificial);
+  out.write_mesh_per_processor_as_vtu(tr,
+                                      filename,
+                                      view_levels,
+                                      include_artificial);
 
   // copy the .pvtu and .vtu files
   // into the logstream

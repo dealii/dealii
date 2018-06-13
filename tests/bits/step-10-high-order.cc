@@ -142,8 +142,10 @@ compute_pi_by_perimeter()
 
   DoFHandler<dim> dof_handler(triangulation);
 
-  FEFaceValues<dim> x_fe_face_values(
-    mapping, fe, quadrature, update_JxW_values);
+  FEFaceValues<dim> x_fe_face_values(mapping,
+                                     fe,
+                                     quadrature,
+                                     update_JxW_values);
   for (unsigned int refinement = 0; refinement < 2;
        ++refinement, triangulation.refine_global(1))
     {

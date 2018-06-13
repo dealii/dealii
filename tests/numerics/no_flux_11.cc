@@ -143,8 +143,10 @@ run()
   ConstraintMatrix             constraints;
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(6);
-  VectorTools::compute_no_normal_flux_constraints(
-    dof_handler, 0, no_normal_flux_boundaries, constraints);
+  VectorTools::compute_no_normal_flux_constraints(dof_handler,
+                                                  0,
+                                                  no_normal_flux_boundaries,
+                                                  constraints);
 
   constraints.print(deallog.get_file_stream());
 

@@ -92,10 +92,10 @@ ConvergenceTable::evaluate_convergence_rates(
               }
             else
               {
-                add_value(
-                  rate_key,
-                  dim * std::log(std::fabs(values[i - 1] / values[i])) /
-                    std::log(std::fabs(ref_values[i] / ref_values[i - 1])));
+                add_value(rate_key,
+                          dim * std::log(std::fabs(values[i - 1] / values[i])) /
+                            std::log(
+                              std::fabs(ref_values[i] / ref_values[i - 1])));
               }
           }
         break;
@@ -235,8 +235,9 @@ ConvergenceTable::evaluate_all_convergence_rates(
        col_iter != columns.end();
        ++col_iter)
     if (!col_iter->second.flag)
-      evaluate_convergence_rates(
-        col_iter->first, reference_column_key, rate_mode);
+      evaluate_convergence_rates(col_iter->first,
+                                 reference_column_key,
+                                 rate_mode);
 }
 
 

@@ -85,8 +85,10 @@ TensorProductPolynomials<dim, PolynomialType>::compute_index(
 {
   Assert(i < Utilities::fixed_power<dim>(polynomials.size()),
          ExcInternalError());
-  internal::compute_tensor_index(
-    index_map[i], polynomials.size(), polynomials.size(), indices);
+  internal::compute_tensor_index(index_map[i],
+                                 polynomials.size(),
+                                 polynomials.size(),
+                                 indices);
 }
 
 
@@ -298,8 +300,9 @@ TensorProductPolynomials<dim, PolynomialType>::compute(
   else
     for (unsigned int i = 0; i < n_polynomials; ++i)
       for (unsigned d = 0; d < dim; ++d)
-        polynomials[i].value(
-          p(d), n_values_and_derivatives, &values_1d[i][d][0]);
+        polynomials[i].value(p(d),
+                             n_values_and_derivatives,
+                             &values_1d[i][d][0]);
 
   unsigned int indices[3];
   unsigned int ind = 0;
@@ -408,9 +411,9 @@ TensorProductPolynomials<dim, PolynomialType>::compute(
 
 template <int dim>
 AnisotropicPolynomials<dim>::AnisotropicPolynomials(
-  const std::vector<std::vector<Polynomials::Polynomial<double>>> &pols) :
-  polynomials(pols),
-  n_tensor_pols(get_n_tensor_pols(pols))
+  const std::vector<std::vector<Polynomials::Polynomial<double>>> &pols)
+  : polynomials(pols)
+  , n_tensor_pols(get_n_tensor_pols(pols))
 {
   Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (unsigned int d = 0; d < dim; ++d)
@@ -434,11 +437,15 @@ AnisotropicPolynomials<dim>::compute_index(const unsigned int i,
 #endif
 
   if (dim == 1)
-    internal::compute_tensor_index(
-      i, polynomials[0].size(), 0 /*not used*/, indices);
+    internal::compute_tensor_index(i,
+                                   polynomials[0].size(),
+                                   0 /*not used*/,
+                                   indices);
   else
-    internal::compute_tensor_index(
-      i, polynomials[0].size(), polynomials[1].size(), indices);
+    internal::compute_tensor_index(i,
+                                   polynomials[0].size(),
+                                   polynomials[1].size(),
+                                   indices);
 }
 
 

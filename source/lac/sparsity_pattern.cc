@@ -39,27 +39,27 @@ __declspec(selectany) // Weak extern binding due to multiple link error
 
 
 
-SparsityPattern::SparsityPattern() :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr),
-  compressed(false),
-  store_diagonal_first_in_row(false)
+SparsityPattern::SparsityPattern()
+  : max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
+  , compressed(false)
+  , store_diagonal_first_in_row(false)
 {
   reinit(0, 0, 0);
 }
 
 
 
-SparsityPattern::SparsityPattern(const SparsityPattern &s) :
-  Subscriptor(),
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr),
-  compressed(false),
-  store_diagonal_first_in_row(false)
+SparsityPattern::SparsityPattern(const SparsityPattern &s)
+  : Subscriptor()
+  , max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
+  , compressed(false)
+  , store_diagonal_first_in_row(false)
 {
   (void)s;
   Assert(s.empty(),
@@ -75,13 +75,13 @@ SparsityPattern::SparsityPattern(const SparsityPattern &s) :
 
 SparsityPattern::SparsityPattern(const size_type    m,
                                  const size_type    n,
-                                 const unsigned int max_per_row) :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr),
-  compressed(false),
-  store_diagonal_first_in_row(m == n)
+                                 const unsigned int max_per_row)
+  : max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
+  , compressed(false)
+  , store_diagonal_first_in_row(m == n)
 {
   reinit(m, n, max_per_row);
 }
@@ -90,12 +90,12 @@ SparsityPattern::SparsityPattern(const size_type    m,
 
 SparsityPattern::SparsityPattern(const size_type                  m,
                                  const size_type                  n,
-                                 const std::vector<unsigned int> &row_lengths) :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr),
-  store_diagonal_first_in_row(m == n)
+                                 const std::vector<unsigned int> &row_lengths)
+  : max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
+  , store_diagonal_first_in_row(m == n)
 {
   reinit(m, n, row_lengths);
 }
@@ -103,11 +103,11 @@ SparsityPattern::SparsityPattern(const size_type                  m,
 
 
 SparsityPattern::SparsityPattern(const size_type    m,
-                                 const unsigned int max_per_row) :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr)
+                                 const unsigned int max_per_row)
+  : max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
 {
   reinit(m, m, max_per_row);
 }
@@ -115,11 +115,11 @@ SparsityPattern::SparsityPattern(const size_type    m,
 
 
 SparsityPattern::SparsityPattern(const size_type                  m,
-                                 const std::vector<unsigned int> &row_lengths) :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr)
+                                 const std::vector<unsigned int> &row_lengths)
+  : max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
 {
   reinit(m, m, row_lengths);
 }
@@ -128,11 +128,11 @@ SparsityPattern::SparsityPattern(const size_type                  m,
 
 SparsityPattern::SparsityPattern(const SparsityPattern &original,
                                  const unsigned int     max_per_row,
-                                 const size_type        extra_off_diagonals) :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(nullptr),
-  colnums(nullptr)
+                                 const size_type        extra_off_diagonals)
+  : max_dim(0)
+  , max_vec_len(0)
+  , rowstart(nullptr)
+  , colnums(nullptr)
 {
   Assert(original.rows == original.cols, ExcNotQuadratic());
   Assert(original.is_compressed(), ExcNotCompressed());
@@ -164,14 +164,16 @@ SparsityPattern::SparsityPattern(const SparsityPattern &original,
       // necessary (see the @p{copy} commands)
       const size_type *const original_last_before_side_diagonals =
         (row > extra_off_diagonals ?
-           Utilities::lower_bound(
-             original_row_start, original_row_end, row - extra_off_diagonals) :
+           Utilities::lower_bound(original_row_start,
+                                  original_row_end,
+                                  row - extra_off_diagonals) :
            original_row_start);
 
       const size_type *const original_first_after_side_diagonals =
         (row < rows - extra_off_diagonals - 1 ?
-           std::upper_bound(
-             original_row_start, original_row_end, row + extra_off_diagonals) :
+           std::upper_bound(original_row_start,
+                            original_row_end,
+                            row + extra_off_diagonals) :
            original_row_end);
 
       // find first free slot. the first slot in each row is the diagonal
@@ -192,8 +194,9 @@ SparsityPattern::SparsityPattern(const SparsityPattern &original,
         *next_free_slot = row + i;
 
       // copy rest
-      next_free_slot = std::copy(
-        original_first_after_side_diagonals, original_row_end, next_free_slot);
+      next_free_slot = std::copy(original_first_after_side_diagonals,
+                                 original_row_end,
+                                 next_free_slot);
 
       // this error may happen if the sum of previous elements per row and
       // those of the new diagonals exceeds the maximum number of elements per
@@ -209,11 +212,11 @@ SparsityPattern &
 SparsityPattern::operator=(const SparsityPattern &s)
 {
   (void)s;
-  Assert(
-    s.empty(),
-    ExcMessage("This operator can only be called if the provided argument "
-               "is the sparsity pattern for an empty matrix. This operator can "
-               "not be used to copy a non-empty sparsity pattern."));
+  Assert(s.empty(),
+         ExcMessage(
+           "This operator can only be called if the provided argument "
+           "is the sparsity pattern for an empty matrix. This operator can "
+           "not be used to copy a non-empty sparsity pattern."));
 
   Assert(this->empty(),
          ExcMessage("This operator can only be called if the current object is "
@@ -290,11 +293,12 @@ SparsityPattern::reinit(
       colnums     = std_cxx14::make_unique<size_type[]>(max_vec_len);
     }
 
-  max_row_length = (row_lengths.size() == 0 ?
-                      0 :
-                      std::min(static_cast<size_type>(*std::max_element(
-                                 row_lengths.begin(), row_lengths.end())),
-                               n));
+  max_row_length =
+    (row_lengths.size() == 0 ?
+       0 :
+       std::min(static_cast<size_type>(
+                  *std::max_element(row_lengths.begin(), row_lengths.end())),
+                n));
 
   if (store_diagonal_first_in_row && (max_row_length == 0) && (m != 0))
     max_row_length = 1;
@@ -363,11 +367,12 @@ SparsityPattern::compress()
 
   // first find out how many non-zero elements there are, in order to allocate
   // the right amount of memory
-  const std::size_t nonzero_elements = std::count_if(
-    &colnums[rowstart[0]],
-    &colnums[rowstart[rows]],
-    std::bind(
-      std::not_equal_to<size_type>(), std::placeholders::_1, invalid_entry));
+  const std::size_t nonzero_elements =
+    std::count_if(&colnums[rowstart[0]],
+                  &colnums[rowstart[rows]],
+                  std::bind(std::not_equal_to<size_type>(),
+                            std::placeholders::_1,
+                            invalid_entry));
   // now allocate the respective memory
   std::unique_ptr<size_type[]> new_colnums(new size_type[nonzero_elements]);
 
@@ -674,8 +679,10 @@ SparsityPattern::operator()(const size_type i, const size_type j) const
   const size_type *sorted_region_start =
     (store_diagonal_first_in_row ? &colnums[rowstart[i] + 1] :
                                    &colnums[rowstart[i]]);
-  const size_type *const p = Utilities::lower_bound<const size_type *>(
-    sorted_region_start, &colnums[rowstart[i + 1]], j);
+  const size_type *const p =
+    Utilities::lower_bound<const size_type *>(sorted_region_start,
+                                              &colnums[rowstart[i + 1]],
+                                              j);
   if ((p != &colnums[rowstart[i + 1]]) && (*p == j))
     return (p - colnums.get());
   else
@@ -740,9 +747,9 @@ SparsityPattern::add_entries(const size_type row,
               {
                 if (store_diagonal_first_in_row && *it == row)
                   continue;
-                Assert(
-                  k <= rowstart[row + 1],
-                  ExcNotEnoughSpace(row, rowstart[row + 1] - rowstart[row]));
+                Assert(k <= rowstart[row + 1],
+                       ExcNotEnoughSpace(row,
+                                         rowstart[row + 1] - rowstart[row]));
                 colnums[k++] = *it;
               }
           else

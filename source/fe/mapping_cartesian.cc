@@ -45,10 +45,10 @@ const unsigned int MappingCartesian<dim, spacedim>::invalid_face_number;
 
 template <int dim, int spacedim>
 MappingCartesian<dim, spacedim>::InternalData::InternalData(
-  const Quadrature<dim> &q) :
-  cell_extents(numbers::signaling_nan<Tensor<1, dim>>()),
-  volume_element(numbers::signaling_nan<double>()),
-  quadrature_points(q.get_points())
+  const Quadrature<dim> &q)
+  : cell_extents(numbers::signaling_nan<Tensor<1, dim>>())
+  , volume_element(numbers::signaling_nan<double>())
+  , quadrature_points(q.get_points())
 {}
 
 
@@ -187,11 +187,12 @@ MappingCartesian<dim, spacedim>::compute_fill(
       // tests/fe/mapping.cc). Therefore,
       // we must use following workaround
       // of two separate assertions
-      Assert(
-        (sub_no == invalid_face_number) ||
-          cell->face(face_no)->has_children() ||
-          (sub_no + 1 < GeometryInfo<dim>::max_children_per_face + 1),
-        ExcIndexRange(sub_no, 0, GeometryInfo<dim>::max_children_per_face));
+      Assert((sub_no == invalid_face_number) ||
+               cell->face(face_no)->has_children() ||
+               (sub_no + 1 < GeometryInfo<dim>::max_children_per_face + 1),
+             ExcIndexRange(sub_no,
+                           0,
+                           GeometryInfo<dim>::max_children_per_face));
       Assert((sub_no == invalid_face_number) ||
                !cell->face(face_no)->has_children() ||
                (sub_no < cell->face(face_no)->n_children()),
@@ -289,8 +290,9 @@ MappingCartesian<dim, spacedim>::compute_fill(
             {
               static const Point<dim> normals[GeometryInfo<1>::faces_per_cell] =
                 {Point<dim>(-1.), Point<dim>(1.)};
-              std::fill(
-                normal_vectors.begin(), normal_vectors.end(), normals[face_no]);
+              std::fill(normal_vectors.begin(),
+                        normal_vectors.end(),
+                        normals[face_no]);
               break;
             }
 
@@ -301,8 +303,9 @@ MappingCartesian<dim, spacedim>::compute_fill(
                  Point<dim>(1, 0),
                  Point<dim>(0, -1),
                  Point<dim>(0, 1)};
-              std::fill(
-                normal_vectors.begin(), normal_vectors.end(), normals[face_no]);
+              std::fill(normal_vectors.begin(),
+                        normal_vectors.end(),
+                        normals[face_no]);
               break;
             }
 
@@ -315,8 +318,9 @@ MappingCartesian<dim, spacedim>::compute_fill(
                  Point<dim>(0, 1, 0),
                  Point<dim>(0, 0, -1),
                  Point<dim>(0, 0, 1)};
-              std::fill(
-                normal_vectors.begin(), normal_vectors.end(), normals[face_no]);
+              std::fill(normal_vectors.begin(),
+                        normal_vectors.end(),
+                        normals[face_no]);
               break;
             }
 

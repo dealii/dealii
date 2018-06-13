@@ -2160,21 +2160,21 @@ namespace TrilinosWrappers
       {
         if (transpose == false)
           {
-            Assert(
-              src.Map().SameAs(mtrx.DomainMap()) == true,
-              ExcMessage("Column map of matrix does not fit with vector map!"));
-            Assert(
-              dst.Map().SameAs(mtrx.RangeMap()) == true,
-              ExcMessage("Row map of matrix does not fit with vector map!"));
+            Assert(src.Map().SameAs(mtrx.DomainMap()) == true,
+                   ExcMessage(
+                     "Column map of matrix does not fit with vector map!"));
+            Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
+                   ExcMessage(
+                     "Row map of matrix does not fit with vector map!"));
           }
         else
           {
-            Assert(
-              src.Map().SameAs(mtrx.RangeMap()) == true,
-              ExcMessage("Column map of matrix does not fit with vector map!"));
-            Assert(
-              dst.Map().SameAs(mtrx.DomainMap()) == true,
-              ExcMessage("Row map of matrix does not fit with vector map!"));
+            Assert(src.Map().SameAs(mtrx.RangeMap()) == true,
+                   ExcMessage(
+                     "Column map of matrix does not fit with vector map!"));
+            Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
+                   ExcMessage(
+                     "Row map of matrix does not fit with vector map!"));
           }
         (void)mtrx; // removes -Wunused-variable in optimized mode
         (void)src;
@@ -2192,18 +2192,18 @@ namespace TrilinosWrappers
             Assert(src.Map().SameAs(op.OperatorDomainMap()) == true,
                    ExcMessage(
                      "Column map of operator does not fit with vector map!"));
-            Assert(
-              dst.Map().SameAs(op.OperatorRangeMap()) == true,
-              ExcMessage("Row map of operator does not fit with vector map!"));
+            Assert(dst.Map().SameAs(op.OperatorRangeMap()) == true,
+                   ExcMessage(
+                     "Row map of operator does not fit with vector map!"));
           }
         else
           {
             Assert(src.Map().SameAs(op.OperatorRangeMap()) == true,
                    ExcMessage(
                      "Column map of operator does not fit with vector map!"));
-            Assert(
-              dst.Map().SameAs(op.OperatorDomainMap()) == true,
-              ExcMessage("Row map of operator does not fit with vector map!"));
+            Assert(dst.Map().SameAs(op.OperatorDomainMap()) == true,
+                   ExcMessage(
+                     "Row map of operator does not fit with vector map!"));
           }
         (void)op; // removes -Wunused-variable in optimized mode
         (void)src;
@@ -2643,10 +2643,10 @@ namespace TrilinosWrappers
   {
     inline AccessorBase::AccessorBase(SparseMatrix *matrix,
                                       size_type     row,
-                                      size_type     index) :
-      matrix(matrix),
-      a_row(row),
-      a_index(index)
+                                      size_type     index)
+      : matrix(matrix)
+      , a_row(row)
+      , a_index(index)
     {
       visit_present_row();
     }
@@ -2678,14 +2678,14 @@ namespace TrilinosWrappers
 
     inline Accessor<true>::Accessor(MatrixType *    matrix,
                                     const size_type row,
-                                    const size_type index) :
-      AccessorBase(const_cast<SparseMatrix *>(matrix), row, index)
+                                    const size_type index)
+      : AccessorBase(const_cast<SparseMatrix *>(matrix), row, index)
     {}
 
 
     template <bool Other>
-    inline Accessor<true>::Accessor(const Accessor<Other> &other) :
-      AccessorBase(other)
+    inline Accessor<true>::Accessor(const Accessor<Other> &other)
+      : AccessorBase(other)
     {}
 
 
@@ -2697,8 +2697,8 @@ namespace TrilinosWrappers
     }
 
 
-    inline Accessor<false>::Reference::Reference(const Accessor<false> &acc) :
-      accessor(const_cast<Accessor<false> &>(acc))
+    inline Accessor<false>::Reference::Reference(const Accessor<false> &acc)
+      : accessor(const_cast<Accessor<false> &>(acc))
     {}
 
 
@@ -2711,8 +2711,9 @@ namespace TrilinosWrappers
     Accessor<false>::Reference::operator=(const TrilinosScalar n) const
     {
       (*accessor.value_cache)[accessor.a_index] = n;
-      accessor.matrix->set(
-        accessor.row(), accessor.column(), static_cast<TrilinosScalar>(*this));
+      accessor.matrix->set(accessor.row(),
+                           accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
       return *this;
     }
 
@@ -2721,8 +2722,9 @@ namespace TrilinosWrappers
     Accessor<false>::Reference::operator+=(const TrilinosScalar n) const
     {
       (*accessor.value_cache)[accessor.a_index] += n;
-      accessor.matrix->set(
-        accessor.row(), accessor.column(), static_cast<TrilinosScalar>(*this));
+      accessor.matrix->set(accessor.row(),
+                           accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
       return *this;
     }
 
@@ -2731,8 +2733,9 @@ namespace TrilinosWrappers
     Accessor<false>::Reference::operator-=(const TrilinosScalar n) const
     {
       (*accessor.value_cache)[accessor.a_index] -= n;
-      accessor.matrix->set(
-        accessor.row(), accessor.column(), static_cast<TrilinosScalar>(*this));
+      accessor.matrix->set(accessor.row(),
+                           accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
       return *this;
     }
 
@@ -2741,8 +2744,9 @@ namespace TrilinosWrappers
     Accessor<false>::Reference::operator*=(const TrilinosScalar n) const
     {
       (*accessor.value_cache)[accessor.a_index] *= n;
-      accessor.matrix->set(
-        accessor.row(), accessor.column(), static_cast<TrilinosScalar>(*this));
+      accessor.matrix->set(accessor.row(),
+                           accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
       return *this;
     }
 
@@ -2751,16 +2755,17 @@ namespace TrilinosWrappers
     Accessor<false>::Reference::operator/=(const TrilinosScalar n) const
     {
       (*accessor.value_cache)[accessor.a_index] /= n;
-      accessor.matrix->set(
-        accessor.row(), accessor.column(), static_cast<TrilinosScalar>(*this));
+      accessor.matrix->set(accessor.row(),
+                           accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
       return *this;
     }
 
 
     inline Accessor<false>::Accessor(MatrixType *    matrix,
                                      const size_type row,
-                                     const size_type index) :
-      AccessorBase(matrix, row, index)
+                                     const size_type index)
+      : AccessorBase(matrix, row, index)
     {}
 
 
@@ -2776,15 +2781,15 @@ namespace TrilinosWrappers
     template <bool Constness>
     inline Iterator<Constness>::Iterator(MatrixType *    matrix,
                                          const size_type row,
-                                         const size_type index) :
-      accessor(matrix, row, index)
+                                         const size_type index)
+      : accessor(matrix, row, index)
     {}
 
 
     template <bool Constness>
     template <bool Other>
-    inline Iterator<Constness>::Iterator(const Iterator<Other> &other) :
-      accessor(other.accessor)
+    inline Iterator<Constness>::Iterator(const Iterator<Other> &other)
+      : accessor(other.accessor)
     {}
 
 
@@ -3055,8 +3060,9 @@ namespace TrilinosWrappers
         if (last_action == Insert)
           {
             int ierr;
-            ierr = matrix->GlobalAssemble(
-              *column_space_map, matrix->RowMap(), false);
+            ierr = matrix->GlobalAssemble(*column_space_map,
+                                          matrix->RowMap(),
+                                          false);
 
             Assert(ierr == 0, ExcTrilinosError(ierr));
             (void)ierr; // removes -Wunused-but-set-variable in optimized mode
@@ -3250,8 +3256,10 @@ namespace TrilinosWrappers
           // as well as from TrilinosWrappers::SparseMatrix::Tvmult
           Assert(&tril_src != &tril_dst,
                  TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
-          internal::check_vector_map_equality(
-            payload, tril_src, tril_dst, !payload.UseTranspose());
+          internal::check_vector_map_equality(payload,
+                                              tril_src,
+                                              tril_dst,
+                                              !payload.UseTranspose());
           solver.solve(payload, tril_dst, tril_src, preconditioner);
         };
 
@@ -3262,8 +3270,10 @@ namespace TrilinosWrappers
           // as well as from TrilinosWrappers::SparseMatrix::Tvmult
           Assert(&tril_src != &tril_dst,
                  TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
-          internal::check_vector_map_equality(
-            payload, tril_src, tril_dst, payload.UseTranspose());
+          internal::check_vector_map_equality(payload,
+                                              tril_src,
+                                              tril_dst,
+                                              payload.UseTranspose());
 
           const_cast<TrilinosPayload &>(payload).transpose();
           solver.solve(payload, tril_dst, tril_src, preconditioner);

@@ -192,9 +192,9 @@ namespace Utilities
         {
           Assert(destinations[i] < n_procs,
                  ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(
-            destinations[i] != myid,
-            ExcMessage("There is no point in communicating with ourselves."));
+          Assert(destinations[i] != myid,
+                 ExcMessage(
+                   "There is no point in communicating with ourselves."));
         }
 
 
@@ -212,8 +212,9 @@ namespace Utilities
       // in there, padded with -1's
       std::vector<unsigned int> my_destinations(max_n_destinations,
                                                 numbers::invalid_unsigned_int);
-      std::copy(
-        destinations.begin(), destinations.end(), my_destinations.begin());
+      std::copy(destinations.begin(),
+                destinations.end(),
+                my_destinations.begin());
 
       // now exchange these (we could communicate less data if we used
       // MPI_Allgatherv, but we'd have to communicate my_n_destinations to all

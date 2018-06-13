@@ -31,17 +31,17 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 FE_RannacherTurek<dim>::FE_RannacherTurek(
   const unsigned int order,
-  const unsigned int n_face_support_points) :
-  FE_Poly<PolynomialsRannacherTurek<dim>, dim>(
-    PolynomialsRannacherTurek<dim>(),
-    FiniteElementData<dim>(this->get_dpo_vector(),
-                           1,
-                           2,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(4, false), // restriction not implemented
-    std::vector<ComponentMask>(4, std::vector<bool>(1, true))),
-  order(order),
-  n_face_support_points(n_face_support_points)
+  const unsigned int n_face_support_points)
+  : FE_Poly<PolynomialsRannacherTurek<dim>, dim>(
+      PolynomialsRannacherTurek<dim>(),
+      FiniteElementData<dim>(this->get_dpo_vector(),
+                             1,
+                             2,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(4, false), // restriction not implemented
+      std::vector<ComponentMask>(4, std::vector<bool>(1, true)))
+  , order(order)
+  , n_face_support_points(n_face_support_points)
 {
   Assert(dim == 2, ExcNotImplemented());
   Assert(order == 0, ExcNotImplemented());

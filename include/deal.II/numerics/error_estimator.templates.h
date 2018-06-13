@@ -218,48 +218,49 @@ namespace internal
       const types::material_id  material_id,
       const typename FunctionMap<spacedim, number>::type *neumann_bc,
       const ComponentMask &                               component_mask,
-      const Function<spacedim> *                          coefficients) :
-      finite_element(fe),
-      face_quadratures(face_quadratures),
-      fe_face_values_cell(
-        mapping,
-        finite_element,
-        face_quadratures,
-        update_gradients | update_JxW_values |
-          (need_quadrature_points ? update_quadrature_points : UpdateFlags()) |
-          update_normal_vectors),
-      fe_face_values_neighbor(mapping,
-                              finite_element,
-                              face_quadratures,
-                              update_gradients | update_normal_vectors),
-      fe_subface_values(mapping,
-                        finite_element,
-                        face_quadratures,
-                        update_gradients | update_normal_vectors),
-      phi(n_solution_vectors,
-          std::vector<std::vector<number>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<number>(fe.n_components()))),
-      psi(n_solution_vectors,
-          std::vector<std::vector<Tensor<1, spacedim, number>>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<Tensor<1, spacedim, number>>(fe.n_components()))),
-      neighbor_psi(
-        n_solution_vectors,
-        std::vector<std::vector<Tensor<1, spacedim, number>>>(
-          face_quadratures.max_n_quadrature_points(),
-          std::vector<Tensor<1, spacedim, number>>(fe.n_components()))),
-      normal_vectors(face_quadratures.max_n_quadrature_points()),
-      neighbor_normal_vectors(face_quadratures.max_n_quadrature_points()),
-      coefficient_values1(face_quadratures.max_n_quadrature_points()),
-      coefficient_values(face_quadratures.max_n_quadrature_points(),
-                         dealii::Vector<double>(fe.n_components())),
-      JxW_values(face_quadratures.max_n_quadrature_points()),
-      subdomain_id(subdomain_id),
-      material_id(material_id),
-      neumann_bc(neumann_bc),
-      component_mask(component_mask),
-      coefficients(coefficients)
+      const Function<spacedim> *                          coefficients)
+      : finite_element(fe)
+      , face_quadratures(face_quadratures)
+      , fe_face_values_cell(mapping,
+                            finite_element,
+                            face_quadratures,
+                            update_gradients | update_JxW_values |
+                              (need_quadrature_points ?
+                                 update_quadrature_points :
+                                 UpdateFlags()) |
+                              update_normal_vectors)
+      , fe_face_values_neighbor(mapping,
+                                finite_element,
+                                face_quadratures,
+                                update_gradients | update_normal_vectors)
+      , fe_subface_values(mapping,
+                          finite_element,
+                          face_quadratures,
+                          update_gradients | update_normal_vectors)
+      , phi(n_solution_vectors,
+            std::vector<std::vector<number>>(
+              face_quadratures.max_n_quadrature_points(),
+              std::vector<number>(fe.n_components())))
+      , psi(n_solution_vectors,
+            std::vector<std::vector<Tensor<1, spacedim, number>>>(
+              face_quadratures.max_n_quadrature_points(),
+              std::vector<Tensor<1, spacedim, number>>(fe.n_components())))
+      , neighbor_psi(n_solution_vectors,
+                     std::vector<std::vector<Tensor<1, spacedim, number>>>(
+                       face_quadratures.max_n_quadrature_points(),
+                       std::vector<Tensor<1, spacedim, number>>(
+                         fe.n_components())))
+      , normal_vectors(face_quadratures.max_n_quadrature_points())
+      , neighbor_normal_vectors(face_quadratures.max_n_quadrature_points())
+      , coefficient_values1(face_quadratures.max_n_quadrature_points())
+      , coefficient_values(face_quadratures.max_n_quadrature_points(),
+                           dealii::Vector<double>(fe.n_components()))
+      , JxW_values(face_quadratures.max_n_quadrature_points())
+      , subdomain_id(subdomain_id)
+      , material_id(material_id)
+      , neumann_bc(neumann_bc)
+      , component_mask(component_mask)
+      , coefficients(coefficients)
     {}
 
 
@@ -448,10 +449,10 @@ namespace internal
               std::vector<dealii::Vector<number>> g(
                 n_q_points, dealii::Vector<number>(n_components));
               parallel_data.neumann_bc->find(boundary_id)
-                ->second->vector_value_list(
-                  fe_face_values_cell.get_present_fe_values()
-                    .get_quadrature_points(),
-                  g);
+                ->second->vector_value_list(fe_face_values_cell
+                                              .get_present_fe_values()
+                                              .get_quadrature_points(),
+                                            g);
 
               for (unsigned int n = 0; n < n_solution_vectors; ++n)
                 for (unsigned int component = 0; component < n_components;
@@ -752,8 +753,9 @@ namespace internal
           // get restriction of finite element function of @p{neighbor} to the
           // common face. in the hp case, use the quadrature formula that
           // matches the one we would use for the present cell
-          fe_face_values_neighbor.reinit(
-            neighbor, neighbor_neighbor, cell->active_fe_index());
+          fe_face_values_neighbor.reinit(neighbor,
+                                         neighbor_neighbor,
+                                         cell->active_fe_index());
 
           factor = regular_face_factor<DoFHandlerType>(cell,
                                                        face_no,
@@ -775,8 +777,10 @@ namespace internal
         }
       else
         {
-          factor = boundary_face_factor<DoFHandlerType>(
-            cell, face_no, fe_face_values_cell, strategy);
+          factor = boundary_face_factor<DoFHandlerType>(cell,
+                                                        face_no,
+                                                        fe_face_values_cell,
+                                                        strategy);
         }
 
       // now go to the generic function that does all the other things
@@ -849,13 +853,16 @@ namespace internal
           Assert(!neighbor_child->has_children(), ExcInternalError());
 
           // restrict the finite element on the present cell to the subface
-          fe_subface_values.reinit(
-            cell, face_no, subface_no, cell->active_fe_index());
+          fe_subface_values.reinit(cell,
+                                   face_no,
+                                   subface_no,
+                                   cell->active_fe_index());
 
           // restrict the finite element on the neighbor cell to the common
           // @p{subface}.
-          fe_face_values.reinit(
-            neighbor_child, neighbor_neighbor, cell->active_fe_index());
+          fe_face_values.reinit(neighbor_child,
+                                neighbor_neighbor,
+                                cell->active_fe_index());
 
           const double factor =
             irregular_face_factor<DoFHandlerType>(cell,
@@ -1219,15 +1226,16 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)
-    Assert(
-      (subdomain_id_ == numbers::invalid_subdomain_id) ||
-        (subdomain_id_ ==
-         dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                        &>(dof_handler.get_triangulation())
-           .locally_owned_subdomain()),
-      ExcMessage("For parallel distributed triangulations, the only "
-                 "valid subdomain_id that can be passed here is the "
-                 "one that corresponds to the locally owned subdomain id."));
+    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
+             (subdomain_id_ ==
+              dynamic_cast<
+                const parallel::distributed::Triangulation<dim, spacedim> &>(
+                dof_handler.get_triangulation())
+                .locally_owned_subdomain()),
+           ExcMessage(
+             "For parallel distributed triangulations, the only "
+             "valid subdomain_id that can be passed here is the "
+             "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id =
     ((dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -1253,8 +1261,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
        i != neumann_bc.end();
        ++i)
     Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(
-             i->first, i->second->n_components, n_components));
+           ExcInvalidBoundaryFunction(i->first,
+                                      i->second->n_components,
+                                      n_components));
 
   Assert(component_mask.represents_n_components(n_components),
          ExcInvalidComponentMask());

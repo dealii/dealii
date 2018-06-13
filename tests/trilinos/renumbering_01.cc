@@ -70,13 +70,13 @@ private:
   TrilinosWrappers::SparseMatrix system_matrix;
 
 public:
-  Test(const bool do_renumber) :
-    mpi_communicator(MPI_COMM_WORLD),
-    rank(Utilities::MPI::this_mpi_process(mpi_communicator)),
-    n_ranks(Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    triangulation(mpi_communicator),
-    dof_handler(triangulation),
-    fe(1)
+  Test(const bool do_renumber)
+    : mpi_communicator(MPI_COMM_WORLD)
+    , rank(Utilities::MPI::this_mpi_process(mpi_communicator))
+    , n_ranks(Utilities::MPI::n_mpi_processes(mpi_communicator))
+    , triangulation(mpi_communicator)
+    , dof_handler(triangulation)
+    , fe(1)
   {
     deallog << "Start";
 
@@ -131,8 +131,10 @@ private:
       MPI_COMM_WORLD,
       locally_relevant_dofs);
 
-    system_matrix.reinit(
-      locally_owned_dofs, locally_owned_dofs, sparsity_pattern, MPI_COMM_WORLD);
+    system_matrix.reinit(locally_owned_dofs,
+                         locally_owned_dofs,
+                         sparsity_pattern,
+                         MPI_COMM_WORLD);
     deallog << "local_range: " << system_matrix.local_range().first << " - "
             << system_matrix.local_range().second << std::endl;
   }

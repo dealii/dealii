@@ -100,11 +100,11 @@ PathSearch::get_suffix_list(const std::string &cls)
 }
 
 
-PathSearch::PathSearch(const std::string &cls, const unsigned int debug) :
-  cls(cls),
-  my_path_list(get_path_list(cls)),
-  my_suffix_list(get_suffix_list(cls)),
-  debug(debug)
+PathSearch::PathSearch(const std::string &cls, const unsigned int debug)
+  : cls(cls)
+  , my_path_list(get_path_list(cls))
+  , my_suffix_list(get_suffix_list(cls))
+  , debug(debug)
 {}
 
 

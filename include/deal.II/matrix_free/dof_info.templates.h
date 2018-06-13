@@ -80,8 +80,8 @@ namespace internal
 
 
     template <typename Number>
-    ConstraintValues<Number>::ConstraintValues() :
-      constraints(FPArrayComparator<double>(1.))
+    ConstraintValues<Number>::ConstraintValues()
+      : constraints(FPArrayComparator<double>(1.))
     {}
 
     template <typename Number>
@@ -522,9 +522,10 @@ namespace internal
       new_constraint_indicator.reserve(constraint_indicator.size());
       if (store_plain_indices == true)
         {
-          new_rowstart_plain.resize(
-            vectorization_length * task_info.cell_partition_data.back() + 1,
-            numbers::invalid_unsigned_int);
+          new_rowstart_plain.resize(vectorization_length *
+                                        task_info.cell_partition_data.back() +
+                                      1,
+                                    numbers::invalid_unsigned_int);
           new_plain_indices.reserve(plain_dof_indices.size());
         }
 
@@ -1140,8 +1141,9 @@ namespace internal
                   if (sp->column() != block)
                     row_entries.insert(renumbering[sp->column()], insert_pos);
               }
-            connectivity.add_entries(
-              renumbering[block], row_entries.begin(), row_entries.end());
+            connectivity.add_entries(renumbering[block],
+                                     row_entries.begin(),
+                                     row_entries.end());
           }
       }
     } // namespace
@@ -1184,8 +1186,9 @@ namespace internal
       // Create a temporary sparsity pattern that holds to each degree of
       // freedom on which cells it appears, i.e., store the connectivity
       // between cells and dofs
-      SparsityPattern connectivity_dof(
-        n_rows, task_info.n_active_cells, row_lengths);
+      SparsityPattern connectivity_dof(n_rows,
+                                       task_info.n_active_cells,
+                                       row_lengths);
       parallel::apply_to_subranges(0,
                                    task_info.n_active_cells,
                                    std::bind(&fill_connectivity_dofs,
@@ -1300,8 +1303,9 @@ namespace internal
                                       const TaskInfo &task_info) const
     {
       out << "       Memory row starts indices:    ";
-      task_info.print_memory_statistics(
-        out, (row_starts.capacity() * sizeof(*row_starts.begin())));
+      task_info.print_memory_statistics(out,
+                                        (row_starts.capacity() *
+                                         sizeof(*row_starts.begin())));
       out << "       Memory dof indices:           ";
       task_info.print_memory_statistics(
         out, MemoryConsumption::memory_consumption(dof_indices));

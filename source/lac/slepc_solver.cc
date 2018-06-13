@@ -32,10 +32,10 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SLEPcWrappers
 {
-  SolverBase::SolverBase(SolverControl &cn, const MPI_Comm &mpi_communicator) :
-    solver_control(cn),
-    mpi_communicator(mpi_communicator),
-    reason(EPS_CONVERGED_ITERATING)
+  SolverBase::SolverBase(SolverControl &cn, const MPI_Comm &mpi_communicator)
+    : solver_control(cn)
+    , mpi_communicator(mpi_communicator)
+    , reason(EPS_CONVERGED_ITERATING)
   {
     // create eigensolver context
     PetscErrorCode ierr = EPSCreate(mpi_communicator, &eps);
@@ -43,8 +43,9 @@ namespace SLEPcWrappers
 
     // hand over the absolute tolerance and the maximum number of
     // iteration steps to the SLEPc convergence criterion.
-    ierr = EPSSetTolerances(
-      eps, this->solver_control.tolerance(), this->solver_control.max_steps());
+    ierr = EPSSetTolerances(eps,
+                            this->solver_control.tolerance(),
+                            this->solver_control.max_steps());
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
 
     // default values:
@@ -339,9 +340,9 @@ namespace SLEPcWrappers
   /* ---------------------- SolverKrylovSchur ------------------------ */
   SolverKrylovSchur::SolverKrylovSchur(SolverControl &       cn,
                                        const MPI_Comm &      mpi_communicator,
-                                       const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+                                       const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     const PetscErrorCode ierr =
       EPSSetType(eps, const_cast<char *>(EPSKRYLOVSCHUR));
@@ -350,15 +351,15 @@ namespace SLEPcWrappers
 
   /* ---------------------- SolverArnoldi ------------------------ */
   SolverArnoldi::AdditionalData::AdditionalData(
-    const bool delayed_reorthogonalization) :
-    delayed_reorthogonalization(delayed_reorthogonalization)
+    const bool delayed_reorthogonalization)
+    : delayed_reorthogonalization(delayed_reorthogonalization)
   {}
 
   SolverArnoldi::SolverArnoldi(SolverControl &       cn,
                                const MPI_Comm &      mpi_communicator,
-                               const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+                               const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     PetscErrorCode ierr = EPSSetType(eps, const_cast<char *>(EPSARNOLDI));
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
@@ -374,16 +375,15 @@ namespace SLEPcWrappers
 
 
   /* ---------------------- Lanczos ------------------------ */
-  SolverLanczos::AdditionalData::AdditionalData(
-    const EPSLanczosReorthogType r) :
-    reorthog(r)
+  SolverLanczos::AdditionalData::AdditionalData(const EPSLanczosReorthogType r)
+    : reorthog(r)
   {}
 
   SolverLanczos::SolverLanczos(SolverControl &       cn,
                                const MPI_Comm &      mpi_communicator,
-                               const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+                               const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     PetscErrorCode ierr = EPSSetType(eps, const_cast<char *>(EPSLANCZOS));
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
@@ -395,9 +395,9 @@ namespace SLEPcWrappers
   /* ----------------------- Power ------------------------- */
   SolverPower::SolverPower(SolverControl &       cn,
                            const MPI_Comm &      mpi_communicator,
-                           const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+                           const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     PetscErrorCode ierr = EPSSetType(eps, const_cast<char *>(EPSPOWER));
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
@@ -405,16 +405,16 @@ namespace SLEPcWrappers
 
   /* ---------------- Generalized Davidson ----------------- */
   SolverGeneralizedDavidson::AdditionalData::AdditionalData(
-    bool double_expansion) :
-    double_expansion(double_expansion)
+    bool double_expansion)
+    : double_expansion(double_expansion)
   {}
 
   SolverGeneralizedDavidson::SolverGeneralizedDavidson(
     SolverControl &       cn,
     const MPI_Comm &      mpi_communicator,
-    const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+    const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     PetscErrorCode ierr = EPSSetType(eps, const_cast<char *>(EPSGD));
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
@@ -429,9 +429,9 @@ namespace SLEPcWrappers
   /* ------------------ Jacobi Davidson -------------------- */
   SolverJacobiDavidson::SolverJacobiDavidson(SolverControl & cn,
                                              const MPI_Comm &mpi_communicator,
-                                             const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+                                             const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     const PetscErrorCode ierr = EPSSetType(eps, const_cast<char *>(EPSJD));
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
@@ -440,9 +440,9 @@ namespace SLEPcWrappers
   /* ---------------------- LAPACK ------------------------- */
   SolverLAPACK::SolverLAPACK(SolverControl &       cn,
                              const MPI_Comm &      mpi_communicator,
-                             const AdditionalData &data) :
-    SolverBase(cn, mpi_communicator),
-    additional_data(data)
+                             const AdditionalData &data)
+    : SolverBase(cn, mpi_communicator)
+    , additional_data(data)
   {
     // 'Tis overwhelmingly likely that PETSc/SLEPc *always* has
     // BLAS/LAPACK, but let's be defensive.

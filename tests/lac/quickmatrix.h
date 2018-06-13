@@ -30,9 +30,9 @@ protected:
 
 
 template <typename number>
-QuickMatrix<number>::QuickMatrix(unsigned int nx, unsigned int ny) :
-  nx(nx),
-  ny(ny)
+QuickMatrix<number>::QuickMatrix(unsigned int nx, unsigned int ny)
+  : nx(nx)
+  , ny(ny)
 {}
 
 template <typename number>

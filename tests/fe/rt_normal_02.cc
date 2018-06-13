@@ -106,12 +106,12 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
           if (!cell->face(f)->at_boundary())
             {
               const QProjector<2>::DataSetDescriptor offset =
-                (QProjector<2>::DataSetDescriptor::face(
-                  f,
-                  cell->face_orientation(f),
-                  cell->face_flip(f),
-                  cell->face_rotation(f),
-                  quad.size()));
+                (QProjector<2>::DataSetDescriptor::face(f,
+                                                        cell->face_orientation(
+                                                          f),
+                                                        cell->face_flip(f),
+                                                        cell->face_rotation(f),
+                                                        quad.size()));
               fe_v_face.reinit(cell, f);
 
               DoFHandler<2>::active_cell_iterator cell_n = cell->neighbor(f);

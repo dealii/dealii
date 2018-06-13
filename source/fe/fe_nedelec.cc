@@ -68,16 +68,16 @@ namespace internal
 
 
 template <int dim>
-FE_Nedelec<dim>::FE_Nedelec(const unsigned int order) :
-  FE_PolyTensor<PolynomialsNedelec<dim>, dim>(
-    order,
-    FiniteElementData<dim>(get_dpo_vector(order),
-                           dim,
-                           order + 1,
-                           FiniteElementData<dim>::Hcurl),
-    std::vector<bool>(PolynomialsNedelec<dim>::compute_n_pols(order), true),
-    std::vector<ComponentMask>(PolynomialsNedelec<dim>::compute_n_pols(order),
-                               std::vector<bool>(dim, true)))
+FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
+  : FE_PolyTensor<PolynomialsNedelec<dim>, dim>(
+      order,
+      FiniteElementData<dim>(get_dpo_vector(order),
+                             dim,
+                             order + 1,
+                             FiniteElementData<dim>::Hcurl),
+      std::vector<bool>(PolynomialsNedelec<dim>::compute_n_pols(order), true),
+      std::vector<ComponentMask>(PolynomialsNedelec<dim>::compute_n_pols(order),
+                                 std::vector<bool>(dim, true)))
 {
 #ifdef DEBUG_NEDELEC
   deallog << get_name() << std::endl;
@@ -143,8 +143,9 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order) :
 
       case 3:
         {
-          this->interface_constraints.reinit(
-            4 * (this->dofs_per_face - this->degree), this->dofs_per_face);
+          this->interface_constraints.reinit(4 * (this->dofs_per_face -
+                                                  this->degree),
+                                             this->dofs_per_face);
 
           unsigned int target_row = 0;
 
@@ -652,24 +653,29 @@ FE_Nedelec<dim>::initialize_restriction()
                                        dof, quadrature_point_2, 1) -
                                this->restriction[index][i](i * this->degree,
                                                            dof) *
-                                 this->shape_value_component(
-                                   i * this->degree, quadrature_point_0, 1));
-                            tmp(1) = -1.0 * weight *
-                                     this->restriction[index][i + 2](
-                                       i * this->degree, dof) *
-                                     this->shape_value_component(
-                                       i * this->degree, quadrature_point_0, 1);
+                                 this->shape_value_component(i * this->degree,
+                                                             quadrature_point_0,
+                                                             1));
+                            tmp(1) =
+                              -1.0 * weight *
+                              this->restriction[index][i + 2](i * this->degree,
+                                                              dof) *
+                              this->shape_value_component(i * this->degree,
+                                                          quadrature_point_0,
+                                                          1);
                             quadrature_point_2 = Point<dim>(
                               2.0 * edge_quadrature_points[q_point](0), i);
                             tmp(2) =
-                              weight * (2.0 * this->shape_value_component(
-                                                dof, quadrature_point_2, 0) -
-                                        this->restriction[index][2 * i](
-                                          (i + 2) * this->degree, dof) *
-                                          this->shape_value_component(
-                                            (i + 2) * this->degree,
-                                            quadrature_point_1,
-                                            0));
+                              weight *
+                              (2.0 * this->shape_value_component(
+                                       dof, quadrature_point_2, 0) -
+                               this->restriction[index][2 * i]((i + 2) *
+                                                                 this->degree,
+                                                               dof) *
+                                 this->shape_value_component((i + 2) *
+                                                               this->degree,
+                                                             quadrature_point_1,
+                                                             0));
                             tmp(3) =
                               -1.0 * weight *
                               this->restriction[index][2 * i + 1](
@@ -680,11 +686,13 @@ FE_Nedelec<dim>::initialize_restriction()
 
                         else
                           {
-                            tmp(0) = -1.0 * weight *
-                                     this->restriction[index][i](
-                                       i * this->degree, dof) *
-                                     this->shape_value_component(
-                                       i * this->degree, quadrature_point_0, 1);
+                            tmp(0) =
+                              -1.0 * weight *
+                              this->restriction[index][i](i * this->degree,
+                                                          dof) *
+                              this->shape_value_component(i * this->degree,
+                                                          quadrature_point_0,
+                                                          1);
 
                             Point<dim> quadrature_point_2(
                               i,
@@ -696,26 +704,29 @@ FE_Nedelec<dim>::initialize_restriction()
                                        dof, quadrature_point_2, 1) -
                                this->restriction[index][i + 2](i * this->degree,
                                                                dof) *
-                                 this->shape_value_component(
-                                   i * this->degree, quadrature_point_0, 1));
+                                 this->shape_value_component(i * this->degree,
+                                                             quadrature_point_0,
+                                                             1));
                             tmp(2) =
                               -1.0 * weight *
-                              this->restriction[index][2 * i](
-                                (i + 2) * this->degree, dof) *
+                              this->restriction[index][2 * i]((i + 2) *
+                                                                this->degree,
+                                                              dof) *
                               this->shape_value_component(
                                 (i + 2) * this->degree, quadrature_point_1, 0);
                             quadrature_point_2 = Point<dim>(
                               2.0 * edge_quadrature_points[q_point](0) - 1.0,
                               i);
                             tmp(3) =
-                              weight * (2.0 * this->shape_value_component(
-                                                dof, quadrature_point_2, 0) -
-                                        this->restriction[index][2 * i + 1](
-                                          (i + 2) * this->degree, dof) *
-                                          this->shape_value_component(
-                                            (i + 2) * this->degree,
-                                            quadrature_point_1,
-                                            0));
+                              weight *
+                              (2.0 * this->shape_value_component(
+                                       dof, quadrature_point_2, 0) -
+                               this->restriction[index][2 * i + 1](
+                                 (i + 2) * this->degree, dof) *
+                                 this->shape_value_component((i + 2) *
+                                                               this->degree,
+                                                             quadrature_point_1,
+                                                             0));
                           }
 
                         for (unsigned int j = 0; j < this->degree - 1; ++j)
@@ -756,8 +767,9 @@ FE_Nedelec<dim>::initialize_restriction()
               const unsigned int &n_quadrature_points = quadrature.size();
 
               {
-                FullMatrix<double> assembling_matrix(
-                  (this->degree - 1) * this->degree, n_quadrature_points);
+                FullMatrix<double> assembling_matrix((this->degree - 1) *
+                                                       this->degree,
+                                                     n_quadrature_points);
 
                 for (unsigned int q_point = 0; q_point < n_quadrature_points;
                      ++q_point)
@@ -832,10 +844,14 @@ FE_Nedelec<dim>::initialize_restriction()
                             2.0 * quadrature_points[q_point](0) - 1.0,
                             2.0 * quadrature_points[q_point](1));
 
-                          tmp(2) += 2.0 * this->shape_value_component(
-                                            dof, quadrature_point, 0);
-                          tmp(3) += 2.0 * this->shape_value_component(
-                                            dof, quadrature_point, 1);
+                          tmp(2) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              0);
+                          tmp(3) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              1);
                         }
 
                       else
@@ -844,27 +860,33 @@ FE_Nedelec<dim>::initialize_restriction()
                             2.0 * quadrature_points[q_point](0) - 1.0,
                             2.0 * quadrature_points[q_point](1) - 1.0);
 
-                          tmp(6) += 2.0 * this->shape_value_component(
-                                            dof, quadrature_point, 0);
-                          tmp(7) += 2.0 * this->shape_value_component(
-                                            dof, quadrature_point, 1);
+                          tmp(6) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              0);
+                          tmp(7) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              1);
                         }
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int j = 0; j < this->degree; ++j)
                           {
-                            tmp(2 * i) -= this->restriction[index][i](
-                                            j + 2 * this->degree, dof) *
-                                          this->shape_value_component(
-                                            j + 2 * this->degree,
-                                            quadrature_points[q_point],
-                                            0);
-                            tmp(2 * i + 1) -= this->restriction[index][i](
-                                                i * this->degree + j, dof) *
-                                              this->shape_value_component(
-                                                i * this->degree + j,
-                                                quadrature_points[q_point],
-                                                1);
+                            tmp(2 * i) -=
+                              this->restriction[index][i](j + 2 * this->degree,
+                                                          dof) *
+                              this->shape_value_component(
+                                j + 2 * this->degree,
+                                quadrature_points[q_point],
+                                0);
+                            tmp(2 * i + 1) -=
+                              this->restriction[index][i](i * this->degree + j,
+                                                          dof) *
+                              this->shape_value_component(
+                                i * this->degree + j,
+                                quadrature_points[q_point],
+                                1);
                             tmp(2 * (i + 2)) -= this->restriction[index][i + 2](
                                                   j + 3 * this->degree, dof) *
                                                 this->shape_value_component(
@@ -955,20 +977,26 @@ FE_Nedelec<dim>::initialize_restriction()
                         Point<dim> quadrature_point(
                           i, 2.0 * edge_quadrature_points[q_point](0), j);
 
-                        this->restriction[index][i + 4 * j](
-                          (i + 4 * j) * this->degree, dof) +=
+                        this->restriction[index][i + 4 * j]((i + 4 * j) *
+                                                              this->degree,
+                                                            dof) +=
                           weight *
                           this->shape_value_component(dof, quadrature_point, 1);
-                        quadrature_point = Point<dim>(
-                          2.0 * edge_quadrature_points[q_point](0), i, j);
+                        quadrature_point =
+                          Point<dim>(2.0 * edge_quadrature_points[q_point](0),
+                                     i,
+                                     j);
                         this->restriction[index][2 * (i + 2 * j)](
                           (i + 4 * j + 2) * this->degree, dof) +=
                           weight *
                           this->shape_value_component(dof, quadrature_point, 0);
-                        quadrature_point = Point<dim>(
-                          i, j, 2.0 * edge_quadrature_points[q_point](0));
-                        this->restriction[index][i + 2 * j](
-                          (i + 2 * (j + 4)) * this->degree, dof) +=
+                        quadrature_point =
+                          Point<dim>(i,
+                                     j,
+                                     2.0 * edge_quadrature_points[q_point](0));
+                        this->restriction[index][i + 2 * j]((i + 2 * (j + 4)) *
+                                                              this->degree,
+                                                            dof) +=
                           weight *
                           this->shape_value_component(dof, quadrature_point, 2);
                       }
@@ -980,8 +1008,9 @@ FE_Nedelec<dim>::initialize_restriction()
                         Point<dim> quadrature_point(
                           i, 2.0 * edge_quadrature_points[q_point](0) - 1.0, j);
 
-                        this->restriction[index][i + 4 * j + 2](
-                          (i + 4 * j) * this->degree, dof) +=
+                        this->restriction[index][i + 4 * j + 2]((i + 4 * j) *
+                                                                  this->degree,
+                                                                dof) +=
                           weight *
                           this->shape_value_component(dof, quadrature_point, 1);
                         quadrature_point = Point<dim>(
@@ -1070,13 +1099,14 @@ FE_Nedelec<dim>::initialize_restriction()
                                               (i + 4 * j) * this->degree,
                                               quadrature_point_0,
                                               1));
-                              tmp(1) = -1.0 * weight *
-                                       this->restriction[index][i + 4 * j + 2](
-                                         (i + 4 * j) * this->degree, dof) *
-                                       this->shape_value_component(
-                                         (i + 4 * j) * this->degree,
-                                         quadrature_point_0,
-                                         1);
+                              tmp(1) =
+                                -1.0 * weight *
+                                this->restriction[index][i + 4 * j + 2](
+                                  (i + 4 * j) * this->degree, dof) *
+                                this->shape_value_component((i + 4 * j) *
+                                                              this->degree,
+                                                            quadrature_point_0,
+                                                            1);
                               quadrature_point_3 = Point<dim>(
                                 2.0 * edge_quadrature_points[q_point](0), i, j);
                               tmp(2) =
@@ -1121,13 +1151,14 @@ FE_Nedelec<dim>::initialize_restriction()
 
                           else
                             {
-                              tmp(0) = -1.0 * weight *
-                                       this->restriction[index][i + 4 * j](
-                                         (i + 4 * j) * this->degree, dof) *
-                                       this->shape_value_component(
-                                         (i + 4 * j) * this->degree,
-                                         quadrature_point_0,
-                                         1);
+                              tmp(0) =
+                                -1.0 * weight *
+                                this->restriction[index][i + 4 * j](
+                                  (i + 4 * j) * this->degree, dof) *
+                                this->shape_value_component((i + 4 * j) *
+                                                              this->degree,
+                                                            quadrature_point_0,
+                                                            1);
 
                               Point<dim> quadrature_point_3(
                                 i,
@@ -1514,8 +1545,9 @@ FE_Nedelec<dim>::initialize_restriction()
                                     n_edge_dofs,
                                   dof) = solution(l * deg + m, 2 * (j + 2 * k));
 
-                              if (std::abs(solution(
-                                    l * deg + m, 2 * (j + 2 * k) + 1)) > 1e-14)
+                              if (std::abs(solution(l * deg + m,
+                                                    2 * (j + 2 * k) + 1)) >
+                                  1e-14)
                                 this->restriction[index][i + 2 * (2 * j + k)](
                                   ((2 * i + 1) * deg + m) * this->degree + l +
                                     n_edge_dofs,
@@ -1531,8 +1563,9 @@ FE_Nedelec<dim>::initialize_restriction()
                                   dof) =
                                   solution(l * deg + m, 2 * (j + 2 * (k + 2)));
 
-                              if (std::abs(solution(
-                                    l * deg + m, 2 * (j + 2 * k) + 9)) > 1e-14)
+                              if (std::abs(solution(l * deg + m,
+                                                    2 * (j + 2 * k) + 9)) >
+                                  1e-14)
                                 this->restriction[index][2 * (i + 2 * j) + k](
                                   ((2 * i + 5) * deg + m) * this->degree + l +
                                     n_edge_dofs,
@@ -1548,8 +1581,9 @@ FE_Nedelec<dim>::initialize_restriction()
                                   dof) =
                                   solution(l * deg + m, 2 * (j + 2 * (k + 4)));
 
-                              if (std::abs(solution(
-                                    l * deg + m, 2 * (j + 2 * k) + 17)) > 1e-14)
+                              if (std::abs(solution(l * deg + m,
+                                                    2 * (j + 2 * k) + 17)) >
+                                  1e-14)
                                 this->restriction[index][2 * (2 * i + j) + k](
                                   ((2 * i + 9) * deg + m) * this->degree + l +
                                     n_edge_dofs,
@@ -1723,12 +1757,18 @@ FE_Nedelec<dim>::initialize_restriction()
                             2.0 * quadrature_points[q_point](1) - 1.0,
                             2.0 * quadrature_points[q_point](2));
 
-                          tmp(18) += 2.0 * this->shape_value_component(
-                                             dof, quadrature_point, 0);
-                          tmp(19) += 2.0 * this->shape_value_component(
-                                             dof, quadrature_point, 1);
-                          tmp(20) += 2.0 * this->shape_value_component(
-                                             dof, quadrature_point, 2);
+                          tmp(18) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              0);
+                          tmp(19) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              1);
+                          tmp(20) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              2);
                         }
 
                       else
@@ -1738,12 +1778,18 @@ FE_Nedelec<dim>::initialize_restriction()
                             2.0 * quadrature_points[q_point](1) - 1.0,
                             2.0 * quadrature_points[q_point](2) - 1.0);
 
-                          tmp(21) += 2.0 * this->shape_value_component(
-                                             dof, quadrature_point, 0);
-                          tmp(22) += 2.0 * this->shape_value_component(
-                                             dof, quadrature_point, 1);
-                          tmp(23) += 2.0 * this->shape_value_component(
-                                             dof, quadrature_point, 2);
+                          tmp(21) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              0);
+                          tmp(22) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              1);
+                          tmp(23) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              2);
                         }
 
                       for (unsigned int i = 0; i < 2; ++i)
@@ -1904,17 +1950,19 @@ FE_Nedelec<dim>::initialize_restriction()
                           for (unsigned int m = 0; m < deg; ++m)
                             for (unsigned int n = 0; n < deg; ++n)
                               {
-                                if (std::abs(solution(
-                                      (l * deg + m) * deg + n,
-                                      3 * (i + 2 * (j + 2 * k)))) > 1e-14)
+                                if (std::abs(
+                                      solution((l * deg + m) * deg + n,
+                                               3 * (i + 2 * (j + 2 * k)))) >
+                                    1e-14)
                                   this->restriction[index][2 * (2 * i + j) + k](
                                     (l * deg + m) * deg + n + n_boundary_dofs,
                                     dof) = solution((l * deg + m) * deg + n,
                                                     3 * (i + 2 * (j + 2 * k)));
 
-                                if (std::abs(solution(
-                                      (l * deg + m) * deg + n,
-                                      3 * (i + 2 * (j + 2 * k)) + 1)) > 1e-14)
+                                if (std::abs(
+                                      solution((l * deg + m) * deg + n,
+                                               3 * (i + 2 * (j + 2 * k)) + 1)) >
+                                    1e-14)
                                   this->restriction[index][2 * (2 * i + j) + k](
                                     (l + (m + deg) * this->degree) * deg + n +
                                       n_boundary_dofs,
@@ -1922,9 +1970,10 @@ FE_Nedelec<dim>::initialize_restriction()
                                     solution((l * deg + m) * deg + n,
                                              3 * (i + 2 * (j + 2 * k)) + 1);
 
-                                if (std::abs(solution(
-                                      (l * deg + m) * deg + n,
-                                      3 * (i + 2 * (j + 2 * k)) + 2)) > 1e-14)
+                                if (std::abs(
+                                      solution((l * deg + m) * deg + n,
+                                               3 * (i + 2 * (j + 2 * k)) + 2)) >
+                                    1e-14)
                                   this->restriction[index][2 * (2 * i + j) + k](
                                     l +
                                       ((m + 2 * deg) * deg + n) * this->degree +
@@ -2442,13 +2491,14 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
 
           for (unsigned int j = 0; j < q - 1; ++j)
             {
-              interpolation_matrix(
-                GeometryInfo<dim>::lines_per_face * p + i * (p - 1) + j,
-                GeometryInfo<dim>::lines_per_face * q + i * (q - 1) + j) = 1.0;
-              interpolation_matrix(
-                GeometryInfo<dim>::lines_per_face * p + i + (j + p - 1) * p,
-                GeometryInfo<dim>::lines_per_face * q + i + (j + q - 1) * q) =
-                1.0;
+              interpolation_matrix(GeometryInfo<dim>::lines_per_face * p +
+                                     i * (p - 1) + j,
+                                   GeometryInfo<dim>::lines_per_face * q +
+                                     i * (q - 1) + j) = 1.0;
+              interpolation_matrix(GeometryInfo<dim>::lines_per_face * p + i +
+                                     (j + p - 1) * p,
+                                   GeometryInfo<dim>::lines_per_face * q + i +
+                                     (j + q - 1) * q) = 1.0;
             }
         }
     }
@@ -2592,12 +2642,15 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                         0.5 * (edge_quadrature_points[q_point](0) + subface));
                       const Point<dim> quadrature_point_1(
                         0.0, edge_quadrature_points[q_point](0));
-                      const double tmp = edge_quadrature.weight(q_point) *
-                                         (0.5 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 1) -
-                                          interpolation_matrix(0, dof) *
-                                            source_fe.shape_value_component(
-                                              0, quadrature_point_1, 1));
+                      const double tmp =
+                        edge_quadrature.weight(q_point) *
+                        (0.5 * this->shape_value_component(dof,
+                                                           quadrature_point_0,
+                                                           1) -
+                         interpolation_matrix(0, dof) *
+                           source_fe.shape_value_component(0,
+                                                           quadrature_point_1,
+                                                           1));
 
                       for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
                         system_rhs(i) +=
@@ -2618,8 +2671,10 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
 
       case 3:
         {
-          const double shifts[4][2] = {
-            {0.0, 0.0}, {1.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}};
+          const double shifts[4][2] = {{0.0, 0.0},
+                                       {1.0, 0.0},
+                                       {0.0, 1.0},
+                                       {1.0, 1.0}};
 
           for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
@@ -2719,24 +2774,28 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                              interpolation_matrix(i * source_fe.degree, dof) *
                                source_fe.shape_value_component(
                                  i * source_fe.degree, quadrature_point_1, 1));
-                          quadrature_point_0 = Point<dim>(
-                            0.5 * (edge_quadrature_points[q_point](0) +
-                                   shifts[subface][0]),
-                            0.5 * (i + shifts[subface][1]),
-                            0.0);
-                          quadrature_point_1 = Point<dim>(
-                            edge_quadrature_points[q_point](0), i, 0.0);
+                          quadrature_point_0 =
+                            Point<dim>(0.5 *
+                                         (edge_quadrature_points[q_point](0) +
+                                          shifts[subface][0]),
+                                       0.5 * (i + shifts[subface][1]),
+                                       0.0);
+                          quadrature_point_1 =
+                            Point<dim>(edge_quadrature_points[q_point](0),
+                                       i,
+                                       0.0);
                           tmp(i + 2) =
-                            weight * (0.5 * this->shape_value_component(
-                                              this->face_to_cell_index(dof, 4),
-                                              quadrature_point_0,
-                                              0) -
-                                      interpolation_matrix(
-                                        (i + 2) * source_fe.degree, dof) *
-                                        source_fe.shape_value_component(
-                                          (i + 2) * source_fe.degree,
-                                          quadrature_point_1,
-                                          0));
+                            weight *
+                            (0.5 * this->shape_value_component(
+                                     this->face_to_cell_index(dof, 4),
+                                     quadrature_point_0,
+                                     0) -
+                             interpolation_matrix((i + 2) * source_fe.degree,
+                                                  dof) *
+                               source_fe.shape_value_component(
+                                 (i + 2) * source_fe.degree,
+                                 quadrature_point_1,
+                                 0));
                         }
 
                       for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
@@ -2882,9 +2941,10 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                       {
                         if (std::abs(solution(i * (source_fe.degree - 1) + j,
                                               0)) > 1e-14)
-                          interpolation_matrix(
-                            i * (source_fe.degree - 1) + j + n_boundary_dofs,
-                            dof) = solution(i * (source_fe.degree - 1) + j, 0);
+                          interpolation_matrix(i * (source_fe.degree - 1) + j +
+                                                 n_boundary_dofs,
+                                               dof) =
+                            solution(i * (source_fe.degree - 1) + j, 0);
 
                         if (std::abs(solution(i * (source_fe.degree - 1) + j,
                                               1)) > 1e-14)
@@ -2911,14 +2971,16 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Prolongation matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Prolongation matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -2969,17 +3031,18 @@ FE_Nedelec<dim>::get_restriction_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-    ExcIndexRange(
-      child,
-      0,
-      GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Restriction matrices are only available for refined cells!"));
+  Assert(child <
+           GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(
+                         RefinementCase<dim>(refinement_case))));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -3040,9 +3103,9 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values.size() == this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(),
+                              this->n_components()));
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);

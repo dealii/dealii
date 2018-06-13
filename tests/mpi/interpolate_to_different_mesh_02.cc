@@ -83,27 +83,27 @@ private:
   unsigned int                              prob_number;
 };
 template <int dim>
-SeventhProblem<dim>::SeventhProblem(unsigned int prob_number) :
-  mpi_communicator(MPI_COMM_WORLD),
-  settings(
-    parallel::distributed::Triangulation<2, 2>::no_automatic_repartitioning),
-  triangulation(mpi_communicator,
-                typename Triangulation<dim>::MeshSmoothing(
-                  Triangulation<dim>::smoothing_on_refinement |
-                  Triangulation<dim>::smoothing_on_coarsening),
-                settings),
-  dof_handler(triangulation),
-  fe(2),
-  second_triangulation(mpi_communicator,
-                       typename Triangulation<dim>::MeshSmoothing(
-                         Triangulation<dim>::smoothing_on_refinement |
-                         Triangulation<dim>::smoothing_on_coarsening),
-                       settings),
-  second_dof_handler(second_triangulation),
-  second_fe(2),
-  pcout(deallog.get_file_stream(),
-        (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-  prob_number(prob_number)
+SeventhProblem<dim>::SeventhProblem(unsigned int prob_number)
+  : mpi_communicator(MPI_COMM_WORLD)
+  , settings(
+      parallel::distributed::Triangulation<2, 2>::no_automatic_repartitioning)
+  , triangulation(mpi_communicator,
+                  typename Triangulation<dim>::MeshSmoothing(
+                    Triangulation<dim>::smoothing_on_refinement |
+                    Triangulation<dim>::smoothing_on_coarsening),
+                  settings)
+  , dof_handler(triangulation)
+  , fe(2)
+  , second_triangulation(mpi_communicator,
+                         typename Triangulation<dim>::MeshSmoothing(
+                           Triangulation<dim>::smoothing_on_refinement |
+                           Triangulation<dim>::smoothing_on_coarsening),
+                         settings)
+  , second_dof_handler(second_triangulation)
+  , second_fe(2)
+  , pcout(deallog.get_file_stream(),
+          (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+  , prob_number(prob_number)
 {}
 
 template <int dim>
@@ -120,15 +120,18 @@ SeventhProblem<dim>::setup_system()
   dof_handler.distribute_dofs(fe);
   locally_owned_dofs = dof_handler.locally_owned_dofs();
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-  locally_relevant_solution.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  locally_relevant_solution.reinit(locally_owned_dofs,
+                                   locally_relevant_dofs,
+                                   mpi_communicator);
   system_rhs.reinit(locally_owned_dofs, mpi_communicator);
   system_rhs = 0;
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
   DynamicSparsityPattern csp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
@@ -137,8 +140,10 @@ SeventhProblem<dim>::setup_system()
     dof_handler.n_locally_owned_dofs_per_processor(),
     mpi_communicator,
     locally_relevant_dofs);
-  system_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  system_matrix.reinit(locally_owned_dofs,
+                       locally_owned_dofs,
+                       csp,
+                       mpi_communicator);
 }
 
 template <int dim>
@@ -149,10 +154,12 @@ SeventhProblem<dim>::setup_second_system()
   second_locally_owned_dofs = second_dof_handler.locally_owned_dofs();
   DoFTools::extract_locally_relevant_dofs(second_dof_handler,
                                           second_locally_relevant_dofs);
-  second_locally_relevant_solution.reinit(
-    second_locally_owned_dofs, second_locally_relevant_dofs, mpi_communicator);
-  interpolated_locally_relevant_solution.reinit(
-    second_locally_owned_dofs, second_locally_relevant_dofs, mpi_communicator);
+  second_locally_relevant_solution.reinit(second_locally_owned_dofs,
+                                          second_locally_relevant_dofs,
+                                          mpi_communicator);
+  interpolated_locally_relevant_solution.reinit(second_locally_owned_dofs,
+                                                second_locally_relevant_dofs,
+                                                mpi_communicator);
 }
 
 template <int dim>
@@ -215,8 +222,10 @@ SeventhProblem<dim>::solve()
   TrilinosWrappers::PreconditionAMG                 preconditioner;
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
   preconditioner.initialize(system_matrix, data);
-  solver.solve(
-    system_matrix, completely_distributed_solution, system_rhs, preconditioner);
+  solver.solve(system_matrix,
+               completely_distributed_solution,
+               system_rhs,
+               preconditioner);
   pcout << " Solved in " << solver_control.last_step() << " iterations."
         << std::endl;
   constraints.distribute(completely_distributed_solution);
@@ -279,9 +288,9 @@ SeventhProblem<dim>::run(unsigned int cycle)
 void
 seventh_grid()
 {
-  ConditionalOStream pcout(
-    deallog.get_file_stream(),
-    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0));
+  ConditionalOStream pcout(deallog.get_file_stream(),
+                           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) ==
+                            0));
 
   pcout << "7th Starting" << std::endl;
   SeventhProblem<2>  lap(1);

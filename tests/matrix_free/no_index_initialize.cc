@@ -62,9 +62,9 @@ class MatrixFreeTest
 public:
   bool read_vector;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) :
-    read_vector(false),
-    data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : read_vector(false)
+    , data(data_in){};
 
   void
   operator()(const MatrixFree<dim, Number> &data,

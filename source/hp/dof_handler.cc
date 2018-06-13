@@ -468,10 +468,12 @@ namespace internal
             // have on each level, allocate the memory. note that we
             // allocate offsets for all faces, though only the active
             // ones will have a non-invalid value later on
-            face_dof_offsets = std::vector<unsigned int>(
-              dof_handler.tria->n_raw_faces(), (unsigned int)(-1));
-            face_dof_indices = std::vector<types::global_dof_index>(
-              n_face_slots, numbers::invalid_dof_index);
+            face_dof_offsets =
+              std::vector<unsigned int>(dof_handler.tria->n_raw_faces(),
+                                        (unsigned int)(-1));
+            face_dof_indices =
+              std::vector<types::global_dof_index>(n_face_slots,
+                                                   numbers::invalid_dof_index);
 
             // with the memory now allocated, loop over the
             // dof_handler.cells again and prime the _offset values as
@@ -791,11 +793,11 @@ namespace internal
         static unsigned int
         max_couplings_between_dofs(const DoFHandler<1, spacedim> &dof_handler)
         {
-          return std::min(
-            static_cast<types::global_dof_index>(
-              3 * dof_handler.fe_collection.max_dofs_per_vertex() +
-              2 * dof_handler.fe_collection.max_dofs_per_line()),
-            dof_handler.n_dofs());
+          return std::min(static_cast<types::global_dof_index>(
+                            3 *
+                              dof_handler.fe_collection.max_dofs_per_vertex() +
+                            2 * dof_handler.fe_collection.max_dofs_per_line()),
+                          dof_handler.n_dofs());
         }
 
 
@@ -929,8 +931,9 @@ namespace internal
                   active_fe_indices[cell->active_cell_index()] =
                     cell->active_fe_index();
 
-              Utilities::MPI::sum(
-                active_fe_indices, tr->get_communicator(), active_fe_indices);
+              Utilities::MPI::sum(active_fe_indices,
+                                  tr->get_communicator(),
+                                  active_fe_indices);
 
               // now go back and fill the active_fe_index on ghost
               // cells. we would like to call cell->set_active_fe_index(),
@@ -976,8 +979,9 @@ namespace internal
 
               GridTools::exchange_cell_data_to_ghosts<
                 unsigned int,
-                dealii::hp::DoFHandler<dim, spacedim>>(
-                dof_handler, pack, unpack);
+                dealii::hp::DoFHandler<dim, spacedim>>(dof_handler,
+                                                       pack,
+                                                       unpack);
             }
           else
             {
@@ -1008,17 +1012,17 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  DoFHandler<dim, spacedim>::DoFHandler() :
-    tria(nullptr, typeid(*this).name()),
-    faces(nullptr)
+  DoFHandler<dim, spacedim>::DoFHandler()
+    : tria(nullptr, typeid(*this).name())
+    , faces(nullptr)
   {}
 
 
   template <int dim, int spacedim>
   DoFHandler<dim, spacedim>::DoFHandler(
-    const Triangulation<dim, spacedim> &tria) :
-    tria(&tria, typeid(*this).name()),
-    faces(nullptr)
+    const Triangulation<dim, spacedim> &tria)
+    : tria(&tria, typeid(*this).name())
+    , faces(nullptr)
   {
     setup_policy_and_listeners();
 
@@ -1390,9 +1394,9 @@ namespace hp
     // cover all fe indices presently in use on the mesh
     for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
       if (cell->is_locally_owned())
-        Assert(
-          cell->active_fe_index() < fe_collection.size(),
-          ExcInvalidFEIndex(cell->active_fe_index(), fe_collection.size()));
+        Assert(cell->active_fe_index() < fe_collection.size(),
+               ExcInvalidFEIndex(cell->active_fe_index(),
+                                 fe_collection.size()));
 
 
     // then allocate space for all the other tables
@@ -1471,12 +1475,12 @@ namespace hp
         std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
                                  Sequential<DoFHandler<dim, spacedim>>>(*this);
 
-    tria_listeners.push_back(
-      this->tria->signals.pre_refinement.connect(std::bind(
-        &DoFHandler<dim, spacedim>::pre_refinement_action, std::ref(*this))));
-    tria_listeners.push_back(
-      this->tria->signals.post_refinement.connect(std::bind(
-        &DoFHandler<dim, spacedim>::post_refinement_action, std::ref(*this))));
+    tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
+      std::bind(&DoFHandler<dim, spacedim>::pre_refinement_action,
+                std::ref(*this))));
+    tria_listeners.push_back(this->tria->signals.post_refinement.connect(
+      std::bind(&DoFHandler<dim, spacedim>::post_refinement_action,
+                std::ref(*this))));
     tria_listeners.push_back(this->tria->signals.create.connect(std::bind(
       &DoFHandler<dim, spacedim>::post_refinement_action, std::ref(*this))));
   }
@@ -1497,9 +1501,9 @@ namespace hp
   DoFHandler<dim, spacedim>::renumber_dofs(
     const std::vector<types::global_dof_index> &new_numbers)
   {
-    Assert(
-      levels.size() > 0,
-      ExcMessage("You need to distribute DoFs before you can renumber them."));
+    Assert(levels.size() > 0,
+           ExcMessage(
+             "You need to distribute DoFs before you can renumber them."));
 
     AssertDimension(new_numbers.size(), n_locally_owned_dofs());
 
@@ -1658,11 +1662,12 @@ namespace hp
         // store refinement cases, so use the 'children' vector
         // instead
         if (dim == 1)
-          std::transform(
-            tria->levels[i]->cells.children.begin(),
-            tria->levels[i]->cells.children.end(),
-            has_children_level->begin(),
-            std::bind(std::not_equal_to<int>(), std::placeholders::_1, -1));
+          std::transform(tria->levels[i]->cells.children.begin(),
+                         tria->levels[i]->cells.children.end(),
+                         has_children_level->begin(),
+                         std::bind(std::not_equal_to<int>(),
+                                   std::placeholders::_1,
+                                   -1));
         else
           std::transform(tria->levels[i]->cells.refinement_cases.begin(),
                          tria->levels[i]->cells.refinement_cases.end(),

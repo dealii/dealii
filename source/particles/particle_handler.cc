@@ -29,18 +29,18 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   template <int dim, int spacedim>
-  ParticleHandler<dim, spacedim>::ParticleHandler() :
-    triangulation(),
-    particles(),
-    ghost_particles(),
-    global_number_of_particles(0),
-    global_max_particles_per_cell(0),
-    next_free_particle_index(0),
-    property_pool(new PropertyPool(0)),
-    size_callback(),
-    store_callback(),
-    load_callback(),
-    handle(numbers::invalid_unsigned_int)
+  ParticleHandler<dim, spacedim>::ParticleHandler()
+    : triangulation()
+    , particles()
+    , ghost_particles()
+    , global_number_of_particles(0)
+    , global_max_particles_per_cell(0)
+    , next_free_particle_index(0)
+    , property_pool(new PropertyPool(0))
+    , size_callback()
+    , store_callback()
+    , load_callback()
+    , handle(numbers::invalid_unsigned_int)
   {}
 
 
@@ -49,19 +49,19 @@ namespace Particles
   ParticleHandler<dim, spacedim>::ParticleHandler(
     const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &                             mapping,
-    const unsigned int                                         n_properties) :
-    triangulation(&triangulation, typeid(*this).name()),
-    mapping(&mapping, typeid(*this).name()),
-    particles(),
-    ghost_particles(),
-    global_number_of_particles(0),
-    global_max_particles_per_cell(0),
-    next_free_particle_index(0),
-    property_pool(new PropertyPool(n_properties)),
-    size_callback(),
-    store_callback(),
-    load_callback(),
-    handle(numbers::invalid_unsigned_int)
+    const unsigned int                                         n_properties)
+    : triangulation(&triangulation, typeid(*this).name())
+    , mapping(&mapping, typeid(*this).name())
+    , particles()
+    , ghost_particles()
+    , global_number_of_particles(0)
+    , global_max_particles_per_cell(0)
+    , next_free_particle_index(0)
+    , property_pool(new PropertyPool(n_properties))
+    , size_callback()
+    , store_callback()
+    , load_callback()
+    , handle(numbers::invalid_unsigned_int)
   {}
 
 
@@ -135,14 +135,16 @@ namespace Particles
           std::max(local_max_particles_per_cell, current_particles_per_cell);
       }
 
-    global_number_of_particles = dealii::Utilities::MPI::sum(
-      particles.size(), triangulation->get_communicator());
+    global_number_of_particles =
+      dealii::Utilities::MPI::sum(particles.size(),
+                                  triangulation->get_communicator());
     next_free_particle_index =
       dealii::Utilities::MPI::max(locally_highest_index,
                                   triangulation->get_communicator()) +
       1;
-    global_max_particles_per_cell = dealii::Utilities::MPI::max(
-      local_max_particles_per_cell, triangulation->get_communicator());
+    global_max_particles_per_cell =
+      dealii::Utilities::MPI::max(local_max_particles_per_cell,
+                                  triangulation->get_communicator());
   }
 
 
@@ -273,8 +275,9 @@ namespace Particles
   {
     typename std::multimap<internal::LevelInd,
                            Particle<dim, spacedim>>::iterator it =
-      particles.insert(std::make_pair(
-        internal::LevelInd(cell->level(), cell->index()), particle));
+      particles.insert(
+        std::make_pair(internal::LevelInd(cell->level(), cell->index()),
+                       particle));
 
     particle_iterator particle_it(particles, it);
     particle_it->set_property_pool(*property_pool);
@@ -356,11 +359,11 @@ namespace Particles
           {
             hint = particles.insert(
               hint,
-              std::make_pair(
-                current_cell,
-                Particle<dim, spacedim>(positions[index_map[i][p]],
-                                        local_positions[i][p],
-                                        local_start_index + index_map[i][p])));
+              std::make_pair(current_cell,
+                             Particle<dim, spacedim>(positions[index_map[i][p]],
+                                                     local_positions[i][p],
+                                                     local_start_index +
+                                                       index_map[i][p])));
           }
       }
 
@@ -563,8 +566,9 @@ namespace Particles
 
       // Create a corresponding map of vectors from vertex to cell center
       const std::vector<std::vector<Tensor<1, spacedim>>>
-        vertex_to_cell_centers(GridTools::vertex_to_cell_centers_directions(
-          *triangulation, vertex_to_cells));
+        vertex_to_cell_centers(
+          GridTools::vertex_to_cell_centers_directions(*triangulation,
+                                                       vertex_to_cells));
 
       std::vector<unsigned int> neighbor_permutation;
 
@@ -600,14 +604,14 @@ namespace Particles
           for (unsigned int i = 0; i < n_neighbor_cells; ++i)
             neighbor_permutation[i] = i;
 
-          std::sort(
-            neighbor_permutation.begin(),
-            neighbor_permutation.end(),
-            std::bind(&compare_particle_association<spacedim>,
-                      std::placeholders::_1,
-                      std::placeholders::_2,
-                      std::cref(vertex_to_particle),
-                      std::cref(vertex_to_cell_centers[closest_vertex_index])));
+          std::sort(neighbor_permutation.begin(),
+                    neighbor_permutation.end(),
+                    std::bind(&compare_particle_association<spacedim>,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::cref(vertex_to_particle),
+                              std::cref(
+                                vertex_to_cell_centers[closest_vertex_index])));
 
           // Search all of the cells adjacent to the closest vertex of the
           // previous cell Most likely we will find the particle in them.
@@ -989,14 +993,15 @@ namespace Particles
             Particle<dim, spacedim>(recv_data_it, property_pool.get())));
 
         if (load_callback)
-          recv_data_it = load_callback(
-            particle_iterator(received_particles, recv_particle), recv_data_it);
+          recv_data_it =
+            load_callback(particle_iterator(received_particles, recv_particle),
+                          recv_data_it);
       }
 
-    AssertThrow(
-      recv_data_it == recv_data.data() + recv_data.size(),
-      ExcMessage("The amount of data that was read into new particles "
-                 "does not match the amount of data sent around."));
+    AssertThrow(recv_data_it == recv_data.data() + recv_data.size(),
+                ExcMessage(
+                  "The amount of data that was read into new particles "
+                  "does not match the amount of data sent around."));
   }
 #  endif
 
@@ -1033,10 +1038,10 @@ namespace Particles
 
     if (global_max_particles_per_cell > 0)
       {
-        const std::function<void(
-          const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const typename Triangulation<dim, spacedim>::CellStatus,
-          void *)>
+        const std::function<
+          void(const typename Triangulation<dim, spacedim>::cell_iterator &,
+               const typename Triangulation<dim, spacedim>::CellStatus,
+               void *)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::store_particles,
                       std::cref(*this),
@@ -1063,8 +1068,9 @@ namespace Particles
           (size_per_particle * global_max_particles_per_cell) *
             (serialization ? 1 : std::pow(2, dim));
 
-        handle = non_const_triangulation->register_data_attach(
-          transfer_size_per_cell, callback_function);
+        handle =
+          non_const_triangulation->register_data_attach(transfer_size_per_cell,
+                                                        callback_function);
       }
   }
 
@@ -1090,10 +1096,10 @@ namespace Particles
     // data correctly. Only do this if something was actually stored.
     if (serialization && (global_max_particles_per_cell > 0))
       {
-        const std::function<void(
-          const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const typename Triangulation<dim, spacedim>::CellStatus,
-          void *)>
+        const std::function<
+          void(const typename Triangulation<dim, spacedim>::cell_iterator &,
+               const typename Triangulation<dim, spacedim>::CellStatus,
+               void *)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::store_particles,
                       std::cref(*this),
@@ -1116,17 +1122,18 @@ namespace Particles
         const std::size_t transfer_size_per_cell =
           sizeof(unsigned int) +
           (size_per_particle * global_max_particles_per_cell);
-        handle = non_const_triangulation->register_data_attach(
-          transfer_size_per_cell, callback_function);
+        handle =
+          non_const_triangulation->register_data_attach(transfer_size_per_cell,
+                                                        callback_function);
       }
 
     // Check if something was stored and load it
     if (handle != numbers::invalid_unsigned_int)
       {
-        const std::function<void(
-          const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const typename Triangulation<dim, spacedim>::CellStatus,
-          const void *)>
+        const std::function<
+          void(const typename Triangulation<dim, spacedim>::cell_iterator &,
+               const typename Triangulation<dim, spacedim>::CellStatus,
+               const void *)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::load_particles,
                       std::ref(*this),
@@ -1255,9 +1262,9 @@ namespace Particles
 #  else
             position_hint = particles.insert(
               position_hint,
-              std::make_pair(
-                std::make_pair(cell->level(), cell->index()),
-                Particle<dim, spacedim>(pdata, property_pool.get())));
+              std::make_pair(std::make_pair(cell->level(), cell->index()),
+                             Particle<dim, spacedim>(pdata,
+                                                     property_pool.get())));
 #  endif
             ++position_hint;
           }
@@ -1283,9 +1290,9 @@ namespace Particles
 #  else
             position_hint = particles.insert(
               position_hint,
-              std::make_pair(
-                std::make_pair(cell->level(), cell->index()),
-                Particle<dim, spacedim>(pdata, property_pool.get())));
+              std::make_pair(std::make_pair(cell->level(), cell->index()),
+                             Particle<dim, spacedim>(pdata,
+                                                     property_pool.get())));
 #  endif
             const Point<dim> p_unit = mapping->transform_real_to_unit_cell(
               cell, position_hint->second.get_location());
@@ -1333,10 +1340,11 @@ namespace Particles
                         // compilers that report a -std=c++11 (like gcc 4.6)
                         // implement it, so require C++14 instead.
 #  ifdef DEAL_II_WITH_CXX14
-                        position_hints[child_index] = particles.emplace_hint(
-                          position_hints[child_index],
-                          std::make_pair(child->level(), child->index()),
-                          std::move(p));
+                        position_hints[child_index] =
+                          particles.emplace_hint(position_hints[child_index],
+                                                 std::make_pair(child->level(),
+                                                                child->index()),
+                                                 std::move(p));
 #  else
                         position_hints[child_index] = particles.insert(
                           position_hints[child_index],

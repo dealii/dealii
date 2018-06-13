@@ -65,7 +65,8 @@ public:
   typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
   typedef double                                         Number;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in)
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in)
   {}
 
   void
@@ -75,10 +76,14 @@ public:
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number>                            vector_t;
-    FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(
-      data, 0, 0, 0);
-    FEEvaluation<dim, degree_p, degree_p + 2, 1, Number> pressure(
-      data, 0, 0, dim);
+    FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(data,
+                                                                        0,
+                                                                        0,
+                                                                        0);
+    FEEvaluation<dim, degree_p, degree_p + 2, 1, Number>       pressure(data,
+                                                                  0,
+                                                                  0,
+                                                                  dim);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -116,8 +121,10 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &MatrixFreeTest<dim, degree_p, VectorType>::local_apply, this, dst, src);
+    data.cell_loop(&MatrixFreeTest<dim, degree_p, VectorType>::local_apply,
+                   this,
+                   dst,
+                   src);
   };
 
 private:
@@ -157,13 +164,16 @@ test()
   no_normal_flux_boundaries.insert(0);
   no_normal_flux_boundaries.insert(1);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::compute_normal_flux_constraints(
-    dof_handler, 0, no_normal_flux_boundaries, constraints);
+  VectorTools::compute_normal_flux_constraints(dof_handler,
+                                               0,
+                                               no_normal_flux_boundaries,
+                                               constraints);
   constraints.close();
 
   std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(
-    dof_handler, dofs_per_block, stokes_sub_blocks);
+  DoFTools::count_dofs_per_block(dof_handler,
+                                 dofs_per_block,
+                                 stokes_sub_blocks);
   {
     BlockDynamicSparsityPattern csp(2, 2);
 
@@ -235,8 +245,9 @@ test()
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
   }
 

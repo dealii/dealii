@@ -53,10 +53,11 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
-  std::vector<types::global_dof_index> indices;
-  std::vector<double>                  values;
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
+  std::vector<types::global_dof_index>       indices;
+  std::vector<double>                        values;
 
   // set local values
   if (myid < 8)

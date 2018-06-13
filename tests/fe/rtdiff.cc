@@ -95,10 +95,12 @@ compare_shapes(const FiniteElement<dim> &other,
   QGauss<dim>      quadrature(other.degree + 1);
   Table<3, double> other_values(quadrature.size(), other.dofs_per_cell, dim);
   Table<3, double> nodes_values(quadrature.size(), other.dofs_per_cell, dim);
-  Table<3, Tensor<1, dim>> other_grads(
-    quadrature.size(), other.dofs_per_cell, dim);
-  Table<3, Tensor<1, dim>> nodes_grads(
-    quadrature.size(), other.dofs_per_cell, dim);
+  Table<3, Tensor<1, dim>> other_grads(quadrature.size(),
+                                       other.dofs_per_cell,
+                                       dim);
+  Table<3, Tensor<1, dim>> nodes_grads(quadrature.size(),
+                                       other.dofs_per_cell,
+                                       dim);
   for (unsigned int k = 0; k < quadrature.size(); ++k)
     for (unsigned int i = 0; i < other.dofs_per_cell; ++i)
       for (unsigned int d = 0; d < dim; ++d)

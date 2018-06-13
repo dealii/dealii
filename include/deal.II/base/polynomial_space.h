@@ -269,11 +269,11 @@ PolynomialSpace<3>::compute_index(const unsigned int n) const;
 
 template <int dim>
 template <class Pol>
-PolynomialSpace<dim>::PolynomialSpace(const std::vector<Pol> &pols) :
-  polynomials(pols.begin(), pols.end()),
-  n_pols(compute_n_pols(polynomials.size())),
-  index_map(n_pols),
-  index_map_inverse(n_pols)
+PolynomialSpace<dim>::PolynomialSpace(const std::vector<Pol> &pols)
+  : polynomials(pols.begin(), pols.end())
+  , n_pols(compute_n_pols(polynomials.size()))
+  , index_map(n_pols)
+  , index_map_inverse(n_pols)
 {
   // per default set this index map
   // to identity. This map can be

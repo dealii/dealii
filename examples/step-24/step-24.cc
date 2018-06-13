@@ -139,7 +139,8 @@ namespace Step24
   class InitialValuesP : public Function<dim>
   {
   public:
-    InitialValuesP() : Function<dim>()
+    InitialValuesP()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -148,7 +149,9 @@ namespace Step24
   private:
     struct Source
     {
-      Source(const Point<dim> &l, const double r) : location(l), radius(r)
+      Source(const Point<dim> &l, const double r)
+        : location(l)
+        , radius(r)
       {}
 
       const Point<dim> location;
@@ -186,14 +189,14 @@ namespace Step24
   // i.e. theta is set to 0.5. The time step is later selected to satisfy $k =
   // \frac hc$: here we initialize it to an invalid number.
   template <int dim>
-  TATForwardProblem<dim>::TATForwardProblem() :
-    fe(1),
-    dof_handler(triangulation),
-    time_step(std::numeric_limits<double>::quiet_NaN()),
-    time(time_step),
-    timestep_number(1),
-    theta(0.5),
-    wave_speed(1.437)
+  TATForwardProblem<dim>::TATForwardProblem()
+    : fe(1)
+    , dof_handler(triangulation)
+    , time_step(std::numeric_limits<double>::quiet_NaN())
+    , time(time_step)
+    , timestep_number(1)
+    , theta(0.5)
+    , wave_speed(1.437)
   {
     // The second task in the constructor is to initialize the array that
     // holds the detector locations. The results of this program were compared
@@ -287,8 +290,9 @@ namespace Step24
     laplace_matrix.reinit(sparsity_pattern);
 
     MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(3), laplace_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler,
+                                         QGauss<dim>(3),
+                                         laplace_matrix);
 
     // The second difference, as mentioned, to step-23 is that we need to
     // build the boundary mass matrix that grew out of the absorbing boundary
@@ -333,8 +337,9 @@ namespace Step24
     // domain. Like this:
     {
       const QGauss<dim - 1> quadrature_formula(3);
-      FEFaceValues<dim>     fe_values(
-        fe, quadrature_formula, update_values | update_JxW_values);
+      FEFaceValues<dim>     fe_values(fe,
+                                  quadrature_formula,
+                                  update_values | update_JxW_values);
 
       const unsigned int dofs_per_cell = fe.dofs_per_cell;
       const unsigned int n_q_points    = quadrature_formula.size();
@@ -519,8 +524,9 @@ namespace Step24
         detector_data << time;
         for (unsigned int i = 0; i < detector_locations.size(); ++i)
           detector_data << " "
-                        << VectorTools::point_value(
-                             dof_handler, solution_p, detector_locations[i])
+                        << VectorTools::point_value(dof_handler,
+                                                    solution_p,
+                                                    detector_locations[i])
                         << " ";
         detector_data << std::endl;
 

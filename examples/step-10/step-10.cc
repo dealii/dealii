@@ -343,9 +343,11 @@ namespace Step10
         // Then we create a FEFaceValues object instead of a FEValues object
         // as in the previous function. Again, we pass a mapping as first
         // argument.
-        FEFaceValues<dim> fe_face_values(
-          mapping, fe, quadrature, update_JxW_values);
-        ConvergenceTable table;
+        FEFaceValues<dim> fe_face_values(mapping,
+                                         fe,
+                                         quadrature,
+                                         update_JxW_values);
+        ConvergenceTable  table;
 
         for (unsigned int refinement = 0; refinement < 6;
              ++refinement, triangulation.refine_global(1))

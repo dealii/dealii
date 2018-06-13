@@ -58,8 +58,9 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof1, locally_relevant_dofs1);
   DoFTools::extract_locally_relevant_dofs(dof2, locally_relevant_dofs2);
 
-  LinearAlgebra::distributed::Vector<double> v1(
-    dof1.locally_owned_dofs(), locally_relevant_dofs1, MPI_COMM_WORLD),
+  LinearAlgebra::distributed::Vector<double> v1(dof1.locally_owned_dofs(),
+                                                locally_relevant_dofs1,
+                                                MPI_COMM_WORLD),
     v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD);
 
   // set first vector to 1

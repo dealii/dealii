@@ -152,8 +152,9 @@ namespace CUDAWrappers
                            n_q_points_1d,
                            Number>::values(const Number *in, Number *out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(
-        global_shape_values, in, out);
+      apply<direction, dof_to_quad, add, in_place>(global_shape_values,
+                                                   in,
+                                                   out);
     }
 
 
@@ -168,8 +169,9 @@ namespace CUDAWrappers
                            Number>::gradients(const Number *in,
                                               Number *      out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(
-        global_shape_gradients, in, out);
+      apply<direction, dof_to_quad, add, in_place>(global_shape_gradients,
+                                                   in,
+                                                   out);
     }
 
 

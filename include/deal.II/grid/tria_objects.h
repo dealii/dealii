@@ -673,11 +673,11 @@ namespace internal
 
 
     template <typename G>
-    inline TriaObjects<G>::TriaObjects() :
-      next_free_single(numbers::invalid_unsigned_int),
-      next_free_pair(numbers::invalid_unsigned_int),
-      reverse_order_next_free_single(false),
-      user_data_type(data_unknown)
+    inline TriaObjects<G>::TriaObjects()
+      : next_free_single(numbers::invalid_unsigned_int)
+      , next_free_pair(numbers::invalid_unsigned_int)
+      , reverse_order_next_free_single(false)
+      , user_data_type(data_unknown)
     {}
 
 
@@ -765,10 +765,11 @@ namespace internal
     TriaObjectsHex::face_orientation(const unsigned int cell,
                                      const unsigned int face) const
     {
-      Assert(
-        cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
-        ExcIndexRange(
-          0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));
+      Assert(cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
+             ExcIndexRange(0,
+                           cell,
+                           face_orientations.size() /
+                             GeometryInfo<3>::faces_per_cell));
       Assert(face < GeometryInfo<3>::faces_per_cell,
              ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
 

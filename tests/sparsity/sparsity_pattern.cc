@@ -85,8 +85,10 @@ main()
         sparsity.back().insert(p->column());
     };
   SparsityPattern sp4;
-  sp4.copy_from(
-    (N - 1) * (N - 1), (N - 1) * (N - 1), sparsity.begin(), sparsity.end());
+  sp4.copy_from((N - 1) * (N - 1),
+                (N - 1) * (N - 1),
+                sparsity.begin(),
+                sparsity.end());
 
   // now check for equivalence of sp3 and sp4
   for (unsigned int row = 0; row < sp3.n_rows(); ++row)
@@ -110,9 +112,9 @@ main()
       const SparsityPattern &sp =
         (loop == 1 ? sp1 : (loop == 2 ? sp2 : (loop == 3 ? sp3 : sp4)));
       for (unsigned int i = 0; i < sp.n_nonzero_elements(); ++i)
-        AssertThrow(
-          sp(sp.matrix_position(i).first, sp.matrix_position(i).second) == i,
-          ExcInternalError());
+        AssertThrow(sp(sp.matrix_position(i).first,
+                       sp.matrix_position(i).second) == i,
+                    ExcInternalError());
       for (types::global_dof_index row = 0; row < sp.n_rows(); ++row)
         for (types::global_dof_index col = 0; col < sp.n_cols(); ++col)
           if (sp(row, col) != SparsityPattern::invalid_entry)

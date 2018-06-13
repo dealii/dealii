@@ -341,12 +341,12 @@ namespace MGTools
                ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
         Assert(couplings.n_cols() == fe.n_components(),
                ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-        Assert(
-          flux_couplings.n_rows() == fe.n_components(),
-          ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
-        Assert(
-          flux_couplings.n_cols() == fe.n_components(),
-          ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+        Assert(flux_couplings.n_rows() == fe.n_components(),
+               ExcDimensionMismatch(flux_couplings.n_rows(),
+                                    fe.n_components()));
+        Assert(flux_couplings.n_cols() == fe.n_components(),
+               ExcDimensionMismatch(flux_couplings.n_cols(),
+                                    fe.n_components()));
 
         cell_indices.resize(fe.dofs_per_cell);
         cell->get_mg_dof_indices(cell_indices);
@@ -1241,8 +1241,10 @@ namespace MGTools
 
         // next count what we got
         for (unsigned int block = 0; block < fe.n_blocks(); ++block)
-          dofs_per_block[l][target_block[block]] += std::count(
-            dofs_in_block[block].begin(), dofs_in_block[block].end(), true);
+          dofs_per_block[l][target_block[block]] +=
+            std::count(dofs_in_block[block].begin(),
+                       dofs_in_block[block].end(),
+                       true);
       }
   }
 
@@ -1485,8 +1487,9 @@ namespace MGTools
           continue;
 
         std::fill(cell_dofs.begin(), cell_dofs.end(), false);
-        std::fill(
-          cell_dofs_interface.begin(), cell_dofs_interface.end(), false);
+        std::fill(cell_dofs_interface.begin(),
+                  cell_dofs_interface.end(),
+                  false);
 
         for (unsigned int face_nr = 0;
              face_nr < GeometryInfo<dim>::faces_per_cell;

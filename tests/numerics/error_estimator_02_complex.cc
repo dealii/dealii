@@ -65,9 +65,9 @@ private:
 };
 
 template <int dim>
-MyFunction<dim>::MyFunction(const double k) :
-  dealii::Function<dim, std::complex<double>>(1),
-  k(k)
+MyFunction<dim>::MyFunction(const double k)
+  : dealii::Function<dim, std::complex<double>>(1)
+  , k(k)
 {}
 
 template <int dim>
@@ -109,9 +109,9 @@ private:
 };
 
 template <int dim>
-NeumanBC<dim>::NeumanBC(const double c) :
-  dealii::Function<dim, std::complex<double>>(1),
-  c(c)
+NeumanBC<dim>::NeumanBC(const double c)
+  : dealii::Function<dim, std::complex<double>>(1)
+  , c(c)
 {}
 
 template <int dim>
@@ -562,8 +562,8 @@ public:
 };
 
 template <int dim>
-MySecondFunction<dim>::MySecondFunction() :
-  dealii::Function<dim, std::complex<double>>(1)
+MySecondFunction<dim>::MySecondFunction()
+  : dealii::Function<dim, std::complex<double>>(1)
 {}
 
 template <int dim>
@@ -576,8 +576,9 @@ MySecondFunction<dim>::value(const dealii::Point<dim> &point,
   Assert(dim > 1, dealii::ExcNotImplemented());
   const double &y = point[1];
 
-  return std::complex<double>(
-    0, (1. - x) * (1. - y) * (1. - y) + std::pow(1.0 - y, 4) * std::exp(-x));
+  return std::complex<double>(0,
+                              (1. - x) * (1. - y) * (1. - y) +
+                                std::pow(1.0 - y, 4) * std::exp(-x));
 }
 
 template <int dim>

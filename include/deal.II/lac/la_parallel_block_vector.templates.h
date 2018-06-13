@@ -89,8 +89,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    BlockVector<Number>::BlockVector(const BlockVector<Number> &v) :
-      BlockVectorBase<Vector<Number>>()
+    BlockVector<Number>::BlockVector(const BlockVector<Number> &v)
+      : BlockVectorBase<Vector<Number>>()
     {
       this->components.resize(v.n_blocks());
       this->block_indices = v.block_indices;
@@ -571,8 +571,9 @@ namespace LinearAlgebra
       // query). this is the same in all the functions below
       int local_result = -1;
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        local_result = std::max(
-          local_result, -static_cast<int>(this->block(i).all_zero_local()));
+        local_result =
+          std::max(local_result,
+                   -static_cast<int>(this->block(i).all_zero_local()));
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return -Utilities::MPI::max(
@@ -891,8 +892,9 @@ namespace LinearAlgebra
               matrix(i, j) = this->block(i).inner_product_local(V.block(j));
         }
 
-      Utilities::MPI::sum(
-        matrix, this->block(0).get_mpi_communicator(), matrix);
+      Utilities::MPI::sum(matrix,
+                          this->block(0).get_mpi_communicator(),
+                          matrix);
     }
 
 

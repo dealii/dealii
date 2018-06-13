@@ -71,7 +71,8 @@ template <int dim>
 class TestMap1 : public Function<dim>
 {
 public:
-  TestMap1(const unsigned int n_components) : Function<dim>(n_components)
+  TestMap1(const unsigned int n_components)
+    : Function<dim>(n_components)
   {}
 
   virtual ~TestMap1()
@@ -564,8 +565,9 @@ project(const Mapping<dim> &    mapping,
 
   // set up mass matrix and right hand side
   vec.reinit(dof.n_dofs());
-  SparsityPattern sparsity(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern sparsity(dof.n_dofs(),
+                           dof.n_dofs(),
+                           dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, sparsity);
   constraints.condense(sparsity);
 

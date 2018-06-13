@@ -95,8 +95,9 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   vector.reinit(partitioning);
 
   // Assemble system: Mass matrix and constrant RHS vector
-  FEValues<dim> fe_values(
-    fe, quadrature_formula, update_values | update_JxW_values);
+  FEValues<dim>      fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_JxW_values);
   const unsigned int n_q_points = quadrature_formula.size();
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -219,19 +220,19 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       // TrilinosWrappers::SparseMatrix::vmult
       out_lo_pyld                  = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
-      AssertDimension(
-        b_local_size,
-        static_cast<size_type>(lo_A.OperatorDomainMap().NumMyPoints()));
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(
+                        lo_A.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(
+                                           out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
+      AssertDimension(b_local_size,
+                      static_cast<size_type>(
+                        lo_A.OperatorDomainMap().NumMyPoints()));
       PayloadVectorType tril_b_pyld(View,
                                     lo_A.OperatorDomainMap(),
                                     const_cast<TrilinosScalar *>(b.begin()),
@@ -289,19 +290,19 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       // Lastly we test functionality added by the Payload
       out_lo_pyld                  = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A_T.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A_T.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
-      AssertDimension(
-        b_local_size,
-        static_cast<size_type>(lo_A_T.OperatorDomainMap().NumMyPoints()));
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(
+                        lo_A_T.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A_T.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(
+                                           out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
+      AssertDimension(b_local_size,
+                      static_cast<size_type>(
+                        lo_A_T.OperatorDomainMap().NumMyPoints()));
       PayloadVectorType tril_b_pyld(View,
                                     lo_A_T.OperatorDomainMap(),
                                     const_cast<TrilinosScalar *>(b.begin()),
@@ -366,16 +367,16 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       const auto lo_A_T_x_lo_A = lo_A_T * lo_A; // Construct composite operator
       out_lo_pyld              = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A_T_x_lo_A.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A_T_x_lo_A.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(
+                        lo_A_T_x_lo_A.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A_T_x_lo_A.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(
+                                           out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
       AssertDimension(b_local_size,
                       static_cast<size_type>(
                         lo_A_T_x_lo_A.OperatorDomainMap().NumMyPoints()));
@@ -445,16 +446,16 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
         transpose_operator(lo_A * lo_A_T); // Construct composite operator
       out_lo_pyld                  = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A_x_lo_A_T.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A_x_lo_A_T.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(
+                        lo_A_x_lo_A_T.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A_x_lo_A_T.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(
+                                           out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
       AssertDimension(b_local_size,
                       static_cast<size_type>(
                         lo_A_x_lo_A_T.OperatorDomainMap().NumMyPoints()));

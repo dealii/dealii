@@ -159,8 +159,9 @@ assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  info_box.initialize_gauss_quadrature(n_gauss_points,
+                                       n_gauss_points,
+                                       n_gauss_points);
   info_box.initialize_update_flags();
   UpdateFlags update_flags = update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
@@ -198,8 +199,9 @@ assemble(const DoFHandler<dim> &             dof_handler,
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  info_box.initialize_gauss_quadrature(n_gauss_points,
+                                       n_gauss_points,
+                                       n_gauss_points);
   info_box.initialize_update_flags();
   UpdateFlags update_flags = update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);

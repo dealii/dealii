@@ -149,7 +149,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>(dim)
+  BoundaryValues()
+    : Function<dim>(dim)
   {}
 
   virtual void
@@ -194,9 +195,9 @@ public:
 };
 
 template <int dim>
-ConstrainValues<dim>::ConstrainValues() :
-  Function<dim>(dim) /*pass down to the main class the number of components of
-                        the function*/
+ConstrainValues<dim>::ConstrainValues()
+  : Function<dim>(dim) /*pass down to the main class the number of components of
+                          the function*/
 {}
 
 template <int dim>
@@ -232,29 +233,30 @@ ConstrainValues<dim>::vector_value_list(
 
 /* constructor*/
 template <int dim>
-ElasticProblem<dim>::ElasticProblem() :
-  n_blocks(2),
-  n_components(dim * n_blocks),
-  first_u_comp(0),
-  first_lamda_comp(dim),
-  degree(1),
-  dofs_per_block(n_blocks),
-  dof_handler(triangulation), /*assotiate dof_handler to the triangulation */
+ElasticProblem<dim>::ElasticProblem()
+  : n_blocks(2)
+  , n_components(dim * n_blocks)
+  , first_u_comp(0)
+  , first_lamda_comp(dim)
+  , degree(1)
+  , dofs_per_block(n_blocks)
+  , dof_handler(triangulation)
+  , /*assotiate dof_handler to the triangulation */
   elasticity_fe(
     FE_Q<dim>(degree),
     dim, // use dim FE_Q of a given degree to represent displacements
     FE_Nothing<dim>(),
     dim // zero extension of lagrange multipliers elsewhere in the domain
-    ),
-  elasticity_w_lagrange_fe(FE_Q<dim>(degree),
-                           dim,
-                           FE_Q<dim>(degree),
-                           dim // same for lagrange multipliers
-                           ),
-  u_fe(first_u_comp),
-  lamda_fe(first_lamda_comp),
-  id_of_lagrange_mult(1),
-  beta1(1.0)
+    )
+  , elasticity_w_lagrange_fe(FE_Q<dim>(degree),
+                             dim,
+                             FE_Q<dim>(degree),
+                             dim // same for lagrange multipliers
+                             )
+  , u_fe(first_u_comp)
+  , lamda_fe(first_lamda_comp)
+  , id_of_lagrange_mult(1)
+  , beta1(1.0)
 {
   fe.push_back(elasticity_fe);            // FE index 0
   fe.push_back(elasticity_w_lagrange_fe); // FE index 1
@@ -279,10 +281,12 @@ ElasticProblem<dim>::make_grid()
 {
   Triangulation<dim> triangulationL;
   Triangulation<dim> triangulationR;
-  GridGenerator::hyper_cube(
-    triangulationL, -1, 0); // create a square [-1,1]^d domain
-  GridGenerator::hyper_cube(
-    triangulationR, -1, 0); // create a square [-1,1]^d domain
+  GridGenerator::hyper_cube(triangulationL,
+                            -1,
+                            0); // create a square [-1,1]^d domain
+  GridGenerator::hyper_cube(triangulationR,
+                            -1,
+                            0); // create a square [-1,1]^d domain
   Point<dim> shift_vector;
   shift_vector[0] = 1.0;
   GridTools::shift(shift_vector, triangulationR);
@@ -299,8 +303,9 @@ ElasticProblem<dim>::make_grid()
                                                               i);
     }
 
-  GridGenerator::merge_triangulations(
-    triangulationL, triangulationR, triangulation);
+  GridGenerator::merge_triangulations(triangulationL,
+                                      triangulationR,
+                                      triangulation);
 
   // triangulation.refine_global (2); //refine twice globally before solving
 }

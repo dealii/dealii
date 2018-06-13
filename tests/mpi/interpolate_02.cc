@@ -66,11 +66,13 @@ test()
   dofh.distribute_dofs(fe);
 
   IndexSet                   owned_set = dofh.locally_owned_dofs();
-  PETScWrappers::MPI::Vector x(
-    MPI_COMM_WORLD, dofh.n_dofs(), owned_set.n_elements());
+  PETScWrappers::MPI::Vector x(MPI_COMM_WORLD,
+                               dofh.n_dofs(),
+                               owned_set.n_elements());
 
-  VectorTools::interpolate(
-    dofh, Functions::ConstantFunction<dim, PetscScalar>(1), x);
+  VectorTools::interpolate(dofh,
+                           Functions::ConstantFunction<dim, PetscScalar>(1),
+                           x);
   const double norm = x.l2_norm();
   if (myid == 0)
     deallog << dofh.n_locally_owned_dofs() << ' ' << dofh.n_dofs() << std::endl

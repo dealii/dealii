@@ -220,8 +220,9 @@ test()
           }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
   }
 

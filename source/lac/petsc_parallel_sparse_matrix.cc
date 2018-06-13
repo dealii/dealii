@@ -31,7 +31,8 @@ namespace PETScWrappers
 {
   namespace MPI
   {
-    SparseMatrix::SparseMatrix() : communicator(MPI_COMM_SELF)
+    SparseMatrix::SparseMatrix()
+      : communicator(MPI_COMM_SELF)
     {
       // just like for vectors: since we
       // create an empty matrix, we can as
@@ -55,8 +56,8 @@ namespace PETScWrappers
                                const size_type local_columns,
                                const size_type n_nonzero_per_row,
                                const bool      is_symmetric,
-                               const size_type n_offdiag_nonzero_per_row) :
-      communicator(communicator)
+                               const size_type n_offdiag_nonzero_per_row)
+      : communicator(communicator)
     {
       do_reinit(m,
                 n,
@@ -77,8 +78,8 @@ namespace PETScWrappers
       const size_type               local_columns,
       const std::vector<size_type> &row_lengths,
       const bool                    is_symmetric,
-      const std::vector<size_type> &offdiag_row_lengths) :
-      communicator(communicator)
+      const std::vector<size_type> &offdiag_row_lengths)
+      : communicator(communicator)
     {
       do_reinit(m,
                 n,
@@ -98,8 +99,8 @@ namespace PETScWrappers
       const std::vector<size_type> &local_rows_per_process,
       const std::vector<size_type> &local_columns_per_process,
       const unsigned int            this_process,
-      const bool                    preset_nonzero_locations) :
-      communicator(communicator)
+      const bool                    preset_nonzero_locations)
+      : communicator(communicator)
     {
       do_reinit(sparsity_pattern,
                 local_rows_per_process,
@@ -316,17 +317,19 @@ namespace PETScWrappers
       // TODO: There must be a significantly better way to provide information
       // about the off-diagonal blocks of the matrix. this way, petsc keeps
       // allocating tiny chunks of memory, and gets completely hung up over this
-      const PetscErrorCode ierr = MatCreateAIJ(
-        communicator,
-        local_rows,
-        local_columns,
-        m,
-        n,
-        0,
-        int_row_lengths.data(),
-        0,
-        offdiag_row_lengths.size() ? int_offdiag_row_lengths.data() : nullptr,
-        &matrix);
+      const PetscErrorCode ierr =
+        MatCreateAIJ(communicator,
+                     local_rows,
+                     local_columns,
+                     m,
+                     n,
+                     0,
+                     int_row_lengths.data(),
+                     0,
+                     offdiag_row_lengths.size() ?
+                       int_offdiag_row_lengths.data() :
+                       nullptr,
+                     &matrix);
 
       // TODO: Sometimes the actual number of nonzero entries allocated is
       // greater than the number of nonzero entries, which petsc will complain
@@ -703,9 +706,9 @@ namespace PETScWrappers
       ierr = MatGetOwnershipRangeColumn(matrix, &min, &max);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      Assert(
-        n_loc_cols == max - min,
-        ExcMessage("PETSc is requiring non contiguous memory allocation."));
+      Assert(n_loc_cols == max - min,
+             ExcMessage(
+               "PETSc is requiring non contiguous memory allocation."));
 
       IndexSet indices(n_cols);
       indices.add_range(min, max);
@@ -729,9 +732,9 @@ namespace PETScWrappers
       ierr = MatGetOwnershipRange(matrix, &min, &max);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      Assert(
-        n_loc_rows == max - min,
-        ExcMessage("PETSc is requiring non contiguous memory allocation."));
+      Assert(n_loc_rows == max - min,
+             ExcMessage(
+               "PETSc is requiring non contiguous memory allocation."));
 
       IndexSet indices(n_rows);
       indices.add_range(min, max);

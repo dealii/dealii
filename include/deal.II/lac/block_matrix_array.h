@@ -547,14 +547,14 @@ inline BlockMatrixArray<number, BlockVectorType>::Entry::Entry(
   size_type         row,
   size_type         col,
   number            prefix,
-  bool              transpose) :
-  row(row),
-  col(col),
-  prefix(prefix),
-  transpose(transpose),
-  matrix(new_pointer_matrix_base(m,
-                                 typename BlockVectorType::BlockType(),
-                                 typeid(*this).name()))
+  bool              transpose)
+  : row(row)
+  , col(col)
+  , prefix(prefix)
+  , transpose(transpose)
+  , matrix(new_pointer_matrix_base(m,
+                                   typename BlockVectorType::BlockType(),
+                                   typeid(*this).name()))
 {}
 
 

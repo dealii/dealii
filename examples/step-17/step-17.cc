@@ -198,7 +198,8 @@ namespace Step17
 
 
   template <int dim>
-  RightHandSide<dim>::RightHandSide() : Function<dim>(dim)
+  RightHandSide<dim>::RightHandSide()
+    : Function<dim>(dim)
   {}
 
 
@@ -262,13 +263,13 @@ namespace Step17
   // the latter is determined by testing whether the process currently
   // executing the constructor call is the first in the MPI universe.
   template <int dim>
-  ElasticProblem<dim>::ElasticProblem() :
-    mpi_communicator(MPI_COMM_WORLD),
-    n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout(std::cout, (this_mpi_process == 0)),
-    dof_handler(triangulation),
-    fe(FE_Q<dim>(1), dim)
+  ElasticProblem<dim>::ElasticProblem()
+    : mpi_communicator(MPI_COMM_WORLD)
+    , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
+    , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
+    , pcout(std::cout, (this_mpi_process == 0))
+    , dof_handler(triangulation)
+    , fe(FE_Q<dim>(1), dim)
   {}
 
 
@@ -375,8 +376,10 @@ namespace Step17
     // to this process (see step-18 or step-40 for a more efficient way to
     // handle this).
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(
-      dof_handler, dsp, hanging_node_constraints, false);
+    DoFTools::make_sparsity_pattern(dof_handler,
+                                    dsp,
+                                    hanging_node_constraints,
+                                    false);
 
     // Now we determine the set of locally owned DoFs and use that to
     // initialize parallel vectors and matrix. Since the matrix and vectors
@@ -397,8 +400,10 @@ namespace Step17
     const IndexSet locally_owned_dofs =
       locally_owned_dofs_per_proc[this_mpi_process];
 
-    system_matrix.reinit(
-      locally_owned_dofs, locally_owned_dofs, dsp, mpi_communicator);
+    system_matrix.reinit(locally_owned_dofs,
+                         locally_owned_dofs,
+                         dsp,
+                         mpi_communicator);
 
     solution.reinit(locally_owned_dofs, mpi_communicator);
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
@@ -602,8 +607,10 @@ namespace Step17
     // we therefore do not eliminate the entries in the affected
     // columns.
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(dim), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
     MatrixTools::apply_boundary_values(
       boundary_values, system_matrix, solution, system_rhs, false);
   }
@@ -830,8 +837,10 @@ namespace Step17
     // does it in exactly the same way.
     const Vector<float> localized_all_errors(distributed_all_errors);
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, localized_all_errors, 0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    localized_all_errors,
+                                                    0.3,
+                                                    0.03);
     triangulation.execute_coarsening_and_refinement();
   }
 

@@ -172,8 +172,10 @@ test()
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   DynamicSparsityPattern csp(locally_relevant_dofs);
@@ -186,15 +188,21 @@ test()
   for (unsigned int i = 0; i < n_mpi_processes; i++)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
-  SparsityTools::distribute_sparsity_pattern(
-    csp, n_locally_owned_dofs, mpi_communicator, locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             n_locally_owned_dofs,
+                                             mpi_communicator,
+                                             locally_relevant_dofs);
 
   // Initialise the stiffness and mass matrices
-  stiffness_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  stiffness_matrix.reinit(locally_owned_dofs,
+                          locally_owned_dofs,
+                          csp,
+                          mpi_communicator);
 
-  mass_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  mass_matrix.reinit(locally_owned_dofs,
+                     locally_owned_dofs,
+                     csp,
+                     mpi_communicator);
 
   eigenfunctions.resize(5);
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
@@ -248,10 +256,12 @@ test()
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_stiffness_matrix,
+                                               local_dof_indices,
+                                               stiffness_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix,
+                                               local_dof_indices,
+                                               mass_matrix);
       }
 
   stiffness_matrix.compress(VectorOperation::add);
@@ -288,11 +298,14 @@ test()
         PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_magnitude,
         true);
 
-    SolverControl solver_control(
-      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
+    SolverControl solver_control(dof_handler.n_dofs(),
+                                 1e-9,
+                                 /*log_history*/ false,
+                                 /*log_results*/ false);
 
-    PArpackSolver<TrilinosWrappers::MPI::Vector> eigensolver(
-      solver_control, mpi_communicator, additional_data);
+    PArpackSolver<TrilinosWrappers::MPI::Vector> eigensolver(solver_control,
+                                                             mpi_communicator,
+                                                             additional_data);
     eigensolver.reinit(locally_owned_dofs);
     eigensolver.set_shift(shift);
     eigenfunctions[0] = 1.;

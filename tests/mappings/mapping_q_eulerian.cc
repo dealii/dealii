@@ -57,7 +57,8 @@ template <int dim>
 class ImposedDisplacement : public Function<dim>
 {
 public:
-  ImposedDisplacement() : Function<dim>(dim)
+  ImposedDisplacement()
+    : Function<dim>(dim)
   {}
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &value) const;
@@ -111,10 +112,10 @@ private:
 // .... CONSTRUCTOR
 
 template <int dim>
-MappingTest<dim>::MappingTest(unsigned int degree) :
-  dof_handler(triangulation),
-  fe(FE_Q<dim>(degree), dim),
-  degree(degree)
+MappingTest<dim>::MappingTest(unsigned int degree)
+  : dof_handler(triangulation)
+  , fe(FE_Q<dim>(degree), dim)
+  , degree(degree)
 {}
 
 
@@ -245,8 +246,10 @@ MappingTest<dim>::graphical_output()
   dof_handler.distribute_dofs(fe);
   displacements.reinit(dof_handler.n_dofs());
 
-  VectorTools::interpolate(
-    MappingQGeneric<dim>(1), dof_handler, imposed_displacement, displacements);
+  VectorTools::interpolate(MappingQGeneric<dim>(1),
+                           dof_handler,
+                           imposed_displacement,
+                           displacements);
 
   explicitly_move_mesh();
 }

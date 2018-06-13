@@ -103,8 +103,9 @@ test()
   Vector<double> squares(dh.n_dofs());
   Vector<double> projected_squares(dh.n_dofs());
 
-  VectorTools::interpolate(
-    space_dh, Functions::SquareFunction<spacedim>(), space_square);
+  VectorTools::interpolate(space_dh,
+                           Functions::SquareFunction<spacedim>(),
+                           space_square);
   VectorTools::interpolate(dh, Functions::SquareFunction<spacedim>(), squares);
 
   coupling.Tvmult(projected_squares, space_square);

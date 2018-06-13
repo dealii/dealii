@@ -72,17 +72,13 @@ protected:
 
 template <>
 const Point<1>
-  SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] = {
-    Point<1>(-1.0 / 3.0),
-    Point<1>(0.0),
-    Point<1>(+1.0 / 3.0)};
+  SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] =
+    {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
 
 template <>
 const Point<2>
-  SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] = {
-    Point<2>(-0.5, +0.5),
-    Point<2>(-0.5, -0.5),
-    Point<2>(+0.5, -0.5)};
+  SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] =
+    {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
 
 template <int dim>
 const double SolutionBase<dim>::width = 1. / 3.;
@@ -93,7 +89,8 @@ template <int dim>
 class Solution : public Function<dim>, protected SolutionBase<dim>
 {
 public:
-  Solution() : Function<dim>()
+  Solution()
+    : Function<dim>()
   {}
 
   virtual double
@@ -145,7 +142,8 @@ template <int dim>
 class RightHandSide : public Function<dim>, protected SolutionBase<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -228,10 +226,10 @@ private:
 
 template <int dim>
 HelmholtzProblem<dim>::HelmholtzProblem(const hp::FECollection<dim> &fe,
-                                        const RefinementMode refinement_mode) :
-  dof_handler(triangulation),
-  fe(&fe),
-  refinement_mode(refinement_mode)
+                                        const RefinementMode refinement_mode)
+  : dof_handler(triangulation)
+  , fe(&fe)
+  , refinement_mode(refinement_mode)
 {}
 
 
@@ -293,11 +291,12 @@ HelmholtzProblem<dim>::assemble_system()
                                 update_values | update_gradients |
                                   update_quadrature_points | update_JxW_values);
 
-  hp::FEFaceValues<dim> x_fe_face_values(
-    *fe,
-    face_quadrature_formula,
-    update_values | update_quadrature_points | update_normal_vectors |
-      update_JxW_values);
+  hp::FEFaceValues<dim> x_fe_face_values(*fe,
+                                         face_quadrature_formula,
+                                         update_values |
+                                           update_quadrature_points |
+                                           update_normal_vectors |
+                                           update_JxW_values);
 
   const RightHandSide<dim> right_hand_side;
   std::vector<double>      rhs_values(n_q_points);
@@ -358,8 +357,9 @@ HelmholtzProblem<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -369,10 +369,14 @@ HelmholtzProblem<dim>::assemble_system()
   hanging_node_constraints.condense(system_rhs);
 
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Solution<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Solution<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

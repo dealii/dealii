@@ -101,9 +101,9 @@ namespace CUDAWrappers
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values) :
-        parallelization_scheme(parallelization_scheme),
-        mapping_update_flags(mapping_update_flags)
+                                                 update_JxW_values)
+        : parallelization_scheme(parallelization_scheme)
+        , mapping_update_flags(mapping_update_flags)
       {}
 
       /**
@@ -294,8 +294,8 @@ namespace CUDAWrappers
   struct SharedData
   {
     __device__
-    SharedData(Number *vd, Number *gq[dim]) :
-      values(vd)
+    SharedData(Number *vd, Number *gq[dim])
+      : values(vd)
     {
       for (int d = 0; d < dim; ++d)
         gradients[d] = gq[d];

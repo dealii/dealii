@@ -38,8 +38,10 @@ test()
     Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   // create a vector that consists of elements indexed from 0 to n
-  PETScWrappers::MPI::BlockVector vec(
-    2, MPI_COMM_WORLD, 100 * n_processes, 100);
+  PETScWrappers::MPI::BlockVector vec(2,
+                                      MPI_COMM_WORLD,
+                                      100 * n_processes,
+                                      100);
   vec.block(0).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.block(1).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.collect_sizes();
@@ -124,16 +126,16 @@ test()
 
   // verify correctness
   if (myid != 0)
-    AssertThrow(
-      get_real_assert_zero_imag(vec(vec.block(0).local_range().first + 10)) ==
-        vec.block(0).local_range().first - 25,
-      ExcInternalError());
+    AssertThrow(get_real_assert_zero_imag(
+                  vec(vec.block(0).local_range().first + 10)) ==
+                  vec.block(0).local_range().first - 25,
+                ExcInternalError());
 
   if (myid != n_processes - 1)
-    AssertThrow(
-      get_real_assert_zero_imag(vec(vec.block(0).local_range().first + 90)) ==
-        vec.block(0).local_range().first + 105,
-      ExcInternalError());
+    AssertThrow(get_real_assert_zero_imag(
+                  vec(vec.block(0).local_range().first + 90)) ==
+                  vec.block(0).local_range().first + 105,
+                ExcInternalError());
 
   if (myid != 0)
     AssertThrow(get_real_assert_zero_imag(

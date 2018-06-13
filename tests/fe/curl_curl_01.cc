@@ -111,7 +111,8 @@ template <int dim>
 class ExactSolution : public Function<dim>
 {
 public:
-  ExactSolution() : Function<dim>(2)
+  ExactSolution()
+    : Function<dim>(2)
   {}
   virtual double
   value(const Point<dim> &p, const unsigned int component) const;
@@ -223,7 +224,8 @@ ExactSolution<dim>::vector_value_list(const std::vector<Point<dim>> &points,
 
 // DEFINE RIGHT HAND SIDE MEMBERS
 template <int dim>
-RightHandSide<dim>::RightHandSide() : Function<dim>(dim)
+RightHandSide<dim>::RightHandSide()
+  : Function<dim>(dim)
 {}
 template <int dim>
 inline void
@@ -258,9 +260,9 @@ RightHandSide<dim>::vector_value_list(
 // END RIGHT HAND SIDE MEMBERS
 
 template <int dim>
-MaxwellProblem<dim>::MaxwellProblem(const unsigned int order) :
-  dof_handler(triangulation),
-  fe(order)
+MaxwellProblem<dim>::MaxwellProblem(const unsigned int order)
+  : dof_handler(triangulation)
+  , fe(order)
 {
   p_order    = order;
   quad_order = p_order + 2;

@@ -59,9 +59,9 @@ DataPostprocessor<dim>::get_data_component_interpretation() const
 template <int dim>
 DataPostprocessorScalar<dim>::DataPostprocessorScalar(
   const std::string &name,
-  const UpdateFlags  update_flags) :
-  name(name),
-  update_flags(update_flags)
+  const UpdateFlags  update_flags)
+  : name(name)
+  , update_flags(update_flags)
 {}
 
 
@@ -98,9 +98,9 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 template <int dim>
 DataPostprocessorVector<dim>::DataPostprocessorVector(
   const std::string &name,
-  const UpdateFlags  update_flags) :
-  name(name),
-  update_flags(update_flags)
+  const UpdateFlags  update_flags)
+  : name(name)
+  , update_flags(update_flags)
 {}
 
 
@@ -137,9 +137,9 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 template <int dim>
 DataPostprocessorTensor<dim>::DataPostprocessorTensor(
   const std::string &name,
-  const UpdateFlags  update_flags) :
-  name(name),
-  update_flags(update_flags)
+  const UpdateFlags  update_flags)
+  : name(name)
+  , update_flags(update_flags)
 {}
 
 

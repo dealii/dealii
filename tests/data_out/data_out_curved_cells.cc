@@ -132,8 +132,9 @@ curved_grid(std::ofstream &out)
       }
   // create triangulation
   Triangulation<2> triangulation;
-  triangulation.create_triangulation_compatibility(
-    vertices, cells, SubCellData());
+  triangulation.create_triangulation_compatibility(vertices,
+                                                   cells,
+                                                   SubCellData());
   // now provide everything that is
   // needed for solving a Laplace
   // equation.

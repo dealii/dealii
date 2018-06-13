@@ -52,17 +52,17 @@ DEAL_II_NAMESPACE_OPEN
 // --------------------- MatrixFree -----------------------------------
 
 template <int dim, typename Number>
-MatrixFree<dim, Number>::MatrixFree() :
-  Subscriptor(),
-  indices_are_initialized(false),
-  mapping_is_initialized(false)
+MatrixFree<dim, Number>::MatrixFree()
+  : Subscriptor()
+  , indices_are_initialized(false)
+  , mapping_is_initialized(false)
 {}
 
 
 
 template <int dim, typename Number>
-MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim, Number> &other) :
-  Subscriptor()
+MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim, Number> &other)
+  : Subscriptor()
 {
   copy_from(other);
 }
@@ -175,8 +175,10 @@ MatrixFree<dim, Number>::get_cell_iterator(const unsigned int macro_cell_number,
 
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[macro_cell_number * vectorization_length + vector_number];
-  return typename DoFHandler<dim>::cell_iterator(
-    &dofh->get_triangulation(), index.first, index.second, dofh);
+  return typename DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),
+                                                 index.first,
+                                                 index.second,
+                                                 dofh);
 }
 
 
@@ -199,8 +201,10 @@ MatrixFree<dim, Number>::get_hp_cell_iterator(
   const hp::DoFHandler<dim> *dofh = dof_handlers.hp_dof_handler[dof_index];
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[macro_cell_number * vectorization_length + vector_number];
-  return typename hp::DoFHandler<dim>::cell_iterator(
-    &dofh->get_triangulation(), index.first, index.second, dofh);
+  return typename hp::DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),
+                                                     index.first,
+                                                     index.second,
+                                                     dofh);
 }
 
 
@@ -653,8 +657,9 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
           my_pid :
           numbers::invalid_subdomain_id;
       for (; cell != end_cell; ++cell)
-        internal::MatrixFreeFunctions::resolve_cell(
-          cell, cell_level_index, subdomain_id);
+        internal::MatrixFreeFunctions::resolve_cell(cell,
+                                                    cell_level_index,
+                                                    subdomain_id);
 
       Assert(n_mpi_procs > 1 ||
                cell_level_index.size() == tria.n_active_cells(),
@@ -725,8 +730,9 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
       my_pid :
       numbers::invalid_subdomain_id;
   for (; cell != end_cell; ++cell)
-    internal::MatrixFreeFunctions::resolve_cell(
-      cell, cell_level_index, subdomain_id);
+    internal::MatrixFreeFunctions::resolve_cell(cell,
+                                                cell_level_index,
+                                                subdomain_id);
 
   Assert(n_mpi_procs > 1 || cell_level_index.size() == tria.n_active_cells(),
          ExcInternalError());
@@ -856,8 +862,9 @@ MatrixFree<dim, Number>::initialize_indices(
 
       // set locally owned range for each component
       Assert(locally_owned_set[no].is_contiguous(), ExcNotImplemented());
-      dof_info[no].vector_partitioner.reset(new Utilities::MPI::Partitioner(
-        locally_owned_set[no], task_info.communicator));
+      dof_info[no].vector_partitioner.reset(
+        new Utilities::MPI::Partitioner(locally_owned_set[no],
+                                        task_info.communicator));
 
       // initialize the arrays for indices
       const unsigned int n_components_total =
@@ -1065,8 +1072,9 @@ MatrixFree<dim, Number>::initialize_indices(
       // can parallelize by threads
       Assert(additional_data.cell_vectorization_category.empty(),
              ExcNotImplemented());
-      task_info.initial_setup_blocks_tasks(
-        subdomain_boundary_cells, renumbering, irregular_cells);
+      task_info.initial_setup_blocks_tasks(subdomain_boundary_cells,
+                                           renumbering,
+                                           irregular_cells);
       task_info.guess_block_size(dof_info[0].dofs_per_cell[0]);
 
       unsigned int n_macro_cells_before =
@@ -1187,8 +1195,9 @@ MatrixFree<dim, Number>::initialize_indices(
           update_default)
         make_connectivity_graph_faces(connectivity);
       if (task_info.n_active_cells > 0)
-        dof_info[0].make_connectivity_graph(
-          task_info, renumbering, connectivity);
+        dof_info[0].make_connectivity_graph(task_info,
+                                            renumbering,
+                                            connectivity);
 
       task_info.make_thread_graph(dof_info[0].cell_active_fe_index,
                                   connectivity,
@@ -1304,8 +1313,10 @@ MatrixFree<dim, Number>::initialize_indices(
 
   AssertDimension(constraint_pool_data.size(), length);
   for (unsigned int no = 0; no < n_fe; ++no)
-    dof_info[no].reorder_cells(
-      task_info, renumbering, constraint_pool_row_index, irregular_cells);
+    dof_info[no].reorder_cells(task_info,
+                               renumbering,
+                               constraint_pool_row_index,
+                               irregular_cells);
 
   // Finally resort the faces and collect several faces for vectorization
   if ((additional_data.mapping_update_flags_inner_faces |
@@ -1465,9 +1476,9 @@ MatrixFree<dim, Number>::initialize_indices(
                         dof_info[no].plain_dof_indices[i]));
                 }
             std::sort(ghost_indices.begin(), ghost_indices.end());
-            ghost_indices.erase(
-              std::unique(ghost_indices.begin(), ghost_indices.end()),
-              ghost_indices.end());
+            ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                            ghost_indices.end()),
+                                ghost_indices.end());
             IndexSet compressed_set(part.size());
             compressed_set.add_indices(ghost_indices.begin(),
                                        ghost_indices.end());
@@ -1560,8 +1571,9 @@ MatrixFree<dim, Number>::initialize_indices(
                                       stride));
                                 i += shape.dofs_per_component_on_cell * stride;
                               }
-                          AssertDimension(
-                            i, dof_info[no].dofs_per_cell[0] * stride);
+                          AssertDimension(i,
+                                          dof_info[no].dofs_per_cell[0] *
+                                            stride);
                         }
                       else if (dof_info[no].index_storage_variants
                                  [internal::MatrixFreeFunctions::DoFInfo::
@@ -1570,13 +1582,14 @@ MatrixFree<dim, Number>::initialize_indices(
                                  IndexStorageVariants::contiguous)
                         has_noncontiguous_cell = true;
                     }
-                has_noncontiguous_cell = Utilities::MPI::min(
-                  (int)has_noncontiguous_cell, task_info.communicator);
+                has_noncontiguous_cell =
+                  Utilities::MPI::min((int)has_noncontiguous_cell,
+                                      task_info.communicator);
 
                 std::sort(ghost_indices.begin(), ghost_indices.end());
-                ghost_indices.erase(
-                  std::unique(ghost_indices.begin(), ghost_indices.end()),
-                  ghost_indices.end());
+                ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                                ghost_indices.end()),
+                                    ghost_indices.end());
                 IndexSet compressed_set(part.size());
                 compressed_set.add_indices(ghost_indices.begin(),
                                            ghost_indices.end());
@@ -1673,14 +1686,15 @@ MatrixFree<dim, Number>::initialize_indices(
                                       stride));
                                 i += shape.dofs_per_component_on_cell * stride;
                               }
-                          AssertDimension(
-                            i, dof_info[no].dofs_per_cell[0] * stride);
+                          AssertDimension(i,
+                                          dof_info[no].dofs_per_cell[0] *
+                                            stride);
                         }
                     }
                 std::sort(ghost_indices.begin(), ghost_indices.end());
-                ghost_indices.erase(
-                  std::unique(ghost_indices.begin(), ghost_indices.end()),
-                  ghost_indices.end());
+                ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                                ghost_indices.end()),
+                                    ghost_indices.end());
                 IndexSet compressed_set(part.size());
                 compressed_set.add_indices(ghost_indices.begin(),
                                            ghost_indices.end());
@@ -1798,10 +1812,10 @@ namespace internal
                 }
             }
           std::sort(new_indices.begin(), new_indices.end());
-          connectivity_direct.add_entries(
-            cell,
-            new_indices.begin(),
-            std::unique(new_indices.begin(), new_indices.end()));
+          connectivity_direct.add_entries(cell,
+                                          new_indices.begin(),
+                                          std::unique(new_indices.begin(),
+                                                      new_indices.end()));
         }
     }
 
@@ -1830,10 +1844,10 @@ namespace internal
                   new_indices.push_back(it_neigh->column());
             }
           std::sort(new_indices.begin(), new_indices.end());
-          connectivity.add_entries(
-            block,
-            new_indices.begin(),
-            std::unique(new_indices.begin(), new_indices.end()));
+          connectivity.add_entries(block,
+                                   new_indices.begin(),
+                                   std::unique(new_indices.begin(),
+                                               new_indices.end()));
         }
     }
   } // namespace

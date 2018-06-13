@@ -57,8 +57,9 @@ test()
   else
     Assert(false, ExcNotImplemented());
 
-  TrilinosWrappers::SparsityPattern sp(
-    locally_owned, locally_owned, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(locally_owned,
+                                       locally_owned,
+                                       MPI_COMM_WORLD);
   if (my_id == 0)
     {
       sp.add(0, 0);

@@ -69,8 +69,9 @@ void create_two_cubes(Triangulation<3> &coarse_grid)
   // finally generate a triangulation
   // out of this
   GridReordering<3>::reorder_cells(cells);
-  coarse_grid.create_triangulation_compatibility(
-    vertices, cells, SubCellData());
+  coarse_grid.create_triangulation_compatibility(vertices,
+                                                 cells,
+                                                 SubCellData());
 }
 
 
@@ -78,10 +79,12 @@ void check(Triangulation<3> &tria)
 {
   QGauss<2>       quadrature(3);
   FE_Q<3>         fe(1);
-  FEFaceValues<3> fe_face_values1(
-    fe, quadrature, update_quadrature_points | update_JxW_values);
-  FEFaceValues<3> fe_face_values2(
-    fe, quadrature, update_quadrature_points | update_JxW_values);
+  FEFaceValues<3> fe_face_values1(fe,
+                                  quadrature,
+                                  update_quadrature_points | update_JxW_values);
+  FEFaceValues<3> fe_face_values2(fe,
+                                  quadrature,
+                                  update_quadrature_points | update_JxW_values);
 
   DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fe);

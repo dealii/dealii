@@ -939,9 +939,10 @@ namespace Differentiation
                        true),
                     "Expected a complex float_type");
 
-      static_assert(
-        (is_complex_valued == true ? boost::is_complex<ad_type>::value : true),
-        "Expected a complex ad_type");
+      static_assert((is_complex_valued == true ?
+                       boost::is_complex<ad_type>::value :
+                       true),
+                    "Expected a complex ad_type");
     };
 
 #  ifdef __clang__

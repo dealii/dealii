@@ -25,7 +25,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  MatrixFree::MatrixFree() : communicator(PETSC_COMM_SELF)
+  MatrixFree::MatrixFree()
+    : communicator(PETSC_COMM_SELF)
   {
     const int m = 0;
     do_reinit(m, m, m, m);
@@ -37,8 +38,8 @@ namespace PETScWrappers
                          const unsigned int m,
                          const unsigned int n,
                          const unsigned int local_rows,
-                         const unsigned int local_columns) :
-    communicator(communicator)
+                         const unsigned int local_columns)
+    : communicator(communicator)
   {
     do_reinit(m, n, local_rows, local_columns);
   }
@@ -51,8 +52,8 @@ namespace PETScWrappers
     const unsigned int               n,
     const std::vector<unsigned int> &local_rows_per_process,
     const std::vector<unsigned int> &local_columns_per_process,
-    const unsigned int               this_process) :
-    communicator(communicator)
+    const unsigned int               this_process)
+    : communicator(communicator)
   {
     Assert(local_rows_per_process.size() == local_columns_per_process.size(),
            ExcDimensionMismatch(local_rows_per_process.size(),
@@ -70,8 +71,8 @@ namespace PETScWrappers
   MatrixFree::MatrixFree(const unsigned int m,
                          const unsigned int n,
                          const unsigned int local_rows,
-                         const unsigned int local_columns) :
-    communicator(MPI_COMM_WORLD)
+                         const unsigned int local_columns)
+    : communicator(MPI_COMM_WORLD)
   {
     do_reinit(m, n, local_rows, local_columns);
   }
@@ -83,8 +84,8 @@ namespace PETScWrappers
     const unsigned int               n,
     const std::vector<unsigned int> &local_rows_per_process,
     const std::vector<unsigned int> &local_columns_per_process,
-    const unsigned int               this_process) :
-    communicator(MPI_COMM_WORLD)
+    const unsigned int               this_process)
+    : communicator(MPI_COMM_WORLD)
   {
     Assert(local_rows_per_process.size() == local_columns_per_process.size(),
            ExcDimensionMismatch(local_rows_per_process.size(),

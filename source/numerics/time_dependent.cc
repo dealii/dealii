@@ -33,21 +33,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-TimeDependent::TimeSteppingData::TimeSteppingData(
-  const unsigned int look_ahead,
-  const unsigned int look_back) :
-  look_ahead(look_ahead),
-  look_back(look_back)
+TimeDependent::TimeSteppingData::TimeSteppingData(const unsigned int look_ahead,
+                                                  const unsigned int look_back)
+  : look_ahead(look_ahead)
+  , look_back(look_back)
 {}
 
 
 TimeDependent::TimeDependent(const TimeSteppingData &data_primal,
                              const TimeSteppingData &data_dual,
-                             const TimeSteppingData &data_postprocess) :
-  sweep_no(numbers::invalid_unsigned_int),
-  timestepping_data_primal(data_primal),
-  timestepping_data_dual(data_dual),
-  timestepping_data_postprocess(data_postprocess)
+                             const TimeSteppingData &data_postprocess)
+  : sweep_no(numbers::invalid_unsigned_int)
+  , timestepping_data_primal(data_primal)
+  , timestepping_data_dual(data_dual)
+  , timestepping_data_postprocess(data_postprocess)
 {}
 
 
@@ -170,33 +169,33 @@ TimeDependent::delete_timestep(const unsigned int position)
 void
 TimeDependent::solve_primal_problem()
 {
-  do_loop(
-    std::bind(&TimeStepBase::init_for_primal_problem, std::placeholders::_1),
-    std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
-    timestepping_data_primal,
-    forward);
+  do_loop(std::bind(&TimeStepBase::init_for_primal_problem,
+                    std::placeholders::_1),
+          std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
+          timestepping_data_primal,
+          forward);
 }
 
 
 void
 TimeDependent::solve_dual_problem()
 {
-  do_loop(
-    std::bind(&TimeStepBase::init_for_dual_problem, std::placeholders::_1),
-    std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
-    timestepping_data_dual,
-    backward);
+  do_loop(std::bind(&TimeStepBase::init_for_dual_problem,
+                    std::placeholders::_1),
+          std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
+          timestepping_data_dual,
+          backward);
 }
 
 
 void
 TimeDependent::postprocess()
 {
-  do_loop(
-    std::bind(&TimeStepBase::init_for_postprocessing, std::placeholders::_1),
-    std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
-    timestepping_data_postprocess,
-    forward);
+  do_loop(std::bind(&TimeStepBase::init_for_postprocessing,
+                    std::placeholders::_1),
+          std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
+          timestepping_data_postprocess,
+          forward);
 }
 
 
@@ -267,13 +266,13 @@ TimeDependent::memory_consumption() const
 /* --------------------------------------------------------------------- */
 
 
-TimeStepBase::TimeStepBase(const double time) :
-  previous_timestep(nullptr),
-  next_timestep(nullptr),
-  sweep_no(numbers::invalid_unsigned_int),
-  timestep_no(numbers::invalid_unsigned_int),
-  time(time),
-  next_action(numbers::invalid_unsigned_int)
+TimeStepBase::TimeStepBase(const double time)
+  : previous_timestep(nullptr)
+  , next_timestep(nullptr)
+  , sweep_no(numbers::invalid_unsigned_int)
+  , timestep_no(numbers::invalid_unsigned_int)
+  , time(time)
+  , next_action(numbers::invalid_unsigned_int)
 {}
 
 
@@ -422,12 +421,12 @@ TimeStepBase::memory_consumption() const
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
-  TimeStepBase(0),
-  tria(nullptr, typeid(*this).name()),
-  coarse_grid(nullptr, typeid(*this).name()),
-  flags(),
-  refinement_flags(0)
+TimeStepBase_Tria<dim>::TimeStepBase_Tria()
+  : TimeStepBase(0)
+  , tria(nullptr, typeid(*this).name())
+  , coarse_grid(nullptr, typeid(*this).name())
+  , flags()
+  , refinement_flags(0)
 {
   Assert(false, ExcPureFunctionCalled());
 }
@@ -439,12 +438,12 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria(
   const double              time,
   const Triangulation<dim> &coarse_grid,
   const Flags &             flags,
-  const RefinementFlags &   refinement_flags) :
-  TimeStepBase(time),
-  tria(nullptr, typeid(*this).name()),
-  coarse_grid(&coarse_grid, typeid(*this).name()),
-  flags(flags),
-  refinement_flags(refinement_flags)
+  const RefinementFlags &   refinement_flags)
+  : TimeStepBase(time)
+  , tria(nullptr, typeid(*this).name())
+  , coarse_grid(&coarse_grid, typeid(*this).name())
+  , flags(flags)
+  , refinement_flags(refinement_flags)
 {}
 
 
@@ -1161,10 +1160,10 @@ TimeStepBase_Tria<dim>::memory_consumption() const
 
 
 template <int dim>
-TimeStepBase_Tria_Flags::Flags<dim>::Flags() :
-  delete_and_rebuild_tria(false),
-  wakeup_level_to_build_grid(0),
-  sleep_level_to_delete_grid(0)
+TimeStepBase_Tria_Flags::Flags<dim>::Flags()
+  : delete_and_rebuild_tria(false)
+  , wakeup_level_to_build_grid(0)
+  , sleep_level_to_delete_grid(0)
 {
   Assert(false, ExcInternalError());
 }
@@ -1175,10 +1174,10 @@ template <int dim>
 TimeStepBase_Tria_Flags::Flags<dim>::Flags(
   const bool         delete_and_rebuild_tria,
   const unsigned int wakeup_level_to_build_grid,
-  const unsigned int sleep_level_to_delete_grid) :
-  delete_and_rebuild_tria(delete_and_rebuild_tria),
-  wakeup_level_to_build_grid(wakeup_level_to_build_grid),
-  sleep_level_to_delete_grid(sleep_level_to_delete_grid)
+  const unsigned int sleep_level_to_delete_grid)
+  : delete_and_rebuild_tria(delete_and_rebuild_tria)
+  , wakeup_level_to_build_grid(wakeup_level_to_build_grid)
+  , sleep_level_to_delete_grid(sleep_level_to_delete_grid)
 {
   //   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
   //        ExcInvalidParameter(wakeup_level_to_build_grid));
@@ -1207,18 +1206,18 @@ TimeStepBase_Tria_Flags::RefinementFlags<dim>::RefinementFlags(
   const CorrectionRelaxations &correction_relaxations,
   const unsigned int           cell_number_correction_steps,
   const bool                   mirror_flags_to_previous_grid,
-  const bool                   adapt_grids) :
-  max_refinement_level(max_refinement_level),
-  first_sweep_with_correction(first_sweep_with_correction),
-  min_cells_for_correction(min_cells_for_correction),
-  cell_number_corridor_top(cell_number_corridor_top),
-  cell_number_corridor_bottom(cell_number_corridor_bottom),
-  correction_relaxations(correction_relaxations.size() != 0 ?
-                           correction_relaxations :
-                           default_correction_relaxations),
-  cell_number_correction_steps(cell_number_correction_steps),
-  mirror_flags_to_previous_grid(mirror_flags_to_previous_grid),
-  adapt_grids(adapt_grids)
+  const bool                   adapt_grids)
+  : max_refinement_level(max_refinement_level)
+  , first_sweep_with_correction(first_sweep_with_correction)
+  , min_cells_for_correction(min_cells_for_correction)
+  , cell_number_corridor_top(cell_number_corridor_top)
+  , cell_number_corridor_bottom(cell_number_corridor_bottom)
+  , correction_relaxations(correction_relaxations.size() != 0 ?
+                             correction_relaxations :
+                             default_correction_relaxations)
+  , cell_number_correction_steps(cell_number_correction_steps)
+  , mirror_flags_to_previous_grid(mirror_flags_to_previous_grid)
+  , adapt_grids(adapt_grids)
 {
   Assert(cell_number_corridor_top >= 0,
          ExcInvalidValue(cell_number_corridor_top));
@@ -1232,8 +1231,9 @@ TimeStepBase_Tria_Flags::RefinementFlags<dim>::RefinementFlags(
 template <int dim>
 TimeStepBase_Tria_Flags::RefinementData<dim>::RefinementData(
   const double _refinement_threshold,
-  const double _coarsening_threshold) :
-  refinement_threshold(_refinement_threshold),
+  const double _coarsening_threshold)
+  : refinement_threshold(_refinement_threshold)
+  ,
   // in some rare cases it may happen that
   // both thresholds are the same (e.g. if
   // there are many cells with the same

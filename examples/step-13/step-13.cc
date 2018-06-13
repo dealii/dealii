@@ -199,9 +199,9 @@ namespace Step13
     template <int dim>
     PointValueEvaluation<dim>::PointValueEvaluation(
       const Point<dim> &evaluation_point,
-      TableHandler &    results_table) :
-      evaluation_point(evaluation_point),
-      results_table(results_table)
+      TableHandler &    results_table)
+      : evaluation_point(evaluation_point)
+      , results_table(results_table)
     {}
 
 
@@ -383,9 +383,9 @@ namespace Step13
     template <int dim>
     SolutionOutput<dim>::SolutionOutput(
       const std::string &             output_name_base,
-      const DataOutBase::OutputFormat output_format) :
-      output_name_base(output_name_base),
-      output_format(output_format)
+      const DataOutBase::OutputFormat output_format)
+      : output_name_base(output_name_base)
+      , output_format(output_format)
     {}
 
 
@@ -523,8 +523,8 @@ namespace Step13
     // The implementation of the only two non-abstract functions is then
     // rather boring:
     template <int dim>
-    Base<dim>::Base(Triangulation<dim> &coarse_grid) :
-      triangulation(&coarse_grid)
+    Base<dim>::Base(Triangulation<dim> &coarse_grid)
+      : triangulation(&coarse_grid)
     {}
 
 
@@ -671,12 +671,12 @@ namespace Step13
     Solver<dim>::Solver(Triangulation<dim> &      triangulation,
                         const FiniteElement<dim> &fe,
                         const Quadrature<dim> &   quadrature,
-                        const Function<dim> &     boundary_values) :
-      Base<dim>(triangulation),
-      fe(&fe),
-      quadrature(&quadrature),
-      dof_handler(triangulation),
-      boundary_values(&boundary_values)
+                        const Function<dim> &     boundary_values)
+      : Base<dim>(triangulation)
+      , fe(&fe)
+      , quadrature(&quadrature)
+      , dof_handler(triangulation)
+      , boundary_values(&boundary_values)
     {}
 
 
@@ -883,8 +883,10 @@ namespace Step13
       // expression to a function pointer type that is specific to the
       // version of the function that you want to call on the task.)
       std::map<types::global_dof_index, double> boundary_value_map;
-      VectorTools::interpolate_boundary_values(
-        dof_handler, 0, *boundary_values, boundary_value_map);
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               *boundary_values,
+                                               boundary_value_map);
 
       rhs_task.join();
       linear_system.hanging_node_constraints.condense(linear_system.rhs);
@@ -892,8 +894,10 @@ namespace Step13
       // Now that we have the complete linear system, we can also
       // treat boundary values, which need to be eliminated from both
       // the matrix and the right hand side:
-      MatrixTools::apply_boundary_values(
-        boundary_value_map, linear_system.matrix, solution, linear_system.rhs);
+      MatrixTools::apply_boundary_values(boundary_value_map,
+                                         linear_system.matrix,
+                                         solution,
+                                         linear_system.rhs);
     }
 
 
@@ -904,17 +908,17 @@ namespace Step13
     template <int dim>
     Solver<dim>::AssemblyScratchData::AssemblyScratchData(
       const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature) :
-      fe_values(fe, quadrature, update_gradients | update_JxW_values)
+      const Quadrature<dim> &   quadrature)
+      : fe_values(fe, quadrature, update_gradients | update_JxW_values)
     {}
 
 
     template <int dim>
     Solver<dim>::AssemblyScratchData::AssemblyScratchData(
-      const AssemblyScratchData &scratch_data) :
-      fe_values(scratch_data.fe_values.get_fe(),
-                scratch_data.fe_values.get_quadrature(),
-                update_gradients | update_JxW_values)
+      const AssemblyScratchData &scratch_data)
+      : fe_values(scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  update_gradients | update_JxW_values)
     {}
 
 
@@ -1081,10 +1085,10 @@ namespace Step13
                                     const FiniteElement<dim> &fe,
                                     const Quadrature<dim> &   quadrature,
                                     const Function<dim> &     rhs_function,
-                                    const Function<dim> &     boundary_values) :
-      Base<dim>(triangulation),
-      Solver<dim>(triangulation, fe, quadrature, boundary_values),
-      rhs_function(&rhs_function)
+                                    const Function<dim> &     boundary_values)
+      : Base<dim>(triangulation)
+      , Solver<dim>(triangulation, fe, quadrature, boundary_values)
+      , rhs_function(&rhs_function)
     {}
 
 
@@ -1170,13 +1174,13 @@ namespace Step13
       const FiniteElement<dim> &fe,
       const Quadrature<dim> &   quadrature,
       const Function<dim> &     rhs_function,
-      const Function<dim> &     boundary_values) :
-      Base<dim>(coarse_grid),
-      PrimalSolver<dim>(coarse_grid,
-                        fe,
-                        quadrature,
-                        rhs_function,
-                        boundary_values)
+      const Function<dim> &     boundary_values)
+      : Base<dim>(coarse_grid)
+      , PrimalSolver<dim>(coarse_grid,
+                          fe,
+                          quadrature,
+                          rhs_function,
+                          boundary_values)
     {}
 
 
@@ -1215,18 +1219,17 @@ namespace Step13
 
 
     template <int dim>
-    RefinementKelly<dim>::RefinementKelly(
-      Triangulation<dim> &      coarse_grid,
-      const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature,
-      const Function<dim> &     rhs_function,
-      const Function<dim> &     boundary_values) :
-      Base<dim>(coarse_grid),
-      PrimalSolver<dim>(coarse_grid,
-                        fe,
-                        quadrature,
-                        rhs_function,
-                        boundary_values)
+    RefinementKelly<dim>::RefinementKelly(Triangulation<dim> &      coarse_grid,
+                                          const FiniteElement<dim> &fe,
+                                          const Quadrature<dim> &   quadrature,
+                                          const Function<dim> &rhs_function,
+                                          const Function<dim> &boundary_values)
+      : Base<dim>(coarse_grid)
+      , PrimalSolver<dim>(coarse_grid,
+                          fe,
+                          quadrature,
+                          rhs_function,
+                          boundary_values)
     {}
 
 
@@ -1241,8 +1244,10 @@ namespace Step13
                                          typename FunctionMap<dim>::type(),
                                          this->solution,
                                          estimated_error_per_cell);
-      GridRefinement::refine_and_coarsen_fixed_number(
-        *this->triangulation, estimated_error_per_cell, 0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(*this->triangulation,
+                                                      estimated_error_per_cell,
+                                                      0.3,
+                                                      0.03);
       this->triangulation->execute_coarsening_and_refinement();
     }
 
@@ -1274,7 +1279,8 @@ namespace Step13
   class Solution : public Function<dim>
   {
   public:
-    Solution() : Function<dim>()
+    Solution()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -1299,7 +1305,8 @@ namespace Step13
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -1443,8 +1450,9 @@ namespace Step13
                                                          results_table);
 
     // Also generate an evaluator which writes out the solution:
-    Evaluation::SolutionOutput<dim> postprocessor2(
-      std::string("solution-") + solver_name, DataOutBase::gnuplot);
+    Evaluation::SolutionOutput<dim> postprocessor2(std::string("solution-") +
+                                                     solver_name,
+                                                   DataOutBase::gnuplot);
 
     // Take these two evaluation objects and put them in a list...
     std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;

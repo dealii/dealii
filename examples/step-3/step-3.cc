@@ -141,7 +141,9 @@ private:
 // you try to distribute degree of freedom on the mesh using the
 // distribute_dofs() function.) All the other member variables of the Step3
 // class have a default constructor which does all we want.
-Step3::Step3() : fe(1), dof_handler(triangulation)
+Step3::Step3()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -457,8 +459,9 @@ void Step3::assemble_system()
       // obtained using local_dof_indices[i]:
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i],
+                            local_dof_indices[j],
+                            cell_matrix(i, j));
 
       // And again, we do the same thing for the right hand side vector.
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -510,13 +513,17 @@ void Step3::assemble_system()
   // of DoF numbers to boundary values is done by the <code>std::map</code>
   // class.
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<2>(), boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<2>(),
+                                           boundary_values);
   // Now that we got the list of boundary DoFs and their respective boundary
   // values, let's use them to modify the system of equations
   // accordingly. This is done by the following function call:
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

@@ -60,11 +60,15 @@ test()
   MappingManifold<dim, spacedim> mapping_manifold;
   MappingQGeneric<dim, spacedim> mapping_q(1);
 
-  FEFaceValues<dim, spacedim> fe_values_mapping(
-    mapping_manifold, fe, quad, update_jacobians);
+  FEFaceValues<dim, spacedim> fe_values_mapping(mapping_manifold,
+                                                fe,
+                                                quad,
+                                                update_jacobians);
 
-  FEFaceValues<dim, spacedim> fe_values_q(
-    mapping_q, fe, quad, update_jacobians);
+  FEFaceValues<dim, spacedim> fe_values_q(mapping_q,
+                                          fe,
+                                          quad,
+                                          update_jacobians);
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell =
     triangulation.begin_active();

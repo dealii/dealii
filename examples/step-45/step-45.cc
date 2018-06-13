@@ -115,7 +115,8 @@ namespace Step45
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>(dim + 1)
+    BoundaryValues()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -151,7 +152,8 @@ namespace Step45
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -212,11 +214,11 @@ namespace Step45
     const MatrixType &        m,
     const PreconditionerType &preconditioner,
     const IndexSet &          locally_owned,
-    const MPI_Comm &          mpi_communicator) :
-    matrix(&m),
-    preconditioner(&preconditioner),
-    mpi_communicator(&mpi_communicator),
-    tmp(locally_owned, mpi_communicator)
+    const MPI_Comm &          mpi_communicator)
+    : matrix(&m)
+    , preconditioner(&preconditioner)
+    , mpi_communicator(&mpi_communicator)
+    , tmp(locally_owned, mpi_communicator)
   {}
 
 
@@ -266,11 +268,11 @@ namespace Step45
     const InverseMatrix<TrilinosWrappers::SparseMatrix, PreconditionerType>
       &             A_inverse,
     const IndexSet &owned_vel,
-    const MPI_Comm &mpi_communicator) :
-    system_matrix(&system_matrix),
-    A_inverse(&A_inverse),
-    tmp1(owned_vel, mpi_communicator),
-    tmp2(tmp1)
+    const MPI_Comm &mpi_communicator)
+    : system_matrix(&system_matrix)
+    , A_inverse(&A_inverse)
+    , tmp1(owned_vel, mpi_communicator)
+    , tmp2(tmp1)
   {}
 
 
@@ -288,14 +290,14 @@ namespace Step45
 
 
   template <int dim>
-  StokesProblem<dim>::StokesProblem(const unsigned int degree) :
-    degree(degree),
-    mpi_communicator(MPI_COMM_WORLD),
-    triangulation(mpi_communicator),
-    fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1),
-    dof_handler(triangulation),
-    pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0),
-    mapping(degree + 1)
+  StokesProblem<dim>::StokesProblem(const unsigned int degree)
+    : degree(degree)
+    , mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator)
+    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , dof_handler(triangulation)
+    , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+    , mapping(degree + 1)
   {}
   // @endcond
   //
@@ -364,8 +366,9 @@ namespace Step45
     DoFRenumbering::component_wise(dof_handler, block_component);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -487,12 +490,12 @@ namespace Step45
                                                  relevant_partitioning,
                                                  mpi_communicator);
 
-      DoFTools::make_sparsity_pattern(
-        dof_handler,
-        bsp,
-        constraints,
-        false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      bsp,
+                                      constraints,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(
+                                        mpi_communicator));
 
       bsp.compress();
 
@@ -500,8 +503,9 @@ namespace Step45
     }
 
     system_rhs.reinit(owned_partitioning, mpi_communicator);
-    solution.reinit(
-      owned_partitioning, relevant_partitioning, mpi_communicator);
+    solution.reinit(owned_partitioning,
+                    relevant_partitioning,
+                    mpi_communicator);
   }
 
   // The rest of the program is then again identical to step-22. We will omit

@@ -154,8 +154,10 @@ test_global_refinement(void (*test_block_list)(const Triangulation<dim> &tr,
   GridGenerator::hyper_L(trl);
   trl.refine_global(1);
 
-  FESystem<dim, dim> fe1(
-    FESystem<dim, dim>(FE_Q<dim, dim>(2), dim), 1, FE_Q<dim, dim>(1), 1);
+  FESystem<dim, dim> fe1(FESystem<dim, dim>(FE_Q<dim, dim>(2), dim),
+                         1,
+                         FE_Q<dim, dim>(1),
+                         1);
 
   deallog.push("Square");
   test_block_list(trc, fe1);

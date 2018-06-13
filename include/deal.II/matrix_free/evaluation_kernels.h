@@ -266,8 +266,9 @@ namespace internal
                   // grad xy
                   if (evaluate_gradients == false)
                     eval.template gradients<0, true, false>(values_dofs, temp1);
-                  eval.template gradients<1, true, false>(
-                    temp1, hessians_quad + 2 * n_q_points);
+                  eval.template gradients<1, true, false>(temp1,
+                                                          hessians_quad +
+                                                            2 * n_q_points);
 
                   // grad xx
                   eval.template hessians<0, true, false>(values_dofs, temp1);
@@ -277,13 +278,15 @@ namespace internal
               // grad y
               eval.template values<0, true, false>(values_dofs, temp1);
               if (evaluate_gradients == true)
-                eval.template gradients<1, true, false>(
-                  temp1, gradients_quad + n_q_points);
+                eval.template gradients<1, true, false>(temp1,
+                                                        gradients_quad +
+                                                          n_q_points);
 
               // grad yy
               if (evaluate_hessians == true)
-                eval.template hessians<1, true, false>(
-                  temp1, hessians_quad + n_q_points);
+                eval.template hessians<1, true, false>(temp1,
+                                                       hessians_quad +
+                                                         n_q_points);
 
               // val: can use values applied in x
               if (evaluate_values == true)
@@ -317,13 +320,15 @@ namespace internal
                                                               temp1);
                       eval.template values<1, true, false>(temp1, temp2);
                     }
-                  eval.template gradients<2, true, false>(
-                    temp2, hessians_quad + 4 * n_q_points);
+                  eval.template gradients<2, true, false>(temp2,
+                                                          hessians_quad +
+                                                            4 * n_q_points);
 
                   // grad xy
                   eval.template gradients<1, true, false>(temp1, temp2);
-                  eval.template values<2, true, false>(
-                    temp2, hessians_quad + 3 * n_q_points);
+                  eval.template values<2, true, false>(temp2,
+                                                       hessians_quad +
+                                                         3 * n_q_points);
 
                   // grad xx
                   eval.template hessians<0, true, false>(values_dofs, temp1);
@@ -336,8 +341,9 @@ namespace internal
               if (evaluate_gradients == true)
                 {
                   eval.template gradients<1, true, false>(temp1, temp2);
-                  eval.template values<2, true, false>(
-                    temp2, gradients_quad + n_q_points);
+                  eval.template values<2, true, false>(temp2,
+                                                       gradients_quad +
+                                                         n_q_points);
                 }
 
               if (evaluate_hessians == true)
@@ -345,27 +351,31 @@ namespace internal
                   // grad yz
                   if (evaluate_gradients == false)
                     eval.template gradients<1, true, false>(temp1, temp2);
-                  eval.template gradients<2, true, false>(
-                    temp2, hessians_quad + 5 * n_q_points);
+                  eval.template gradients<2, true, false>(temp2,
+                                                          hessians_quad +
+                                                            5 * n_q_points);
 
                   // grad yy
                   eval.template hessians<1, true, false>(temp1, temp2);
-                  eval.template values<2, true, false>(
-                    temp2, hessians_quad + n_q_points);
+                  eval.template values<2, true, false>(temp2,
+                                                       hessians_quad +
+                                                         n_q_points);
                 }
 
               // grad z: can use the values applied in x direction stored in
               // temp1
               eval.template values<1, true, false>(temp1, temp2);
               if (evaluate_gradients == true)
-                eval.template gradients<2, true, false>(
-                  temp2, gradients_quad + 2 * n_q_points);
+                eval.template gradients<2, true, false>(temp2,
+                                                        gradients_quad +
+                                                          2 * n_q_points);
 
               // grad zz: can use the values applied in x and y direction stored
               // in temp2
               if (evaluate_hessians == true)
-                eval.template hessians<2, true, false>(
-                  temp2, hessians_quad + 2 * n_q_points);
+                eval.template hessians<2, true, false>(temp2,
+                                                       hessians_quad +
+                                                         2 * n_q_points);
 
               // val: can use the values applied in x & y direction stored in
               // temp2
@@ -512,8 +522,9 @@ namespace internal
                 }
               if (integrate_gradients == true)
                 {
-                  eval.template gradients<1, false, false>(
-                    gradients_quad + n_q_points, temp1);
+                  eval.template gradients<1, false, false>(gradients_quad +
+                                                             n_q_points,
+                                                           temp1);
                   if (integrate_values)
                     eval.template values<1, false, true>(values_quad, temp1);
                   if (add_into_values_array == false)
@@ -545,13 +556,15 @@ namespace internal
                 }
               if (integrate_gradients == true)
                 {
-                  eval.template gradients<2, false, false>(
-                    gradients_quad + 2 * n_q_points, temp1);
+                  eval.template gradients<2, false, false>(gradients_quad +
+                                                             2 * n_q_points,
+                                                           temp1);
                   if (integrate_values)
                     eval.template values<2, false, true>(values_quad, temp1);
                   eval.template values<1, false, false>(temp1, temp2);
-                  eval.template values<2, false, false>(
-                    gradients_quad + n_q_points, temp1);
+                  eval.template values<2, false, false>(gradients_quad +
+                                                          n_q_points,
+                                                        temp1);
                   eval.template gradients<1, false, true>(temp1, temp2);
                   if (add_into_values_array == false)
                     eval.template values<0, false, false>(temp2, values_dofs);
@@ -724,19 +737,22 @@ namespace internal
           values_out -= Utilities::fixed_power<dim>(np_2);
           if (next_dim < dim)
             for (unsigned int q = np_1; q != 0; --q)
-              FEEvaluationImplBasisChange<variant,
-                                          next_dim,
-                                          basis_size_1,
-                                          basis_size_2,
-                                          1,
-                                          Number,
-                                          Number2>::
-                do_forward(
-                  transformation_matrix,
-                  values_in + (q - 1) * Utilities::fixed_power<next_dim>(np_1),
-                  values_out + (q - 1) * Utilities::fixed_power<next_dim>(np_2),
-                  basis_size_1_variable,
-                  basis_size_2_variable);
+              FEEvaluationImplBasisChange<
+                variant,
+                next_dim,
+                basis_size_1,
+                basis_size_2,
+                1,
+                Number,
+                Number2>::do_forward(transformation_matrix,
+                                     values_in +
+                                       (q - 1) *
+                                         Utilities::fixed_power<next_dim>(np_1),
+                                     values_out +
+                                       (q - 1) *
+                                         Utilities::fixed_power<next_dim>(np_2),
+                                     basis_size_1_variable,
+                                     basis_size_2_variable);
 
           // the recursion stops if dim==1 or if dim==2 and
           // basis_size_1==basis_size_2 (the latter is used because the
@@ -799,10 +815,10 @@ namespace internal
       Assert(
         basis_size_1 != 0 || basis_size_1_variable <= basis_size_2_variable,
         ExcMessage("The second dimension must not be smaller than the first"));
-      Assert(
-        add_into_result == false || values_in != values_out,
-        ExcMessage("Input and output cannot alias with each other when "
-                   "adding the result of the basis change to existing data"));
+      Assert(add_into_result == false || values_in != values_out,
+             ExcMessage(
+               "Input and output cannot alias with each other when "
+               "adding the result of the basis change to existing data"));
 
       constexpr int next_dim =
         (dim > 2 ||
@@ -860,13 +876,14 @@ namespace internal
                                           1,
                                           Number,
                                           Number2>::
-                do_backward(
-                  transformation_matrix,
-                  add_into_result,
-                  values_in + q * Utilities::fixed_power<next_dim>(np_2),
-                  values_out + q * Utilities::fixed_power<next_dim>(np_1),
-                  basis_size_1_variable,
-                  basis_size_2_variable);
+                do_backward(transformation_matrix,
+                            add_into_result,
+                            values_in +
+                              q * Utilities::fixed_power<next_dim>(np_2),
+                            values_out +
+                              q * Utilities::fixed_power<next_dim>(np_1),
+                            basis_size_1_variable,
+                            basis_size_2_variable);
 
           values_in += Utilities::fixed_power<dim>(np_2);
           values_out += Utilities::fixed_power<dim>(np_1);
@@ -911,10 +928,12 @@ namespace internal
           n_components,
           Number,
           Number2>::do_forward(transformation_matrix,
-                               values_in + (q - 1) * Utilities::pow(
-                                                       basis_size_1, dim - 1),
-                               my_scratch + (q - 1) * Utilities::pow(
-                                                        basis_size_2, dim - 1));
+                               values_in +
+                                 (q - 1) *
+                                   Utilities::pow(basis_size_1, dim - 1),
+                               my_scratch +
+                                 (q - 1) *
+                                   Utilities::pow(basis_size_2, dim - 1));
       EvaluatorTensorProduct<variant,
                              dim,
                              basis_size_1,
@@ -939,22 +958,19 @@ namespace internal
                 my_scratch + i, my_scratch + i);
           }
       for (unsigned int q = 0; q < basis_size_1; ++q)
-        FEEvaluationImplBasisChange<variant,
-                                    next_dim,
-                                    basis_size_1,
-                                    basis_size_2,
-                                    n_components,
-                                    Number,
-                                    Number2>::do_backward(transformation_matrix,
-                                                          false,
-                                                          my_scratch +
-                                                            q * Utilities::pow(
-                                                                  basis_size_2,
-                                                                  dim - 1),
-                                                          values_out +
-                                                            q * Utilities::pow(
-                                                                  basis_size_1,
-                                                                  dim - 1));
+        FEEvaluationImplBasisChange<
+          variant,
+          next_dim,
+          basis_size_1,
+          basis_size_2,
+          n_components,
+          Number,
+          Number2>::do_backward(transformation_matrix,
+                                false,
+                                my_scratch +
+                                  q * Utilities::pow(basis_size_2, dim - 1),
+                                values_out +
+                                  q * Utilities::pow(basis_size_1, dim - 1));
     }
   };
 
@@ -1037,30 +1053,36 @@ namespace internal
             eval.template gradients<0, true, false>(values_dofs,
                                                     gradients_quad);
             if (dim > 1)
-              eval.template gradients<1, true, false>(
-                values_dofs, gradients_quad + n_q_points);
+              eval.template gradients<1, true, false>(values_dofs,
+                                                      gradients_quad +
+                                                        n_q_points);
             if (dim > 2)
-              eval.template gradients<2, true, false>(
-                values_dofs, gradients_quad + 2 * n_q_points);
+              eval.template gradients<2, true, false>(values_dofs,
+                                                      gradients_quad +
+                                                        2 * n_q_points);
           }
         if (evaluate_hessians == true)
           {
             eval.template hessians<0, true, false>(values_dofs, hessians_quad);
             if (dim > 1)
               {
-                eval.template gradients<1, true, false>(
-                  gradients_quad, hessians_quad + dim * n_q_points);
-                eval.template hessians<1, true, false>(
-                  values_dofs, hessians_quad + n_q_points);
+                eval.template gradients<1, true, false>(gradients_quad,
+                                                        hessians_quad +
+                                                          dim * n_q_points);
+                eval.template hessians<1, true, false>(values_dofs,
+                                                       hessians_quad +
+                                                         n_q_points);
               }
             if (dim > 2)
               {
-                eval.template gradients<2, true, false>(
-                  gradients_quad, hessians_quad + 4 * n_q_points);
+                eval.template gradients<2, true, false>(gradients_quad,
+                                                        hessians_quad +
+                                                          4 * n_q_points);
                 eval.template gradients<2, true, false>(
                   gradients_quad + n_q_points, hessians_quad + 5 * n_q_points);
-                eval.template hessians<2, true, false>(
-                  values_dofs, hessians_quad + 2 * n_q_points);
+                eval.template hessians<2, true, false>(values_dofs,
+                                                       hessians_quad +
+                                                         2 * n_q_points);
               }
             hessians_quad += (dim * (dim + 1)) / 2 * n_q_points;
           }
@@ -1114,11 +1136,13 @@ namespace internal
               eval.template gradients<0, false, false>(gradients_quad,
                                                        values_dofs);
             if (dim > 1)
-              eval.template gradients<1, false, true>(
-                gradients_quad + n_q_points, values_dofs);
+              eval.template gradients<1, false, true>(gradients_quad +
+                                                        n_q_points,
+                                                      values_dofs);
             if (dim > 2)
-              eval.template gradients<2, false, true>(
-                gradients_quad + 2 * n_q_points, values_dofs);
+              eval.template gradients<2, false, true>(gradients_quad +
+                                                        2 * n_q_points,
+                                                      values_dofs);
           }
         gradients_quad += dim * n_q_points;
         values_quad += n_q_points;
@@ -1428,8 +1452,9 @@ namespace internal
 
                       eval1.template values<0, true, false>(values_dofs,
                                                             scratch_data);
-                      eval2.template gradients<1, true, false>(
-                        scratch_data, gradients_quad + n_q_points);
+                      eval2.template gradients<1, true, false>(scratch_data,
+                                                               gradients_quad +
+                                                                 n_q_points);
 
                       if (evaluate_val == true)
                         eval2.template values<1, true, false>(scratch_data,
@@ -1442,9 +1467,10 @@ namespace internal
 
                   break;
                 case 2:
-                  eval1.template values<0, true, false>(
-                    values_dofs + size_deg,
-                    gradients_quad + (dim - 1) * n_q_points);
+                  eval1.template values<0, true, false>(values_dofs + size_deg,
+                                                        gradients_quad +
+                                                          (dim - 1) *
+                                                            n_q_points);
                   eval1.template gradients<0, true, false>(values_dofs,
                                                            gradients_quad);
                   if (evaluate_val == true)
@@ -1551,9 +1577,10 @@ namespace internal
             switch (dim)
               {
                 case 3:
-                  eval2.template values<1, false, false>(
-                    gradients_quad + 2 * n_q_points,
-                    gradients_quad + 2 * n_q_points);
+                  eval2.template values<1, false, false>(gradients_quad +
+                                                           2 * n_q_points,
+                                                         gradients_quad +
+                                                           2 * n_q_points);
                   eval1.template values<0, false, false>(
                     gradients_quad + 2 * n_q_points, values_dofs + size_deg);
                   if (symmetric_evaluate && n_q_points_1d > fe_degree)

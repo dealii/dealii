@@ -70,11 +70,11 @@ namespace Step38
 
 
   template <int spacedim>
-  Extract_Mesh_Test<spacedim>::Extract_Mesh_Test() :
-    space_fe(spacedim),
-    boundary_fe(1),
-    space_dof_handler(volume_mesh_triangulation),
-    contact_dof_handler(boundary_triangulation)
+  Extract_Mesh_Test<spacedim>::Extract_Mesh_Test()
+    : space_fe(spacedim)
+    , boundary_fe(1)
+    , space_dof_handler(volume_mesh_triangulation)
+    , contact_dof_handler(boundary_triangulation)
   {}
 
   template <int spacedim>
@@ -89,8 +89,10 @@ namespace Step38
 
     std::map<typename DoFHandler<boundary_dim, spacedim>::cell_iterator,
              typename DoFHandler<spacedim>::face_iterator>
-      element_assignment = GridGenerator::extract_boundary_mesh(
-        space_dof_handler, contact_dof_handler, boundary_ids);
+      element_assignment =
+        GridGenerator::extract_boundary_mesh(space_dof_handler,
+                                             contact_dof_handler,
+                                             boundary_ids);
 
     contact_dof_handler.distribute_dofs(boundary_fe);
 

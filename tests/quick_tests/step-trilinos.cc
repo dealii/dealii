@@ -74,7 +74,9 @@ private:
   TableHandler output_table;
 };
 
-LaplaceProblem::LaplaceProblem() : fe(1), dof_handler(triangulation)
+LaplaceProblem::LaplaceProblem()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 void

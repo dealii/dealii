@@ -57,8 +57,9 @@ test(unsigned int degree)
     shift(i) = 0.1;
 
   QGauss<dim>                                     quad(degree + 1);
-  MappingQEulerian<dim, Vector<double>, spacedim> mapping(
-    degree, shift_dh, shift);
+  MappingQEulerian<dim, Vector<double>, spacedim> mapping(degree,
+                                                          shift_dh,
+                                                          shift);
 
   Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active(),
                                                      endc = tria.end();

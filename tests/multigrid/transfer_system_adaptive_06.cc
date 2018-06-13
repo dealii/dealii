@@ -157,8 +157,9 @@ check(const FiniteElement<dim> &fe)
   Functions::ZeroFunction<dim>    dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] = &dirichlet_bc;
 
-  MGTools::make_boundary_list(
-    mg_dof_handler, dirichlet_boundary, boundary_indices);
+  MGTools::make_boundary_list(mg_dof_handler,
+                              dirichlet_boundary,
+                              boundary_indices);
 
   std::vector<unsigned int> block_selected(2);
   block_selected[0] = 0;

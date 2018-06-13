@@ -865,25 +865,25 @@ private:
 namespace ChunkSparsityPatternIterators
 {
   inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern,
-                            const unsigned int          row) :
-    sparsity_pattern(sparsity_pattern),
-    reduced_accessor(row == sparsity_pattern->n_rows() ?
-                       *sparsity_pattern->sparsity_pattern.end() :
-                       *sparsity_pattern->sparsity_pattern.begin(
-                         row / sparsity_pattern->get_chunk_size())),
-    chunk_row(row == sparsity_pattern->n_rows() ?
-                0 :
-                row % sparsity_pattern->get_chunk_size()),
-    chunk_col(0)
+                            const unsigned int          row)
+    : sparsity_pattern(sparsity_pattern)
+    , reduced_accessor(row == sparsity_pattern->n_rows() ?
+                         *sparsity_pattern->sparsity_pattern.end() :
+                         *sparsity_pattern->sparsity_pattern.begin(
+                           row / sparsity_pattern->get_chunk_size()))
+    , chunk_row(row == sparsity_pattern->n_rows() ?
+                  0 :
+                  row % sparsity_pattern->get_chunk_size())
+    , chunk_col(0)
   {}
 
 
 
-  inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern) :
-    sparsity_pattern(sparsity_pattern),
-    reduced_accessor(*sparsity_pattern->sparsity_pattern.end()),
-    chunk_row(0),
-    chunk_col(0)
+  inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern)
+    : sparsity_pattern(sparsity_pattern)
+    , reduced_accessor(*sparsity_pattern->sparsity_pattern.end())
+    , chunk_row(0)
+    , chunk_col(0)
   {}
 
 
@@ -1040,8 +1040,8 @@ namespace ChunkSparsityPatternIterators
 
 
   inline Iterator::Iterator(const ChunkSparsityPattern *sparsity_pattern,
-                            const unsigned int          row) :
-    accessor(sparsity_pattern, row)
+                            const unsigned int          row)
+    : accessor(sparsity_pattern, row)
   {}
 
 

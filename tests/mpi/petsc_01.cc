@@ -54,8 +54,9 @@ test()
   mat.add(2 * myid + 1, 2 * myid + 1, 1.0);
   mat.add(1, 0, 42.0);
 
-  mat.add(
-    (2 * myid + 2) % (2 * numprocs), (2 * myid + 2) % (2 * numprocs), 0.1);
+  mat.add((2 * myid + 2) % (2 * numprocs),
+          (2 * myid + 2) % (2 * numprocs),
+          0.1);
 
   mat.compress(VectorOperation::add);
 
@@ -71,8 +72,9 @@ test()
   mat.add(2 * myid, 2 * myid, 1.0);
   mat.add(2 * myid + 1, 2 * myid + 1, 1.0);
 
-  mat.add(
-    (2 * myid + 2) % (2 * numprocs), (2 * myid + 2) % (2 * numprocs), 0.1);
+  mat.add((2 * myid + 2) % (2 * numprocs),
+          (2 * myid + 2) % (2 * numprocs),
+          0.1);
 
   mat.compress(VectorOperation::add);
   //    mat.write_ascii();

@@ -66,9 +66,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components)
+    : Function<dim>(n_components)
+    , q(q)
   {}
 
   virtual double
@@ -122,8 +122,9 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 
-  LinearAlgebra::distributed::Vector<double> projection(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  LinearAlgebra::distributed::Vector<double> projection(locally_owned_dofs,
+                                                        locally_relevant_dofs,
+                                                        mpi_communicator);
   Vector<float> error(triangulation.n_active_cells());
   for (unsigned int q = 0; q <= p + 2 - order_difference; ++q)
     {
@@ -228,8 +229,9 @@ test_with_wrong_face_orientation(const FiniteElement<dim> &fe,
       cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
 
-      do_project<dim, components, fe_degree>(
-        triangulation, fe, order_difference);
+      do_project<dim, components, fe_degree>(triangulation,
+                                             fe,
+                                             order_difference);
     }
 }
 
@@ -349,8 +351,9 @@ test_with_2d_deformed_refined_mesh(const FiniteElement<dim> &fe,
         }
       triangulation.execute_coarsening_and_refinement();
 
-      do_project<dim, components, fe_degree>(
-        triangulation, fe, order_difference);
+      do_project<dim, components, fe_degree>(triangulation,
+                                             fe,
+                                             order_difference);
     }
 }
 

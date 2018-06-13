@@ -103,7 +103,8 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
 class TestFunction : public Function<2>
 {
 public:
-  TestFunction() : Function<2>()
+  TestFunction()
+    : Function<2>()
   {}
   virtual double
   value(const Point<2> &p, const unsigned int) const

@@ -55,17 +55,17 @@ class MatrixFreeTest
 public:
   typedef std::vector<Vector<Number>> VectorType;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) :
-    data(data_in),
-    fe_val0(data.get_dof_handler(0).get_fe(),
-            Quadrature<dim>(data.get_quadrature(0)),
-            update_values | update_gradients | update_JxW_values),
-    fe_val01(data.get_dof_handler(0).get_fe(),
-             Quadrature<dim>(data.get_quadrature(1)),
-             update_values | update_gradients | update_JxW_values),
-    fe_val1(data.get_dof_handler(1).get_fe(),
-            Quadrature<dim>(data.get_quadrature(1)),
-            update_values | update_gradients | update_JxW_values){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in)
+    , fe_val0(data.get_dof_handler(0).get_fe(),
+              Quadrature<dim>(data.get_quadrature(0)),
+              update_values | update_gradients | update_JxW_values)
+    , fe_val01(data.get_dof_handler(0).get_fe(),
+               Quadrature<dim>(data.get_quadrature(1)),
+               update_values | update_gradients | update_JxW_values)
+    , fe_val1(data.get_dof_handler(1).get_fe(),
+              Quadrature<dim>(data.get_quadrature(1)),
+              update_values | update_gradients | update_JxW_values){};
 
   void
   operator()(const MatrixFree<dim, Number> &              data,

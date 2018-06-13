@@ -62,7 +62,10 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    NumberCache<1>::NumberCache() : n_levels(0), n_lines(0), n_active_lines(0)
+    NumberCache<1>::NumberCache()
+      : n_levels(0)
+      , n_lines(0)
+      , n_active_lines(0)
     // all other fields are
     // default constructed
     {}
@@ -80,7 +83,9 @@ namespace internal
     }
 
 
-    NumberCache<2>::NumberCache() : n_quads(0), n_active_quads(0)
+    NumberCache<2>::NumberCache()
+      : n_quads(0)
+      , n_active_quads(0)
     // all other fields are
     // default constructed
     {}
@@ -99,7 +104,9 @@ namespace internal
 
 
 
-    NumberCache<3>::NumberCache() : n_hexes(0), n_active_hexes(0)
+    NumberCache<3>::NumberCache()
+      : n_hexes(0)
+      , n_active_hexes(0)
     // all other fields are
     // default constructed
     {}
@@ -377,8 +384,9 @@ namespace
     const unsigned int                                             face_no,
     RefinementCase<dim - 1> &expected_face_ref_case)
   {
-    return face_will_be_refined_by_neighbor_internal(
-      cell, face_no, expected_face_ref_case);
+    return face_will_be_refined_by_neighbor_internal(cell,
+                                                     face_no,
+                                                     expected_face_ref_case);
   }
 
 
@@ -1690,8 +1698,9 @@ namespace internal
                 // throw an exception if no such cells should exist.
                 if (!triangulation.check_for_distorted_cells)
                   {
-                    const double cell_measure = GridTools::cell_measure<1>(
-                      triangulation.vertices, cells[cell_no].vertices);
+                    const double cell_measure =
+                      GridTools::cell_measure<1>(triangulation.vertices,
+                                                 cells[cell_no].vertices);
                     AssertThrow(cell_measure > 0,
                                 ExcGridHasInvalidCell(cell_no));
                   }
@@ -1890,8 +1899,9 @@ namespace internal
                 // See the note in the 1D function on this if statement.
                 if (!triangulation.check_for_distorted_cells)
                   {
-                    const double cell_measure = GridTools::cell_measure<2>(
-                      triangulation.vertices, cells[cell_no].vertices);
+                    const double cell_measure =
+                      GridTools::cell_measure<2>(triangulation.vertices,
+                                                 cells[cell_no].vertices);
                     AssertThrow(cell_measure > 0,
                                 ExcGridHasInvalidCell(cell_no));
                   }
@@ -1986,13 +1996,13 @@ namespace internal
           // is at least two. if not so,
           // then clean triangulation and
           // exit with an exception
-          AssertThrow(
-            *(std::min_element(vertex_touch_count.begin(),
-                               vertex_touch_count.end())) >= 2,
-            ExcMessage("During creation of a triangulation, a part of the "
-                       "algorithm encountered a vertex that is part of only "
-                       "a single adjacent line. However, in 2d, every vertex "
-                       "needs to be at least part of two lines."));
+          AssertThrow(*(std::min_element(vertex_touch_count.begin(),
+                                         vertex_touch_count.end())) >= 2,
+                      ExcMessage(
+                        "During creation of a triangulation, a part of the "
+                        "algorithm encountered a vertex that is part of only "
+                        "a single adjacent line. However, in 2d, every vertex "
+                        "needs to be at least part of two lines."));
         }
 
         // reserve enough space
@@ -2122,8 +2132,9 @@ namespace internal
         for (; boundary_line != end_boundary_line; ++boundary_line)
           {
             typename Triangulation<dim, spacedim>::line_iterator line;
-            std::pair<int, int> line_vertices(std::make_pair(
-              boundary_line->vertices[0], boundary_line->vertices[1]));
+            std::pair<int, int>                                  line_vertices(
+              std::make_pair(boundary_line->vertices[0],
+                             boundary_line->vertices[1]));
             if (needed_lines.find(line_vertices) != needed_lines.end())
               // line found in this direction
               line = needed_lines[line_vertices];
@@ -2141,11 +2152,11 @@ namespace internal
               }
 
             // assert that we only set boundary info once
-            AssertThrow(
-              !(line->boundary_id() != 0 &&
-                line->boundary_id() != numbers::internal_face_boundary_id),
-              ExcMultiplySetLineInfoOfLine(line_vertices.first,
-                                           line_vertices.second));
+            AssertThrow(!(line->boundary_id() != 0 &&
+                          line->boundary_id() !=
+                            numbers::internal_face_boundary_id),
+                        ExcMultiplySetLineInfoOfLine(line_vertices.first,
+                                                     line_vertices.second));
 
             // Assert that only exterior lines are given a boundary
             // indicator; however, it is possible that someone may
@@ -2285,8 +2296,9 @@ namespace internal
             // See the note in the 1D function on this if statement.
             if (!triangulation.check_for_distorted_cells)
               {
-                const double cell_measure = GridTools::cell_measure<3>(
-                  triangulation.vertices, cells[cell_no].vertices);
+                const double cell_measure =
+                  GridTools::cell_measure<3>(triangulation.vertices,
+                                             cells[cell_no].vertices);
                 AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
               }
           }
@@ -2572,48 +2584,48 @@ namespace internal
                 // later set the
                 // face_orientation flag
                 const internal::TriangulationImplementation::TriaObject<2>
-                  test_quad_1(
-                    quad.face(2),
-                    quad.face(3),
-                    quad.face(0),
-                    quad.face(1)), // face_orientation=false, face_flip=false,
-                                   // face_rotation=false
-                  test_quad_2(
-                    quad.face(0),
-                    quad.face(1),
-                    quad.face(3),
-                    quad.face(2)), // face_orientation=false, face_flip=false,
-                                   // face_rotation=true
-                  test_quad_3(
-                    quad.face(3),
-                    quad.face(2),
-                    quad.face(1),
-                    quad.face(0)), // face_orientation=false, face_flip=true,
-                                   // face_rotation=false
-                  test_quad_4(
-                    quad.face(1),
-                    quad.face(0),
-                    quad.face(2),
-                    quad.face(3)), // face_orientation=false, face_flip=true,
-                                   // face_rotation=true
-                  test_quad_5(
-                    quad.face(2),
-                    quad.face(3),
-                    quad.face(1),
-                    quad.face(0)), // face_orientation=true,  face_flip=false,
-                                   // face_rotation=true
-                  test_quad_6(
-                    quad.face(1),
-                    quad.face(0),
-                    quad.face(3),
-                    quad.face(2)), // face_orientation=true,  face_flip=true,
-                                   // face_rotation=false
-                  test_quad_7(
-                    quad.face(3),
-                    quad.face(2),
-                    quad.face(0),
-                    quad.face(1)); // face_orientation=true,  face_flip=true,
-                                   // face_rotation=true
+                  test_quad_1(quad.face(2),
+                              quad.face(3),
+                              quad.face(0),
+                              quad.face(
+                                1)), // face_orientation=false, face_flip=false,
+                                     // face_rotation=false
+                  test_quad_2(quad.face(0),
+                              quad.face(1),
+                              quad.face(3),
+                              quad.face(
+                                2)), // face_orientation=false, face_flip=false,
+                                     // face_rotation=true
+                  test_quad_3(quad.face(3),
+                              quad.face(2),
+                              quad.face(1),
+                              quad.face(
+                                0)), // face_orientation=false, face_flip=true,
+                                     // face_rotation=false
+                  test_quad_4(quad.face(1),
+                              quad.face(0),
+                              quad.face(2),
+                              quad.face(
+                                3)), // face_orientation=false, face_flip=true,
+                                     // face_rotation=true
+                  test_quad_5(quad.face(2),
+                              quad.face(3),
+                              quad.face(1),
+                              quad.face(
+                                0)), // face_orientation=true,  face_flip=false,
+                                     // face_rotation=true
+                  test_quad_6(quad.face(1),
+                              quad.face(0),
+                              quad.face(3),
+                              quad.face(
+                                2)), // face_orientation=true,  face_flip=true,
+                                     // face_rotation=false
+                  test_quad_7(quad.face(3),
+                              quad.face(2),
+                              quad.face(0),
+                              quad.face(
+                                1)); // face_orientation=true,  face_flip=true,
+                                     // face_rotation=true
                 if (needed_quads.find(test_quad_1) == needed_quads.end() &&
                     needed_quads.find(test_quad_2) == needed_quads.end() &&
                     needed_quads.find(test_quad_3) == needed_quads.end() &&
@@ -2787,12 +2799,12 @@ namespace internal
                           quad.face(1),
                           quad.face(0)), // face_orientation=false,
                                          // face_flip=true,  face_rotation=false
-                        test_quad_4(
-                          quad.face(1),
-                          quad.face(0),
-                          quad.face(2),
-                          quad.face(3)), // face_orientation=false,
-                                         // face_flip=true,  face_rotation=true
+                        test_quad_4(quad.face(1),
+                                    quad.face(0),
+                                    quad.face(2),
+                                    quad.face(
+                                      3)), // face_orientation=false,
+                                           // face_flip=true, face_rotation=true
                         test_quad_5(
                           quad.face(2),
                           quad.face(3),
@@ -2805,12 +2817,12 @@ namespace internal
                           quad.face(3),
                           quad.face(2)), // face_orientation=true,
                                          // face_flip=true,  face_rotation=false
-                        test_quad_7(
-                          quad.face(3),
-                          quad.face(2),
-                          quad.face(0),
-                          quad.face(1)); // face_orientation=true,
-                                         // face_flip=true,  face_rotation=true
+                        test_quad_7(quad.face(3),
+                                    quad.face(2),
+                                    quad.face(0),
+                                    quad.face(
+                                      1)); // face_orientation=true,
+                                           // face_flip=true, face_rotation=true
                       if (needed_quads.find(test_quad_1) != needed_quads.end())
                         {
                           face_iterator[face] = needed_quads[test_quad_1].first;
@@ -3066,8 +3078,9 @@ namespace internal
         for (; boundary_line != end_boundary_line; ++boundary_line)
           {
             typename Triangulation<dim, spacedim>::line_iterator line;
-            std::pair<int, int> line_vertices(std::make_pair(
-              boundary_line->vertices[0], boundary_line->vertices[1]));
+            std::pair<int, int>                                  line_vertices(
+              std::make_pair(boundary_line->vertices[0],
+                             boundary_line->vertices[1]));
             if (needed_lines.find(line_vertices) != needed_lines.end())
               // line found in this
               // direction
@@ -3101,10 +3114,10 @@ namespace internal
             // different than the
             // previously set value
             if (line->boundary_id() != 0)
-              AssertThrow(
-                line->boundary_id() == boundary_line->boundary_id,
-                ExcMessage("Duplicate boundary lines are only allowed "
-                           "if they carry the same boundary indicator."));
+              AssertThrow(line->boundary_id() == boundary_line->boundary_id,
+                          ExcMessage(
+                            "Duplicate boundary lines are only allowed "
+                            "if they carry the same boundary indicator."));
 
             line->set_boundary_id_internal(boundary_line->boundary_id);
             // Set manifold id if given
@@ -3135,9 +3148,8 @@ namespace internal
                   boundary_quad
                     ->vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(i,
                                                                             0)],
-                  boundary_quad
-                    ->vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(
-                      i, 1)]);
+                  boundary_quad->vertices
+                    [GeometryInfo<dim - 1>::line_to_cell_vertices(i, 1)]);
 
                 // check whether line
                 // already exists
@@ -3257,10 +3269,10 @@ namespace internal
             // different than the
             // previously set value
             if (quad->boundary_id() != 0)
-              AssertThrow(
-                quad->boundary_id() == boundary_quad->boundary_id,
-                ExcMessage("Duplicate boundary quads are only allowed "
-                           "if they carry the same boundary indicator."));
+              AssertThrow(quad->boundary_id() == boundary_quad->boundary_id,
+                          ExcMessage(
+                            "Duplicate boundary quads are only allowed "
+                            "if they carry the same boundary indicator."));
 
             quad->set_boundary_id_internal(boundary_quad->boundary_id);
             quad->set_manifold_id(boundary_quad->manifold_id);
@@ -4694,10 +4706,11 @@ namespace internal
 
         // add to needed vertices how many
         // vertices are already in use
-        needed_vertices += std::count_if(
-          triangulation.vertices_used.begin(),
-          triangulation.vertices_used.end(),
-          std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+        needed_vertices += std::count_if(triangulation.vertices_used.begin(),
+                                         triangulation.vertices_used.end(),
+                                         std::bind(std::equal_to<bool>(),
+                                                   std::placeholders::_1,
+                                                   true));
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -5044,10 +5057,11 @@ namespace internal
         triangulation.faces->lines.reserve_space(n_lines_in_pairs, 0);
 
         // add to needed vertices how many vertices are already in use
-        needed_vertices += std::count_if(
-          triangulation.vertices_used.begin(),
-          triangulation.vertices_used.end(),
-          std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+        needed_vertices += std::count_if(triangulation.vertices_used.begin(),
+                                         triangulation.vertices_used.end(),
+                                         std::bind(std::equal_to<bool>(),
+                                                   std::placeholders::_1,
+                                                   true));
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -5413,13 +5427,12 @@ namespace internal
                             // face. therefore we set the user_index
                             // uniquely
                             {
-                              Assert(
-                                aface->refinement_case() ==
-                                    RefinementCase<dim -
-                                                   1>::isotropic_refinement ||
-                                  aface->refinement_case() ==
-                                    RefinementCase<dim - 1>::no_refinement,
-                                ExcInternalError());
+                              Assert(aface->refinement_case() ==
+                                         RefinementCase<
+                                           dim - 1>::isotropic_refinement ||
+                                       aface->refinement_case() ==
+                                         RefinementCase<dim - 1>::no_refinement,
+                                     ExcInternalError());
                               aface->set_user_index(face_ref_case);
                             }
                         }
@@ -5525,10 +5538,11 @@ namespace internal
 
 
         // add to needed vertices how many vertices are already in use
-        needed_vertices += std::count_if(
-          triangulation.vertices_used.begin(),
-          triangulation.vertices_used.end(),
-          std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+        needed_vertices += std::count_if(triangulation.vertices_used.begin(),
+                                         triangulation.vertices_used.end(),
+                                         std::bind(std::equal_to<bool>(),
+                                                   std::placeholders::_1,
+                                                   true));
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -5724,10 +5738,11 @@ namespace internal
                            ExcInternalError());
 
                     // this quad needs to be refined anisotropically
-                    Assert(
-                      quad->user_index() == RefinementCase<dim - 1>::cut_x ||
-                        quad->user_index() == RefinementCase<dim - 1>::cut_y,
-                      ExcInternalError());
+                    Assert(quad->user_index() ==
+                               RefinementCase<dim - 1>::cut_x ||
+                             quad->user_index() ==
+                               RefinementCase<dim - 1>::cut_y,
+                           ExcInternalError());
 
                     // make the new line interior to the quad
                     typename Triangulation<dim, spacedim>::raw_line_iterator
@@ -5994,9 +6009,9 @@ namespace internal
 
                                 new_child[i]->set(
                                   internal::TriangulationImplementation::
-                                    TriaObject<1>(
-                                      old_child[i]->vertex_index(0),
-                                      old_child[i]->vertex_index(1)));
+                                    TriaObject<1>(old_child[i]->vertex_index(0),
+                                                  old_child[i]->vertex_index(
+                                                    1)));
                                 new_child[i]->set_boundary_id_internal(
                                   old_child[i]->boundary_id());
                                 new_child[i]->set_manifold_id(
@@ -7577,10 +7592,10 @@ namespace internal
                           // first, create the new internal line
                           new_lines[0]->set(
                             internal::TriangulationImplementation::TriaObject<
-                              1>(
-                              middle_vertex_index<dim, spacedim>(hex->face(4)),
-                              middle_vertex_index<dim, spacedim>(
-                                hex->face(5))));
+                              1>(middle_vertex_index<dim, spacedim>(
+                                   hex->face(4)),
+                                 middle_vertex_index<dim, spacedim>(
+                                   hex->face(5))));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -8022,10 +8037,10 @@ namespace internal
                           // first, create the new internal line
                           new_lines[0]->set(
                             internal::TriangulationImplementation::TriaObject<
-                              1>(
-                              middle_vertex_index<dim, spacedim>(hex->face(2)),
-                              middle_vertex_index<dim, spacedim>(
-                                hex->face(3))));
+                              1>(middle_vertex_index<dim, spacedim>(
+                                   hex->face(2)),
+                                 middle_vertex_index<dim, spacedim>(
+                                   hex->face(3))));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -8478,10 +8493,10 @@ namespace internal
                           // internal line
                           new_lines[0]->set(
                             internal::TriangulationImplementation::TriaObject<
-                              1>(
-                              middle_vertex_index<dim, spacedim>(hex->face(0)),
-                              middle_vertex_index<dim, spacedim>(
-                                hex->face(1))));
+                              1>(middle_vertex_index<dim, spacedim>(
+                                   hex->face(0)),
+                                 middle_vertex_index<dim, spacedim>(
+                                   hex->face(1))));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -10122,10 +10137,10 @@ const unsigned int Triangulation<dim, spacedim>::dimension;
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::Triangulation(
   const MeshSmoothing smooth_grid,
-  const bool          check_for_distorted_cells) :
-  smooth_grid(smooth_grid),
-  anisotropic_refinement(false),
-  check_for_distorted_cells(check_for_distorted_cells)
+  const bool          check_for_distorted_cells)
+  : smooth_grid(smooth_grid)
+  , anisotropic_refinement(false)
+  , check_for_distorted_cells(check_for_distorted_cells)
 {
   if (dim == 1)
     {
@@ -10146,21 +10161,21 @@ Triangulation<dim, spacedim>::Triangulation(
 
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::Triangulation(
-  Triangulation<dim, spacedim> &&tria) noexcept :
-  Subscriptor(std::move(tria)),
-  smooth_grid(tria.smooth_grid),
-  periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0)),
-  periodic_face_map(std::move(tria.periodic_face_map)),
-  levels(std::move(tria.levels)),
-  faces(std::move(tria.faces)),
-  vertices(std::move(tria.vertices)),
-  vertices_used(std::move(tria.vertices_used)),
-  manifold(std::move(tria.manifold)),
-  anisotropic_refinement(tria.anisotropic_refinement),
-  check_for_distorted_cells(tria.check_for_distorted_cells),
-  number_cache(std::move(tria.number_cache)),
-  vertex_to_boundary_id_map_1d(std::move(tria.vertex_to_boundary_id_map_1d)),
-  vertex_to_manifold_id_map_1d(std::move(tria.vertex_to_manifold_id_map_1d))
+  Triangulation<dim, spacedim> &&tria) noexcept
+  : Subscriptor(std::move(tria))
+  , smooth_grid(tria.smooth_grid)
+  , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
+  , periodic_face_map(std::move(tria.periodic_face_map))
+  , levels(std::move(tria.levels))
+  , faces(std::move(tria.faces))
+  , vertices(std::move(tria.vertices))
+  , vertices_used(std::move(tria.vertices_used))
+  , manifold(std::move(tria.manifold))
+  , anisotropic_refinement(tria.anisotropic_refinement)
+  , check_for_distorted_cells(tria.check_for_distorted_cells)
+  , number_cache(std::move(tria.number_cache))
+  , vertex_to_boundary_id_map_1d(std::move(tria.vertex_to_boundary_id_map_1d))
+  , vertex_to_manifold_id_map_1d(std::move(tria.vertex_to_manifold_id_map_1d))
 {
   tria.number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
@@ -10469,14 +10484,14 @@ Triangulation<dim, spacedim>::copy_triangulation(
 {
   Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
-  Assert(
-    (other_tria.levels.size() != 0) && (other_tria.vertices.size() != 0) &&
-      (dim == 1 || other_tria.faces != nullptr),
-    ExcMessage("When calling Triangulation::copy_triangulation(), "
-               "the target triangulation must be empty but the source "
-               "triangulation (the argument to this function) must contain "
-               "something. Here, it seems like the source does not "
-               "contain anything at all."));
+  Assert((other_tria.levels.size() != 0) && (other_tria.vertices.size() != 0) &&
+           (dim == 1 || other_tria.faces != nullptr),
+         ExcMessage(
+           "When calling Triangulation::copy_triangulation(), "
+           "the target triangulation must be empty but the source "
+           "triangulation (the argument to this function) must contain "
+           "something. Here, it seems like the source does not "
+           "contain anything at all."));
 
 
   // copy normal elements
@@ -10689,10 +10704,10 @@ Triangulation<dim, spacedim>::create_triangulation(
                         {
                           // If we have visited this guy, then the ordering and
                           // the orientation should agree
-                          Assert(
-                            !(correct(i, j) ^ (neighbor->direction_flag() ==
-                                               (*cell)->direction_flag())),
-                            ExcNonOrientableTriangulation());
+                          Assert(!(correct(i, j) ^
+                                   (neighbor->direction_flag() ==
+                                    (*cell)->direction_flag())),
+                                 ExcNonOrientableTriangulation());
                         }
                       else
                         {
@@ -10802,8 +10817,10 @@ Triangulation<dim, spacedim>::save_refine_flags(std::ostream &out) const
 {
   std::vector<bool> v;
   save_refine_flags(v);
-  write_bool_vector(
-    mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end, out);
+  write_bool_vector(mn_tria_refine_flags_begin,
+                    v,
+                    mn_tria_refine_flags_end,
+                    out);
 }
 
 
@@ -10868,8 +10885,10 @@ Triangulation<dim, spacedim>::save_coarsen_flags(std::ostream &out) const
 {
   std::vector<bool> v;
   save_coarsen_flags(v);
-  write_bool_vector(
-    mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end, out);
+  write_bool_vector(mn_tria_coarsen_flags_begin,
+                    v,
+                    mn_tria_coarsen_flags_end,
+                    out);
 }
 
 
@@ -10879,8 +10898,10 @@ void
 Triangulation<dim, spacedim>::load_coarsen_flags(std::istream &in)
 {
   std::vector<bool> v;
-  read_bool_vector(
-    mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end, in);
+  read_bool_vector(mn_tria_coarsen_flags_begin,
+                   v,
+                   mn_tria_coarsen_flags_end,
+                   in);
   load_coarsen_flags(v);
 }
 
@@ -11173,8 +11194,9 @@ Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
   if (dim >= 2)
     {
       tmp.clear();
-      tmp.insert(
-        tmp.end(), v.begin() + n_lines(), v.begin() + n_lines() + n_quads());
+      tmp.insert(tmp.end(),
+                 v.begin() + n_lines(),
+                 v.begin() + n_lines() + n_quads());
       load_user_flags_quad(tmp);
     }
 
@@ -11214,8 +11236,10 @@ Triangulation<dim, spacedim>::save_user_flags_line(std::ostream &out) const
 {
   std::vector<bool> v;
   save_user_flags_line(v);
-  write_bool_vector(
-    mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end, out);
+  write_bool_vector(mn_tria_line_user_flags_begin,
+                    v,
+                    mn_tria_line_user_flags_end,
+                    out);
 }
 
 
@@ -11225,8 +11249,10 @@ void
 Triangulation<dim, spacedim>::load_user_flags_line(std::istream &in)
 {
   std::vector<bool> v;
-  read_bool_vector(
-    mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end, in);
+  read_bool_vector(mn_tria_line_user_flags_begin,
+                   v,
+                   mn_tria_line_user_flags_end,
+                   in);
   load_user_flags_line(v);
 }
 
@@ -11333,8 +11359,10 @@ Triangulation<dim, spacedim>::save_user_flags_quad(std::ostream &out) const
 {
   std::vector<bool> v;
   save_user_flags_quad(v);
-  write_bool_vector(
-    mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end, out);
+  write_bool_vector(mn_tria_quad_user_flags_begin,
+                    v,
+                    mn_tria_quad_user_flags_end,
+                    out);
 }
 
 
@@ -11344,8 +11372,10 @@ void
 Triangulation<dim, spacedim>::load_user_flags_quad(std::istream &in)
 {
   std::vector<bool> v;
-  read_bool_vector(
-    mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end, in);
+  read_bool_vector(mn_tria_quad_user_flags_begin,
+                   v,
+                   mn_tria_quad_user_flags_end,
+                   in);
   load_user_flags_quad(v);
 }
 
@@ -11398,8 +11428,10 @@ Triangulation<dim, spacedim>::save_user_flags_hex(std::ostream &out) const
 {
   std::vector<bool> v;
   save_user_flags_hex(v);
-  write_bool_vector(
-    mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end, out);
+  write_bool_vector(mn_tria_hex_user_flags_begin,
+                    v,
+                    mn_tria_hex_user_flags_end,
+                    out);
 }
 
 
@@ -11409,8 +11441,10 @@ void
 Triangulation<dim, spacedim>::load_user_flags_hex(std::istream &in)
 {
   std::vector<bool> v;
-  read_bool_vector(
-    mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end, in);
+  read_bool_vector(mn_tria_hex_user_flags_begin,
+                   v,
+                   mn_tria_hex_user_flags_end,
+                   in);
   load_user_flags_hex(v);
 }
 
@@ -11487,8 +11521,9 @@ Triangulation<dim, spacedim>::load_user_indices(
   if (dim >= 2)
     {
       tmp.clear();
-      tmp.insert(
-        tmp.end(), v.begin() + n_lines(), v.begin() + n_lines() + n_quads());
+      tmp.insert(tmp.end(),
+                 v.begin() + n_lines(),
+                 v.begin() + n_lines() + n_quads());
       load_user_indices_quad(tmp);
     }
 
@@ -11740,8 +11775,9 @@ Triangulation<dim, spacedim>::load_user_pointers(const std::vector<void *> &v)
   if (dim >= 2)
     {
       tmp.clear();
-      tmp.insert(
-        tmp.end(), v.begin() + n_lines(), v.begin() + n_lines() + n_quads());
+      tmp.insert(tmp.end(),
+                 v.begin() + n_lines(),
+                 v.begin() + n_lines() + n_quads());
       load_user_pointers_quad(tmp);
     }
 
@@ -11976,8 +12012,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 Triangulation<dim, spacedim>::end() const
 {
-  return cell_iterator(
-    const_cast<Triangulation<dim, spacedim> *>(this), -1, -1);
+  return cell_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
+                       -1,
+                       -1);
 }
 
 
@@ -12141,8 +12178,10 @@ Triangulation<dim, spacedim>::begin_vertex() const
     }
   else
     {
-      vertex_iterator i = raw_vertex_iterator(
-        const_cast<Triangulation<dim, spacedim> *>(this), 0, 0);
+      vertex_iterator i =
+        raw_vertex_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
+                            0,
+                            0);
       if (i.state() != IteratorState::valid)
         return i;
       // This loop will end because every triangulation has used vertices.
@@ -12245,8 +12284,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::line_iterator
 Triangulation<dim, spacedim>::end_line() const
 {
-  return raw_line_iterator(
-    const_cast<Triangulation<dim, spacedim> *>(this), -1, -1);
+  return raw_line_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
+                           -1,
+                           -1);
 }
 
 
@@ -12328,8 +12368,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::quad_iterator
 Triangulation<dim, spacedim>::end_quad() const
 {
-  return raw_quad_iterator(
-    const_cast<Triangulation<dim, spacedim> *>(this), -1, -1);
+  return raw_quad_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
+                           -1,
+                           -1);
 }
 
 
@@ -12402,8 +12443,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::hex_iterator
 Triangulation<dim, spacedim>::end_hex() const
 {
-  return raw_hex_iterator(
-    const_cast<Triangulation<dim, spacedim> *>(this), -1, -1);
+  return raw_hex_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
+                          -1,
+                          -1);
 }
 
 
@@ -13057,10 +13099,11 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_used_vertices() const
 {
-  return std::count_if(
-    vertices_used.begin(),
-    vertices_used.end(),
-    std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+  return std::count_if(vertices_used.begin(),
+                       vertices_used.end(),
+                       std::bind(std::equal_to<bool>(),
+                                 std::placeholders::_1,
+                                 true));
 }
 
 
@@ -13485,8 +13528,9 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
                 for (unsigned int vertex = 0;
                      vertex < GeometryInfo<dim>::vertices_per_cell;
                      ++vertex)
-                  vertex_level[cell->vertex_index(vertex)] = std::max(
-                    vertex_level[cell->vertex_index(vertex)], cell->level());
+                  vertex_level[cell->vertex_index(vertex)] =
+                    std::max(vertex_level[cell->vertex_index(vertex)],
+                             cell->level());
               else
                 {
                   // if coarsen flag is set then tentatively assume
@@ -14168,8 +14212,9 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                 for (unsigned int vertex = 0;
                      vertex < GeometryInfo<dim>::vertices_per_cell;
                      ++vertex)
-                  vertex_level[cell->vertex_index(vertex)] = std::max(
-                    vertex_level[cell->vertex_index(vertex)], cell->level());
+                  vertex_level[cell->vertex_index(vertex)] =
+                    std::max(vertex_level[cell->vertex_index(vertex)],
+                             cell->level());
               else
                 {
                   // if coarsen flag is set then tentatively assume
@@ -14793,8 +14838,9 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                 (face_ref_case == RefinementCase<dim>::cut_y &&
                                  needed_face_ref_case ==
                                    RefinementCase<dim>::cut_x))
-                              changed = cell->flag_for_face_refinement(
-                                i, face_ref_case);
+                              changed =
+                                cell->flag_for_face_refinement(i,
+                                                               face_ref_case);
                           }
                       }
                   }

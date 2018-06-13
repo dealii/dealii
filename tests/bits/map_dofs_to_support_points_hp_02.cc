@@ -69,8 +69,9 @@ test()
   // now map the dofs to the support points and show them on the screen
   std::vector<Point<dim>> hp_map(hp_dof_handler.n_dofs());
 
-  DoFTools::map_dofs_to_support_points(
-    mapping_collection, hp_dof_handler, hp_map);
+  DoFTools::map_dofs_to_support_points(mapping_collection,
+                                       hp_dof_handler,
+                                       hp_map);
 
   // output the elements
   for (unsigned int i = 0; i < hp_map.size(); i++)

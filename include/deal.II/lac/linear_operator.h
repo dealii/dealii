@@ -167,9 +167,9 @@ public:
    * be used for any linear operator operations, and will throw an exception
    * upon invocation.
    */
-  LinearOperator(const Payload &payload = Payload()) :
-    Payload(payload),
-    is_null_operator(false)
+  LinearOperator(const Payload &payload = Payload())
+    : Payload(payload)
+    , is_null_operator(false)
   {
     vmult = [](Range &, const Domain &) {
       Assert(false,

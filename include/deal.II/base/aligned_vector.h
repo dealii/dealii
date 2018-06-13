@@ -377,9 +377,9 @@ namespace internal
      */
     AlignedVectorCopy(const T *const source_begin,
                       const T *const source_end,
-                      T *const       destination) :
-      source_(source_begin),
-      destination_(destination)
+                      T *const       destination)
+      : source_(source_begin)
+      , destination_(destination)
     {
       Assert(source_end >= source_begin, ExcInternalError());
       Assert(source_end == source_begin || destination != nullptr,
@@ -444,9 +444,9 @@ namespace internal
      */
     AlignedVectorMove(T *const source_begin,
                       T *const source_end,
-                      T *const destination) :
-      source_(source_begin),
-      destination_(destination)
+                      T *const destination)
+      : source_(source_begin)
+      , destination_(destination)
     {
       Assert(source_end >= source_begin, ExcInternalError());
       Assert(source_end == source_begin || destination != nullptr,
@@ -517,10 +517,10 @@ namespace internal
      */
     AlignedVectorSet(const std::size_t size,
                      const T &         element,
-                     T *const          destination) :
-      element_(element),
-      destination_(destination),
-      trivial_element(false)
+                     T *const          destination)
+      : element_(element)
+      , destination_(destination)
+      , trivial_element(false)
     {
       if (size == 0)
         return;
@@ -557,8 +557,9 @@ namespace internal
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std::is_trivial<T>::value == true && trivial_element)
-        std::memset(
-          (void *)(destination_ + begin), 0, (end - begin) * sizeof(T));
+        std::memset((void *)(destination_ + begin),
+                    0,
+                    (end - begin) * sizeof(T));
       else
         copy_construct_or_assign(
           begin, end, std::integral_constant<bool, initialize_memory>());
@@ -614,9 +615,8 @@ namespace internal
      * Constructor. Issues a parallel call if there are sufficiently many
      * elements, otherwise work in serial.
      */
-    AlignedVectorDefaultInitialize(const std::size_t size,
-                                   T *const          destination) :
-      destination_(destination)
+    AlignedVectorDefaultInitialize(const std::size_t size, T *const destination)
+      : destination_(destination)
     {
       if (size == 0)
         return;
@@ -640,8 +640,9 @@ namespace internal
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std::is_trivial<T>::value == true)
-        std::memset(
-          (void *)(destination_ + begin), 0, (end - begin) * sizeof(T));
+        std::memset((void *)(destination_ + begin),
+                    0,
+                    (end - begin) * sizeof(T));
       else
         default_construct_or_assign(
           begin, end, std::integral_constant<bool, initialize_memory>());
@@ -678,19 +679,19 @@ namespace internal
 
 
 template <class T>
-inline AlignedVector<T>::AlignedVector() :
-  _data(nullptr),
-  _end_data(nullptr),
-  _end_allocated(nullptr)
+inline AlignedVector<T>::AlignedVector()
+  : _data(nullptr)
+  , _end_data(nullptr)
+  , _end_allocated(nullptr)
 {}
 
 
 
 template <class T>
-inline AlignedVector<T>::AlignedVector(const size_type size, const T &init) :
-  _data(nullptr),
-  _end_data(nullptr),
-  _end_allocated(nullptr)
+inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
+  : _data(nullptr)
+  , _end_data(nullptr)
+  , _end_allocated(nullptr)
 {
   if (size > 0)
     resize(size, init);
@@ -707,10 +708,10 @@ inline AlignedVector<T>::~AlignedVector()
 
 
 template <class T>
-inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec) :
-  _data(nullptr),
-  _end_data(nullptr),
-  _end_allocated(nullptr)
+inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
+  : _data(nullptr)
+  , _end_data(nullptr)
+  , _end_allocated(nullptr)
 {
   // copy the data from vec
   reserve(vec._end_data - vec._data);
@@ -721,10 +722,10 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec) :
 
 
 template <class T>
-inline AlignedVector<T>::AlignedVector(AlignedVector<T> &&vec) noexcept :
-  _data(vec._data),
-  _end_data(vec._end_data),
-  _end_allocated(vec._end_allocated)
+inline AlignedVector<T>::AlignedVector(AlignedVector<T> &&vec) noexcept
+  : _data(vec._data)
+  , _end_data(vec._end_data)
+  , _end_allocated(vec._end_allocated)
 {
   vec._data          = nullptr;
   vec._end_data      = nullptr;
@@ -783,8 +784,9 @@ AlignedVector<T>::resize_fast(const size_type size_in)
   // need to still set the values in case the class is non-trivial because
   // virtual classes etc. need to run their (default) constructor
   if (std::is_trivial<T>::value == false && size_in > old_size)
-    dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, _data + old_size);
+    dealii::internal::AlignedVectorDefaultInitialize<T, true>(size_in -
+                                                                old_size,
+                                                              _data + old_size);
 }
 
 
@@ -807,8 +809,9 @@ AlignedVector<T>::resize(const size_type size_in)
 
   // finally set the desired init values
   if (size_in > old_size)
-    dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, _data + old_size);
+    dealii::internal::AlignedVectorDefaultInitialize<T, true>(size_in -
+                                                                old_size,
+                                                              _data + old_size);
 }
 
 
@@ -831,8 +834,9 @@ AlignedVector<T>::resize(const size_type size_in, const T &init)
 
   // finally set the desired init values
   if (size_in > old_size)
-    dealii::internal::AlignedVectorSet<T, true>(
-      size_in - old_size, init, _data + old_size);
+    dealii::internal::AlignedVectorSet<T, true>(size_in - old_size,
+                                                init,
+                                                _data + old_size);
 }
 
 
@@ -857,8 +861,9 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       // allocate and align along 64-byte boundaries (this is enough for all
       // levels of vectorization currently supported by deal.II)
       T *new_data;
-      Utilities::System::posix_memalign(
-        (void **)&new_data, 64, size_actual_allocate);
+      Utilities::System::posix_memalign((void **)&new_data,
+                                        64,
+                                        size_actual_allocate);
 
       // copy data in case there was some content before and release the old
       // memory with the function corresponding to the one used for allocating
@@ -867,8 +872,9 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       _end_allocated = _data + new_size;
       if (_end_data != _data)
         {
-          dealii::internal::AlignedVectorMove<T>(
-            new_data, new_data + old_size, _data);
+          dealii::internal::AlignedVectorMove<T>(new_data,
+                                                 new_data + old_size,
+                                                 _data);
           free(new_data);
         }
       else

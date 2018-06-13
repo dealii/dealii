@@ -50,7 +50,10 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const double adj) : Function<dim>(3), q(q), adj(adj)
+  F(const unsigned int q, const double adj)
+    : Function<dim>(3)
+    , q(q)
+    , adj(adj)
   {}
 
   virtual void
@@ -111,10 +114,14 @@ test()
       for (unsigned int q = 0; q <= p + 2; ++q)
         {
           // interpolate the function
-          VectorTools::interpolate(
-            dof_handler, F<dim>(q, adj1), interpolant, mask1);
-          VectorTools::interpolate(
-            dof_handler, F<dim>(q, adj2), interpolant, mask2);
+          VectorTools::interpolate(dof_handler,
+                                   F<dim>(q, adj1),
+                                   interpolant,
+                                   mask1);
+          VectorTools::interpolate(dof_handler,
+                                   F<dim>(q, adj2),
+                                   interpolant,
+                                   mask2);
           constraints.distribute(interpolant);
 
 

@@ -34,9 +34,9 @@ std::vector<bool> end_sweep_flags;
 class TimeStep : public TimeStepBase
 {
 public:
-  TimeStep(const unsigned int time_step_number) :
-    TimeStepBase(0),
-    time_step_number(time_step_number)
+  TimeStep(const unsigned int time_step_number)
+    : TimeStepBase(0)
+    , time_step_number(time_step_number)
   {}
 
   virtual void

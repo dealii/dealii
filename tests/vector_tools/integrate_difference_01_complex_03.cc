@@ -48,7 +48,8 @@ template <int dim>
 class Ref : public Function<dim, std::complex<double>>
 {
 public:
-  Ref() : Function<dim, std::complex<double>>(dim)
+  Ref()
+    : Function<dim, std::complex<double>>(dim)
   {}
 
   std::complex<double>

@@ -79,8 +79,9 @@ test()
       local_relevant.add_range(4, 7);
     }
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
   v = 0.;
 
   // set local values

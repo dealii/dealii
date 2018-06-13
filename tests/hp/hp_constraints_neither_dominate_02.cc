@@ -114,8 +114,10 @@ test2cells(const FiniteElement<dim> &fe_0,
     p1[0] = -1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
     repetitoins[0] = 2;
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitoins, p1, p2);
+    GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                              repetitoins,
+                                              p1,
+                                              p2);
   }
 
   hp::DoFHandler<dim> dof_handler(triangulation);
@@ -287,8 +289,9 @@ test2cells(const FiniteElement<dim> &fe_0,
     }
 
   // sort
-  std::sort(
-    pairs_point_value.begin(), pairs_point_value.end(), less_than_key<dim>());
+  std::sort(pairs_point_value.begin(),
+            pairs_point_value.end(),
+            less_than_key<dim>());
   for (unsigned int p = 0; p < pairs_point_value.size(); p++)
     {
       const Point<dim> &    pt  = pairs_point_value[p].first;

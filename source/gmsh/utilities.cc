@@ -30,9 +30,9 @@ namespace Gmsh
 {
   AdditionalParameters::AdditionalParameters(
     const double       characteristic_length,
-    const std::string &output_base_name) :
-    characteristic_length(characteristic_length),
-    output_base_name(output_base_name)
+    const std::string &output_base_name)
+    : characteristic_length(characteristic_length)
+    , output_base_name(output_base_name)
   {}
 
 
@@ -92,9 +92,9 @@ namespace Gmsh
             << log_file_name << " 2> " << warnings_file_name;
 
     const auto ret_value = std::system(command.str().c_str());
-    AssertThrow(
-      ret_value == 0,
-      ExcMessage("Gmsh failed to run. Check the " + log_file_name + " file."));
+    AssertThrow(ret_value == 0,
+                ExcMessage("Gmsh failed to run. Check the " + log_file_name +
+                           " file."));
 
     std::ifstream grid_file(msh_file_name);
     Assert(grid_file, ExcIO());
@@ -124,9 +124,9 @@ namespace Gmsh
                         ExcMessage("Failed to remove " + *filename));
           }
         const auto ret_value = std::remove(dir_template);
-        AssertThrow(
-          ret_value == 0,
-          ExcMessage("Failed to remove " + std::string(dir_template)));
+        AssertThrow(ret_value == 0,
+                    ExcMessage("Failed to remove " +
+                               std::string(dir_template)));
       }
   }
 #  endif

@@ -63,7 +63,8 @@ public:
   typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
   typedef double                                         Number;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   local_apply(const MatrixFree<dim, Number> &              data,
@@ -72,10 +73,14 @@ public:
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number>                            vector_t;
-    FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(
-      data, 0, 0, 0);
-    FEEvaluation<dim, degree_p, degree_p + 2, 1, Number> pressure(
-      data, 0, 0, dim);
+    FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(data,
+                                                                        0,
+                                                                        0,
+                                                                        0);
+    FEEvaluation<dim, degree_p, degree_p + 2, 1, Number>       pressure(data,
+                                                                  0,
+                                                                  0,
+                                                                  dim);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -113,8 +118,10 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &MatrixFreeTest<dim, degree_p, VectorType>::local_apply, this, dst, src);
+    data.cell_loop(&MatrixFreeTest<dim, degree_p, VectorType>::local_apply,
+                   this,
+                   dst,
+                   src);
   };
 
 private:
@@ -238,8 +245,9 @@ test(const FESystem<dim> &fe)
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
   }
 

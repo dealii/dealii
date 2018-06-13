@@ -45,7 +45,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-MappingQ1<dim, spacedim>::MappingQ1() : MappingQGeneric<dim, spacedim>(1)
+MappingQ1<dim, spacedim>::MappingQ1()
+  : MappingQGeneric<dim, spacedim>(1)
 {}
 
 

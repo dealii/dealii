@@ -32,22 +32,22 @@ const unsigned int PersistentTriangulation<dim, spacedim>::spacedimension;
 
 template <int dim, int spacedim>
 PersistentTriangulation<dim, spacedim>::PersistentTriangulation(
-  const Triangulation<dim, spacedim> &coarse_grid) :
-  coarse_grid(&coarse_grid, typeid(*this).name())
+  const Triangulation<dim, spacedim> &coarse_grid)
+  : coarse_grid(&coarse_grid, typeid(*this).name())
 {}
 
 
 
 template <int dim, int spacedim>
 PersistentTriangulation<dim, spacedim>::PersistentTriangulation(
-  const PersistentTriangulation<dim, spacedim> &old_tria) :
-  // default initialize
-  // tria, i.e. it will be
-  // empty on first use
-  Triangulation<dim, spacedim>(),
-  coarse_grid(old_tria.coarse_grid),
-  refine_flags(old_tria.refine_flags),
-  coarsen_flags(old_tria.coarsen_flags)
+  const PersistentTriangulation<dim, spacedim> &old_tria)
+  : // default initialize
+    // tria, i.e. it will be
+    // empty on first use
+  Triangulation<dim, spacedim>()
+  , coarse_grid(old_tria.coarse_grid)
+  , refine_flags(old_tria.refine_flags)
+  , coarsen_flags(old_tria.coarsen_flags)
 {
   Assert(old_tria.n_levels() == 0, ExcTriaNotEmpty());
 }

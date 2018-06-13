@@ -197,8 +197,10 @@ namespace PETScWrappers
     for (size_type i = 0; i < sparsity_pattern.n_rows(); ++i)
       row_lengths[i] = sparsity_pattern.row_length(i);
 
-    do_reinit(
-      sparsity_pattern.n_rows(), sparsity_pattern.n_cols(), row_lengths, false);
+    do_reinit(sparsity_pattern.n_rows(),
+              sparsity_pattern.n_cols(),
+              row_lengths,
+              false);
 
     // next preset the exact given matrix
     // entries with zeros, if the user

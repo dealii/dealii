@@ -128,10 +128,10 @@ struct periodicity_tests
 };
 
 template <int dim>
-periodicity_tests<dim>::periodicity_tests() :
-  refn_cycle(0),
-  mpi_comm(MPI_COMM_WORLD),
-  the_grid(mpi_comm)
+periodicity_tests<dim>::periodicity_tests()
+  : refn_cycle(0)
+  , mpi_comm(MPI_COMM_WORLD)
+  , the_grid(mpi_comm)
 {
   Assert(dim == 2 || dim == 3,
          ExcMessage("Only implemented for the 2D and 3D case!"));

@@ -111,7 +111,9 @@ coefficient(const Point<dim> &p)
 
 
 template <int dim>
-Step6<dim>::Step6() : dof_handler(triangulation), fe(2)
+Step6<dim>::Step6()
+  : dof_handler(triangulation)
+  , fe(2)
 {}
 
 
@@ -138,8 +140,10 @@ Step6<dim>::setup_system()
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
 
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           ZeroFunction<dim>(),
+                                           constraints);
 
 
   constraints.close();
@@ -239,8 +243,10 @@ Step6<dim>::refine_grid()
                                      solution,
                                      estimated_error_per_cell);
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
 
   triangulation.execute_coarsening_and_refinement();
 }
@@ -250,9 +256,9 @@ template <int dim>
 class HeatFluxPostprocessor : public DataPostprocessorVector<dim>
 {
 public:
-  HeatFluxPostprocessor() :
-    // like above, but now also make sure that DataOut provides
-    // us with coordinates of the evaluation points:
+  HeatFluxPostprocessor()
+    : // like above, but now also make sure that DataOut provides
+      // us with coordinates of the evaluation points:
     DataPostprocessorVector<dim>("heatflux",
                                  update_gradients | update_quadrature_points)
   {}

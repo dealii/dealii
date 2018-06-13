@@ -49,10 +49,10 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   const Triangulation<dim, spacedim> *tria,
   const int                           level,
   const int                           index,
-  const AccessorData *) :
-  present_level((structdim == dim) ? level : 0),
-  present_index(index),
-  tria(tria)
+  const AccessorData *)
+  : present_level((structdim == dim) ? level : 0)
+  , present_index(index)
+  , tria(tria)
 {
   // non-cells have no level, so a 0
   // should have been passed, or a -1
@@ -69,10 +69,10 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
 
 template <int structdim, int dim, int spacedim>
 inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
-  const TriaAccessorBase<structdim, dim, spacedim> &a) :
-  present_level(a.present_level),
-  present_index(a.present_index),
-  tria(a.tria)
+  const TriaAccessorBase<structdim, dim, spacedim> &a)
+  : present_level(a.present_level)
+  , present_index(a.present_index)
+  , tria(a.tria)
 {}
 
 
@@ -413,9 +413,9 @@ InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
 
 template <int structdim, int dim, int spacedim>
 InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
-  const InvalidAccessor &i) :
-  TriaAccessorBase<structdim, dim, spacedim>(
-    static_cast<const TriaAccessorBase<structdim, dim, spacedim> &>(i))
+  const InvalidAccessor &i)
+  : TriaAccessorBase<structdim, dim, spacedim>(
+      static_cast<const TriaAccessorBase<structdim, dim, spacedim> &>(i))
 {
   Assert(false,
          ExcMessage("You are attempting an illegal conversion between "
@@ -701,9 +701,8 @@ namespace internal
       face_orientation(const TriaAccessor<3, dim, spacedim> &accessor,
                        const unsigned int                    face)
       {
-        return (
-          accessor.tria->levels[accessor.present_level]->cells.face_orientation(
-            accessor.present_index, face));
+        return (accessor.tria->levels[accessor.present_level]
+                  ->cells.face_orientation(accessor.present_index, face));
       }
 
 
@@ -1132,8 +1131,8 @@ inline TriaAccessor<structdim, dim, spacedim>::TriaAccessor(
   const Triangulation<dim, spacedim> *parent,
   const int                           level,
   const int                           index,
-  const AccessorData *                local_data) :
-  TriaAccessorBase<structdim, dim, spacedim>(parent, level, index, local_data)
+  const AccessorData *                local_data)
+  : TriaAccessorBase<structdim, dim, spacedim>(parent, level, index, local_data)
 {}
 
 
@@ -1142,9 +1141,9 @@ template <int structdim, int dim, int spacedim>
 inline bool
 TriaAccessor<structdim, dim, spacedim>::used() const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
   return this->objects().used[this->present_index];
 }
 
@@ -1155,8 +1154,9 @@ inline TriaIterator<TriaAccessor<0, dim, spacedim>>
 TriaAccessor<structdim, dim, spacedim>::vertex_iterator(
   const unsigned int i) const
 {
-  return TriaIterator<TriaAccessor<0, dim, spacedim>>(
-    this->tria, 0, vertex_index(i));
+  return TriaIterator<TriaAccessor<0, dim, spacedim>>(this->tria,
+                                                      0,
+                                                      vertex_index(i));
 }
 
 
@@ -1343,9 +1343,9 @@ template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::set_used_flag() const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
   this->objects().used[this->present_index] = true;
 }
 
@@ -1355,9 +1355,9 @@ template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::clear_used_flag() const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
   this->objects().used[this->present_index] = false;
 }
 
@@ -1430,9 +1430,9 @@ template <int structdim, int dim, int spacedim>
 RefinementCase<structdim>
 TriaAccessor<structdim, dim, spacedim>::refinement_case() const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
 
   switch (structdim)
     {
@@ -1537,9 +1537,9 @@ template <int structdim, int dim, int spacedim>
 inline bool
 TriaAccessor<structdim, dim, spacedim>::has_children() const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
 
   // each set of two children are stored
   // consecutively, so we only have to find
@@ -1565,13 +1565,14 @@ inline void
 TriaAccessor<structdim, dim, spacedim>::set_refinement_case(
   const RefinementCase<structdim> &refinement_case) const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
   Assert(static_cast<unsigned int>(this->present_index) <
            this->objects().refinement_cases.size(),
-         ExcIndexRange(
-           this->present_index, 0, this->objects().refinement_cases.size()));
+         ExcIndexRange(this->present_index,
+                       0,
+                       this->objects().refinement_cases.size()));
 
   this->objects().refinement_cases[this->present_index] = refinement_case;
 }
@@ -1581,13 +1582,14 @@ template <int structdim, int dim, int spacedim>
 inline void
 TriaAccessor<structdim, dim, spacedim>::clear_refinement_case() const
 {
-  Assert(
-    this->state() == IteratorState::valid,
-    TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
+  Assert(this->state() == IteratorState::valid,
+         TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
+           *this));
   Assert(static_cast<unsigned int>(this->present_index) <
            this->objects().refinement_cases.size(),
-         ExcIndexRange(
-           this->present_index, 0, this->objects().refinement_cases.size()));
+         ExcIndexRange(this->present_index,
+                       0,
+                       this->objects().refinement_cases.size()));
 
   this->objects().refinement_cases[this->present_index] =
     RefinementCase<structdim>::no_refinement;
@@ -2057,8 +2059,9 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
     is_initial_guess_vertex;
 
   // First let all the vertices be outside
-  std::fill(
-    is_initial_guess_vertex.begin(), is_initial_guess_vertex.end(), false);
+  std::fill(is_initial_guess_vertex.begin(),
+            is_initial_guess_vertex.end(),
+            false);
 
   // Get an initial guess by looking at the largest diagonal
   Point<spacedim> center;
@@ -2092,8 +2095,10 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
           const Point<spacedim>     p61(this->vertex(6) - this->vertex(1));
           const Point<spacedim>     p25(this->vertex(2) - this->vertex(5));
           const Point<spacedim>     p34(this->vertex(3) - this->vertex(4));
-          const std::vector<double> diagonals = {
-            p70.norm(), p61.norm(), p25.norm(), p34.norm()};
+          const std::vector<double> diagonals = {p70.norm(),
+                                                 p61.norm(),
+                                                 p25.norm(),
+                                                 p34.norm()};
           const std::vector<double>::const_iterator it =
             std::max_element(diagonals.begin(), diagonals.end());
           if (it == diagonals.begin())
@@ -2239,9 +2244,9 @@ TriaAccessor<structdim, dim, spacedim>::is_translation_of(
 template <int dim, int spacedim>
 inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
   const Triangulation<dim, spacedim> *tria,
-  const unsigned int                  vertex_index) :
-  tria(tria),
-  global_vertex_index(vertex_index)
+  const unsigned int                  vertex_index)
+  : tria(tria)
+  , global_vertex_index(vertex_index)
 {}
 
 
@@ -2251,9 +2256,9 @@ inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
   const Triangulation<dim, spacedim> *tria,
   const int /*level*/,
   const int index,
-  const AccessorData *) :
-  tria(tria),
-  global_vertex_index(index)
+  const AccessorData *)
+  : tria(tria)
+  , global_vertex_index(index)
 {}
 
 
@@ -2261,9 +2266,9 @@ inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
 template <int dim, int spacedim>
 template <int structdim2, int dim2, int spacedim2>
 inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
-  const TriaAccessor<structdim2, dim2, spacedim2> &) :
-  tria(nullptr),
-  global_vertex_index(numbers::invalid_unsigned_int)
+  const TriaAccessor<structdim2, dim2, spacedim2> &)
+  : tria(nullptr)
+  , global_vertex_index(numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
 }
@@ -2273,9 +2278,9 @@ inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
 template <int dim, int spacedim>
 template <int structdim2, int dim2, int spacedim2>
 inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
-  const InvalidAccessor<structdim2, dim2, spacedim2> &) :
-  tria(nullptr),
-  global_vertex_index(numbers::invalid_unsigned_int)
+  const InvalidAccessor<structdim2, dim2, spacedim2> &)
+  : tria(nullptr)
+  , global_vertex_index(numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
 }
@@ -2598,10 +2603,10 @@ template <int spacedim>
 inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
   const Triangulation<1, spacedim> *tria,
   const VertexKind                  vertex_kind,
-  const unsigned int                vertex_index) :
-  tria(tria),
-  vertex_kind(vertex_kind),
-  global_vertex_index(vertex_index)
+  const unsigned int                vertex_index)
+  : tria(tria)
+  , vertex_kind(vertex_kind)
+  , global_vertex_index(vertex_index)
 {}
 
 
@@ -2611,10 +2616,10 @@ inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
   const Triangulation<1, spacedim> *tria,
   const int                         level,
   const int                         index,
-  const AccessorData *) :
-  tria(tria),
-  vertex_kind(interior_vertex),
-  global_vertex_index(numbers::invalid_unsigned_int)
+  const AccessorData *)
+  : tria(tria)
+  , vertex_kind(interior_vertex)
+  , global_vertex_index(numbers::invalid_unsigned_int)
 {
   // in general, calling this constructor should yield an error -- users should
   // instead call the one immediately above. however, if you create something
@@ -2633,10 +2638,10 @@ inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
 template <int spacedim>
 template <int structdim2, int dim2, int spacedim2>
 inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
-  const TriaAccessor<structdim2, dim2, spacedim2> &) :
-  tria(nullptr),
-  vertex_kind(interior_vertex),
-  global_vertex_index(numbers::invalid_unsigned_int)
+  const TriaAccessor<structdim2, dim2, spacedim2> &)
+  : tria(nullptr)
+  , vertex_kind(interior_vertex)
+  , global_vertex_index(numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
 }
@@ -2646,10 +2651,10 @@ inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
 template <int spacedim>
 template <int structdim2, int dim2, int spacedim2>
 inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
-  const InvalidAccessor<structdim2, dim2, spacedim2> &) :
-  tria(nullptr),
-  vertex_kind(interior_vertex),
-  global_vertex_index(numbers::invalid_unsigned_int)
+  const InvalidAccessor<structdim2, dim2, spacedim2> &)
+  : tria(nullptr)
+  , vertex_kind(interior_vertex)
+  , global_vertex_index(numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
 }
@@ -2824,10 +2829,10 @@ TriaAccessor<0, 1, spacedim>::boundary_id() const
       case left_vertex:
       case right_vertex:
         {
-          Assert(
-            tria->vertex_to_boundary_id_map_1d->find(this->vertex_index()) !=
-              tria->vertex_to_boundary_id_map_1d->end(),
-            ExcInternalError());
+          Assert(tria->vertex_to_boundary_id_map_1d->find(
+                   this->vertex_index()) !=
+                   tria->vertex_to_boundary_id_map_1d->end(),
+                 ExcInternalError());
 
           return (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()];
         }
@@ -3026,17 +3031,17 @@ inline CellAccessor<dim, spacedim>::CellAccessor(
   const Triangulation<dim, spacedim> *parent,
   const int                           level,
   const int                           index,
-  const AccessorData *                local_data) :
-  TriaAccessor<dim, dim, spacedim>(parent, level, index, local_data)
+  const AccessorData *                local_data)
+  : TriaAccessor<dim, dim, spacedim>(parent, level, index, local_data)
 {}
 
 
 
 template <int dim, int spacedim>
 inline CellAccessor<dim, spacedim>::CellAccessor(
-  const TriaAccessor<dim, dim, spacedim> &cell_accessor) :
-  TriaAccessor<dim, dim, spacedim>(
-    static_cast<const TriaAccessor<dim, dim, spacedim> &>(cell_accessor))
+  const TriaAccessor<dim, dim, spacedim> &cell_accessor)
+  : TriaAccessor<dim, dim, spacedim>(
+      static_cast<const TriaAccessor<dim, dim, spacedim> &>(cell_accessor))
 {}
 
 
@@ -3418,8 +3423,9 @@ template <int dim, int spacedim>
 inline TriaIterator<CellAccessor<dim, spacedim>>
 CellAccessor<dim, spacedim>::neighbor(const unsigned int i) const
 {
-  TriaIterator<CellAccessor<dim, spacedim>> q(
-    this->tria, neighbor_level(i), neighbor_index(i));
+  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
+                                              neighbor_level(i),
+                                              neighbor_index(i));
 
   Assert((q.state() == IteratorState::past_the_end) || q->used(),
          ExcInternalError());
@@ -3433,8 +3439,9 @@ template <int dim, int spacedim>
 inline TriaIterator<CellAccessor<dim, spacedim>>
 CellAccessor<dim, spacedim>::child(const unsigned int i) const
 {
-  TriaIterator<CellAccessor<dim, spacedim>> q(
-    this->tria, this->present_level + 1, this->child_index(i));
+  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
+                                              this->present_level + 1,
+                                              this->child_index(i));
 
   Assert((q.state() == IteratorState::past_the_end) || q->used(),
          ExcInternalError());

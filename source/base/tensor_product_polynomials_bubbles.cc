@@ -237,12 +237,14 @@ TensorProductPolynomialsBubbles<dim>::compute(
     ExcDimensionMismatch2(grad_grads.size(), max_q_indices + n_bubbles, 0));
   Assert(third_derivatives.size() == max_q_indices + n_bubbles ||
            third_derivatives.size() == 0,
-         ExcDimensionMismatch2(
-           third_derivatives.size(), max_q_indices + n_bubbles, 0));
+         ExcDimensionMismatch2(third_derivatives.size(),
+                               max_q_indices + n_bubbles,
+                               0));
   Assert(fourth_derivatives.size() == max_q_indices + n_bubbles ||
            fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(
-           fourth_derivatives.size(), max_q_indices + n_bubbles, 0));
+         ExcDimensionMismatch2(fourth_derivatives.size(),
+                               max_q_indices + n_bubbles,
+                               0));
 
   bool do_values = false, do_grads = false, do_grad_grads = false;
   bool do_3rd_derivatives = false, do_4th_derivatives = false;

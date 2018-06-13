@@ -197,8 +197,9 @@ print_matching(DoFHandler<dim> &dof_handler,
   ConstraintMatrix        constraint_matrix;
   ConstraintMatrix        constraint_matrix_reverse;
   std::vector<Point<dim>> support_points(dof_handler.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim>(
-    mapping, dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points<dim>(mapping,
+                                            dof_handler,
+                                            support_points);
 
   FEValuesExtractors::Vector v(0);
   FEValuesExtractors::Scalar v_1(0);
@@ -284,14 +285,15 @@ print_matching(DoFHandler<dim> &dof_handler,
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
 
-  DoFTools::make_periodicity_constraints(
-    face_2,
-    face_1,
-    constraint_matrix_reverse,
-    velocity_mask,
-    orientation[0],
-    orientation[0] ? orientation[1] ^ orientation[2] : orientation[1],
-    orientation[2]);
+  DoFTools::make_periodicity_constraints(face_2,
+                                         face_1,
+                                         constraint_matrix_reverse,
+                                         velocity_mask,
+                                         orientation[0],
+                                         orientation[0] ?
+                                           orientation[1] ^ orientation[2] :
+                                           orientation[1],
+                                         orientation[2]);
   deallog << "Reverse Matching:" << std::endl;
   constraint_matrix_reverse.print(deallog.get_file_stream());
   constraint_matrix_reverse.close();

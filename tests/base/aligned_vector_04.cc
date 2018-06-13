@@ -41,12 +41,15 @@ public:
 class Function : public FunctionBase
 {
 public:
-  Function() : size_(2)
+  Function()
+    : size_(2)
   {
     deallog << "Construct object" << std::endl;
   }
 
-  Function(const Function &f) : size_(f.size_), vec(f.vec)
+  Function(const Function &f)
+    : size_(f.size_)
+    , vec(f.vec)
   {
     deallog << "Copy construct object" << std::endl;
   }

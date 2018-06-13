@@ -71,11 +71,10 @@ private:
 };
 
 template <int dim>
-BubbleFunction<dim>::BubbleFunction(unsigned int degree,
-                                    unsigned int direction) :
-  Function<dim>(),
-  m_degree(degree),
-  m_direction(direction)
+BubbleFunction<dim>::BubbleFunction(unsigned int degree, unsigned int direction)
+  : Function<dim>()
+  , m_degree(degree)
+  , m_direction(direction)
 {}
 
 template <int dim>
@@ -157,10 +156,10 @@ private:
 };
 
 template <int dim>
-Step3<dim>::Step3(FiniteElement<dim> *fe, const unsigned int degree) :
-  fe(fe),
-  dof_handler(triangulation),
-  m_degree(degree + 1)
+Step3<dim>::Step3(FiniteElement<dim> *fe, const unsigned int degree)
+  : fe(fe)
+  , dof_handler(triangulation)
+  , m_degree(degree + 1)
 {}
 
 
@@ -240,8 +239,9 @@ Step3<dim>::assemble_system(unsigned int i)
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i],
+                            local_dof_indices[j],
+                            cell_matrix(i, j));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);

@@ -58,7 +58,8 @@ template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
-  EnrichmentFunction() : Function<dim>(1)
+  EnrichmentFunction()
+    : Function<dim>(1)
   {}
 
   virtual double
@@ -95,8 +96,9 @@ test1()
   dof_handler.distribute_dofs(fe);
 
   QGauss<dim>   quadrature(1);
-  FEValues<dim> fe_values(
-    fe, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_JxW_values);
 
   typename DoFHandler<dim>::active_cell_iterator cell =
                                                    dof_handler.begin_active(),

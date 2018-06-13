@@ -52,20 +52,21 @@ namespace internal
 
 
 template <int dim, int spacedim>
-FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree) :
-  FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
-    TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(
-      internal::FE_DGQ::get_QGaussLobatto_points(degree))),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      true),
-    std::vector<ComponentMask>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      std::vector<bool>(1, true)))
+FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
+  : FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
+      TensorProductPolynomials<dim>(
+        Polynomials::generate_complete_Lagrange_basis(
+          internal::FE_DGQ::get_QGaussLobatto_points(degree))),
+      FiniteElementData<dim>(get_dpo_vector(degree),
+                             1,
+                             degree,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        true),
+      std::vector<ComponentMask>(
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        std::vector<bool>(1, true)))
 {
   // Compute support points, which are the tensor product of the Lagrange
   // interpolation points in the constructor.
@@ -84,25 +85,25 @@ FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree) :
 
 template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ(
-  const std::vector<Polynomials::Polynomial<double>> &polynomials) :
-  FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
-    TensorProductPolynomials<dim>(polynomials),
-    FiniteElementData<dim>(get_dpo_vector(polynomials.size() - 1),
-                           1,
-                           polynomials.size() - 1,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(
+  const std::vector<Polynomials::Polynomial<double>> &polynomials)
+  : FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
+      TensorProductPolynomials<dim>(polynomials),
       FiniteElementData<dim>(get_dpo_vector(polynomials.size() - 1),
                              1,
-                             polynomials.size() - 1)
-        .dofs_per_cell,
-      true),
-    std::vector<ComponentMask>(
-      FiniteElementData<dim>(get_dpo_vector(polynomials.size() - 1),
-                             1,
-                             polynomials.size() - 1)
-        .dofs_per_cell,
-      std::vector<bool>(1, true)))
+                             polynomials.size() - 1,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(
+                                                 polynomials.size() - 1),
+                                               1,
+                                               polynomials.size() - 1)
+                          .dofs_per_cell,
+                        true),
+      std::vector<ComponentMask>(
+        FiniteElementData<dim>(get_dpo_vector(polynomials.size() - 1),
+                               1,
+                               polynomials.size() - 1)
+          .dofs_per_cell,
+        std::vector<bool>(1, true)))
 {
   // No support points can be defined in general. Derived classes might define
   // support points like the class FE_DGQArbitraryNodes
@@ -264,9 +265,9 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
   // source FE is also a
   // DGQ element
   typedef FiniteElement<dim, spacedim> FE;
-  AssertThrow(
-    (dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) != nullptr),
-    typename FE::ExcInterpolationNotImplemented());
+  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
+               nullptr),
+              typename FE::ExcInterpolationNotImplemented());
 
   // ok, source is a Q element, so
   // we will be able to do the work
@@ -275,9 +276,9 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
 
   Assert(interpolation_matrix.m() == this->dofs_per_cell,
          ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(
-    interpolation_matrix.n() == source_fe.dofs_per_cell,
-    ExcDimensionMismatch(interpolation_matrix.n(), source_fe.dofs_per_cell));
+  Assert(interpolation_matrix.n() == source_fe.dofs_per_cell,
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              source_fe.dofs_per_cell));
 
 
   // compute the interpolation
@@ -347,9 +348,9 @@ FE_DGQ<dim, spacedim>::get_face_interpolation_matrix(
   // much we need to do here.
   (void)interpolation_matrix;
   typedef FiniteElement<dim, spacedim> FE;
-  AssertThrow(
-    (dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) != nullptr),
-    typename FE::ExcInterpolationNotImplemented());
+  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
+               nullptr),
+              typename FE::ExcInterpolationNotImplemented());
 
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
@@ -374,9 +375,9 @@ FE_DGQ<dim, spacedim>::get_subface_interpolation_matrix(
   // much we need to do here.
   (void)interpolation_matrix;
   typedef FiniteElement<dim, spacedim> FE;
-  AssertThrow(
-    (dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) != nullptr),
-    typename FE::ExcInterpolationNotImplemented());
+  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
+               nullptr),
+              typename FE::ExcInterpolationNotImplemented());
 
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
@@ -393,14 +394,16 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Prolongation matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Prolongation matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -424,11 +427,13 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
             GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
           if (dim == spacedim)
-            FETools::compute_embedding_matrices(
-              *this, isotropic_matrices, true);
+            FETools::compute_embedding_matrices(*this,
+                                                isotropic_matrices,
+                                                true);
           else
-            FETools::compute_embedding_matrices(
-              FE_DGQ<dim>(this->degree), isotropic_matrices, true);
+            FETools::compute_embedding_matrices(FE_DGQ<dim>(this->degree),
+                                                isotropic_matrices,
+                                                true);
           this_nonconst.prolongation[refinement_case - 1].swap(
             isotropic_matrices.back());
         }
@@ -469,14 +474,16 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Restriction matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -500,11 +507,13 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
             GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
           if (dim == spacedim)
-            FETools::compute_projection_matrices(
-              *this, isotropic_matrices, true);
+            FETools::compute_projection_matrices(*this,
+                                                 isotropic_matrices,
+                                                 true);
           else
-            FETools::compute_projection_matrices(
-              FE_DGQ<dim>(this->degree), isotropic_matrices, true);
+            FETools::compute_projection_matrices(FE_DGQ<dim>(this->degree),
+                                                 isotropic_matrices,
+                                                 true);
           this_nonconst.restriction[refinement_case - 1].swap(
             isotropic_matrices.back());
         }
@@ -721,9 +730,9 @@ FE_DGQ<dim, spacedim>::memory_consumption() const
 
 template <int dim, int spacedim>
 FE_DGQArbitraryNodes<dim, spacedim>::FE_DGQArbitraryNodes(
-  const Quadrature<1> &points) :
-  FE_DGQ<dim, spacedim>(
-    Polynomials::generate_complete_Lagrange_basis(points.get_points()))
+  const Quadrature<1> &points)
+  : FE_DGQ<dim, spacedim>(
+      Polynomials::generate_complete_Lagrange_basis(points.get_points()))
 {
   Assert(points.size() > 0,
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
@@ -871,8 +880,9 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 // ---------------------------------- FE_DGQLegendre -------------------------
 
 template <int dim, int spacedim>
-FE_DGQLegendre<dim, spacedim>::FE_DGQLegendre(const unsigned int degree) :
-  FE_DGQ<dim, spacedim>(Polynomials::Legendre::generate_complete_basis(degree))
+FE_DGQLegendre<dim, spacedim>::FE_DGQLegendre(const unsigned int degree)
+  : FE_DGQ<dim, spacedim>(
+      Polynomials::Legendre::generate_complete_basis(degree))
 {}
 
 
@@ -913,9 +923,9 @@ FE_DGQLegendre<dim, spacedim>::clone() const
 // ---------------------------------- FE_DGQHermite --------------------------
 
 template <int dim, int spacedim>
-FE_DGQHermite<dim, spacedim>::FE_DGQHermite(const unsigned int degree) :
-  FE_DGQ<dim, spacedim>(
-    Polynomials::HermiteLikeInterpolation::generate_complete_basis(degree))
+FE_DGQHermite<dim, spacedim>::FE_DGQHermite(const unsigned int degree)
+  : FE_DGQ<dim, spacedim>(
+      Polynomials::HermiteLikeInterpolation::generate_complete_basis(degree))
 {}
 
 

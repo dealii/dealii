@@ -200,13 +200,13 @@ TensorProductManifold<dim,
                       chartdim_B>::
   TensorProductManifold(
     const ChartManifold<dim_A, spacedim_A, chartdim_A> &manifold_A,
-    const ChartManifold<dim_B, spacedim_B, chartdim_B> &manifold_B) :
-  ChartManifold<dim, spacedim_A + spacedim_B, chartdim_A + chartdim_B>(
-    internal::TensorProductManifoldImplementation::concat(
-      manifold_A.get_periodicity(),
-      manifold_B.get_periodicity())),
-  manifold_A(&manifold_A),
-  manifold_B(&manifold_B)
+    const ChartManifold<dim_B, spacedim_B, chartdim_B> &manifold_B)
+  : ChartManifold<dim, spacedim_A + spacedim_B, chartdim_A + chartdim_B>(
+      internal::TensorProductManifoldImplementation::concat(
+        manifold_A.get_periodicity(),
+        manifold_B.get_periodicity()))
+  , manifold_A(&manifold_A)
+  , manifold_B(&manifold_B)
 {}
 
 template <int dim,
@@ -267,8 +267,9 @@ TensorProductManifold<dim,
 {
   Point<spacedim_A> space_point_A;
   Point<spacedim_B> space_point_B;
-  internal::TensorProductManifoldImplementation::split_point(
-    space_point, space_point_A, space_point_B);
+  internal::TensorProductManifoldImplementation::split_point(space_point,
+                                                             space_point_A,
+                                                             space_point_B);
 
   Point<chartdim_A> result_A = manifold_A->pull_back(space_point_A);
   Point<chartdim_B> result_B = manifold_B->pull_back(space_point_B);
@@ -309,8 +310,9 @@ TensorProductManifold<dim,
 {
   Point<chartdim_A> chart_point_A;
   Point<chartdim_B> chart_point_B;
-  internal::TensorProductManifoldImplementation::split_point(
-    chart_point, chart_point_A, chart_point_B);
+  internal::TensorProductManifoldImplementation::split_point(chart_point,
+                                                             chart_point_A,
+                                                             chart_point_B);
 
   Point<spacedim_A> result_A = manifold_A->push_forward(chart_point_A);
   Point<spacedim_B> result_B = manifold_B->push_forward(chart_point_B);
@@ -360,8 +362,9 @@ TensorProductManifold<dim,
 {
   Point<chartdim_A> chart_point_A;
   Point<chartdim_B> chart_point_B;
-  internal::TensorProductManifoldImplementation::split_point(
-    chart_point, chart_point_A, chart_point_B);
+  internal::TensorProductManifoldImplementation::split_point(chart_point,
+                                                             chart_point_A,
+                                                             chart_point_B);
 
   DerivativeForm<1, chartdim_A, spacedim_A> result_A =
     manifold_A->push_forward_gradient(chart_point_A);

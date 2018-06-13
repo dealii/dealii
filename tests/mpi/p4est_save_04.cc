@@ -81,8 +81,9 @@ test()
       DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
 
       PETScWrappers::MPI::Vector x(locally_owned_dofs, com_small);
-      PETScWrappers::MPI::Vector rel_x(
-        locally_owned_dofs, locally_relevant_dofs, com_small);
+      PETScWrappers::MPI::Vector rel_x(locally_owned_dofs,
+                                       locally_relevant_dofs,
+                                       com_small);
 
       parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
         soltrans(dh);

@@ -44,8 +44,9 @@ namespace internal
                               RefinementCase<dim>::no_refinement);
 
           coarsen_flags.reserve(total_cells);
-          coarsen_flags.insert(
-            coarsen_flags.end(), total_cells - coarsen_flags.size(), false);
+          coarsen_flags.insert(coarsen_flags.end(),
+                               total_cells - coarsen_flags.size(),
+                               false);
 
           active_cell_indices.reserve(total_cells);
           active_cell_indices.insert(active_cell_indices.end(),
@@ -53,8 +54,9 @@ namespace internal
                                      numbers::invalid_unsigned_int);
 
           subdomain_ids.reserve(total_cells);
-          subdomain_ids.insert(
-            subdomain_ids.end(), total_cells - subdomain_ids.size(), 0);
+          subdomain_ids.insert(subdomain_ids.end(),
+                               total_cells - subdomain_ids.size(),
+                               0);
 
           level_subdomain_ids.reserve(total_cells);
           level_subdomain_ids.insert(level_subdomain_ids.end(),
@@ -72,8 +74,9 @@ namespace internal
             direction_flags.clear();
 
           parents.reserve((int)(total_cells + 1) / 2);
-          parents.insert(
-            parents.end(), (total_cells + 1) / 2 - parents.size(), -1);
+          parents.insert(parents.end(),
+                         (total_cells + 1) / 2 - parents.size(),
+                         -1);
 
           neighbors.reserve(total_cells * (2 * dimension));
           neighbors.insert(neighbors.end(),
@@ -133,8 +136,9 @@ namespace internal
                               RefinementCase<3>::no_refinement);
 
           coarsen_flags.reserve(total_cells);
-          coarsen_flags.insert(
-            coarsen_flags.end(), total_cells - coarsen_flags.size(), false);
+          coarsen_flags.insert(coarsen_flags.end(),
+                               total_cells - coarsen_flags.size(),
+                               false);
 
           active_cell_indices.reserve(total_cells);
           active_cell_indices.insert(active_cell_indices.end(),
@@ -142,8 +146,9 @@ namespace internal
                                      numbers::invalid_unsigned_int);
 
           subdomain_ids.reserve(total_cells);
-          subdomain_ids.insert(
-            subdomain_ids.end(), total_cells - subdomain_ids.size(), 0);
+          subdomain_ids.insert(subdomain_ids.end(),
+                               total_cells - subdomain_ids.size(),
+                               0);
 
           level_subdomain_ids.reserve(total_cells);
           level_subdomain_ids.insert(level_subdomain_ids.end(),
@@ -161,8 +166,9 @@ namespace internal
             direction_flags.clear();
 
           parents.reserve((int)(total_cells + 1) / 2);
-          parents.insert(
-            parents.end(), (total_cells + 1) / 2 - parents.size(), -1);
+          parents.insert(parents.end(),
+                         (total_cells + 1) / 2 - parents.size(),
+                         -1);
 
           neighbors.reserve(total_cells * (2 * dimension));
           neighbors.insert(neighbors.end(),

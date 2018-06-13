@@ -58,12 +58,12 @@ test()
                                        relevant_partitioning,
                                        MPI_COMM_WORLD);
 
-  DoFTools::make_sparsity_pattern(
-    dh,
-    sp,
-    constraints,
-    true,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dh,
+                                  sp,
+                                  constraints,
+                                  true,
+                                  Utilities::MPI::this_mpi_process(
+                                    MPI_COMM_WORLD));
   sp.compress();
 
   // output

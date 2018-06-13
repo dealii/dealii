@@ -33,7 +33,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  PreconditionerBase::PreconditionerBase() : pc(nullptr), matrix(nullptr)
+  PreconditionerBase::PreconditionerBase()
+    : pc(nullptr)
+    , matrix(nullptr)
   {}
 
   PreconditionerBase::~PreconditionerBase()
@@ -211,8 +213,8 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionSOR -------------------- */
 
-  PreconditionSOR::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  PreconditionSOR::AdditionalData::AdditionalData(const double omega)
+    : omega(omega)
   {}
 
 
@@ -252,8 +254,8 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionSSOR -------------------- */
 
-  PreconditionSSOR::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  PreconditionSSOR::AdditionalData::AdditionalData(const double omega)
+    : omega(omega)
   {}
 
 
@@ -297,8 +299,8 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionEisenstat -------------------- */
 
-  PreconditionEisenstat::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  PreconditionEisenstat::AdditionalData::AdditionalData(const double omega)
+    : omega(omega)
   {}
 
 
@@ -340,8 +342,8 @@ namespace PETScWrappers
   /* ----------------- PreconditionICC -------------------- */
 
 
-  PreconditionICC::AdditionalData::AdditionalData(const unsigned int levels) :
-    levels(levels)
+  PreconditionICC::AdditionalData::AdditionalData(const unsigned int levels)
+    : levels(levels)
   {}
 
 
@@ -381,8 +383,8 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionILU -------------------- */
 
-  PreconditionILU::AdditionalData::AdditionalData(const unsigned int levels) :
-    levels(levels)
+  PreconditionILU::AdditionalData::AdditionalData(const unsigned int levels)
+    : levels(levels)
   {}
 
 
@@ -427,12 +429,12 @@ namespace PETScWrappers
     const double       strong_threshold,
     const double       max_row_sum,
     const unsigned int aggressive_coarsening_num_levels,
-    const bool         output_details) :
-    symmetric_operator(symmetric_operator),
-    strong_threshold(strong_threshold),
-    max_row_sum(max_row_sum),
-    aggressive_coarsening_num_levels(aggressive_coarsening_num_levels),
-    output_details(output_details)
+    const bool         output_details)
+    : symmetric_operator(symmetric_operator)
+    , strong_threshold(strong_threshold)
+    , max_row_sum(max_row_sum)
+    , aggressive_coarsening_num_levels(aggressive_coarsening_num_levels)
+    , output_details(output_details)
   {}
 
 
@@ -479,9 +481,9 @@ namespace PETScWrappers
         set_option_value("-pc_hypre_boomeramg_print_statistics", "1");
       }
 
-    set_option_value(
-      "-pc_hypre_boomeramg_agg_nl",
-      Utilities::to_string(additional_data.aggressive_coarsening_num_levels));
+    set_option_value("-pc_hypre_boomeramg_agg_nl",
+                     Utilities::to_string(
+                       additional_data.aggressive_coarsening_num_levels));
 
     std::stringstream ssStream;
     ssStream << additional_data.max_row_sum;
@@ -550,12 +552,12 @@ namespace PETScWrappers
     const unsigned int n_levels,
     const double       threshold,
     const double       filter,
-    const bool         output_details) :
-    symmetric(symmetric),
-    n_levels(n_levels),
-    threshold(threshold),
-    filter(filter),
-    output_details(output_details)
+    const bool         output_details)
+    : symmetric(symmetric)
+    , n_levels(n_levels)
+    , threshold(threshold)
+    , filter(filter)
+    , output_details(output_details)
   {}
 
 
@@ -688,10 +690,10 @@ namespace PETScWrappers
 
   PreconditionLU::AdditionalData::AdditionalData(const double pivoting,
                                                  const double zero_pivot,
-                                                 const double damping) :
-    pivoting(pivoting),
-    zero_pivot(zero_pivot),
-    damping(damping)
+                                                 const double damping)
+    : pivoting(pivoting)
+    , zero_pivot(zero_pivot)
+    , damping(damping)
   {}
 
 

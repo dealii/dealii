@@ -134,7 +134,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double value(const Point<dim> & p,
@@ -147,7 +148,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double value(const Point<dim> & p,
@@ -232,7 +234,9 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
 // and associates the DoFHandler to the triangulation just as in the previous
 // example program, step-3:
 template <int dim>
-Step4<dim>::Step4() : fe(1), dof_handler(triangulation)
+Step4<dim>::Step4()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -397,8 +401,9 @@ void Step4<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -411,10 +416,14 @@ void Step4<dim>::assemble_system()
   // object of the class which describes the boundary values we would like to
   // use (i.e. the <code>BoundaryValues</code> class declared above):
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

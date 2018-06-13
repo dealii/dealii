@@ -89,18 +89,18 @@ namespace Step50
   struct ScratchData
   {
     ScratchData(const FiniteElement<dim> &fe,
-                const unsigned int        quadrature_degree) :
-      fe_values(fe,
-                QGauss<dim>(quadrature_degree),
-                update_values | update_gradients | update_quadrature_points |
-                  update_JxW_values)
+                const unsigned int        quadrature_degree)
+      : fe_values(fe,
+                  QGauss<dim>(quadrature_degree),
+                  update_values | update_gradients | update_quadrature_points |
+                    update_JxW_values)
     {}
 
-    ScratchData(const ScratchData<dim> &scratch_data) :
-      fe_values(scratch_data.fe_values.get_fe(),
-                scratch_data.fe_values.get_quadrature(),
-                update_values | update_gradients | update_quadrature_points |
-                  update_JxW_values)
+    ScratchData(const ScratchData<dim> &scratch_data)
+      : fe_values(scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  update_values | update_gradients | update_quadrature_points |
+                    update_JxW_values)
     {}
 
     FEValues<dim> fe_values;
@@ -168,7 +168,8 @@ namespace Step50
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient() : Function<dim>()
+    Coefficient()
+      : Function<dim>()
     {}
 
     virtual double
@@ -215,14 +216,14 @@ namespace Step50
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    fe(degree),
-    mg_dof_handler(triangulation),
-    degree(degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
+    , fe(degree)
+    , mg_dof_handler(triangulation)
+    , degree(degree)
   {}
 
 
@@ -248,15 +249,18 @@ namespace Step50
     Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(1.0);
     dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values(
-      mg_dof_handler, dirichlet_boundary, constraints);
+    VectorTools::interpolate_boundary_values(mg_dof_handler,
+                                             dirichlet_boundary,
+                                             constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(),
                                mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(mg_dof_handler, dsp, constraints);
-    system_matrix.reinit(
-      mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
+    system_matrix.reinit(mg_dof_handler.locally_owned_dofs(),
+                         dsp,
+                         MPI_COMM_WORLD,
+                         true);
 
 
     mg_constrained_dofs.clear();
@@ -289,8 +293,10 @@ namespace Step50
         {
           DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(level),
                                      mg_dof_handler.n_dofs(level));
-          MGTools::make_interface_sparsity_pattern(
-            mg_dof_handler, mg_constrained_dofs, dsp, level);
+          MGTools::make_interface_sparsity_pattern(mg_dof_handler,
+                                                   mg_constrained_dofs,
+                                                   dsp,
+                                                   level);
 
           mg_interface_matrices[level].reinit(
             mg_dof_handler.locally_owned_mg_dofs(level),
@@ -362,8 +368,9 @@ namespace Step50
          ++level)
       {
         IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(
-          mg_dof_handler, level, dofset);
+        DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler,
+                                                      level,
+                                                      dofset);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));

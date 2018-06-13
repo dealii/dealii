@@ -67,8 +67,10 @@ test_mpi()
       deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
     }
 
-  SparsityTools::distribute_sparsity_pattern(
-    csp, locally_owned_dofs_per_cpu, MPI_COMM_WORLD, locally_rel);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             locally_owned_dofs_per_cpu,
+                                             MPI_COMM_WORLD,
+                                             locally_rel);
   /*  {
       std::ofstream
      f((std::string("after")+Utilities::int_to_string(myid)).c_str());
@@ -117,8 +119,10 @@ test_mpi()
                                              (i + 1) * num_local);
 
 
-  SparsityTools::distribute_sparsity_pattern(
-    csp, locally_owned_dofs_per_cpu2, MPI_COMM_WORLD, locally_rel);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             locally_owned_dofs_per_cpu2,
+                                             MPI_COMM_WORLD,
+                                             locally_rel);
 
   if (myid == 0)
     {

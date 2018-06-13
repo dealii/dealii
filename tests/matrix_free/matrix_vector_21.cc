@@ -68,8 +68,9 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
       fe_eval.evaluate(true, true, false);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
-          fe_eval.submit_value(
-            make_vectorized_array(Number(10)) * fe_eval.get_value(q), q);
+          fe_eval.submit_value(make_vectorized_array(Number(10)) *
+                                 fe_eval.get_value(q),
+                               q);
           fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
         }
       fe_eval.integrate(true, true);
@@ -87,7 +88,8 @@ public:
   static const std::size_t        n_vectors =
     VectorizedArray<Number>::n_array_elements;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   vmult(LinearAlgebra::distributed::BlockVector<Number> &      dst,
@@ -95,11 +97,11 @@ public:
   {
     for (unsigned int i = 0; i < dst.size(); ++i)
       dst[i] = 0;
-    const std::function<void(
-      const MatrixFree<dim, Number> &,
-      LinearAlgebra::distributed::BlockVector<Number> &,
-      const LinearAlgebra::distributed::BlockVector<Number> &,
-      const std::pair<unsigned int, unsigned int> &)>
+    const std::function<
+      void(const MatrixFree<dim, Number> &,
+           LinearAlgebra::distributed::BlockVector<Number> &,
+           const LinearAlgebra::distributed::BlockVector<Number> &,
+           const std::pair<unsigned int, unsigned int> &)>
       wrap = helmholtz_operator<dim, fe_degree, Number>;
     data.cell_loop(wrap, dst, src);
   };
@@ -150,8 +152,10 @@ test()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -238,8 +242,9 @@ test()
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, sparse_matrix);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 local_dof_indices,
+                                                 sparse_matrix);
         }
   }
 

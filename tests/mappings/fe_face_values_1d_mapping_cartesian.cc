@@ -56,12 +56,13 @@ plot_faces(Mapping<dim> &                           mapping,
   QGauss<dim - 1> q(4);
   Assert(q.size() == 1, ExcInternalError());
 
-  FEFaceValues<dim> fe_values(
-    mapping,
-    fe,
-    q,
-    UpdateFlags(update_quadrature_points | update_JxW_values | update_values |
-                update_gradients | update_hessians | update_normal_vectors));
+  FEFaceValues<dim> fe_values(mapping,
+                              fe,
+                              q,
+                              UpdateFlags(update_quadrature_points |
+                                          update_JxW_values | update_values |
+                                          update_gradients | update_hessians |
+                                          update_normal_vectors));
 
   for (unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
        ++face_nr)

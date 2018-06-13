@@ -38,8 +38,10 @@ test()
     Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   // create a vector that consists of elements indexed from 0 to n
-  PETScWrappers::MPI::BlockVector vec(
-    2, MPI_COMM_WORLD, 100 * n_processes, 100);
+  PETScWrappers::MPI::BlockVector vec(2,
+                                      MPI_COMM_WORLD,
+                                      100 * n_processes,
+                                      100);
   vec.block(0).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.block(1).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.collect_sizes();

@@ -83,8 +83,9 @@ check2()
   hp::DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fes);
 
-  GridTools::find_active_cell_around_point(
-    mappings, dof_handler, p2); // triggered exception
+  GridTools::find_active_cell_around_point(mappings,
+                                           dof_handler,
+                                           p2); // triggered exception
 }
 
 

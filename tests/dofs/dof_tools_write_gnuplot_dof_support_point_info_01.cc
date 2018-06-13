@@ -41,10 +41,14 @@ test()
 
   std::vector<unsigned int> rep(dim, 1);
   rep[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, rep, Point<dim>(), Point<dim>(2.0, 1.0));
-  FESystem<dim> fe(
-    FE_Q<dim>(velocity_degree), dim, FE_Q<dim>(velocity_degree - 1), 1);
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            rep,
+                                            Point<dim>(),
+                                            Point<dim>(2.0, 1.0));
+  FESystem<dim> fe(FE_Q<dim>(velocity_degree),
+                   dim,
+                   FE_Q<dim>(velocity_degree - 1),
+                   1);
 
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
@@ -55,8 +59,9 @@ test()
   out << "e" << std::endl;
 
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    MappingQ1<dim>(), dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
+                                       dof_handler,
+                                       support_points);
   DoFTools::write_gnuplot_dof_support_point_info(deallog.get_file_stream(),
                                                  support_points);
   out << "e" << std::endl;

@@ -581,24 +581,24 @@ namespace MeshWorker
   //----------------------------------------------------------------------//
 
   template <int dim, int sdim>
-  inline IntegrationInfo<dim, sdim>::IntegrationInfo() :
-    fevalv(0),
-    multigrid(false),
-    global_data(std::make_shared<VectorDataBase<dim, sdim>>()),
-    n_components(numbers::invalid_unsigned_int)
+  inline IntegrationInfo<dim, sdim>::IntegrationInfo()
+    : fevalv(0)
+    , multigrid(false)
+    , global_data(std::make_shared<VectorDataBase<dim, sdim>>())
+    , n_components(numbers::invalid_unsigned_int)
   {}
 
 
   template <int dim, int sdim>
   inline IntegrationInfo<dim, sdim>::IntegrationInfo(
-    const IntegrationInfo<dim, sdim> &other) :
-    multigrid(other.multigrid),
-    values(other.values),
-    gradients(other.gradients),
-    hessians(other.hessians),
-    global_data(other.global_data),
-    fe_pointer(other.fe_pointer),
-    n_components(other.n_components)
+    const IntegrationInfo<dim, sdim> &other)
+    : multigrid(other.multigrid)
+    , values(other.values)
+    , gradients(other.gradients)
+    , hessians(other.hessians)
+    , global_data(other.global_data)
+    , fe_pointer(other.fe_pointer)
+    , n_components(other.n_components)
   {
     fevalv.resize(other.fevalv.size());
     for (unsigned int i = 0; i < other.fevalv.size(); ++i)
@@ -656,8 +656,10 @@ namespace MeshWorker
       {
         fevalv.resize(el.n_base_elements());
         for (unsigned int i = 0; i < fevalv.size(); ++i)
-          fevalv[i] = std::make_shared<FEVALUES>(
-            mapping, el.base_element(i), quadrature, flags);
+          fevalv[i] = std::make_shared<FEVALUES>(mapping,
+                                                 el.base_element(i),
+                                                 quadrature,
+                                                 flags);
       }
     n_components = el.n_components();
   }
@@ -786,14 +788,16 @@ namespace MeshWorker
                                             const BlockInfo *block_info)
   {
     initialize_update_flags();
-    initialize_gauss_quadrature(
-      (cell_flags & update_values) ? (el.tensor_degree() + 1) :
-                                     el.tensor_degree(),
-      (boundary_flags & update_values) ? (el.tensor_degree() + 1) :
-                                         el.tensor_degree(),
-      (face_flags & update_values) ? (el.tensor_degree() + 1) :
-                                     el.tensor_degree(),
-      false);
+    initialize_gauss_quadrature((cell_flags & update_values) ?
+                                  (el.tensor_degree() + 1) :
+                                  el.tensor_degree(),
+                                (boundary_flags & update_values) ?
+                                  (el.tensor_degree() + 1) :
+                                  el.tensor_degree(),
+                                (face_flags & update_values) ?
+                                  (el.tensor_degree() + 1) :
+                                  el.tensor_degree(),
+                                false);
 
     cell.template initialize<FEValues<dim, sdim>>(
       el, mapping, cell_quadrature, cell_flags, block_info);

@@ -58,15 +58,15 @@ namespace internal
     } // namespace
 
     template <typename Number>
-    ShapeInfo<Number>::ShapeInfo() :
-      element_type(tensor_general),
-      fe_degree(numbers::invalid_unsigned_int),
-      n_q_points_1d(0),
-      n_q_points(0),
-      dofs_per_component_on_cell(0),
-      n_q_points_face(0),
-      dofs_per_component_on_face(0),
-      nodal_at_cell_boundaries(false)
+    ShapeInfo<Number>::ShapeInfo()
+      : element_type(tensor_general)
+      , fe_degree(numbers::invalid_unsigned_int)
+      , n_q_points_1d(0)
+      , n_q_points(0)
+      , dofs_per_component_on_cell(0)
+      , n_q_points_face(0)
+      , dofs_per_component_on_face(0)
+      , nodal_at_cell_boundaries(false)
     {}
 
 
@@ -168,10 +168,10 @@ namespace internal
 
             // invert numbering again. Need to do it manually because we might
             // have undefined blocks
-            lexicographic_numbering.resize(
-              fe_in.element_multiplicity(base_element_number) *
-                fe->dofs_per_cell,
-              numbers::invalid_unsigned_int);
+            lexicographic_numbering.resize(fe_in.element_multiplicity(
+                                             base_element_number) *
+                                             fe->dofs_per_cell,
+                                           numbers::invalid_unsigned_int);
             for (unsigned int i = 0; i < lexicographic.size(); ++i)
               if (lexicographic[i] != numbers::invalid_unsigned_int)
                 {

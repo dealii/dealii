@@ -241,8 +241,8 @@ private:
 
 template <typename Iterator>
 inline IteratorRange<Iterator>::IteratorOverIterators::IteratorOverIterators(
-  const BaseIterator &iterator) :
-  element_of_iterator_collection(iterator)
+  const BaseIterator &iterator)
+  : element_of_iterator_collection(iterator)
 {}
 
 
@@ -297,16 +297,18 @@ operator!=(const IteratorOverIterators &i_o_i)
 
 
 template <typename Iterator>
-inline IteratorRange<Iterator>::IteratorRange() : it_begin(), it_end()
+inline IteratorRange<Iterator>::IteratorRange()
+  : it_begin()
+  , it_end()
 {}
 
 
 
 template <typename Iterator>
 inline IteratorRange<Iterator>::IteratorRange(const iterator b,
-                                              const iterator e) :
-  it_begin(b),
-  it_end(e)
+                                              const iterator e)
+  : it_begin(b)
+  , it_end(e)
 {}
 
 

@@ -64,8 +64,9 @@ namespace LinearAlgebra
     else
       {
         Number *new_values;
-        Utilities::System::posix_memalign(
-          (void **)&new_values, 64, sizeof(Number) * new_alloc_size);
+        Utilities::System::posix_memalign((void **)&new_values,
+                                          64,
+                                          sizeof(Number) * new_alloc_size);
         values.reset(new_values);
 
         if (new_alloc_size >= 4 * dealii::internal::VectorImplementation::
@@ -177,8 +178,10 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::apply(const Functor &func)
   {
     FunctorTemplate<Functor> functor(*this, func);
-    internal::VectorOperations::parallel_for(
-      functor, 0, n_elements(), thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(functor,
+                                             0,
+                                             n_elements(),
+                                             thread_loop_partitioner);
   }
 
 
@@ -196,8 +199,10 @@ namespace LinearAlgebra
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
       in_vector.values.get(), values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      copier, 0, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(copier,
+                                                     0,
+                                                     n_elements(),
+                                                     thread_loop_partitioner);
 
     return *this;
   }
@@ -215,8 +220,10 @@ namespace LinearAlgebra
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
       in_vector.values.get(), values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      copier, 0, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(copier,
+                                                     0,
+                                                     n_elements(),
+                                                     thread_loop_partitioner);
 
     return *this;
   }
@@ -391,10 +398,10 @@ namespace LinearAlgebra
         epetra_comm_pattern =
           std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern>(
             communication_pattern);
-        AssertThrow(
-          epetra_comm_pattern != nullptr,
-          ExcMessage(std::string("The communication pattern is not of type ") +
-                     "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+        AssertThrow(epetra_comm_pattern != nullptr,
+                    ExcMessage(
+                      std::string("The communication pattern is not of type ") +
+                      "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
       }
 
     Epetra_Import import(epetra_comm_pattern->get_epetra_import());

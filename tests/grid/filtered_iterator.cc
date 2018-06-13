@@ -164,16 +164,16 @@ test()
                               tria.end())) ==
                static_cast<signed int>(tria.n_active_cells(3)),
              ExcInternalError());
-      logfile << "Check 4: "
-              << (std::distance(
-                    FI(std::bind(predicate, std::placeholders::_1, 3))
-                      .set_to_next_positive(tria.begin_active()),
-                    FI(std::bind(predicate, std::placeholders::_1, 3),
-                       tria.end())) ==
-                      static_cast<signed int>(tria.n_active_cells(3)) ?
-                    "OK" :
-                    "Failed")
-              << std::endl;
+      logfile
+        << "Check 4: "
+        << (std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
+                            .set_to_next_positive(tria.begin_active()),
+                          FI(std::bind(predicate, std::placeholders::_1, 3),
+                             tria.end())) ==
+                static_cast<signed int>(tria.n_active_cells(3)) ?
+              "OK" :
+              "Failed")
+        << std::endl;
     };
 
 

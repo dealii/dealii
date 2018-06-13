@@ -98,9 +98,9 @@ namespace Step36
 
 
   template <int dim>
-  EigenvalueProblem<dim>::EigenvalueProblem(const std::string &prm_file) :
-    fe(1),
-    dof_handler(triangulation)
+  EigenvalueProblem<dim>::EigenvalueProblem(const std::string &prm_file)
+    : fe(1)
+    , dof_handler(triangulation)
   {}
 
 
@@ -189,10 +189,12 @@ namespace Step36
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_stiffness_matrix,
+                                               local_dof_indices,
+                                               stiffness_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix,
+                                               local_dof_indices,
+                                               mass_matrix);
       }
 
     stiffness_matrix.compress(VectorOperation::add);

@@ -90,8 +90,9 @@ namespace OpenCASCADE
     for (exp.Init(shape, TopAbs_VERTEX); exp.More(); exp.Next(), ++n_vertices)
       {
       }
-    return std::tuple<unsigned int, unsigned int, unsigned int>(
-      n_faces, n_edges, n_vertices);
+    return std::tuple<unsigned int, unsigned int, unsigned int>(n_faces,
+                                                                n_edges,
+                                                                n_vertices);
   }
 
   void
@@ -476,8 +477,10 @@ namespace OpenCASCADE
         std::sort(curve_points.begin(),
                   curve_points.end(),
                   [&](const Point<dim> &p1, const Point<dim> &p2) {
-                    return OpenCASCADE::point_compare(
-                      p1, p2, direction, tolerance);
+                    return OpenCASCADE::point_compare(p1,
+                                                      p2,
+                                                      direction,
+                                                      tolerance);
                   });
       }
 
@@ -785,8 +788,10 @@ namespace OpenCASCADE
         Max_Curvature *= -1;
       }
 
-    return std::tuple<Point<3>, Tensor<1, 3>, double, double>(
-      point<3>(Value), normal, Min_Curvature, Max_Curvature);
+    return std::tuple<Point<3>, Tensor<1, 3>, double, double>(point<3>(Value),
+                                                              normal,
+                                                              Min_Curvature,
+                                                              Max_Curvature);
   }
 
 

@@ -91,7 +91,8 @@ main()
 }
 
 
-Explicit::Explicit(const FullMatrix<double> &M) : matrix(&M)
+Explicit::Explicit(const FullMatrix<double> &M)
+  : matrix(&M)
 {
   m.reinit(M.m(), M.n());
 }
@@ -115,7 +116,8 @@ Explicit::operator()(AnyData &out, const AnyData &in)
 }
 
 
-Implicit::Implicit(const FullMatrix<double> &M) : matrix(&M)
+Implicit::Implicit(const FullMatrix<double> &M)
+  : matrix(&M)
 {
   m.reinit(M.m(), M.n());
 }

@@ -67,13 +67,13 @@ namespace internal
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &               finite_elements,
       const UpdateFlags update_flags,
-      const bool        use_face_values) :
-      n_datasets(n_datasets),
-      n_subdivisions(n_subdivisions),
-      postprocessed_values(n_postprocessor_outputs.size()),
-      mapping_collection(mapping),
-      finite_elements(finite_elements),
-      update_flags(update_flags)
+      const bool        use_face_values)
+      : n_datasets(n_datasets)
+      , n_subdivisions(n_subdivisions)
+      , postprocessed_values(n_postprocessor_outputs.size())
+      , mapping_collection(mapping)
+      , finite_elements(finite_elements)
+      , update_flags(update_flags)
     {
       unsigned int n_q_points = 0;
       if (use_face_values == false)
@@ -150,15 +150,15 @@ namespace internal
     // x_fe_values
     template <int dim, int spacedim>
     ParallelDataBase<dim, spacedim>::ParallelDataBase(
-      const ParallelDataBase<dim, spacedim> &data) :
-      n_datasets(data.n_datasets),
-      n_subdivisions(data.n_subdivisions),
-      patch_values_scalar(data.patch_values_scalar),
-      patch_values_system(data.patch_values_system),
-      postprocessed_values(data.postprocessed_values),
-      mapping_collection(data.mapping_collection),
-      finite_elements(data.finite_elements),
-      update_flags(data.update_flags)
+      const ParallelDataBase<dim, spacedim> &data)
+      : n_datasets(data.n_datasets)
+      , n_subdivisions(data.n_subdivisions)
+      , patch_values_scalar(data.patch_values_scalar)
+      , patch_values_system(data.patch_values_system)
+      , postprocessed_values(data.postprocessed_values)
+      , mapping_collection(data.mapping_collection)
+      , finite_elements(data.finite_elements)
+      , update_flags(data.update_flags)
     {
       if (data.x_fe_values.empty() == false)
         {
@@ -388,17 +388,17 @@ namespace internal
       const std::vector<std::string> &names_in,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &data_component_interpretation) :
-      dof_handler(
-        dofs,
-        typeid(dealii::DataOut_DoFData<DoFHandlerType,
-                                       DoFHandlerType::dimension,
-                                       DoFHandlerType::space_dimension>)
-          .name()),
-      names(names_in),
-      data_component_interpretation(data_component_interpretation),
-      postprocessor(nullptr, typeid(*this).name()),
-      n_output_variables(names.size())
+        &data_component_interpretation)
+      : dof_handler(dofs,
+                    typeid(
+                      dealii::DataOut_DoFData<DoFHandlerType,
+                                              DoFHandlerType::dimension,
+                                              DoFHandlerType::space_dimension>)
+                      .name())
+      , names(names_in)
+      , data_component_interpretation(data_component_interpretation)
+      , postprocessor(nullptr, typeid(*this).name())
+      , n_output_variables(names.size())
     {
       Assert(names.size() == data_component_interpretation.size(),
              ExcDimensionMismatch(data_component_interpretation.size(),
@@ -423,18 +423,18 @@ namespace internal
     DataEntryBase<DoFHandlerType>::DataEntryBase(
       const DoFHandlerType *dofs,
       const DataPostprocessor<DoFHandlerType::space_dimension>
-        *data_postprocessor) :
-      dof_handler(
-        dofs,
-        typeid(dealii::DataOut_DoFData<DoFHandlerType,
-                                       DoFHandlerType::dimension,
-                                       DoFHandlerType::space_dimension>)
-          .name()),
-      names(data_postprocessor->get_names()),
-      data_component_interpretation(
-        data_postprocessor->get_data_component_interpretation()),
-      postprocessor(data_postprocessor, typeid(*this).name()),
-      n_output_variables(names.size())
+        *data_postprocessor)
+      : dof_handler(dofs,
+                    typeid(
+                      dealii::DataOut_DoFData<DoFHandlerType,
+                                              DoFHandlerType::dimension,
+                                              DoFHandlerType::space_dimension>)
+                      .name())
+      , names(data_postprocessor->get_names())
+      , data_component_interpretation(
+          data_postprocessor->get_data_component_interpretation())
+      , postprocessor(data_postprocessor, typeid(*this).name())
+      , n_output_variables(names.size())
     {
       Assert(data_postprocessor->get_names().size() ==
                data_postprocessor->get_data_component_interpretation().size(),
@@ -609,9 +609,11 @@ namespace internal
       const std::vector<std::string> &names,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &data_component_interpretation) :
-      DataEntryBase<DoFHandlerType>(dofs, names, data_component_interpretation),
-      vector(data)
+        &data_component_interpretation)
+      : DataEntryBase<DoFHandlerType>(dofs,
+                                      names,
+                                      data_component_interpretation)
+      , vector(data)
     {}
 
 
@@ -621,9 +623,9 @@ namespace internal
       const DoFHandlerType *dofs,
       const VectorType *    data,
       const DataPostprocessor<DoFHandlerType::space_dimension>
-        *data_postprocessor) :
-      DataEntryBase<DoFHandlerType>(dofs, data_postprocessor),
-      vector(data)
+        *data_postprocessor)
+      : DataEntryBase<DoFHandlerType>(dofs, data_postprocessor)
+      , vector(data)
     {}
 
 
@@ -1001,9 +1003,9 @@ namespace internal
 
 
 template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::DataOut_DoFData() :
-  triangulation(nullptr, typeid(*this).name()),
-  dofs(nullptr, typeid(*this).name())
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::DataOut_DoFData()
+  : triangulation(nullptr, typeid(*this).name())
+  , dofs(nullptr, typeid(*this).name())
 {}
 
 

@@ -35,17 +35,17 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree) :
-  FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>(
-    TensorProductPolynomials<dim - 1>(
-      Polynomials::generate_complete_Lagrange_basis(
-        QGaussLobatto<1>(degree + 1).get_points())),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(1, true)),
-  fe_q(degree)
+FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree)
+  : FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>(
+      TensorProductPolynomials<dim - 1>(
+        Polynomials::generate_complete_Lagrange_basis(
+          QGaussLobatto<1>(degree + 1).get_points())),
+      FiniteElementData<dim>(get_dpo_vector(degree),
+                             1,
+                             degree,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(1, true))
+  , fe_q(degree)
 {
   Assert(degree > 0,
          ExcMessage("FE_Trace can only be used for polynomial degrees "
@@ -218,8 +218,9 @@ FE_TraceQ<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  get_subface_interpolation_matrix(
-    source_fe, numbers::invalid_unsigned_int, interpolation_matrix);
+  get_subface_interpolation_matrix(source_fe,
+                                   numbers::invalid_unsigned_int,
+                                   interpolation_matrix);
 }
 
 
@@ -234,16 +235,17 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
   // this is the code from FE_FaceQ
   Assert(interpolation_matrix.n() == this->dofs_per_face,
          ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(
-    interpolation_matrix.m() == x_source_fe.dofs_per_face,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
+  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_face));
 
   // see if source is a FaceQ element
   if (const FE_TraceQ<dim, spacedim> *source_fe =
         dynamic_cast<const FE_TraceQ<dim, spacedim> *>(&x_source_fe))
     {
-      fe_q.get_subface_interpolation_matrix(
-        source_fe->fe_q, subface, interpolation_matrix);
+      fe_q.get_subface_interpolation_matrix(source_fe->fe_q,
+                                            subface,
+                                            interpolation_matrix);
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
     {
@@ -259,8 +261,8 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
 
 
 template <int spacedim>
-FE_TraceQ<1, spacedim>::FE_TraceQ(const unsigned int degree) :
-  FE_FaceQ<1, spacedim>(degree)
+FE_TraceQ<1, spacedim>::FE_TraceQ(const unsigned int degree)
+  : FE_FaceQ<1, spacedim>(degree)
 {}
 
 

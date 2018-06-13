@@ -98,7 +98,8 @@ namespace Maxwell
   };
 
   template <int dim>
-  ExactSolution<dim>::ExactSolution() : Function<dim>(dim)
+  ExactSolution<dim>::ExactSolution()
+    : Function<dim>(dim)
   {}
   template <int dim>
   void
@@ -185,11 +186,11 @@ namespace Maxwell
   };
 
   template <int dim>
-  MaxwellProblem<dim>::MaxwellProblem(const unsigned int order) :
-    mapping(1),
-    dof_handler(triangulation),
-    fe(order),
-    exact_solution()
+  MaxwellProblem<dim>::MaxwellProblem(const unsigned int order)
+    : mapping(1)
+    , dof_handler(triangulation)
+    , fe(order)
+    , exact_solution()
   {
     p_order    = order;
     quad_order = 2 * (p_order + 1);
@@ -303,8 +304,10 @@ namespace Maxwell
     constraints.close();
 
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_sparsity_pattern(dof_handler,
+                                    c_sparsity,
+                                    constraints,
+                                    false);
 
     sparsity_pattern.copy_from(c_sparsity);
     system_matrix.reinit(sparsity_pattern);

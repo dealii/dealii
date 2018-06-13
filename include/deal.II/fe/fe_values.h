@@ -4772,9 +4772,10 @@ template <int dim, int spacedim>
 inline const FEValuesViews::Scalar<dim, spacedim> &FEValuesBase<dim, spacedim>::
                                                    operator[](const FEValuesExtractors::Scalar &scalar) const
 {
-  Assert(
-    scalar.component < fe_values_views_cache.scalars.size(),
-    ExcIndexRange(scalar.component, 0, fe_values_views_cache.scalars.size()));
+  Assert(scalar.component < fe_values_views_cache.scalars.size(),
+         ExcIndexRange(scalar.component,
+                       0,
+                       fe_values_views_cache.scalars.size()));
 
   return fe_values_views_cache.scalars[scalar.component];
 }

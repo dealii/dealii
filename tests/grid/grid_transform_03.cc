@@ -34,9 +34,9 @@ template <int dim>
 class L2_inverse : public Function<dim>
 {
 public:
-  L2_inverse(const std::vector<Point<dim>> &distance_source) :
-    Function<dim>(),
-    distance_source(distance_source)
+  L2_inverse(const std::vector<Point<dim>> &distance_source)
+    : Function<dim>()
+    , distance_source(distance_source)
   {
     Assert(distance_source.size() > 0, ExcNotImplemented());
   }

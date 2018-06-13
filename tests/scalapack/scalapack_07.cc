@@ -57,8 +57,9 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
       mpi_communicator, size, size, block_size_i, block_size_i);
   // create 1d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_1d =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, n_mpi_processes, 1);
+    std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,
+                                                  n_mpi_processes,
+                                                  1);
   // create process grid containing one process
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_single =
     std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator, 1, 1);

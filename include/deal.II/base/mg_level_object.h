@@ -181,8 +181,8 @@ private:
 
 template <class Object>
 MGLevelObject<Object>::MGLevelObject(const unsigned int min,
-                                     const unsigned int max) :
-  minlevel(0)
+                                     const unsigned int max)
+  : minlevel(0)
 {
   resize(min, max);
 }

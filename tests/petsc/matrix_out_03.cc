@@ -52,8 +52,9 @@ main(int argc, char **argv)
       sparse_matrix.compress(VectorOperation::insert);
 
       MatrixOut matrix_out;
-      matrix_out.build_patches(
-        sparse_matrix, "sparse_matrix", MatrixOut::Options(true, 1, true));
+      matrix_out.build_patches(sparse_matrix,
+                               "sparse_matrix",
+                               MatrixOut::Options(true, 1, true));
       matrix_out.write_gnuplot(logfile);
     }
 }

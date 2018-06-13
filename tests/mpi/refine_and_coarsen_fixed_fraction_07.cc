@@ -51,8 +51,10 @@ test()
   std::vector<unsigned int>               subdivisions(2);
   subdivisions[0] = 120;
   subdivisions[1] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, subdivisions, Point<2>(), Point<2>(1, 1));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            subdivisions,
+                                            Point<2>(),
+                                            Point<2>(1, 1));
   // initialize the refinement indicators with a set of particular values from
   // the original testcase
   const double values[] = {

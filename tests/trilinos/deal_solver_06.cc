@@ -78,7 +78,9 @@ main(int argc, char **argv)
     PreconditionIdentity                            preconditioner;
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 5269, 5271);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner),
+                              control.last_step(),
+                              5269,
+                              5271);
   }
 }

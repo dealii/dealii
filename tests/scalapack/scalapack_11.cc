@@ -76,8 +76,10 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
                                                     grid,
                                                     block_size_j,
                                                     block_size_i);
-  scalapack_matrix.copy_to(
-    scalapack_matrix_dest, offset_A, offset_B, submatrix_size);
+  scalapack_matrix.copy_to(scalapack_matrix_dest,
+                           offset_A,
+                           offset_B,
+                           submatrix_size);
   FullMatrix<NumberType> dest(sub_size + offset_B.first,
                               sub_size + offset_B.second);
   scalapack_matrix_dest.copy_to(dest);

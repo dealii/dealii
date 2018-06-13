@@ -50,8 +50,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(
-    fe, quadrature, update_values | update_gradients | update_hessians);
+  FEValues<dim>     fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_hessians);
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
@@ -91,10 +92,11 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
                   for (unsigned int d = 0; d < dim; ++d)
                     {
-                      AssertThrow(
-                        fe_values[vec_components].value(i, q)[d] ==
-                          fe_values.shape_value_component(i, q, c + d),
-                        ExcInternalError());
+                      AssertThrow(fe_values[vec_components].value(i, q)[d] ==
+                                    fe_values.shape_value_component(i,
+                                                                    q,
+                                                                    c + d),
+                                  ExcInternalError());
 
                       AssertThrow(fe_values[vec_components].gradient(i, q)[d] ==
                                     fe_values.shape_grad_component(i, q, c + d),
@@ -110,10 +112,11 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                             2),
                         ExcInternalError());
 
-                      AssertThrow(
-                        fe_values[vec_components].hessian(i, q)[d] ==
-                          fe_values.shape_hessian_component(i, q, c + d),
-                        ExcInternalError());
+                      AssertThrow(fe_values[vec_components].hessian(i, q)[d] ==
+                                    fe_values.shape_hessian_component(i,
+                                                                      q,
+                                                                      c + d),
+                                  ExcInternalError());
                     }
                 }
           }

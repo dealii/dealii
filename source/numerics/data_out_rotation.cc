@@ -63,16 +63,16 @@ namespace internal
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &               finite_elements,
-      const UpdateFlags update_flags) :
-      internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
-        n_datasets,
-        n_subdivisions,
-        n_postprocessor_outputs,
-        mapping,
-        finite_elements,
-        update_flags,
-        false),
-      n_patches_per_circle(n_patches_per_circle)
+      const UpdateFlags update_flags)
+      : internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
+          n_datasets,
+          n_subdivisions,
+          n_postprocessor_outputs,
+          mapping,
+          finite_elements,
+          update_flags,
+          false)
+      , n_patches_per_circle(n_patches_per_circle)
     {}
 
 
@@ -389,12 +389,13 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                             for (unsigned int x = 0; x < n_points; ++x)
                               for (unsigned int y = 0; y < n_points; ++y)
                                 for (unsigned int z = 0; z < n_points; ++z)
-                                  my_patches[angle].data(
-                                    offset + component,
-                                    x * n_points * n_points + y * n_points +
-                                      z) = data.patch_values_system
-                                             .solution_values[x * n_points + z](
-                                               component);
+                                  my_patches[angle].data(offset + component,
+                                                         x * n_points *
+                                                             n_points +
+                                                           y * n_points + z) =
+                                    data.patch_values_system
+                                      .solution_values[x * n_points + z](
+                                        component);
                             break;
 
                           default:

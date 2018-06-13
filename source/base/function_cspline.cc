@@ -25,9 +25,9 @@ namespace Functions
 {
   template <int dim>
   CSpline<dim>::CSpline(const std::vector<double> &x_,
-                        const std::vector<double> &y_) :
-    interpolation_points(x_),
-    interpolation_values(y_)
+                        const std::vector<double> &y_)
+    : interpolation_points(x_)
+    , interpolation_values(y_)
   {
     Assert(interpolation_points.size() > 0,
            ExcCSplineEmpty(interpolation_points.size()));
@@ -39,15 +39,18 @@ namespace Functions
     // check that input vector @p interpolation_points is provided in ascending order:
     for (unsigned int i = 0; i < interpolation_points.size() - 1; i++)
       AssertThrow(interpolation_points[i] < interpolation_points[i + 1],
-                  ExcCSplineOrder(
-                    i, interpolation_points[i], interpolation_points[i + 1]));
+                  ExcCSplineOrder(i,
+                                  interpolation_points[i],
+                                  interpolation_points[i + 1]));
 
     acc                  = gsl_interp_accel_alloc();
     const unsigned int n = interpolation_points.size();
     cspline              = gsl_spline_alloc(gsl_interp_cspline, n);
     // gsl_spline_init returns something but it seems nobody knows what
-    gsl_spline_init(
-      cspline, interpolation_points.data(), interpolation_values.data(), n);
+    gsl_spline_init(cspline,
+                    interpolation_points.data(),
+                    interpolation_values.data(),
+                    n);
   }
 
 
@@ -75,8 +78,9 @@ namespace Functions
     const double &x = p[0];
     Assert(x >= interpolation_points.front() &&
              x <= interpolation_points.back(),
-           ExcCSplineRange(
-             x, interpolation_points.front(), interpolation_points.back()));
+           ExcCSplineRange(x,
+                           interpolation_points.front(),
+                           interpolation_points.back()));
 
     return gsl_spline_eval(cspline, x, acc);
   }
@@ -95,8 +99,9 @@ namespace Functions
     const double &x = p[0];
     Assert(x >= interpolation_points.front() &&
              x <= interpolation_points.back(),
-           ExcCSplineRange(
-             x, interpolation_points.front(), interpolation_points.back()));
+           ExcCSplineRange(x,
+                           interpolation_points.front(),
+                           interpolation_points.back()));
 
     const double   deriv = gsl_spline_eval_deriv(cspline, x, acc);
     Tensor<1, dim> res;
@@ -118,8 +123,9 @@ namespace Functions
     const double &x = p[0];
     Assert(x >= interpolation_points.front() &&
              x <= interpolation_points.back(),
-           ExcCSplineRange(
-             x, interpolation_points.front(), interpolation_points.back()));
+           ExcCSplineRange(x,
+                           interpolation_points.front(),
+                           interpolation_points.back()));
 
     return gsl_spline_eval_deriv2(cspline, x, acc);
   }

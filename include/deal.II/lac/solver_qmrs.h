@@ -130,11 +130,11 @@ public:
     explicit AdditionalData(const bool   left_preconditioning = false,
                             const double solver_tolerance     = 1.e-9,
                             const bool   breakdown_testing    = true,
-                            const double breakdown_threshold  = 1.e-16) :
-      left_preconditioning(left_preconditioning),
-      solver_tolerance(solver_tolerance),
-      breakdown_testing(breakdown_testing),
-      breakdown_threshold(breakdown_threshold)
+                            const double breakdown_threshold  = 1.e-16)
+      : left_preconditioning(left_preconditioning)
+      , solver_tolerance(solver_tolerance)
+      , breakdown_testing(breakdown_testing)
+      , breakdown_threshold(breakdown_threshold)
     {}
 
     /**
@@ -244,9 +244,9 @@ private:
 template <class VectorType>
 SolverQMRS<VectorType>::IterationResult::IterationResult(
   const SolverControl::State state,
-  const double               last_residual) :
-  state(state),
-  last_residual(last_residual)
+  const double               last_residual)
+  : state(state)
+  , last_residual(last_residual)
 {}
 
 
@@ -254,18 +254,18 @@ SolverQMRS<VectorType>::IterationResult::IterationResult(
 template <class VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl &           cn,
                                    VectorMemory<VectorType> &mem,
-                                   const AdditionalData &    data) :
-  Solver<VectorType>(cn, mem),
-  additional_data(data),
-  step(0)
+                                   const AdditionalData &    data)
+  : Solver<VectorType>(cn, mem)
+  , additional_data(data)
+  , step(0)
 {}
 
 template <class VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl &       cn,
-                                   const AdditionalData &data) :
-  Solver<VectorType>(cn),
-  additional_data(data),
-  step(0)
+                                   const AdditionalData &data)
+  : Solver<VectorType>(cn)
+  , additional_data(data)
+  , step(0)
 {}
 
 template <class VectorType>

@@ -117,9 +117,9 @@ namespace Step48
   template <int dim, int fe_degree>
   SineGordonOperation<dim, fe_degree>::SineGordonOperation(
     const MatrixFree<dim, double> &data_in,
-    const double                   time_step) :
-    data(data_in),
-    delta_t_sqr(make_vectorized_array(time_step * time_step))
+    const double                   time_step)
+    : data(data_in)
+    , delta_t_sqr(make_vectorized_array(time_step * time_step))
   {
     VectorizedArray<double> one = make_vectorized_array(1.);
 
@@ -235,8 +235,10 @@ namespace Step48
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &SineGordonOperation<dim, fe_degree>::local_apply, this, dst, src);
+    data.cell_loop(&SineGordonOperation<dim, fe_degree>::local_apply,
+                   this,
+                   dst,
+                   src);
     dst.scale(inv_mass_matrix);
   }
 
@@ -250,8 +252,8 @@ namespace Step48
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution(const unsigned int n_components = 1, const double time = 0.) :
-      Function<dim>(n_components, time)
+    ExactSolution(const unsigned int n_components = 1, const double time = 0.)
+      : Function<dim>(n_components, time)
     {}
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
@@ -332,19 +334,21 @@ namespace Step48
   // conditioning versus equidistant points. To make things more explicit, we
   // choose to state the selection of the nodal points nonetheless.
   template <int dim>
-  SineGordonProblem<dim>::SineGordonProblem() :
-    pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
+  SineGordonProblem<dim>::SineGordonProblem()
+    : pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    ,
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(MPI_COMM_WORLD),
+    triangulation(MPI_COMM_WORLD)
+    ,
 #endif
-    fe(QGaussLobatto<1>(fe_degree + 1)),
-    dof_handler(triangulation),
-    n_global_refinements(10 - 2 * dim),
-    time(-10),
-    time_step(10.),
-    final_time(10),
-    cfl_number(.1 / fe_degree),
-    output_timestep_skip(200)
+    fe(QGaussLobatto<1>(fe_degree + 1))
+    , dof_handler(triangulation)
+    , n_global_refinements(10 - 2 * dim)
+    , time(-10)
+    , time_step(10.)
+    , final_time(10)
+    , cfl_number(.1 / fe_degree)
+    , output_timestep_skip(200)
   {}
 
   //@sect4{SineGordonProblem::make_grid_and_dofs}
@@ -420,8 +424,10 @@ namespace Step48
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::partition_partition;
 
-    matrix_free_data.reinit(
-      dof_handler, constraints, quadrature, additional_data);
+    matrix_free_data.reinit(dof_handler,
+                            constraints,
+                            quadrature,
+                            additional_data);
 
     matrix_free_data.initialize_dof_vector(solution);
     old_solution.reinit(solution);
@@ -467,8 +473,10 @@ namespace Step48
                                       norm_per_cell,
                                       QGauss<dim>(fe_degree + 1),
                                       VectorTools::L2_norm);
-    const double solution_norm = VectorTools::compute_global_error(
-      triangulation, norm_per_cell, VectorTools::L2_norm);
+    const double solution_norm =
+      VectorTools::compute_global_error(triangulation,
+                                        norm_per_cell,
+                                        VectorTools::L2_norm);
 
     pcout << "   Time:" << std::setw(8) << std::setprecision(3) << time
           << ", solution norm: " << std::setprecision(5) << std::setw(7)
@@ -546,10 +554,12 @@ namespace Step48
     // the two starting solutions in a <tt>std::vector</tt> of pointers field
     // and to set up an instance of the <code> SineGordonOperation class </code>
     // based on the finite element degree specified at the top of this file.
-    VectorTools::interpolate(
-      dof_handler, ExactSolution<dim>(1, time), solution);
-    VectorTools::interpolate(
-      dof_handler, ExactSolution<dim>(1, time - time_step), old_solution);
+    VectorTools::interpolate(dof_handler,
+                             ExactSolution<dim>(1, time),
+                             solution);
+    VectorTools::interpolate(dof_handler,
+                             ExactSolution<dim>(1, time - time_step),
+                             old_solution);
     output_results(0);
 
     std::vector<LinearAlgebra::distributed::Vector<double> *>

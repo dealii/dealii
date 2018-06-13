@@ -604,12 +604,12 @@ template <typename VectorType>
 inline MGSmoother<VectorType>::MGSmoother(const unsigned int steps,
                                           const bool         variable,
                                           const bool         symmetric,
-                                          const bool         transpose) :
-  steps(steps),
-  variable(variable),
-  symmetric(symmetric),
-  transpose(transpose),
-  debug(0)
+                                          const bool         transpose)
+  : steps(steps)
+  , variable(variable)
+  , symmetric(symmetric)
+  , transpose(transpose)
+  , debug(0)
 {}
 
 
@@ -661,8 +661,8 @@ namespace mg
     const unsigned int steps,
     const bool         variable,
     const bool         symmetric,
-    const bool         transpose) :
-    MGSmoother<VectorType>(steps, variable, symmetric, transpose)
+    const bool         transpose)
+    : MGSmoother<VectorType>(steps, variable, symmetric, transpose)
   {}
 
 
@@ -794,8 +794,8 @@ inline MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::
   MGSmootherRelaxation(const unsigned int steps,
                        const bool         variable,
                        const bool         symmetric,
-                       const bool         transpose) :
-  MGSmoother<VectorType>(steps, variable, symmetric, transpose)
+                       const bool         transpose)
+  : MGSmoother<VectorType>(steps, variable, symmetric, transpose)
 {}
 
 
@@ -1006,8 +1006,8 @@ inline MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
   MGSmootherPrecondition(const unsigned int steps,
                          const bool         variable,
                          const bool         symmetric,
-                         const bool         transpose) :
-  MGSmoother<VectorType>(steps, variable, symmetric, transpose)
+                         const bool         transpose)
+  : MGSmoother<VectorType>(steps, variable, symmetric, transpose)
 {}
 
 

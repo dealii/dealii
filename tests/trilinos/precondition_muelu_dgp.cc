@@ -137,7 +137,9 @@ private:
 
 
 template <int dim>
-Step4<dim>::Step4() : fe(1), dof_handler(triangulation)
+Step4<dim>::Step4()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -196,8 +198,9 @@ Step4<dim>::solve()
   deallog.push(Utilities::int_to_string(dof_handler.n_dofs(), 5));
   TrilinosWrappers::PreconditionAMGMueLu                 preconditioner;
   TrilinosWrappers::PreconditionAMGMueLu::AdditionalData data;
-  DoFTools::extract_constant_modes(
-    dof_handler, std::vector<bool>(1, true), data.constant_modes);
+  DoFTools::extract_constant_modes(dof_handler,
+                                   std::vector<bool>(1, true),
+                                   data.constant_modes);
   data.smoother_sweeps = 2;
   {
     solution = 0;

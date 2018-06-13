@@ -257,14 +257,14 @@ operator<<(std::ostream &out, const ComponentMask &mask);
 
 // -------------------- inline functions ---------------------
 
-inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask) :
-  component_mask(component_mask)
+inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
+  : component_mask(component_mask)
 {}
 
 
 inline ComponentMask::ComponentMask(const unsigned int n_components,
-                                    const bool         initializer) :
-  component_mask(n_components, initializer)
+                                    const bool         initializer)
+  : component_mask(n_components, initializer)
 {}
 
 

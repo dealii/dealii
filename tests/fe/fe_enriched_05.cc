@@ -58,7 +58,8 @@ template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
-  EnrichmentFunction() : Function<dim>(1)
+  EnrichmentFunction()
+    : Function<dim>(1)
   {}
 
   virtual double

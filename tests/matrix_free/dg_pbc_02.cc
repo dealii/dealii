@@ -53,8 +53,10 @@ test()
   p2[0] = 2;
   for (unsigned int d = 1; d < dim; ++d)
     p2[d] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    tria, refinements, Point<dim>(), p2);
+  GridGenerator::subdivided_hyper_rectangle(tria,
+                                            refinements,
+                                            Point<dim>(),
+                                            p2);
 
   tria.begin()->face(0)->set_all_boundary_ids(10);
   tria.last()->face(1)->set_all_boundary_ids(11);
@@ -146,9 +148,10 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc,
+                                            argv,
+                                            testing_max_num_threads());
+  MPILogInitAll                    log;
   deallog << std::setprecision(3);
 
   {

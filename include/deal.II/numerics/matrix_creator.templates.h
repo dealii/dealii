@@ -113,18 +113,17 @@ namespace MatrixCreator
     template <typename DoFHandlerType>
     inline IteratorRange<DoFHandlerType>::IteratorRange(
       const active_cell_iterator &first,
-      const active_cell_iterator &second) :
-      first(first),
-      second(second)
+      const active_cell_iterator &second)
+      : first(first)
+      , second(second)
     {}
 
 
 
     template <typename DoFHandlerType>
-    inline IteratorRange<DoFHandlerType>::IteratorRange(
-      const iterator_pair &ip) :
-      first(ip.first),
-      second(ip.second)
+    inline IteratorRange<DoFHandlerType>::IteratorRange(const iterator_pair &ip)
+      : first(ip.first)
+      , second(ip.second)
     {}
 
 
@@ -139,42 +138,42 @@ namespace MatrixCreator
                 const Function<spacedim, number> *               coefficient,
                 const Function<spacedim, number> *               rhs_function,
                 const ::dealii::hp::QCollection<dim> &           quadrature,
-                const ::dealii::hp::MappingCollection<dim, spacedim> &mapping) :
-          fe_collection(fe),
-          quadrature_collection(quadrature),
-          mapping_collection(mapping),
-          x_fe_values(mapping_collection,
-                      fe_collection,
-                      quadrature_collection,
-                      update_flags),
-          coefficient_values(quadrature_collection.max_n_quadrature_points()),
-          coefficient_vector_values(
-            quadrature_collection.max_n_quadrature_points(),
-            dealii::Vector<number>(fe_collection.n_components())),
-          rhs_values(quadrature_collection.max_n_quadrature_points()),
-          rhs_vector_values(
-            quadrature_collection.max_n_quadrature_points(),
-            dealii::Vector<number>(fe_collection.n_components())),
-          coefficient(coefficient),
-          rhs_function(rhs_function),
-          update_flags(update_flags)
+                const ::dealii::hp::MappingCollection<dim, spacedim> &mapping)
+          : fe_collection(fe)
+          , quadrature_collection(quadrature)
+          , mapping_collection(mapping)
+          , x_fe_values(mapping_collection,
+                        fe_collection,
+                        quadrature_collection,
+                        update_flags)
+          , coefficient_values(quadrature_collection.max_n_quadrature_points())
+          , coefficient_vector_values(
+              quadrature_collection.max_n_quadrature_points(),
+              dealii::Vector<number>(fe_collection.n_components()))
+          , rhs_values(quadrature_collection.max_n_quadrature_points())
+          , rhs_vector_values(quadrature_collection.max_n_quadrature_points(),
+                              dealii::Vector<number>(
+                                fe_collection.n_components()))
+          , coefficient(coefficient)
+          , rhs_function(rhs_function)
+          , update_flags(update_flags)
         {}
 
-        Scratch(const Scratch &data) :
-          fe_collection(data.fe_collection),
-          quadrature_collection(data.quadrature_collection),
-          mapping_collection(data.mapping_collection),
-          x_fe_values(mapping_collection,
-                      fe_collection,
-                      quadrature_collection,
-                      data.update_flags),
-          coefficient_values(data.coefficient_values),
-          coefficient_vector_values(data.coefficient_vector_values),
-          rhs_values(data.rhs_values),
-          rhs_vector_values(data.rhs_vector_values),
-          coefficient(data.coefficient),
-          rhs_function(data.rhs_function),
-          update_flags(data.update_flags)
+        Scratch(const Scratch &data)
+          : fe_collection(data.fe_collection)
+          , quadrature_collection(data.quadrature_collection)
+          , mapping_collection(data.mapping_collection)
+          , x_fe_values(mapping_collection,
+                        fe_collection,
+                        quadrature_collection,
+                        data.update_flags)
+          , coefficient_values(data.coefficient_values)
+          , coefficient_vector_values(data.coefficient_vector_values)
+          , rhs_values(data.rhs_values)
+          , rhs_vector_values(data.rhs_vector_values)
+          , coefficient(data.coefficient)
+          , rhs_function(data.rhs_function)
+          , update_flags(data.update_flags)
         {}
 
         Scratch &
@@ -359,21 +358,26 @@ namespace MatrixCreator
                           if (data.coefficient->n_components == 1)
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
-                              add_data += (data.coefficient_values[point] *
-                                           fe_values.shape_value_component(
-                                             i, point, comp_i) *
-                                           fe_values.shape_value_component(
-                                             j, point, comp_i) *
-                                           JxW[point]);
+                              add_data +=
+                                (data.coefficient_values[point] *
+                                 fe_values.shape_value_component(i,
+                                                                 point,
+                                                                 comp_i) *
+                                 fe_values.shape_value_component(j,
+                                                                 point,
+                                                                 comp_i) *
+                                 JxW[point]);
                           else
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
                                 (data.coefficient_vector_values[point](comp_i) *
-                                 fe_values.shape_value_component(
-                                   i, point, comp_i) *
-                                 fe_values.shape_value_component(
-                                   j, point, comp_i) *
+                                 fe_values.shape_value_component(i,
+                                                                 point,
+                                                                 comp_i) *
+                                 fe_values.shape_value_component(j,
+                                                                 point,
+                                                                 comp_i) *
                                  JxW[point]);
                         }
                       else
@@ -560,19 +564,23 @@ namespace MatrixCreator
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
-                                ((fe_values.shape_grad_component(
-                                    i, point, comp_i) *
-                                  fe_values.shape_grad_component(
-                                    j, point, comp_i)) *
+                                ((fe_values.shape_grad_component(i,
+                                                                 point,
+                                                                 comp_i) *
+                                  fe_values.shape_grad_component(j,
+                                                                 point,
+                                                                 comp_i)) *
                                  JxW[point] * data.coefficient_values[point]);
                           else
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
-                                ((fe_values.shape_grad_component(
-                                    i, point, comp_i) *
-                                  fe_values.shape_grad_component(
-                                    j, point, comp_i)) *
+                                ((fe_values.shape_grad_component(i,
+                                                                 point,
+                                                                 comp_i) *
+                                  fe_values.shape_grad_component(j,
+                                                                 point,
+                                                                 comp_i)) *
                                  JxW[point] *
                                  data.coefficient_vector_values[point](comp_i));
                         }
@@ -637,8 +645,9 @@ namespace MatrixCreator
                                                      *matrix,
                                                      *right_hand_side);
       else
-        data.constraints->distribute_local_to_global(
-          data.cell_matrix, data.dof_indices, *matrix);
+        data.constraints->distribute_local_to_global(data.cell_matrix,
+                                                     data.dof_indices,
+                                                     *matrix);
     }
 
 
@@ -667,19 +676,19 @@ namespace MatrixCreator
 
 
       template <typename DoFHandlerType, typename number>
-      CopyData<DoFHandlerType, number>::CopyData() :
-        dofs_per_cell(numbers::invalid_unsigned_int)
+      CopyData<DoFHandlerType, number>::CopyData()
+        : dofs_per_cell(numbers::invalid_unsigned_int)
       {}
 
 
       template <typename DoFHandlerType, typename number>
-      CopyData<DoFHandlerType, number>::CopyData(CopyData const &data) :
-        dofs_per_cell(data.dofs_per_cell),
-        dofs(data.dofs),
-        dof_is_on_face(data.dof_is_on_face),
-        cell(data.cell),
-        cell_matrix(data.cell_matrix),
-        cell_vector(data.cell_vector)
+      CopyData<DoFHandlerType, number>::CopyData(CopyData const &data)
+        : dofs_per_cell(data.dofs_per_cell)
+        , dofs(data.dofs)
+        , dof_is_on_face(data.dof_is_on_face)
+        , cell(data.cell)
+        , cell_matrix(data.cell_matrix)
+        , cell_vector(data.cell_vector)
       {}
     } // namespace AssemblerBoundary
   }   // namespace internal
@@ -706,14 +715,14 @@ namespace MatrixCreator
     hp::QCollection<dim>                 q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
-      assembler_data(
-        fe_collection,
-        update_values | update_JxW_values |
-          (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
-        coefficient,
-        /*rhs_function=*/nullptr,
-        q_collection,
-        mapping_collection);
+      assembler_data(fe_collection,
+                     update_values | update_JxW_values |
+                       (coefficient != nullptr ? update_quadrature_points :
+                                                 UpdateFlags(0)),
+                     coefficient,
+                     /*rhs_function=*/nullptr,
+                     q_collection,
+                     mapping_collection);
 
     MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit(
@@ -857,14 +866,14 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
-      assembler_data(
-        dof.get_fe_collection(),
-        update_values | update_JxW_values |
-          (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
-        coefficient,
-        /*rhs_function=*/nullptr,
-        q,
-        mapping);
+                                                             assembler_data(dof.get_fe_collection(),
+                     update_values | update_JxW_values |
+                       (coefficient != nullptr ? update_quadrature_points :
+                                                 UpdateFlags(0)),
+                     coefficient,
+                     /*rhs_function=*/nullptr,
+                     q,
+                     mapping);
     MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -1164,16 +1173,19 @@ namespace MatrixCreator
                                    ++j)
                                 copy_data.cell_matrix.back()(i, j) +=
                                   coefficient_vector_values[point](comp) *
-                                  fe_values.shape_value_component(
-                                    j, point, comp) *
-                                  fe_values.shape_value_component(
-                                    i, point, comp) *
+                                  fe_values.shape_value_component(j,
+                                                                  point,
+                                                                  comp) *
+                                  fe_values.shape_value_component(i,
+                                                                  point,
+                                                                  comp) *
                                   normal_adjustment[point][comp] * weight;
                               copy_data.cell_vector.back()(i) +=
                                 rhs_values_system[point](
                                   component_mapping[comp]) *
-                                fe_values.shape_value_component(
-                                  i, point, comp) *
+                                fe_values.shape_value_component(i,
+                                                                point,
+                                                                comp) *
                                 normal_adjustment[point][comp] * weight;
                             }
                         }
@@ -1394,11 +1406,11 @@ namespace MatrixCreator
     WorkStream::run(
       dof.begin_active(),
       dof.end(),
-      static_cast<std::function<void(
-        typename DoFHandler<dim, spacedim>::active_cell_iterator const &,
-        MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-        MatrixCreator::internal::AssemblerBoundary::
-          CopyData<DoFHandler<dim, spacedim>, number> &)>>(
+      static_cast<std::function<
+        void(typename DoFHandler<dim, spacedim>::active_cell_iterator const &,
+             MatrixCreator::internal::AssemblerBoundary::Scratch const &,
+             MatrixCreator::internal::AssemblerBoundary::
+               CopyData<DoFHandler<dim, spacedim>, number> &)>>(
         std::bind(
           &internal::create_boundary_mass_matrix_1<dim, spacedim, number>,
           std::placeholders::_1,
@@ -1459,8 +1471,10 @@ namespace MatrixCreator
       UpdateFlags update_flags =
         UpdateFlags(update_values | update_JxW_values | update_normal_vectors |
                     update_quadrature_points);
-      hp::FEFaceValues<dim, spacedim> x_fe_values(
-        mapping, fe_collection, q, update_flags);
+      hp::FEFaceValues<dim, spacedim> x_fe_values(mapping,
+                                                  fe_collection,
+                                                  q,
+                                                  update_flags);
 
       // two variables for the coefficient,
       // one for the two cases indicated in
@@ -1612,16 +1626,19 @@ namespace MatrixCreator
                                    ++j)
                                 copy_data.cell_matrix.back()(i, j) +=
                                   coefficient_vector_values[point](comp) *
-                                  fe_values.shape_value_component(
-                                    i, point, comp) *
-                                  fe_values.shape_value_component(
-                                    j, point, comp) *
+                                  fe_values.shape_value_component(i,
+                                                                  point,
+                                                                  comp) *
+                                  fe_values.shape_value_component(j,
+                                                                  point,
+                                                                  comp) *
                                   normal_adjustment[point][comp] * weight;
                               copy_data.cell_vector.back()(i) +=
                                 rhs_values_system[point](
                                   component_mapping[comp]) *
-                                fe_values.shape_value_component(
-                                  i, point, comp) *
+                                fe_values.shape_value_component(i,
+                                                                point,
+                                                                comp) *
                                 normal_adjustment[point][comp] * weight;
                             }
                         }
@@ -1940,14 +1957,14 @@ namespace MatrixCreator
     hp::QCollection<dim>                 q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
-      assembler_data(
-        fe_collection,
-        update_gradients | update_JxW_values |
-          (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
-        coefficient,
-        /*rhs_function=*/nullptr,
-        q_collection,
-        mapping_collection);
+                                                             assembler_data(fe_collection,
+                     update_gradients | update_JxW_values |
+                       (coefficient != nullptr ? update_quadrature_points :
+                                                 UpdateFlags(0)),
+                     coefficient,
+                     /*rhs_function=*/nullptr,
+                     q_collection,
+                     mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),
@@ -2088,14 +2105,14 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
-      assembler_data(
-        dof.get_fe_collection(),
-        update_gradients | update_JxW_values |
-          (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
-        coefficient,
-        /*rhs_function=*/nullptr,
-        q,
-        mapping);
+                                                             assembler_data(dof.get_fe_collection(),
+                     update_gradients | update_JxW_values |
+                       (coefficient != nullptr ? update_quadrature_points :
+                                                 UpdateFlags(0)),
+                     coefficient,
+                     /*rhs_function=*/nullptr,
+                     q,
+                     mapping);
     MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit(
       assembler_data.fe_collection.max_dofs_per_cell(),

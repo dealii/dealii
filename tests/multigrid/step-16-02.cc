@@ -86,8 +86,8 @@ public:
 
 
 template <int dim>
-LaplaceMatrix<dim>::LaplaceMatrix() :
-  MeshWorker::LocalIntegrator<dim>(true, false, false)
+LaplaceMatrix<dim>::LaplaceMatrix()
+  : MeshWorker::LocalIntegrator<dim>(true, false, false)
 {}
 
 
@@ -177,7 +177,8 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  Coefficient() : Function<dim>()
+  Coefficient()
+    : Function<dim>()
   {}
 
   virtual double
@@ -222,12 +223,12 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-  triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-  fe(degree),
-  mg_dof_handler(triangulation),
-  degree(degree),
-  matrix_integrator()
+LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+  : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+  , fe(degree)
+  , mg_dof_handler(triangulation)
+  , degree(degree)
+  , matrix_integrator()
 {}
 
 
@@ -258,8 +259,10 @@ LaplaceProblem<dim>::setup_system()
   Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   MappingQGeneric<dim> mapping(1);
-  VectorTools::interpolate_boundary_values(
-    mapping, mg_dof_handler, dirichlet_boundary, constraints);
+  VectorTools::interpolate_boundary_values(mapping,
+                                           mg_dof_handler,
+                                           dirichlet_boundary,
+                                           constraints);
   constraints.close();
   constraints.condense(sparsity_pattern);
   sparsity_pattern.compress();
@@ -458,8 +461,9 @@ LaplaceProblem<dim>::assemble_multigrid(const bool &use_mw)
                 cell_matrix(i, j) = 0;
 
           boundary_interface_constraints[cell->level()]
-            .distribute_local_to_global(
-              cell_matrix, local_dof_indices, mg_interface_in[cell->level()]);
+            .distribute_local_to_global(cell_matrix,
+                                        local_dof_indices,
+                                        mg_interface_in[cell->level()]);
         }
     }
 }

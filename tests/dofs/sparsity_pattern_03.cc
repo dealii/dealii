@@ -84,8 +84,9 @@ check()
   dof_1.distribute_dofs(element_1);
   dof_2.distribute_dofs(element_2);
 
-  SparsityPattern sparsity(
-    dof_1.n_dofs(), dof_2.n_dofs(), std::max(dof_1.n_dofs(), dof_2.n_dofs()));
+  SparsityPattern sparsity(dof_1.n_dofs(),
+                           dof_2.n_dofs(),
+                           std::max(dof_1.n_dofs(), dof_2.n_dofs()));
   DoFTools::make_sparsity_pattern(dof_1, dof_2, sparsity);
   sparsity.compress();
 

@@ -78,8 +78,10 @@ test()
 
   // This failed before this test was introduced.
   // Interpolate onto the first component only.
-  VectorTools::interpolate(
-    dofh, Functions::ConstantFunction<dim>(1, 2), x, ComponentMask(components));
+  VectorTools::interpolate(dofh,
+                           Functions::ConstantFunction<dim>(1, 2),
+                           x,
+                           ComponentMask(components));
 
   // Integrate the difference in the first component, if everything went
   // well, this should be zero.

@@ -89,16 +89,19 @@ test()
   LinearAlgebra::distributed::Vector<double> vector_Re,
     vector_Re_locally_relevant, vector_Im, vector_Im_locally_relevant;
   vector.reinit(locally_owned_dofs, mpi_communicator);
-  vector_locally_relevant.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  vector_locally_relevant.reinit(locally_owned_dofs,
+                                 locally_relevant_dofs,
+                                 mpi_communicator);
 
   vector_Re.reinit(locally_owned_dofs, mpi_communicator);
-  vector_Re_locally_relevant.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  vector_Re_locally_relevant.reinit(locally_owned_dofs,
+                                    locally_relevant_dofs,
+                                    mpi_communicator);
 
   vector_Im.reinit(locally_owned_dofs, mpi_communicator);
-  vector_Im_locally_relevant.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  vector_Im_locally_relevant.reinit(locally_owned_dofs,
+                                    locally_relevant_dofs,
+                                    mpi_communicator);
 
   const types::global_dof_index n_local_dofs = locally_owned_dofs.n_elements();
 
@@ -129,8 +132,9 @@ test()
     // a separate quadrature formula
     // enough for mass and kinetic matrices assembly
     QGauss<dim>   quadrature_formula(poly_degree + 1);
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();

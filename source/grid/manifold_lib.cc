@@ -118,10 +118,10 @@ namespace internal
 // ============================================================
 
 template <int dim, int spacedim>
-PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center) :
-  ChartManifold<dim, spacedim, spacedim>(
-    PolarManifold<dim, spacedim>::get_periodicity()),
-  center(center)
+PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
+  : ChartManifold<dim, spacedim, spacedim>(
+      PolarManifold<dim, spacedim>::get_periodicity())
+  , center(center)
 {}
 
 
@@ -279,9 +279,9 @@ PolarManifold<dim, spacedim>::push_forward_gradient(
 
 template <int dim, int spacedim>
 SphericalManifold<dim, spacedim>::SphericalManifold(
-  const Point<spacedim> center) :
-  center(center),
-  polar_manifold(center)
+  const Point<spacedim> center)
+  : center(center)
+  , polar_manifold(center)
 {}
 
 
@@ -434,8 +434,9 @@ SphericalManifold<dim, spacedim>::normal_vector(
     }
   const auto minmax_distance =
     std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex = std::min_element(
-    distances_to_first_vertex.begin(), distances_to_first_vertex.end());
+  const auto min_distance_to_first_vertex =
+    std::min_element(distances_to_first_vertex.begin(),
+                     distances_to_first_vertex.end());
 
   if (*minmax_distance.second - *minmax_distance.first <
       1.e-10 * *min_distance_to_first_vertex)
@@ -495,8 +496,9 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
     }
   const auto minmax_distance =
     std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex = std::min_element(
-    distances_to_first_vertex.begin(), distances_to_first_vertex.end());
+  const auto min_distance_to_first_vertex =
+    std::min_element(distances_to_first_vertex.begin(),
+                     distances_to_first_vertex.end());
 
   if (*minmax_distance.second - *minmax_distance.first <
       1.e-10 * *min_distance_to_first_vertex)
@@ -536,8 +538,9 @@ SphericalManifold<dim, spacedim>::get_new_point(
   // To avoid duplicating all of the logic in get_new_points, simply call it
   // for one position.
   Point<spacedim> new_point;
-  get_new_points(
-    vertices, weights, make_array_view(&new_point, &new_point + 1));
+  get_new_points(vertices,
+                 weights,
+                 make_array_view(&new_point, &new_point + 1));
 
   return new_point;
 }
@@ -725,8 +728,9 @@ SphericalManifold<dim, spacedim>::get_new_points(
   const ArrayView<const Tensor<1, spacedim>> array_merged_directions =
     make_array_view(merged_directions.begin(),
                     merged_directions.begin() + n_unique_directions);
-  const ArrayView<const double> array_merged_distances = make_array_view(
-    merged_distances.begin(), merged_distances.begin() + n_unique_directions);
+  const ArrayView<const double> array_merged_distances =
+    make_array_view(merged_distances.begin(),
+                    merged_distances.begin() + n_unique_directions);
 
   for (unsigned int row = 0; row < weight_rows; ++row)
     if (!accurate_point_was_found[row])
@@ -835,8 +839,10 @@ namespace
           SphericalManifold<3, 3> unit_manifold;
           Assert(std::abs(weights[0] + weights[1] - 1.0) < 1e-13,
                  ExcMessage("Weights do not sum up to 1"));
-          Point<3> intermediate = unit_manifold.get_intermediate_point(
-            Point<3>(directions[0]), Point<3>(directions[1]), weights[1]);
+          Point<3> intermediate =
+            unit_manifold.get_intermediate_point(Point<3>(directions[0]),
+                                                 Point<3>(directions[1]),
+                                                 weights[1]);
           return intermediate;
         }
 
@@ -978,12 +984,11 @@ SphericalManifold<3, 3>::get_new_point(
 // CylindricalManifold
 // ============================================================
 template <int dim, int spacedim>
-CylindricalManifold<dim, spacedim>::CylindricalManifold(
-  const unsigned int axis,
-  const double       tolerance) :
-  CylindricalManifold<dim, spacedim>(Point<spacedim>::unit_vector(axis),
-                                     Point<spacedim>(),
-                                     tolerance)
+CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
+                                                        const double tolerance)
+  : CylindricalManifold<dim, spacedim>(Point<spacedim>::unit_vector(axis),
+                                       Point<spacedim>(),
+                                       tolerance)
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
@@ -997,12 +1002,12 @@ template <int dim, int spacedim>
 CylindricalManifold<dim, spacedim>::CylindricalManifold(
   const Tensor<1, spacedim> &direction,
   const Point<spacedim> &    point_on_axis,
-  const double               tolerance) :
-  ChartManifold<dim, spacedim, 3>(Tensor<1, 3>({0, 2. * numbers::PI, 0})),
-  normal_direction(internal::compute_normal(direction, true)),
-  direction(direction / direction.norm()),
-  point_on_axis(point_on_axis),
-  tolerance(tolerance)
+  const double               tolerance)
+  : ChartManifold<dim, spacedim, 3>(Tensor<1, 3>({0, 2. * numbers::PI, 0}))
+  , normal_direction(internal::compute_normal(direction, true))
+  , direction(direction / direction.norm())
+  , point_on_axis(point_on_axis)
+  , tolerance(tolerance)
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
@@ -1151,13 +1156,13 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const Function<chartdim> & push_forward_function,
   const Function<spacedim> & pull_back_function,
   const Tensor<1, chartdim> &periodicity,
-  const double               tolerance) :
-  ChartManifold<dim, spacedim, chartdim>(periodicity),
-  push_forward_function(&push_forward_function),
-  pull_back_function(&pull_back_function),
-  tolerance(tolerance),
-  owns_pointers(false),
-  finite_difference_step(0)
+  const double               tolerance)
+  : ChartManifold<dim, spacedim, chartdim>(periodicity)
+  , push_forward_function(&push_forward_function)
+  , pull_back_function(&pull_back_function)
+  , tolerance(tolerance)
+  , owns_pointers(false)
+  , finite_difference_step(0)
 {
   AssertDimension(push_forward_function.n_components, spacedim);
   AssertDimension(pull_back_function.n_components, chartdim);
@@ -1174,16 +1179,16 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const std::string                                 chart_vars,
   const std::string                                 space_vars,
   const double                                      tolerance,
-  const double                                      h) :
-  ChartManifold<dim, spacedim, chartdim>(periodicity),
-  const_map(const_map),
-  tolerance(tolerance),
-  owns_pointers(true),
-  push_forward_expression(push_forward_expression),
-  pull_back_expression(pull_back_expression),
-  chart_vars(chart_vars),
-  space_vars(space_vars),
-  finite_difference_step(h)
+  const double                                      h)
+  : ChartManifold<dim, spacedim, chartdim>(periodicity)
+  , const_map(const_map)
+  , tolerance(tolerance)
+  , owns_pointers(true)
+  , push_forward_expression(push_forward_expression)
+  , pull_back_expression(pull_back_expression)
+  , chart_vars(chart_vars)
+  , space_vars(space_vars)
+  , finite_difference_step(h)
 {
   FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim, 0.0, h);
   FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim, 0.0, h);
@@ -1344,10 +1349,10 @@ TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
 
 
 template <int dim>
-TorusManifold<dim>::TorusManifold(const double R, const double r) :
-  ChartManifold<dim, 3, 3>(Point<3>(2 * numbers::PI, 2 * numbers::PI, 0.0)),
-  r(r),
-  R(R)
+TorusManifold<dim>::TorusManifold(const double R, const double r)
+  : ChartManifold<dim, 3, 3>(Point<3>(2 * numbers::PI, 2 * numbers::PI, 0.0))
+  , r(r)
+  , R(R)
 {
   Assert(R > r,
          ExcMessage("Outer radius R must be greater than the inner "
@@ -1398,9 +1403,9 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
 // ============================================================
 template <int dim, int spacedim>
 TransfiniteInterpolationManifold<dim,
-                                 spacedim>::TransfiniteInterpolationManifold() :
-  triangulation(nullptr),
-  level_coarse(-1)
+                                 spacedim>::TransfiniteInterpolationManifold()
+  : triangulation(nullptr)
+  , level_coarse(-1)
 {
   AssertThrow(dim > 1, ExcNotImplemented());
 }
@@ -1544,10 +1549,12 @@ namespace
             if (line_manifold_id == my_manifold_id ||
                 line_manifold_id == numbers::invalid_manifold_id)
               {
-                weights_vertices[GeometryInfo<2>::line_to_cell_vertices(
-                  line, 0)] -= my_weight * (1. - line_point);
-                weights_vertices[GeometryInfo<2>::line_to_cell_vertices(
-                  line, 1)] -= my_weight * line_point;
+                weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,
+                                                                        0)] -=
+                  my_weight * (1. - line_point);
+                weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,
+                                                                        1)] -=
+                  my_weight * line_point;
               }
             else
               {
@@ -1747,10 +1754,12 @@ namespace
             if (line_manifold_id == my_manifold_id ||
                 line_manifold_id == numbers::invalid_manifold_id)
               {
-                weights_vertices[GeometryInfo<3>::line_to_cell_vertices(
-                  line, 0)] -= my_weight * (1. - line_point);
-                weights_vertices[GeometryInfo<3>::line_to_cell_vertices(
-                  line, 1)] -= my_weight * (line_point);
+                weights_vertices[GeometryInfo<3>::line_to_cell_vertices(line,
+                                                                        0)] -=
+                  my_weight * (1. - line_point);
+                weights_vertices[GeometryInfo<3>::line_to_cell_vertices(line,
+                                                                        1)] -=
+                  my_weight * (line_point);
               }
             else
               {
@@ -1790,8 +1799,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::push_forward(
   Assert(GeometryInfo<dim>::is_inside_unit_cell(chart_point, 1e-6),
          ExcMessage("chart_point is not in unit interval"));
 
-  return compute_transfinite_interpolation(
-    *cell, chart_point, coarse_cell_is_flat[cell->index()]);
+  return compute_transfinite_interpolation(*cell,
+                                           chart_point,
+                                           coarse_cell_is_flat[cell->index()]);
 }
 
 
@@ -1813,8 +1823,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::push_forward_gradient(
       // avoid checking outside of the unit interval
       modified[d] += step;
       Tensor<1, spacedim> difference =
-        compute_transfinite_interpolation(
-          *cell, modified, coarse_cell_is_flat[cell->index()]) -
+        compute_transfinite_interpolation(*cell,
+                                          modified,
+                                          coarse_cell_is_flat[cell->index()]) -
         pushed_forward_chart_point;
       for (unsigned int e = 0; e < spacedim; ++e)
         grad[e][d] = difference[e] / step;
@@ -1845,8 +1856,10 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
   // as those are relatively expensive and failure occurs quite regularly in
   // the implementation of the compute_chart_points method.
   Tensor<1, spacedim> residual =
-    point - compute_transfinite_interpolation(
-              *cell, chart_point, coarse_cell_is_flat[cell->index()]);
+    point -
+    compute_transfinite_interpolation(*cell,
+                                      chart_point,
+                                      coarse_cell_is_flat[cell->index()]);
   const double tolerance = 1e-21 * Utilities::fixed_power<2>(cell->diameter());
   double       residual_norm_square = residual.norm_square();
   DerivativeForm<1, dim, spacedim> inv_grad;
@@ -1881,8 +1894,10 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
           // chart region. Note that the Jacobian here represents the
           // derivative of the forward map and should have a positive
           // determinant since we use properly oriented meshes.
-          DerivativeForm<1, dim, spacedim> grad = push_forward_gradient(
-            cell, chart_point, Point<spacedim>(point - residual));
+          DerivativeForm<1, dim, spacedim> grad =
+            push_forward_gradient(cell,
+                                  chart_point,
+                                  Point<spacedim>(point - residual));
           if (grad.determinant() <= 0.0)
             return outside;
           inv_grad = grad.covariant_form();
@@ -1897,9 +1912,10 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
 
       // check if point is inside 1.2 times the unit cell to avoid
       // hitting points very far away from valid ones in the manifolds
-      while (!GeometryInfo<dim>::is_inside_unit_cell(
-               chart_point + alpha * update, 0.2) &&
-             alpha > 1e-7)
+      while (
+        !GeometryInfo<dim>::is_inside_unit_cell(chart_point + alpha * update,
+                                                0.2) &&
+        alpha > 1e-7)
         alpha *= 0.5;
 
       const Tensor<1, spacedim> old_residual = residual;
@@ -2240,13 +2256,13 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
               message << "Transformation to chart coordinates: " << std::endl;
               for (unsigned int i = 0; i < surrounding_points.size(); ++i)
                 {
-                  message << surrounding_points[i] << " -> "
-                          << pull_back(
-                               cell,
-                               surrounding_points[i],
-                               cell->real_to_unit_cell_affine_approximation(
-                                 surrounding_points[i]))
-                          << std::endl;
+                  message
+                    << surrounding_points[i] << " -> "
+                    << pull_back(cell,
+                                 surrounding_points[i],
+                                 cell->real_to_unit_cell_affine_approximation(
+                                   surrounding_points[i]))
+                    << std::endl;
                 }
             }
 
@@ -2303,10 +2319,10 @@ TransfiniteInterpolationManifold<dim, spacedim>::get_new_points(
 
   boost::container::small_vector<Point<dim>, 100> new_points_on_chart(
     weights.size(0));
-  chart_manifold.get_new_points(
-    chart_points_view,
-    weights,
-    make_array_view(new_points_on_chart.begin(), new_points_on_chart.end()));
+  chart_manifold.get_new_points(chart_points_view,
+                                weights,
+                                make_array_view(new_points_on_chart.begin(),
+                                                new_points_on_chart.end()));
 
   for (unsigned int row = 0; row < weights.size(0); ++row)
     new_points[row] = push_forward(cell, new_points_on_chart[row]);

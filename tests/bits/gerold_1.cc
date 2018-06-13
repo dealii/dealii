@@ -73,7 +73,9 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() : fe(1), dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 

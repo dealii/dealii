@@ -118,8 +118,9 @@ namespace SparsityTools
                  ExcDimensionMismatch(cell_weights.size(),
                                       sparsity_pattern.n_rows()));
           int_cell_weights.resize(cell_weights.size());
-          std::copy(
-            cell_weights.begin(), cell_weights.end(), int_cell_weights.begin());
+          std::copy(cell_weights.begin(),
+                    cell_weights.end(),
+                    int_cell_weights.begin());
         }
       // Set a pointer to the optional cell weighting information.
       // METIS expects a null pointer if there are no weights to be considered.
@@ -424,9 +425,9 @@ namespace SparsityTools
            SparsityPattern::ExcNotCompressed());
 
     Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
-    Assert(
-      partition_indices.size() == sparsity_pattern.n_rows(),
-      ExcInvalidArraySize(partition_indices.size(), sparsity_pattern.n_rows()));
+    Assert(partition_indices.size() == sparsity_pattern.n_rows(),
+           ExcInvalidArraySize(partition_indices.size(),
+                               sparsity_pattern.n_rows()));
 
     // check for an easy return
     if (n_partitions == 1 || (sparsity_pattern.n_rows() == 1))
@@ -436,11 +437,15 @@ namespace SparsityTools
       }
 
     if (partitioner == Partitioner::metis)
-      partition_metis(
-        sparsity_pattern, cell_weights, n_partitions, partition_indices);
+      partition_metis(sparsity_pattern,
+                      cell_weights,
+                      n_partitions,
+                      partition_indices);
     else if (partitioner == Partitioner::zoltan)
-      partition_zoltan(
-        sparsity_pattern, cell_weights, n_partitions, partition_indices);
+      partition_zoltan(sparsity_pattern,
+                       cell_weights,
+                       n_partitions,
+                       partition_indices);
     else
       AssertThrow(false, ExcInternalError());
   }
@@ -493,8 +498,10 @@ namespace SparsityTools
       global_ids[i] = i;
 
     // Call ZOLTAN coloring algorithm
-    int rc = zz->Color(
-      num_gid_entries, num_objects, global_ids.data(), color_exp.data());
+    int rc = zz->Color(num_gid_entries,
+                       num_objects,
+                       global_ids.data(),
+                       color_exp.data());
 
     (void)rc;
     // Check for error code
@@ -581,10 +588,10 @@ namespace SparsityTools
     Assert(starting_indices.size() <= sparsity.n_rows(),
            ExcMessage(
              "You can't specify more starting indices than there are rows"));
-    Assert(
-      sparsity.row_index_set().size() == 0 ||
-        sparsity.row_index_set().size() == sparsity.n_rows(),
-      ExcMessage("Only valid for sparsity patterns which store all rows."));
+    Assert(sparsity.row_index_set().size() == 0 ||
+             sparsity.row_index_set().size() == sparsity.n_rows(),
+           ExcMessage(
+             "Only valid for sparsity patterns which store all rows."));
     for (SparsityPattern::size_type i = 0; i < starting_indices.size(); ++i)
       Assert(starting_indices[i] < sparsity.n_rows(),
              ExcMessage("Invalid starting index: All starting indices need "
@@ -597,8 +604,9 @@ namespace SparsityTools
       starting_indices);
 
     // initialize the new_indices array with invalid values
-    std::fill(
-      new_indices.begin(), new_indices.end(), numbers::invalid_size_type);
+    std::fill(new_indices.begin(),
+              new_indices.end(),
+              numbers::invalid_size_type);
 
     // if no starting indices were given: find dof with lowest coordination
     // number
@@ -726,10 +734,10 @@ namespace SparsityTools
     {
       AssertDimension(connectivity.n_rows(), connectivity.n_cols());
       AssertDimension(connectivity.n_rows(), renumbering.size());
-      Assert(
-        connectivity.row_index_set().size() == 0 ||
-          connectivity.row_index_set().size() == connectivity.n_rows(),
-        ExcMessage("Only valid for sparsity patterns which store all rows."));
+      Assert(connectivity.row_index_set().size() == 0 ||
+               connectivity.row_index_set().size() == connectivity.n_rows(),
+             ExcMessage(
+               "Only valid for sparsity patterns which store all rows."));
 
       std::vector<types::global_dof_index> touched_nodes(
         connectivity.n_rows(), numbers::invalid_dof_index);

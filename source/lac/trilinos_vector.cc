@@ -64,27 +64,28 @@ namespace TrilinosWrappers
 
   namespace MPI
   {
-    Vector::Vector() :
-      Subscriptor(),
-      last_action(Zero),
-      compressed(true),
-      has_ghosts(false),
-      vector(new Epetra_FEVector(
-        Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
+    Vector::Vector()
+      : Subscriptor()
+      , last_action(Zero)
+      , compressed(true)
+      , has_ghosts(false)
+      , vector(new Epetra_FEVector(
+          Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
 
 
     Vector::Vector(const IndexSet &parallel_partitioning,
-                   const MPI_Comm &communicator) :
-      Vector()
+                   const MPI_Comm &communicator)
+      : Vector()
     {
       reinit(parallel_partitioning, communicator);
     }
 
 
 
-    Vector::Vector(const Vector &v) : Vector()
+    Vector::Vector(const Vector &v)
+      : Vector()
     {
       has_ghosts     = v.has_ghosts;
       vector         = std_cxx14::make_unique<Epetra_FEVector>(*v.vector);
@@ -93,7 +94,8 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector(Vector &&v) noexcept : Vector()
+    Vector::Vector(Vector &&v) noexcept
+      : Vector()
     {
       // initialize a minimal, valid object and swap
       swap(v);
@@ -103,15 +105,15 @@ namespace TrilinosWrappers
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const Vector &  v,
-                   const MPI_Comm &communicator) :
-      Vector()
+                   const MPI_Comm &communicator)
+      : Vector()
     {
       AssertThrow(parallel_partitioner.size() ==
                     static_cast<size_type>(
                       TrilinosWrappers::n_global_elements(v.vector->Map())),
-                  ExcDimensionMismatch(
-                    parallel_partitioner.size(),
-                    TrilinosWrappers::n_global_elements(v.vector->Map())));
+                  ExcDimensionMismatch(parallel_partitioner.size(),
+                                       TrilinosWrappers::n_global_elements(
+                                         v.vector->Map())));
 
       vector = std_cxx14::make_unique<Epetra_FEVector>(
         parallel_partitioner.make_trilinos_map(communicator, true));
@@ -122,8 +124,8 @@ namespace TrilinosWrappers
 
     Vector::Vector(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &communicator) :
-      Vector()
+                   const MPI_Comm &communicator)
+      : Vector()
     {
       reinit(local, ghost, communicator, false);
     }
@@ -320,11 +322,11 @@ namespace TrilinosWrappers
 
       if (import_data == true)
         {
-          AssertThrow(
-            static_cast<size_type>(
-              TrilinosWrappers::global_length(*actual_vec)) == v.size(),
-            ExcDimensionMismatch(TrilinosWrappers::global_length(*actual_vec),
-                                 v.size()));
+          AssertThrow(static_cast<size_type>(TrilinosWrappers::global_length(
+                        *actual_vec)) == v.size(),
+                      ExcDimensionMismatch(TrilinosWrappers::global_length(
+                                             *actual_vec),
+                                           v.size()));
 
           Epetra_Import data_exchange(vector->Map(), actual_vec->Map());
 
@@ -477,8 +479,9 @@ namespace TrilinosWrappers
         }
 
       if (v.nonlocal_vector.get() != nullptr)
-        nonlocal_vector = std_cxx14::make_unique<Epetra_MultiVector>(
-          v.nonlocal_vector->Map(), 1);
+        nonlocal_vector =
+          std_cxx14::make_unique<Epetra_MultiVector>(v.nonlocal_vector->Map(),
+                                                     1);
 
       return *this;
     }
@@ -578,11 +581,11 @@ namespace TrilinosWrappers
       Assert(comm_ptr != nullptr, ExcInternalError());
       Utilities::MPI::MinMaxAvg result =
         Utilities::MPI::min_max_avg(double_mode, comm_ptr->GetMpiComm());
-      Assert(
-        result.max - result.min < 1e-5,
-        ExcMessage("Not all processors agree whether the last operation on "
-                   "this vector was an addition or a set operation. This will "
-                   "prevent the compress() operation from succeeding."));
+      Assert(result.max - result.min < 1e-5,
+             ExcMessage(
+               "Not all processors agree whether the last operation on "
+               "this vector was an addition or a set operation. This will "
+               "prevent the compress() operation from succeeding."));
 
 #    endif
 #  endif

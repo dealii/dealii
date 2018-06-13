@@ -37,8 +37,9 @@ test_symm_tensor_contract_3(const T1<rank1, dim, number> &    l,
                             const T3<rank3, dim, number> &    r)
 {
   const double res1 = contract3(l, m, r);
-  const double res2 = contract3(
-    static_cast<Tensor<rank1, dim>>(l), m, static_cast<Tensor<rank3, dim>>(r));
+  const double res2 = contract3(static_cast<Tensor<rank1, dim>>(l),
+                                m,
+                                static_cast<Tensor<rank3, dim>>(r));
   Assert(std::abs(res1 - res2) < 1e-12,
          ExcMessage("Result from symmetric tensor contract3 is incorrect."));
 }

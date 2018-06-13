@@ -34,7 +34,8 @@
 class Rotate2d
 {
 public:
-  Rotate2d(const double angle) : angle(angle)
+  Rotate2d(const double angle)
+    : angle(angle)
   {}
 
   template <int spacedim>

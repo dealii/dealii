@@ -113,7 +113,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -135,7 +136,8 @@ RightHandSide<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() : dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem()
+  : dof_handler(triangulation)
 {
   for (unsigned int degree = 2; degree < (dim == 2 ? 8 : 5); ++degree)
     {
@@ -252,8 +254,9 @@ LaplaceProblem<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -264,10 +267,14 @@ LaplaceProblem<dim>::assemble_system()
   hanging_node_constraints.condense(system_rhs);
   condense.stop();
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 template <int dim>
@@ -334,8 +341,9 @@ LaplaceProblem<dim>::estimate_smoothness(
                 if (!((i == 0) && (j == 0) && (k == 0)) &&
                     (i * i + j * j + k * k < N * N))
                   {
-                    k_vectors.push_back(Point<dim>(
-                      numbers::PI * i, numbers::PI * j, numbers::PI * k));
+                    k_vectors.push_back(Point<dim>(numbers::PI * i,
+                                                   numbers::PI * j,
+                                                   numbers::PI * k));
                     k_vectors_magnitude.push_back(i * i + j * j + k * k);
                   }
 
@@ -469,8 +477,10 @@ LaplaceProblem<dim>::refine_grid()
   Vector<float> smoothness_indicators(triangulation.n_active_cells());
   estimate_smoothness(smoothness_indicators);
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
 
   float max_smoothness = 0,
         min_smoothness = smoothness_indicators.linfty_norm();
@@ -528,8 +538,9 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
     estimate_smoothness(smoothness_indicators);
 
     Vector<double> smoothness_field(dof_handler.n_dofs());
-    DoFTools::distribute_cell_to_dof_vector(
-      dof_handler, smoothness_indicators, smoothness_field);
+    DoFTools::distribute_cell_to_dof_vector(dof_handler,
+                                            smoothness_indicators,
+                                            smoothness_field);
 
     Vector<float> fe_indices(triangulation.n_active_cells());
     {
@@ -626,18 +637,24 @@ LaplaceProblem<3>::create_coarse_grid()
   static const Point<3> vertices_1[] = {
     // points on the lower surface
     Point<dim>(0, 0, -4),
-    Point<dim>(
-      std::cos(0 * numbers::PI / 6), std::sin(0 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), -4),
+    Point<dim>(std::cos(0 * numbers::PI / 6),
+               std::sin(0 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(2 * numbers::PI / 6),
+               std::sin(2 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(4 * numbers::PI / 6),
+               std::sin(4 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(6 * numbers::PI / 6),
+               std::sin(6 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(8 * numbers::PI / 6),
+               std::sin(8 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(10 * numbers::PI / 6),
+               std::sin(10 * numbers::PI / 6),
+               -4),
 
     // same points on the top
     // of the stem, with
@@ -648,8 +665,9 @@ LaplaceProblem<3>::create_coarse_grid()
     Point<dim>(std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), 4),
     Point<dim>(std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 4),
     Point<dim>(std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), 4),
-    Point<dim>(
-      std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 4),
+    Point<dim>(std::cos(10 * numbers::PI / 6),
+               std::sin(10 * numbers::PI / 6),
+               4),
 
     // point at top of chevron
     Point<dim>(0, 0, 4 + std::sqrt(2.) / 2),
@@ -661,20 +679,26 @@ LaplaceProblem<3>::create_coarse_grid()
                                      std::sin(2 * numbers::PI / 6),
                                      0) *
                             4,
-    Point<dim>(
-      std::cos(0 * numbers::PI / 6), std::sin(0 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(0 * numbers::PI / 6),
+               std::sin(0 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(2 * numbers::PI / 6),
+                 std::sin(2 * numbers::PI / 6),
+                 0) *
         4,
-    Point<dim>(
-      std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(2 * numbers::PI / 6),
+               std::sin(2 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(2 * numbers::PI / 6),
+                 std::sin(2 * numbers::PI / 6),
+                 0) *
         4,
-    Point<dim>(
-      std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(4 * numbers::PI / 6),
+               std::sin(4 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(2 * numbers::PI / 6),
+                 std::sin(2 * numbers::PI / 6),
+                 0) *
         4,
 
     // points at the top of the
@@ -684,20 +708,26 @@ LaplaceProblem<3>::create_coarse_grid()
                                      std::sin(6 * numbers::PI / 6),
                                      0) *
                             4,
-    Point<dim>(
-      std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(4 * numbers::PI / 6),
+               std::sin(4 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(6 * numbers::PI / 6),
+                 std::sin(6 * numbers::PI / 6),
+                 0) *
         4,
-    Point<dim>(
-      std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(6 * numbers::PI / 6),
+               std::sin(6 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(6 * numbers::PI / 6),
+                 std::sin(6 * numbers::PI / 6),
+                 0) *
         4,
-    Point<dim>(
-      std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(8 * numbers::PI / 6),
+               std::sin(8 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(6 * numbers::PI / 6),
+                 std::sin(6 * numbers::PI / 6),
+                 0) *
         4,
 
     // points at the top of the
@@ -707,20 +737,26 @@ LaplaceProblem<3>::create_coarse_grid()
                                      std::sin(10 * numbers::PI / 6),
                                      0) *
                             4,
-    Point<dim>(
-      std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(8 * numbers::PI / 6),
+               std::sin(8 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(10 * numbers::PI / 6),
+                 std::sin(10 * numbers::PI / 6),
+                 0) *
         4,
-    Point<dim>(
-      std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(10 * numbers::PI / 6),
+               std::sin(10 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(10 * numbers::PI / 6),
+                 std::sin(10 * numbers::PI / 6),
+                 0) *
         4,
-    Point<dim>(
-      std::cos(0 * numbers::PI / 6), std::sin(0 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(0 * numbers::PI / 6),
+               std::sin(0 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(10 * numbers::PI / 6),
+                 std::sin(10 * numbers::PI / 6),
+                 0) *
         4,
 
   };

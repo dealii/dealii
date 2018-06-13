@@ -34,11 +34,11 @@ FE_Poly<PolynomialType, dim, spacedim>::FE_Poly(
   const PolynomialType &            poly_space,
   const FiniteElementData<dim> &    fe_data,
   const std::vector<bool> &         restriction_is_additive_flags,
-  const std::vector<ComponentMask> &nonzero_components) :
-  FiniteElement<dim, spacedim>(fe_data,
-                               restriction_is_additive_flags,
-                               nonzero_components),
-  poly_space(poly_space)
+  const std::vector<ComponentMask> &nonzero_components)
+  : FiniteElement<dim, spacedim>(fe_data,
+                                 restriction_is_additive_flags,
+                                 nonzero_components)
+  , poly_space(poly_space)
 {
   AssertDimension(dim, PolynomialType::dimension);
 }
@@ -278,15 +278,17 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
       cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        mapping.transform(
-          make_array_view(fe_data.shape_3rd_derivatives, k),
-          mapping_covariant_hessian,
-          mapping_internal,
-          make_array_view(output_data.shape_3rd_derivatives, k));
+        mapping.transform(make_array_view(fe_data.shape_3rd_derivatives, k),
+                          mapping_covariant_hessian,
+                          mapping_internal,
+                          make_array_view(output_data.shape_3rd_derivatives,
+                                          k));
 
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(
-          output_data, mapping_data, quadrature.size(), k);
+        correct_third_derivatives(output_data,
+                                  mapping_data,
+                                  quadrature.size(),
+                                  k);
     }
 }
 
@@ -365,16 +367,20 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_face_values(
   if (flags & update_3rd_derivatives)
     {
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        mapping.transform(
-          make_array_view(
-            fe_data.shape_3rd_derivatives, k, offset, quadrature.size()),
-          mapping_covariant_hessian,
-          mapping_internal,
-          make_array_view(output_data.shape_3rd_derivatives, k));
+        mapping.transform(make_array_view(fe_data.shape_3rd_derivatives,
+                                          k,
+                                          offset,
+                                          quadrature.size()),
+                          mapping_covariant_hessian,
+                          mapping_internal,
+                          make_array_view(output_data.shape_3rd_derivatives,
+                                          k));
 
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(
-          output_data, mapping_data, quadrature.size(), k);
+        correct_third_derivatives(output_data,
+                                  mapping_data,
+                                  quadrature.size(),
+                                  k);
     }
 }
 
@@ -456,16 +462,20 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   if (flags & update_3rd_derivatives)
     {
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        mapping.transform(
-          make_array_view(
-            fe_data.shape_3rd_derivatives, k, offset, quadrature.size()),
-          mapping_covariant_hessian,
-          mapping_internal,
-          make_array_view(output_data.shape_3rd_derivatives, k));
+        mapping.transform(make_array_view(fe_data.shape_3rd_derivatives,
+                                          k,
+                                          offset,
+                                          quadrature.size()),
+                          mapping_covariant_hessian,
+                          mapping_internal,
+                          make_array_view(output_data.shape_3rd_derivatives,
+                                          k));
 
       for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(
-          output_data, mapping_data, quadrature.size(), k);
+        correct_third_derivatives(output_data,
+                                  mapping_data,
+                                  quadrature.size(),
+                                  k);
     }
 }
 

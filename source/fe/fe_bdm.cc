@@ -38,16 +38,16 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
-FE_BDM<dim>::FE_BDM(const unsigned int deg) :
-  FE_PolyTensor<PolynomialsBDM<dim>, dim>(
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 1,
-                           FiniteElementData<dim>::Hdiv),
-    get_ria_vector(deg),
-    std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
-                               std::vector<bool>(dim, true)))
+FE_BDM<dim>::FE_BDM(const unsigned int deg)
+  : FE_PolyTensor<PolynomialsBDM<dim>, dim>(
+      deg,
+      FiniteElementData<dim>(get_dpo_vector(deg),
+                             dim,
+                             deg + 1,
+                             FiniteElementData<dim>::Hdiv),
+      get_ria_vector(deg),
+      std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
+                                 std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   Assert(
@@ -181,8 +181,9 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
 
   AssertDimension(dbase,
                   this->dofs_per_face * GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(
-    pbase, this->generalized_support_points.size() - test_values_cell.size());
+  AssertDimension(pbase,
+                  this->generalized_support_points.size() -
+                    test_values_cell.size());
 
   // Done for BDM1
   if (dbase == this->dofs_per_cell)
@@ -361,8 +362,9 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // point values on faces in 2D. In 3D, this is impossible, since the
   // moments are only taken with respect to PolynomialsP.
   if (dim > 2)
-    internal::FE_BDM::initialize_test_values(
-      test_values_face, face_points, deg);
+    internal::FE_BDM::initialize_test_values(test_values_face,
+                                             face_points,
+                                             deg);
 
   if (deg <= 1)
     return;
@@ -378,8 +380,9 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // the test functions in the
   // interior quadrature points
 
-  internal::FE_BDM::initialize_test_values(
-    test_values_cell, cell_points, deg - 2);
+  internal::FE_BDM::initialize_test_values(test_values_cell,
+                                           cell_points,
+                                           deg - 2);
 }
 
 

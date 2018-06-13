@@ -163,16 +163,16 @@ namespace StokesClass
                                const PreconditionerA & Apreconditioner,
                                const bool              do_solve_A,
                                const double            A_block_tolerance,
-                               const double            S_block_tolerance) :
-      stokes_matrix(S),
-      mass_matrix(Mass),
-      mp_preconditioner(Mppreconditioner),
-      a_preconditioner(Apreconditioner),
-      do_solve_A(do_solve_A),
-      n_iterations_A_(0),
-      n_iterations_S_(0),
-      A_block_tolerance(A_block_tolerance),
-      S_block_tolerance(S_block_tolerance)
+                               const double            S_block_tolerance)
+      : stokes_matrix(S)
+      , mass_matrix(Mass)
+      , mp_preconditioner(Mppreconditioner)
+      , a_preconditioner(Apreconditioner)
+      , do_solve_A(do_solve_A)
+      , n_iterations_A_(0)
+      , n_iterations_S_(0)
+      , A_block_tolerance(A_block_tolerance)
+      , S_block_tolerance(S_block_tolerance)
     {}
 
     template <class StokesMatrixType,
@@ -218,16 +218,20 @@ namespace StokesClass
       // first solve with the bottom left block, which we have built
       // as a mass matrix with the inverse of the viscosity
       {
-        SolverControl solver_control(
-          1000, src.block(1).l2_norm() * S_block_tolerance, false, false);
+        SolverControl solver_control(1000,
+                                     src.block(1).l2_norm() * S_block_tolerance,
+                                     false,
+                                     false);
 
         SolverCG<LinearAlgebra::distributed::Vector<double>> solver(
           solver_control);
         try
           {
             dst.block(1) = 0.0;
-            solver.solve(
-              mass_matrix, dst.block(1), src.block(1), mp_preconditioner);
+            solver.solve(mass_matrix,
+                         dst.block(1),
+                         src.block(1),
+                         mp_preconditioner);
             n_iterations_S_ += solver_control.last_step();
           }
         // if the solver fails, report the error from processor 0 with some
@@ -387,7 +391,8 @@ namespace StokesClass
   class ExactSolution_BoundaryValues : public Function<dim>
   {
   public:
-    ExactSolution_BoundaryValues() : Function<dim>(dim + 1)
+    ExactSolution_BoundaryValues()
+      : Function<dim>(dim + 1)
     {}
     virtual void
     vector_value(const Point<dim> &p, Vector<double> &value) const;
@@ -407,7 +412,8 @@ namespace StokesClass
   class ExactSolution_BoundaryValues_u : public Function<dim>
   {
   public:
-    ExactSolution_BoundaryValues_u() : Function<dim>(dim)
+    ExactSolution_BoundaryValues_u()
+      : Function<dim>(dim)
     {}
     virtual void
     vector_value(const Point<dim> &p, Vector<double> &value) const;
@@ -432,9 +438,9 @@ namespace StokesClass
         Base<dim, LinearAlgebra::distributed::BlockVector<number>>
   {
   public:
-    StokesOperator() :
-      MatrixFreeOperators::
-        Base<dim, LinearAlgebra::distributed::BlockVector<number>>()
+    StokesOperator()
+      : MatrixFreeOperators::
+          Base<dim, LinearAlgebra::distributed::BlockVector<number>>()
     {}
     void
     clear();
@@ -562,9 +568,9 @@ namespace StokesClass
         Base<dim, LinearAlgebra::distributed::Vector<number>>
   {
   public:
-    MassMatrixOperator() :
-      MatrixFreeOperators::Base<dim,
-                                LinearAlgebra::distributed::Vector<number>>()
+    MassMatrixOperator()
+      : MatrixFreeOperators::Base<dim,
+                                  LinearAlgebra::distributed::Vector<number>>()
     {}
     void
     clear();
@@ -649,8 +655,9 @@ namespace StokesClass
         pressure.read_dof_values(src);
         pressure.evaluate(true, false);
         for (unsigned int q = 0; q < pressure.n_q_points; ++q)
-          pressure.submit_value(
-            one_over_viscosity(cell, q) * pressure.get_value(q), q);
+          pressure.submit_value(one_over_viscosity(cell, q) *
+                                  pressure.get_value(q),
+                                q);
         pressure.integrate(true, false);
         pressure.distribute_local_to_global(dst);
       }
@@ -683,8 +690,10 @@ namespace StokesClass
     this->data->initialize_dof_vector(inverse_diagonal);
     this->data->initialize_dof_vector(diagonal);
 
-    this->data->cell_loop(
-      &MassMatrixOperator::local_compute_diagonal, this, diagonal, dummy);
+    this->data->cell_loop(&MassMatrixOperator::local_compute_diagonal,
+                          this,
+                          diagonal,
+                          dummy);
 
     this->set_constrained_entries_to_one(diagonal);
     inverse_diagonal              = diagonal;
@@ -719,8 +728,9 @@ namespace StokesClass
 
             pressure.evaluate(true, false, false);
             for (unsigned int q = 0; q < pressure.n_q_points; ++q)
-              pressure.submit_value(
-                one_over_viscosity(cell, q) * pressure.get_value(q), q);
+              pressure.submit_value(one_over_viscosity(cell, q) *
+                                      pressure.get_value(q),
+                                    q);
             pressure.integrate(true, false);
 
             diagonal[i] = pressure.begin_dof_values()[i];
@@ -738,9 +748,9 @@ namespace StokesClass
                            Base<dim, LinearAlgebra::distributed::Vector<number>>
   {
   public:
-    ABlockOperator() :
-      MatrixFreeOperators::Base<dim,
-                                LinearAlgebra::distributed::Vector<number>>()
+    ABlockOperator()
+      : MatrixFreeOperators::Base<dim,
+                                  LinearAlgebra::distributed::Vector<number>>()
     {}
     void
     clear();
@@ -855,8 +865,10 @@ namespace StokesClass
       this->inverse_diagonal_entries->get_vector();
     this->data->initialize_dof_vector(inverse_diagonal);
     unsigned int dummy = 0;
-    this->data->cell_loop(
-      &ABlockOperator::local_compute_diagonal, this, inverse_diagonal, dummy);
+    this->data->cell_loop(&ABlockOperator::local_compute_diagonal,
+                          this,
+                          inverse_diagonal,
+                          dummy);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
@@ -966,19 +978,19 @@ namespace StokesClass
 
 
   template <int dim>
-  StokesProblem<dim>::StokesProblem() :
-    degree_u(velocity_degree),
-    fe_u(FE_Q<dim>(degree_u), dim),
-    fe_p(FE_Q<dim>(degree_u - 1)),
-    triangulation(
-      MPI_COMM_WORLD,
-      typename Triangulation<dim>::MeshSmoothing(
-        Triangulation<dim>::limit_level_difference_at_vertices |
-        Triangulation<dim>::smoothing_on_refinement |
-        Triangulation<dim>::smoothing_on_coarsening),
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    dof_handler_u(triangulation),
-    dof_handler_p(triangulation)
+  StokesProblem<dim>::StokesProblem()
+    : degree_u(velocity_degree)
+    , fe_u(FE_Q<dim>(degree_u), dim)
+    , fe_p(FE_Q<dim>(degree_u - 1))
+    , triangulation(MPI_COMM_WORLD,
+                    typename Triangulation<dim>::MeshSmoothing(
+                      Triangulation<dim>::limit_level_difference_at_vertices |
+                      Triangulation<dim>::smoothing_on_refinement |
+                      Triangulation<dim>::smoothing_on_coarsening),
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
+    , dof_handler_u(triangulation)
+    , dof_handler_p(triangulation)
   {}
 
   template <int dim>
@@ -1107,8 +1119,9 @@ namespace StokesClass
     for (unsigned int level = 0; level < n_levels; ++level)
       {
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler_u, level, relevant_dofs);
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler_u,
+                                                      level,
+                                                      relevant_dofs);
         ConstraintMatrix level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
@@ -1128,8 +1141,9 @@ namespace StokesClass
                                     QGauss<1>(degree_u + 1),
                                     additional_data);
 
-        mg_matrices[level].initialize(
-          mg_mf_storage_level, mg_constrained_dofs, level);
+        mg_matrices[level].initialize(mg_mf_storage_level,
+                                      mg_constrained_dofs,
+                                      level);
         mg_matrices[level].evaluate_2_x_viscosity(Viscosity<dim>(sinker));
         mg_matrices[level].compute_diagonal();
       }
@@ -1181,8 +1195,10 @@ namespace StokesClass
 
     std::shared_ptr<MatrixFree<dim, double>> matrix_free_homogeneous(
       new MatrixFree<dim, double>());
-    matrix_free_homogeneous->reinit(
-      dofs, constraints_no_dirchlet, QGauss<1>(degree_u + 1), data);
+    matrix_free_homogeneous->reinit(dofs,
+                                    constraints_no_dirchlet,
+                                    QGauss<1>(degree_u + 1),
+                                    data);
 
     operator_homogeneous.initialize(matrix_free_homogeneous);
     operator_homogeneous.evaluate_2_x_viscosity(Viscosity<dim>(sinker));
@@ -1258,8 +1274,10 @@ namespace StokesClass
 
     PrimitiveVectorMemory<block_vector_t> mem;
 
-    SolverControl solver_control_cheap(
-      n_cheap_stokes_solver_steps, solver_tolerance, false, false);
+    SolverControl solver_control_cheap(n_cheap_stokes_solver_steps,
+                                       solver_tolerance,
+                                       false,
+                                       false);
 
     typedef MGTransferMatrixFree<dim, double> Transfer;
 
@@ -1318,8 +1336,9 @@ namespace StokesClass
     mg.set_edge_matrices(mg_interface, mg_interface);
 
 
-    PreconditionMG<dim, vector_t, Transfer> prec_A(
-      dof_handler_u, mg, mg_transfer);
+    PreconditionMG<dim, vector_t, Transfer> prec_A(dof_handler_u,
+                                                   mg,
+                                                   mg_transfer);
 
     typedef PreconditionChebyshev<MassMatrixType, vector_t> MassPrec;
     MassPrec                                                prec_S;

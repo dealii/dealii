@@ -63,8 +63,10 @@ test()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 1, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           1,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   SparsityPattern sparsity;
@@ -95,10 +97,12 @@ test()
           else
             local_mat(i, j) = random_value<double>();
       cell->get_dof_indices(local_dof_indices);
-      constraints.distribute_local_to_global(
-        local_mat, local_dof_indices, sparse);
-      constraints.distribute_local_to_global(
-        local_mat, local_dof_indices, full);
+      constraints.distribute_local_to_global(local_mat,
+                                             local_dof_indices,
+                                             sparse);
+      constraints.distribute_local_to_global(local_mat,
+                                             local_dof_indices,
+                                             full);
     }
 
   // now check that the entries are indeed the

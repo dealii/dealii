@@ -58,7 +58,8 @@ template <int dim>
 class Displacement : public Function<dim>
 {
 public:
-  Displacement() : Function<dim>(dim)
+  Displacement()
+    : Function<dim>(dim)
   {}
 
   double
@@ -122,15 +123,17 @@ test()
 
   // Displacement vector
   LinearAlgebra::distributed::Vector<NumberType> displacement;
-  displacement.reinit(
-    locally_owned_dofs_euler, locally_relevant_dofs_euler, mpi_communicator);
+  displacement.reinit(locally_owned_dofs_euler,
+                      locally_relevant_dofs_euler,
+                      mpi_communicator);
   displacement = 0.;
 
   Displacement<dim> displacement_function;
 
   // first, move via mapping:
-  VectorTools::interpolate(
-    dof_handler_euler, displacement_function, displacement);
+  VectorTools::interpolate(dof_handler_euler,
+                           displacement_function,
+                           displacement);
   displacement.compress(VectorOperation::insert);
   displacement.update_ghost_values();
 

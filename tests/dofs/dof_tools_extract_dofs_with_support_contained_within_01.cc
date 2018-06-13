@@ -50,8 +50,9 @@ test(const unsigned int flag)
   // Setup system
   Triangulation<dim> triangulation;
 
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<dim>(0, 0), Point<dim>(1, 1));
+  GridGenerator::hyper_rectangle(triangulation,
+                                 Point<dim>(0, 0),
+                                 Point<dim>(1, 1));
 
   if (flag == 0)
     triangulation.refine_global(2);

@@ -25,11 +25,11 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &f,
                                             const Point<dim> &   dir,
-                                            const double         h) :
-  AutoDerivativeFunction<dim>(h, f.n_components, f.get_time()),
-  f(f),
-  h(h),
-  incr(1, h * dir)
+                                            const double         h)
+  : AutoDerivativeFunction<dim>(h, f.n_components, f.get_time())
+  , f(f)
+  , h(h)
+  , incr(1, h * dir)
 {
   set_formula();
 }
@@ -39,11 +39,11 @@ FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &f,
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &          f,
                                             const std::vector<Point<dim>> &dir,
-                                            const double                   h) :
-  AutoDerivativeFunction<dim>(h, f.n_components, f.get_time()),
-  f(f),
-  h(h),
-  incr(dir.size())
+                                            const double                   h)
+  : AutoDerivativeFunction<dim>(h, f.n_components, f.get_time())
+  , f(f)
+  , h(h)
+  , incr(dir.size())
 {
   for (unsigned int i = 0; i < incr.size(); ++i)
     incr[i] = h * dir[i];

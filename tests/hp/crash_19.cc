@@ -95,11 +95,15 @@ test()
 
   ExactSolution<dim>                        exact_solution;
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, exact_solution, boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           exact_solution,
+                                           boundary_values);
   if (dim == 1)
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, exact_solution, boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             exact_solution,
+                                             boundary_values);
 
   for (std::map<types::global_dof_index, double>::iterator i =
          boundary_values.begin();

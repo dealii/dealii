@@ -253,8 +253,9 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                         !level_constraints[l].is_constrained(dofs_1[i]))
                       {
                         level_constraints[l].add_line(dofs_2[i]);
-                        level_constraints[l].add_entry(
-                          dofs_2[i], dofs_1[i], 1.);
+                        level_constraints[l].add_entry(dofs_2[i],
+                                                       dofs_1[i],
+                                                       1.);
                       }
                 }
           }
@@ -283,8 +284,10 @@ MGConstrainedDoFs::initialize(
   // At this point boundary_indices is empty.
   boundary_indices.resize(n_levels);
 
-  MGTools::make_boundary_list(
-    dof, function_map, boundary_indices, component_mask);
+  MGTools::make_boundary_list(dof,
+                              function_map,
+                              boundary_indices,
+                              component_mask);
 }
 
 
@@ -302,8 +305,10 @@ MGConstrainedDoFs::make_zero_boundary_constraints(
          ExcInternalError());
   boundary_indices.resize(n_levels);
 
-  MGTools::make_boundary_list(
-    dof, boundary_ids, boundary_indices, component_mask);
+  MGTools::make_boundary_list(dof,
+                              boundary_ids,
+                              boundary_indices,
+                              component_mask);
 }
 
 

@@ -318,8 +318,10 @@ namespace DoFTools
           {
             master_dof_mask =
               std_cxx14::make_unique<std::vector<bool>>(fe1.dofs_per_face);
-            select_master_dofs_for_face_restriction(
-              fe1, fe2, face_interpolation_matrix, *master_dof_mask);
+            select_master_dofs_for_face_restriction(fe1,
+                                                    fe2,
+                                                    face_interpolation_matrix,
+                                                    *master_dof_mask);
           }
       }
 
@@ -340,8 +342,9 @@ namespace DoFTools
       {
         if (matrix == nullptr)
           {
-            matrix = std_cxx14::make_unique<FullMatrix<double>>(
-              fe2.dofs_per_face, fe1.dofs_per_face);
+            matrix =
+              std_cxx14::make_unique<FullMatrix<double>>(fe2.dofs_per_face,
+                                                         fe1.dofs_per_face);
             fe1.get_face_interpolation_matrix(fe2, *matrix);
           }
       }
@@ -361,8 +364,9 @@ namespace DoFTools
       {
         if (matrix == nullptr)
           {
-            matrix = std_cxx14::make_unique<FullMatrix<double>>(
-              fe2.dofs_per_face, fe1.dofs_per_face);
+            matrix =
+              std_cxx14::make_unique<FullMatrix<double>>(fe2.dofs_per_face,
+                                                         fe1.dofs_per_face);
             fe1.get_subface_interpolation_matrix(fe2, subface, *matrix);
           }
       }
@@ -382,10 +386,11 @@ namespace DoFTools
           &split_matrix)
       {
         AssertDimension(master_dof_mask.size(), face_interpolation_matrix.m());
-        Assert(
-          std::count(master_dof_mask.begin(), master_dof_mask.end(), true) ==
-            static_cast<signed int>(face_interpolation_matrix.n()),
-          ExcInternalError());
+        Assert(std::count(master_dof_mask.begin(),
+                          master_dof_mask.end(),
+                          true) ==
+                 static_cast<signed int>(face_interpolation_matrix.n()),
+               ExcInternalError());
 
         if (split_matrix == nullptr)
           {
@@ -717,9 +722,9 @@ namespace DoFTools
                 dofs_on_children.clear();
                 dofs_on_children.reserve(n_dofs_on_children);
 
-                Assert(
-                  n_dofs_on_mother == fe.constraints().n(),
-                  ExcDimensionMismatch(n_dofs_on_mother, fe.constraints().n()));
+                Assert(n_dofs_on_mother == fe.constraints().n(),
+                       ExcDimensionMismatch(n_dofs_on_mother,
+                                            fe.constraints().n()));
                 Assert(n_dofs_on_children == fe.constraints().m(),
                        ExcDimensionMismatch(n_dofs_on_children,
                                             fe.constraints().m()));
@@ -903,9 +908,9 @@ namespace DoFTools
                 dofs_on_children.clear();
                 dofs_on_children.reserve(n_dofs_on_children);
 
-                Assert(
-                  n_dofs_on_mother == fe.constraints().n(),
-                  ExcDimensionMismatch(n_dofs_on_mother, fe.constraints().n()));
+                Assert(n_dofs_on_mother == fe.constraints().n(),
+                       ExcDimensionMismatch(n_dofs_on_mother,
+                                            fe.constraints().n()));
                 Assert(n_dofs_on_children == fe.constraints().m(),
                        ExcDimensionMismatch(n_dofs_on_children,
                                             fe.constraints().m()));
@@ -2440,10 +2445,11 @@ namespace DoFTools
         // In the case that both faces have children, we loop over all
         // children and apply make_periodicty_constrains recursively:
 
-        Assert(
-          face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
-            face_2->n_children() == GeometryInfo<dim>::max_children_per_face,
-          ExcNotImplemented());
+        Assert(face_1->n_children() ==
+                   GeometryInfo<dim>::max_children_per_face &&
+                 face_2->n_children() ==
+                   GeometryInfo<dim>::max_children_per_face,
+               ExcNotImplemented());
 
         for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
              ++i)
@@ -2537,15 +2543,16 @@ namespace DoFTools
             // face_1. Therefore face_flip has to be toggled if
             // face_rotation is true:
             // In case of inverted orientation, nothing has to be done.
-            set_periodicity_constraints(
-              face_1,
-              face_2,
-              transformation,
-              constraint_matrix,
-              component_mask,
-              face_orientation,
-              face_orientation ? face_rotation ^ face_flip : face_flip,
-              face_rotation);
+            set_periodicity_constraints(face_1,
+                                        face_2,
+                                        transformation,
+                                        constraint_matrix,
+                                        component_mask,
+                                        face_orientation,
+                                        face_orientation ?
+                                          face_rotation ^ face_flip :
+                                          face_flip,
+                                        face_rotation);
           }
       }
   }
@@ -2625,8 +2632,9 @@ namespace DoFTools
     GridTools::collect_periodic_faces(
       dof_handler, b_id1, b_id2, direction, matched_faces);
 
-    make_periodicity_constraints<DoFHandlerType>(
-      matched_faces, constraints, component_mask);
+    make_periodicity_constraints<DoFHandlerType>(matched_faces,
+                                                 constraints,
+                                                 component_mask);
   }
 
 
@@ -2654,11 +2662,14 @@ namespace DoFTools
       matched_faces;
 
     // Collect matching periodic cells on the coarsest level:
-    GridTools::collect_periodic_faces(
-      dof_handler, b_id, direction, matched_faces);
+    GridTools::collect_periodic_faces(dof_handler,
+                                      b_id,
+                                      direction,
+                                      matched_faces);
 
-    make_periodicity_constraints<DoFHandlerType>(
-      matched_faces, constraints, component_mask);
+    make_periodicity_constraints<DoFHandlerType>(matched_faces,
+                                                 constraints,
+                                                 component_mask);
   }
 
 
@@ -3097,8 +3108,9 @@ namespace DoFTools
                       dof_is_interesting[local_dof_indices[i]] = true;
                 };
 
-            n_parameters_on_fine_grid = std::count(
-              dof_is_interesting.begin(), dof_is_interesting.end(), true);
+            n_parameters_on_fine_grid = std::count(dof_is_interesting.begin(),
+                                                   dof_is_interesting.end(),
+                                                   true);
           };
 
 
@@ -3533,8 +3545,9 @@ namespace DoFTools
                       // Find out if a dof has a contribution in this
                       // component, and if so, add it to the list
                       const std::vector<types::global_dof_index>::iterator
-                        it_index_on_cell = std::find(
-                          cell_dofs.begin(), cell_dofs.end(), face_dofs[i]);
+                        it_index_on_cell = std::find(cell_dofs.begin(),
+                                                     cell_dofs.end(),
+                                                     face_dofs[i]);
                       Assert(it_index_on_cell != cell_dofs.end(),
                              ExcInvalidIterator());
                       const unsigned int index_on_cell =

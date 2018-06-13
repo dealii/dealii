@@ -64,8 +64,10 @@ main()
                   << " ) " << std::setw(22) << std::setprecision(19)
                   << 0.5 + 0.5 * roots_reference[i]
                   << " (fval = " << std::setw(9) << std::setprecision(3)
-                  << jacobi_polynomial_value(
-                       degree, alpha, beta, 0.5 + 0.5 * roots_reference[i])
+                  << jacobi_polynomial_value(degree,
+                                             alpha,
+                                             beta,
+                                             0.5 + 0.5 * roots_reference[i])
                   << " )" << std::endl;
         deallog << std::endl;
       }

@@ -42,8 +42,9 @@ test()
   IndexSet local_owned(numproc * 2);
   local_owned.add_range(myid * 2, myid * 2 + 2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_owned,
+                                               MPI_COMM_WORLD);
 
   // set local values
   v(myid * 2)     = myid * 2.0;

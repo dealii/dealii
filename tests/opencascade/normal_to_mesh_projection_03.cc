@@ -100,8 +100,9 @@ main()
     DoFHandler<2, 3> dh(tria);
     dh.distribute_dofs(fe);
     std::vector<Point<3>> spoints(dh.n_dofs());
-    DoFTools::map_dofs_to_support_points(
-      StaticMappingQ1<2, 3>::mapping, dh, spoints);
+    DoFTools::map_dofs_to_support_points(StaticMappingQ1<2, 3>::mapping,
+                                         dh,
+                                         spoints);
 
     std::sort(spoints.begin(),
               spoints.end(),

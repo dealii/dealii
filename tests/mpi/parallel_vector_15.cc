@@ -49,8 +49,9 @@ test()
   if (numproc > 1)
     local_relevant.add_range(3, 4);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
 
   // set local values
   if (myid < 2)

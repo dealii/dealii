@@ -1103,11 +1103,11 @@ namespace DataPostprocessorInputs
   typename DoFHandlerType::cell_iterator
   CommonInputs<spacedim>::get_cell() const
   {
-    Assert(
-      cell.empty() == false,
-      ExcMessage("You are trying to access the cell associated with a "
-                 "DataPostprocessorInputs::Scalar object for which no cell has "
-                 "been set."));
+    Assert(cell.empty() == false,
+           ExcMessage(
+             "You are trying to access the cell associated with a "
+             "DataPostprocessorInputs::Scalar object for which no cell has "
+             "been set."));
     Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) !=
              nullptr,
            ExcMessage(

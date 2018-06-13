@@ -1275,9 +1275,9 @@ namespace
 // of the std::enable_if.
 template <int dim, int spacedim>
 template <class... FEPairs, typename>
-FESystem<dim, spacedim>::FESystem(FEPairs &&... fe_pairs) :
-  FESystem<dim, spacedim>(
-    {promote_to_fe_pair<dim, spacedim>(std::forward<FEPairs>(fe_pairs))...})
+FESystem<dim, spacedim>::FESystem(FEPairs &&... fe_pairs)
+  : FESystem<dim, spacedim>(
+      {promote_to_fe_pair<dim, spacedim>(std::forward<FEPairs>(fe_pairs))...})
 {}
 
 
@@ -1286,14 +1286,15 @@ template <int dim, int spacedim>
 FESystem<dim, spacedim>::FESystem(
   const std::initializer_list<
     std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
-    &fe_systems) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers<dim, spacedim>(fe_systems),
-    FETools::Compositing::compute_restriction_is_additive_flags<dim, spacedim>(
-      fe_systems),
-    FETools::Compositing::compute_nonzero_components<dim, spacedim>(
-      fe_systems)),
-  base_elements(count_nonzeros(fe_systems))
+    &fe_systems)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers<dim, spacedim>(fe_systems),
+      FETools::Compositing::compute_restriction_is_additive_flags<dim,
+                                                                  spacedim>(
+        fe_systems),
+      FETools::Compositing::compute_nonzero_components<dim, spacedim>(
+        fe_systems))
+  , base_elements(count_nonzeros(fe_systems))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   std::vector<unsigned int>                         multiplicities;

@@ -63,8 +63,10 @@ test()
 
   MappingManifold<dim, spacedim> mapping;
 
-  FEValues<dim, spacedim> fe_values(
-    mapping, fe, quad, update_quadrature_points);
+  FEValues<dim, spacedim> fe_values(mapping,
+                                    fe,
+                                    quad,
+                                    update_quadrature_points);
 
   for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
          triangulation.begin_active();

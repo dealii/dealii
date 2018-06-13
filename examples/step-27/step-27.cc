@@ -136,7 +136,8 @@ namespace Step27
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -188,9 +189,9 @@ namespace Step27
   }
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    dof_handler(triangulation),
-    max_degree(dim <= 2 ? 7 : 5)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : dof_handler(triangulation)
+    , max_degree(dim <= 2 ? 7 : 5)
   {
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
       {
@@ -233,8 +234,9 @@ namespace Step27
       fourier_q_collection.push_back(quadrature);
 
     // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std::make_shared<FESeries::Fourier<dim>>(
-      N, fe_collection, fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim>>(N,
+                                                       fe_collection,
+                                                       fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.
@@ -268,8 +270,10 @@ namespace Step27
 
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -471,8 +475,10 @@ namespace Step27
     // estimated error to flag those cells for refinement that have the
     // largest error. This is what we have always done:
     {
-      GridRefinement::refine_and_coarsen_fixed_number(
-        triangulation, estimated_error_per_cell, 0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                      estimated_error_per_cell,
+                                                      0.3,
+                                                      0.03);
 
       // Next we would like to figure out which of the cells that have been
       // flagged for refinement should actually have $p$ increased instead of
@@ -708,8 +714,9 @@ namespace Step27
         local_dof_values.reinit(cell->get_fe().dofs_per_cell);
         cell->get_dof_values(solution, local_dof_values);
 
-        fourier->calculate(
-          local_dof_values, cell->active_fe_index(), fourier_coefficients);
+        fourier->calculate(local_dof_values,
+                           cell->active_fe_index(),
+                           fourier_coefficients);
 
         // The next thing, as explained in the introduction, is that we wanted
         // to only fit our exponential decay of Fourier coefficients to the
@@ -721,8 +728,9 @@ namespace Step27
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
           FESeries::process_coefficients<dim>(
             fourier_coefficients,
-            std::bind(
-              &LaplaceProblem<dim>::predicate, this, std::placeholders::_1),
+            std::bind(&LaplaceProblem<dim>::predicate,
+                      this,
+                      std::placeholders::_1),
             VectorTools::Linfty_norm);
 
         Assert(res.first.size() == res.second.size(), ExcInternalError());

@@ -68,8 +68,9 @@ check(const FiniteElement<dim> &fe)
         exponents_monomial[d] = 1;
       LinearAlgebra::distributed::Vector<double> vref;
       vref.reinit(mgdof.n_dofs());
-      VectorTools::interpolate(
-        mgdof, Functions::Monomial<dim>(exponents_monomial), vref);
+      VectorTools::interpolate(mgdof,
+                               Functions::Monomial<dim>(exponents_monomial),
+                               vref);
 
       deallog << "no. cells: " << tr.n_global_active_cells() << std::endl;
 
@@ -89,8 +90,9 @@ check(const FiniteElement<dim> &fe)
       for (unsigned int level = vectors.max_level(); level > 0; --level)
         {
           LinearAlgebra::distributed::Vector<Number> vec2(vectors[level - 1]);
-          transfer_ref.restrict_and_add(
-            level, vectors[level - 1], vectors[level]);
+          transfer_ref.restrict_and_add(level,
+                                        vectors[level - 1],
+                                        vectors[level]);
           transfer.restrict_and_add(level, vec2, vectors[level]);
           vec2 -= vectors[level - 1];
           deallog << "Error in restriction:  " << (double)vec2.linfty_norm()
@@ -100,8 +102,9 @@ check(const FiniteElement<dim> &fe)
       for (unsigned int level = 1; level < vectors.max_level(); ++level)
         {
           LinearAlgebra::distributed::Vector<Number> vec2(vectors[level + 1]);
-          transfer_ref.prolongate(
-            level + 1, vectors[level + 1], vectors[level]);
+          transfer_ref.prolongate(level + 1,
+                                  vectors[level + 1],
+                                  vectors[level]);
           transfer.prolongate(level + 1, vec2, vectors[level]);
           vec2 -= vectors[level + 1];
           deallog << "Error in prolongation: " << (double)vec2.linfty_norm()

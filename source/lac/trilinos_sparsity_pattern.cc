@@ -86,8 +86,10 @@ namespace TrilinosWrappers
       std_cxx14::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
                                          TrilinosWrappers::types::int_type(0),
                                          Utilities::Trilinos::comm_self());
-    graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
-      View, *column_space_map, *column_space_map, 0);
+    graph = std_cxx14::make_unique<Epetra_FECrsGraph>(View,
+                                                      *column_space_map,
+                                                      *column_space_map,
+                                                      0);
     graph->FillComplete();
   }
 
@@ -147,27 +149,28 @@ namespace TrilinosWrappers
 
 
 
-  SparsityPattern::SparsityPattern(SparsityPattern &&other) noexcept :
-    Subscriptor(std::move(other)),
-    column_space_map(std::move(other.column_space_map)),
-    graph(std::move(other.graph)),
-    nonlocal_graph(std::move(other.nonlocal_graph))
+  SparsityPattern::SparsityPattern(SparsityPattern &&other) noexcept
+    : Subscriptor(std::move(other))
+    , column_space_map(std::move(other.column_space_map))
+    , graph(std::move(other.graph))
+    , nonlocal_graph(std::move(other.nonlocal_graph))
   {}
 
 
   // Copy function only works if the
   // sparsity pattern is empty.
-  SparsityPattern::SparsityPattern(const SparsityPattern &input_sparsity) :
-    Subscriptor(),
-    column_space_map(new Epetra_Map(TrilinosWrappers::types::int_type(0),
-                                    TrilinosWrappers::types::int_type(0),
-                                    Utilities::Trilinos::comm_self())),
-    graph(new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
+  SparsityPattern::SparsityPattern(const SparsityPattern &input_sparsity)
+    : Subscriptor()
+    , column_space_map(new Epetra_Map(TrilinosWrappers::types::int_type(0),
+                                      TrilinosWrappers::types::int_type(0),
+                                      Utilities::Trilinos::comm_self()))
+    , graph(
+        new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
   {
     (void)input_sparsity;
-    Assert(
-      input_sparsity.n_rows() == 0,
-      ExcMessage("Copy constructor only works for empty sparsity patterns."));
+    Assert(input_sparsity.n_rows() == 0,
+           ExcMessage(
+             "Copy constructor only works for empty sparsity patterns."));
   }
 
 
@@ -330,9 +333,9 @@ namespace TrilinosWrappers
       // release memory before reallocation
       nonlocal_graph.reset();
       graph.reset();
-      AssertDimension(
-        n_entries_per_row.size(),
-        static_cast<size_type>(TrilinosWrappers::n_global_elements(row_map)));
+      AssertDimension(n_entries_per_row.size(),
+                      static_cast<size_type>(
+                        TrilinosWrappers::n_global_elements(row_map)));
 
       column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
       std::vector<int> local_entries_per_row(
@@ -371,18 +374,18 @@ namespace TrilinosWrappers
       nonlocal_graph.reset();
       graph.reset();
 
-      AssertDimension(
-        sp.n_rows(),
-        static_cast<size_type>(TrilinosWrappers::n_global_elements(row_map)));
-      AssertDimension(
-        sp.n_cols(),
-        static_cast<size_type>(TrilinosWrappers::n_global_elements(col_map)));
+      AssertDimension(sp.n_rows(),
+                      static_cast<size_type>(
+                        TrilinosWrappers::n_global_elements(row_map)));
+      AssertDimension(sp.n_cols(),
+                      static_cast<size_type>(
+                        TrilinosWrappers::n_global_elements(col_map)));
 
       column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
 
-      Assert(
-        row_map.LinearMap() == true,
-        ExcMessage("This function only works if the row map is contiguous."));
+      Assert(row_map.LinearMap() == true,
+             ExcMessage(
+               "This function only works if the row map is contiguous."));
 
       const size_type first_row = TrilinosWrappers::min_my_gid(row_map),
                       last_row  = TrilinosWrappers::max_my_gid(row_map) + 1;
@@ -428,8 +431,9 @@ namespace TrilinosWrappers
                     ++p;
                 }
             }
-            graph->Epetra_CrsGraph::InsertGlobalIndices(
-              row, row_length, row_indices.data());
+            graph->Epetra_CrsGraph::InsertGlobalIndices(row,
+                                                        row_length,
+                                                        row_indices.data());
           }
       else
         for (size_type row = 0; row < sp.n_rows(); ++row)
@@ -458,10 +462,10 @@ namespace TrilinosWrappers
               row_indices.data());
           }
 
-      int ierr = graph->GlobalAssemble(
-        *column_space_map,
-        static_cast<const Epetra_Map &>(graph->RangeMap()),
-        true);
+      int ierr = graph->GlobalAssemble(*column_space_map,
+                                       static_cast<const Epetra_Map &>(
+                                         graph->RangeMap()),
+                                       true);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
       ierr = graph->OptimizeStorage();
@@ -618,10 +622,10 @@ namespace TrilinosWrappers
 #  ifdef DEBUG
     {
       IndexSet tmp = writable_rows & row_parallel_partitioning;
-      Assert(
-        tmp == row_parallel_partitioning,
-        ExcMessage("The set of writable rows passed to this method does not "
-                   "contain the locally owned rows, which is not allowed."));
+      Assert(tmp == row_parallel_partitioning,
+             ExcMessage(
+               "The set of writable rows passed to this method does not "
+               "contain the locally owned rows, which is not allowed."));
     }
 #  endif
     nonlocal_partitioner.subtract_set(row_parallel_partitioning);
@@ -771,8 +775,10 @@ namespace TrilinosWrappers
       std_cxx14::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
                                          TrilinosWrappers::types::int_type(0),
                                          Utilities::Trilinos::comm_self());
-    graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
-      View, *column_space_map, *column_space_map, 0);
+    graph = std_cxx14::make_unique<Epetra_FECrsGraph>(View,
+                                                      *column_space_map,
+                                                      *column_space_map,
+                                                      0);
     graph->FillComplete();
 
     nonlocal_graph.reset();
@@ -799,22 +805,22 @@ namespace TrilinosWrappers
         Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
                  nonlocal_graph->IndicesAreGlobal() == true,
                ExcInternalError());
-        nonlocal_graph->FillComplete(
-          *column_space_map,
-          static_cast<const Epetra_Map &>(graph->RangeMap()));
+        nonlocal_graph->FillComplete(*column_space_map,
+                                     static_cast<const Epetra_Map &>(
+                                       graph->RangeMap()));
         nonlocal_graph->OptimizeStorage();
         Epetra_Export exporter(nonlocal_graph->RowMap(), graph->RowMap());
         ierr = graph->Export(*nonlocal_graph, exporter, Add);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-        ierr = graph->FillComplete(
-          *column_space_map,
-          static_cast<const Epetra_Map &>(graph->RangeMap()));
+        ierr = graph->FillComplete(*column_space_map,
+                                   static_cast<const Epetra_Map &>(
+                                     graph->RangeMap()));
       }
     else
-      ierr = graph->GlobalAssemble(
-        *column_space_map,
-        static_cast<const Epetra_Map &>(graph->RangeMap()),
-        true);
+      ierr = graph->GlobalAssemble(*column_space_map,
+                                   static_cast<const Epetra_Map &>(
+                                     graph->RangeMap()),
+                                   true);
 
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
@@ -936,8 +942,9 @@ namespace TrilinosWrappers
                 static_cast<TrilinosWrappers::types::int_type>(i - indices[j]));
           }
       }
-    graph->Comm().MaxAll(
-      (TrilinosWrappers::types::int_type *)&local_b, &global_b, 1);
+    graph->Comm().MaxAll((TrilinosWrappers::types::int_type *)&local_b,
+                         &global_b,
+                         1);
     return static_cast<size_type>(global_b);
   }
 

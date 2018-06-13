@@ -69,9 +69,9 @@ Manifold<dim, spacedim>::get_new_point(
 
   Assert(n_points > 0, ExcMessage("There should be at least one point."));
 
-  Assert(
-    n_points == weights.size(),
-    ExcMessage("There should be as many surrounding points as weights given."));
+  Assert(n_points == weights.size(),
+         ExcMessage(
+           "There should be as many surrounding points as weights given."));
 
   Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0) - 1.0) <
            tol,
@@ -101,8 +101,9 @@ Manifold<dim, spacedim>::get_new_point(
         weight = w / (weights[permutation[i]] + w);
 
       if (std::abs(weight) > 1e-14)
-        p = get_intermediate_point(
-          p, surrounding_points[permutation[i]], 1.0 - weight);
+        p = get_intermediate_point(p,
+                                   surrounding_points[permutation[i]],
+                                   1.0 - weight);
       w += weights[permutation[i]];
     }
 
@@ -122,9 +123,10 @@ Manifold<dim, spacedim>::get_new_points(
 
   for (unsigned int row = 0; row < weights.size(0); ++row)
     {
-      new_points[row] = get_new_point(
-        make_array_view(surrounding_points.begin(), surrounding_points.end()),
-        make_array_view(weights, row));
+      new_points[row] =
+        get_new_point(make_array_view(surrounding_points.begin(),
+                                      surrounding_points.end()),
+                      make_array_view(weights, row));
     }
 }
 
@@ -309,10 +311,10 @@ Manifold<dim, spacedim>::get_new_point_on_line(
   const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
   const auto points_weights = get_default_points_and_weights(line);
-  return get_new_point(
-    make_array_view(points_weights.first.begin(), points_weights.first.end()),
-    make_array_view(points_weights.second.begin(),
-                    points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first.begin(),
+                                       points_weights.first.end()),
+                       make_array_view(points_weights.second.begin(),
+                                       points_weights.second.end()));
 }
 
 
@@ -323,10 +325,10 @@ Manifold<dim, spacedim>::get_new_point_on_quad(
   const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
   const auto points_weights = get_default_points_and_weights(quad);
-  return get_new_point(
-    make_array_view(points_weights.first.begin(), points_weights.first.end()),
-    make_array_view(points_weights.second.begin(),
-                    points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first.begin(),
+                                       points_weights.first.end()),
+                       make_array_view(points_weights.second.begin(),
+                                       points_weights.second.end()));
 }
 
 
@@ -454,10 +456,10 @@ Manifold<3, 3>::get_new_point_on_hex(
   const Triangulation<3, 3>::hex_iterator &hex) const
 {
   const auto points_weights = get_default_points_and_weights(hex, true);
-  return get_new_point(
-    make_array_view(points_weights.first.begin(), points_weights.first.end()),
-    make_array_view(points_weights.second.begin(),
-                    points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first.begin(),
+                                       points_weights.first.end()),
+                       make_array_view(points_weights.second.begin(),
+                                       points_weights.second.end()));
 }
 
 
@@ -508,9 +510,9 @@ namespace internal
 template <int dim, int spacedim>
 FlatManifold<dim, spacedim>::FlatManifold(
   const Tensor<1, spacedim> &periodicity,
-  const double               tolerance) :
-  periodicity(periodicity),
-  tolerance(tolerance)
+  const double               tolerance)
+  : periodicity(periodicity)
+  , tolerance(tolerance)
 {}
 
 
@@ -552,11 +554,11 @@ FlatManifold<dim, spacedim>::get_new_point(
           for (unsigned int i = 0; i < surrounding_points.size(); ++i)
             {
               minP[d] = std::min(minP[d], surrounding_points[i][d]);
-              Assert(
-                (surrounding_points[i][d] <
-                 periodicity[d] + tolerance * periodicity[d]) ||
-                  (surrounding_points[i][d] >= -tolerance * periodicity[d]),
-                ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
+              Assert((surrounding_points[i][d] <
+                      periodicity[d] + tolerance * periodicity[d]) ||
+                       (surrounding_points[i][d] >=
+                        -tolerance * periodicity[d]),
+                     ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
             }
 
       // compute the weighted average point, possibly taking into account
@@ -659,9 +661,10 @@ FlatManifold<dim, spacedim>::get_new_points(
 
       // TODO should this use surrounding_points_start or surrounding_points?
       // The older version used surrounding_points
-      new_points[row] = project_to_manifold(
-        make_array_view(surrounding_points.begin(), surrounding_points.end()),
-        new_point);
+      new_points[row] =
+        project_to_manifold(make_array_view(surrounding_points.begin(),
+                                            surrounding_points.end()),
+                            new_point);
     }
 }
 
@@ -779,8 +782,10 @@ FlatManifold<3>::get_normals_at_vertices(
 {
   const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face;
 
-  static const unsigned int neighboring_vertices[4][2] = {
-    {1, 2}, {3, 0}, {0, 3}, {2, 1}};
+  static const unsigned int neighboring_vertices[4][2] = {{1, 2},
+                                                          {3, 0},
+                                                          {0, 3},
+                                                          {2, 1}};
   for (unsigned int vertex = 0; vertex < vertices_per_face; ++vertex)
     {
       // first define the two tangent vectors at the vertex by using the
@@ -943,8 +948,8 @@ FlatManifold<dim, spacedim>::normal_vector(
 /* -------------------------- ChartManifold --------------------- */
 template <int dim, int spacedim, int chartdim>
 ChartManifold<dim, spacedim, chartdim>::ChartManifold(
-  const Tensor<1, chartdim> &periodicity) :
-  sub_manifold(periodicity)
+  const Tensor<1, chartdim> &periodicity)
+  : sub_manifold(periodicity)
 {}
 
 
@@ -1042,10 +1047,10 @@ ChartManifold<dim, spacedim, chartdim>::get_tangent_vector(
   // determinant is the product of chartdim factors, take the
   // chartdim-th root of it in comparing against the size of the
   // derivative
-  Assert(
-    std::pow(std::abs(F_prime.determinant()), 1. / chartdim) >=
-      1e-12 * F_prime.norm(),
-    ExcMessage("The derivative of a chart function must not be singular."));
+  Assert(std::pow(std::abs(F_prime.determinant()), 1. / chartdim) >=
+           1e-12 * F_prime.norm(),
+         ExcMessage(
+           "The derivative of a chart function must not be singular."));
 
   const Tensor<1, chartdim> delta =
     sub_manifold.get_tangent_vector(pull_back(x1), pull_back(x2));

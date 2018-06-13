@@ -75,15 +75,15 @@ private:
 
 
 template <int dim>
-MixedElastoPlasticity<dim>::MixedElastoPlasticity(const unsigned int degree) :
-  degree(degree),
-  n_stress_components((dim * (dim + 1)) / 2),
-  n_gamma_components(1),
-  fe(FE_Q<dim>(degree),
-     n_stress_components,
-     FE_Q<dim>(degree),
-     n_gamma_components),
-  dof_handler(triangulation)
+MixedElastoPlasticity<dim>::MixedElastoPlasticity(const unsigned int degree)
+  : degree(degree)
+  , n_stress_components((dim * (dim + 1)) / 2)
+  , n_gamma_components(1)
+  , fe(FE_Q<dim>(degree),
+       n_stress_components,
+       FE_Q<dim>(degree),
+       n_gamma_components)
+  , dof_handler(triangulation)
 {}
 
 
@@ -102,8 +102,9 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << std::endl;
 
   // stress -> 0 gamma -> 1
-  std::vector<unsigned int> block_component(
-    n_stress_components + n_gamma_components, 1);
+  std::vector<unsigned int> block_component(n_stress_components +
+                                              n_gamma_components,
+                                            1);
   for (unsigned int ii = 0; ii < n_stress_components; ii++)
     block_component[ii] = 0;
 

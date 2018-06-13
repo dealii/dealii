@@ -52,7 +52,8 @@ template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
-  MySquareFunction() : Function<dim>(1)
+  MySquareFunction()
+    : Function<dim>(1)
   {}
 
   virtual double

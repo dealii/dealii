@@ -44,17 +44,18 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg) :
-  FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>(
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 1,
-                           FiniteElementData<dim>::Hdiv),
-    std::vector<bool>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(
-      PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
-      std::vector<bool>(dim, true)))
+FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
+  : FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>(
+      deg,
+      FiniteElementData<dim>(get_dpo_vector(deg),
+                             dim,
+                             deg + 1,
+                             FiniteElementData<dim>::Hdiv),
+      std::vector<bool>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
+                        true),
+      std::vector<ComponentMask>(PolynomialsRaviartThomas<dim>::compute_n_pols(
+                                   deg),
+                                 std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -91,8 +92,10 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg) :
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
-  FETools::compute_face_embedding_matrices<dim, double>(
-    *this, face_embeddings, 0, 0);
+  FETools::compute_face_embedding_matrices<dim, double>(*this,
+                                                        face_embeddings,
+                                                        0,
+                                                        0);
   this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
                                      this->dofs_per_face);
   unsigned int target_row = 0;
@@ -320,8 +323,9 @@ FE_RaviartThomas<dim>::initialize_restriction()
                   // subcell are NOT
                   // transformed, so we
                   // have to do it here.
-                  this->restriction[iso][child](
-                    face * this->dofs_per_face + i_face, i_child) +=
+                  this->restriction[iso][child](face * this->dofs_per_face +
+                                                  i_face,
+                                                i_child) +=
                     Utilities::fixed_power<dim - 1>(.5) * q_sub.weight(k) *
                     cached_values_on_face(i_child, k) *
                     this->shape_value_component(
@@ -358,8 +362,9 @@ FE_RaviartThomas<dim>::initialize_restriction()
   // Store shape values, since the
   // evaluation suffers if not
   // ordered by point
-  Table<3, double> cached_values_on_cell(
-    this->dofs_per_cell, q_cell.size(), dim);
+  Table<3, double> cached_values_on_cell(this->dofs_per_cell,
+                                         q_cell.size(),
+                                         dim);
   for (unsigned int k = 0; k < q_cell.size(); ++k)
     for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
       for (unsigned int d = 0; d < dim; ++d)
@@ -377,8 +382,9 @@ FE_RaviartThomas<dim>::initialize_restriction()
             for (unsigned int i_weight = 0; i_weight < polynomials[d]->n();
                  ++i_weight)
               {
-                this->restriction[iso][child](
-                  start_cell_dofs + i_weight * dim + d, i_child) +=
+                this->restriction[iso][child](start_cell_dofs + i_weight * dim +
+                                                d,
+                                              i_child) +=
                   q_sub.weight(k) * cached_values_on_cell(i_child, k, d) *
                   polynomials[d]->compute_value(i_weight, q_sub.point(k));
               }
@@ -486,9 +492,9 @@ FE_RaviartThomas<dim>::convert_generalized_support_point_values_to_dof_values(
                               this->generalized_support_points.size()));
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(),
+                              this->n_components()));
 
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 

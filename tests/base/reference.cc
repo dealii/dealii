@@ -38,7 +38,8 @@ class Test : public Subscriptor
   const char *name;
 
 public:
-  Test(const char *n) : name(n)
+  Test(const char *n)
+    : name(n)
   {
     deallog << "Construct " << name << std::endl;
   }

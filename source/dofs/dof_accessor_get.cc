@@ -88,17 +88,17 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
       // mesh). consequently, we cannot interpolate from children's FE
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
-      Assert(
-        (dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension> *>(
-           this->dof_handler) != nullptr) ||
-          (fe_index != DoFHandlerType::default_fe_index),
-        ExcMessage("You cannot call this function on non-active cells "
-                   "of hp::DoFHandler objects unless you provide an explicit "
-                   "finite element index because they do not have naturally "
-                   "associated finite element spaces associated: degrees "
-                   "of freedom are only distributed on active cells for which "
-                   "the active_fe_index has been set."));
+      Assert((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
+                                      DoFHandlerType::space_dimension> *>(
+                this->dof_handler) != nullptr) ||
+               (fe_index != DoFHandlerType::default_fe_index),
+             ExcMessage(
+               "You cannot call this function on non-active cells "
+               "of hp::DoFHandler objects unless you provide an explicit "
+               "finite element index because they do not have naturally "
+               "associated finite element spaces associated: degrees "
+               "of freedom are only distributed on active cells for which "
+               "the active_fe_index has been set."));
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);
@@ -155,8 +155,9 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
               // interpolation itself either from its own children or
               // by interpolating from the finite element on an active
               // child to the finite element space requested here
-              this->child(child)->get_interpolated_dof_values(
-                values, tmp1, fe_index);
+              this->child(child)->get_interpolated_dof_values(values,
+                                                              tmp1,
+                                                              fe_index);
               // interpolate these to the mother cell
               fe.get_restriction_matrix(child, this->refinement_case())
                 .vmult(tmp2, tmp1);

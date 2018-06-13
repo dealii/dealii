@@ -34,14 +34,14 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_Bernstein<dim, spacedim>::FE_Bernstein(const unsigned int degree) :
-  FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
-    this->renumber_bases(degree),
-    FiniteElementData<dim>(this->get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::H1),
-    std::vector<bool>(1, false))
+FE_Bernstein<dim, spacedim>::FE_Bernstein(const unsigned int degree)
+  : FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
+      this->renumber_bases(degree),
+      FiniteElementData<dim>(this->get_dpo_vector(degree),
+                             1,
+                             degree,
+                             FiniteElementData<dim>::H1),
+      std::vector<bool>(1, false))
 {}
 
 
@@ -97,8 +97,9 @@ FE_Bernstein<dim, spacedim>::get_face_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix) const
 {
   Assert(dim > 1, ExcImpossibleInDim(1));
-  get_subface_interpolation_matrix(
-    source_fe, numbers::invalid_unsigned_int, interpolation_matrix);
+  get_subface_interpolation_matrix(source_fe,
+                                   numbers::invalid_unsigned_int,
+                                   interpolation_matrix);
 }
 
 
@@ -109,9 +110,9 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
   const unsigned int                  subface,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  Assert(
-    interpolation_matrix.m() == x_source_fe.dofs_per_face,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
+  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_face));
 
   // see if source is a Bernstein element
   if (const FE_Bernstein<dim, spacedim> *source_fe =
@@ -119,9 +120,9 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(
-        interpolation_matrix.n() == this->dofs_per_face,
-        ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+      Assert(interpolation_matrix.n() == this->dofs_per_face,
+             ExcDimensionMismatch(interpolation_matrix.n(),
+                                  this->dofs_per_face));
 
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure

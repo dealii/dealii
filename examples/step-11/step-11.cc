@@ -106,10 +106,10 @@ namespace Step11
   // denotes the polynomial degree), and mappings of given order. Print to
   // screen what we are about to do.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree) :
-    fe(1),
-    dof_handler(triangulation),
-    mapping(mapping_degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
+    : fe(1)
+    , dof_handler(triangulation)
+    , mapping(mapping_degree)
   {
     std::cout << "Using mapping with degree " << mapping_degree << ":"
               << std::endl
@@ -148,8 +148,9 @@ namespace Step11
     // whose every element equals <code>true</code> when one just default
     // constructs such an object, so this is what we'll do here.
     std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(
-      dof_handler, ComponentMask(), boundary_dofs);
+    DoFTools::extract_boundary_dofs(dof_handler,
+                                    ComponentMask(),
+                                    boundary_dofs);
 
     // Now first for the generation of the constraints: as mentioned in the
     // introduction, we constrain one of the nodes on the boundary by the
@@ -263,11 +264,14 @@ namespace Step11
     // side function.
     //
     // Let us look at the way the matrix and body forces are integrated:
-    const unsigned int gauss_degree = std::max(
-      static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)),
-      2U);
-    MatrixTools::create_laplace_matrix(
-      mapping, dof_handler, QGauss<dim>(gauss_degree), system_matrix);
+    const unsigned int gauss_degree =
+      std::max(static_cast<unsigned int>(
+                 std::ceil(1. * (mapping.get_degree() + 1) / 2)),
+               2U);
+    MatrixTools::create_laplace_matrix(mapping,
+                                       dof_handler,
+                                       QGauss<dim>(gauss_degree),
+                                       system_matrix);
     VectorTools::create_right_hand_side(mapping,
                                         dof_handler,
                                         QGauss<dim>(gauss_degree),
@@ -363,8 +367,10 @@ namespace Step11
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
     // norm, we do the following:
-    const double norm = VectorTools::compute_global_error(
-      triangulation, norm_per_cell, VectorTools::H1_seminorm);
+    const double norm =
+      VectorTools::compute_global_error(triangulation,
+                                        norm_per_cell,
+                                        VectorTools::H1_seminorm);
 
     // Last task -- generate output:
     output_table.add_value("cells", triangulation.n_active_cells());

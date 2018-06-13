@@ -88,12 +88,12 @@ main()
             {
               const Point<dim> &old_vertex = face->vertex(vertex_no);
 
-              Point<dim> new_vertex(
-                old_vertex[0],
-                old_vertex[1],
-                (old_vertex[0] <= 0 ?
-                   old_vertex[2] / 2 :
-                   old_vertex[2] / (2 + 4 * old_vertex[0] * old_vertex[0])));
+              Point<dim> new_vertex(old_vertex[0],
+                                    old_vertex[1],
+                                    (old_vertex[0] <= 0 ?
+                                       old_vertex[2] / 2 :
+                                       old_vertex[2] / (2 + 4 * old_vertex[0] *
+                                                              old_vertex[0])));
 
               new_points[face->vertex_index(vertex_no)] = new_vertex;
             }

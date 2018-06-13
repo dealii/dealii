@@ -118,7 +118,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -142,7 +143,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -163,9 +165,9 @@ RightHandSide<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  dof_handler(triangulation),
-  max_degree(5)
+LaplaceProblem<dim>::LaplaceProblem()
+  : dof_handler(triangulation)
+  , max_degree(5)
 {
   if (dim == 2)
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
@@ -218,8 +220,10 @@ LaplaceProblem<dim>::setup_system()
   {
     test_all_constraints.merge(hanging_nodes_only);
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, BoundaryValues<dim>(), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             boundary_values);
     std::map<types::global_dof_index, double>::const_iterator boundary_value =
       boundary_values.begin();
     for (; boundary_value != boundary_values.end(); ++boundary_value)
@@ -352,10 +356,14 @@ LaplaceProblem<dim>::assemble_reference()
 
   hanging_nodes_only.condense(reference_matrix, reference_rhs);
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, reference_matrix, solution, reference_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     reference_matrix,
+                                     solution,
+                                     reference_rhs);
 
   deallog << "  Reference matrix nonzeros: "
           << reference_matrix.n_nonzero_elements() << ", actually: "
@@ -534,8 +542,10 @@ LaplaceProblem<dim>::postprocess()
   for (unsigned int i = 0; i < estimated_error_per_cell.size(); ++i)
     estimated_error_per_cell(i) = i;
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
   triangulation.execute_coarsening_and_refinement();
 }
 
@@ -674,8 +684,9 @@ LaplaceProblem<dim>::estimate_smoothness(
                 if (!((i == 0) && (j == 0) && (k == 0)) &&
                     (i * i + j * j + k * k < N * N))
                   {
-                    k_vectors.push_back(Point<dim>(
-                      numbers::PI * i, numbers::PI * j, numbers::PI * k));
+                    k_vectors.push_back(Point<dim>(numbers::PI * i,
+                                                   numbers::PI * j,
+                                                   numbers::PI * k));
                     k_vectors_magnitude.push_back(i * i + j * j + k * k);
                   }
 

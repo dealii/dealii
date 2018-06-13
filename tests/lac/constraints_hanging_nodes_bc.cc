@@ -103,8 +103,10 @@ test()
           << "Total number of constraints: "
           << correct_constraints.n_constraints() << std::endl;
 
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ConstantFunction<dim>(1.), library_constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ConstantFunction<dim>(1.),
+                                           library_constraints);
   library_constraints.close();
 
   // the two constraint matrices should look the

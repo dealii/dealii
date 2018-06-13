@@ -546,8 +546,9 @@ namespace
 
     for (int i = 0; i < l; ++i)
       {
-        typename Triangulation<dim, spacedim>::cell_iterator cell(
-          tria, i, dealii_index);
+        typename Triangulation<dim, spacedim>::cell_iterator cell(tria,
+                                                                  i,
+                                                                  dealii_index);
         if (cell->has_children() == false)
           {
             cell->clear_coarsen_flag();
@@ -561,8 +562,9 @@ namespace
         dealii_index = cell->child_index(child_id);
       }
 
-    typename Triangulation<dim, spacedim>::cell_iterator cell(
-      tria, l, dealii_index);
+    typename Triangulation<dim, spacedim>::cell_iterator cell(tria,
+                                                              l,
+                                                              dealii_index);
     if (cell->has_children())
       delete_all_children<dim, spacedim>(cell);
     else
@@ -909,8 +911,8 @@ namespace
 
   template <int dim, int spacedim>
   PartitionWeights<dim, spacedim>::PartitionWeights(
-    const std::vector<unsigned int> &cell_weights) :
-    cell_weights_list(cell_weights)
+    const std::vector<unsigned int> &cell_weights)
+    : cell_weights_list(cell_weights)
   {
     // set the current pointer to the first element of the list, given that
     // we will walk through it sequentially
@@ -1134,10 +1136,10 @@ namespace parallel
       MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
-      const Settings settings_) :
-      // Do not check for distorted cells.
-      // For multigrid, we need limit_level_difference_at_vertices
-      // to make sure the transfer operators only need to consider two levels.
+      const Settings settings_)
+      : // Do not check for distorted cells.
+        // For multigrid, we need limit_level_difference_at_vertices
+        // to make sure the transfer operators only need to consider two levels.
       dealii::parallel::Triangulation<dim, spacedim>(
         mpi_communicator,
         (settings_ & construct_multigrid_hierarchy) ?
@@ -1146,12 +1148,12 @@ namespace parallel
             smooth_grid |
             Triangulation<dim, spacedim>::limit_level_difference_at_vertices) :
           smooth_grid,
-        false),
-      settings(settings_),
-      triangulation_has_content(false),
-      connectivity(nullptr),
-      parallel_forest(nullptr),
-      cell_attached_data({0, 0, 0, {}})
+        false)
+      , settings(settings_)
+      , triangulation_has_content(false)
+      , connectivity(nullptr)
+      , parallel_forest(nullptr)
+      , cell_attached_data({0, 0, 0, {}})
     {
       parallel_ghost = nullptr;
     }
@@ -1280,8 +1282,9 @@ namespace parallel
             std::memcpy(ptr, &num_cells, sizeof(unsigned int));
             ptr += sizeof(unsigned int);
 
-            std::memcpy(
-              ptr, tree_index.data(), num_cells * sizeof(unsigned int));
+            std::memcpy(ptr,
+                        tree_index.data(),
+                        num_cells * sizeof(unsigned int));
             ptr += num_cells * sizeof(unsigned int);
 
             std::memcpy(
@@ -1318,11 +1321,11 @@ namespace parallel
             ptr += sizeof(unsigned int) * cells;
 
             quadrants.resize(cells);
-            memcpy(
-              quadrants.data(),
-              ptr,
-              sizeof(typename dealii::internal::p4est::types<dim>::quadrant) *
-                cells);
+            memcpy(quadrants.data(),
+                   ptr,
+                   sizeof(
+                     typename dealii::internal::p4est::types<dim>::quadrant) *
+                     cells);
             ptr +=
               sizeof(typename dealii::internal::p4est::types<dim>::quadrant) *
               cells;
@@ -1663,8 +1666,9 @@ namespace parallel
     {
       Assert(parallel_forest != nullptr,
              ExcMessage("Can't produce output when no forest is created yet."));
-      dealii::internal::p4est::functions<dim>::vtk_write_file(
-        parallel_forest, nullptr, file_basename);
+      dealii::internal::p4est::functions<dim>::vtk_write_file(parallel_forest,
+                                                              nullptr,
+                                                              file_basename);
     }
 
 
@@ -1729,8 +1733,10 @@ namespace parallel
 
       // and release the data
       void *userptr = parallel_forest->user_pointer;
-      dealii::internal::p4est::functions<dim>::reset_data(
-        parallel_forest, 0, nullptr, nullptr);
+      dealii::internal::p4est::functions<dim>::reset_data(parallel_forest,
+                                                          0,
+                                                          nullptr,
+                                                          nullptr);
       parallel_forest->user_pointer = userptr;
     }
 
@@ -1850,9 +1856,9 @@ namespace parallel
     unsigned int
     Triangulation<dim, spacedim>::get_checksum() const
     {
-      Assert(
-        parallel_forest != nullptr,
-        ExcMessage("Can't produce a check sum when no forest is created yet."));
+      Assert(parallel_forest != nullptr,
+             ExcMessage(
+               "Can't produce a check sum when no forest is created yet."));
       return dealii::internal::p4est::functions<dim>::checksum(parallel_forest);
     }
 
@@ -1905,8 +1911,10 @@ namespace parallel
                             unsigned int>>>
         vertex_to_cell;
       get_vertex_to_cell_mappings(*this, vertex_touch_count, vertex_to_cell);
-      const dealii::internal::p4est::types<2>::locidx num_vtt = std::accumulate(
-        vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
+      const dealii::internal::p4est::types<2>::locidx num_vtt =
+        std::accumulate(vertex_touch_count.begin(),
+                        vertex_touch_count.end(),
+                        0u);
 
       // now create a connectivity object with the right sizes for all
       // arrays. set vertex information only in debug mode (saves a few bytes
@@ -1970,8 +1978,10 @@ namespace parallel
                             unsigned int>>>
         vertex_to_cell;
       get_vertex_to_cell_mappings(*this, vertex_touch_count, vertex_to_cell);
-      const dealii::internal::p4est::types<2>::locidx num_vtt = std::accumulate(
-        vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
+      const dealii::internal::p4est::types<2>::locidx num_vtt =
+        std::accumulate(vertex_touch_count.begin(),
+                        vertex_touch_count.end(),
+                        0u);
 
       // now create a connectivity object with the right sizes for all
       // arrays. set vertex information only in debug mode (saves a few bytes
@@ -2032,8 +2042,10 @@ namespace parallel
         std::pair<Triangulation<3>::active_cell_iterator, unsigned int>>>
         vertex_to_cell;
       get_vertex_to_cell_mappings(*this, vertex_touch_count, vertex_to_cell);
-      const dealii::internal::p4est::types<2>::locidx num_vtt = std::accumulate(
-        vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
+      const dealii::internal::p4est::types<2>::locidx num_vtt =
+        std::accumulate(vertex_touch_count.begin(),
+                        vertex_touch_count.end(),
+                        0u);
 
       std::vector<unsigned int> edge_touch_count;
       std::vector<std::list<
@@ -2567,8 +2579,10 @@ namespace parallel
               unsigned int coarse_cell_index =
                 p4est_tree_to_coarse_cell_permutation[ghost_tree];
 
-              match_quadrant<dim, spacedim>(
-                this, coarse_cell_index, *quadr, ghost_owner);
+              match_quadrant<dim, spacedim>(this,
+                                            coarse_cell_index,
+                                            *quadr,
+                                            ghost_owner);
             }
 
           // fix all the flags to make sure we have a consistent mesh
@@ -2777,10 +2791,10 @@ namespace parallel
            cell != this->end();
            ++cell)
         if (cell->is_locally_owned() && cell->refine_flag_set())
-          Assert(
-            cell->refine_flag_set() ==
-              RefinementPossibilities<dim>::isotropic_refinement,
-            ExcMessage("This class does not support anisotropic refinement"));
+          Assert(cell->refine_flag_set() ==
+                   RefinementPossibilities<dim>::isotropic_refinement,
+                 ExcMessage(
+                   "This class does not support anisotropic refinement"));
 #  endif
 
 
@@ -3071,9 +3085,9 @@ namespace parallel
     Triangulation<dim, spacedim>::communicate_locally_moved_vertices(
       const std::vector<bool> &vertex_locally_moved)
     {
-      Assert(
-        vertex_locally_moved.size() == this->n_vertices(),
-        ExcDimensionMismatch(vertex_locally_moved.size(), this->n_vertices()));
+      Assert(vertex_locally_moved.size() == this->n_vertices(),
+             ExcDimensionMismatch(vertex_locally_moved.size(),
+                                  this->n_vertices()));
 #  ifdef DEBUG
       {
         const std::vector<bool> locally_owned_vertices =
@@ -3208,14 +3222,14 @@ namespace parallel
               dealii::internal::p4est::init_coarse_quadrant<dim>(
                 p4est_coarse_cell);
 
-              CommunicateLocallyMovedVertices::
-                set_vertices_recursively<dim, spacedim>(
-                  *this,
-                  p4est_coarse_cell,
-                  cell,
-                  cellinfo.quadrants[c],
-                  cellinfo.first_vertices[c],
-                  cellinfo.first_vertex_indices[c]);
+              CommunicateLocallyMovedVertices::set_vertices_recursively<
+                dim,
+                spacedim>(*this,
+                          p4est_coarse_cell,
+                          cell,
+                          cellinfo.quadrants[c],
+                          cellinfo.first_vertices[c],
+                          cellinfo.first_vertex_indices[c]);
             }
         }
 
@@ -3364,8 +3378,10 @@ namespace parallel
 
           // and release the data
           void *userptr = parallel_forest->user_pointer;
-          dealii::internal::p4est::functions<dim>::reset_data(
-            parallel_forest, 0, nullptr, nullptr);
+          dealii::internal::p4est::functions<dim>::reset_data(parallel_forest,
+                                                              0,
+                                                              nullptr,
+                                                              nullptr);
           parallel_forest->user_pointer = userptr;
         }
     }
@@ -3398,9 +3414,9 @@ namespace parallel
     {
       Assert(dim > 1, ExcNotImplemented());
 
-      return dealii::internal::p4est::
-        compute_vertices_with_ghost_neighbors<dim, spacedim>(
-          *this, this->parallel_forest, this->parallel_ghost);
+      return dealii::internal::p4est::compute_vertices_with_ghost_neighbors<
+        dim,
+        spacedim>(*this, this->parallel_forest, this->parallel_ghost);
     }
 
 
@@ -3717,10 +3733,10 @@ namespace parallel
       // separate)
       triangulation_has_content = true;
 
-      Assert(
-        other_tria.n_levels() == 1,
-        ExcMessage("Parallel distributed triangulations can only be copied, "
-                   "if they are not refined!"));
+      Assert(other_tria.n_levels() == 1,
+             ExcMessage(
+               "Parallel distributed triangulations can only be copied, "
+               "if they are not refined!"));
 
       if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
             *other_tria_x =
@@ -3969,10 +3985,10 @@ namespace parallel
       MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<1, spacedim>::MeshSmoothing
         smooth_grid,
-      const Settings /*settings*/) :
-      dealii::parallel::Triangulation<1, spacedim>(mpi_communicator,
-                                                   smooth_grid,
-                                                   false)
+      const Settings /*settings*/)
+      : dealii::parallel::Triangulation<1, spacedim>(mpi_communicator,
+                                                     smooth_grid,
+                                                     false)
     {
       Assert(false, ExcNotImplemented());
     }

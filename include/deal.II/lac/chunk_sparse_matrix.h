@@ -1666,27 +1666,27 @@ namespace ChunkSparseMatrixIterators
 {
   template <typename number>
   inline Accessor<number, true>::Accessor(const MatrixType * matrix,
-                                          const unsigned int row) :
-    ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
-                                            row),
-    matrix(matrix)
+                                          const unsigned int row)
+    : ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
+                                              row)
+    , matrix(matrix)
   {}
 
 
 
   template <typename number>
-  inline Accessor<number, true>::Accessor(const MatrixType *matrix) :
-    ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern()),
-    matrix(matrix)
+  inline Accessor<number, true>::Accessor(const MatrixType *matrix)
+    : ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern())
+    , matrix(matrix)
   {}
 
 
 
   template <typename number>
   inline Accessor<number, true>::Accessor(
-    const ChunkSparseMatrixIterators::Accessor<number, false> &a) :
-    ChunkSparsityPatternIterators::Accessor(a),
-    matrix(&a.get_matrix())
+    const ChunkSparseMatrixIterators::Accessor<number, false> &a)
+    : ChunkSparsityPatternIterators::Accessor(a)
+    , matrix(&a.get_matrix())
   {}
 
 
@@ -1714,8 +1714,8 @@ namespace ChunkSparseMatrixIterators
 
   template <typename number>
   inline Accessor<number, false>::Reference::Reference(const Accessor *accessor,
-                                                       const bool) :
-    accessor(accessor)
+                                                       const bool)
+    : accessor(accessor)
   {}
 
 
@@ -1803,18 +1803,18 @@ namespace ChunkSparseMatrixIterators
 
   template <typename number>
   inline Accessor<number, false>::Accessor(MatrixType *       matrix,
-                                           const unsigned int row) :
-    ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
-                                            row),
-    matrix(matrix)
+                                           const unsigned int row)
+    : ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
+                                              row)
+    , matrix(matrix)
   {}
 
 
 
   template <typename number>
-  inline Accessor<number, false>::Accessor(MatrixType *matrix) :
-    ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern()),
-    matrix(matrix)
+  inline Accessor<number, false>::Accessor(MatrixType *matrix)
+    : ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern())
+    , matrix(matrix)
   {}
 
 
@@ -1839,23 +1839,23 @@ namespace ChunkSparseMatrixIterators
 
   template <typename number, bool Constness>
   inline Iterator<number, Constness>::Iterator(MatrixType *       matrix,
-                                               const unsigned int row) :
-    accessor(matrix, row)
+                                               const unsigned int row)
+    : accessor(matrix, row)
   {}
 
 
 
   template <typename number, bool Constness>
-  inline Iterator<number, Constness>::Iterator(MatrixType *matrix) :
-    accessor(matrix)
+  inline Iterator<number, Constness>::Iterator(MatrixType *matrix)
+    : accessor(matrix)
   {}
 
 
 
   template <typename number, bool Constness>
   inline Iterator<number, Constness>::Iterator(
-    const ChunkSparseMatrixIterators::Iterator<number, false> &i) :
-    accessor(*i)
+    const ChunkSparseMatrixIterators::Iterator<number, false> &i)
+    : accessor(*i)
   {}
 
 

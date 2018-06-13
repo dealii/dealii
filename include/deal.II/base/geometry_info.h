@@ -2308,15 +2308,14 @@ GeometryInfo<3>::d_linear_shape_function_gradient(const Point<3> &   xi,
 /* -------------- inline functions ------------- */
 
 
-inline GeometryPrimitive::GeometryPrimitive(const Object object) :
-  object(object)
+inline GeometryPrimitive::GeometryPrimitive(const Object object)
+  : object(object)
 {}
 
 
 
-inline GeometryPrimitive::GeometryPrimitive(
-  const unsigned int object_dimension) :
-  object(static_cast<Object>(object_dimension))
+inline GeometryPrimitive::GeometryPrimitive(const unsigned int object_dimension)
+  : object(static_cast<Object>(object_dimension))
 {}
 
 
@@ -2331,9 +2330,8 @@ namespace internal
 {
   template <int dim>
   inline SubfaceCase<dim>::SubfaceCase(
-    const typename SubfacePossibilities<dim>::Possibilities
-      subface_possibility) :
-    value(subface_possibility)
+    const typename SubfacePossibilities<dim>::Possibilities subface_possibility)
+    : value(subface_possibility)
   {}
 
 
@@ -2396,41 +2394,41 @@ RefinementCase<3>::cut_axis(const unsigned int i)
 
 
 template <int dim>
-inline RefinementCase<dim>::RefinementCase() :
-  value(RefinementPossibilities<dim>::no_refinement)
+inline RefinementCase<dim>::RefinementCase()
+  : value(RefinementPossibilities<dim>::no_refinement)
 {}
 
 
 
 template <int dim>
 inline RefinementCase<dim>::RefinementCase(
-  const typename RefinementPossibilities<dim>::Possibilities refinement_case) :
-  value(refinement_case)
+  const typename RefinementPossibilities<dim>::Possibilities refinement_case)
+  : value(refinement_case)
 {
   // check that only those bits of
   // the given argument are set that
   // make sense for a given space
   // dimension
-  Assert(
-    (refinement_case & RefinementPossibilities<dim>::isotropic_refinement) ==
-      refinement_case,
-    ExcInvalidRefinementCase(refinement_case));
+  Assert((refinement_case &
+          RefinementPossibilities<dim>::isotropic_refinement) ==
+           refinement_case,
+         ExcInvalidRefinementCase(refinement_case));
 }
 
 
 
 template <int dim>
-inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case) :
-  value(refinement_case)
+inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case)
+  : value(refinement_case)
 {
   // check that only those bits of
   // the given argument are set that
   // make sense for a given space
   // dimension
-  Assert(
-    (refinement_case & RefinementPossibilities<dim>::isotropic_refinement) ==
-      refinement_case,
-    ExcInvalidRefinementCase(refinement_case));
+  Assert((refinement_case &
+          RefinementPossibilities<dim>::isotropic_refinement) ==
+           refinement_case,
+         ExcInvalidRefinementCase(refinement_case));
 }
 
 
@@ -2612,9 +2610,10 @@ GeometryInfo<2>::cell_to_child_coordinates(const Point<2> &        p,
                                            const RefinementCase<2> refine_case)
 
 {
-  Assert(
-    child_index < GeometryInfo<2>::n_children(refine_case),
-    ExcIndexRange(child_index, 0, GeometryInfo<2>::n_children(refine_case)));
+  Assert(child_index < GeometryInfo<2>::n_children(refine_case),
+         ExcIndexRange(child_index,
+                       0,
+                       GeometryInfo<2>::n_children(refine_case)));
 
   Point<2> point = p;
   switch (refine_case)
@@ -2649,9 +2648,10 @@ GeometryInfo<3>::cell_to_child_coordinates(const Point<3> &        p,
                                            const RefinementCase<3> refine_case)
 
 {
-  Assert(
-    child_index < GeometryInfo<3>::n_children(refine_case),
-    ExcIndexRange(child_index, 0, GeometryInfo<3>::n_children(refine_case)));
+  Assert(child_index < GeometryInfo<3>::n_children(refine_case),
+         ExcIndexRange(child_index,
+                       0,
+                       GeometryInfo<3>::n_children(refine_case)));
 
   Point<3> point = p;
   // there might be a cleverer way to do
@@ -2754,9 +2754,10 @@ GeometryInfo<3>::child_to_cell_coordinates(const Point<3> &        p,
                                            const RefinementCase<3> refine_case)
 
 {
-  Assert(
-    child_index < GeometryInfo<3>::n_children(refine_case),
-    ExcIndexRange(child_index, 0, GeometryInfo<3>::n_children(refine_case)));
+  Assert(child_index < GeometryInfo<3>::n_children(refine_case),
+         ExcIndexRange(child_index,
+                       0,
+                       GeometryInfo<3>::n_children(refine_case)));
 
   Point<3> point = p;
   // there might be a cleverer way to do
@@ -2828,9 +2829,10 @@ GeometryInfo<2>::child_to_cell_coordinates(const Point<2> &        p,
                                            const unsigned int      child_index,
                                            const RefinementCase<2> refine_case)
 {
-  Assert(
-    child_index < GeometryInfo<2>::n_children(refine_case),
-    ExcIndexRange(child_index, 0, GeometryInfo<2>::n_children(refine_case)));
+  Assert(child_index < GeometryInfo<2>::n_children(refine_case),
+         ExcIndexRange(child_index,
+                       0,
+                       GeometryInfo<2>::n_children(refine_case)));
 
   Point<2> point = p;
   switch (refine_case)
@@ -2977,19 +2979,19 @@ GeometryInfo<3>::line_to_cell_vertices(const unsigned int line,
   Assert(line < lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
   Assert(vertex < 2, ExcIndexRange(vertex, 0, 2));
 
-  constexpr unsigned vertices[lines_per_cell][2] = {
-    {0, 2}, // bottom face
-    {1, 3},
-    {0, 1},
-    {2, 3},
-    {4, 6}, // top face
-    {5, 7},
-    {4, 5},
-    {6, 7},
-    {0, 4}, // connects of bottom
-    {1, 5}, //   top face
-    {2, 6},
-    {3, 7}};
+  constexpr unsigned vertices[lines_per_cell][2] = {{0, 2}, // bottom face
+                                                    {1, 3},
+                                                    {0, 1},
+                                                    {2, 3},
+                                                    {4, 6}, // top face
+                                                    {5, 7},
+                                                    {4, 5},
+                                                    {6, 7},
+                                                    {0,
+                                                     4}, // connects of bottom
+                                                    {1, 5}, //   top face
+                                                    {2, 6},
+                                                    {3, 7}};
   return vertices[line][vertex];
 }
 
@@ -3908,10 +3910,10 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
   Assert(ref_case > RefinementCase<dim - 1>::no_refinement,
          ExcMessage("Cell has no children."));
   Assert(face < faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(
-    subface < GeometryInfo<dim - 1>::n_children(face_ref_case) ||
-      (subface == 0 && face_ref_case == RefinementCase<dim - 1>::no_refinement),
-    ExcIndexRange(subface, 0, GeometryInfo<2>::n_children(face_ref_case)));
+  Assert(subface < GeometryInfo<dim - 1>::n_children(face_ref_case) ||
+           (subface == 0 &&
+            face_ref_case == RefinementCase<dim - 1>::no_refinement),
+         ExcIndexRange(subface, 0, GeometryInfo<2>::n_children(face_ref_case)));
 
   // invalid number used for invalid cases,
   // e.g. when the children are more refined at
@@ -4392,8 +4394,9 @@ Tensor<1, 3> inline GeometryInfo<3>::d_linear_shape_function_gradient(
   switch (i)
     {
       case 0:
-        return Point<3>(
-          -(1 - y) * (1 - z), -(1 - x) * (1 - z), -(1 - x) * (1 - y));
+        return Point<3>(-(1 - y) * (1 - z),
+                        -(1 - x) * (1 - z),
+                        -(1 - x) * (1 - y));
       case 1:
         return Point<3>((1 - y) * (1 - z), -x * (1 - z), -x * (1 - y));
       case 2:

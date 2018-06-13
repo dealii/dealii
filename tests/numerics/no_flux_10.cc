@@ -184,8 +184,9 @@ void sixty_deg_hyper_shell(Triangulation<3> &tria,
       cells[i].material_id = 0;
     }
 
-  tria.create_triangulation(
-    vertices, cells, SubCellData()); // no boundary information
+  tria.create_triangulation(vertices,
+                            cells,
+                            SubCellData()); // no boundary information
 
   colorize_sixty_deg_hyper_shell(tria, center, inner_radius, outer_radius);
 }
@@ -228,8 +229,10 @@ run()
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(0);
   no_normal_flux_boundaries.insert(2);
-  VectorTools::compute_no_normal_flux_constraints(
-    dof_handler, 0, no_normal_flux_boundaries, constraints);
+  VectorTools::compute_no_normal_flux_constraints(dof_handler,
+                                                  0,
+                                                  no_normal_flux_boundaries,
+                                                  constraints);
 
   constraints.print(deallog.get_file_stream());
 

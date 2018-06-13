@@ -75,15 +75,15 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert(
-      (dof.get_triangulation().locally_owned_subdomain() ==
-       numbers::invalid_subdomain_id) ||
-        (subdomain_id == numbers::invalid_subdomain_id) ||
-        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
-      ExcMessage(
-        "For parallel::distributed::Triangulation objects and "
-        "associated DoF handler objects, asking for any subdomain other "
-        "than the locally owned one does not make sense."));
+    Assert((dof.get_triangulation().locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id) ||
+             (subdomain_id == numbers::invalid_subdomain_id) ||
+             (subdomain_id ==
+              dof.get_triangulation().locally_owned_subdomain()),
+           ExcMessage(
+             "For parallel::distributed::Triangulation objects and "
+             "associated DoF handler objects, asking for any subdomain other "
+             "than the locally owned one does not make sense."));
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     dofs_on_this_cell.reserve(max_dofs_per_cell(dof));
@@ -105,8 +105,9 @@ namespace DoFTools
           // make sparsity pattern for this cell. if no constraints pattern
           // was given, then the following call acts as if simply no
           // constraints existed
-          constraints.add_entries_local_to_global(
-            dofs_on_this_cell, sparsity, keep_constrained_dofs);
+          constraints.add_entries_local_to_global(dofs_on_this_cell,
+                                                  sparsity,
+                                                  keep_constrained_dofs);
         }
   }
 
@@ -130,25 +131,25 @@ namespace DoFTools
            ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
     Assert(sparsity.n_cols() == n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(
-      couplings.n_rows() == dof.get_fe(0).n_components(),
-      ExcDimensionMismatch(couplings.n_rows(), dof.get_fe(0).n_components()));
-    Assert(
-      couplings.n_cols() == dof.get_fe(0).n_components(),
-      ExcDimensionMismatch(couplings.n_cols(), dof.get_fe(0).n_components()));
+    Assert(couplings.n_rows() == dof.get_fe(0).n_components(),
+           ExcDimensionMismatch(couplings.n_rows(),
+                                dof.get_fe(0).n_components()));
+    Assert(couplings.n_cols() == dof.get_fe(0).n_components(),
+           ExcDimensionMismatch(couplings.n_cols(),
+                                dof.get_fe(0).n_components()));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert(
-      (dof.get_triangulation().locally_owned_subdomain() ==
-       numbers::invalid_subdomain_id) ||
-        (subdomain_id == numbers::invalid_subdomain_id) ||
-        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
-      ExcMessage(
-        "For parallel::distributed::Triangulation objects and "
-        "associated DoF handler objects, asking for any subdomain other "
-        "than the locally owned one does not make sense."));
+    Assert((dof.get_triangulation().locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id) ||
+             (subdomain_id == numbers::invalid_subdomain_id) ||
+             (subdomain_id ==
+              dof.get_triangulation().locally_owned_subdomain()),
+           ExcMessage(
+             "For parallel::distributed::Triangulation objects and "
+             "associated DoF handler objects, asking for any subdomain other "
+             "than the locally owned one does not make sense."));
 
     const hp::FECollection<DoFHandlerType::dimension,
                            DoFHandlerType::space_dimension> &fe_collection =
@@ -162,8 +163,9 @@ namespace DoFTools
     std::vector<Table<2, bool>> bool_dof_mask(fe_collection.size());
     for (unsigned int f = 0; f < fe_collection.size(); ++f)
       {
-        bool_dof_mask[f].reinit(TableIndices<2>(
-          fe_collection[f].dofs_per_cell, fe_collection[f].dofs_per_cell));
+        bool_dof_mask[f].reinit(
+          TableIndices<2>(fe_collection[f].dofs_per_cell,
+                          fe_collection[f].dofs_per_cell));
         bool_dof_mask[f].fill(false);
         for (unsigned int i = 0; i < fe_collection[f].dofs_per_cell; ++i)
           for (unsigned int j = 0; j < fe_collection[f].dofs_per_cell; ++j)
@@ -503,15 +505,15 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert(
-      (dof.get_triangulation().locally_owned_subdomain() ==
-       numbers::invalid_subdomain_id) ||
-        (subdomain_id == numbers::invalid_subdomain_id) ||
-        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
-      ExcMessage(
-        "For parallel::distributed::Triangulation objects and "
-        "associated DoF handler objects, asking for any subdomain other "
-        "than the locally owned one does not make sense."));
+    Assert((dof.get_triangulation().locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id) ||
+             (subdomain_id == numbers::invalid_subdomain_id) ||
+             (subdomain_id ==
+              dof.get_triangulation().locally_owned_subdomain()),
+           ExcMessage(
+             "For parallel::distributed::Triangulation objects and "
+             "associated DoF handler objects, asking for any subdomain other "
+             "than the locally owned one does not make sense."));
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     std::vector<types::global_dof_index> dofs_on_other_cell;
@@ -540,8 +542,9 @@ namespace DoFTools
           // make sparsity pattern for this cell. if no constraints pattern
           // was given, then the following call acts as if simply no
           // constraints existed
-          constraints.add_entries_local_to_global(
-            dofs_on_this_cell, sparsity, keep_constrained_dofs);
+          constraints.add_entries_local_to_global(dofs_on_this_cell,
+                                                  sparsity,
+                                                  keep_constrained_dofs);
 
           for (unsigned int face = 0;
                face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
@@ -667,12 +670,12 @@ namespace DoFTools
     const FiniteElement<dim, spacedim> &fe,
     const Table<2, Coupling> &          component_couplings)
   {
-    Assert(
-      component_couplings.n_rows() == fe.n_components(),
-      ExcDimensionMismatch(component_couplings.n_rows(), fe.n_components()));
-    Assert(
-      component_couplings.n_cols() == fe.n_components(),
-      ExcDimensionMismatch(component_couplings.n_cols(), fe.n_components()));
+    Assert(component_couplings.n_rows() == fe.n_components(),
+           ExcDimensionMismatch(component_couplings.n_rows(),
+                                fe.n_components()));
+    Assert(component_couplings.n_cols() == fe.n_components(),
+           ExcDimensionMismatch(component_couplings.n_cols(),
+                                fe.n_components()));
 
     const unsigned int n_dofs = fe.dofs_per_cell;
 
@@ -744,12 +747,9 @@ namespace DoFTools
         std::vector<types::global_dof_index> dofs_on_other_cell(
           fe.dofs_per_cell);
 
-        const Table<2, Coupling> int_dof_mask =
-                                   dof_couplings_from_component_couplings(
-                                     fe, int_mask),
-                                 flux_dof_mask =
-                                   dof_couplings_from_component_couplings(
-                                     fe, flux_mask);
+        const Table<2, Coupling>
+          int_dof_mask  = dof_couplings_from_component_couplings(fe, int_mask),
+          flux_dof_mask = dof_couplings_from_component_couplings(fe, flux_mask);
 
         Table<2, bool> support_on_face(
           fe.dofs_per_cell,
@@ -1189,10 +1189,9 @@ namespace DoFTools
                                              .get_nonzero_components(j)
                                              .first_selected_component());
 
-                                      Assert(
-                                        jj <
-                                          sub_neighbor->get_fe().n_components(),
-                                        ExcInternalError());
+                                      Assert(jj < sub_neighbor->get_fe()
+                                                    .n_components(),
+                                             ExcInternalError());
 
                                       if ((flux_mask(ii, jj) == always) ||
                                           (flux_mask(ii, jj) == nonzero))
@@ -1330,15 +1329,15 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert(
-      (dof.get_triangulation().locally_owned_subdomain() ==
-       numbers::invalid_subdomain_id) ||
-        (subdomain_id == numbers::invalid_subdomain_id) ||
-        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
-      ExcMessage(
-        "For parallel::distributed::Triangulation objects and "
-        "associated DoF handler objects, asking for any subdomain other "
-        "than the locally owned one does not make sense."));
+    Assert((dof.get_triangulation().locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id) ||
+             (subdomain_id == numbers::invalid_subdomain_id) ||
+             (subdomain_id ==
+              dof.get_triangulation().locally_owned_subdomain()),
+           ExcMessage(
+             "For parallel::distributed::Triangulation objects and "
+             "associated DoF handler objects, asking for any subdomain other "
+             "than the locally owned one does not make sense."));
 
     internal::make_flux_sparsity_pattern(dof,
                                          sparsity,

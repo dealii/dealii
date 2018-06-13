@@ -422,8 +422,8 @@ namespace CUDAWrappers
 
   template <typename Number>
   SolverDirect<Number>::AdditionalData::AdditionalData(
-    const std::string &solver_type) :
-    solver_type(solver_type)
+    const std::string &solver_type)
+    : solver_type(solver_type)
   {}
 
 
@@ -431,10 +431,10 @@ namespace CUDAWrappers
   template <typename Number>
   SolverDirect<Number>::SolverDirect(const Utilities::CUDA::Handle &handle,
                                      SolverControl &                cn,
-                                     const AdditionalData &         data) :
-    cuda_handle(handle),
-    solver_control(cn),
-    additional_data(data.solver_type)
+                                     const AdditionalData &         data)
+    : cuda_handle(handle)
+    , solver_control(cn)
+    , additional_data(data.solver_type)
   {}
 
 
@@ -456,8 +456,10 @@ namespace CUDAWrappers
     const LinearAlgebra::CUDAWrappers::Vector<Number> &b)
   {
     if (additional_data.solver_type == "Cholesky")
-      internal::cholesky_factorization(
-        cuda_handle.cusolver_sp_handle, A, b.get_values(), x.get_values());
+      internal::cholesky_factorization(cuda_handle.cusolver_sp_handle,
+                                       A,
+                                       b.get_values(),
+                                       x.get_values());
     else if (additional_data.solver_type == "LU_dense")
       internal::lu_factorization(cuda_handle.cusparse_handle,
                                  cuda_handle.cusolver_dn_handle,
@@ -465,8 +467,10 @@ namespace CUDAWrappers
                                  b.get_values(),
                                  x.get_values());
     else if (additional_data.solver_type == "LU_host")
-      internal::lu_factorization(
-        cuda_handle.cusolver_sp_handle, A, b.get_values(), x.get_values());
+      internal::lu_factorization(cuda_handle.cusolver_sp_handle,
+                                 A,
+                                 b.get_values(),
+                                 x.get_values());
     else
       AssertThrow(false,
                   ExcMessage("The provided solver name " +

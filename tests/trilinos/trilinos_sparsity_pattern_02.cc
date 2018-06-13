@@ -91,8 +91,9 @@ namespace Step22
     DoFRenumbering::component_wise(dof_handler, block_component);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -117,12 +118,12 @@ namespace Step22
                                                  owned_partitioning,
                                                  relevant_partitioning,
                                                  mpi_communicator);
-      DoFTools::make_sparsity_pattern(
-        dof_handler,
-        bsp,
-        new_constraints,
-        false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      bsp,
+                                      new_constraints,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(
+                                        mpi_communicator));
 
       bsp.compress();
     }

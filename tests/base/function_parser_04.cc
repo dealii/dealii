@@ -37,7 +37,8 @@ struct scratch_data
 struct copy_data
 {
   int value;
-  copy_data() : value(0)
+  copy_data()
+    : value(0)
   {}
 };
 

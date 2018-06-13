@@ -50,8 +50,9 @@ MGTransferSelect<number>::copy_to_mg(
   MGLevelObject<Vector<number>> &  dst,
   const BlockVector<number2> &     src) const
 {
-  do_copy_to_mg(
-    mg_dof_handler, dst, src.block(target_component[selected_component]));
+  do_copy_to_mg(mg_dof_handler,
+                dst,
+                src.block(target_component[selected_component]));
 }
 
 
@@ -78,8 +79,9 @@ MGTransferSelect<number>::copy_from_mg(
   const MGLevelObject<Vector<number>> &src) const
 {
   dst = 0;
-  do_copy_from_mg(
-    mg_dof_handler, dst.block(target_component[selected_component]), src);
+  do_copy_from_mg(mg_dof_handler,
+                  dst.block(target_component[selected_component]),
+                  src);
   if (constraints != nullptr)
     constraints->condense(dst);
 }
@@ -109,8 +111,9 @@ MGTransferSelect<number>::copy_from_mg(
       const unsigned int n_blocks =
         *std::max_element(target_component.begin(), target_component.end()) + 1;
       std::vector<types::global_dof_index> dofs_per_block(n_blocks);
-      DoFTools::count_dofs_per_block(
-        mg_dof_handler, dofs_per_block, target_component);
+      DoFTools::count_dofs_per_block(mg_dof_handler,
+                                     dofs_per_block,
+                                     target_component);
       BlockVector<number> tmp;
       tmp.reinit(n_blocks);
       for (unsigned int b = 0; b < n_blocks; ++b)

@@ -69,8 +69,10 @@ check()
         Assert(false, ExcNotImplemented());
     }
 
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, subdivisions, p1, p2);
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            subdivisions,
+                                            p1,
+                                            p2);
 
   // Create FE Collection and insert two FE objects
   // (RT0 - DGQ0 - Q1 ^ dim) and (Nothing - Nothing - Q2 ^ dim)
@@ -115,8 +117,10 @@ check()
           face_coupling[c][d] = DoFTools::always;
       }
 
-  DoFTools::make_flux_sparsity_pattern(
-    dof_handler, dsp, cell_coupling, face_coupling);
+  DoFTools::make_flux_sparsity_pattern(dof_handler,
+                                       dsp,
+                                       cell_coupling,
+                                       face_coupling);
   dsp.compress();
 
   // Print sparsity pattern

@@ -45,10 +45,12 @@ test()
   local_active[1].add_range(myid * 2, myid * 2 + 2);
 
   LinearAlgebra::distributed::BlockVector<double> v(2);
-  v.block(0).reinit(
-    local_active[0], complete_index_set(numproc), MPI_COMM_WORLD);
-  v.block(1).reinit(
-    local_active[1], complete_index_set(2 * numproc), MPI_COMM_WORLD);
+  v.block(0).reinit(local_active[0],
+                    complete_index_set(numproc),
+                    MPI_COMM_WORLD);
+  v.block(1).reinit(local_active[1],
+                    complete_index_set(2 * numproc),
+                    MPI_COMM_WORLD);
   v.collect_sizes();
 
   for (unsigned int i = 0; i < v.size(); ++i)

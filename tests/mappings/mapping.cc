@@ -143,11 +143,11 @@ plot_subfaces(Mapping<dim> &                           mapping,
   const unsigned int nq =
     (unsigned int)(.01 + std::pow(q.size(), 1. / (dim - 1)));
 
-  FESubfaceValues<dim> fe_values(
-    mapping,
-    fe,
-    q,
-    UpdateFlags(update_quadrature_points | update_normal_vectors));
+  FESubfaceValues<dim> fe_values(mapping,
+                                 fe,
+                                 q,
+                                 UpdateFlags(update_quadrature_points |
+                                             update_normal_vectors));
   for (unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
        ++face_nr)
     for (unsigned int sub_nr = 0;
@@ -272,10 +272,10 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
         cells[0].vertices[j] = cell_vertices[0][j];
       cells[0].material_id = 0;
 
-      tria->create_triangulation(
-        std::vector<Point<2>>(&vertices[0], &vertices[4]),
-        cells,
-        SubCellData());
+      tria->create_triangulation(std::vector<Point<2>>(&vertices[0],
+                                                       &vertices[4]),
+                                 cells,
+                                 SubCellData());
       exact_areas.push_back(9.);
     }
 

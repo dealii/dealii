@@ -46,10 +46,10 @@ test(PETScWrappers::SparseMatrix &m)
           AssertThrow(m(i, j) == std::complex<double>((i * j * .5 + .5) * 1.25,
                                                       i * j * .5 * 1.25),
                       ExcInternalError());
-          AssertThrow(
-            m.el(i, j) ==
-              std::complex<double>((i * j * .5 + .5) * 1.25, i * j * .5 * 1.25),
-            ExcInternalError());
+          AssertThrow(m.el(i, j) ==
+                        std::complex<double>((i * j * .5 + .5) * 1.25,
+                                             i * j * .5 * 1.25),
+                      ExcInternalError());
         }
       else
         {

@@ -47,13 +47,13 @@ test()
   // create an empty sparsity pattern
   TrilinosWrappers::SparsityPattern sparsity;
   sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern(
-    dof_handler,
-    coupling,
-    sparsity,
-    ConstraintMatrix(),
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  coupling,
+                                  sparsity,
+                                  ConstraintMatrix(),
+                                  false,
+                                  Utilities::MPI::this_mpi_process(
+                                    MPI_COMM_WORLD));
   sparsity.compress();
 
   // attach a sparse matrix to it

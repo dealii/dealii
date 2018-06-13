@@ -169,8 +169,10 @@ test()
   std::vector<unsigned int> reps;
   reps.push_back(2);
   reps.push_back(1);
-  GridGenerator::subdivided_hyper_rectangle(
-    tr, reps, Point<dim>(), Point<dim>(2.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(tr,
+                                            reps,
+                                            Point<dim>(),
+                                            Point<dim>(2.0, 1.0));
 
   FE_DGP<dim> fe(0);
 

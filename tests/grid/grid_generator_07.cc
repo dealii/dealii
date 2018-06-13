@@ -47,8 +47,9 @@ test(std::ostream &out)
        ++cell)
     cells_to_remove.insert(cell);
 
-  GridGenerator::create_triangulation_with_removed_cells(
-    triangulation, cells_to_remove, tr);
+  GridGenerator::create_triangulation_with_removed_cells(triangulation,
+                                                         cells_to_remove,
+                                                         tr);
   GridOut go;
   go.write_gnuplot(tr, out);
 }

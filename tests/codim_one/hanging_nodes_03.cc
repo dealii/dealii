@@ -48,8 +48,9 @@ main()
     cell->face(0)->set_all_boundary_ids(1);
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
-    GridGenerator::extract_boundary_mesh(
-      volume_mesh, boundary_mesh, boundary_ids);
+    GridGenerator::extract_boundary_mesh(volume_mesh,
+                                         boundary_mesh,
+                                         boundary_ids);
   }
 
   Triangulation<dim, spacedim>::active_cell_iterator cell =

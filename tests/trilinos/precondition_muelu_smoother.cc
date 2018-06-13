@@ -77,7 +77,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -90,7 +91,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -124,7 +126,9 @@ BoundaryValues<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-Step4<dim>::Step4() : fe(1), dof_handler(triangulation)
+Step4<dim>::Step4()
+  : fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -146,8 +150,10 @@ Step4<dim>::setup_system()
 
   constraints.clear();
   std::map<unsigned int, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           constraints);
   constraints.close();
 
   DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());

@@ -49,7 +49,8 @@ template <int dim>
 class MyPostprocessor : public DataPostprocessorVector<dim>
 {
 public:
-  MyPostprocessor() : DataPostprocessorVector<dim>("data", update_values)
+  MyPostprocessor()
+    : DataPostprocessorVector<dim>("data", update_values)
   {}
 
   virtual void

@@ -126,7 +126,9 @@ namespace Step26
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(), period(0.2)
+    RightHandSide()
+      : Function<dim>()
+      , period(0.2)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -200,13 +202,13 @@ namespace Step26
   // period with 100 time steps) and chooses the Crank Nicolson method
   // by setting $\theta=1/2$.
   template <int dim>
-  HeatEquation<dim>::HeatEquation() :
-    fe(1),
-    dof_handler(triangulation),
-    time(0.0),
-    time_step(1. / 500),
-    timestep_number(0),
-    theta(0.5)
+  HeatEquation<dim>::HeatEquation()
+    : fe(1)
+    , dof_handler(triangulation)
+    , time(0.0)
+    , time_step(1. / 500)
+    , timestep_number(0)
+    , theta(0.5)
   {}
 
 
@@ -251,10 +253,12 @@ namespace Step26
     laplace_matrix.reinit(sparsity_pattern);
     system_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(
-      dof_handler, QGauss<dim>(fe.degree + 1), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(fe.degree + 1), laplace_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler,
+                                      QGauss<dim>(fe.degree + 1),
+                                      mass_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler,
+                                         QGauss<dim>(fe.degree + 1),
+                                         laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
     old_solution.reinit(dof_handler.n_dofs());
@@ -340,8 +344,10 @@ namespace Step26
                                        solution,
                                        estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_fraction(
-      triangulation, estimated_error_per_cell, 0.6, 0.4);
+    GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
+                                                      estimated_error_per_cell,
+                                                      0.6,
+                                                      0.4);
 
     if (triangulation.n_levels() > max_grid_level)
       for (typename Triangulation<dim>::active_cell_iterator cell =
@@ -454,8 +460,9 @@ namespace Step26
     forcing_terms.reinit(solution.size());
 
 
-    VectorTools::interpolate(
-      dof_handler, Functions::ZeroFunction<dim>(), old_solution);
+    VectorTools::interpolate(dof_handler,
+                             Functions::ZeroFunction<dim>(),
+                             old_solution);
     solution = old_solution;
 
     output_results();
@@ -488,14 +495,18 @@ namespace Step26
         // all ends up in the forcing_terms variable:
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
-        VectorTools::create_right_hand_side(
-          dof_handler, QGauss<dim>(fe.degree + 1), rhs_function, tmp);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(fe.degree + 1),
+                                            rhs_function,
+                                            tmp);
         forcing_terms = tmp;
         forcing_terms *= time_step * theta;
 
         rhs_function.set_time(time - time_step);
-        VectorTools::create_right_hand_side(
-          dof_handler, QGauss<dim>(fe.degree + 1), rhs_function, tmp);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(fe.degree + 1),
+                                            rhs_function,
+                                            tmp);
 
         forcing_terms.add(time_step * (1 - theta), tmp);
 
@@ -523,11 +534,15 @@ namespace Step26
           boundary_values_function.set_time(time);
 
           std::map<types::global_dof_index, double> boundary_values;
-          VectorTools::interpolate_boundary_values(
-            dof_handler, 0, boundary_values_function, boundary_values);
+          VectorTools::interpolate_boundary_values(dof_handler,
+                                                   0,
+                                                   boundary_values_function,
+                                                   boundary_values);
 
-          MatrixTools::apply_boundary_values(
-            boundary_values, system_matrix, solution, system_rhs);
+          MatrixTools::apply_boundary_values(boundary_values,
+                                             system_matrix,
+                                             solution,
+                                             system_rhs);
         }
 
         // With this out of the way, all we have to do is solve the

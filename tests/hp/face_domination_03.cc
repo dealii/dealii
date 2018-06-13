@@ -50,10 +50,10 @@ public:
 };
 
 template <int dim>
-MixedFECollection<dim>::MixedFECollection() :
-  continuous_fe(FE_Q<dim>(1), dim),
-  discontinuous_fe(FE_DGQ<dim>(1), dim),
-  dof_handler(triangulation)
+MixedFECollection<dim>::MixedFECollection()
+  : continuous_fe(FE_Q<dim>(1), dim)
+  , discontinuous_fe(FE_DGQ<dim>(1), dim)
+  , dof_handler(triangulation)
 {}
 
 template <int dim>

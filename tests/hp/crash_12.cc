@@ -69,11 +69,11 @@ test()
   Triangulation<dim>        triangulation;
   std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation,
-    subdivisions,
-    Point<dim>(),
-    (dim == 3 ? Point<dim>(2, 1, 1) : Point<dim>(2, 1)));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            subdivisions,
+                                            Point<dim>(),
+                                            (dim == 3 ? Point<dim>(2, 1, 1) :
+                                                        Point<dim>(2, 1)));
   (++triangulation.begin_active())->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 

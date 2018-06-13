@@ -116,11 +116,11 @@ namespace Step54
     const std::string &  initial_mesh_filename,
     const std::string &  cad_file_name,
     const std::string &  output_filename,
-    const ProjectionType surface_projection_kind) :
-    initial_mesh_filename(initial_mesh_filename),
-    cad_file_name(cad_file_name),
-    output_filename(output_filename),
-    surface_projection_kind(surface_projection_kind)
+    const ProjectionType surface_projection_kind)
+    : initial_mesh_filename(initial_mesh_filename)
+    , cad_file_name(cad_file_name)
+    , output_filename(output_filename)
+    , surface_projection_kind(surface_projection_kind)
   {}
 
   TriangulationOnCAD::~TriangulationOnCAD()
@@ -296,8 +296,9 @@ namespace Step54
         case DirectionalProjection:
           {
             OpenCASCADE::DirectionalProjectionBoundary<2, 3>
-              directional_projector(
-                bow_surface, Point<3>(0.0, 1.0, 0.0), tolerance);
+              directional_projector(bow_surface,
+                                    Point<3>(0.0, 1.0, 0.0),
+                                    tolerance);
             tria.set_manifold(1, directional_projector);
 
             break;

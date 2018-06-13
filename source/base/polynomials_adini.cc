@@ -35,13 +35,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-PolynomialsAdini::PolynomialsAdini() :
-  coef(12, 12),
-  dx(12, 12),
-  dy(12, 12),
-  dxx(12, 12),
-  dyy(12, 12),
-  dxy(12, 12)
+PolynomialsAdini::PolynomialsAdini()
+  : coef(12, 12)
+  , dx(12, 12)
+  , dy(12, 12)
+  , dxx(12, 12)
+  , dyy(12, 12)
+  , dxy(12, 12)
 {
   //                       1  x  y  xx yy xy 3x 3y xyy xxy 3xy x3y
   //                       0  1  2  3  4  5  6  7  8  9 10 11

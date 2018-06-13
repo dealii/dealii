@@ -51,7 +51,8 @@ template <int dim>
 class Ref : public Function<dim>
 {
 public:
-  Ref() : Function<dim>(2 * dim)
+  Ref()
+    : Function<dim>(2 * dim)
   {}
 
   void

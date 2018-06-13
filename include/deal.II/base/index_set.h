@@ -981,9 +981,9 @@ complete_index_set(const unsigned int N)
 
 inline IndexSet::IntervalAccessor::IntervalAccessor(
   const IndexSet *          idxset,
-  const IndexSet::size_type range_idx) :
-  index_set(idxset),
-  range_idx(range_idx)
+  const IndexSet::size_type range_idx)
+  : index_set(idxset)
+  , range_idx(range_idx)
 {
   Assert(range_idx < idxset->n_intervals(),
          ExcInternalError("Invalid range index"));
@@ -991,17 +991,17 @@ inline IndexSet::IntervalAccessor::IntervalAccessor(
 
 
 
-inline IndexSet::IntervalAccessor::IntervalAccessor(const IndexSet *idxset) :
-  index_set(idxset),
-  range_idx(numbers::invalid_dof_index)
+inline IndexSet::IntervalAccessor::IntervalAccessor(const IndexSet *idxset)
+  : index_set(idxset)
+  , range_idx(numbers::invalid_dof_index)
 {}
 
 
 
 inline IndexSet::IntervalAccessor::IntervalAccessor(
-  const IndexSet::IntervalAccessor &other) :
-  index_set(other.index_set),
-  range_idx(other.range_idx)
+  const IndexSet::IntervalAccessor &other)
+  : index_set(other.index_set)
+  , range_idx(other.range_idx)
 {
   Assert(range_idx == numbers::invalid_dof_index || is_valid(),
          ExcMessage("invalid iterator"));
@@ -1030,8 +1030,9 @@ inline IndexSet::ElementIterator
 IndexSet::IntervalAccessor::begin() const
 {
   Assert(is_valid(), ExcMessage("invalid iterator"));
-  return IndexSet::ElementIterator(
-    index_set, range_idx, index_set->ranges[range_idx].begin);
+  return IndexSet::ElementIterator(index_set,
+                                   range_idx,
+                                   index_set->ranges[range_idx].begin);
 }
 
 
@@ -1043,8 +1044,9 @@ IndexSet::IntervalAccessor::end() const
 
   // point to first index in next interval unless we are the last interval.
   if (range_idx < index_set->ranges.size() - 1)
-    return IndexSet::ElementIterator(
-      index_set, range_idx + 1, index_set->ranges[range_idx + 1].begin);
+    return IndexSet::ElementIterator(index_set,
+                                     range_idx + 1,
+                                     index_set->ranges[range_idx + 1].begin);
   else
     return index_set->end();
 }
@@ -1077,9 +1079,9 @@ inline bool
 IndexSet::IntervalAccessor::
 operator==(const IndexSet::IntervalAccessor &other) const
 {
-  Assert(
-    index_set == other.index_set,
-    ExcMessage("Can not compare accessors pointing to different IndexSets"));
+  Assert(index_set == other.index_set,
+         ExcMessage(
+           "Can not compare accessors pointing to different IndexSets"));
   return range_idx == other.range_idx;
 }
 
@@ -1089,9 +1091,9 @@ inline bool
 IndexSet::IntervalAccessor::
 operator<(const IndexSet::IntervalAccessor &other) const
 {
-  Assert(
-    index_set == other.index_set,
-    ExcMessage("Can not compare accessors pointing to different IndexSets"));
+  Assert(index_set == other.index_set,
+         ExcMessage(
+           "Can not compare accessors pointing to different IndexSets"));
   return range_idx < other.range_idx;
 }
 
@@ -1116,26 +1118,27 @@ IndexSet::IntervalAccessor::advance()
 
 inline IndexSet::IntervalIterator::IntervalIterator(
   const IndexSet *          idxset,
-  const IndexSet::size_type range_idx) :
-  accessor(idxset, range_idx)
+  const IndexSet::size_type range_idx)
+  : accessor(idxset, range_idx)
 {}
 
 
 
-inline IndexSet::IntervalIterator::IntervalIterator() : accessor(nullptr)
+inline IndexSet::IntervalIterator::IntervalIterator()
+  : accessor(nullptr)
 {}
 
 
 
-inline IndexSet::IntervalIterator::IntervalIterator(const IndexSet *idxset) :
-  accessor(idxset)
+inline IndexSet::IntervalIterator::IntervalIterator(const IndexSet *idxset)
+  : accessor(idxset)
 {}
 
 
 
 inline IndexSet::IntervalIterator::IntervalIterator(
-  const IndexSet::IntervalIterator &other) :
-  accessor(other.accessor)
+  const IndexSet::IntervalIterator &other)
+  : accessor(other.accessor)
 {}
 
 
@@ -1215,9 +1218,9 @@ inline int
 IndexSet::IntervalIterator::
 operator-(const IndexSet::IntervalIterator &other) const
 {
-  Assert(
-    accessor.index_set == other.accessor.index_set,
-    ExcMessage("Can not compare iterators belonging to different IndexSets"));
+  Assert(accessor.index_set == other.accessor.index_set,
+         ExcMessage(
+           "Can not compare iterators belonging to different IndexSets"));
 
   const size_type lhs = (accessor.range_idx == numbers::invalid_dof_index) ?
                           accessor.index_set->ranges.size() :
@@ -1240,10 +1243,10 @@ operator-(const IndexSet::IntervalIterator &other) const
 inline IndexSet::ElementIterator::ElementIterator(
   const IndexSet *          idxset,
   const IndexSet::size_type range_idx,
-  const IndexSet::size_type index) :
-  index_set(idxset),
-  range_idx(range_idx),
-  idx(index)
+  const IndexSet::size_type index)
+  : index_set(idxset)
+  , range_idx(range_idx)
+  , idx(index)
 {
   Assert(range_idx < index_set->ranges.size(),
          ExcMessage(
@@ -1257,10 +1260,10 @@ inline IndexSet::ElementIterator::ElementIterator(
 
 
 
-inline IndexSet::ElementIterator::ElementIterator(const IndexSet *idxset) :
-  index_set(idxset),
-  range_idx(numbers::invalid_dof_index),
-  idx(numbers::invalid_dof_index)
+inline IndexSet::ElementIterator::ElementIterator(const IndexSet *idxset)
+  : index_set(idxset)
+  , range_idx(numbers::invalid_dof_index)
+  , idx(numbers::invalid_dof_index)
 {}
 
 
@@ -1295,9 +1298,9 @@ inline bool
 IndexSet::ElementIterator::
 operator==(const IndexSet::ElementIterator &other) const
 {
-  Assert(
-    index_set == other.index_set,
-    ExcMessage("Can not compare iterators belonging to different IndexSets"));
+  Assert(index_set == other.index_set,
+         ExcMessage(
+           "Can not compare iterators belonging to different IndexSets"));
   return range_idx == other.range_idx && idx == other.idx;
 }
 
@@ -1364,9 +1367,9 @@ inline bool
 IndexSet::ElementIterator::
 operator<(const IndexSet::ElementIterator &other) const
 {
-  Assert(
-    index_set == other.index_set,
-    ExcMessage("Can not compare iterators belonging to different IndexSets"));
+  Assert(index_set == other.index_set,
+         ExcMessage(
+           "Can not compare iterators belonging to different IndexSets"));
   return range_idx < other.range_idx ||
          (range_idx == other.range_idx && idx < other.idx);
 }
@@ -1377,9 +1380,9 @@ inline std::ptrdiff_t
 IndexSet::ElementIterator::
 operator-(const IndexSet::ElementIterator &other) const
 {
-  Assert(
-    index_set == other.index_set,
-    ExcMessage("Can not compare iterators belonging to different IndexSets"));
+  Assert(index_set == other.index_set,
+         ExcMessage(
+           "Can not compare iterators belonging to different IndexSets"));
   if (*this == other)
     return 0;
   if (!(*this < other))
@@ -1417,45 +1420,45 @@ operator-(const IndexSet::ElementIterator &other) const
 
 /* Range */
 
-inline IndexSet::Range::Range() :
-  begin(numbers::invalid_dof_index),
-  end(numbers::invalid_dof_index),
-  nth_index_in_set(numbers::invalid_dof_index)
+inline IndexSet::Range::Range()
+  : begin(numbers::invalid_dof_index)
+  , end(numbers::invalid_dof_index)
+  , nth_index_in_set(numbers::invalid_dof_index)
 {}
 
 
 
-inline IndexSet::Range::Range(const size_type i1, const size_type i2) :
-  begin(i1),
-  end(i2),
-  nth_index_in_set(numbers::invalid_dof_index)
+inline IndexSet::Range::Range(const size_type i1, const size_type i2)
+  : begin(i1)
+  , end(i2)
+  , nth_index_in_set(numbers::invalid_dof_index)
 {}
 
 
 
 /* IndexSet itself */
 
-inline IndexSet::IndexSet() :
-  is_compressed(true),
-  index_space_size(0),
-  largest_range(numbers::invalid_unsigned_int)
+inline IndexSet::IndexSet()
+  : is_compressed(true)
+  , index_space_size(0)
+  , largest_range(numbers::invalid_unsigned_int)
 {}
 
 
 
-inline IndexSet::IndexSet(const size_type size) :
-  is_compressed(true),
-  index_space_size(size),
-  largest_range(numbers::invalid_unsigned_int)
+inline IndexSet::IndexSet(const size_type size)
+  : is_compressed(true)
+  , index_space_size(size)
+  , largest_range(numbers::invalid_unsigned_int)
 {}
 
 
 
-inline IndexSet::IndexSet(IndexSet &&is) noexcept :
-  ranges(std::move(is.ranges)),
-  is_compressed(is.is_compressed),
-  index_space_size(is.index_space_size),
-  largest_range(is.largest_range)
+inline IndexSet::IndexSet(IndexSet &&is) noexcept
+  : ranges(std::move(is.ranges))
+  , is_compressed(is.is_compressed)
+  , index_space_size(is.index_space_size)
+  , largest_range(is.largest_range)
 {
   is.ranges.clear();
   is.is_compressed    = true;
@@ -1635,9 +1638,10 @@ IndexSet::add_index(const size_type index)
   else if (index == ranges.back().end)
     ranges.back().end++;
   else
-    ranges.insert(
-      Utilities::lower_bound(ranges.begin(), ranges.end(), new_range),
-      new_range);
+    ranges.insert(Utilities::lower_bound(ranges.begin(),
+                                         ranges.end(),
+                                         new_range),
+                  new_range);
   is_compressed = false;
 }
 

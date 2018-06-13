@@ -82,7 +82,8 @@ template <int dim>
 class Location : public Point<dim>
 {
 public:
-  Location(const Point<dim> &in) : Point<dim>(in)
+  Location(const Point<dim> &in)
+    : Point<dim>(in)
   {}
 
   inline bool
@@ -194,12 +195,12 @@ main(int argc, char *argv[])
 
 template <int dim>
 TriaTest<dim>::TriaTest(
-  const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option) :
-  mpi_communicator(MPI_COMM_WORLD),
-  triangulation(mpi_communicator, smoothing_option),
-  myid(Utilities::MPI::this_mpi_process(mpi_communicator)),
-  I_am_host(myid == 0),
-  case_name(smoothing_option ? "smooth-" : "no_smooth-")
+  const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option)
+  : mpi_communicator(MPI_COMM_WORLD)
+  , triangulation(mpi_communicator, smoothing_option)
+  , myid(Utilities::MPI::this_mpi_process(mpi_communicator))
+  , I_am_host(myid == 0)
+  , case_name(smoothing_option ? "smooth-" : "no_smooth-")
 {
   std::vector<unsigned int> repetitions;
   Point<dim>                p1;
@@ -315,8 +316,9 @@ TriaTest<dim>::write_vtu(const unsigned int counter) const
   data_out.attach_triangulation(triangulation);
   {
     const std::string data_name("refine_flag");
-    data_out.add_data_vector(
-      refine_mark, data_name, DataOut<dim>::type_cell_data);
+    data_out.add_data_vector(refine_mark,
+                             data_name,
+                             DataOut<dim>::type_cell_data);
   }
 
   data_out.build_patches();

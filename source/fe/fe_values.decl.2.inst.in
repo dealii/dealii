@@ -24,6 +24,7 @@ for (VEC : VECTOR_TYPES)
     /// @p get_interpolated_dof_values
     /// of the iterator with the
     /// given arguments.
-    virtual void get_interpolated_dof_values(
-      const VEC &in, Vector<VEC::value_type> &out) const override;
+    virtual void get_interpolated_dof_values(const VEC &              in,
+                                             Vector<VEC::value_type> &out)
+      const override;
   }

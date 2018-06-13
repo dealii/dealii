@@ -160,12 +160,12 @@ namespace internal
     inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
       const Mapping<dim> & mapping,
       const Quadrature<1> &quadrature,
-      const UpdateFlags    update_flags) :
-      fe_values(mapping,
-                fe_dummy,
-                Quadrature<dim>(quadrature),
-                MappingInfo<dim, Number>::compute_update_flags(update_flags)),
-      quadrature_1d(quadrature)
+      const UpdateFlags    update_flags)
+      : fe_values(mapping,
+                  fe_dummy,
+                  Quadrature<dim>(quadrature),
+                  MappingInfo<dim, Number>::compute_update_flags(update_flags))
+      , quadrature_1d(quadrature)
     {
       mapping_info_storage.descriptor.resize(1);
       mapping_info_storage.descriptor[0].initialize(quadrature);
@@ -194,10 +194,10 @@ namespace internal
     template <int dim, typename Number>
     inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
       const Quadrature<1> &quadrature,
-      const UpdateFlags    update_flags) :
-      MappingDataOnTheFly(::dealii::StaticMappingQ1<dim, dim>::mapping,
-                          quadrature,
-                          update_flags)
+      const UpdateFlags    update_flags)
+      : MappingDataOnTheFly(::dealii::StaticMappingQ1<dim, dim>::mapping,
+                            quadrature,
+                            update_flags)
     {}
 
 

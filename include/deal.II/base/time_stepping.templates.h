@@ -224,11 +224,11 @@ namespace TimeStepping
   ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(
     const runge_kutta_method method,
     const unsigned int       max_it,
-    const double             tolerance) :
-    RungeKutta<VectorType>(),
-    skip_linear_combi(false),
-    max_it(max_it),
-    tolerance(tolerance)
+    const double             tolerance)
+    : RungeKutta<VectorType>()
+    , skip_linear_combi(false)
+    , max_it(max_it)
+    , tolerance(tolerance)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -452,16 +452,16 @@ namespace TimeStepping
     const double             min_delta,
     const double             max_delta,
     const double             refine_tol,
-    const double             coarsen_tol) :
-    coarsen_param(coarsen_param),
-    refine_param(refine_param),
-    min_delta_t(min_delta),
-    max_delta_t(max_delta),
-    refine_tol(refine_tol),
-    coarsen_tol(coarsen_tol),
-    last_same_as_first(false),
-    last_stage(nullptr),
-    status{}
+    const double             coarsen_tol)
+    : coarsen_param(coarsen_param)
+    , refine_param(refine_param)
+    , min_delta_t(min_delta)
+    , max_delta_t(max_delta)
+    , refine_tol(refine_tol)
+    , coarsen_tol(coarsen_tol)
+    , last_same_as_first(false)
+    , last_stage(nullptr)
+    , status{}
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class

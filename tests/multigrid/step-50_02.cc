@@ -132,7 +132,8 @@ namespace Step50
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient() : Function<dim>()
+    Coefficient()
+      : Function<dim>()
     {}
 
     virtual double
@@ -178,19 +179,19 @@ namespace Step50
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-    triangulation(
-      MPI_COMM_WORLD,
-      typename Triangulation<dim>::MeshSmoothing(
-        Triangulation<dim>::limit_level_difference_at_vertices),
-      true,
-      // parallel::shared::Triangulation<dim>::Settings::partition_custom_signal),
-      typename parallel::shared::Triangulation<dim>::Settings(
-        parallel::shared::Triangulation<dim>::partition_zorder |
-        parallel::shared::Triangulation<dim>::construct_multigrid_hierarchy)),
-    fe(degree),
-    mg_dof_handler(triangulation),
-    degree(degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+    : triangulation(
+        MPI_COMM_WORLD,
+        typename Triangulation<dim>::MeshSmoothing(
+          Triangulation<dim>::limit_level_difference_at_vertices),
+        true,
+        // parallel::shared::Triangulation<dim>::Settings::partition_custom_signal),
+        typename parallel::shared::Triangulation<dim>::Settings(
+          parallel::shared::Triangulation<dim>::partition_zorder |
+          parallel::shared::Triangulation<dim>::construct_multigrid_hierarchy))
+    , fe(degree)
+    , mg_dof_handler(triangulation)
+    , degree(degree)
   {}
 
 
@@ -216,15 +217,18 @@ namespace Step50
     Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(1.0);
     dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values(
-      mg_dof_handler, dirichlet_boundary, constraints);
+    VectorTools::interpolate_boundary_values(mg_dof_handler,
+                                             dirichlet_boundary,
+                                             constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(),
                                mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(mg_dof_handler, dsp, constraints);
-    system_matrix.reinit(
-      mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
+    system_matrix.reinit(mg_dof_handler.locally_owned_dofs(),
+                         dsp,
+                         MPI_COMM_WORLD,
+                         true);
 
 
     mg_constrained_dofs.clear();
@@ -356,8 +360,9 @@ namespace Step50
          ++level)
       {
         IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(
-          mg_dof_handler, level, dofset);
+        DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler,
+                                                      level,
+                                                      dofset);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));

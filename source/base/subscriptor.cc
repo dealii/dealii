@@ -27,7 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 static const char *unknown_subscriber = "unknown subscriber";
 
 
-Subscriptor::Subscriptor() : counter(0), object_info(nullptr)
+Subscriptor::Subscriptor()
+  : counter(0)
+  , object_info(nullptr)
 {
   // this has to go somewhere to avoid an extra warning.
   (void)unknown_subscriber;
@@ -35,14 +37,16 @@ Subscriptor::Subscriptor() : counter(0), object_info(nullptr)
 
 
 
-Subscriptor::Subscriptor(const Subscriptor &) : counter(0), object_info(nullptr)
+Subscriptor::Subscriptor(const Subscriptor &)
+  : counter(0)
+  , object_info(nullptr)
 {}
 
 
 
-Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept :
-  counter(0),
-  object_info(subscriptor.object_info)
+Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
+  : counter(0)
+  , object_info(subscriptor.object_info)
 {
   subscriptor.check_no_subscribers();
 }
@@ -95,9 +99,10 @@ Subscriptor::check_no_subscribers() const noexcept
           if (infostring == "")
             infostring = "<none>";
 
-          AssertNothrow(
-            counter == 0,
-            ExcInUse(counter.load(), object_info->name(), infostring));
+          AssertNothrow(counter == 0,
+                        ExcInUse(counter.load(),
+                                 object_info->name(),
+                                 infostring));
         }
       else
         {

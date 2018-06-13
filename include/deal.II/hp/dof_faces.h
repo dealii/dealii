@@ -368,20 +368,20 @@ namespace internal
       const unsigned int                           local_index,
       const unsigned int /*obj_level*/) const
     {
-      Assert(
-        (fe_index != dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
-        ExcMessage("You need to specify a FE index when working "
-                   "with hp DoFHandlers"));
-      Assert(
-        fe_index < dof_handler.get_fe_collection().size(),
-        ExcIndexRange(fe_index, 0, dof_handler.get_fe_collection().size()));
-      Assert(
-        local_index <
-          dof_handler.get_fe(fe_index).template n_dofs_per_object<structdim>(),
-        ExcIndexRange(local_index,
-                      0,
-                      dof_handler.get_fe(fe_index)
-                        .template n_dofs_per_object<structdim>()));
+      Assert((fe_index !=
+              dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
+             ExcMessage("You need to specify a FE index when working "
+                        "with hp DoFHandlers"));
+      Assert(fe_index < dof_handler.get_fe_collection().size(),
+             ExcIndexRange(fe_index,
+                           0,
+                           dof_handler.get_fe_collection().size()));
+      Assert(local_index < dof_handler.get_fe(fe_index)
+                             .template n_dofs_per_object<structdim>(),
+             ExcIndexRange(local_index,
+                           0,
+                           dof_handler.get_fe(fe_index)
+                             .template n_dofs_per_object<structdim>()));
       Assert(obj_index < dof_offsets.size(),
              ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
@@ -429,20 +429,20 @@ namespace internal
       const types::global_dof_index                global_index,
       const unsigned int /*obj_level*/)
     {
-      Assert(
-        (fe_index != dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
-        ExcMessage("You need to specify a FE index when working "
-                   "with hp DoFHandlers"));
-      Assert(
-        fe_index < dof_handler.get_fe_collection().size(),
-        ExcIndexRange(fe_index, 0, dof_handler.get_fe_collection().size()));
-      Assert(
-        local_index <
-          dof_handler.get_fe(fe_index).template n_dofs_per_object<structdim>(),
-        ExcIndexRange(local_index,
-                      0,
-                      dof_handler.get_fe(fe_index)
-                        .template n_dofs_per_object<structdim>()));
+      Assert((fe_index !=
+              dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
+             ExcMessage("You need to specify a FE index when working "
+                        "with hp DoFHandlers"));
+      Assert(fe_index < dof_handler.get_fe_collection().size(),
+             ExcIndexRange(fe_index,
+                           0,
+                           dof_handler.get_fe_collection().size()));
+      Assert(local_index < dof_handler.get_fe(fe_index)
+                             .template n_dofs_per_object<structdim>(),
+             ExcIndexRange(local_index,
+                           0,
+                           dof_handler.get_fe(fe_index)
+                             .template n_dofs_per_object<structdim>()));
       Assert(obj_index < dof_offsets.size(),
              ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
@@ -590,15 +590,17 @@ namespace internal
       const unsigned int /*obj_level*/) const
     {
       Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(
-               obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
-      Assert(
-        (fe_index != dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
-        ExcMessage("You need to specify a FE index when working "
-                   "with hp DoFHandlers"));
-      Assert(
-        fe_index < dof_handler.get_fe_collection().size(),
-        ExcIndexRange(fe_index, 0, dof_handler.get_fe_collection().size()));
+             ExcIndexRange(obj_index,
+                           0,
+                           static_cast<unsigned int>(dof_offsets.size())));
+      Assert((fe_index !=
+              dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
+             ExcMessage("You need to specify a FE index when working "
+                        "with hp DoFHandlers"));
+      Assert(fe_index < dof_handler.get_fe_collection().size(),
+             ExcIndexRange(fe_index,
+                           0,
+                           dof_handler.get_fe_collection().size()));
 
       // make sure we are on an
       // object for which DoFs have
