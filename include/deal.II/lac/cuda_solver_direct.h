@@ -43,6 +43,9 @@ namespace CUDAWrappers
   class SolverDirect
   {
   public:
+    /**
+     * Struct for additional settings for SolverDirect.
+     */
     struct AdditionalData
     {
       /**
@@ -54,9 +57,10 @@ namespace CUDAWrappers
        * Set the solver type. Possibilities are:
        * <ul>
        * <li> "Cholesky" which performs a Cholesky decomposition on the device
-       * </li> <li> "LU_dense" which converts the sparse matrix to a dense
-       * matrix and uses LU factorization </li> <li> "LU_host" which uses LU
-       * factorization on the host </li>
+       * </li>
+       * <li> "LU_dense" which converts the sparse matrix to a dense
+       * matrix and uses LU factorization </li>
+       * <li> "LU_host" which uses LU factorization on the host </li>
        * </ul>
        */
       std::string solver_type;

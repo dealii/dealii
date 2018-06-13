@@ -101,7 +101,8 @@ DEAL_II_NAMESPACE_OPEN
  * main features of this framework.
  *
  * For details on usage of this class, see the description of FEEvaluation or
- * the @ref matrixfree "matrix-free module".
+ * the
+ * @ref matrixfree "matrix-free module".
  *
  * @ingroup matrixfree
  *

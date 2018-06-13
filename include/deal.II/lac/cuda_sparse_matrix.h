@@ -269,7 +269,7 @@ namespace CUDAWrappers
      */
     std::tuple<Number *, int *, int *, cusparseMatDescr_t>
     get_cusparse_matrix() const;
-    //*}
+    //@}
 
   private:
     /**
