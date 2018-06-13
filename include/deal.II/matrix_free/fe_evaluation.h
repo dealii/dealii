@@ -6924,7 +6924,7 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
   if (!(evaluate_values + evaluate_gradients))
     return;
 
-  const unsigned int static_dofs_per_face =
+  constexpr unsigned int static_dofs_per_face =
     fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
                      numbers::invalid_unsigned_int;
   const unsigned int dofs_per_face =
@@ -7043,7 +7043,7 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>::
   if (this->face_orientation)
     adjust_for_face_orientation(true, integrate_values, integrate_gradients);
 
-  const unsigned int static_dofs_per_face =
+  constexpr unsigned int static_dofs_per_face =
     fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
                      numbers::invalid_unsigned_int;
   const unsigned int dofs_per_face =
@@ -7124,17 +7124,22 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
                   const bool        evaluate_gradients)
 {
   const unsigned int side = this->face_no % 2;
-  const unsigned int dofs_per_face =
+
+  constexpr unsigned int static_dofs_per_face =
     fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
+                     numbers::invalid_unsigned_int;
+  const unsigned int dofs_per_face =
+    fe_degree > -1 ? static_dofs_per_face :
                      Utilities::pow(this->data->fe_degree + 1, dim - 1);
 
   constexpr unsigned int stack_array_size_threshold = 100;
 
-  VectorizedArray<Number> temp_data[dofs_per_face < stack_array_size_threshold ?
-                                      n_components_ * 2 * dofs_per_face :
-                                      1];
+  VectorizedArray<Number>
+    temp_data[static_dofs_per_face < stack_array_size_threshold ?
+                n_components_ * 2 * dofs_per_face :
+                1];
   VectorizedArray<Number> *__restrict temp1;
-  if (dofs_per_face < stack_array_size_threshold)
+  if (static_dofs_per_face < stack_array_size_threshold)
     temp1 = &temp_data[0];
   else
     temp1 = this->scratch_data;
