@@ -520,6 +520,16 @@ namespace TrilinosWrappers
     typedef dealii::types::global_dof_index size_type;
 
     /**
+     * Exception
+     */
+    DeclException1(ExcAccessToNonlocalRow,
+                   std::size_t,
+                   << "You tried to access row " << arg1
+                   << " of a non-contiguous locally owned row set."
+                   << " The row " << arg1
+                   << " is not stored locally and can't be accessed.");
+
+    /**
      * A structure that describes some of the traits of this class in terms of
      * its run-time behavior. Some other classes (such as the block matrix
      * classes) that take one or other of the matrix classes as its template
