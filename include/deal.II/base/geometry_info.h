@@ -911,8 +911,8 @@ namespace internal
    *
    * *---*---*
    * | 1 | 3 |
-   * *---*---*    case_x1y2y   (successive refinement: first cut_x, then cut_y
-   * for both children) | 0 | 2 |
+   * *---*---*    case_x1y2y   (successive refinement: first cut_x, then cut_y for both children)
+   * | 0 | 2 |
    * *---*---*
    *
    * *-------*
@@ -935,8 +935,8 @@ namespace internal
    *
    * *---*---*
    * | 2 | 3 |
-   * *---*---*    case_y1x2x   (successive refinement: first cut_y, then cut_x
-   * for both children) | 0 | 1 |
+   * *---*---*    case_y1x2x   (successive refinement: first cut_y, then cut_x for both children)
+   * | 0 | 1 |
    * *---+---*
    *
    * *---*---*

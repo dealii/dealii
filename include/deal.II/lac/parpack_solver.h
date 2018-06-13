@@ -382,8 +382,8 @@ public:
    *
    * If this function is not called, the shift is assumed to be zero.
    *
-   * @note only relevant for <code>mode=3</code> (see the general documentation
-   * of this class for a definition of what the different modes are).
+   * @note only relevant for <code>mode=3</code> (see the general documentation of this
+   * class for a definition of what the different modes are).
    */
   void
   set_shift(const std::complex<double> sigma);

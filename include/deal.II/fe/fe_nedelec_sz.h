@@ -225,8 +225,7 @@ protected:
    * <ul>
    * <li> $\lambda_{i}$ - trilinear function, equal to one at the $i$-th vertex
    * and zero at all other vertices.</li>
-   * <li> $\sigma_{i}$ - linear functional associated with the $i$-th
-   * vertex.</li>
+   * <li> $\sigma_{i}$ - linear functional associated with the $i$-th vertex.</li>
    * </ul>
    *
    * The definitions of these functionals, as well as the edge and face

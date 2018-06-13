@@ -254,10 +254,10 @@ namespace FESeries
    * @p predicate being constant. Return the pair of vectors of predicate values
    * and the vector of calculated subset norms.
    *
-   * @p predicate should return a pair of <code>bool</code> and <code>unsigned int</code>.
-   * The former is a flag whether a given TableIndices should be used in
-   * calculation, whereas the latter is the unrolled value of indices according
-   * to which the subsets of coefficients will be formed.
+   * @p predicate should return a pair of <code>bool</code> and <code>unsigned
+   * int</code>. The former is a flag whether a given TableIndices should be
+   * used in calculation, whereas the latter is the unrolled value of indices
+   * according to which the subsets of coefficients will be formed.
    *
    * @note Only the following values of @p norm are implemented and make sense
    * in this case: mean, L1_norm, L2_norm, Linfty_norm. The mean norm can only

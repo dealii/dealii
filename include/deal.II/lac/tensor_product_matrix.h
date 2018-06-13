@@ -207,9 +207,9 @@ private:
  * @tparam dim Dimension of the problem. Currently, 1D, 2D, and 3D codes are
  * implemented.
  *
- * @tparam Number Arithmetic type of the underlying array elements. Note that
- * the underlying LAPACK implementation supports only float and double numbers,
- * so only these two types are currently supported by the generic class.
+ * @tparam Number Arithmetic type of the underlying array elements. Note that the
+ * underlying LAPACK implementation supports only float and double numbers, so
+ * only these two types are currently supported by the generic class.
  * Nevertheless, a template specialization for the vectorized types
  * VectorizedArray<float> and VectorizedArray<double> exists. This is necessary
  * to perform LAPACK calculations for each vectorization lane, i.e. for the

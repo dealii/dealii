@@ -522,10 +522,10 @@ protected:
      * The variable is made mutable as InternalData's provided to fill_fe_values
      * and alike are const.
      *
-     * @note We do not want to store this information in the finite element
-     * object itself, because this would mean that (i) only one FEValues object
-     * could use a finite element object at a time, and (ii) that these objects
-     * could not be used in a multithreaded context.
+     * @note We do not want to store this information in the finite element object itself,
+     * because this would mean that (i) only one FEValues object could use a
+     * finite element object at a time, and (ii) that these objects could not be
+     * used in a multithreaded context.
      */
     mutable std::vector<std::vector<EnrichmentValues>> enrichment;
   };
@@ -533,8 +533,8 @@ protected:
   /**
    * For each finite element @p i used in enrichment and each enrichment function
    * @p j associated with it (essentially its multiplicity),
-   * @p base_no_mult_local_enriched_dofs[i][j] contains the associated local DoFs
-   * on the FE_Enriched finite element.
+   * @p base_no_mult_local_enriched_dofs[i][j] contains the associated local
+   * DoFs on the FE_Enriched finite element.
    */
   std::vector<std::vector<std::vector<unsigned int>>>
     base_no_mult_local_enriched_dofs;

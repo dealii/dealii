@@ -1803,8 +1803,8 @@ namespace VectorTools
    * function multiple times with only one boundary indicator, or whether we
    * call the function once with the whole set of boundary indicators at once.
    *
-   * Argument four (@p function_map) describes the boundary function $\vec u_\Gamma$
-   * for each boundary id. The function <code>function_map[id]</code>
+   * Argument four (@p function_map) describes the boundary function $\vec
+   * u_\Gamma$ for each boundary id. The function <code>function_map[id]</code>
    * is used on boundary with id @p id taken from the set @p boundary_ids.
    * Each function in @p function_map is expected to have @p dim
    * components, which are used independent of @p first_vector_component.

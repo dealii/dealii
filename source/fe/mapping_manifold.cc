@@ -651,9 +651,9 @@ namespace internal
     {
       /**
        * Depending on what information is called for in the update flags of the
-       * @p data object, compute the various pieces of information that is required
-       * by the fill_fe_face_values() and fill_fe_subface_values() functions.
-       * This function simply unifies the work that would be done by
+       * @p data object, compute the various pieces of information that is
+       * required by the fill_fe_face_values() and fill_fe_subface_values()
+       * functions. This function simply unifies the work that would be done by
        * those two functions.
        *
        * The resulting data is put into the @p output_data argument.

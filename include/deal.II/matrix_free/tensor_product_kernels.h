@@ -76,8 +76,8 @@ namespace internal
    * @tparam variant Variant of evaluation used for creating template
    *                 specializations
    * @tparam dim Dimension of the function
-   * @tparam n_rows Number of rows in the transformation matrix, which
-   * corresponds to the number of 1d shape functions in the usual tensor
+   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
+   *                to the number of 1d shape functions in the usual tensor
    *                contraction setting
    * @tparam n_columns Number of columns in the transformation matrix, which
    *                   corresponds to the number of 1d shape functions in the
@@ -103,8 +103,8 @@ namespace internal
    * tensor product form of the basis functions.
    *
    * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which
-   * corresponds to the number of 1d shape functions in the usual tensor
+   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
+   *                to the number of 1d shape functions in the usual tensor
    *                contraction setting
    * @tparam n_columns Number of columns in the transformation matrix, which
    *                   corresponds to the number of 1d shape functions in the
@@ -259,12 +259,15 @@ namespace internal
      * before calling any interpolation within the face.
      *
      * @tparam face_direction Direction of the normal vector (0=x, 1=y, etc)
-     * @tparam contract_onto_face If true, the input vector is of size
-     * n_rows^dim and interpolation into n_rows^(dim-1) points is performed.
-     * This is a typical scenario in FEFaceEvaluation::evaluate() calls. If
-     * false, data from n_rows^(dim-1) points is expanded into the n_rows^dim
-     * points of the higher- dimensional data array. Derivatives in the case
-     * contract_onto_face==false are summed together
+     * @tparam contract_onto_face If true, the input vector is of size n_rows^dim
+     *                            and interpolation into n_rows^(dim-1) points
+     *                            is performed. This is a typical scenario in
+     *                            FEFaceEvaluation::evaluate() calls. If false,
+     *                            data from n_rows^(dim-1) points is expanded
+     *                            into the n_rows^dim points of the higher-
+     *                            dimensional data array. Derivatives in the
+     *                            case contract_onto_face==false are summed
+     *                            together
      * @tparam add If true, the result is added to the output vector, else
      *             the computed values overwrite the content in the output
      * @tparam max_derivative Sets the number of derivatives that should be
@@ -852,8 +855,8 @@ namespace internal
    * are, too.
    *
    * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which
-   * corresponds to the number of 1d shape functions in the usual tensor
+   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
+   *                to the number of 1d shape functions in the usual tensor
    *                contraction setting
    * @tparam n_columns Number of columns in the transformation matrix, which
    *                   corresponds to the number of 1d shape functions in the
@@ -1432,8 +1435,8 @@ namespace internal
    * constants (templates).
    *
    * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which
-   * corresponds to the number of 1d shape functions in the usual tensor
+   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
+   *                to the number of 1d shape functions in the usual tensor
    *                contraction setting
    * @tparam n_columns Number of columns in the transformation matrix, which
    *                   corresponds to the number of 1d shape functions in the
@@ -1821,8 +1824,8 @@ namespace internal
    * difference is in the way the input and output quantities are symmetrized.
    *
    * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which
-   * corresponds to the number of 1d shape functions in the usual tensor
+   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
+   *                to the number of 1d shape functions in the usual tensor
    *                contraction setting
    * @tparam n_columns Number of columns in the transformation matrix, which
    *                   corresponds to the number of 1d shape functions in the

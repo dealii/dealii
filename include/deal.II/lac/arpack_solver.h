@@ -164,8 +164,7 @@ dseupd_(int *         rvec,
  * @ref step_36 "step-36"
  * for an example.
  *
- * @author Baerbel Janssen, Agnieszka Miedlar, 2010, Guido Kanschat 2015, Joscha
- * Gedicke 2016
+ * @author Baerbel Janssen, Agnieszka Miedlar, 2010, Guido Kanschat 2015, Joscha Gedicke 2016
  */
 class ArpackSolver : public Subscriptor
 {

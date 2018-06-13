@@ -337,8 +337,7 @@ namespace Differentiation
      * This specialization is for the case where @p ADNumberType is an
      * taped Adol-C (real) double.
      *
-     * @note In this case the number traits are the same as those for a taped
-     * double.
+     * @note In this case the number traits are the same as those for a taped double.
      *
      * @author Jean-Paul Pelteret, 2017
      */
@@ -361,8 +360,8 @@ namespace Differentiation
      * This specialization is for the case where @p ADNumberType is an
      * taped Adol-C complex double.
      *
-     * @note In this case the number traits are the same as those for a taped
-     * complex double.
+     * @note In this case the number traits are the same as those for a taped complex
+     * double.
      *
      * @author Jean-Paul Pelteret, 2017
      */
@@ -386,8 +385,7 @@ namespace Differentiation
      * This specialization is for the case where @p ADNumberType is an
      * tapeless Adol-C (real) double.
      *
-     * @note In this case the number traits are the same as those for a tapeless
-     * double.
+     * @note In this case the number traits are the same as those for a tapeless double.
      *
      * @author Jean-Paul Pelteret, 2017
      */

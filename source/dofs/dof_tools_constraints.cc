@@ -1812,8 +1812,8 @@ namespace DoFTools
      *
      * @precondition: face_1 is supposed to be active
      *
-     * @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82)
-     * and the corresponding testcase bits/periodicity_05 demonstrate, we can
+     * @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and the
+     * corresponding testcase bits/periodicity_05 demonstrate, we can
      * occasionally get into trouble if we already have the constraint x1=x2 and
      * want to insert x2=x1. we avoid this by skipping an identity constraint if
      * the opposite constraint already exists
