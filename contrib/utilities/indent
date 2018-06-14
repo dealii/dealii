@@ -23,129 +23,39 @@
 # While we're already touching every file, this script also makes
 # sure we set permissions correctly
 #
-# The script needs to be executed as 
+# The script needs to be executed as
 #   ./contrib/utilities/indent
 # from the top-level directory of the source tree, or via
 #   make indent
 # from a build directory.
 #
 
-if test ! -d source -o ! -d include -o ! -d examples ; then
+if [ ! -f contrib/utilities/indent_common.sh ]; then
   echo "*** This script must be run from the top-level directory of deal.II."
   exit 1
 fi
 
-# Add the location 'download_clang_format' or 'compile_clang_format'
-# installs clang-format to to the local PATH.
-CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
-export PATH="${CLANG_FORMAT_PATH}:${PATH}"
-
-if ! [ -x "$(command -v clang-format)" ]; then
-  echo "*** No clang-format program found."
-  echo "***"
-  echo "*** You can run the 'download_clang_format' script or the"
-  echo "*** 'compile_clang_format' script for obtaining a compatible"
-  echo "*** binary and installing to an appropriate directory."
-  exit 1
-fi
-
-# Make sure to have the right version. We know that clang-6.0.0
-# and clang-6.0.1 work. Hence, test for clang-6.0.
-CLANG_FORMAT_VERSION="$(clang-format --version)"
-CLANG_FORMAT_MAJOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
-CLANG_FORMAT_MINOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
-
-if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 6 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 0 ]; then
-  echo "*** Found a version of clang-format different than the required version 6.0."
-  exit 1
-fi
+source contrib/utilities/indent_common.sh
 
 #
-# Collect all header and source files and process them in batches of 50
-# files with up to 10 in parallel
-#
-# The command line is a bit complicated, so let's discuss the more
-# complicated arguments:
-# - For 'find', -print0 makes sure that file names are separated by \0
-#   characters, as opposed to the default \n. That's because, surprisingly,
-#   \n is a valid character in a file name, whereas \0 is not -- so it
-#   serves as a good candidate to separate individual file names.
-# - For 'xargs', -0 does the opposite: it separates filenames that are
-#   delimited by \0
-# - -n 50 calls the following script with up to 50 file names at a time
-# - -P 10 calls the following script up to 10 times in parallel
-#
-find tests include source examples \
-  \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
-  xargs -0 -n 50 -P 10 clang-format -i
-
-#
-# Use the same process to set file permissions for all source files.
+# Run sanity checks:
 #
 
-find tests include source examples \
-  \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
-  xargs -0 -n 50 -P 10 chmod 644
+checks
 
 #
-# Convert DOS formatted files to unix file format by stripping out
-# carriage returns (15=0x0D):
+# Process all source and header files:
 #
 
-dos_to_unix()
-{
-  f=$1
-  tr -d '\015' <"$f" >"$f.tmp"
-  diff -q "$f" "$f.tmp" >/dev/null || mv "$f.tmp" "$f"
-  rm -f "$f.tmp"
-}
-export -f dos_to_unix
-
-find tests include source examples \
-  \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
-  xargs -0 -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {}
+process "tests include source examples" ".*\.(cc|h|cu|cuh)" format_file
+process "source" ".*\.inst.in" format_inst
 
 #
-# Format .inst.in files. We need to replace \{ and \} by a sentinel because
-# clang-format happily strips away the backslash. Further, there is a minor
-# caveat: clang-format automatically renames a comment after a closing
-# bracket for a namespace to "} // namespace FooBar". Thus use "namespace"
-# as keyword:
+# Fix permissions and convert to unix line ending if necessary:
 #
 
-format_inst()
-{
-    f=$1
-    cp "$f" "$f.tmp"
-    sed -i.orig 's#\\{#{ // namespace#g' "$f.tmp"
-    sed -i.orig 's#\\}#} // namespace#g' "$f.tmp"
-    clang-format -i "$f.tmp"
-    sed -i.orig 's#{ // namespace#\\{#g' "$f.tmp"
-    sed -i.orig 's#}[ ]*// namespace.*#\\}#g' "$f.tmp"
-    if ! diff -q "$f" "$f.tmp" >/dev/null
-    then
-      cp "$f.tmp" "$f"
-    fi
-    rm "$f.tmp" "$f.tmp.orig"
-}
-export -f format_inst
+process "tests include source examples" \
+  ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-#
-# Now do the formatting. The arguments are as discussed above, plus the
-# following:
-# - '-n 1' implies that the following script is called for each file
-#  individually
-# - '-I {}' tells 'xargs' to substitute '{}' in the following by the
-#   one file name we process at a time
-# - 'bash -c' executes the command that follows. Here, this is
-#   'format_inst "$@"' where 'format_inst' is the macro exported
-#   above, and '$@' expands to the list of arguments passed on the
-#   command line, starting at $1. Because we execute a command with
-#   -c, there is no $0 for this bash invokation, and if we just had
-#   {} following the argument of -c, then the first element of that
-#   list would be ignored. To avoid this, we need a dummy argument
-#   to take the role of $0 so that {} can be expanded into $1. We
-#   simply use '_' here, but any other string would do fine as well.
-#
-find source -name '*.inst.in' -print0 |
-  xargs -0 -n 1 -P 10 -I {} bash -c 'format_inst "$@"' _ {}
+process "tests include source examples" \
+  ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" dos_to_unix
