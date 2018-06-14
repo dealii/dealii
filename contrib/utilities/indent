@@ -58,4 +58,4 @@ process "tests include source examples" \
   ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
 process "tests include source examples" \
-  ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" dos_to_unix
+  ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix
