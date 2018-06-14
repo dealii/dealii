@@ -99,7 +99,8 @@ format_inst()
   tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
 
   cp "${file}" "${tmpfile}"
-  sed -i -e 's#\\{#{ // namespace#g' -e 's#\\}#} // namespace#g' "${tmpfile}"
+  sed -i -e 's#\\{#{ // namespace#g' "${tmpfile}"
+  sed -i -e 's#\\}#} // namespace#g' "${tmpfile}"
 
   #
   # Yes, we have to call clang-format in this weird way to ensure that it
@@ -108,8 +109,8 @@ format_inst()
   #
   clang-format < "${tmpfile}" > "${tmpfile}new"
 
-  sed -i -e 's#{ // namespace#\\{#g' -e 's#}[ ]*// namespace.*#\\}#g' \
-    "${tmpfile}new"
+  sed -i -e 's#{ // namespace#\\{#g' "${tmpfile}new"
+  sed -i -e 's#}[ ]*// namespace.*#\\}#g' "${tmpfile}new"
 
   diff -q "${file}" "${tmpfile}new" >/dev/null || mv "${tmpfile}new" "${file}"
   rm -f "${tmpfile}" "${tmpfile}new"
