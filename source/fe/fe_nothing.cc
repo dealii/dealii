@@ -20,18 +20,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace internal
-{
-  namespace FE_Nothing
-  {
-    namespace
-    {
-      const char *zero_dof_message = "This element has no shape functions.";
-    }
-  } // namespace FE_Nothing
-} // namespace internal
-
-
 
 template <int dim, int spacedim>
 FE_Nothing<dim, spacedim>::FE_Nothing(const unsigned int n_components,
@@ -96,8 +84,7 @@ double
 FE_Nothing<dim, spacedim>::shape_value(const unsigned int /*i*/,
                                        const Point<dim> & /*p*/) const
 {
-  (void)internal::FE_Nothing::zero_dof_message;
-  Assert(false, ExcMessage(internal::FE_Nothing::zero_dof_message));
+  Assert(false, ExcMessage("This element has no shape functions."));
   return 0;
 }
 
