@@ -131,8 +131,9 @@ main()
     deallog << "=================================" << std::endl;
     ;
     for (unsigned int i = 0; i < num_points; i++)
-      deallog << manifold.get_intermediate_point(
-                   P1, P2, (1.0 * i) / (num_points - 1))
+      deallog << manifold.get_intermediate_point(P1,
+                                                 P2,
+                                                 (1.0 * i) / (num_points - 1))
               << std::endl;
     deallog << "=================================" << std::endl;
   }

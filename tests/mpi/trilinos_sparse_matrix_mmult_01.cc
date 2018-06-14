@@ -72,8 +72,9 @@ test()
   const unsigned int local_index[n_entries] = {1, 1};
   const double       local_value[n_entries] = {1.0, 1.0};
 
-  TrilinosWrappers::SparsityPattern sp(
-    row_partitioning, col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning,
+                                       col_partitioning,
+                                       MPI_COMM_WORLD);
   for (unsigned int i = 0; i < n_entries; ++i)
     if (row_partitioning.is_element(line[i]))
       sp.add(line[i], local_index[i]);

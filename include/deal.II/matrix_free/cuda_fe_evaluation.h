@@ -200,11 +200,11 @@ namespace CUDAWrappers
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     FEEvaluation(int                      cell_id,
                  const data_type *        data,
-                 SharedData<dim, Number> *shdata) :
-    n_cells(data->n_cells),
-    padding_length(data->padding_length),
-    constraint_mask(data->constraint_mask[cell_id]),
-    values(shdata->values)
+                 SharedData<dim, Number> *shdata)
+    : n_cells(data->n_cells)
+    , padding_length(data->padding_length)
+    , constraint_mask(data->constraint_mask[cell_id])
+    , values(shdata->values)
   {
     local_to_global = data->local_to_global + padding_length * cell_id;
     inv_jac         = data->inv_jacobian + padding_length * cell_id;

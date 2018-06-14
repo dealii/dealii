@@ -94,9 +94,9 @@ namespace
 } // namespace
 
 template <int dim, int spacedim>
-GridIn<dim, spacedim>::GridIn() :
-  tria(nullptr, typeid(*this).name()),
-  default_format(ucd)
+GridIn<dim, spacedim>::GridIn()
+  : tria(nullptr, typeid(*this).name())
+  , default_format(ucd)
 {}
 
 
@@ -173,9 +173,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
     }
 
   else
-    AssertThrow(
-      false,
-      ExcMessage("While reading VTK file, failed to find POINTS section"));
+    AssertThrow(false,
+                ExcMessage(
+                  "While reading VTK file, failed to find POINTS section"));
 
 
   //////////////////ignoring space between points and cells
@@ -289,9 +289,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
             }
         }
       else
-        AssertThrow(
-          false,
-          ExcMessage("While reading VTK file, failed to find CELLS section"));
+        AssertThrow(false,
+                    ExcMessage(
+                      "While reading VTK file, failed to find CELLS section"));
 
       /////////////////////Processing the CELL_TYPES
       /// section////////////////////////
@@ -354,11 +354,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 if (linenew.size() > textnew[0].size())
                   linenew.resize(textnew[0].size());
 
-              AssertThrow(
-                linenew.compare(textnew[i]) == 0,
-                ExcMessage(
-                  std::string("While reading VTK file, failed to find <") +
-                  textnew[i] + "> section"));
+              AssertThrow(linenew.compare(textnew[i]) == 0,
+                          ExcMessage(
+                            std::string(
+                              "While reading VTK file, failed to find <") +
+                            textnew[i] + "> section"));
             }
 
           // read material ids first for all cells, then for all
@@ -408,9 +408,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       return;
     }
   else
-    AssertThrow(
-      false,
-      ExcMessage("While reading VTK file, failed to find CELLS section"));
+    AssertThrow(false,
+                ExcMessage(
+                  "While reading VTK file, failed to find CELLS section"));
 }
 
 
@@ -572,11 +572,11 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           no_quad++;
         }
       else
-        AssertThrow(
-          false,
-          ExcMessage("Unknown element label <" +
-                     Utilities::int_to_string(type) +
-                     "> when running in dim=" + Utilities::int_to_string(dim)));
+        AssertThrow(false,
+                    ExcMessage("Unknown element label <" +
+                               Utilities::int_to_string(type) +
+                               "> when running in dim=" +
+                               Utilities::int_to_string(dim)));
     }
 
   // note that so far all materials and bcs are explicitly set to 0
@@ -769,8 +769,9 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             else
               {
                 // no such vertex index
-                AssertThrow(
-                  false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+                AssertThrow(false,
+                            ExcInvalidVertexIndex(cell,
+                                                  cells.back().vertices[i]));
 
                 cells.back().vertices[i] = numbers::invalid_unsigned_int;
               }
@@ -789,9 +790,10 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(
-            material_id < numbers::internal_face_boundary_id,
-            ExcIndexRange(material_id, 0, numbers::internal_face_boundary_id));
+          Assert(material_id < numbers::internal_face_boundary_id,
+                 ExcIndexRange(material_id,
+                               0,
+                               numbers::internal_face_boundary_id));
 
           if (apply_all_indicators_to_manifolds)
             subcelldata.boundary_lines.back().manifold_id =
@@ -812,10 +814,10 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             else
               {
                 // no such vertex index
-                AssertThrow(
-                  false,
-                  ExcInvalidVertexIndex(
-                    cell, subcelldata.boundary_lines.back().vertices[i]));
+                AssertThrow(false,
+                            ExcInvalidVertexIndex(
+                              cell,
+                              subcelldata.boundary_lines.back().vertices[i]));
                 subcelldata.boundary_lines.back().vertices[i] =
                   numbers::invalid_unsigned_int;
               };
@@ -836,9 +838,10 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(
-            material_id < numbers::internal_face_boundary_id,
-            ExcIndexRange(material_id, 0, numbers::internal_face_boundary_id));
+          Assert(material_id < numbers::internal_face_boundary_id,
+                 ExcIndexRange(material_id,
+                               0,
+                               numbers::internal_face_boundary_id));
 
           if (apply_all_indicators_to_manifolds)
             subcelldata.boundary_quads.back().manifold_id =
@@ -1516,8 +1519,9 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             {
               AssertThrow(vertex_indices.find(cells.back().vertices[i]) !=
                             vertex_indices.end(),
-                          ExcInvalidVertexIndexGmsh(
-                            cell, elm_number, cells.back().vertices[i]));
+                          ExcInvalidVertexIndexGmsh(cell,
+                                                    elm_number,
+                                                    cells.back().vertices[i]));
 
               // vertex with this index exists
               cells.back().vertices[i] =
@@ -1538,9 +1542,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(
-            material_id < numbers::internal_face_boundary_id,
-            ExcIndexRange(material_id, 0, numbers::internal_face_boundary_id));
+          Assert(material_id < numbers::internal_face_boundary_id,
+                 ExcIndexRange(material_id,
+                               0,
+                               numbers::internal_face_boundary_id));
 
           subcelldata.boundary_lines.back().boundary_id =
             static_cast<types::boundary_id>(material_id);
@@ -1557,10 +1562,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             else
               {
                 // no such vertex index
-                AssertThrow(
-                  false,
-                  ExcInvalidVertexIndex(
-                    cell, subcelldata.boundary_lines.back().vertices[i]));
+                AssertThrow(false,
+                            ExcInvalidVertexIndex(
+                              cell,
+                              subcelldata.boundary_lines.back().vertices[i]));
                 subcelldata.boundary_lines.back().vertices[i] =
                   numbers::invalid_unsigned_int;
               };
@@ -1581,9 +1586,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(
-            material_id < numbers::internal_face_boundary_id,
-            ExcIndexRange(material_id, 0, numbers::internal_face_boundary_id));
+          Assert(material_id < numbers::internal_face_boundary_id,
+                 ExcIndexRange(material_id,
+                               0,
+                               numbers::internal_face_boundary_id));
 
           subcelldata.boundary_quads.back().boundary_id =
             static_cast<types::boundary_id>(material_id);
@@ -1857,8 +1863,9 @@ GridIn<2>::read_netcdf(const std::string &filename)
               ExcIO());
 
   std::vector<int> vertex_indices(n_bquads * vertices_per_quad);
-  vertex_indices_var->get(
-    &*vertex_indices.begin(), n_bquads, vertices_per_quad);
+  vertex_indices_var->get(&*vertex_indices.begin(),
+                          n_bquads,
+                          vertices_per_quad);
 
   for (unsigned int i = 0; i < vertex_indices.size(); ++i)
     AssertThrow(vertex_indices[i] >= 0, ExcIO());
@@ -2088,14 +2095,15 @@ GridIn<3>::read_netcdf(const std::string &filename)
   AssertThrow(bvertex_indices_var->is_valid(), ExcIO());
   AssertThrow(bvertex_indices_var->num_dims() == 2, ExcIO());
   const unsigned int n_bquads = bvertex_indices_var->get_dim(0)->size();
-  AssertThrow(
-    static_cast<unsigned int>(bvertex_indices_var->get_dim(1)->size()) ==
-      GeometryInfo<dim>::vertices_per_face,
-    ExcIO());
+  AssertThrow(static_cast<unsigned int>(
+                bvertex_indices_var->get_dim(1)->size()) ==
+                GeometryInfo<dim>::vertices_per_face,
+              ExcIO());
 
   std::vector<int> bvertex_indices(n_bquads * vertices_per_quad);
-  bvertex_indices_var->get(
-    &*bvertex_indices.begin(), n_bquads, vertices_per_quad);
+  bvertex_indices_var->get(&*bvertex_indices.begin(),
+                           n_bquads,
+                           vertices_per_quad);
 
   // next we read
   // int boundarymarker_of_surfaces(
@@ -2273,9 +2281,9 @@ GridIn<dim, spacedim>::parse_tecplot_header(
       else if (Utilities::match_at_string_start(entries[i], "ZONETYPE="))
         // unsupported ZONETYPE
         {
-          AssertThrow(
-            false,
-            ExcMessage("The tecplot file contains an unsupported ZONETYPE."));
+          AssertThrow(false,
+                      ExcMessage(
+                        "The tecplot file contains an unsupported ZONETYPE."));
         }
       else if (Utilities::match_at_string_start(entries[i],
                                                 "DATAPACKING=POINT"))
@@ -2578,8 +2586,10 @@ GridIn<2>::read_tecplot(std::istream &in)
       // or o-type grids around a body
       // (airfoil). this automatically deletes
       // unused vertices as well.
-      GridTools::delete_duplicated_vertices(
-        vertices, cells, subcelldata, boundary_vertices);
+      GridTools::delete_duplicated_vertices(vertices,
+                                            cells,
+                                            subcelldata,
+                                            boundary_vertices);
     }
   else
     {
@@ -2645,11 +2655,12 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   Assimp::Importer importer;
 
   // And have it read the given file with some  postprocessing
-  const aiScene *scene = importer.ReadFile(
-    filename.c_str(),
-    aiProcess_RemoveComponent | aiProcess_JoinIdenticalVertices |
-      aiProcess_ImproveCacheLocality | aiProcess_SortByPType |
-      aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
+  const aiScene *scene =
+    importer.ReadFile(filename.c_str(),
+                      aiProcess_RemoveComponent |
+                        aiProcess_JoinIdenticalVertices |
+                        aiProcess_ImproveCacheLocality | aiProcess_SortByPType |
+                        aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
 
   // If the import failed, report it
   AssertThrow(scene, ExcMessage(importer.GetErrorString()))
@@ -2800,11 +2811,11 @@ GridIn<dim, spacedim>::skip_empty_lines(std::istream &in)
       // consists only of spaces, and
       // if not put the whole thing
       // back and return
-      if (std::find_if(
-            line.begin(),
-            line.end(),
-            std::bind(std::not_equal_to<char>(), std::placeholders::_1, ' ')) !=
-          line.end())
+      if (std::find_if(line.begin(),
+                       line.end(),
+                       std::bind(std::not_equal_to<char>(),
+                                 std::placeholders::_1,
+                                 ' ')) != line.end())
         {
           in.putback('\n');
           for (int i = line.length() - 1; i >= 0; --i)
@@ -3186,9 +3197,9 @@ GridIn<dim, spacedim>::get_format_names()
 namespace
 {
   template <int dim>
-  Abaqus_to_UCD<dim>::Abaqus_to_UCD() :
-    tolerance(5e-16) // Used to offset Cubit tolerance error when outputting
-                     // value close to zero
+  Abaqus_to_UCD<dim>::Abaqus_to_UCD()
+    : tolerance(5e-16) // Used to offset Cubit tolerance error when outputting
+                       // value close to zero
   {
     AssertThrow(dim == 2 || dim == 3, ExcNotImplemented());
   }
@@ -3358,8 +3369,10 @@ namespace
                   goto cont;
 
                 // Change all characters to upper case
-                std::transform(
-                  line.begin(), line.end(), line.begin(), ::toupper);
+                std::transform(line.begin(),
+                               line.end(),
+                               line.begin(),
+                               ::toupper);
 
                 // Surface can be created from ELSET, or directly from cells
                 // If elsets_list contains a key with specific name - refers to
@@ -3514,8 +3527,9 @@ namespace
               line.find("MATERIAL=") + material_key.size();
             const std::size_t material_id_start = line.find('-', last_equal);
             int               material_id       = 0;
-            from_string(
-              material_id, line.substr(material_id_start + 1), std::dec);
+            from_string(material_id,
+                        line.substr(material_id_start + 1),
+                        std::dec);
 
             // Assign material id to cells
             const std::vector<int> &elset_cells = elsets_list[elset_name];

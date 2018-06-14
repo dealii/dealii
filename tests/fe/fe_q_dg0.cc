@@ -125,7 +125,8 @@ namespace Step22
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution() : Function<dim>(dim + 1)
+    ExactSolution()
+      : Function<dim>(dim + 1)
     {}
 
     /*virtual*/ double
@@ -259,7 +260,8 @@ namespace Step22
   class JumpFunction : public Function<dim>
   {
   public:
-    JumpFunction() : Function<dim>(1)
+    JumpFunction()
+      : Function<dim>(1)
     {}
 
     double
@@ -287,7 +289,8 @@ namespace Step22
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     /*virtual*/ double
@@ -329,9 +332,9 @@ namespace Step22
   template <class Matrix, class Preconditioner>
   InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
     const Matrix &        m,
-    const Preconditioner &preconditioner) :
-    matrix(&m),
-    preconditioner(&preconditioner)
+    const Preconditioner &preconditioner)
+    : matrix(&m)
+    , preconditioner(&preconditioner)
   {}
 
   template <class Matrix, class Preconditioner>
@@ -377,11 +380,11 @@ namespace Step22
   template <class Preconditioner>
   SchurComplement<Preconditioner>::SchurComplement(
     const BlockSparseMatrix<double> &                          system_matrix,
-    const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse) :
-    system_matrix(&system_matrix),
-    A_inverse(&A_inverse),
-    tmp1(system_matrix.block(0, 0).m()),
-    tmp2(system_matrix.block(0, 0).m())
+    const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse)
+    : system_matrix(&system_matrix)
+    , A_inverse(&A_inverse)
+    , tmp1(system_matrix.block(0, 0).m())
+    , tmp2(system_matrix.block(0, 0).m())
   {}
 
 
@@ -397,11 +400,11 @@ namespace Step22
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(const unsigned int degree,
-                                    FESystem<dim> &    fe_) :
-    degree(degree),
-    triangulation(Triangulation<dim>::maximum_smoothing),
-    fe(fe_),
-    dof_handler(triangulation)
+                                    FESystem<dim> &    fe_)
+    : degree(degree)
+    , triangulation(Triangulation<dim>::maximum_smoothing)
+    , fe(fe_)
+    , dof_handler(triangulation)
   {}
 
   template <int dim>
@@ -467,8 +470,9 @@ namespace Step22
     constraints.close();
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     deallog << "   Number of active cells: " << triangulation.n_active_cells()

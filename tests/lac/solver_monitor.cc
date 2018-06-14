@@ -95,8 +95,9 @@ main()
   cg.connect(&monitor_norm);
   cg.connect(&monitor_mean);
 
-  SolverGMRES<> gmres(
-    control, mem, SolverGMRES<>::AdditionalData(/*max_vecs=*/8));
+  SolverGMRES<> gmres(control,
+                      mem,
+                      SolverGMRES<>::AdditionalData(/*max_vecs=*/8));
   gmres.connect(&monitor_norm);
   gmres.connect(&monitor_mean);
 

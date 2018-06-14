@@ -86,8 +86,9 @@ test()
 
       // then do the same with the "correct", local fe_index
       Vector<double> local2(cell->get_fe().dofs_per_cell);
-      cell->get_interpolated_dof_values(
-        solution, local2, cell->active_fe_index());
+      cell->get_interpolated_dof_values(solution,
+                                        local2,
+                                        cell->active_fe_index());
 
       // and do it a third time with the fe_index for a Q1 element
       Vector<double> local3(fe[0].dofs_per_cell);

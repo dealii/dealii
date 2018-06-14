@@ -231,14 +231,14 @@ namespace SUNDIALS
 
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
-                             const MPI_Comm        mpi_comm) :
-    data(data),
-    arkode_mem(nullptr),
-    yy(nullptr),
-    abs_tolls(nullptr),
-    communicator(is_serial_vector<VectorType>::value ?
-                   MPI_COMM_SELF :
-                   Utilities::MPI::duplicate_communicator(mpi_comm))
+                             const MPI_Comm        mpi_comm)
+    : data(data)
+    , arkode_mem(nullptr)
+    , yy(nullptr)
+    , abs_tolls(nullptr)
+    , communicator(is_serial_vector<VectorType>::value ?
+                     MPI_COMM_SELF :
+                     Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }
@@ -415,8 +415,9 @@ namespace SUNDIALS
       }
     else
       {
-        status = ARKodeSStolerances(
-          arkode_mem, data.relative_tolerance, data.absolute_tolerance);
+        status = ARKodeSStolerances(arkode_mem,
+                                    data.relative_tolerance,
+                                    data.absolute_tolerance);
         AssertARKode(status);
       }
 

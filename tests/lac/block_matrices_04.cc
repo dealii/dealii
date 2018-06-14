@@ -89,10 +89,10 @@ private:
 
 template <typename VectorType, class Matrix, class Sparsity>
 LaplaceProblem<VectorType, Matrix, Sparsity>::LaplaceProblem(
-  const unsigned int n_blocks) :
-  n_blocks(n_blocks),
-  fe(1),
-  dof_handler(triangulation)
+  const unsigned int n_blocks)
+  : n_blocks(n_blocks)
+  , fe(1)
+  , dof_handler(triangulation)
 {
   sparsity_pattern.reinit(n_blocks, n_blocks);
 }
@@ -101,20 +101,20 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::LaplaceProblem(
 
 template <>
 LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::
-  LaplaceProblem(const unsigned int n_blocks) :
-  n_blocks(n_blocks),
-  fe(1),
-  dof_handler(triangulation)
+  LaplaceProblem(const unsigned int n_blocks)
+  : n_blocks(n_blocks)
+  , fe(1)
+  , dof_handler(triangulation)
 {}
 
 
 
 template <>
 LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::
-  LaplaceProblem(const unsigned int n_blocks) :
-  n_blocks(n_blocks),
-  fe(1),
-  dof_handler(triangulation)
+  LaplaceProblem(const unsigned int n_blocks)
+  : n_blocks(n_blocks)
+  , fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -286,10 +286,10 @@ void
 LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
 {
   QGauss<2>   quadrature_formula(2);
-  FEValues<2> fe_values(
-    fe,
-    quadrature_formula,
-    UpdateFlags(update_values | update_gradients | update_JxW_values));
+  FEValues<2> fe_values(fe,
+                        quadrature_formula,
+                        UpdateFlags(update_values | update_gradients |
+                                    update_JxW_values));
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -324,8 +324,9 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i],
+                            local_dof_indices[j],
+                            cell_matrix(i, j));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
@@ -339,8 +340,10 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
     0,
     Functions::ZeroFunction<2, typename VectorType::value_type>(),
     boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

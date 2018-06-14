@@ -318,13 +318,12 @@ namespace mg
 /*----------------------------------------------------------------------*/
 
 template <typename MatrixType, typename number>
-MGMatrixSelect<MatrixType, number>::MGMatrixSelect(
-  const unsigned int         row,
-  const unsigned int         col,
-  MGLevelObject<MatrixType> *p) :
-  matrix(p, typeid(*this).name()),
-  row(row),
-  col(col)
+MGMatrixSelect<MatrixType, number>::MGMatrixSelect(const unsigned int row,
+                                                   const unsigned int col,
+                                                   MGLevelObject<MatrixType> *p)
+  : matrix(p, typeid(*this).name())
+  , row(row)
+  , col(col)
 {}
 
 

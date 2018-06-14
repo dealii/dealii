@@ -28,8 +28,8 @@
 class FullMatrixModified : public FullMatrix<double>
 {
 public:
-  FullMatrixModified(unsigned int size1, unsigned int size2) :
-    FullMatrix<double>(size1, size2)
+  FullMatrixModified(unsigned int size1, unsigned int size2)
+    : FullMatrix<double>(size1, size2)
   {}
 
   double

@@ -765,8 +765,7 @@ inline DEAL_II_CUDA_HOST_DEV
 Tensor<0, dim, Number>::Tensor()
   // Some auto-differentiable numbers need explicit
   // zero initialization.
-  :
-  value(internal::NumberType<Number>::value(0.0))
+  : value(internal::NumberType<Number>::value(0.0))
 {}
 
 
@@ -1772,12 +1771,12 @@ inline DEAL_II_ALWAYS_INLINE
   contract(const Tensor<rank_1, dim, Number> &     src1,
            const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(
-    0 <= index_1 && index_1 < rank_1,
-    ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(
-    0 <= index_2 && index_2 < rank_2,
-    ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
+  Assert(0 <= index_1 && index_1 < rank_1,
+         ExcMessage(
+           "The specified index_1 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_2 && index_2 < rank_2,
+         ExcMessage(
+           "The specified index_2 must lie within the range [0,rank_2)"));
 
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
@@ -1846,20 +1845,20 @@ inline
   double_contract(const Tensor<rank_1, dim, Number> &     src1,
                   const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(
-    0 <= index_1 && index_1 < rank_1,
-    ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(
-    0 <= index_3 && index_3 < rank_1,
-    ExcMessage("The specified index_3 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_1 && index_1 < rank_1,
+         ExcMessage(
+           "The specified index_1 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_3 && index_3 < rank_1,
+         ExcMessage(
+           "The specified index_3 must lie within the range [0,rank_1)"));
   Assert(index_1 != index_3,
          ExcMessage("index_1 and index_3 must not be the same"));
-  Assert(
-    0 <= index_2 && index_2 < rank_2,
-    ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
-  Assert(
-    0 <= index_4 && index_4 < rank_2,
-    ExcMessage("The specified index_4 must lie within the range [0,rank_2)"));
+  Assert(0 <= index_2 && index_2 < rank_2,
+         ExcMessage(
+           "The specified index_2 must lie within the range [0,rank_2)"));
+  Assert(0 <= index_4 && index_4 < rank_2,
+         ExcMessage(
+           "The specified index_4 must lie within the range [0,rank_2)"));
   Assert(index_2 != index_4,
          ExcMessage("index_2 and index_4 must not be the same"));
 
@@ -1965,8 +1964,9 @@ contract3(const TensorT1<rank_1, dim, T1> &         left,
 {
   typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
     return_type;
-  return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(
-    left, middle, right);
+  return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(left,
+                                                                      middle,
+                                                                      right);
 }
 
 

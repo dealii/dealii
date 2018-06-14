@@ -103,18 +103,18 @@ namespace Step40
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    mpi_communicator(MPI_COMM_WORLD),
-    triangulation(mpi_communicator,
-                  typename Triangulation<dim>::MeshSmoothing(
-                    Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
-    dof_handler(triangulation),
-    fe(2),
-    pcout(Utilities::MPI::this_mpi_process(mpi_communicator) == 0 ?
-            deallog.get_file_stream() :
-            std::cout,
-          (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+  LaplaceProblem<dim>::LaplaceProblem()
+    : mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator,
+                    typename Triangulation<dim>::MeshSmoothing(
+                      Triangulation<dim>::smoothing_on_refinement |
+                      Triangulation<dim>::smoothing_on_coarsening))
+    , dof_handler(triangulation)
+    , fe(2)
+    , pcout(Utilities::MPI::this_mpi_process(mpi_communicator) == 0 ?
+              deallog.get_file_stream() :
+              std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
   {}
 
 
@@ -136,20 +136,24 @@ namespace Step40
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-    locally_relevant_solution.reinit(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    locally_relevant_solution.reinit(locally_owned_dofs,
+                                     locally_relevant_dofs,
+                                     mpi_communicator);
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
     system_rhs = PetscScalar();
 
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
-    DynamicSparsityPattern csp(
-      dof_handler.n_dofs(), dof_handler.n_dofs(), locally_relevant_dofs);
+    DynamicSparsityPattern csp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs(),
+                               locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     SparsityTools::distribute_sparsity_pattern(
       csp,

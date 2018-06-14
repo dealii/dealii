@@ -317,22 +317,22 @@ namespace SUNDIALS
         const double &relative_tolerance                = 1e-5,
         const bool &  ignore_algebraic_terms_for_errors = true,
         // Initial conditions parameters
-        const InitialConditionCorrection &ic_type            = use_y_diff,
-        const InitialConditionCorrection &reset_type         = use_y_diff,
-        const unsigned int &maximum_non_linear_iterations_ic = 5) :
-        initial_time(initial_time),
-        final_time(final_time),
-        initial_step_size(initial_step_size),
-        minimum_step_size(minimum_step_size),
-        absolute_tolerance(absolute_tolerance),
-        relative_tolerance(relative_tolerance),
-        maximum_order(maximum_order),
-        output_period(output_period),
-        ignore_algebraic_terms_for_errors(ignore_algebraic_terms_for_errors),
-        ic_type(ic_type),
-        reset_type(reset_type),
-        maximum_non_linear_iterations_ic(maximum_non_linear_iterations_ic),
-        maximum_non_linear_iterations(maximum_non_linear_iterations)
+        const InitialConditionCorrection &ic_type    = use_y_diff,
+        const InitialConditionCorrection &reset_type = use_y_diff,
+        const unsigned int &              maximum_non_linear_iterations_ic = 5)
+        : initial_time(initial_time)
+        , final_time(final_time)
+        , initial_step_size(initial_step_size)
+        , minimum_step_size(minimum_step_size)
+        , absolute_tolerance(absolute_tolerance)
+        , relative_tolerance(relative_tolerance)
+        , maximum_order(maximum_order)
+        , output_period(output_period)
+        , ignore_algebraic_terms_for_errors(ignore_algebraic_terms_for_errors)
+        , ic_type(ic_type)
+        , reset_type(reset_type)
+        , maximum_non_linear_iterations_ic(maximum_non_linear_iterations_ic)
+        , maximum_non_linear_iterations(maximum_non_linear_iterations)
       {}
 
       /**

@@ -43,21 +43,22 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix(const size_type n) : Table<2, number>(n, n)
+FullMatrix<number>::FullMatrix(const size_type n)
+  : Table<2, number>(n, n)
 {}
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix(const size_type m, const size_type n) :
-  Table<2, number>(m, n)
+FullMatrix<number>::FullMatrix(const size_type m, const size_type n)
+  : Table<2, number>(m, n)
 {}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix(const size_type m,
                                const size_type n,
-                               const number *  entries) :
-  Table<2, number>(m, n)
+                               const number *  entries)
+  : Table<2, number>(m, n)
 {
   this->fill(entries);
 }
@@ -65,8 +66,8 @@ FullMatrix<number>::FullMatrix(const size_type m,
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix(const IdentityMatrix &id) :
-  Table<2, number>(id.m(), id.n())
+FullMatrix<number>::FullMatrix(const IdentityMatrix &id)
+  : Table<2, number>(id.m(), id.n())
 {
   for (size_type i = 0; i < id.m(); ++i)
     (*this)(i, i) = 1;

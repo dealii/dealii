@@ -97,8 +97,10 @@ public:
   {
     int dummy;
     result.zero_out_ghosts();
-    data.cell_loop(
-      &LaplaceOperator::local_diagonal_by_cell, this, result, dummy);
+    data.cell_loop(&LaplaceOperator::local_diagonal_by_cell,
+                   this,
+                   result,
+                   dummy);
   }
 
   void

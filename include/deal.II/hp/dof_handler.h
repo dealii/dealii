@@ -1180,13 +1180,13 @@ namespace hp
       ExcMessage(
         "The object being loaded into does not match the triangulation "
         "that has been stored previously."));
-    AssertThrow(
-      policy_name == dealii::internal::policy_to_string(*policy),
-      ExcMessage("The policy currently associated with this DoFHandler (" +
-                 dealii::internal::policy_to_string(*policy) +
-                 ") does not match the one that was associated with the "
-                 "DoFHandler previously stored (" +
-                 policy_name + ")."));
+    AssertThrow(policy_name == dealii::internal::policy_to_string(*policy),
+                ExcMessage(
+                  "The policy currently associated with this DoFHandler (" +
+                  dealii::internal::policy_to_string(*policy) +
+                  ") does not match the one that was associated with the "
+                  "DoFHandler previously stored (" +
+                  policy_name + ")."));
   }
 
   template <int dim, int spacedim>

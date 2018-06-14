@@ -763,7 +763,8 @@ protected:
 namespace internal
 {
   template <typename T>
-  TableEntry::TableEntry(const T &t) : value(t)
+  TableEntry::TableEntry(const T &t)
+    : value(t)
   {}
 
 
@@ -908,17 +909,19 @@ TableHandler::add_value(const std::string &key, const T value)
       for (std::map<std::string, Column>::iterator p = columns.begin();
            p != columns.end();
            ++p)
-        max_col_length = std::max(
-          max_col_length, static_cast<unsigned int>(p->second.entries.size()));
+        max_col_length =
+          std::max(max_col_length,
+                   static_cast<unsigned int>(p->second.entries.size()));
 
       while (columns[key].entries.size() + 1 < max_col_length)
         {
           columns[key].entries.push_back(internal::TableEntry(T()));
           internal::TableEntry &entry = columns[key].entries.back();
           entry.cache_string(columns[key].scientific, columns[key].precision);
-          columns[key].max_length = std::max(
-            columns[key].max_length,
-            static_cast<unsigned int>(entry.get_cached_string().length()));
+          columns[key].max_length =
+            std::max(columns[key].max_length,
+                     static_cast<unsigned int>(
+                       entry.get_cached_string().length()));
         }
     }
 

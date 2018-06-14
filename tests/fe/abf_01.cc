@@ -510,8 +510,9 @@ project(const Mapping<dim> &    mapping,
 
   // set up mass matrix and right hand side
   vec.reinit(dof.n_dofs());
-  SparsityPattern sparsity(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern sparsity(dof.n_dofs(),
+                           dof.n_dofs(),
+                           dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, sparsity);
   constraints.condense(sparsity);
 
@@ -535,8 +536,10 @@ project(const Mapping<dim> &    mapping,
   PreconditionSSOR<> prec;
   prec.initialize(mass_matrix, 1.2);
   // solve
-  check_solver_within_range(
-    cg.solve(mass_matrix, vec, tmp, prec), control.last_step(), 16, 17);
+  check_solver_within_range(cg.solve(mass_matrix, vec, tmp, prec),
+                            control.last_step(),
+                            16,
+                            17);
 
   // distribute solution
   constraints.distribute(vec);

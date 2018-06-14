@@ -106,18 +106,14 @@ namespace Step51
 
   template <>
   const Point<1>
-    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] = {
-      Point<1>(-1.0 / 3.0),
-      Point<1>(0.0),
-      Point<1>(+1.0 / 3.0)};
+    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] =
+      {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
 
 
   template <>
   const Point<2>
-    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] = {
-      Point<2>(-0.5, +0.5),
-      Point<2>(-0.5, -0.5),
-      Point<2>(+0.5, -0.5)};
+    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] =
+      {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
 
   template <>
   const Point<3>
@@ -134,7 +130,8 @@ namespace Step51
   class Solution : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    Solution() : Function<dim>()
+    Solution()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -194,7 +191,8 @@ namespace Step51
   class SolutionAndGradient : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    SolutionAndGradient() : Function<dim>(dim)
+    SolutionAndGradient()
+      : Function<dim>(dim)
     {}
 
     virtual void vector_value(const Point<dim> &p,
@@ -222,7 +220,8 @@ namespace Step51
   class ConvectionVelocity : public TensorFunction<1, dim>
   {
   public:
-    ConvectionVelocity() : TensorFunction<1, dim>()
+    ConvectionVelocity()
+      : TensorFunction<1, dim>()
     {}
 
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
@@ -265,7 +264,8 @@ namespace Step51
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -413,15 +413,14 @@ namespace Step51
   // elements for the local DG part, including the gradient/flux part and the
   // scalar part.
   template <int dim>
-  HDG<dim>::HDG(const unsigned int   degree,
-                const RefinementMode refinement_mode) :
-    fe_local(FE_DGQ<dim>(degree), dim, FE_DGQ<dim>(degree), 1),
-    dof_handler_local(triangulation),
-    fe(degree),
-    dof_handler(triangulation),
-    fe_u_post(degree + 1),
-    dof_handler_u_post(triangulation),
-    refinement_mode(refinement_mode)
+  HDG<dim>::HDG(const unsigned int degree, const RefinementMode refinement_mode)
+    : fe_local(FE_DGQ<dim>(degree), dim, FE_DGQ<dim>(degree), 1)
+    , dof_handler_local(triangulation)
+    , fe(degree)
+    , dof_handler(triangulation)
+    , fe_u_post(degree + 1)
+    , dof_handler_u_post(triangulation)
+    , refinement_mode(refinement_mode)
   {}
 
 
@@ -497,11 +496,11 @@ namespace Step51
 
     bool trace_reconstruct;
 
-    PerTaskData(const unsigned int n_dofs, const bool trace_reconstruct) :
-      cell_matrix(n_dofs, n_dofs),
-      cell_vector(n_dofs),
-      dof_indices(n_dofs),
-      trace_reconstruct(trace_reconstruct)
+    PerTaskData(const unsigned int n_dofs, const bool trace_reconstruct)
+      : cell_matrix(n_dofs, n_dofs)
+      , cell_vector(n_dofs)
+      , dof_indices(n_dofs)
+      , trace_reconstruct(trace_reconstruct)
     {}
   };
 
@@ -554,24 +553,26 @@ namespace Step51
                 const QGauss<dim - 1> &   face_quadrature_formula,
                 const UpdateFlags         local_flags,
                 const UpdateFlags         local_face_flags,
-                const UpdateFlags         flags) :
-      fe_values_local(fe_local, quadrature_formula, local_flags),
-      fe_face_values_local(fe_local, face_quadrature_formula, local_face_flags),
-      fe_face_values(fe, face_quadrature_formula, flags),
-      ll_matrix(fe_local.dofs_per_cell, fe_local.dofs_per_cell),
-      lf_matrix(fe_local.dofs_per_cell, fe.dofs_per_cell),
-      fl_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell),
-      tmp_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell),
-      l_rhs(fe_local.dofs_per_cell),
-      tmp_rhs(fe_local.dofs_per_cell),
-      q_phi(fe_local.dofs_per_cell),
-      q_phi_div(fe_local.dofs_per_cell),
-      u_phi(fe_local.dofs_per_cell),
-      u_phi_grad(fe_local.dofs_per_cell),
-      tr_phi(fe.dofs_per_cell),
-      trace_values(face_quadrature_formula.size()),
-      fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell),
-      fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
+                const UpdateFlags         flags)
+      : fe_values_local(fe_local, quadrature_formula, local_flags)
+      , fe_face_values_local(fe_local,
+                             face_quadrature_formula,
+                             local_face_flags)
+      , fe_face_values(fe, face_quadrature_formula, flags)
+      , ll_matrix(fe_local.dofs_per_cell, fe_local.dofs_per_cell)
+      , lf_matrix(fe_local.dofs_per_cell, fe.dofs_per_cell)
+      , fl_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell)
+      , tmp_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell)
+      , l_rhs(fe_local.dofs_per_cell)
+      , tmp_rhs(fe_local.dofs_per_cell)
+      , q_phi(fe_local.dofs_per_cell)
+      , q_phi_div(fe_local.dofs_per_cell)
+      , u_phi(fe_local.dofs_per_cell)
+      , u_phi_grad(fe_local.dofs_per_cell)
+      , tr_phi(fe.dofs_per_cell)
+      , trace_values(face_quadrature_formula.size())
+      , fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell)
+      , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
     {
       for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
            ++face)
@@ -590,30 +591,30 @@ namespace Step51
           }
     }
 
-    ScratchData(const ScratchData &sd) :
-      fe_values_local(sd.fe_values_local.get_fe(),
-                      sd.fe_values_local.get_quadrature(),
-                      sd.fe_values_local.get_update_flags()),
-      fe_face_values_local(sd.fe_face_values_local.get_fe(),
-                           sd.fe_face_values_local.get_quadrature(),
-                           sd.fe_face_values_local.get_update_flags()),
-      fe_face_values(sd.fe_face_values.get_fe(),
-                     sd.fe_face_values.get_quadrature(),
-                     sd.fe_face_values.get_update_flags()),
-      ll_matrix(sd.ll_matrix),
-      lf_matrix(sd.lf_matrix),
-      fl_matrix(sd.fl_matrix),
-      tmp_matrix(sd.tmp_matrix),
-      l_rhs(sd.l_rhs),
-      tmp_rhs(sd.tmp_rhs),
-      q_phi(sd.q_phi),
-      q_phi_div(sd.q_phi_div),
-      u_phi(sd.u_phi),
-      u_phi_grad(sd.u_phi_grad),
-      tr_phi(sd.tr_phi),
-      trace_values(sd.trace_values),
-      fe_local_support_on_face(sd.fe_local_support_on_face),
-      fe_support_on_face(sd.fe_support_on_face)
+    ScratchData(const ScratchData &sd)
+      : fe_values_local(sd.fe_values_local.get_fe(),
+                        sd.fe_values_local.get_quadrature(),
+                        sd.fe_values_local.get_update_flags())
+      , fe_face_values_local(sd.fe_face_values_local.get_fe(),
+                             sd.fe_face_values_local.get_quadrature(),
+                             sd.fe_face_values_local.get_update_flags())
+      , fe_face_values(sd.fe_face_values.get_fe(),
+                       sd.fe_face_values.get_quadrature(),
+                       sd.fe_face_values.get_update_flags())
+      , ll_matrix(sd.ll_matrix)
+      , lf_matrix(sd.lf_matrix)
+      , fl_matrix(sd.fl_matrix)
+      , tmp_matrix(sd.tmp_matrix)
+      , l_rhs(sd.l_rhs)
+      , tmp_rhs(sd.tmp_rhs)
+      , q_phi(sd.q_phi)
+      , q_phi_div(sd.q_phi_div)
+      , u_phi(sd.u_phi)
+      , u_phi_grad(sd.u_phi_grad)
+      , tr_phi(sd.tr_phi)
+      , trace_values(sd.trace_values)
+      , fe_local_support_on_face(sd.fe_local_support_on_face)
+      , fe_support_on_face(sd.fe_support_on_face)
     {}
   };
 
@@ -640,28 +641,28 @@ namespace Step51
                            const FiniteElement<dim> &fe_local,
                            const QGauss<dim> &       quadrature_formula,
                            const UpdateFlags         local_flags,
-                           const UpdateFlags         flags) :
-      fe_values_local(fe_local, quadrature_formula, local_flags),
-      fe_values(fe, quadrature_formula, flags),
-      u_values(quadrature_formula.size()),
-      u_gradients(quadrature_formula.size()),
-      cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell),
-      cell_rhs(fe.dofs_per_cell),
-      cell_sol(fe.dofs_per_cell)
+                           const UpdateFlags         flags)
+      : fe_values_local(fe_local, quadrature_formula, local_flags)
+      , fe_values(fe, quadrature_formula, flags)
+      , u_values(quadrature_formula.size())
+      , u_gradients(quadrature_formula.size())
+      , cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell)
+      , cell_rhs(fe.dofs_per_cell)
+      , cell_sol(fe.dofs_per_cell)
     {}
 
-    PostProcessScratchData(const PostProcessScratchData &sd) :
-      fe_values_local(sd.fe_values_local.get_fe(),
-                      sd.fe_values_local.get_quadrature(),
-                      sd.fe_values_local.get_update_flags()),
-      fe_values(sd.fe_values.get_fe(),
-                sd.fe_values.get_quadrature(),
-                sd.fe_values.get_update_flags()),
-      u_values(sd.u_values),
-      u_gradients(sd.u_gradients),
-      cell_matrix(sd.cell_matrix),
-      cell_rhs(sd.cell_rhs),
-      cell_sol(sd.cell_sol)
+    PostProcessScratchData(const PostProcessScratchData &sd)
+      : fe_values_local(sd.fe_values_local.get_fe(),
+                        sd.fe_values_local.get_quadrature(),
+                        sd.fe_values_local.get_update_flags())
+      , fe_values(sd.fe_values.get_fe(),
+                  sd.fe_values.get_quadrature(),
+                  sd.fe_values.get_update_flags())
+      , u_values(sd.u_values)
+      , u_gradients(sd.u_gradients)
+      , cell_matrix(sd.cell_matrix)
+      , cell_rhs(sd.cell_rhs)
+      , cell_sol(sd.cell_sol)
     {}
   };
 
@@ -719,8 +720,10 @@ namespace Step51
     PerTaskData &                                         task_data)
   {
     // Construct iterator for dof_handler_local for FEValues reinit function.
-    typename DoFHandler<dim>::active_cell_iterator loc_cell(
-      &triangulation, cell->level(), cell->index(), &dof_handler_local);
+    typename DoFHandler<dim>::active_cell_iterator loc_cell(&triangulation,
+                                                            cell->level(),
+                                                            cell->index(),
+                                                            &dof_handler_local);
 
     const unsigned int n_q_points =
       scratch.fe_values_local.get_quadrature().size();
@@ -956,8 +959,9 @@ namespace Step51
       {
         scratch.fl_matrix.mmult(scratch.tmp_matrix, scratch.ll_matrix);
         scratch.tmp_matrix.vmult_add(task_data.cell_vector, scratch.l_rhs);
-        scratch.tmp_matrix.mmult(
-          task_data.cell_matrix, scratch.lf_matrix, true);
+        scratch.tmp_matrix.mmult(task_data.cell_matrix,
+                                 scratch.lf_matrix,
+                                 true);
         cell->get_dof_indices(task_data.dof_indices);
       }
     // For (2), we are simply solving (ll_matrix).(solution_local) = (l_rhs).
@@ -1073,8 +1077,10 @@ namespace Step51
                                       QGauss<dim>(fe.degree + 2),
                                       VectorTools::L2_norm,
                                       &value_select);
-    const double L2_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::L2_norm);
+    const double L2_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     ComponentSelectFunction<dim> gradient_select(
       std::pair<unsigned int, unsigned int>(0, dim), dim + 1);
@@ -1085,8 +1091,10 @@ namespace Step51
                                       QGauss<dim>(fe.degree + 2),
                                       VectorTools::L2_norm,
                                       &gradient_select);
-    const double grad_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::L2_norm);
+    const double grad_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     VectorTools::integrate_difference(dof_handler_u_post,
                                       solution_u_post,
@@ -1094,8 +1102,10 @@ namespace Step51
                                       difference_per_cell,
                                       QGauss<dim>(fe.degree + 3),
                                       VectorTools::L2_norm);
-    const double post_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::L2_norm);
+    const double post_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     convergence_table.add_value("cells", triangulation.n_active_cells());
     convergence_table.add_value("dofs", dof_handler.n_dofs());
@@ -1131,8 +1141,10 @@ namespace Step51
     PostProcessScratchData &                              scratch,
     unsigned int &)
   {
-    typename DoFHandler<dim>::active_cell_iterator loc_cell(
-      &triangulation, cell->level(), cell->index(), &dof_handler_local);
+    typename DoFHandler<dim>::active_cell_iterator loc_cell(&triangulation,
+                                                            cell->level(),
+                                                            cell->index(),
+                                                            &dof_handler_local);
 
     scratch.fe_values_local.reinit(loc_cell);
     scratch.fe_values.reinit(cell);
@@ -1236,8 +1248,10 @@ namespace Step51
         dim + 1, DataComponentInterpretation::component_is_part_of_vector);
     component_interpretation[dim] =
       DataComponentInterpretation::component_is_scalar;
-    data_out.add_data_vector(
-      dof_handler_local, solution_local, names, component_interpretation);
+    data_out.add_data_vector(dof_handler_local,
+                             solution_local,
+                             names,
+                             component_interpretation);
 
     // The second data item we add is the post-processed solution.
     // In this case, it is a single scalar variable belonging to
@@ -1245,8 +1259,10 @@ namespace Step51
     std::vector<std::string> post_name(1, "u_post");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       post_comp_type(1, DataComponentInterpretation::component_is_scalar);
-    data_out.add_data_vector(
-      dof_handler_u_post, solution_u_post, post_name, post_comp_type);
+    data_out.add_data_vector(dof_handler_u_post,
+                             solution_u_post,
+                             post_name,
+                             post_comp_type);
 
     data_out.build_patches(fe.degree);
     data_out.write_vtk(output);
@@ -1265,8 +1281,10 @@ namespace Step51
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       face_component_type(1, DataComponentInterpretation::component_is_scalar);
 
-    data_out_face.add_data_vector(
-      dof_handler, solution, face_name, face_component_type);
+    data_out_face.add_data_vector(dof_handler,
+                                  solution,
+                                  face_name,
+                                  face_component_type);
 
     data_out_face.build_patches(fe.degree);
     data_out_face.write_vtk(face_output);
@@ -1298,8 +1316,10 @@ namespace Step51
           case global_refinement:
             {
               triangulation.clear();
-              GridGenerator::subdivided_hyper_cube(
-                triangulation, 2 + (cycle % 2), -1, 1);
+              GridGenerator::subdivided_hyper_cube(triangulation,
+                                                   2 + (cycle % 2),
+                                                   -1,
+                                                   1);
               triangulation.refine_global(3 - dim + cycle / 2);
               break;
             }
@@ -1311,13 +1331,13 @@ namespace Step51
 
               FEValuesExtractors::Scalar      scalar(dim);
               typename FunctionMap<dim>::type neumann_boundary;
-              KellyErrorEstimator<dim>::estimate(
-                dof_handler_local,
-                QGauss<dim - 1>(3),
-                neumann_boundary,
-                solution_local,
-                estimated_error_per_cell,
-                fe_local.component_mask(scalar));
+              KellyErrorEstimator<dim>::estimate(dof_handler_local,
+                                                 QGauss<dim - 1>(3),
+                                                 neumann_boundary,
+                                                 solution_local,
+                                                 estimated_error_per_cell,
+                                                 fe_local.component_mask(
+                                                   scalar));
 
               GridRefinement::refine_and_coarsen_fixed_number(
                 triangulation, estimated_error_per_cell, 0.3, 0.);

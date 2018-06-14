@@ -92,7 +92,8 @@ namespace Step22
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>(dim + 1)
+    BoundaryValues()
+      : Function<dim>(dim + 1)
     {}
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const;
@@ -125,7 +126,8 @@ namespace Step22
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const;
@@ -151,11 +153,11 @@ namespace Step22
   }
 
   template <int dim>
-  StokesProblem<dim>::StokesProblem(const unsigned int degree) :
-    degree(degree),
-    triangulation(Triangulation<dim>::maximum_smoothing),
-    fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1),
-    dof_handler(triangulation)
+  StokesProblem<dim>::StokesProblem(const unsigned int degree)
+    : degree(degree)
+    , triangulation(Triangulation<dim>::maximum_smoothing)
+    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , dof_handler(triangulation)
   {}
 
   template <int dim>
@@ -180,8 +182,9 @@ namespace Step22
     }
     constraints.close();
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
     deallog << "   Number of active cells: " << triangulation.n_active_cells()
             << std::endl
@@ -295,28 +298,31 @@ namespace Step22
     SparseILU<double> preconditioner_A;
     preconditioner_A.initialize(system_matrix.block(0, 0),
                                 SparseILU<double>::AdditionalData());
-    ReductionControl solver_control_A(
-      system_matrix.block(0, 0).m(), 1e-10, 1e-6);
-    SolverCG<> solver_A(solver_control_A);
-    const auto A_inv = inverse_operator(A, solver_A, preconditioner_A);
+    ReductionControl solver_control_A(system_matrix.block(0, 0).m(),
+                                      1e-10,
+                                      1e-6);
+    SolverCG<>       solver_A(solver_control_A);
+    const auto       A_inv = inverse_operator(A, solver_A, preconditioner_A);
 
     // Inverse of mass matrix stored in block "D"
     SparseILU<double> preconditioner_M;
     preconditioner_M.initialize(system_matrix.block(1, 1),
                                 SparseILU<double>::AdditionalData());
-    ReductionControl solver_control_M(
-      system_matrix.block(1, 1).m(), 1e-10, 1e-6);
-    SolverCG<> solver_M(solver_control_M);
-    const auto M_inv = inverse_operator(M, solver_M, preconditioner_M);
+    ReductionControl solver_control_M(system_matrix.block(1, 1).m(),
+                                      1e-10,
+                                      1e-6);
+    SolverCG<>       solver_M(solver_control_M);
+    const auto       M_inv = inverse_operator(M, solver_M, preconditioner_M);
 
     // Schur complement
     const auto S = schur_complement(A_inv, B, C, D0);
 
     // Inverse of Schur complement
-    ReductionControl solver_control_S(
-      system_matrix.block(1, 1).m(), 1e-10, 1e-6);
-    SolverCG<> solver_S(solver_control_S);
-    const auto S_inv = inverse_operator(S, solver_S, M_inv);
+    ReductionControl solver_control_S(system_matrix.block(1, 1).m(),
+                                      1e-10,
+                                      1e-6);
+    SolverCG<>       solver_S(solver_control_S);
+    const auto       S_inv = inverse_operator(S, solver_S, M_inv);
 
     Vector<double> &      x   = solution.block(0);
     Vector<double> &      y   = solution.block(1);
@@ -344,8 +350,10 @@ namespace Step22
                                        solution,
                                        estimated_error_per_cell,
                                        fe.component_mask(pressure));
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.0);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.0);
     triangulation.execute_coarsening_and_refinement();
   }
 
@@ -360,8 +368,10 @@ namespace Step22
         (dim == 2 ? Point<dim>(-2, -1) : Point<dim>(-2, 0, -1));
       const Point<dim> top_right =
         (dim == 2 ? Point<dim>(2, 0) : Point<dim>(2, 1, 0));
-      GridGenerator::subdivided_hyper_rectangle(
-        triangulation, subdivisions, bottom_left, top_right);
+      GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                                subdivisions,
+                                                bottom_left,
+                                                top_right);
     }
     for (typename Triangulation<dim>::active_cell_iterator cell =
            triangulation.begin_active();

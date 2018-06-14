@@ -199,8 +199,10 @@ namespace MatrixTools
                   const unsigned int column) =
                   &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator p =
-                  Utilities::lower_bound(
-                    matrix.begin(row) + 1, matrix.end(row), dof_number, comp);
+                  Utilities::lower_bound(matrix.begin(row) + 1,
+                                         matrix.end(row),
+                                         dof_number,
+                                         comp);
 
                 // check whether this line has an entry in the
                 // regarding column (check for ==dof_number and !=

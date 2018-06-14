@@ -38,7 +38,10 @@ struct CopyData
   unsigned int n_own_cells;
   unsigned int n_ghost_cells;
 
-  CopyData() : n_cells(0), n_own_cells(0), n_ghost_cells(0)
+  CopyData()
+    : n_cells(0)
+    , n_own_cells(0)
+    , n_ghost_cells(0)
   {}
 
   void
@@ -119,8 +122,8 @@ test()
 
   std::function<void(const Iterator &, ScratchData &, CopyData &)>
     empty_cell_worker;
-  std::function<void(
-    const Iterator &, const unsigned int &, ScratchData &, CopyData &)>
+  std::function<
+    void(const Iterator &, const unsigned int &, ScratchData &, CopyData &)>
     empty_boundary_worker;
 
   auto print_summary = [&]() {

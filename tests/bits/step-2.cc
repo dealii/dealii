@@ -83,8 +83,9 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   static const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs(finite_element);
 
-  SparsityPattern sparsity_pattern(
-    dof_handler.n_dofs(), dof_handler.n_dofs(), 20);
+  SparsityPattern sparsity_pattern(dof_handler.n_dofs(),
+                                   dof_handler.n_dofs(),
+                                   20);
 
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
   sparsity_pattern.compress();

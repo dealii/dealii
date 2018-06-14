@@ -59,15 +59,15 @@ class HarmonicOscillator
 public:
   HarmonicOscillator(
     double                                                        _kappa,
-    const typename SUNDIALS::IDA<Vector<double>>::AdditionalData &data) :
-    time_stepper(data),
-    y(2),
-    y_dot(2),
-    J(2, 2),
-    A(2, 2),
-    Jinv(2, 2),
-    kappa(_kappa),
-    out("output")
+    const typename SUNDIALS::IDA<Vector<double>>::AdditionalData &data)
+    : time_stepper(data)
+    , y(2)
+    , y_dot(2)
+    , J(2, 2)
+    , A(2, 2)
+    , Jinv(2, 2)
+    , kappa(_kappa)
+    , out("output")
   {
     typedef Vector<double> VectorType;
 

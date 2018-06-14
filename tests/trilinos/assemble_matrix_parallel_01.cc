@@ -65,18 +65,18 @@ namespace Assembly
     struct Data
     {
       Data(const hp::FECollection<dim> &fe,
-           const hp::QCollection<dim> & quadrature) :
-        hp_fe_values(fe,
-                     quadrature,
-                     update_values | update_gradients |
-                       update_quadrature_points | update_JxW_values)
+           const hp::QCollection<dim> & quadrature)
+        : hp_fe_values(fe,
+                       quadrature,
+                       update_values | update_gradients |
+                         update_quadrature_points | update_JxW_values)
       {}
 
-      Data(const Data &data) :
-        hp_fe_values(data.hp_fe_values.get_mapping_collection(),
-                     data.hp_fe_values.get_fe_collection(),
-                     data.hp_fe_values.get_quadrature_collection(),
-                     data.hp_fe_values.get_update_flags())
+      Data(const Data &data)
+        : hp_fe_values(data.hp_fe_values.get_mapping_collection(),
+                       data.hp_fe_values.get_fe_collection(),
+                       data.hp_fe_values.get_quadrature_collection(),
+                       data.hp_fe_values.get_update_flags())
       {}
 
       hp::FEValues<dim> hp_fe_values;
@@ -158,7 +158,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -182,7 +183,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -203,9 +205,9 @@ RightHandSide<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  dof_handler(triangulation),
-  max_degree(5)
+LaplaceProblem<dim>::LaplaceProblem()
+  : dof_handler(triangulation)
+  , max_degree(5)
 {
   if (dim == 2)
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
@@ -264,8 +266,10 @@ LaplaceProblem<dim>::setup_system()
   // having added the hanging node constraints in order to be consistent and
   // skip dofs that are already constrained (i.e., are hanging nodes on the
   // boundary in 3D). In contrast to step-27, we choose a sine function.
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           constraints);
   constraints.close();
 
   graph = GraphColoring::make_graph_coloring(
@@ -280,8 +284,9 @@ LaplaceProblem<dim>::setup_system()
 
   DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
-  reference_matrix.reinit(
-    dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD);
+  reference_matrix.reinit(dof_handler.locally_owned_dofs(),
+                          csp,
+                          MPI_COMM_WORLD);
   test_matrix.reinit(reference_matrix);
 }
 
@@ -380,19 +385,20 @@ LaplaceProblem<dim>::assemble_test()
   test_matrix = 0;
   test_rhs    = 0;
 
-  WorkStream::run(
-    graph,
-    std::bind(&LaplaceProblem<dim>::local_assemble,
-              this,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::placeholders::_3),
-    std::bind(
-      &LaplaceProblem<dim>::copy_local_to_global, this, std::placeholders::_1),
-    Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
-    Assembly::Copy::Data(),
-    2 * MultithreadInfo::n_threads(),
-    1);
+  WorkStream::run(graph,
+                  std::bind(&LaplaceProblem<dim>::local_assemble,
+                            this,
+                            std::placeholders::_1,
+                            std::placeholders::_2,
+                            std::placeholders::_3),
+                  std::bind(&LaplaceProblem<dim>::copy_local_to_global,
+                            this,
+                            std::placeholders::_1),
+                  Assembly::Scratch::Data<dim>(fe_collection,
+                                               quadrature_collection),
+                  Assembly::Copy::Data(),
+                  2 * MultithreadInfo::n_threads(),
+                  1);
   test_matrix.compress(VectorOperation::add);
   test_rhs.compress(VectorOperation::add);
 
@@ -414,8 +420,10 @@ LaplaceProblem<dim>::postprocess()
   for (unsigned int i = 0; i < estimated_error_per_cell.size(); ++i)
     estimated_error_per_cell(i) = i;
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
   triangulation.execute_coarsening_and_refinement();
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator cell =

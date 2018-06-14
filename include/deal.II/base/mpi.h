@@ -729,16 +729,17 @@ namespace Utilities
             ierr = MPI_Recv(
               buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
-            Assert(
-              received_objects.find(rank) == received_objects.end(),
-              ExcInternalError("I should not receive again from this rank"));
+            Assert(received_objects.find(rank) == received_objects.end(),
+                   ExcInternalError(
+                     "I should not receive again from this rank"));
             received_objects[rank] = Utilities::unpack<T>(buffer);
           }
       }
 
       // Wait to have sent all objects.
-      MPI_Waitall(
-        send_to.size(), buffer_send_requests.data(), MPI_STATUSES_IGNORE);
+      MPI_Waitall(send_to.size(),
+                  buffer_send_requests.data(),
+                  MPI_STATUSES_IGNORE);
 
       return received_objects;
 #  endif // deal.II with MPI
@@ -789,9 +790,10 @@ namespace Utilities
       std::vector<T> received_objects(n_procs);
       for (unsigned int i = 0; i < n_procs; ++i)
         {
-          std::vector<char> local_buffer(
-            received_unrolled_buffer.begin() + rdispls[i],
-            received_unrolled_buffer.begin() + rdispls[i] + size_all_data[i]);
+          std::vector<char> local_buffer(received_unrolled_buffer.begin() +
+                                           rdispls[i],
+                                         received_unrolled_buffer.begin() +
+                                           rdispls[i] + size_all_data[i]);
           received_objects[i] = Utilities::unpack<T>(local_buffer);
         }
 

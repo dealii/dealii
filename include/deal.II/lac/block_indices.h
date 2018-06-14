@@ -281,15 +281,17 @@ BlockIndices::reinit(const std::vector<size_type> &block_sizes)
 }
 
 
-inline BlockIndices::BlockIndices() : n_blocks(0), start_indices(1, 0)
+inline BlockIndices::BlockIndices()
+  : n_blocks(0)
+  , start_indices(1, 0)
 {}
 
 
 
 inline BlockIndices::BlockIndices(const unsigned int n_blocks,
-                                  const size_type    block_size) :
-  n_blocks(n_blocks),
-  start_indices(n_blocks + 1)
+                                  const size_type    block_size)
+  : n_blocks(n_blocks)
+  , start_indices(n_blocks + 1)
 {
   for (size_type i = 0; i <= n_blocks; ++i)
     start_indices[i] = i * block_size;
@@ -297,18 +299,18 @@ inline BlockIndices::BlockIndices(const unsigned int n_blocks,
 
 
 
-inline BlockIndices::BlockIndices(const std::vector<size_type> &block_sizes) :
-  n_blocks(static_cast<unsigned int>(block_sizes.size())),
-  start_indices(block_sizes.size() + 1)
+inline BlockIndices::BlockIndices(const std::vector<size_type> &block_sizes)
+  : n_blocks(static_cast<unsigned int>(block_sizes.size()))
+  , start_indices(block_sizes.size() + 1)
 {
   reinit(block_sizes);
 }
 
 
 
-inline BlockIndices::BlockIndices(BlockIndices &&b) noexcept :
-  n_blocks(b.n_blocks),
-  start_indices(std::move(b.start_indices))
+inline BlockIndices::BlockIndices(BlockIndices &&b) noexcept
+  : n_blocks(b.n_blocks)
+  , start_indices(std::move(b.start_indices))
 {
   b.n_blocks      = 0;
   b.start_indices = std::vector<size_type>(1, 0);

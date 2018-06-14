@@ -57,11 +57,12 @@ test()
   // let each of the processors report whether they own
   // cells or now by setting a bit mask that we then add up.
   // output which processor owns something and which don't
-  const int cells_owned = Utilities::MPI::sum(
-    tr.n_locally_owned_active_cells() > 0 ?
-      1 << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) :
-      0,
-    MPI_COMM_WORLD);
+  const int cells_owned =
+    Utilities::MPI::sum(tr.n_locally_owned_active_cells() > 0 ?
+                          1 << Utilities::MPI::this_mpi_process(
+                            MPI_COMM_WORLD) :
+                          0,
+                        MPI_COMM_WORLD);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       for (unsigned int i = 0;
@@ -82,11 +83,12 @@ test()
     }
 
   // now check how many processors own DoFs using the same procedure
-  const int dofs_owned = Utilities::MPI::sum(
-    dof_handler.has_active_dofs() ?
-      1 << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) :
-      0,
-    MPI_COMM_WORLD);
+  const int dofs_owned =
+    Utilities::MPI::sum(dof_handler.has_active_dofs() ?
+                          1 << Utilities::MPI::this_mpi_process(
+                            MPI_COMM_WORLD) :
+                          0,
+                        MPI_COMM_WORLD);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       for (unsigned int i = 0;

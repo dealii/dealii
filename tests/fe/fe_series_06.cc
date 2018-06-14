@@ -62,8 +62,9 @@ test_2d()
     local_dof_values[i] = dofs[i];
 
   const unsigned int cell_active_fe_index = 0;
-  fourier.calculate(
-    local_dof_values, cell_active_fe_index, fourier_coefficients);
+  fourier.calculate(local_dof_values,
+                    cell_active_fe_index,
+                    fourier_coefficients);
 
   for (unsigned int i = 0; i < fourier_coefficients.size(0); i++)
     for (unsigned int j = 0; j < fourier_coefficients.size(1); j++)

@@ -54,8 +54,9 @@ test()
   deallog << "Shifted constraints" << std::endl;
   constraints1.print(deallog.get_file_stream());
 
-  constraints1.merge(
-    constraints2, ConstraintMatrix::no_conflicts_allowed, true);
+  constraints1.merge(constraints2,
+                     ConstraintMatrix::no_conflicts_allowed,
+                     true);
   deallog << "Shifted and merged constraints" << std::endl;
   constraints1.print(deallog.get_file_stream());
 

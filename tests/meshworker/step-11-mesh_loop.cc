@@ -117,10 +117,10 @@ namespace Step11
   // denotes the polynomial degree), and mappings of given order. Print to
   // screen what we are about to do.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree) :
-    fe(1),
-    dof_handler(triangulation),
-    mapping(mapping_degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
+    : fe(1)
+    , dof_handler(triangulation)
+    , mapping(mapping_degree)
   {
     deallog << "Using mapping with degree " << mapping_degree << ":\n"
             << "============================" << std::endl;
@@ -142,8 +142,9 @@ namespace Step11
     system_rhs.reinit(dof_handler.n_dofs());
 
     std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(
-      dof_handler, ComponentMask(), boundary_dofs);
+    DoFTools::extract_boundary_dofs(dof_handler,
+                                    ComponentMask(),
+                                    boundary_dofs);
 
     const unsigned int first_boundary_dof = std::distance(
       boundary_dofs.begin(),
@@ -179,30 +180,30 @@ namespace Step11
   {
     ScratchData(const Mapping<dim> &      mapping,
                 const FiniteElement<dim> &fe,
-                const unsigned int        quadrature_degree) :
-      fe_values(mapping,
-                fe,
-                QGauss<dim>(quadrature_degree),
-                update_values | update_gradients | update_quadrature_points |
-                  update_JxW_values),
-      fe_face_values(mapping,
-                     fe,
-                     QGauss<dim - 1>(quadrature_degree),
-                     update_values | update_quadrature_points |
-                       update_JxW_values | update_normal_vectors)
+                const unsigned int        quadrature_degree)
+      : fe_values(mapping,
+                  fe,
+                  QGauss<dim>(quadrature_degree),
+                  update_values | update_gradients | update_quadrature_points |
+                    update_JxW_values)
+      , fe_face_values(mapping,
+                       fe,
+                       QGauss<dim - 1>(quadrature_degree),
+                       update_values | update_quadrature_points |
+                         update_JxW_values | update_normal_vectors)
     {}
 
-    ScratchData(const ScratchData<dim> &scratch_data) :
-      fe_values(scratch_data.fe_values.get_mapping(),
-                scratch_data.fe_values.get_fe(),
-                scratch_data.fe_values.get_quadrature(),
-                update_values | update_gradients | update_quadrature_points |
-                  update_JxW_values),
-      fe_face_values(scratch_data.fe_face_values.get_mapping(),
-                     scratch_data.fe_face_values.get_fe(),
-                     scratch_data.fe_face_values.get_quadrature(),
-                     update_values | update_quadrature_points |
-                       update_JxW_values | update_normal_vectors)
+    ScratchData(const ScratchData<dim> &scratch_data)
+      : fe_values(scratch_data.fe_values.get_mapping(),
+                  scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  update_values | update_gradients | update_quadrature_points |
+                    update_JxW_values)
+      , fe_face_values(scratch_data.fe_face_values.get_mapping(),
+                       scratch_data.fe_face_values.get_fe(),
+                       scratch_data.fe_face_values.get_quadrature(),
+                       update_values | update_quadrature_points |
+                         update_JxW_values | update_normal_vectors)
     {}
 
     FEValues<dim>     fe_values;
@@ -294,9 +295,10 @@ namespace Step11
                                              system_rhs);
     };
 
-    const unsigned int gauss_degree = std::max(
-      static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)),
-      2U);
+    const unsigned int gauss_degree =
+      std::max(static_cast<unsigned int>(
+                 std::ceil(1. * (mapping.get_degree() + 1) / 2)),
+               2U);
 
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
@@ -340,8 +342,10 @@ namespace Step11
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
     // norm, we do the following:
-    const double norm = VectorTools::compute_global_error(
-      triangulation, norm_per_cell, VectorTools::H1_seminorm);
+    const double norm =
+      VectorTools::compute_global_error(triangulation,
+                                        norm_per_cell,
+                                        VectorTools::H1_seminorm);
 
     // Last task -- generate output:
     output_table.add_value("cells", triangulation.n_active_cells());

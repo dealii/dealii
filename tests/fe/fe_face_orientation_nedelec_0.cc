@@ -112,10 +112,11 @@ evaluate(const FE_Nedelec<3> & fe,
   const QGauss<3>                  quadrature(2);
   const unsigned int               n_q_points = quadrature.size();
   Functions::FEFieldFunction<3>    fe_field_function(dof_handler, u);
-  FEValues<3>                      fe_values(
-    fe, quadrature, update_quadrature_points | update_values);
-  std::vector<Vector<double>> values(n_q_points, Vector<double>(3));
-  std::vector<Tensor<1, 3>>   values_ref(n_q_points);
+  FEValues<3>                      fe_values(fe,
+                        quadrature,
+                        update_quadrature_points | update_values);
+  std::vector<Vector<double>>      values(n_q_points, Vector<double>(3));
+  std::vector<Tensor<1, 3>>        values_ref(n_q_points);
 
   for (DoFHandler<3>::active_cell_iterator cell =
          dof_handler_ref.begin_active();

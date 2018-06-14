@@ -70,9 +70,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components)
+    : Function<dim>(n_components)
+    , q(q)
   {}
 
   virtual double
@@ -154,9 +154,9 @@ do_project(const Triangulation<dim> &triangulation,
               << std::endl;
 
       if (q <= p - order_difference)
-        AssertThrow(
-          error.l2_norm() <= 1e-10 * projection.l2_norm(),
-          ExcFailedProjection(error.l2_norm() / projection.l2_norm()));
+        AssertThrow(error.l2_norm() <= 1e-10 * projection.l2_norm(),
+                    ExcFailedProjection(error.l2_norm() /
+                                        projection.l2_norm()));
     }
 }
 

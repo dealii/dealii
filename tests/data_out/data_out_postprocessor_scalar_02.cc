@@ -49,7 +49,8 @@ template <int dim>
 class MyPostprocessor : public DataPostprocessorScalar<dim>
 {
 public:
-  MyPostprocessor() : DataPostprocessorScalar<dim>("data", update_values)
+  MyPostprocessor()
+    : DataPostprocessorScalar<dim>("data", update_values)
   {}
 
   virtual void

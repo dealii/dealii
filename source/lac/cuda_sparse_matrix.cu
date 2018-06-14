@@ -165,13 +165,13 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  SparseMatrix<Number>::SparseMatrix() :
-    nnz(0),
-    n_rows(0),
-    val_dev(nullptr),
-    column_index_dev(nullptr),
-    row_ptr_dev(nullptr),
-    descr(nullptr)
+  SparseMatrix<Number>::SparseMatrix()
+    : nnz(0)
+    , n_rows(0)
+    , val_dev(nullptr)
+    , column_index_dev(nullptr)
+    , row_ptr_dev(nullptr)
+    , descr(nullptr)
   {}
 
 
@@ -179,11 +179,11 @@ namespace CUDAWrappers
   template <typename Number>
   SparseMatrix<Number>::SparseMatrix(
     Utilities::CUDA::Handle &             handle,
-    const ::dealii::SparseMatrix<Number> &sparse_matrix_host) :
-    val_dev(nullptr),
-    column_index_dev(nullptr),
-    row_ptr_dev(nullptr),
-    descr(nullptr)
+    const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
+    : val_dev(nullptr)
+    , column_index_dev(nullptr)
+    , row_ptr_dev(nullptr)
+    , descr(nullptr)
   {
     reinit(handle, sparse_matrix_host);
   }
@@ -299,8 +299,10 @@ namespace CUDAWrappers
     // Copy the elements to the gpu
     cudaError_t error_code = cudaMalloc(&val_dev, nnz * sizeof(Number));
     AssertCuda(error_code);
-    error_code = cudaMemcpy(
-      val_dev, &val[0], nnz * sizeof(Number), cudaMemcpyHostToDevice);
+    error_code = cudaMemcpy(val_dev,
+                            &val[0],
+                            nnz * sizeof(Number),
+                            cudaMemcpyHostToDevice);
     AssertCuda(error_code);
 
     // Copy the column indices to the gpu

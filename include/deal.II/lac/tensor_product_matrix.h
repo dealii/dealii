@@ -705,16 +705,18 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
   std::array<Table<2, Number>, dim> mass_copy;
   std::array<Table<2, Number>, dim> deriv_copy;
 
-  std::transform(
-    mass_matrix.cbegin(),
-    mass_matrix.cend(),
-    mass_copy.begin(),
-    [](const FullMatrix<Number> &m) -> Table<2, Number> { return m; });
-  std::transform(
-    derivative_matrix.cbegin(),
-    derivative_matrix.cend(),
-    deriv_copy.begin(),
-    [](const FullMatrix<Number> &m) -> Table<2, Number> { return m; });
+  std::transform(mass_matrix.cbegin(),
+                 mass_matrix.cend(),
+                 mass_copy.begin(),
+                 [](const FullMatrix<Number> &m) -> Table<2, Number> {
+                   return m;
+                 });
+  std::transform(derivative_matrix.cbegin(),
+                 derivative_matrix.cend(),
+                 deriv_copy.begin(),
+                 [](const FullMatrix<Number> &m) -> Table<2, Number> {
+                   return m;
+                 });
 
   reinit_impl(std::move(mass_copy), std::move(deriv_copy));
 }
@@ -731,8 +733,9 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
   std::array<Table<2, Number>, dim> derivative_matrices;
 
   std::fill(mass_matrices.begin(), mass_matrices.end(), mass_matrix);
-  std::fill(
-    derivative_matrices.begin(), derivative_matrices.end(), derivative_matrix);
+  std::fill(derivative_matrices.begin(),
+            derivative_matrices.end(),
+            derivative_matrix);
 
   reinit_impl(std::move(mass_matrices), std::move(derivative_matrices));
 }
@@ -871,8 +874,9 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::reinit(
   std::array<Table<2, VectorizedArray<Number>>, dim> derivative_matrices;
 
   std::fill(mass_matrices.begin(), mass_matrices.end(), mass_matrix);
-  std::fill(
-    derivative_matrices.begin(), derivative_matrices.end(), derivative_matrix);
+  std::fill(derivative_matrices.begin(),
+            derivative_matrices.end(),
+            derivative_matrix);
 
   reinit_impl(std::move(mass_matrices), std::move(derivative_matrices));
 }

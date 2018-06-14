@@ -29,9 +29,9 @@ std::vector<SmartPointer<ParameterAcceptor>> ParameterAcceptor::class_list;
 // Static parameter handler
 ParameterHandler ParameterAcceptor::prm;
 
-ParameterAcceptor::ParameterAcceptor(const std::string &name) :
-  acceptor_id(class_list.size()),
-  section_name(name)
+ParameterAcceptor::ParameterAcceptor(const std::string &name)
+  : acceptor_id(class_list.size())
+  , section_name(name)
 {
   SmartPointer<ParameterAcceptor> pt(
     this, boost::core::demangle(typeid(*this).name()).c_str());
@@ -228,8 +228,9 @@ ParameterAcceptor::get_section_path() const
             if ((previous_path.size() > 0) && has_trailing == false)
               previous_path.resize(previous_path.size() - 1);
 
-            sections.insert(
-              sections.begin(), previous_path.begin(), previous_path.end());
+            sections.insert(sections.begin(),
+                            previous_path.begin(),
+                            previous_path.end());
             // Exit the for cycle
             break;
           }

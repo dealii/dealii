@@ -36,7 +36,9 @@ template <int dim, int fe_degree, typename number>
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const MatrixFree<dim, number> &data) : data(data), error(2)
+  MatrixFreeTest(const MatrixFree<dim, number> &data)
+    : data(data)
+    , error(2)
   {}
 
   ~MatrixFreeTest()

@@ -161,8 +161,9 @@ check(const FiniteElement<dim> &fe)
   Functions::ZeroFunction<dim>    dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] = &dirichlet_bc;
 
-  MGTools::make_boundary_list(
-    mg_dof_handler, dirichlet_boundary, boundary_indices);
+  MGTools::make_boundary_list(mg_dof_handler,
+                              dirichlet_boundary,
+                              boundary_indices);
 
   MGTransferSelect<double> transfer;
   transfer.build_matrices(mg_dof_handler,

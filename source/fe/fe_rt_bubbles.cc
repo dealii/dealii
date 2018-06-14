@@ -37,16 +37,17 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg) :
-  FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>(
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 1,
-                           FiniteElementData<dim>::Hdiv),
-    get_ria_vector(deg),
-    std::vector<ComponentMask>(PolynomialsRT_Bubbles<dim>::compute_n_pols(deg),
-                               std::vector<bool>(dim, true)))
+FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
+  : FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>(
+      deg,
+      FiniteElementData<dim>(get_dpo_vector(deg),
+                             dim,
+                             deg + 1,
+                             FiniteElementData<dim>::Hdiv),
+      get_ria_vector(deg),
+      std::vector<ComponentMask>(PolynomialsRT_Bubbles<dim>::compute_n_pols(
+                                   deg),
+                                 std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   Assert(
@@ -82,8 +83,10 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg) :
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
-  FETools::compute_face_embedding_matrices<dim, double>(
-    *this, face_embeddings, 0, 0);
+  FETools::compute_face_embedding_matrices<dim, double>(*this,
+                                                        face_embeddings,
+                                                        0,
+                                                        0);
   this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
                                      this->dofs_per_face);
   unsigned int target_row = 0;
@@ -183,10 +186,11 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
               ((d == 0) ? low : high), ((d == 1) ? low : high));
             break;
           case 3:
-            quadrature = std_cxx14::make_unique<QAnisotropic<dim>>(
-              ((d == 0) ? low : high),
-              ((d == 1) ? low : high),
-              ((d == 2) ? low : high));
+            quadrature =
+              std_cxx14::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
+                                                        ((d == 1) ? low : high),
+                                                        ((d == 2) ? low :
+                                                                    high));
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -265,9 +269,9 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
                               this->generalized_support_points.size()));
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(),
+                              this->n_components()));
 
   // First do interpolation on faces. There, the component
   // evaluated depends on the face direction and orientation.

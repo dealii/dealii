@@ -89,10 +89,10 @@ namespace LinearAdvectionTest
 
 
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem() :
-    triangulation(MPI_COMM_WORLD),
-    fe(1),
-    dof_handler(triangulation)
+  AdvectionProblem<dim>::AdvectionProblem()
+    : triangulation(MPI_COMM_WORLD)
+    , fe(1)
+    , dof_handler(triangulation)
   {
     std::vector<unsigned int> repetitions(2);
     repetitions[0] = 2;
@@ -100,8 +100,10 @@ namespace LinearAdvectionTest
 
     const Point<2> p0(0.0, 0.0);
     const Point<2> p1(2.0, 1.0);
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitions, p0, p1);
+    GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                              repetitions,
+                                              p0,
+                                              p1);
   }
 
   template <int dim>
@@ -226,12 +228,14 @@ namespace LinearAdvectionTest
     const UpdateFlags update_flags =
       update_values | update_quadrature_points | update_JxW_values;
 
-    FEFaceValues<dim> current_face_values(
-      fe, face_quadrature, update_flags | update_normal_vectors);
+    FEFaceValues<dim> current_face_values(fe,
+                                          face_quadrature,
+                                          update_flags | update_normal_vectors);
 
     FEFaceValues<dim> neighbor_face_values(fe, face_quadrature, update_flags);
-    FESubfaceValues<dim> neighbor_subface_values(
-      fe, face_quadrature, update_flags);
+    FESubfaceValues<dim> neighbor_subface_values(fe,
+                                                 face_quadrature,
+                                                 update_flags);
 
     typename DoFHandler<dim>::active_cell_iterator current_cell =
                                                      dof_handler.begin_active(),

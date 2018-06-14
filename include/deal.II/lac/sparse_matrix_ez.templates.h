@@ -30,26 +30,26 @@ DEAL_II_NAMESPACE_OPEN
 //---------------------------------------------------------------------------
 
 template <typename number>
-SparseMatrixEZ<number>::SparseMatrixEZ() :
-  n_columns(0),
-  increment(1),
-  saved_default_row_length(0)
+SparseMatrixEZ<number>::SparseMatrixEZ()
+  : n_columns(0)
+  , increment(1)
+  , saved_default_row_length(0)
 {}
 
 
 template <typename number>
-SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m) :
-  Subscriptor(m),
-  n_columns(0),
-  increment(m.increment),
-  saved_default_row_length(m.saved_default_row_length)
+SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
+  : Subscriptor(m)
+  , n_columns(0)
+  , increment(m.increment)
+  , saved_default_row_length(m.saved_default_row_length)
 {
-  Assert(
-    m.m() == 0 && m.n() == 0,
-    ExcMessage("This constructor can only be called if the provided argument "
-               "is an empty matrix. This constructor can not be used to "
-               "copy-construct a non-empty matrix. Use the "
-               "SparseMatrixEZ::copy_from() function for that purpose."));
+  Assert(m.m() == 0 && m.n() == 0,
+         ExcMessage(
+           "This constructor can only be called if the provided argument "
+           "is an empty matrix. This constructor can not be used to "
+           "copy-construct a non-empty matrix. Use the "
+           "SparseMatrixEZ::copy_from() function for that purpose."));
 }
 
 

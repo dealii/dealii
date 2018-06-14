@@ -961,9 +961,9 @@ namespace internal
     template <int rank_, int dim, bool constness, int P, typename Number>
     Accessor<rank_, dim, constness, P, Number>::Accessor(
       tensor_type &              tensor,
-      const TableIndices<rank_> &previous_indices) :
-      tensor(tensor),
-      previous_indices(previous_indices)
+      const TableIndices<rank_> &previous_indices)
+      : tensor(tensor)
+      , previous_indices(previous_indices)
     {}
 
 
@@ -993,9 +993,9 @@ namespace internal
     template <int rank_, int dim, bool constness, typename Number>
     Accessor<rank_, dim, constness, 1, Number>::Accessor(
       tensor_type &              tensor,
-      const TableIndices<rank_> &previous_indices) :
-      tensor(tensor),
-      previous_indices(previous_indices)
+      const TableIndices<rank_> &previous_indices)
+      : tensor(tensor)
+      , previous_indices(previous_indices)
     {}
 
 
@@ -1091,8 +1091,9 @@ inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
 
 template <int rank_, int dim, typename Number>
 inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
-  const Number (&array)[n_independent_components]) :
-  data(*reinterpret_cast<const typename base_tensor_type::array_type *>(array))
+  const Number (&array)[n_independent_components])
+  : data(
+      *reinterpret_cast<const typename base_tensor_type::array_type *>(array))
 {
   // ensure that the reinterpret_cast above actually works
   Assert(sizeof(typename base_tensor_type::array_type) == sizeof(array),
@@ -1732,8 +1733,9 @@ inline typename internal::SymmetricTensorAccessors::
 {
   typename internal::SymmetricTensorAccessors::
     double_contraction_result<rank_, 4, dim, Number, OtherNumber>::type tmp;
-  tmp.data = internal::perform_double_contraction<dim, Number, OtherNumber>(
-    data, s.data);
+  tmp.data =
+    internal::perform_double_contraction<dim, Number, OtherNumber>(data,
+                                                                   s.data);
   return tmp;
 }
 
@@ -2365,15 +2367,18 @@ namespace internal
 
             case 3:
               {
-                static const unsigned int table[3][3] = {
-                  {0, 3, 4}, {3, 1, 5}, {4, 5, 2}};
+                static const unsigned int table[3][3] = {{0, 3, 4},
+                                                         {3, 1, 5},
+                                                         {4, 5, 2}};
                 return table[indices[0]][indices[1]];
               }
 
             case 4:
               {
-                static const unsigned int table[4][4] = {
-                  {0, 4, 5, 6}, {4, 1, 7, 8}, {5, 7, 2, 9}, {6, 8, 9, 3}};
+                static const unsigned int table[4][4] = {{0, 4, 5, 6},
+                                                         {4, 1, 7, 8},
+                                                         {5, 7, 2, 9},
+                                                         {6, 8, 9, 3}};
                 return table[indices[0]][indices[1]];
               }
 

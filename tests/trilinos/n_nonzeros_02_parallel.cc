@@ -58,13 +58,13 @@ test()
                   system_partitioning,
                   system_relevant_set,
                   MPI_COMM_WORLD);
-  DoFTools::make_sparsity_pattern(
-    dof_handler,
-    coupling,
-    sparsity,
-    ConstraintMatrix(),
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  coupling,
+                                  sparsity,
+                                  ConstraintMatrix(),
+                                  false,
+                                  Utilities::MPI::this_mpi_process(
+                                    MPI_COMM_WORLD));
   sparsity.compress();
 
   // attach a sparse matrix to it

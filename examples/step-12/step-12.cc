@@ -219,10 +219,10 @@ namespace Step12
   // We start with the constructor. The 1 in the constructor call of
   // <code>fe</code> is the polynomial degree.
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem() :
-    mapping(),
-    fe(1),
-    dof_handler(triangulation)
+  AdvectionProblem<dim>::AdvectionProblem()
+    : mapping()
+    , fe(1)
+    , dof_handler(triangulation)
   {}
 
 
@@ -277,8 +277,9 @@ namespace Step12
     // used. Since the quadratures for cells, boundary and interior faces can
     // be selected independently, we have to hand over this value three times.
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-    info_box.initialize_gauss_quadrature(
-      n_gauss_points, n_gauss_points, n_gauss_points);
+    info_box.initialize_gauss_quadrature(n_gauss_points,
+                                         n_gauss_points,
+                                         n_gauss_points);
 
     // These are the types of values we need for integrating our system. They
     // are added to the flags used on cells, boundary and interior faces, as
@@ -547,8 +548,10 @@ namespace Step12
     Vector<float> gradient_indicator(triangulation.n_active_cells());
 
     // Now the approximate gradients are computed
-    DerivativeApproximation::approximate_gradient(
-      mapping, dof_handler, solution, gradient_indicator);
+    DerivativeApproximation::approximate_gradient(mapping,
+                                                  dof_handler,
+                                                  solution,
+                                                  gradient_indicator);
 
     // and they are cell-wise scaled by the factor $h^{1+d/2}$
     typename DoFHandler<dim>::active_cell_iterator cell =
@@ -559,8 +562,10 @@ namespace Step12
         std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
 
     // Finally they serve as refinement indicator.
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, gradient_indicator, 0.3, 0.1);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    gradient_indicator,
+                                                    0.3,
+                                                    0.1);
 
     triangulation.execute_coarsening_and_refinement();
   }

@@ -98,7 +98,8 @@ namespace Step59
   class Solution : public Function<dim>
   {
   public:
-    Solution() : Function<dim>()
+    Solution()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> &p,
@@ -134,7 +135,8 @@ namespace Step59
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> &p,
@@ -944,21 +946,25 @@ namespace Step59
 
 
   template <int dim, int fe_degree>
-  LaplaceProblem<dim, fe_degree>::LaplaceProblem() :
+  LaplaceProblem<dim, fe_degree>::LaplaceProblem()
+    :
 #ifdef DEAL_II_WITH_P4EST
     triangulation(
       MPI_COMM_WORLD,
       Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy)
+    ,
 #else
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
+    triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+    ,
 #endif
-    fe(fe_degree),
-    dof_handler(triangulation),
-    setup_time(0.),
-    pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
-    time_details(std::cout,
-                 false && Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    fe(fe_degree)
+    , dof_handler(triangulation)
+    , setup_time(0.)
+    , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    , time_details(std::cout,
+                   false &&
+                     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
@@ -1014,8 +1020,10 @@ namespace Step59
          update_quadrature_points);
       std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
         new MatrixFree<dim, double>());
-      system_mf_storage->reinit(
-        dof_handler, dummy, QGauss<1>(fe.degree + 1), additional_data);
+      system_mf_storage->reinit(dof_handler,
+                                dummy,
+                                QGauss<1>(fe.degree + 1),
+                                additional_data);
       system_matrix.initialize(system_mf_storage);
     }
 
@@ -1044,8 +1052,10 @@ namespace Step59
         additional_data.level_mg_handler = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(
-          dof_handler, dummy, QGauss<1>(fe.degree + 1), additional_data);
+        mg_mf_storage_level->reinit(dof_handler,
+                                    dummy,
+                                    QGauss<1>(fe.degree + 1),
+                                    additional_data);
 
         mg_matrices[level].initialize(mg_mf_storage_level);
       }
@@ -1324,8 +1334,9 @@ namespace Step59
             upper_right[0] = 2.5;
             for (unsigned int d = 1; d < dim; ++d)
               upper_right[d] = 2.8;
-            GridGenerator::hyper_rectangle(
-              triangulation, Point<dim>(), upper_right);
+            GridGenerator::hyper_rectangle(triangulation,
+                                           Point<dim>(),
+                                           upper_right);
             triangulation.begin_active()->face(0)->set_boundary_id(10);
             triangulation.begin_active()->face(1)->set_boundary_id(11);
             triangulation.begin_active()->face(2)->set_boundary_id(0);

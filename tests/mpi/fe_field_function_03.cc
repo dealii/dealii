@@ -75,8 +75,9 @@ test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
-  GridGenerator::hyper_cube_with_cylindrical_hole(
-    tr, 0.05 /* cylinder radius */, 0.4 / 2.0 /* box radius */);
+  GridGenerator::hyper_cube_with_cylindrical_hole(tr,
+                                                  0.05 /* cylinder radius */,
+                                                  0.4 / 2.0 /* box radius */);
   tr.refine_global(1);
 
   const FE_Q<dim> fe(1);

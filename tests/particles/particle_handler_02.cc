@@ -57,26 +57,32 @@ test()
     if (dim > 2)
       reference_position(2) = 0.6;
 
-    Particles::Particle<dim, spacedim> particle(
-      position, reference_position, 7);
+    Particles::Particle<dim, spacedim> particle(position,
+                                                reference_position,
+                                                7);
     deallog << "Particle location: " << particle.get_location() << std::endl;
 
 
     std::pair<typename parallel::distributed::Triangulation<dim, spacedim>::
                 active_cell_iterator,
               Point<dim>>
-      cell_position = GridTools::find_active_cell_around_point(
-        mapping, tr, particle.get_location());
+      cell_position =
+        GridTools::find_active_cell_around_point(mapping,
+                                                 tr,
+                                                 particle.get_location());
 
     particle_handler.insert_particle(particle, cell_position.first);
     particle_handler.insert_particle(particle, cell_position.first);
 
     position(0) = 0.7;
-    Particles::Particle<dim, spacedim> particle2(
-      position, reference_position, 9);
+    Particles::Particle<dim, spacedim> particle2(position,
+                                                 reference_position,
+                                                 9);
 
-    cell_position = GridTools::find_active_cell_around_point(
-      mapping, tr, particle2.get_location());
+    cell_position =
+      GridTools::find_active_cell_around_point(mapping,
+                                               tr,
+                                               particle2.get_location());
     particle_handler.insert_particle(particle2, cell_position.first);
 
     particle_handler.update_cached_numbers();

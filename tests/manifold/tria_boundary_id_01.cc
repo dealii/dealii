@@ -89,8 +89,9 @@ main()
   const double       outer_radius = 0.5;
   const double       tol          = 1e-6;
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube_with_cylindrical_hole(
-    tria, inner_radius, outer_radius);
+  GridGenerator::hyper_cube_with_cylindrical_hole(tria,
+                                                  inner_radius,
+                                                  outer_radius);
   tria.reset_all_manifolds();
 
   // Enumerate the flat boundaries and the curved one separately. Also provide

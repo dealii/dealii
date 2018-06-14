@@ -81,8 +81,9 @@ main(int argc, char *argv[])
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-    locally_relevant_sol.reinit(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    locally_relevant_sol.reinit(locally_owned_dofs,
+                                locally_relevant_dofs,
+                                mpi_communicator);
 
     DataOutFaces<dim> data_out_face(false);
 

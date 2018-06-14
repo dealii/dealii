@@ -38,8 +38,9 @@ check()
         new ::dealii::parallel::internal::TBBPartitioner());
 
       Number *val;
-      Utilities::System::posix_memalign(
-        (void **)&val, 64, sizeof(Number) * size);
+      Utilities::System::posix_memalign((void **)&val,
+                                        64,
+                                        sizeof(Number) * size);
 
       const Number                                   s = 3.1415;
       internal::VectorOperations::Vector_set<Number> setter(s, val);
@@ -51,8 +52,10 @@ check()
         {
           const unsigned int begin = i * chunk_size;
           const unsigned int end   = std::min((i + 1) * chunk_size, size);
-          internal::VectorOperations::parallel_for(
-            setter, begin, end, thread_loop_partitioner);
+          internal::VectorOperations::parallel_for(setter,
+                                                   begin,
+                                                   end,
+                                                   thread_loop_partitioner);
         }
 
       // check values:

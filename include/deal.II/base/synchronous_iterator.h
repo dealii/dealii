@@ -78,9 +78,8 @@ private:
 
 
 template <typename Iterators>
-inline SynchronousIterators<Iterators>::SynchronousIterators(
-  const Iterators &i) :
-  iterators(i)
+inline SynchronousIterators<Iterators>::SynchronousIterators(const Iterators &i)
+  : iterators(i)
 {}
 
 

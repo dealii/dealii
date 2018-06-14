@@ -507,9 +507,10 @@ namespace Step60
   // `DistributedLagrangeProblem` for two different dimensions, without having
   // conflicts in the parameters for the two problems.
   template <int dim, int spacedim>
-  DistributedLagrangeProblem<dim, spacedim>::Parameters::Parameters() :
-    ParameterAcceptor("/Distributed Lagrange<" + Utilities::int_to_string(dim) +
-                      "," + Utilities::int_to_string(spacedim) + ">/")
+  DistributedLagrangeProblem<dim, spacedim>::Parameters::Parameters()
+    : ParameterAcceptor("/Distributed Lagrange<" +
+                        Utilities::int_to_string(dim) + "," +
+                        Utilities::int_to_string(spacedim) + ">/")
   {
     // The ParameterAcceptor::add_parameter() function does a few things:
     //
@@ -573,12 +574,12 @@ namespace Step60
   // `ParameterAcceptorProxy` objects, as explained earlier.
   template <int dim, int spacedim>
   DistributedLagrangeProblem<dim, spacedim>::DistributedLagrangeProblem(
-    const Parameters &parameters) :
-    parameters(parameters),
-    embedded_configuration_function("Embedded configuration", spacedim),
-    embedded_value_function("Embedded value"),
-    schur_solver_control("Schur solver control"),
-    monitor(std::cout, TimerOutput::summary, TimerOutput::cpu_and_wall_times)
+    const Parameters &parameters)
+    : parameters(parameters)
+    , embedded_configuration_function("Embedded configuration", spacedim)
+    , embedded_value_function("Embedded value")
+    , schur_solver_control("Schur solver control")
+    , monitor(std::cout, TimerOutput::summary, TimerOutput::cpu_and_wall_times)
   {
     // Here is a way to set default values for a ParameterAcceptor class
     // that was constructed using ParameterAcceptorProxy.
@@ -753,8 +754,9 @@ namespace Step60
     // This is precisely what the `embedded_mapping` is there for.
     std::vector<Point<spacedim>> support_points(embedded_dh->n_dofs());
     if (parameters.delta_refinement != 0)
-      DoFTools::map_dofs_to_support_points(
-        *embedded_mapping, *embedded_dh, support_points);
+      DoFTools::map_dofs_to_support_points(*embedded_mapping,
+                                           *embedded_dh,
+                                           support_points);
 
     // Once we have the support points of the embedded finite element space, we
     // would like to identify what cells of the embedding space contain what
@@ -814,8 +816,9 @@ namespace Step60
     // is not the case, we bail out with an exception.
     for (unsigned int i = 0; i < parameters.delta_refinement; ++i)
       {
-        const auto point_locations = GridTools::compute_point_locations(
-          *space_grid_tools_cache, support_points);
+        const auto point_locations =
+          GridTools::compute_point_locations(*space_grid_tools_cache,
+                                             support_points);
         const auto &cells = std::get<0>(point_locations);
         for (auto cell : cells)
           {
@@ -843,12 +846,13 @@ namespace Step60
                  embedding_space_minimal_diameter
             << std::endl;
 
-    AssertThrow(
-      embedded_space_maximal_diameter < embedding_space_minimal_diameter,
-      ExcMessage("The embedding grid is too refined (or the embedded grid "
-                 "is too coarse). Adjust the parameters so that the minimal "
-                 "grid size of the embedding grid is larger "
-                 "than the maximal grid size of the embedded grid."));
+    AssertThrow(embedded_space_maximal_diameter <
+                  embedding_space_minimal_diameter,
+                ExcMessage(
+                  "The embedding grid is too refined (or the embedded grid "
+                  "is too coarse). Adjust the parameters so that the minimal "
+                  "grid size of the embedding grid is larger "
+                  "than the maximal grid size of the embedded grid."));
 
     // $\Omega$ has been refined and we can now set up its DoFs
     setup_embedding_dofs();
@@ -944,19 +948,19 @@ namespace Step60
       TimerOutput::Scope timer_section(monitor, "Assemble system");
 
       // Embedding stiffness matrix $K$, and the right hand side $G$.
-      MatrixTools::create_laplace_matrix(
-        *space_dh,
-        QGauss<spacedim>(2 * space_fe->degree + 1),
-        stiffness_matrix,
-        (const Function<spacedim> *)nullptr,
-        constraints);
+      MatrixTools::create_laplace_matrix(*space_dh,
+                                         QGauss<spacedim>(2 * space_fe->degree +
+                                                          1),
+                                         stiffness_matrix,
+                                         (const Function<spacedim> *)nullptr,
+                                         constraints);
 
-      VectorTools::create_right_hand_side(
-        *embedded_mapping,
-        *embedded_dh,
-        QGauss<dim>(2 * embedded_fe->degree + 1),
-        embedded_value_function,
-        embedded_rhs);
+      VectorTools::create_right_hand_side(*embedded_mapping,
+                                          *embedded_dh,
+                                          QGauss<dim>(2 * embedded_fe->degree +
+                                                      1),
+                                          embedded_value_function,
+                                          embedded_rhs);
     }
     {
       TimerOutput::Scope timer_section(monitor, "Assemble coupling system");

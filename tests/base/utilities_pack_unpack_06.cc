@@ -72,16 +72,19 @@ check(const double (&array)[N], const Point<dim>(&point))
   Utilities::unpack(array_compressed.cbegin(),
                     array_compressed.cend(),
                     unpacked_array_compressed);
-  Point<dim> unpacked_point_compressed = Utilities::unpack<Point<dim>>(
-    point_compressed.cbegin(), point_compressed.cend());
+  Point<dim> unpacked_point_compressed =
+    Utilities::unpack<Point<dim>>(point_compressed.cbegin(),
+                                  point_compressed.cend());
 
   double unpacked_array_uncompressed[N];
   Utilities::unpack(array_uncompressed.cbegin(),
                     array_uncompressed.cend(),
                     unpacked_array_uncompressed,
                     false);
-  Point<dim> unpacked_point_uncompressed = Utilities::unpack<Point<dim>>(
-    point_uncompressed.cbegin(), point_uncompressed.cend(), false);
+  Point<dim> unpacked_point_uncompressed =
+    Utilities::unpack<Point<dim>>(point_uncompressed.cbegin(),
+                                  point_uncompressed.cend(),
+                                  false);
 
   // check if unpacked results are okay
   bool equal_array = true;
@@ -117,8 +120,10 @@ check(const double (&array)[N], const Point<dim>(&point))
   // try something nasty
   try
     {
-      Point<dim> forbidden = Utilities::unpack<Point<dim>>(
-        point_compressed.cbegin(), point_compressed.cend(), false);
+      Point<dim> forbidden =
+        Utilities::unpack<Point<dim>>(point_compressed.cbegin(),
+                                      point_compressed.cend(),
+                                      false);
     }
   catch (const boost::archive::archive_exception &)
     {
@@ -128,8 +133,10 @@ check(const double (&array)[N], const Point<dim>(&point))
   try
     {
       double forbidden[N];
-      Utilities::unpack(
-        array_compressed.cbegin(), array_compressed.cend(), forbidden, false);
+      Utilities::unpack(array_compressed.cbegin(),
+                        array_compressed.cend(),
+                        forbidden,
+                        false);
     }
   catch (const boost::archive::archive_exception &)
     {
@@ -139,8 +146,10 @@ check(const double (&array)[N], const Point<dim>(&point))
 
   try
     {
-      Point<dim> forbidden = Utilities::unpack<Point<dim>>(
-        point_uncompressed.cbegin(), point_uncompressed.cend(), true);
+      Point<dim> forbidden =
+        Utilities::unpack<Point<dim>>(point_uncompressed.cbegin(),
+                                      point_uncompressed.cend(),
+                                      true);
     }
   catch (const boost::archive::archive_exception &)
     {

@@ -444,15 +444,15 @@ namespace Step39
 
   template <int dim>
   InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(
-    const FiniteElement<dim> &fe) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    mapping(1),
-    fe(fe),
-    dof_handler(triangulation),
-    estimates(1)
+    const FiniteElement<dim> &fe)
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
+    , mapping(1)
+    , fe(fe)
+    , dof_handler(triangulation)
+    , estimates(1)
   {
     GridGenerator::hyper_L(triangulation, -1, 1);
   }
@@ -472,8 +472,10 @@ namespace Step39
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(),
                                       dof_handler.n_dofs());
     DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
-    matrix.reinit(
-      dof_handler.locally_owned_dofs(), c_sparsity, MPI_COMM_WORLD, true);
+    matrix.reinit(dof_handler.locally_owned_dofs(),
+                  c_sparsity,
+                  MPI_COMM_WORLD,
+                  true);
 
     const unsigned int n_levels = triangulation.n_global_levels();
     mg_matrix.resize(0, n_levels - 1);
@@ -500,8 +502,9 @@ namespace Step39
             DynamicSparsityPattern ci_sparsity;
             ci_sparsity.reinit(dof_handler.n_dofs(level - 1),
                                dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(
-              dof_handler, ci_sparsity, level);
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler,
+                                                     ci_sparsity,
+                                                     level);
 
             mg_matrix_dg_up[level].reinit(
               dof_handler.locally_owned_mg_dofs(level - 1),
@@ -689,8 +692,9 @@ namespace Step39
     MeshWorker::IntegrationInfoBox<dim> info_box;
     const unsigned int                  n_gauss_points =
       dof_handler.get_fe().tensor_degree() + 1;
-    info_box.initialize_gauss_quadrature(
-      n_gauss_points, n_gauss_points + 1, n_gauss_points);
+    info_box.initialize_gauss_quadrature(n_gauss_points,
+                                         n_gauss_points + 1,
+                                         n_gauss_points);
 
     AnyData solution_data;
     solution_data.add<TrilinosWrappers::MPI::Vector *>(&ghost, "solution");
@@ -746,8 +750,10 @@ namespace Step39
         else
           {
             parallel::distributed::GridRefinement::
-              refine_and_coarsen_fixed_fraction(
-                triangulation, estimates.block(0), 0.5, 0.0);
+              refine_and_coarsen_fixed_fraction(triangulation,
+                                                estimates.block(0),
+                                                0.5,
+                                                0.0);
             triangulation.execute_coarsening_and_refinement();
           }
 

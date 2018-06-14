@@ -60,7 +60,8 @@ public:
 };
 
 template <int dim>
-VectorBoundaryValues<dim>::VectorBoundaryValues() : Function<dim>(2)
+VectorBoundaryValues<dim>::VectorBoundaryValues()
+  : Function<dim>(2)
 {}
 
 template <int dim>
@@ -101,9 +102,9 @@ private:
 // first component: Q1-Element,
 // second component: lowest order DG_Element
 template <int dim>
-FindBug<dim>::FindBug() :
-  fe(FE_Q<dim>(1), 1, FE_DGP<dim>(0), 1),
-  dof_handler(triangulation)
+FindBug<dim>::FindBug()
+  : fe(FE_Q<dim>(1), 1, FE_DGP<dim>(0), 1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -194,8 +195,10 @@ FindBug<dim>::dirichlet_conditions()
 
   // get a list of those boundary DoFs which
   // we want to be fixed:
-  DoFTools::extract_boundary_dofs(
-    dof_handler, component_mask, fixed_dofs, boundary_ids);
+  DoFTools::extract_boundary_dofs(dof_handler,
+                                  component_mask,
+                                  fixed_dofs,
+                                  boundary_ids);
 
   // (Primitive) Check if the DoFs
   // where adjusted correctly (note

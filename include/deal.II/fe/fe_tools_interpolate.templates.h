@@ -197,8 +197,9 @@ namespace FETools
                 std_cxx14::make_unique<FullMatrix<double>>(dofs_per_cell2,
                                                            dofs_per_cell1);
 
-              get_interpolation_matrix(
-                cell1->get_fe(), cell2->get_fe(), *interpolation_matrix);
+              get_interpolation_matrix(cell1->get_fe(),
+                                       cell2->get_fe(),
+                                       *interpolation_matrix);
 
               interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()] =
                 std::move(interpolation_matrix);
@@ -217,8 +218,9 @@ namespace FETools
               const types::global_dof_index gdi = dofs[i];
               if (u2_elements.is_element(gdi))
                 {
-                  ::dealii::internal::ElementAccess<OutVector>::add(
-                    u2_local(i), dofs[i], u2);
+                  ::dealii::internal::ElementAccess<OutVector>::add(u2_local(i),
+                                                                    dofs[i],
+                                                                    u2);
                   ::dealii::internal::ElementAccess<OutVector>::add(
                     1, dofs[i], touch_count);
                 }
@@ -279,9 +281,9 @@ namespace FETools
                    const FiniteElement<dim, spacedim> & fe2,
                    OutVector &                          u1_interpolated)
   {
-    Assert(
-      dof1.get_fe(0).n_components() == fe2.n_components(),
-      ExcDimensionMismatch(dof1.get_fe(0).n_components(), fe2.n_components()));
+    Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
+           ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                fe2.n_components()));
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u1_interpolated.size() == dof1.n_dofs(),
@@ -521,9 +523,9 @@ namespace FETools
                            const FiniteElement<dim, spacedim> &fe2,
                            OutVector &                         u1_difference)
   {
-    Assert(
-      dof1.get_fe(0).n_components() == fe2.n_components(),
-      ExcDimensionMismatch(dof1.get_fe(0).n_components(), fe2.n_components()));
+    Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
+           ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                fe2.n_components()));
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u1_difference.size() == dof1.n_dofs(),
@@ -712,8 +714,9 @@ namespace FETools
         cell2->get_dof_indices(dofs);
         for (unsigned int i = 0; i < n2; ++i)
           {
-            ::dealii::internal::ElementAccess<OutVector>::add(
-              u2_local(i), dofs[i], u2);
+            ::dealii::internal::ElementAccess<OutVector>::add(u2_local(i),
+                                                              dofs[i],
+                                                              u2);
           }
 
         ++cell1;

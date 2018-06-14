@@ -139,7 +139,8 @@ namespace Step38
   class Solution : public Function<dim>
   {
   public:
-    Solution() : Function<dim>()
+    Solution()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -199,7 +200,8 @@ namespace Step38
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -256,10 +258,10 @@ namespace Step38
   // DoF handler to the triangulation:
   template <int spacedim>
   LaplaceBeltramiProblem<spacedim>::LaplaceBeltramiProblem(
-    const unsigned degree) :
-    fe(degree),
-    dof_handler(triangulation),
-    mapping(degree)
+    const unsigned degree)
+    : fe(degree)
+    , dof_handler(triangulation)
+    , mapping(degree)
   {}
 
 
@@ -313,8 +315,9 @@ namespace Step38
       std::set<types::boundary_id> boundary_ids;
       boundary_ids.insert(0);
 
-      GridGenerator::extract_boundary_mesh(
-        volume_mesh, triangulation, boundary_ids);
+      GridGenerator::extract_boundary_mesh(volume_mesh,
+                                           triangulation,
+                                           boundary_ids);
     }
     triangulation.set_all_manifold_ids(0);
     triangulation.set_manifold(0, SphericalManifold<dim, spacedim>());
@@ -404,8 +407,9 @@ namespace Step38
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(
-                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+              system_matrix.add(local_dof_indices[i],
+                                local_dof_indices[j],
+                                cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -505,8 +509,9 @@ namespace Step38
                                       QGauss<dim>(2 * fe.degree + 1),
                                       VectorTools::H1_norm);
 
-    double h1_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::H1_norm);
+    double h1_error = VectorTools::compute_global_error(triangulation,
+                                                        difference_per_cell,
+                                                        VectorTools::H1_norm);
     std::cout << "H1 error = " << h1_error << std::endl;
   }
 

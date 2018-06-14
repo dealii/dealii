@@ -136,10 +136,10 @@ namespace internal
      * Empty constructor. Does nothing. Be careful when using 'values' and
      * related methods because they need to be filled with the other pointer
      */
-    EvaluatorTensorProduct() :
-      shape_values(nullptr),
-      shape_gradients(nullptr),
-      shape_hessians(nullptr)
+    EvaluatorTensorProduct()
+      : shape_values(nullptr)
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
     {}
 
     /**
@@ -149,10 +149,10 @@ namespace internal
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
                            const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0) :
-      shape_values(shape_values.begin()),
-      shape_gradients(shape_gradients.begin()),
-      shape_hessians(shape_hessians.begin())
+                           const unsigned int            dummy2 = 0)
+      : shape_values(shape_values.begin())
+      , shape_gradients(shape_gradients.begin())
+      , shape_hessians(shape_hessians.begin())
     {
       // We can enter this function either for the apply() path that has
       // n_rows * n_columns entries or for the apply_face() path that only has
@@ -310,9 +310,9 @@ namespace internal
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(
-      shape_data != nullptr,
-      ExcMessage("The given array shape_data must not be the null pointer!"));
+    Assert(shape_data != nullptr,
+           ExcMessage(
+             "The given array shape_data must not be the null pointer!"));
     Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
              in != out,
            ExcMessage("In-place operation only supported for "
@@ -393,9 +393,9 @@ namespace internal
     static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
     static_assert(max_derivative >= 0 && max_derivative < 3,
                   "Only derivative orders 0-2 implemented");
-    Assert(
-      shape_values != nullptr,
-      ExcMessage("The given array shape_values must not be the null pointer."));
+    Assert(shape_values != nullptr,
+           ExcMessage(
+             "The given array shape_values must not be the null pointer."));
 
     constexpr int n_blocks1 = dim > 1 ? n_rows : 1;
     constexpr int n_blocks2 = dim > 2 ? n_rows : 1;
@@ -534,12 +534,12 @@ namespace internal
      * Empty constructor. Does nothing. Be careful when using 'values' and
      * related methods because they need to be filled with the other constructor
      */
-    EvaluatorTensorProduct() :
-      shape_values(nullptr),
-      shape_gradients(nullptr),
-      shape_hessians(nullptr),
-      n_rows(numbers::invalid_unsigned_int),
-      n_columns(numbers::invalid_unsigned_int)
+    EvaluatorTensorProduct()
+      : shape_values(nullptr)
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
+      , n_rows(numbers::invalid_unsigned_int)
+      , n_columns(numbers::invalid_unsigned_int)
     {}
 
     /**
@@ -549,12 +549,12 @@ namespace internal
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
                            const unsigned int            n_rows,
-                           const unsigned int            n_columns) :
-      shape_values(shape_values.begin()),
-      shape_gradients(shape_gradients.begin()),
-      shape_hessians(shape_hessians.begin()),
-      n_rows(n_rows),
-      n_columns(n_columns)
+                           const unsigned int            n_columns)
+      : shape_values(shape_values.begin())
+      , shape_gradients(shape_gradients.begin())
+      , shape_hessians(shape_hessians.begin())
+      , n_rows(n_rows)
+      , n_columns(n_columns)
     {
       // We can enter this function either for the apply() path that has
       // n_rows * n_columns entries or for the apply_face() path that only has
@@ -653,9 +653,9 @@ namespace internal
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(
-      shape_data != nullptr,
-      ExcMessage("The given array shape_data must not be the null pointer!"));
+    Assert(shape_data != nullptr,
+           ExcMessage(
+             "The given array shape_data must not be the null pointer!"));
     Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
              in != out,
            ExcMessage("In-place operation only supported for "
@@ -727,9 +727,9 @@ namespace internal
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT out) const
   {
-    Assert(
-      shape_values != nullptr,
-      ExcMessage("The given array shape_data must not be the null pointer!"));
+    Assert(shape_values != nullptr,
+           ExcMessage(
+             "The given array shape_data must not be the null pointer!"));
     static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
     const int n_blocks1 = dim > 1 ? n_rows : 1;
     const int n_blocks2 = dim > 2 ? n_rows : 1;
@@ -888,10 +888,10 @@ namespace internal
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
                            const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0) :
-      shape_values(shape_values.begin()),
-      shape_gradients(shape_gradients.begin()),
-      shape_hessians(shape_hessians.begin())
+                           const unsigned int            dummy2 = 0)
+      : shape_values(shape_values.begin())
+      , shape_gradients(shape_gradients.begin())
+      , shape_hessians(shape_hessians.begin())
     {
       Assert(shape_values.size() == 0 ||
                shape_values.size() == n_rows * n_columns,
@@ -1466,20 +1466,20 @@ namespace internal
      * related methods because they need to be filled with the other
      * constructor passing in at least an array for the values.
      */
-    EvaluatorTensorProduct() :
-      shape_values(nullptr),
-      shape_gradients(nullptr),
-      shape_hessians(nullptr)
+    EvaluatorTensorProduct()
+      : shape_values(nullptr)
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
     {}
 
     /**
      * Constructor, taking the data from ShapeInfo (using the even-odd
      * variants stored there)
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values) :
-      shape_values(shape_values.begin()),
-      shape_gradients(nullptr),
-      shape_hessians(nullptr)
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values)
+      : shape_values(shape_values.begin())
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
     {
       AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
     }
@@ -1492,10 +1492,10 @@ namespace internal
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
                            const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0) :
-      shape_values(shape_values.begin()),
-      shape_gradients(shape_gradients.begin()),
-      shape_hessians(shape_hessians.begin())
+                           const unsigned int            dummy2 = 0)
+      : shape_values(shape_values.begin())
+      , shape_gradients(shape_gradients.begin())
+      , shape_hessians(shape_hessians.begin())
     {
       // In this function, we allow for dummy pointers if some of values,
       // gradients or hessians should not be computed
@@ -1546,8 +1546,9 @@ namespace internal
     gradients_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(
-        shape_gradients, in, out);
+      apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
+                                                         in,
+                                                         out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -1555,8 +1556,9 @@ namespace internal
     hessians_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 2, true>(
-        shape_hessians, in, out);
+      apply<direction, contract_over_rows, add, 2, true>(shape_hessians,
+                                                         in,
+                                                         out);
     }
 
     /**
@@ -1853,20 +1855,20 @@ namespace internal
      * related methods because they need to be filled with the other
      * constructor passing in at least an array for the values.
      */
-    EvaluatorTensorProduct() :
-      shape_values(nullptr),
-      shape_gradients(nullptr),
-      shape_hessians(nullptr)
+    EvaluatorTensorProduct()
+      : shape_values(nullptr)
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
     {}
 
     /**
      * Constructor, taking the data from ShapeInfo (using the even-odd
      * variants stored there)
      */
-    EvaluatorTensorProduct(const AlignedVector<Number> &shape_values) :
-      shape_values(shape_values.begin()),
-      shape_gradients(nullptr),
-      shape_hessians(nullptr)
+    EvaluatorTensorProduct(const AlignedVector<Number> &shape_values)
+      : shape_values(shape_values.begin())
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
     {}
 
     /**
@@ -1877,10 +1879,10 @@ namespace internal
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
                            const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0) :
-      shape_values(shape_values.begin()),
-      shape_gradients(shape_gradients.begin()),
-      shape_hessians(shape_hessians.begin())
+                           const unsigned int            dummy2 = 0)
+      : shape_values(shape_values.begin())
+      , shape_gradients(shape_gradients.begin())
+      , shape_hessians(shape_hessians.begin())
     {
       (void)dummy1;
       (void)dummy2;
@@ -1923,8 +1925,9 @@ namespace internal
     gradients_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(
-        shape_gradients, in, out);
+      apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
+                                                         in,
+                                                         out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -1932,8 +1935,9 @@ namespace internal
     hessians_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0, true>(
-        shape_hessians, in, out);
+      apply<direction, contract_over_rows, add, 0, true>(shape_hessians,
+                                                         in,
+                                                         out);
     }
 
     /**

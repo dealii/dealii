@@ -172,8 +172,8 @@ namespace Threads
 
   PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
                                          const char *,
-                                         void *) :
-    count(count)
+                                         void *)
+    : count(count)
   {
     // throw an exception unless we
     // have the special case that a

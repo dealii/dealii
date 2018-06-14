@@ -106,13 +106,21 @@ test()
 
   MatrixFree<dim, number> mf_data;
   if (fe_degree > 1)
-    sub_test<dim, fe_degree, fe_degree - 1, number>(
-      dof, constraints, mf_data, solution);
-  sub_test<dim, fe_degree, fe_degree, number>(
-    dof, constraints, mf_data, solution);
-  sub_test<dim, fe_degree, fe_degree + 2, number>(
-    dof, constraints, mf_data, solution);
+    sub_test<dim, fe_degree, fe_degree - 1, number>(dof,
+                                                    constraints,
+                                                    mf_data,
+                                                    solution);
+  sub_test<dim, fe_degree, fe_degree, number>(dof,
+                                              constraints,
+                                              mf_data,
+                                              solution);
+  sub_test<dim, fe_degree, fe_degree + 2, number>(dof,
+                                                  constraints,
+                                                  mf_data,
+                                                  solution);
   if (dim == 2)
-    sub_test<dim, fe_degree, fe_degree + 3, number>(
-      dof, constraints, mf_data, solution);
+    sub_test<dim, fe_degree, fe_degree + 3, number>(dof,
+                                                    constraints,
+                                                    mf_data,
+                                                    solution);
 }

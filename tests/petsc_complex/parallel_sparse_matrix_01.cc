@@ -98,8 +98,10 @@ test(const unsigned int poly_degree = 1)
     mpi_communicator,
     locally_relevant_dofs);
 
-  mass_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, dsp, mpi_communicator);
+  mass_matrix.reinit(locally_owned_dofs,
+                     locally_owned_dofs,
+                     dsp,
+                     mpi_communicator);
 
   // assemble mass matrix:
   mass_matrix = PetscScalar();
@@ -137,8 +139,9 @@ test(const unsigned int poly_degree = 1)
                 }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_mass_matrix, local_dof_indices, mass_matrix);
+          constraints.distribute_local_to_global(cell_mass_matrix,
+                                                 local_dof_indices,
+                                                 mass_matrix);
         }
 
     mass_matrix.compress(VectorOperation::add);

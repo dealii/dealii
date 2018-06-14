@@ -41,7 +41,8 @@
 class F : public Function<2>
 {
 public:
-  F() : Function<2>(2)
+  F()
+    : Function<2>(2)
   {}
 
   virtual void
@@ -118,9 +119,9 @@ test(const Triangulation<dim> &tr,
       // curl of this function should be
       //   curl F = d_x F_y - d_y F_x = 2x
       // verify that this is true
-      AssertThrow(
-        std::fabs(curls[q][0] - 2 * fe_values.quadrature_point(q)[0]) <= 1e-10,
-        ExcInternalError());
+      AssertThrow(std::fabs(curls[q][0] -
+                            2 * fe_values.quadrature_point(q)[0]) <= 1e-10,
+                  ExcInternalError());
     }
 }
 

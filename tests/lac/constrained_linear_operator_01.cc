@@ -94,7 +94,9 @@ private:
 
 
 template <int dim>
-Step6<dim>::Step6() : fe(2), dof_handler(triangulation)
+Step6<dim>::Step6()
+  : fe(2)
+  , dof_handler(triangulation)
 {}
 
 
@@ -112,8 +114,10 @@ Step6<dim>::setup_system()
 
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ConstantFunction<dim>(1.), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ConstantFunction<dim>(1.),
+                                           constraints);
   constraints.close();
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -216,8 +220,10 @@ Step6<dim>::refine_grid()
                                      solution,
                                      estimated_error_per_cell);
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
 
   triangulation.execute_coarsening_and_refinement();
 }

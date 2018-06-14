@@ -93,8 +93,10 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -143,20 +145,21 @@ test()
   TrilinosWrappers::SparseMatrix sparse_matrix;
   {
     TrilinosWrappers::SparsityPattern csp(owned_set, MPI_COMM_WORLD);
-    DoFTools::make_sparsity_pattern(
-      dof,
-      csp,
-      constraints,
-      true,
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    DoFTools::make_sparsity_pattern(dof,
+                                    csp,
+                                    constraints,
+                                    true,
+                                    Utilities::MPI::this_mpi_process(
+                                      MPI_COMM_WORLD));
     csp.compress();
     sparse_matrix.reinit(csp);
   }
   {
     QGauss<dim> quadrature_formula(fe_degree + 1);
 
-    FEValues<dim> fe_values(
-      dof.get_fe(), quadrature_formula, update_gradients | update_JxW_values);
+    FEValues<dim> fe_values(dof.get_fe(),
+                            quadrature_formula,
+                            update_gradients | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -182,8 +185,9 @@ test()
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, sparse_matrix);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 local_dof_indices,
+                                                 sparse_matrix);
         }
   }
   sparse_matrix.compress(VectorOperation::add);

@@ -58,7 +58,8 @@ template <int dim>
 class Ref : public Function<dim>
 {
 public:
-  Ref() : Function<dim>(dim)
+  Ref()
+    : Function<dim>(dim)
   {}
 
   double

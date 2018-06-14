@@ -22,10 +22,10 @@ namespace GridTools
 {
   template <int dim, int spacedim>
   Cache<dim, spacedim>::Cache(const Triangulation<dim, spacedim> &tria,
-                              const Mapping<dim, spacedim> &      mapping) :
-    update_flags(update_all),
-    tria(&tria),
-    mapping(&mapping)
+                              const Mapping<dim, spacedim> &      mapping)
+    : update_flags(update_all)
+    , tria(&tria)
+    , mapping(&mapping)
   {
     tria_signal =
       tria.signals.any_change.connect([&]() { mark_for_update(update_all); });

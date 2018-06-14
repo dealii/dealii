@@ -66,18 +66,19 @@ class MatrixFreeTest
 public:
   typedef VectorizedArray<Number> vector_t;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in)
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in)
   {}
 
   void
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    const std::function<void(
-      const MatrixFree<dim, typename VectorType::value_type> &,
-      VectorType &,
-      const VectorType &,
-      const std::pair<unsigned int, unsigned int> &)>
+    const std::function<
+      void(const MatrixFree<dim, typename VectorType::value_type> &,
+           VectorType &,
+           const VectorType &,
+           const std::pair<unsigned int, unsigned int> &)>
       wrap = helmholtz_operator<dim, fe_degree, VectorType, n_q_points_1d>;
     data.cell_loop(wrap, dst, src);
   }

@@ -254,8 +254,9 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
       // adaptive refinement) and the numbering of the finest level DoFs and
       // the global DoFs are the same, we can do a plain copy
       AssertDimension(dst[dst.max_level()].size(), src.size());
-      internal::copy_vector(
-        copy_indices[dst.max_level()], src, dst[dst.max_level()]);
+      internal::copy_vector(copy_indices[dst.max_level()],
+                            src,
+                            dst[dst.max_level()]);
       return;
     }
 
@@ -313,8 +314,9 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
   if (perform_plain_copy)
     {
       AssertDimension(dst.size(), src[src.max_level()].size());
-      internal::copy_vector(
-        copy_indices[src.max_level()], src[src.max_level()], dst);
+      internal::copy_vector(copy_indices[src.max_level()],
+                            src[src.max_level()],
+                            dst);
       return;
     }
 

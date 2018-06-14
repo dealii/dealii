@@ -36,7 +36,10 @@ struct CopyData
   unsigned int n_own_cells;
   unsigned int n_ghost_cells;
 
-  CopyData() : n_cells(0), n_own_cells(0), n_ghost_cells(0)
+  CopyData()
+    : n_cells(0)
+    , n_own_cells(0)
+    , n_ghost_cells(0)
   {}
 
   void

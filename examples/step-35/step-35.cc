@@ -116,22 +116,22 @@ namespace Step35
     // In the constructor of this class we declare all the parameters. The
     // details of how this works have been discussed elsewhere, for example in
     // step-19 and step-29.
-    Data_Storage::Data_Storage() :
-      form(METHOD_ROTATIONAL),
-      initial_time(0.),
-      final_time(1.),
-      Reynolds(1.),
-      dt(5e-4),
-      n_global_refines(0),
-      pressure_degree(1),
-      vel_max_iterations(1000),
-      vel_Krylov_size(30),
-      vel_off_diagonals(60),
-      vel_update_prec(15),
-      vel_eps(1e-12),
-      vel_diag_strength(0.01),
-      verbose(true),
-      output_interval(15)
+    Data_Storage::Data_Storage()
+      : form(METHOD_ROTATIONAL)
+      , initial_time(0.)
+      , final_time(1.)
+      , Reynolds(1.)
+      , dt(5e-4)
+      , n_global_refines(0)
+      , pressure_degree(1)
+      , vel_max_iterations(1000)
+      , vel_Krylov_size(30)
+      , vel_off_diagonals(60)
+      , vel_update_prec(15)
+      , vel_eps(1e-12)
+      , vel_diag_strength(0.01)
+      , verbose(true)
+      , output_interval(15)
     {
       prm.declare_entry("Method_Form",
                         "rotational",
@@ -148,15 +148,19 @@ namespace Step35
                           "1.",
                           Patterns::Double(0.),
                           " The final time of the simulation. ");
-        prm.declare_entry(
-          "Reynolds", "1.", Patterns::Double(0.), " The Reynolds number. ");
+        prm.declare_entry("Reynolds",
+                          "1.",
+                          Patterns::Double(0.),
+                          " The Reynolds number. ");
       }
       prm.leave_subsection();
 
       prm.enter_subsection("Time step data");
       {
-        prm.declare_entry(
-          "dt", "5e-4", Patterns::Double(0.), " The time step size. ");
+        prm.declare_entry("dt",
+                          "5e-4",
+                          Patterns::Double(0.),
+                          " The time step size. ");
       }
       prm.leave_subsection();
 
@@ -180,8 +184,10 @@ namespace Step35
           "1000",
           Patterns::Integer(1, 1000),
           " The maximal number of iterations GMRES must make. ");
-        prm.declare_entry(
-          "eps", "1e-12", Patterns::Double(0.), " The stopping criterion. ");
+        prm.declare_entry("eps",
+                          "1e-12",
+                          Patterns::Double(0.),
+                          " The stopping criterion. ");
         prm.declare_entry("Krylov_size",
                           "30",
                           Patterns::Integer(1),
@@ -295,9 +301,9 @@ namespace Step35
 
     template <int dim>
     MultiComponentFunction<dim>::MultiComponentFunction(
-      const double initial_time) :
-      Function<dim>(1, initial_time),
-      comp(0)
+      const double initial_time)
+      : Function<dim>(1, initial_time)
+      , comp(0)
     {}
 
 
@@ -327,8 +333,8 @@ namespace Step35
 
 
     template <int dim>
-    Velocity<dim>::Velocity(const double initial_time) :
-      MultiComponentFunction<dim>(initial_time)
+    Velocity<dim>::Velocity(const double initial_time)
+      : MultiComponentFunction<dim>(initial_time)
     {}
 
 
@@ -375,8 +381,8 @@ namespace Step35
     };
 
     template <int dim>
-    Pressure<dim>::Pressure(const double initial_time) :
-      Function<dim>(1, initial_time)
+    Pressure<dim>::Pressure(const double initial_time)
+      : Function<dim>(1, initial_time)
     {}
 
 
@@ -545,13 +551,13 @@ namespace Step35
 
       InitGradPerTaskData(const unsigned int dd,
                           const unsigned int vdpc,
-                          const unsigned int pdpc) :
-        d(dd),
-        vel_dpc(vdpc),
-        pres_dpc(pdpc),
-        local_grad(vdpc, pdpc),
-        vel_local_dof_indices(vdpc),
-        pres_local_dof_indices(pdpc)
+                          const unsigned int pdpc)
+        : d(dd)
+        , vel_dpc(vdpc)
+        , pres_dpc(pdpc)
+        , local_grad(vdpc, pdpc)
+        , vel_local_dof_indices(vdpc)
+        , pres_local_dof_indices(pdpc)
       {}
     };
 
@@ -564,19 +570,19 @@ namespace Step35
                           const FE_Q<dim> &  fe_p,
                           const QGauss<dim> &quad,
                           const UpdateFlags  flags_v,
-                          const UpdateFlags  flags_p) :
-        nqp(quad.size()),
-        fe_val_vel(fe_v, quad, flags_v),
-        fe_val_pres(fe_p, quad, flags_p)
+                          const UpdateFlags  flags_p)
+        : nqp(quad.size())
+        , fe_val_vel(fe_v, quad, flags_v)
+        , fe_val_pres(fe_p, quad, flags_p)
       {}
-      InitGradScratchData(const InitGradScratchData &data) :
-        nqp(data.nqp),
-        fe_val_vel(data.fe_val_vel.get_fe(),
-                   data.fe_val_vel.get_quadrature(),
-                   data.fe_val_vel.get_update_flags()),
-        fe_val_pres(data.fe_val_pres.get_fe(),
-                    data.fe_val_pres.get_quadrature(),
-                    data.fe_val_pres.get_update_flags())
+      InitGradScratchData(const InitGradScratchData &data)
+        : nqp(data.nqp)
+        , fe_val_vel(data.fe_val_vel.get_fe(),
+                     data.fe_val_vel.get_quadrature(),
+                     data.fe_val_vel.get_update_flags())
+        , fe_val_pres(data.fe_val_pres.get_fe(),
+                      data.fe_val_pres.get_quadrature(),
+                      data.fe_val_pres.get_update_flags())
       {}
     };
 
@@ -594,9 +600,9 @@ namespace Step35
     {
       FullMatrix<double>                   local_advection;
       std::vector<types::global_dof_index> local_dof_indices;
-      AdvectionPerTaskData(const unsigned int dpc) :
-        local_advection(dpc, dpc),
-        local_dof_indices(dpc)
+      AdvectionPerTaskData(const unsigned int dpc)
+        : local_advection(dpc, dpc)
+        , local_dof_indices(dpc)
       {}
     };
 
@@ -610,24 +616,24 @@ namespace Step35
       FEValues<dim>               fe_val;
       AdvectionScratchData(const FE_Q<dim> &  fe,
                            const QGauss<dim> &quad,
-                           const UpdateFlags  flags) :
-        nqp(quad.size()),
-        dpc(fe.dofs_per_cell),
-        u_star_local(nqp),
-        grad_u_star(nqp),
-        u_star_tmp(nqp),
-        fe_val(fe, quad, flags)
+                           const UpdateFlags  flags)
+        : nqp(quad.size())
+        , dpc(fe.dofs_per_cell)
+        , u_star_local(nqp)
+        , grad_u_star(nqp)
+        , u_star_tmp(nqp)
+        , fe_val(fe, quad, flags)
       {}
 
-      AdvectionScratchData(const AdvectionScratchData &data) :
-        nqp(data.nqp),
-        dpc(data.dpc),
-        u_star_local(nqp),
-        grad_u_star(nqp),
-        u_star_tmp(nqp),
-        fe_val(data.fe_val.get_fe(),
-               data.fe_val.get_quadrature(),
-               data.fe_val.get_update_flags())
+      AdvectionScratchData(const AdvectionScratchData &data)
+        : nqp(data.nqp)
+        , dpc(data.dpc)
+        , u_star_local(nqp)
+        , grad_u_star(nqp)
+        , u_star_tmp(nqp)
+        , fe_val(data.fe_val.get_fe(),
+                 data.fe_val.get_quadrature(),
+                 data.fe_val.get_update_flags())
       {}
     };
 
@@ -658,26 +664,26 @@ namespace Step35
   // triangulation and load the initial data.
   template <int dim>
   NavierStokesProjection<dim>::NavierStokesProjection(
-    const RunTimeParameters::Data_Storage &data) :
-    type(data.form),
-    deg(data.pressure_degree),
-    dt(data.dt),
-    t_0(data.initial_time),
-    T(data.final_time),
-    Re(data.Reynolds),
-    vel_exact(data.initial_time),
-    fe_velocity(deg + 1),
-    fe_pressure(deg),
-    dof_handler_velocity(triangulation),
-    dof_handler_pressure(triangulation),
-    quadrature_pressure(deg + 1),
-    quadrature_velocity(deg + 2),
-    vel_max_its(data.vel_max_iterations),
-    vel_Krylov_size(data.vel_Krylov_size),
-    vel_off_diagonals(data.vel_off_diagonals),
-    vel_update_prec(data.vel_update_prec),
-    vel_eps(data.vel_eps),
-    vel_diag_strength(data.vel_diag_strength)
+    const RunTimeParameters::Data_Storage &data)
+    : type(data.form)
+    , deg(data.pressure_degree)
+    , dt(data.dt)
+    , t_0(data.initial_time)
+    , T(data.final_time)
+    , Re(data.Reynolds)
+    , vel_exact(data.initial_time)
+    , fe_velocity(deg + 1)
+    , fe_pressure(deg)
+    , dof_handler_velocity(triangulation)
+    , dof_handler_pressure(triangulation)
+    , quadrature_pressure(deg + 1)
+    , quadrature_velocity(deg + 2)
+    , vel_max_its(data.vel_max_iterations)
+    , vel_Krylov_size(data.vel_Krylov_size)
+    , vel_off_diagonals(data.vel_off_diagonals)
+    , vel_update_prec(data.vel_update_prec)
+    , vel_eps(data.vel_eps)
+    , vel_diag_strength(data.vel_diag_strength)
   {
     if (deg < 1)
       std::cout
@@ -772,11 +778,13 @@ namespace Step35
       {
         vel_exact.set_time(t_0);
         vel_exact.set_component(d);
-        VectorTools::interpolate(
-          dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n_minus_1[d]);
+        VectorTools::interpolate(dof_handler_velocity,
+                                 Functions::ZeroFunction<dim>(),
+                                 u_n_minus_1[d]);
         vel_exact.advance_time(dt);
-        VectorTools::interpolate(
-          dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n[d]);
+        VectorTools::interpolate(dof_handler_velocity,
+                                 Functions::ZeroFunction<dim>(),
+                                 u_n[d]);
       }
   }
 
@@ -811,10 +819,12 @@ namespace Step35
     vel_Laplace.reinit(sparsity_pattern_velocity);
     vel_Advection.reinit(sparsity_pattern_velocity);
 
-    MatrixCreator::create_mass_matrix(
-      dof_handler_velocity, quadrature_velocity, vel_Mass);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler_velocity, quadrature_velocity, vel_Laplace);
+    MatrixCreator::create_mass_matrix(dof_handler_velocity,
+                                      quadrature_velocity,
+                                      vel_Mass);
+    MatrixCreator::create_laplace_matrix(dof_handler_velocity,
+                                         quadrature_velocity,
+                                         vel_Laplace);
   }
 
   // The initialization of the matrices that act on the pressure space is
@@ -833,10 +843,12 @@ namespace Step35
     pres_iterative.reinit(sparsity_pattern_pressure);
     pres_Mass.reinit(sparsity_pattern_pressure);
 
-    MatrixCreator::create_laplace_matrix(
-      dof_handler_pressure, quadrature_pressure, pres_Laplace);
-    MatrixCreator::create_mass_matrix(
-      dof_handler_pressure, quadrature_pressure, pres_Mass);
+    MatrixCreator::create_laplace_matrix(dof_handler_pressure,
+                                         quadrature_pressure,
+                                         pres_Laplace);
+    MatrixCreator::create_mass_matrix(dof_handler_pressure,
+                                      quadrature_pressure,
+                                      pres_Mass);
   }
 
 
@@ -853,13 +865,15 @@ namespace Step35
     {
       DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(),
                                  dof_handler_pressure.n_dofs());
-      DoFTools::make_sparsity_pattern(
-        dof_handler_velocity, dof_handler_pressure, dsp);
+      DoFTools::make_sparsity_pattern(dof_handler_velocity,
+                                      dof_handler_pressure,
+                                      dsp);
       sparsity_pattern_pres_vel.copy_from(dsp);
     }
 
-    InitGradPerTaskData per_task_data(
-      0, fe_velocity.dofs_per_cell, fe_pressure.dofs_per_cell);
+    InitGradPerTaskData per_task_data(0,
+                                      fe_velocity.dofs_per_cell,
+                                      fe_pressure.dofs_per_cell);
     InitGradScratchData scratch_data(fe_velocity,
                                      fe_pressure,
                                      quadrature_velocity,
@@ -1064,8 +1078,10 @@ namespace Step35
                   Assert(false, ExcNotImplemented());
               }
           }
-        MatrixTools::apply_boundary_values(
-          boundary_values, vel_it_matrix[d], u_n[d], force[d]);
+        MatrixTools::apply_boundary_values(boundary_values,
+                                           vel_it_matrix[d],
+                                           u_n[d],
+                                           force[d]);
       }
 
 
@@ -1193,8 +1209,10 @@ namespace Step35
 
     static std::map<types::global_dof_index, double> bval;
     if (reinit_prec)
-      VectorTools::interpolate_boundary_values(
-        dof_handler_pressure, 3, Functions::ZeroFunction<dim>(), bval);
+      VectorTools::interpolate_boundary_values(dof_handler_pressure,
+                                               3,
+                                               Functions::ZeroFunction<dim>(),
+                                               bval);
 
     MatrixTools::apply_boundary_values(bval, pres_iterative, phi_n, pres_tmp);
 

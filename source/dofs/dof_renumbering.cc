@@ -129,8 +129,10 @@ namespace DoFRenumbering
     {
       std::vector<types::global_dof_index> renumbering(
         dof_handler.n_dofs(), numbers::invalid_dof_index);
-      compute_Cuthill_McKee(
-        renumbering, dof_handler, reversed_numbering, use_constraints);
+      compute_Cuthill_McKee(renumbering,
+                            dof_handler,
+                            reversed_numbering,
+                            use_constraints);
 
       // actually perform renumbering;
       // this is dimension specific and
@@ -189,8 +191,10 @@ namespace DoFRenumbering
     {
       std::vector<types::global_dof_index> renumbering(
         dof_handler.n_dofs(), numbers::invalid_dof_index);
-      compute_king_ordering(
-        renumbering, dof_handler, reversed_numbering, use_constraints);
+      compute_king_ordering(renumbering,
+                            dof_handler,
+                            reversed_numbering,
+                            use_constraints);
 
       // actually perform renumbering;
       // this is dimension specific and
@@ -243,8 +247,10 @@ namespace DoFRenumbering
     {
       std::vector<types::global_dof_index> renumbering(
         dof_handler.n_dofs(), numbers::invalid_dof_index);
-      compute_minimum_degree(
-        renumbering, dof_handler, reversed_numbering, use_constraints);
+      compute_minimum_degree(renumbering,
+                             dof_handler,
+                             reversed_numbering,
+                             use_constraints);
 
       // actually perform renumbering;
       // this is dimension specific and
@@ -327,8 +333,9 @@ namespace DoFRenumbering
         make_iterator_property_map(degree.begin(), id, degree[0]),
         inverse_perm.data(),
         perm.data(),
-        make_iterator_property_map(
-          supernode_sizes.begin(), id, supernode_sizes[0]),
+        make_iterator_property_map(supernode_sizes.begin(),
+                                   id,
+                                   supernode_sizes[0]),
         delta,
         id);
 
@@ -346,8 +353,9 @@ namespace DoFRenumbering
       if (reversed_numbering == true)
         std::copy(perm.begin(), perm.end(), new_dof_indices.begin());
       else
-        std::copy(
-          inverse_perm.begin(), inverse_perm.end(), new_dof_indices.begin());
+        std::copy(inverse_perm.begin(),
+                  inverse_perm.end(),
+                  new_dof_indices.begin());
     }
 
   } // namespace boost
@@ -420,8 +428,9 @@ namespace DoFRenumbering
         DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
         DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
-        SparsityTools::reorder_Cuthill_McKee(
-          dsp, new_indices, starting_indices);
+        SparsityTools::reorder_Cuthill_McKee(dsp,
+                                             new_indices,
+                                             starting_indices);
         if (reversed_numbering)
           new_indices = Utilities::reverse_permutation(new_indices);
       }
@@ -463,8 +472,9 @@ namespace DoFRenumbering
         // then create first the global sparsity pattern, and then the local
         // sparsity pattern from the global one by transferring its indices to
         // processor-local (locally owned or locally active) index space
-        DynamicSparsityPattern dsp(
-          dof_handler.n_dofs(), dof_handler.n_dofs(), index_set_to_use);
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(),
+                                   dof_handler.n_dofs(),
+                                   index_set_to_use);
         DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
         DynamicSparsityPattern local_sparsity(index_set_to_use.n_elements(),
@@ -482,8 +492,10 @@ namespace DoFRenumbering
                 if (col != row && index_set_to_use.is_element(col))
                   row_entries.push_back(index_set_to_use.index_within_set(col));
               }
-            local_sparsity.add_entries(
-              i, row_entries.begin(), row_entries.end(), true);
+            local_sparsity.add_entries(i,
+                                       row_entries.begin(),
+                                       row_entries.end(),
+                                       true);
           }
 
         // translate starting indices from global to local indices
@@ -497,8 +509,9 @@ namespace DoFRenumbering
         AssertDimension(new_indices.size(), locally_owned_dofs.n_elements());
         std::vector<types::global_dof_index> my_new_indices(
           index_set_to_use.n_elements());
-        SparsityTools::reorder_Cuthill_McKee(
-          local_sparsity, my_new_indices, local_starting_indices);
+        SparsityTools::reorder_Cuthill_McKee(local_sparsity,
+                                             my_new_indices,
+                                             local_starting_indices);
         if (reversed_numbering)
           my_new_indices = Utilities::reverse_permutation(my_new_indices);
 
@@ -716,9 +729,10 @@ namespace DoFRenumbering
                                 fe_collection.n_components()));
 
     for (unsigned int i = 0; i < component_order.size(); ++i)
-      Assert(
-        component_order[i] < fe_collection.n_components(),
-        ExcIndexRange(component_order[i], 0, fe_collection.n_components()));
+      Assert(component_order[i] < fe_collection.n_components(),
+             ExcIndexRange(component_order[i],
+                           0,
+                           fe_collection.n_components()));
 
     // vector to hold the dof indices on
     // the cell we visit at a time
@@ -945,8 +959,10 @@ namespace DoFRenumbering
       dim,
       spacedim,
       typename DoFHandler<dim, spacedim>::active_cell_iterator,
-      typename DoFHandler<dim, spacedim>::level_cell_iterator>(
-      renumbering, start, end, false);
+      typename DoFHandler<dim, spacedim>::level_cell_iterator>(renumbering,
+                                                               start,
+                                                               end,
+                                                               false);
     if (result == 0)
       return;
 
@@ -983,8 +999,10 @@ namespace DoFRenumbering
       dim,
       spacedim,
       typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
-      typename hp::DoFHandler<dim, spacedim>::level_cell_iterator>(
-      renumbering, start, end, false);
+      typename hp::DoFHandler<dim, spacedim>::level_cell_iterator>(renumbering,
+                                                                   start,
+                                                                   end,
+                                                                   false);
 
     if (result == 0)
       return;
@@ -1015,8 +1033,10 @@ namespace DoFRenumbering
       dim,
       spacedim,
       typename DoFHandler<dim, spacedim>::level_cell_iterator,
-      typename DoFHandler<dim, spacedim>::level_cell_iterator>(
-      renumbering, start, end, true);
+      typename DoFHandler<dim, spacedim>::level_cell_iterator>(renumbering,
+                                                               start,
+                                                               end,
+                                                               true);
 
     if (result == 0)
       return;
@@ -1448,8 +1468,10 @@ namespace DoFRenumbering
 
     std::vector<types::global_dof_index> renumbering(
       dof_handler.n_dofs(level), numbers::invalid_dof_index);
-    compute_sort_selected_dofs_back(
-      renumbering, dof_handler, selected_dofs, level);
+    compute_sort_selected_dofs_back(renumbering,
+                                    dof_handler,
+                                    selected_dofs,
+                                    level);
 
     dof_handler.renumber_dofs(level, renumbering);
   }
@@ -1614,11 +1636,11 @@ namespace DoFRenumbering
               }
           }
       }
-    Assert(
-      global_index == n_global_dofs,
-      ExcMessage("Traversing over the given set of cells did not cover all "
-                 "degrees of freedom in the DoFHandler. Does the set of cells "
-                 "not include all active cells?"));
+    Assert(global_index == n_global_dofs,
+           ExcMessage(
+             "Traversing over the given set of cells did not cover all "
+             "degrees of freedom in the DoFHandler. Does the set of cells "
+             "not include all active cells?"));
 
     for (types::global_dof_index i = 0; i < reverse.size(); ++i)
       new_indices[reverse[i]] = i;
@@ -1691,11 +1713,11 @@ namespace DoFRenumbering
               }
           }
       }
-    Assert(
-      global_index == n_global_dofs,
-      ExcMessage("Traversing over the given set of cells did not cover all "
-                 "degrees of freedom in the DoFHandler. Does the set of cells "
-                 "not include all cells of the specified level?"));
+    Assert(global_index == n_global_dofs,
+           ExcMessage(
+             "Traversing over the given set of cells did not cover all "
+             "degrees of freedom in the DoFHandler. Does the set of cells "
+             "not include all cells of the specified level?"));
 
     for (types::global_dof_index i = 0; i < new_order.size(); ++i)
       new_order[reverse[i]] = i;
@@ -1784,8 +1806,9 @@ namespace DoFRenumbering
                 fe_collection[comp].get_unit_support_points()));
           }
         hp::FEValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-          hp_fe_values(
-            fe_collection, quadrature_collection, update_quadrature_points);
+          hp_fe_values(fe_collection,
+                       quadrature_collection,
+                       update_quadrature_points);
 
         std::vector<bool> already_touched(n_dofs, false);
 
@@ -1815,8 +1838,9 @@ namespace DoFRenumbering
 
         ComparePointwiseDownstream<DoFHandlerType::space_dimension> comparator(
           direction);
-        std::sort(
-          support_point_list.begin(), support_point_list.end(), comparator);
+        std::sort(support_point_list.begin(),
+                  support_point_list.end(),
+                  comparator);
         for (types::global_dof_index i = 0; i < n_dofs; ++i)
           new_indices[support_point_list[i].second] = i;
       }
@@ -1914,8 +1938,9 @@ namespace DoFRenumbering
 
         ComparePointwiseDownstream<DoFHandlerType::space_dimension> comparator(
           direction);
-        std::sort(
-          support_point_list.begin(), support_point_list.end(), comparator);
+        std::sort(support_point_list.begin(),
+                  support_point_list.end(),
+                  comparator);
         for (types::global_dof_index i = 0; i < n_dofs; ++i)
           new_indices[support_point_list[i].second] = i;
       }
@@ -1943,9 +1968,9 @@ namespace DoFRenumbering
       /**
        * Constructor.
        */
-      ClockCells(const Point<dim> &center, bool counter) :
-        center(center),
-        counter(counter)
+      ClockCells(const Point<dim> &center, bool counter)
+        : center(center)
+        , counter(counter)
       {}
 
       /**
@@ -2097,8 +2122,9 @@ namespace DoFRenumbering
     for (unsigned int i = 1; i < n_dofs; ++i)
       {
         // get a random number between 0 and i (inclusive)
-        const unsigned int j = ::boost::random::uniform_int_distribution<>(
-          0, i)(random_number_generator);
+        const unsigned int j =
+          ::boost::random::uniform_int_distribution<>(0, i)(
+            random_number_generator);
 
         // if possible, swap the elements
         if (i != j)

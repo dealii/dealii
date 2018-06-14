@@ -474,8 +474,9 @@ project(const Mapping<dim> &    mapping,
 
   // set up mass matrix and right hand side
   vec.reinit(dof.n_dofs());
-  SparsityPattern sparsity(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern sparsity(dof.n_dofs(),
+                           dof.n_dofs(),
+                           dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, sparsity);
   constraints.condense(sparsity);
 

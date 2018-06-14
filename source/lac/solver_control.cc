@@ -30,20 +30,20 @@ DEAL_II_NAMESPACE_OPEN
 SolverControl::SolverControl(const unsigned int maxiter,
                              const double       tolerance,
                              const bool         m_log_history,
-                             const bool         m_log_result) :
-  maxsteps(maxiter),
-  tol(tolerance),
-  lcheck(failure),
-  initial_val(numbers::signaling_nan<double>()),
-  lvalue(numbers::signaling_nan<double>()),
-  lstep(numbers::invalid_unsigned_int),
-  check_failure(false),
-  relative_failure_residual(0),
-  failure_residual(0),
-  m_log_history(m_log_history),
-  m_log_frequency(1),
-  m_log_result(m_log_result),
-  history_data_enabled(false)
+                             const bool         m_log_result)
+  : maxsteps(maxiter)
+  , tol(tolerance)
+  , lcheck(failure)
+  , initial_val(numbers::signaling_nan<double>())
+  , lvalue(numbers::signaling_nan<double>())
+  , lstep(numbers::invalid_unsigned_int)
+  , check_failure(false)
+  , relative_failure_residual(0)
+  , failure_residual(0)
+  , m_log_history(m_log_history)
+  , m_log_frequency(1)
+  , m_log_result(m_log_result)
+  , history_data_enabled(false)
 {}
 
 
@@ -228,17 +228,17 @@ ReductionControl::ReductionControl(const unsigned int n,
                                    const double       tol,
                                    const double       red,
                                    const bool         m_log_history,
-                                   const bool         m_log_result) :
-  SolverControl(n, tol, m_log_history, m_log_result),
-  reduce(red),
-  reduced_tol(numbers::signaling_nan<double>())
+                                   const bool         m_log_result)
+  : SolverControl(n, tol, m_log_history, m_log_result)
+  , reduce(red)
+  , reduced_tol(numbers::signaling_nan<double>())
 {}
 
 
-ReductionControl::ReductionControl(const SolverControl &c) :
-  SolverControl(c),
-  reduce(numbers::signaling_nan<double>()),
-  reduced_tol(numbers::signaling_nan<double>())
+ReductionControl::ReductionControl(const SolverControl &c)
+  : SolverControl(c)
+  , reduce(numbers::signaling_nan<double>())
+  , reduced_tol(numbers::signaling_nan<double>())
 {
   set_reduction(0.);
 }
@@ -312,8 +312,8 @@ ReductionControl::parse_parameters(ParameterHandler &param)
 IterationNumberControl::IterationNumberControl(const unsigned int n,
                                                const double       tolerance,
                                                const bool         m_log_history,
-                                               const bool m_log_result) :
-  SolverControl(n, tolerance, m_log_history, m_log_result)
+                                               const bool         m_log_result)
+  : SolverControl(n, tolerance, m_log_history, m_log_result)
 {}
 
 
@@ -346,10 +346,10 @@ ConsecutiveControl::ConsecutiveControl(
   const double       tolerance,
   const unsigned int n_consecutive_iterations,
   const bool         m_log_history,
-  const bool         m_log_result) :
-  SolverControl(n, tolerance, m_log_history, m_log_result),
-  n_consecutive_iterations(n_consecutive_iterations),
-  n_converged_iterations(0)
+  const bool         m_log_result)
+  : SolverControl(n, tolerance, m_log_history, m_log_result)
+  , n_consecutive_iterations(n_consecutive_iterations)
+  , n_converged_iterations(0)
 {
   AssertThrow(n_consecutive_iterations > 0,
               ExcMessage("n_consecutive_iterations should be positive"));
@@ -357,10 +357,10 @@ ConsecutiveControl::ConsecutiveControl(
 
 
 
-ConsecutiveControl::ConsecutiveControl(const SolverControl &c) :
-  SolverControl(c),
-  n_consecutive_iterations(1),
-  n_converged_iterations(0)
+ConsecutiveControl::ConsecutiveControl(const SolverControl &c)
+  : SolverControl(c)
+  , n_consecutive_iterations(1)
+  , n_converged_iterations(0)
 {}
 
 

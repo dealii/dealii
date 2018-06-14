@@ -78,7 +78,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -104,7 +105,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -130,7 +132,8 @@ template <int dim>
 class FluxBoundaryValues : public Function<dim>
 {
 public:
-  FluxBoundaryValues() : Function<dim>()
+  FluxBoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -154,7 +157,8 @@ template <int dim>
 class Advection : public TensorFunction<1, dim>
 {
 public:
-  Advection() : TensorFunction<1, dim>()
+  Advection()
+    : TensorFunction<1, dim>()
   {}
 
   virtual Tensor<1, dim>
@@ -520,10 +524,10 @@ private:
 
 template <int dim>
 MeshWorkerConstraintMatrixTest<dim>::MeshWorkerConstraintMatrixTest(
-  const FiniteElement<dim> &fe) :
-  mapping(),
-  dof_handler(triangulation),
-  fe(fe)
+  const FiniteElement<dim> &fe)
+  : mapping()
+  , dof_handler(triangulation)
+  , fe(fe)
 {
   GridGenerator::hyper_cube(this->triangulation, -1, 1);
 
@@ -562,11 +566,15 @@ MeshWorkerConstraintMatrixTest<dim>::setup_system()
   std::string fe_name = fe.get_name();
   std::size_t found   = fe_name.find(str);
   if (found != std::string::npos)
-    DoFTools::make_flux_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_flux_sparsity_pattern(dof_handler,
+                                         c_sparsity,
+                                         constraints,
+                                         false);
   else
-    DoFTools::make_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_sparsity_pattern(dof_handler,
+                                    c_sparsity,
+                                    constraints,
+                                    false);
 
   sparsity_pattern.copy_from(c_sparsity);
 
@@ -585,8 +593,9 @@ MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
   MeshWorker::IntegrationInfoBox<dim> info_box;
 
   const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  info_box.initialize_gauss_quadrature(n_gauss_points,
+                                       n_gauss_points,
+                                       n_gauss_points);
 
   UpdateFlags update_flags =
     update_quadrature_points | update_values | update_gradients;
@@ -620,8 +629,9 @@ MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
   MeshWorker::IntegrationInfoBox<dim> info_box;
 
   const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  info_box.initialize_gauss_quadrature(n_gauss_points,
+                                       n_gauss_points,
+                                       n_gauss_points);
 
   UpdateFlags update_flags =
     update_quadrature_points | update_values | update_gradients;
@@ -662,12 +672,15 @@ MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
 {
   this->constraintsInhom.clear();
   // boundary constraints
-  VectorTools::interpolate_boundary_values(
-    this->dof_handler, 0, BoundaryValues<dim>(), this->constraintsInhom);
+  VectorTools::interpolate_boundary_values(this->dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           this->constraintsInhom);
   // constraint of the origin
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    this->mapping, this->dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points(this->mapping,
+                                       this->dof_handler,
+                                       support_points);
   for (unsigned int dof_index = 0; dof_index < this->dof_handler.n_dofs();
        ++dof_index)
     {

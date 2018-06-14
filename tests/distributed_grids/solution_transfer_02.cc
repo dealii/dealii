@@ -44,7 +44,8 @@ template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
-  MyFunction() : Function<dim>(){};
+  MyFunction()
+    : Function<dim>(){};
 
   virtual double
   value(const Point<dim> &p, const unsigned int) const

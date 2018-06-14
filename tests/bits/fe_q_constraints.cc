@@ -67,7 +67,8 @@ public:
 
 
 template <int dim>
-TestFunction<dim>::TestFunction(const unsigned int p_order) : p_order(p_order)
+TestFunction<dim>::TestFunction(const unsigned int p_order)
+  : p_order(p_order)
 {
   std::vector<double> coeff(p_order);
 
@@ -120,11 +121,11 @@ private:
 
 template <int dim>
 TestFEQConstraints<dim>::TestFEQConstraints(unsigned int p_order,
-                                            unsigned int refinements) :
-  refinements(refinements),
-  p_order(p_order),
-  fe(p_order),
-  dof_handler(triangulation)
+                                            unsigned int refinements)
+  : refinements(refinements)
+  , p_order(p_order)
+  , fe(p_order)
+  , dof_handler(triangulation)
 {}
 
 
@@ -141,8 +142,10 @@ TestFEQConstraints<dim>::refine_grid_random()
   for (unsigned int i = 0; i < n_cells; ++i)
     estimated_error_per_cell(i) = random_value<double>();
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
   triangulation.execute_coarsening_and_refinement();
 }
 

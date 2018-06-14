@@ -76,12 +76,12 @@ test()
 
   DynamicSparsityPattern         sp(relevant);
   typename LA::MPI::SparseMatrix matrix;
-  DoFTools::make_sparsity_pattern(
-    dof_handler,
-    sp,
-    cm,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  sp,
+                                  cm,
+                                  false,
+                                  Utilities::MPI::this_mpi_process(
+                                    MPI_COMM_WORLD));
   SparsityTools::distribute_sparsity_pattern(
     sp,
     dof_handler.n_locally_owned_dofs_per_processor(),
@@ -137,12 +137,12 @@ test_trilinos_alternative()
 
   TrilinosWrappers::SparsityPattern sp(owned, MPI_COMM_WORLD);
   typename LA::MPI::SparseMatrix    matrix;
-  DoFTools::make_sparsity_pattern(
-    dof_handler,
-    sp,
-    cm,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  sp,
+                                  cm,
+                                  false,
+                                  Utilities::MPI::this_mpi_process(
+                                    MPI_COMM_WORLD));
   sp.compress();
   matrix.reinit(sp);
 

@@ -28,9 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template <int dim, int spacedim, typename Number>
-  VectorDataBase<dim, spacedim, Number>::VectorDataBase(
-    const VectorSelector &v) :
-    VectorSelector(v)
+  VectorDataBase<dim, spacedim, Number>::VectorDataBase(const VectorSelector &v)
+    : VectorSelector(v)
   {}
 
 
@@ -82,8 +81,8 @@ namespace MeshWorker
   //----------------------------------------------------------------------//
 
   template <typename VectorType, int dim, int spacedim>
-  VectorData<VectorType, dim, spacedim>::VectorData(const VectorSelector &s) :
-    VectorDataBase<dim, spacedim, typename VectorType::value_type>(s)
+  VectorData<VectorType, dim, spacedim>::VectorData(const VectorSelector &s)
+    : VectorDataBase<dim, spacedim, typename VectorType::value_type>(s)
   {}
 
 
@@ -145,8 +144,10 @@ namespace MeshWorker
         VectorSlice<std::vector<
           std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
           dst(gradients[i], component, n_comp);
-        fe.get_function_gradients(
-          *src, make_slice(index, start, size), dst, true);
+        fe.get_function_gradients(*src,
+                                  make_slice(index, start, size),
+                                  dst,
+                                  true);
       }
 
     for (unsigned int i = 0; i < this->n_hessians(); ++i)
@@ -156,8 +157,10 @@ namespace MeshWorker
         VectorSlice<std::vector<
           std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
           dst(hessians[i], component, n_comp);
-        fe.get_function_hessians(
-          *src, make_slice(index, start, size), dst, true);
+        fe.get_function_hessians(*src,
+                                 make_slice(index, start, size),
+                                 dst,
+                                 true);
       }
   }
 
@@ -174,9 +177,8 @@ namespace MeshWorker
   //----------------------------------------------------------------------//
 
   template <typename VectorType, int dim, int spacedim>
-  MGVectorData<VectorType, dim, spacedim>::MGVectorData(
-    const VectorSelector &s) :
-    VectorData<VectorType, dim, spacedim>(s)
+  MGVectorData<VectorType, dim, spacedim>::MGVectorData(const VectorSelector &s)
+    : VectorData<VectorType, dim, spacedim>(s)
   {}
 
 
@@ -233,8 +235,10 @@ namespace MeshWorker
           data.read_ptr<MGLevelObject<VectorType>>(this->value_index(i));
         VectorSlice<std::vector<std::vector<typename VectorType::value_type>>>
           dst(values[i], component, n_comp);
-        fe.get_function_values(
-          (*src)[level], make_slice(index, start, size), dst, true);
+        fe.get_function_values((*src)[level],
+                               make_slice(index, start, size),
+                               dst,
+                               true);
       }
 
     for (unsigned int i = 0; i < this->n_gradients(); ++i)
@@ -244,8 +248,10 @@ namespace MeshWorker
         VectorSlice<std::vector<
           std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
           dst(gradients[i], component, n_comp);
-        fe.get_function_gradients(
-          (*src)[level], make_slice(index, start, size), dst, true);
+        fe.get_function_gradients((*src)[level],
+                                  make_slice(index, start, size),
+                                  dst,
+                                  true);
       }
 
     for (unsigned int i = 0; i < this->n_hessians(); ++i)
@@ -255,8 +261,10 @@ namespace MeshWorker
         VectorSlice<std::vector<
           std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
           dst(hessians[i], component, n_comp);
-        fe.get_function_hessians(
-          (*src)[level], make_slice(index, start, size), dst, true);
+        fe.get_function_hessians((*src)[level],
+                                 make_slice(index, start, size),
+                                 dst,
+                                 true);
       }
   }
 } // namespace MeshWorker

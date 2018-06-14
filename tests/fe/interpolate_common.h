@@ -90,7 +90,8 @@ template <int dim, int degree, int COMP = 1>
 class Q1WedgeFunction : public Function<dim>
 {
 public:
-  Q1WedgeFunction() : Function<dim>(COMP)
+  Q1WedgeFunction()
+    : Function<dim>(COMP)
   {}
 
   double

@@ -84,7 +84,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -97,7 +98,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -131,11 +133,11 @@ BoundaryValues<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-Step4<dim>::Step4() :
-  fe(3),
-  dof_handler(triangulation),
-  fe_precondition(3),
-  dof_handler_precondition(triangulation)
+Step4<dim>::Step4()
+  : fe(3)
+  , dof_handler(triangulation)
+  , fe_precondition(3)
+  , dof_handler_precondition(triangulation)
 {}
 
 
@@ -158,8 +160,10 @@ Step4<dim>::setup_system()
 
   constraints.clear();
   std::map<unsigned int, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           constraints);
   constraints.close();
 
   DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
@@ -267,8 +271,9 @@ Step4<dim>::assemble_preconditioner()
           }
 
       cell->get_dof_indices(local_dof_indices);
-      constraints.distribute_local_to_global(
-        cell_matrix, local_dof_indices, preconditioner_matrix);
+      constraints.distribute_local_to_global(cell_matrix,
+                                             local_dof_indices,
+                                             preconditioner_matrix);
     }
   preconditioner_matrix.compress(VectorOperation::add);
 }

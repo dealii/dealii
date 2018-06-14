@@ -207,12 +207,12 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const unsigned int deg) :
-  triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-  mapping(1),
-  fe(FE_Q<dim>(deg), 3),
-  mg_dof_handler_renumbered(triangulation),
-  degree(deg)
+LaplaceProblem<dim>::LaplaceProblem(const unsigned int deg)
+  : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+  , mapping(1)
+  , fe(FE_Q<dim>(deg), 3)
+  , mg_dof_handler_renumbered(triangulation)
+  , degree(deg)
 {}
 
 
@@ -295,8 +295,9 @@ LaplaceProblem<dim>::test_boundary()
   typename FunctionMap<dim>::type dirichlet_boundary;
   Functions::ZeroFunction<dim>    dirichlet_bc(fe.n_components());
   dirichlet_boundary[0] = &dirichlet_bc;
-  MGTools::make_boundary_list(
-    mg_dof_handler_renumbered, dirichlet_boundary, boundary_indices_renumbered);
+  MGTools::make_boundary_list(mg_dof_handler_renumbered,
+                              dirichlet_boundary,
+                              boundary_indices_renumbered);
 
   MGLevelObject<Vector<double>> u(0, triangulation.n_levels() - 1);
   MGLevelObject<Vector<double>> d(0, triangulation.n_levels() - 1);

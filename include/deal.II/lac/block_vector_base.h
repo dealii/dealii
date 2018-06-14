@@ -1071,26 +1071,26 @@ namespace internal
   {
     template <class BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness>::Iterator(
-      const Iterator<BlockVectorType, Constness> &c) :
-      parent(c.parent),
-      global_index(c.global_index),
-      current_block(c.current_block),
-      index_within_block(c.index_within_block),
-      next_break_forward(c.next_break_forward),
-      next_break_backward(c.next_break_backward)
+      const Iterator<BlockVectorType, Constness> &c)
+      : parent(c.parent)
+      , global_index(c.global_index)
+      , current_block(c.current_block)
+      , index_within_block(c.index_within_block)
+      , next_break_forward(c.next_break_forward)
+      , next_break_backward(c.next_break_backward)
     {}
 
 
 
     template <class BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness>::Iterator(
-      const Iterator<BlockVectorType, !Constness> &c) :
-      parent(c.parent),
-      global_index(c.global_index),
-      current_block(c.current_block),
-      index_within_block(c.index_within_block),
-      next_break_forward(c.next_break_forward),
-      next_break_backward(c.next_break_backward)
+      const Iterator<BlockVectorType, !Constness> &c)
+      : parent(c.parent)
+      , global_index(c.global_index)
+      , current_block(c.current_block)
+      , index_within_block(c.index_within_block)
+      , next_break_forward(c.next_break_forward)
+      , next_break_backward(c.next_break_backward)
     {
       // Only permit copy-constructing const iterators from non-const
       // iterators, and not vice versa (i.e., Constness must always be
@@ -1109,13 +1109,13 @@ namespace internal
       const size_type current_block,
       const size_type index_within_block,
       const size_type next_break_forward,
-      const size_type next_break_backward) :
-      parent(&parent),
-      global_index(global_index),
-      current_block(current_block),
-      index_within_block(index_within_block),
-      next_break_forward(next_break_forward),
-      next_break_backward(next_break_backward)
+      const size_type next_break_backward)
+      : parent(&parent)
+      , global_index(global_index)
+      , current_block(current_block)
+      , index_within_block(index_within_block)
+      , next_break_forward(next_break_forward)
+      , next_break_backward(next_break_backward)
     {}
 
 
@@ -1411,11 +1411,10 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    Iterator<BlockVectorType, Constness>::Iterator(
-      BlockVector &   parent,
-      const size_type global_index) :
-      parent(&parent),
-      global_index(global_index)
+    Iterator<BlockVectorType, Constness>::Iterator(BlockVector &   parent,
+                                                   const size_type global_index)
+      : parent(&parent)
+      , global_index(global_index)
     {
       // find which block we are
       // in. for this, take into

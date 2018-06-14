@@ -112,7 +112,8 @@ template <int dim>
 class PushForward : public Function<dim>
 {
 public:
-  PushForward() : Function<dim>(dim)
+  PushForward()
+    : Function<dim>(dim)
   {}
 
   double
@@ -138,7 +139,8 @@ template <int dim>
 class PullBack : public Function<dim>
 {
 public:
-  PullBack() : Function<dim>(dim)
+  PullBack()
+    : Function<dim>(dim)
   {}
 
   double
@@ -183,7 +185,8 @@ class CubicRoofManifold : private CubicRoofFunctions<dim>,
                           public FunctionManifold<dim>
 {
 public:
-  CubicRoofManifold() : FunctionManifold<dim>(this->forward, this->backward)
+  CubicRoofManifold()
+    : FunctionManifold<dim>(this->forward, this->backward)
   {}
 };
 
@@ -239,13 +242,13 @@ protected:
 
 
 template <int dim>
-JxWError<dim>::JxWError(const unsigned int n_global_refines) :
-  manufactured_solution(new HardManufacturedSolution<dim>()),
-  manufactured_forcing(new HardManufacturedForcing<dim>()),
-  finite_element(fe_order),
-  dof_handler(triangulation),
-  cell_quadrature(fe_order + 1),
-  cell_mapping(fe_order)
+JxWError<dim>::JxWError(const unsigned int n_global_refines)
+  : manufactured_solution(new HardManufacturedSolution<dim>())
+  , manufactured_forcing(new HardManufacturedForcing<dim>())
+  , finite_element(fe_order)
+  , dof_handler(triangulation)
+  , cell_quadrature(fe_order + 1)
+  , cell_mapping(fe_order)
 
 {
   boundary_manifold = cubic_roof(triangulation);
@@ -337,12 +340,12 @@ double
 JxWError<dim>::solve()
 {
   {
-    SolverControl solver_control(
-      std::max(types::global_dof_index(100),
-               static_cast<types::global_dof_index>(system_rhs.size())),
-      1e-14 * system_rhs.l2_norm(),
-      false,
-      false);
+    SolverControl      solver_control(std::max(types::global_dof_index(100),
+                                          static_cast<types::global_dof_index>(
+                                            system_rhs.size())),
+                                 1e-14 * system_rhs.l2_norm(),
+                                 false,
+                                 false);
     SolverCG<>         solver(solver_control);
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
@@ -363,8 +366,10 @@ JxWError<dim>::solve()
     QIterated<dim>(QGauss<1>(finite_element.degree), 2),
     VectorTools::L2_norm);
 
-  const double l2_error = VectorTools::compute_global_error(
-    triangulation, cell_l2_error, VectorTools::L2_norm);
+  const double l2_error =
+    VectorTools::compute_global_error(triangulation,
+                                      cell_l2_error,
+                                      VectorTools::L2_norm);
   return l2_error;
 }
 

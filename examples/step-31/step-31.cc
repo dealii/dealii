@@ -130,7 +130,8 @@ namespace Step31
     class TemperatureInitialValues : public Function<dim>
     {
     public:
-      TemperatureInitialValues() : Function<dim>(1)
+      TemperatureInitialValues()
+        : Function<dim>(1)
       {}
 
       virtual double value(const Point<dim> & p,
@@ -163,7 +164,8 @@ namespace Step31
     class TemperatureRightHandSide : public Function<dim>
     {
     public:
-      TemperatureRightHandSide() : Function<dim>(1)
+      TemperatureRightHandSide()
+        : Function<dim>(1)
       {}
 
       virtual double value(const Point<dim> & p,
@@ -281,9 +283,9 @@ namespace Step31
     template <class MatrixType, class PreconditionerType>
     InverseMatrix<MatrixType, PreconditionerType>::InverseMatrix(
       const MatrixType &        m,
-      const PreconditionerType &preconditioner) :
-      matrix(&m),
-      preconditioner(preconditioner)
+      const PreconditionerType &preconditioner)
+      : matrix(&m)
+      , preconditioner(preconditioner)
     {}
 
 
@@ -402,11 +404,11 @@ namespace Step31
         const TrilinosWrappers::BlockSparseMatrix &S,
         const InverseMatrix<TrilinosWrappers::SparseMatrix,
                             PreconditionerTypeMp> &Mpinv,
-        const PreconditionerTypeA &                Apreconditioner) :
-      stokes_matrix(&S),
-      m_inverse(&Mpinv),
-      a_preconditioner(Apreconditioner),
-      tmp(complete_index_set(stokes_matrix->block(1, 1).m()))
+        const PreconditionerTypeA &                Apreconditioner)
+      : stokes_matrix(&S)
+      , m_inverse(&Mpinv)
+      , a_preconditioner(Apreconditioner)
+      , tmp(complete_index_set(stokes_matrix->block(1, 1).m()))
     {}
 
 
@@ -558,23 +560,25 @@ namespace Step31
   // initialize the time stepping as well as the options for matrix assembly
   // and preconditioning:
   template <int dim>
-  BoussinesqFlowProblem<dim>::BoussinesqFlowProblem() :
-    triangulation(Triangulation<dim>::maximum_smoothing),
-    global_Omega_diameter(std::numeric_limits<double>::quiet_NaN()),
-    stokes_degree(1),
-    stokes_fe(FE_Q<dim>(stokes_degree + 1), dim, FE_Q<dim>(stokes_degree), 1),
-    stokes_dof_handler(triangulation),
+  BoussinesqFlowProblem<dim>::BoussinesqFlowProblem()
+    : triangulation(Triangulation<dim>::maximum_smoothing)
+    , global_Omega_diameter(std::numeric_limits<double>::quiet_NaN())
+    , stokes_degree(1)
+    , stokes_fe(FE_Q<dim>(stokes_degree + 1), dim, FE_Q<dim>(stokes_degree), 1)
+    , stokes_dof_handler(triangulation)
+    ,
 
-    temperature_degree(2),
-    temperature_fe(temperature_degree),
-    temperature_dof_handler(triangulation),
+    temperature_degree(2)
+    , temperature_fe(temperature_degree)
+    , temperature_dof_handler(triangulation)
+    ,
 
-    time_step(0),
-    old_time_step(0),
-    timestep_number(0),
-    rebuild_stokes_matrix(true),
-    rebuild_temperature_matrices(true),
-    rebuild_stokes_preconditioner(true)
+    time_step(0)
+    , old_time_step(0)
+    , timestep_number(0)
+    , rebuild_stokes_matrix(true)
+    , rebuild_temperature_matrices(true)
+    , rebuild_stokes_preconditioner(true)
   {}
 
 
@@ -880,8 +884,10 @@ namespace Step31
                                               stokes_constraints);
       std::set<types::boundary_id> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert(0);
-      VectorTools::compute_no_normal_flux_constraints(
-        stokes_dof_handler, 0, no_normal_flux_boundaries, stokes_constraints);
+      VectorTools::compute_no_normal_flux_constraints(stokes_dof_handler,
+                                                      0,
+                                                      no_normal_flux_boundaries,
+                                                      stokes_constraints);
       stokes_constraints.close();
     }
     {
@@ -894,8 +900,9 @@ namespace Step31
     }
 
     std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      stokes_dof_handler, stokes_dofs_per_block, stokes_sub_blocks);
+    DoFTools::count_dofs_per_block(stokes_dof_handler,
+                                   stokes_dofs_per_block,
+                                   stokes_sub_blocks);
 
     const unsigned int n_u = stokes_dofs_per_block[0],
                        n_p = stokes_dofs_per_block[1],
@@ -1019,8 +1026,10 @@ namespace Step31
       temperature_matrix.clear();
 
       DynamicSparsityPattern dsp(n_T, n_T);
-      DoFTools::make_sparsity_pattern(
-        temperature_dof_handler, dsp, temperature_constraints, false);
+      DoFTools::make_sparsity_pattern(temperature_dof_handler,
+                                      dsp,
+                                      temperature_constraints,
+                                      false);
 
       temperature_matrix.reinit(dsp);
       temperature_mass_matrix.reinit(temperature_matrix);
@@ -1167,10 +1176,10 @@ namespace Step31
 
     std::vector<std::vector<bool>> constant_modes;
     FEValuesExtractors::Vector     velocity_components(0);
-    DoFTools::extract_constant_modes(
-      stokes_dof_handler,
-      stokes_fe.component_mask(velocity_components),
-      constant_modes);
+    DoFTools::extract_constant_modes(stokes_dof_handler,
+                                     stokes_fe.component_mask(
+                                       velocity_components),
+                                     constant_modes);
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
     amg_data.constant_modes = constant_modes;
 
@@ -1276,8 +1285,9 @@ namespace Step31
       update_values | update_quadrature_points | update_JxW_values |
         (rebuild_stokes_matrix == true ? update_gradients : UpdateFlags(0)));
 
-    FEValues<dim> temperature_fe_values(
-      temperature_fe, quadrature_formula, update_values);
+    FEValues<dim> temperature_fe_values(temperature_fe,
+                                        quadrature_formula,
+                                        update_values);
 
     const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -1399,8 +1409,9 @@ namespace Step31
                                                         stokes_matrix,
                                                         stokes_rhs);
         else
-          stokes_constraints.distribute_local_to_global(
-            local_rhs, local_dof_indices, stokes_rhs);
+          stokes_constraints.distribute_local_to_global(local_rhs,
+                                                        local_dof_indices,
+                                                        stokes_rhs);
       }
 
     rebuild_stokes_matrix = false;
@@ -1546,13 +1557,15 @@ namespace Step31
     temperature_rhs = 0;
 
     const QGauss<dim> quadrature_formula(temperature_degree + 2);
-    FEValues<dim>     temperature_fe_values(
-      temperature_fe,
-      quadrature_formula,
-      update_values | update_gradients | update_hessians |
-        update_quadrature_points | update_JxW_values);
-    FEValues<dim> stokes_fe_values(
-      stokes_fe, quadrature_formula, update_values);
+    FEValues<dim>     temperature_fe_values(temperature_fe,
+                                        quadrature_formula,
+                                        update_values | update_gradients |
+                                          update_hessians |
+                                          update_quadrature_points |
+                                          update_JxW_values);
+    FEValues<dim>     stokes_fe_values(stokes_fe,
+                                   quadrature_formula,
+                                   update_values);
 
     const unsigned int dofs_per_cell = temperature_fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -1701,8 +1714,9 @@ namespace Step31
           }
 
         cell->get_dof_indices(local_dof_indices);
-        temperature_constraints.distribute_local_to_global(
-          local_rhs, local_dof_indices, temperature_rhs);
+        temperature_constraints.distribute_local_to_global(local_rhs,
+                                                           local_dof_indices,
+                                                           temperature_rhs);
       }
   }
 
@@ -1907,8 +1921,9 @@ namespace Step31
                              stokes_solution,
                              stokes_names,
                              stokes_component_interpretation);
-    data_out.add_data_vector(
-      temperature_dof_handler, temperature_solution, "T");
+    data_out.add_data_vector(temperature_dof_handler,
+                             temperature_solution,
+                             "T");
     data_out.build_patches(std::min(stokes_degree, temperature_degree));
 
     std::ofstream output("solution-" +
@@ -1964,8 +1979,10 @@ namespace Step31
                                        temperature_solution,
                                        estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_fraction(
-      triangulation, estimated_error_per_cell, 0.8, 0.1);
+    GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
+                                                      estimated_error_per_cell,
+                                                      0.8,
+                                                      0.1);
     if (triangulation.n_levels() > max_grid_level)
       for (typename Triangulation<dim>::active_cell_iterator cell =
              triangulation.begin_active(max_grid_level);
@@ -2167,9 +2184,9 @@ int main(int argc, char *argv[])
         argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(
-        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-        ExcMessage("This program can only be run in serial, use ./step-31"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+                  ExcMessage(
+                    "This program can only be run in serial, use ./step-31"));
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run();

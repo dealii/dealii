@@ -43,8 +43,10 @@ test(Utilities::CUDA::Handle &cuda_handle)
       for (unsigned int j = j_min; j < j_max; ++j)
         column_indices[i].emplace_back(j);
     }
-  sparsity_pattern.copy_from(
-    size, size, column_indices.begin(), column_indices.end());
+  sparsity_pattern.copy_from(size,
+                             size,
+                             column_indices.begin(),
+                             column_indices.end());
   matrix.reinit(sparsity_pattern);
   for (unsigned int i = 0; i < size; ++i)
     {
@@ -72,8 +74,9 @@ test(Utilities::CUDA::Handle &cuda_handle)
   rhs_dev.import(rhs_host, VectorOperation::insert);
 
   LinearAlgebra::CUDAWrappers::Vector<double> solution_dev(size);
-  const std::array<std::string, 3>            solver_names{
-    "Cholesky", "LU_dense", "LU_host"};
+  const std::array<std::string, 3>            solver_names{"Cholesky",
+                                                "LU_dense",
+                                                "LU_host"};
 
   for (auto solver_type : solver_names)
     {
@@ -81,8 +84,9 @@ test(Utilities::CUDA::Handle &cuda_handle)
       CUDAWrappers::SolverDirect<double>::AdditionalData data(solver_type);
       SolverControl                                      solver_control;
 
-      CUDAWrappers::SolverDirect<double> solver(
-        cuda_handle, solver_control, data);
+      CUDAWrappers::SolverDirect<double> solver(cuda_handle,
+                                                solver_control,
+                                                data);
       solver.solve(matrix_dev, solution_dev, rhs_dev);
 
       // Move the result back to the host

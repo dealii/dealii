@@ -100,8 +100,9 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
       if (my_pair.first->is_locally_owned())
         {
           computed_pts++;
-          auto cells_it = std::find(
-            computed_cells.begin(), computed_cells.end(), my_pair.first);
+          auto cells_it = std::find(computed_cells.begin(),
+                                    computed_cells.end(),
+                                    my_pair.first);
 
           if (cells_it == computed_cells.end())
             {

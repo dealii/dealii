@@ -54,7 +54,9 @@ private:
 
 
 template <int dim>
-TestFunction<dim>::TestFunction(unsigned int p) : Function<dim>(dim), degree(p)
+TestFunction<dim>::TestFunction(unsigned int p)
+  : Function<dim>(dim)
+  , degree(p)
 {}
 
 

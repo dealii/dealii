@@ -27,11 +27,11 @@ namespace Polynomials
     const Polynomial<number> &coefficients_on_interval,
     const unsigned int        n_intervals,
     const unsigned int        interval,
-    const bool                spans_next_interval) :
-    polynomial(coefficients_on_interval),
-    n_intervals(n_intervals),
-    interval(interval),
-    spans_two_intervals(spans_next_interval)
+    const bool                spans_next_interval)
+    : polynomial(coefficients_on_interval)
+    , n_intervals(n_intervals)
+    , interval(interval)
+    , spans_two_intervals(spans_next_interval)
   {
     Assert(n_intervals > 0, ExcMessage("No intervals given"));
     AssertIndexRange(interval, n_intervals);

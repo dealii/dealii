@@ -46,10 +46,10 @@ namespace
 } // namespace
 
 template <int dim>
-PolynomialsABF<dim>::PolynomialsABF(const unsigned int k) :
-  my_degree(k),
-  polynomial_space(get_abf_polynomials<dim>(k)),
-  n_pols(compute_n_pols(k))
+PolynomialsABF<dim>::PolynomialsABF(const unsigned int k)
+  : my_degree(k)
+  , polynomial_space(get_abf_polynomials<dim>(k))
+  , n_pols(compute_n_pols(k))
 {
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so

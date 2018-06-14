@@ -65,10 +65,10 @@ namespace GridTools
 
     const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
 
-    Assert(
-      tria.get_vertices().size() == marked_vertices.size() ||
-        marked_vertices.size() == 0,
-      ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+    Assert(tria.get_vertices().size() == marked_vertices.size() ||
+             marked_vertices.size() == 0,
+           ExcDimensionMismatch(tria.get_vertices().size(),
+                                marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -146,10 +146,10 @@ namespace GridTools
 
     auto vertices = extract_used_vertices(tria, mapping);
 
-    Assert(
-      tria.get_vertices().size() == marked_vertices.size() ||
-        marked_vertices.size() == 0,
-      ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+    Assert(tria.get_vertices().size() == marked_vertices.size() ||
+             marked_vertices.size() == 0,
+           ExcDimensionMismatch(tria.get_vertices().size(),
+                                marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -1052,8 +1052,9 @@ namespace GridTools
 
     const std::vector<typename MeshType::active_cell_iterator>
       ghost_cell_layer_within_distance =
-        compute_active_cell_layer_within_distance(
-          mesh, predicate, layer_thickness);
+        compute_active_cell_layer_within_distance(mesh,
+                                                  predicate,
+                                                  layer_thickness);
 
     // Check that we never return locally owned or artificial cells
     // What is left should only be the ghost cells
@@ -2164,11 +2165,11 @@ namespace GridTools
     const unsigned int size_new = matched_pairs.size();
     for (unsigned int i = size_old; i < size_new; ++i)
       {
-        Assert(
-          matched_pairs[i].orientation == 1,
-          ExcMessage("Found a face match with non standard orientation. "
-                     "This function is only suitable for meshes with cells "
-                     "in default orientation"));
+        Assert(matched_pairs[i].orientation == 1,
+               ExcMessage(
+                 "Found a face match with non standard orientation. "
+                 "This function is only suitable for meshes with cells "
+                 "in default orientation"));
       }
 #endif
   }

@@ -41,12 +41,12 @@ namespace parallel
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
       const bool     allow_artificial_cells,
-      const Settings settings) :
-      dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator,
-                                                     smooth_grid,
-                                                     false),
-      settings(settings),
-      allow_artificial_cells(allow_artificial_cells)
+      const Settings settings)
+      : dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator,
+                                                       smooth_grid,
+                                                       false)
+      , settings(settings)
+      , allow_artificial_cells(allow_artificial_cells)
     {
       const auto partition_settings =
         (partition_zoltan | partition_metis | partition_zorder |
@@ -102,13 +102,13 @@ namespace parallel
       if (partition_settings == partition_zoltan)
         {
 #  ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
-          AssertThrow(
-            false,
-            ExcMessage("Choosing 'partition_zoltan' requires the library "
-                       "to be compiled with support for Zoltan! "
-                       "Instead, you might use 'partition_auto' to select "
-                       "a partitioning algorithm that is supported "
-                       "by your current configuration."));
+          AssertThrow(false,
+                      ExcMessage(
+                        "Choosing 'partition_zoltan' requires the library "
+                        "to be compiled with support for Zoltan! "
+                        "Instead, you might use 'partition_auto' to select "
+                        "a partitioning algorithm that is supported "
+                        "by your current configuration."));
 #  else
           GridTools::partition_triangulation(
             this->n_subdomains, *this, SparsityTools::Partitioner::zoltan);
@@ -117,16 +117,17 @@ namespace parallel
       else if (partition_settings == partition_metis)
         {
 #  ifndef DEAL_II_WITH_METIS
-          AssertThrow(
-            false,
-            ExcMessage("Choosing 'partition_metis' requires the library "
-                       "to be compiled with support for METIS! "
-                       "Instead, you might use 'partition_auto' to select "
-                       "a partitioning algorithm that is supported "
-                       "by your current configuration."));
+          AssertThrow(false,
+                      ExcMessage(
+                        "Choosing 'partition_metis' requires the library "
+                        "to be compiled with support for METIS! "
+                        "Instead, you might use 'partition_auto' to select "
+                        "a partitioning algorithm that is supported "
+                        "by your current configuration."));
 #  else
-          GridTools::partition_triangulation(
-            this->n_subdomains, *this, SparsityTools::Partitioner::metis);
+          GridTools::partition_triangulation(this->n_subdomains,
+                                             *this,
+                                             SparsityTools::Partitioner::metis);
 #  endif
         }
       else if (partition_settings == partition_zorder)

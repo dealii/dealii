@@ -39,8 +39,10 @@ check_matrix(SparseMatrix<double> const &        A,
 
   int                 nnz = A_dev.n_nonzero_elements();
   std::vector<double> val_host(nnz);
-  cuda_error_code = cudaMemcpy(
-    &val_host[0], val_dev, nnz * sizeof(double), cudaMemcpyDeviceToHost);
+  cuda_error_code = cudaMemcpy(&val_host[0],
+                               val_dev,
+                               nnz * sizeof(double),
+                               cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error_code);
 
   std::vector<int> column_index_host(nnz);

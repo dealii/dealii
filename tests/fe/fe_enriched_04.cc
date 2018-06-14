@@ -58,7 +58,8 @@ template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
-  EnrichmentFunction() : Function<dim>(1)
+  EnrichmentFunction()
+    : Function<dim>(1)
   {}
 
   virtual double
@@ -96,8 +97,9 @@ test3()
   dof_handler.distribute_dofs(fe);
 
   QGauss<dim>   quadrature(2);
-  FEValues<dim> fe_values(
-    fe, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_JxW_values);
 
   Vector<double> solution_fe(dof_handler.n_dofs()),
     solution_pou(dof_handler.n_dofs()), solution(dof_handler.n_dofs());

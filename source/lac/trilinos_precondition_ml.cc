@@ -48,18 +48,18 @@ namespace TrilinosWrappers
     const unsigned int                    smoother_overlap,
     const bool                            output_details,
     const char *                          smoother_type,
-    const char *                          coarse_type) :
-    elliptic(elliptic),
-    higher_order_elements(higher_order_elements),
-    n_cycles(n_cycles),
-    w_cycle(w_cycle),
-    aggregation_threshold(aggregation_threshold),
-    constant_modes(constant_modes),
-    smoother_sweeps(smoother_sweeps),
-    smoother_overlap(smoother_overlap),
-    output_details(output_details),
-    smoother_type(smoother_type),
-    coarse_type(coarse_type)
+    const char *                          coarse_type)
+    : elliptic(elliptic)
+    , higher_order_elements(higher_order_elements)
+    , n_cycles(n_cycles)
+    , w_cycle(w_cycle)
+    , aggregation_threshold(aggregation_threshold)
+    , constant_modes(constant_modes)
+    , smoother_sweeps(smoother_sweeps)
+    , smoother_overlap(smoother_overlap)
+    , output_details(output_details)
+    , smoother_type(smoother_type)
+    , coarse_type(coarse_type)
   {}
 
 
@@ -155,9 +155,9 @@ namespace TrilinosWrappers
         Assert(global_size ==
                  static_cast<size_type>(
                    TrilinosWrappers::global_length(distributed_constant_modes)),
-               ExcDimensionMismatch(
-                 global_size,
-                 TrilinosWrappers::global_length(distributed_constant_modes)));
+               ExcDimensionMismatch(global_size,
+                                    TrilinosWrappers::global_length(
+                                      distributed_constant_modes)));
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == global_size;
         const size_type my_size = domain_map.NumMyElements();
@@ -225,8 +225,9 @@ namespace TrilinosWrappers
                               const Teuchos::ParameterList &ml_parameters)
   {
     preconditioner.reset();
-    preconditioner = std::make_shared<ML_Epetra::MultiLevelPreconditioner>(
-      matrix, ml_parameters);
+    preconditioner =
+      std::make_shared<ML_Epetra::MultiLevelPreconditioner>(matrix,
+                                                            ml_parameters);
   }
 
 

@@ -568,7 +568,8 @@ namespace Step18
 
 
   template <int dim>
-  BodyForce<dim>::BodyForce() : Function<dim>(dim)
+  BodyForce<dim>::BodyForce()
+    : Function<dim>(dim)
   {}
 
 
@@ -654,11 +655,11 @@ namespace Step18
   template <int dim>
   IncrementalBoundaryValues<dim>::IncrementalBoundaryValues(
     const double present_time,
-    const double present_timestep) :
-    Function<dim>(dim),
-    velocity(.08),
-    present_time(present_time),
-    present_timestep(present_timestep)
+    const double present_timestep)
+    : Function<dim>(dim)
+    , velocity(.08)
+    , present_time(present_time)
+    , present_timestep(present_timestep)
   {}
 
 
@@ -711,20 +712,20 @@ namespace Step18
   // Gaussian quadrature formula with 2 points in each coordinate
   // direction. The destructor should be obvious:
   template <int dim>
-  TopLevel<dim>::TopLevel() :
-    triangulation(MPI_COMM_WORLD),
-    fe(FE_Q<dim>(1), dim),
-    dof_handler(triangulation),
-    quadrature_formula(2),
-    present_time(0.0),
-    present_timestep(1.0),
-    end_time(10.0),
-    timestep_no(0),
-    mpi_communicator(MPI_COMM_WORLD),
-    n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout(std::cout, this_mpi_process == 0),
-    n_local_cells(numbers::invalid_unsigned_int)
+  TopLevel<dim>::TopLevel()
+    : triangulation(MPI_COMM_WORLD)
+    , fe(FE_Q<dim>(1), dim)
+    , dof_handler(triangulation)
+    , quadrature_formula(2)
+    , present_time(0.0)
+    , present_timestep(1.0)
+    , end_time(10.0)
+    , timestep_no(0)
+    , mpi_communicator(MPI_COMM_WORLD)
+    , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
+    , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
+    , pcout(std::cout, this_mpi_process == 0)
+    , n_local_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -988,10 +989,9 @@ namespace Step18
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 {
-                  const SymmetricTensor<2, dim> eps_phi_i = get_strain(
-                                                  fe_values, i, q_point),
-                                                eps_phi_j = get_strain(
-                                                  fe_values, j, q_point);
+                  const SymmetricTensor<2, dim>
+                    eps_phi_i = get_strain(fe_values, i, q_point),
+                    eps_phi_j = get_strain(fe_values, j, q_point);
 
                   cell_matrix(i, j) += (eps_phi_i * stress_strain_tensor *
                                         eps_phi_j * fe_values.JxW(q_point));
@@ -1086,8 +1086,10 @@ namespace Step18
     // motion, it has only its last component set:
     FEValuesExtractors::Scalar                z_component(dim - 1);
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(dim), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
     VectorTools::interpolate_boundary_values(
       dof_handler,
       1,
@@ -1468,8 +1470,10 @@ namespace Step18
     // Once we have that, copy it back into local copies on all processors and
     // refine the mesh accordingly:
     error_per_cell = distributed_error_per_cell;
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, error_per_cell, 0.35, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    error_per_cell,
+                                                    0.35,
+                                                    0.03);
     triangulation.execute_coarsening_and_refinement();
 
     // Finally, set up quadrature point data again on the new mesh, and only
@@ -1731,8 +1735,9 @@ namespace Step18
     // the incremental displacements and the gradients thereof at the
     // quadrature points, together with a vector that will hold this
     // information:
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_gradients);
+    FEValues<dim>                            fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients);
     std::vector<std::vector<Tensor<1, dim>>> displacement_increment_grads(
       quadrature_formula.size(), std::vector<Tensor<1, dim>>(dim));
 

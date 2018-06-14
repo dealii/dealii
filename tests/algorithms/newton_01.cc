@@ -42,7 +42,8 @@ class SquareRootResidual : public Algorithms::OperatorBase
   SmartPointer<SquareRoot, SquareRootResidual> discretization;
 
 public:
-  SquareRootResidual(SquareRoot &problem) : discretization(&problem)
+  SquareRootResidual(SquareRoot &problem)
+    : discretization(&problem)
   {}
 
   virtual void
@@ -57,7 +58,8 @@ class SquareRootSolver : public Algorithms::OperatorBase
   SmartPointer<SquareRoot, SquareRootSolver> solver;
 
 public:
-  SquareRootSolver(SquareRoot &problem) : solver(&problem)
+  SquareRootSolver(SquareRoot &problem)
+    : solver(&problem)
   {}
 
   virtual void

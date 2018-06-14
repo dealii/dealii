@@ -262,8 +262,8 @@ namespace Rol
 
   template <typename VectorType>
   VectorAdaptor<VectorType>::VectorAdaptor(
-    const Teuchos::RCP<VectorType> &vector_ptr) :
-    vector_ptr(vector_ptr)
+    const Teuchos::RCP<VectorType> &vector_ptr)
+    : vector_ptr(vector_ptr)
   {}
 
 

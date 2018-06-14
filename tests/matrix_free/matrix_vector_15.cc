@@ -55,9 +55,9 @@ class MatrixFreeTest
 {
 public:
   MatrixFreeTest(const DoFHandler<dim> & dof_handler,
-                 const ConstraintMatrix &constraints) :
-    dof_handler(dof_handler),
-    constraints(constraints)
+                 const ConstraintMatrix &constraints)
+    : dof_handler(dof_handler)
+    , constraints(constraints)
   {}
 
   void
@@ -168,8 +168,9 @@ do_test(const DoFHandler<dim> & dof,
             }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, sparse_matrix);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               local_dof_indices,
+                                               sparse_matrix);
       }
   }
 
@@ -213,8 +214,10 @@ test()
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double>(dof, constraints);

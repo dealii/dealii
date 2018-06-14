@@ -24,9 +24,11 @@
 class foo
 {
 public:
-  foo(const unsigned int a) : vec(1, a)
+  foo(const unsigned int a)
+    : vec(1, a)
   {}
-  foo(const foo &bar) : vec(bar.vec)
+  foo(const foo &bar)
+    : vec(bar.vec)
   {}
   foo &
   operator=(const foo &bar)

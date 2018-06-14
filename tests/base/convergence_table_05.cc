@@ -39,7 +39,9 @@ main()
   t.add_value("error", 0.1);
   t.add_value("cells", t2);
   t.add_value("error", 0.025);
-  t.evaluate_convergence_rates(
-    "error", "cells", ConvergenceTable::reduction_rate_log2, 2);
+  t.evaluate_convergence_rates("error",
+                               "cells",
+                               ConvergenceTable::reduction_rate_log2,
+                               2);
   t.write_text(deallog.get_file_stream());
 }

@@ -84,8 +84,9 @@ namespace TrilinosWrappers
         components.resize(n_blocks());
 
       for (size_type i = 0; i < n_blocks(); ++i)
-        components[i].reinit(
-          parallel_partitioning[i], communicator, omit_zeroing_entries);
+        components[i].reinit(parallel_partitioning[i],
+                             communicator,
+                             omit_zeroing_entries);
 
       collect_sizes();
     }

@@ -154,9 +154,9 @@ namespace Functions
 
   template <int dim>
   Spherical<dim>::Spherical(const Point<dim> & p,
-                            const unsigned int n_components) :
-    Function<dim>(n_components),
-    coordinate_system_offset(p)
+                            const unsigned int n_components)
+    : Function<dim>(n_components)
+    , coordinate_system_offset(p)
   {
     AssertThrow(dim == 3, ExcNotImplemented());
   }

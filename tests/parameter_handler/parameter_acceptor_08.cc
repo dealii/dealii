@@ -27,10 +27,10 @@ class Test : public ParameterAcceptor
 public:
   Test(const std::string &sec_name  = "First Class",
        const std::string &par_name  = "Parameter name",
-       const std::string &par_value = "Parameter value") :
-    ParameterAcceptor(sec_name),
-    par_name(par_name),
-    par_value(par_value)
+       const std::string &par_value = "Parameter value")
+    : ParameterAcceptor(sec_name)
+    , par_name(par_name)
+    , par_value(par_value)
   {
     add_parameter(par_name, this->par_value);
 

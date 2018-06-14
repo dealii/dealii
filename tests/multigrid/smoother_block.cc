@@ -83,7 +83,8 @@ private:
 //----------------------------------------------------------------------//
 
 template <typename number>
-ScalingMatrix<number>::ScalingMatrix(number factor) : factor(factor)
+ScalingMatrix<number>::ScalingMatrix(number factor)
+  : factor(factor)
 {}
 
 

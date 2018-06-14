@@ -113,7 +113,8 @@ template <int dim>
 class VectorFunction : public Function<dim>
 {
 public:
-  VectorFunction() : Function<dim>(dim)
+  VectorFunction()
+    : Function<dim>(dim)
   {}
   virtual double
   value(const Point<dim> &p, const unsigned int component) const;
@@ -287,13 +288,14 @@ test(const FiniteElement<dim> &fe,
                               update_JxW_values | update_quadrature_points |
                                 update_values | update_gradients |
                                 update_hessians);
-      FEFaceValues<dim> fe_face_values(
-        mapping,
-        fe,
-        face_quadrature,
-        update_JxW_values | update_quadrature_points | update_values |
-          update_gradients | update_normal_vectors);
-      unsigned int cell_index = 0;
+      FEFaceValues<dim> fe_face_values(mapping,
+                                       fe,
+                                       face_quadrature,
+                                       update_JxW_values |
+                                         update_quadrature_points |
+                                         update_values | update_gradients |
+                                         update_normal_vectors);
+      unsigned int      cell_index = 0;
 
       for (typename DoFHandler<dim>::active_cell_iterator cell =
              dof_handler.begin_active();
@@ -393,8 +395,10 @@ test(const FiniteElement<dim> &fe,
         triangulation.refine_global();
       else
         {
-          GridRefinement::refine_and_coarsen_fixed_number(
-            triangulation, diff, 0.3, 0.0);
+          GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                          diff,
+                                                          0.3,
+                                                          0.0);
           triangulation.prepare_coarsening_and_refinement();
           triangulation.execute_coarsening_and_refinement();
         }

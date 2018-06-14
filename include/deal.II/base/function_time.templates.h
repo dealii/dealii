@@ -22,8 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename Number>
-FunctionTime<Number>::FunctionTime(const Number initial_time) :
-  time(initial_time)
+FunctionTime<Number>::FunctionTime(const Number initial_time)
+  : time(initial_time)
 {}
 
 

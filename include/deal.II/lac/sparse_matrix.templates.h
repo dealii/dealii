@@ -46,37 +46,37 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix() :
-  cols(nullptr, "SparseMatrix"),
-  val(nullptr),
-  max_len(0)
+SparseMatrix<number>::SparseMatrix()
+  : cols(nullptr, "SparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {}
 
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix(const SparseMatrix &m) :
-  Subscriptor(m),
-  cols(nullptr, "SparseMatrix"),
-  val(nullptr),
-  max_len(0)
+SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
+  : Subscriptor(m)
+  , cols(nullptr, "SparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {
-  Assert(
-    m.cols == nullptr && m.val == nullptr && m.max_len == 0,
-    ExcMessage("This constructor can only be called if the provided argument "
-               "is an empty matrix. This constructor can not be used to "
-               "copy-construct a non-empty matrix. Use the "
-               "SparseMatrix::copy_from() function for that purpose."));
+  Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
+         ExcMessage(
+           "This constructor can only be called if the provided argument "
+           "is an empty matrix. This constructor can not be used to "
+           "copy-construct a non-empty matrix. Use the "
+           "SparseMatrix::copy_from() function for that purpose."));
 }
 
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix(SparseMatrix<number> &&m) noexcept :
-  Subscriptor(std::move(m)),
-  cols(m.cols),
-  val(std::move(m.val)),
-  max_len(m.max_len)
+SparseMatrix<number>::SparseMatrix(SparseMatrix<number> &&m) noexcept
+  : Subscriptor(std::move(m))
+  , cols(m.cols)
+  , val(std::move(m.val))
+  , max_len(m.max_len)
 {
   m.cols    = nullptr;
   m.val     = nullptr;
@@ -119,10 +119,10 @@ SparseMatrix<number>::operator=(SparseMatrix<number> &&m) noexcept
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix(const SparsityPattern &c) :
-  cols(nullptr, "SparseMatrix"),
-  val(nullptr),
-  max_len(0)
+SparseMatrix<number>::SparseMatrix(const SparsityPattern &c)
+  : cols(nullptr, "SparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -134,10 +134,10 @@ SparseMatrix<number>::SparseMatrix(const SparsityPattern &c) :
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix(const SparsityPattern &c,
-                                   const IdentityMatrix & id) :
-  cols(nullptr, "SparseMatrix"),
-  val(nullptr),
-  max_len(0)
+                                   const IdentityMatrix & id)
+  : cols(nullptr, "SparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {
   (void)id;
   Assert(c.n_rows() == id.m(), ExcDimensionMismatch(c.n_rows(), id.m()));
@@ -385,8 +385,9 @@ SparseMatrix<number>::copy_from(const SparseMatrix<somenumber> &matrix)
   Assert(val != nullptr, ExcNotInitialized());
   Assert(cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  std::copy(
-    matrix.val.get(), matrix.val.get() + cols->n_nonzero_elements(), val.get());
+  std::copy(matrix.val.get(),
+            matrix.val.get() + cols->n_nonzero_elements(),
+            val.get());
 
   return *this;
 }
@@ -553,9 +554,9 @@ SparseMatrix<number>::add(const size_type  row,
       // really sorted
 #ifdef DEBUG
       for (size_type i = 1; i < n_cols; ++i)
-        Assert(
-          col_indices[i] > col_indices[i - 1],
-          ExcMessage("List of indices is unsorted or contains duplicates."));
+        Assert(col_indices[i] > col_indices[i - 1],
+               ExcMessage(
+                 "List of indices is unsorted or contains duplicates."));
 #endif
 
       const size_type *this_cols    = &cols->colnums[cols->rowstart[row]];
@@ -605,9 +606,9 @@ SparseMatrix<number>::add(const size_type  row,
               val_ptr[counter] += values[i];
             }
 
-          Assert(
-            counter < cols->row_length(row),
-            ExcMessage("Specified invalid column indices in add function."));
+          Assert(counter < cols->row_length(row),
+                 ExcMessage(
+                   "Specified invalid column indices in add function."));
         }
       else
         {
@@ -624,9 +625,9 @@ SparseMatrix<number>::add(const size_type  row,
 
               val_ptr[counter] += values[i];
             }
-          Assert(
-            counter < cols->row_length(row),
-            ExcMessage("Specified invalid column indices in add function."));
+          Assert(counter < cols->row_length(row),
+                 ExcMessage(
+                   "Specified invalid column indices in add function."));
         }
       return;
     }
@@ -1077,12 +1078,12 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
           // special treatment for diagonal
           if (sp_B.n_rows() == sp_B.n_cols())
             {
-              C.add(
-                i,
-                *new_cols,
-                numberC(A_val) *
-                  numberC(B.val[new_cols - &sp_B.colnums[sp_B.rowstart[0]]]) *
-                  numberC(use_vector ? V(col) : 1));
+              C.add(i,
+                    *new_cols,
+                    numberC(A_val) *
+                      numberC(
+                        B.val[new_cols - &sp_B.colnums[sp_B.rowstart[0]]]) *
+                      numberC(use_vector ? V(col) : 1));
               ++new_cols;
             }
 
@@ -1216,12 +1217,12 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
 
           // special treatment for diagonal
           if (sp_B.n_rows() == sp_B.n_cols())
-            C.add(
-              row,
-              i,
-              numberC(A_val) *
-                numberC(B.val[new_cols - 1 - &sp_B.colnums[sp_B.rowstart[0]]]) *
-                numberC(use_vector ? V(i) : 1));
+            C.add(row,
+                  i,
+                  numberC(A_val) *
+                    numberC(
+                      B.val[new_cols - 1 - &sp_B.colnums[sp_B.rowstart[0]]]) *
+                    numberC(use_vector ? V(i) : 1));
 
           // now the innermost loop that goes over all the elements in row
           // 'col' of matrix B. Cache the elements, and then write them into C

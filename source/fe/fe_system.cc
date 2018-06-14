@@ -42,8 +42,9 @@ namespace internal
       unsigned int
       count_nonzeros(const std::vector<unsigned int> &vec)
       {
-        return std::count_if(
-          vec.begin(), vec.end(), [](const unsigned int i) { return i > 0; });
+        return std::count_if(vec.begin(), vec.end(), [](const unsigned int i) {
+          return i > 0;
+        });
       }
     } // namespace
   }   // namespace FESystemImplementation
@@ -53,9 +54,9 @@ namespace internal
 
 template <int dim, int spacedim>
 FESystem<dim, spacedim>::InternalData::InternalData(
-  const unsigned int n_base_elements) :
-  base_fe_datas(n_base_elements),
-  base_fe_output_objects(n_base_elements)
+  const unsigned int n_base_elements)
+  : base_fe_datas(n_base_elements)
+  , base_fe_output_objects(n_base_elements)
 {}
 
 
@@ -115,13 +116,13 @@ const unsigned int FESystem<dim, spacedim>::invalid_face_number;
 
 template <int dim, int spacedim>
 FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe,
-                                  const unsigned int n_elements) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers(&fe, n_elements),
-    FETools::Compositing::compute_restriction_is_additive_flags(&fe,
-                                                                n_elements),
-    FETools::Compositing::compute_nonzero_components(&fe, n_elements)),
-  base_elements((n_elements > 0))
+                                  const unsigned int n_elements)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers(&fe, n_elements),
+      FETools::Compositing::compute_restriction_is_additive_flags(&fe,
+                                                                  n_elements),
+      FETools::Compositing::compute_nonzero_components(&fe, n_elements))
+  , base_elements((n_elements > 0))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   fes.push_back(&fe);
@@ -136,15 +137,15 @@ template <int dim, int spacedim>
 FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const unsigned int                  n1,
                                   const FiniteElement<dim, spacedim> &fe2,
-                                  const unsigned int                  n2) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers(&fe1, n1, &fe2, n2),
-    FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                n1,
-                                                                &fe2,
-                                                                n2),
-    FETools::Compositing::compute_nonzero_components(&fe1, n1, &fe2, n2)),
-  base_elements((n1 > 0) + (n2 > 0))
+                                  const unsigned int                  n2)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers(&fe1, n1, &fe2, n2),
+      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
+                                                                  n1,
+                                                                  &fe2,
+                                                                  n2),
+      FETools::Compositing::compute_nonzero_components(&fe1, n1, &fe2, n2))
+  , base_elements((n1 > 0) + (n2 > 0))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   fes.push_back(&fe1);
@@ -163,22 +164,22 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe2,
                                   const unsigned int                  n2,
                                   const FiniteElement<dim, spacedim> &fe3,
-                                  const unsigned int                  n3) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers(&fe1, n1, &fe2, n2, &fe3, n3),
-    FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                n1,
-                                                                &fe2,
-                                                                n2,
-                                                                &fe3,
-                                                                n3),
-    FETools::Compositing::compute_nonzero_components(&fe1,
-                                                     n1,
-                                                     &fe2,
-                                                     n2,
-                                                     &fe3,
-                                                     n3)),
-  base_elements((n1 > 0) + (n2 > 0) + (n3 > 0))
+                                  const unsigned int                  n3)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers(&fe1, n1, &fe2, n2, &fe3, n3),
+      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
+                                                                  n1,
+                                                                  &fe2,
+                                                                  n2,
+                                                                  &fe3,
+                                                                  n3),
+      FETools::Compositing::compute_nonzero_components(&fe1,
+                                                       n1,
+                                                       &fe2,
+                                                       n2,
+                                                       &fe3,
+                                                       n3))
+  , base_elements((n1 > 0) + (n2 > 0) + (n3 > 0))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   fes.push_back(&fe1);
@@ -201,33 +202,33 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe3,
                                   const unsigned int                  n3,
                                   const FiniteElement<dim, spacedim> &fe4,
-                                  const unsigned int                  n4) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers(&fe1,
-                                               n1,
-                                               &fe2,
-                                               n2,
-                                               &fe3,
-                                               n3,
-                                               &fe4,
-                                               n4),
-    FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                n1,
-                                                                &fe2,
-                                                                n2,
-                                                                &fe3,
-                                                                n3,
-                                                                &fe4,
-                                                                n4),
-    FETools::Compositing::compute_nonzero_components(&fe1,
-                                                     n1,
-                                                     &fe2,
-                                                     n2,
-                                                     &fe3,
-                                                     n3,
-                                                     &fe4,
-                                                     n4)),
-  base_elements((n1 > 0) + (n2 > 0) + (n3 > 0) + (n4 > 0))
+                                  const unsigned int                  n4)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers(&fe1,
+                                                 n1,
+                                                 &fe2,
+                                                 n2,
+                                                 &fe3,
+                                                 n3,
+                                                 &fe4,
+                                                 n4),
+      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
+                                                                  n1,
+                                                                  &fe2,
+                                                                  n2,
+                                                                  &fe3,
+                                                                  n3,
+                                                                  &fe4,
+                                                                  n4),
+      FETools::Compositing::compute_nonzero_components(&fe1,
+                                                       n1,
+                                                       &fe2,
+                                                       n2,
+                                                       &fe3,
+                                                       n3,
+                                                       &fe4,
+                                                       n4))
+  , base_elements((n1 > 0) + (n2 > 0) + (n3 > 0) + (n4 > 0))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   fes.push_back(&fe1);
@@ -254,31 +255,31 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe4,
                                   const unsigned int                  n4,
                                   const FiniteElement<dim, spacedim> &fe5,
-                                  const unsigned int                  n5) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::
-      multiply_dof_numbers(&fe1, n1, &fe2, n2, &fe3, n3, &fe4, n4, &fe5, n5),
-    FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                n1,
-                                                                &fe2,
-                                                                n2,
-                                                                &fe3,
-                                                                n3,
-                                                                &fe4,
-                                                                n4,
-                                                                &fe5,
-                                                                n5),
-    FETools::Compositing::compute_nonzero_components(&fe1,
-                                                     n1,
-                                                     &fe2,
-                                                     n2,
-                                                     &fe3,
-                                                     n3,
-                                                     &fe4,
-                                                     n4,
-                                                     &fe5,
-                                                     n5)),
-  base_elements((n1 > 0) + (n2 > 0) + (n3 > 0) + (n4 > 0) + (n5 > 0))
+                                  const unsigned int                  n5)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::
+        multiply_dof_numbers(&fe1, n1, &fe2, n2, &fe3, n3, &fe4, n4, &fe5, n5),
+      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
+                                                                  n1,
+                                                                  &fe2,
+                                                                  n2,
+                                                                  &fe3,
+                                                                  n3,
+                                                                  &fe4,
+                                                                  n4,
+                                                                  &fe5,
+                                                                  n5),
+      FETools::Compositing::compute_nonzero_components(&fe1,
+                                                       n1,
+                                                       &fe2,
+                                                       n2,
+                                                       &fe3,
+                                                       n3,
+                                                       &fe4,
+                                                       n4,
+                                                       &fe5,
+                                                       n5))
+  , base_elements((n1 > 0) + (n2 > 0) + (n3 > 0) + (n4 > 0) + (n5 > 0))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   fes.push_back(&fe1);
@@ -300,14 +301,15 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
 template <int dim, int spacedim>
 FESystem<dim, spacedim>::FESystem(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
-  const std::vector<unsigned int> &                        multiplicities) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers(fes, multiplicities),
-    FETools::Compositing::compute_restriction_is_additive_flags(fes,
-                                                                multiplicities),
-    FETools::Compositing::compute_nonzero_components(fes, multiplicities)),
-  base_elements(
-    internal::FESystemImplementation::count_nonzeros(multiplicities))
+  const std::vector<unsigned int> &                        multiplicities)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers(fes, multiplicities),
+      FETools::Compositing::compute_restriction_is_additive_flags(
+        fes,
+        multiplicities),
+      FETools::Compositing::compute_nonzero_components(fes, multiplicities))
+  , base_elements(
+      internal::FESystemImplementation::count_nonzeros(multiplicities))
 {
   initialize(fes, multiplicities);
 }
@@ -395,9 +397,9 @@ FESystem<dim, spacedim>::shape_value(const unsigned int i,
                                      const Point<dim> & p) const
 {
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(
-    this->is_primitive(i),
-    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(i)));
+  Assert(this->is_primitive(i),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
             .shape_value(this->system_to_base_table[i].second, p));
@@ -448,9 +450,9 @@ FESystem<dim, spacedim>::shape_grad(const unsigned int i,
                                     const Point<dim> & p) const
 {
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(
-    this->is_primitive(i),
-    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(i)));
+  Assert(this->is_primitive(i),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
             .shape_grad(this->system_to_base_table[i].second, p));
@@ -494,9 +496,9 @@ FESystem<dim, spacedim>::shape_grad_grad(const unsigned int i,
                                          const Point<dim> & p) const
 {
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(
-    this->is_primitive(i),
-    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(i)));
+  Assert(this->is_primitive(i),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
             .shape_grad_grad(this->system_to_base_table[i].second, p));
@@ -540,9 +542,9 @@ FESystem<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                               const Point<dim> & p) const
 {
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(
-    this->is_primitive(i),
-    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(i)));
+  Assert(this->is_primitive(i),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
             .shape_3rd_derivative(this->system_to_base_table[i].second, p));
@@ -586,9 +588,9 @@ FESystem<dim, spacedim>::shape_4th_derivative(const unsigned int i,
                                               const Point<dim> & p) const
 {
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(
-    this->is_primitive(i),
-    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(i)));
+  Assert(this->is_primitive(i),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
             .shape_4th_derivative(this->system_to_base_table[i].second, p));
@@ -639,10 +641,10 @@ FESystem<dim, spacedim>::get_interpolation_matrix(
   Assert((interpolation_matrix.m() == this->dofs_per_cell) ||
            (x_source_fe.dofs_per_cell == 0),
          ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(
-    (interpolation_matrix.n() == x_source_fe.dofs_per_cell) ||
-      (this->dofs_per_cell == 0),
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_cell));
+  Assert((interpolation_matrix.n() == x_source_fe.dofs_per_cell) ||
+           (this->dofs_per_cell == 0),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_cell));
 
   // there are certain conditions that the two elements have to satisfy so
   // that this can work.
@@ -709,14 +711,16 @@ FESystem<dim, spacedim>::get_restriction_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Restriction matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -803,14 +807,16 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Restriction matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request, construction completely analogous to
   // restriction matrix
@@ -971,8 +977,10 @@ FESystem<dim, spacedim>::get_data(
       // out of the base output object into the system output object,
       // but we can't because we can't know what the elements already
       // copied and/or will want to update on every cell
-      auto base_fe_data = base_element(base_no).get_data(
-        flags, mapping, quadrature, base_fe_output_object);
+      auto base_fe_data = base_element(base_no).get_data(flags,
+                                                         mapping,
+                                                         quadrature,
+                                                         base_fe_output_object);
 
       data->set_fe_data(base_no, std::move(base_fe_data));
     }
@@ -1811,10 +1819,9 @@ FESystem<dim, spacedim>::initialize(
     init_tasks += Threads::new_task([&]() {
       // the array into which we want to write should have the correct size
       // already.
-      Assert(
-        this->adjust_quad_dof_index_for_face_orientation_table.n_elements() ==
-          8 * this->dofs_per_quad,
-        ExcInternalError());
+      Assert(this->adjust_quad_dof_index_for_face_orientation_table
+                 .n_elements() == 8 * this->dofs_per_quad,
+             ExcInternalError());
 
       // to obtain the shifts for this composed element, copy the shift
       // information of the base elements
@@ -1885,9 +1892,9 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
 {
   Assert(interpolation_matrix.n() == this->dofs_per_face,
          ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(
-    interpolation_matrix.m() == x_source_fe.dofs_per_face,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
+  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_face));
 
   // since dofs for each base are independent, we only have to stack things up
   // from base element to base element
@@ -2000,9 +2007,9 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
 
   Assert(interpolation_matrix.n() == this->dofs_per_face,
          ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(
-    interpolation_matrix.m() == x_source_fe.dofs_per_face,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
+  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_face));
 
   // since dofs for each base are independent, we only have to stack things up
   // from base element to base element
@@ -2041,8 +2048,9 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
           // get the interpolation from the bases
           base_to_base_interpolation.reinit(base_other.dofs_per_face,
                                             base.dofs_per_face);
-          base.get_subface_interpolation_matrix(
-            base_other, subface, base_to_base_interpolation);
+          base.get_subface_interpolation_matrix(base_other,
+                                                subface,
+                                                base_to_base_interpolation);
 
           // now translate entries. we'd like to have something like
           // face_base_to_system_index, but that doesn't exist. rather, all we
@@ -2396,9 +2404,9 @@ FESystem<dim, spacedim>::get_constant_modes() const
             this->system_to_base_index(k);
           if (ind.first.first == i)
             for (unsigned int c = 0; c < base_table.first.n_rows(); ++c)
-              constant_modes(
-                comp + ind.first.second * base_table.first.n_rows() + c, k) =
-                base_table.first(c, ind.second);
+              constant_modes(comp +
+                               ind.first.second * base_table.first.n_rows() + c,
+                             k) = base_table.first(c, ind.second);
         }
       for (unsigned int r = 0; r < element_multiplicity; ++r)
         for (unsigned int c = 0; c < base_table.second.size(); ++c)

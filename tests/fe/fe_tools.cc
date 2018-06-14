@@ -78,8 +78,9 @@ test_embedding(const FiniteElement<dim> &fe)
   for (unsigned int i = 0; i < nc; ++i)
     {
       deallog << fe.get_name() << " embedding " << i << std::endl;
-      print_formatted(
-        P[RefinementCase<dim>::isotropic_refinement - 1][i], 8, 6);
+      print_formatted(P[RefinementCase<dim>::isotropic_refinement - 1][i],
+                      8,
+                      6);
     }
 }
 

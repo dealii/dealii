@@ -32,17 +32,17 @@ namespace internal
       const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
         &                                   fe_collection,
       const dealii::hp::QCollection<q_dim> &q_collection,
-      const UpdateFlags                     update_flags) :
-      fe_collection(&fe_collection),
-      mapping_collection(&mapping_collection),
-      q_collection(q_collection),
-      fe_values_table(fe_collection.size(),
-                      mapping_collection.size(),
-                      q_collection.size()),
-      present_fe_values_index(numbers::invalid_unsigned_int,
-                              numbers::invalid_unsigned_int,
-                              numbers::invalid_unsigned_int),
-      update_flags(update_flags)
+      const UpdateFlags                     update_flags)
+      : fe_collection(&fe_collection)
+      , mapping_collection(&mapping_collection)
+      , q_collection(q_collection)
+      , fe_values_table(fe_collection.size(),
+                        mapping_collection.size(),
+                        q_collection.size())
+      , present_fe_values_index(numbers::invalid_unsigned_int,
+                                numbers::invalid_unsigned_int,
+                                numbers::invalid_unsigned_int)
+      , update_flags(update_flags)
     {}
 
 
@@ -51,17 +51,17 @@ namespace internal
       const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
         &                                   fe_collection,
       const dealii::hp::QCollection<q_dim> &q_collection,
-      const UpdateFlags                     update_flags) :
-      fe_collection(&fe_collection),
-      mapping_collection(
-        &dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
-          mapping_collection),
-      q_collection(q_collection),
-      fe_values_table(fe_collection.size(), 1, q_collection.size()),
-      present_fe_values_index(numbers::invalid_unsigned_int,
-                              numbers::invalid_unsigned_int,
-                              numbers::invalid_unsigned_int),
-      update_flags(update_flags)
+      const UpdateFlags                     update_flags)
+      : fe_collection(&fe_collection)
+      , mapping_collection(
+          &dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
+            mapping_collection)
+      , q_collection(q_collection)
+      , fe_values_table(fe_collection.size(), 1, q_collection.size())
+      , present_fe_values_index(numbers::invalid_unsigned_int,
+                                numbers::invalid_unsigned_int,
+                                numbers::invalid_unsigned_int)
+      , update_flags(update_flags)
     {}
 
 
@@ -115,12 +115,12 @@ namespace hp
     const hp::MappingCollection<dim, spacedim> &mapping,
     const hp::FECollection<dim, spacedim> &     fe_collection,
     const hp::QCollection<dim> &                q_collection,
-    const UpdateFlags                           update_flags) :
-    internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(
-      mapping,
-      fe_collection,
-      q_collection,
-      update_flags)
+    const UpdateFlags                           update_flags)
+    : internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(
+        mapping,
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -128,11 +128,11 @@ namespace hp
   FEValues<dim, spacedim>::FEValues(
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim> &           q_collection,
-    const UpdateFlags                      update_flags) :
-    internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(
-      fe_collection,
-      q_collection,
-      update_flags)
+    const UpdateFlags                      update_flags)
+    : internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -172,9 +172,10 @@ namespace hp
     // some checks
     Assert(real_q_index < this->q_collection.size(),
            ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(
-      real_mapping_index < this->mapping_collection->size(),
-      ExcIndexRange(real_mapping_index, 0, this->mapping_collection->size()));
+    Assert(real_mapping_index < this->mapping_collection->size(),
+           ExcIndexRange(real_mapping_index,
+                         0,
+                         this->mapping_collection->size()));
     Assert(real_fe_index < this->fe_collection->size(),
            ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
 
@@ -212,9 +213,10 @@ namespace hp
     // some checks
     Assert(real_q_index < this->q_collection.size(),
            ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(
-      real_mapping_index < this->mapping_collection->size(),
-      ExcIndexRange(real_mapping_index, 0, this->mapping_collection->size()));
+    Assert(real_mapping_index < this->mapping_collection->size(),
+           ExcIndexRange(real_mapping_index,
+                         0,
+                         this->mapping_collection->size()));
     Assert(real_fe_index < this->fe_collection->size(),
            ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
 
@@ -234,13 +236,13 @@ namespace hp
     const hp::MappingCollection<dim, spacedim> &mapping,
     const hp::FECollection<dim, spacedim> &     fe_collection,
     const hp::QCollection<dim - 1> &            q_collection,
-    const UpdateFlags                           update_flags) :
-    internal::hp::
-      FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
-        mapping,
-        fe_collection,
-        q_collection,
-        update_flags)
+    const UpdateFlags                           update_flags)
+    : internal::hp::
+        FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
+          mapping,
+          fe_collection,
+          q_collection,
+          update_flags)
   {}
 
 
@@ -248,12 +250,12 @@ namespace hp
   FEFaceValues<dim, spacedim>::FEFaceValues(
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim - 1> &       q_collection,
-    const UpdateFlags                      update_flags) :
-    internal::hp::
-      FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
-        fe_collection,
-        q_collection,
-        update_flags)
+    const UpdateFlags                      update_flags)
+    : internal::hp::
+        FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
+          fe_collection,
+          q_collection,
+          update_flags)
   {}
 
 
@@ -294,9 +296,10 @@ namespace hp
     // some checks
     Assert(real_q_index < this->q_collection.size(),
            ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(
-      real_mapping_index < this->mapping_collection->size(),
-      ExcIndexRange(real_mapping_index, 0, this->mapping_collection->size()));
+    Assert(real_mapping_index < this->mapping_collection->size(),
+           ExcIndexRange(real_mapping_index,
+                         0,
+                         this->mapping_collection->size()));
     Assert(real_fe_index < this->fe_collection->size(),
            ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
 
@@ -335,9 +338,10 @@ namespace hp
     // some checks
     Assert(real_q_index < this->q_collection.size(),
            ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(
-      real_mapping_index < this->mapping_collection->size(),
-      ExcIndexRange(real_mapping_index, 0, this->mapping_collection->size()));
+    Assert(real_mapping_index < this->mapping_collection->size(),
+           ExcIndexRange(real_mapping_index,
+                         0,
+                         this->mapping_collection->size()));
     Assert(real_fe_index < this->fe_collection->size(),
            ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
 
@@ -357,13 +361,13 @@ namespace hp
     const hp::MappingCollection<dim, spacedim> &mapping,
     const hp::FECollection<dim, spacedim> &     fe_collection,
     const hp::QCollection<dim - 1> &            q_collection,
-    const UpdateFlags                           update_flags) :
-    internal::hp::
-      FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
-        mapping,
-        fe_collection,
-        q_collection,
-        update_flags)
+    const UpdateFlags                           update_flags)
+    : internal::hp::
+        FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
+          mapping,
+          fe_collection,
+          q_collection,
+          update_flags)
   {}
 
 
@@ -371,12 +375,12 @@ namespace hp
   FESubfaceValues<dim, spacedim>::FESubfaceValues(
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim - 1> &       q_collection,
-    const UpdateFlags                      update_flags) :
-    internal::hp::
-      FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
-        fe_collection,
-        q_collection,
-        update_flags)
+    const UpdateFlags                      update_flags)
+    : internal::hp::
+        FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
+          fe_collection,
+          q_collection,
+          update_flags)
   {}
 
 
@@ -418,9 +422,10 @@ namespace hp
     // some checks
     Assert(real_q_index < this->q_collection.size(),
            ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(
-      real_mapping_index < this->mapping_collection->size(),
-      ExcIndexRange(real_mapping_index, 0, this->mapping_collection->size()));
+    Assert(real_mapping_index < this->mapping_collection->size(),
+           ExcIndexRange(real_mapping_index,
+                         0,
+                         this->mapping_collection->size()));
     Assert(real_fe_index < this->fe_collection->size(),
            ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
 
@@ -460,9 +465,10 @@ namespace hp
     // some checks
     Assert(real_q_index < this->q_collection.size(),
            ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(
-      real_mapping_index < this->mapping_collection->size(),
-      ExcIndexRange(real_mapping_index, 0, this->mapping_collection->size()));
+    Assert(real_mapping_index < this->mapping_collection->size(),
+           ExcIndexRange(real_mapping_index,
+                         0,
+                         this->mapping_collection->size()));
     Assert(real_fe_index < this->fe_collection->size(),
            ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
 

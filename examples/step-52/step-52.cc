@@ -147,12 +147,12 @@ namespace Step52
 
 
   // We choose quadratic finite elements and we initialize the parameters.
-  Diffusion::Diffusion() :
-    fe_degree(2),
-    diffusion_coefficient(1. / 30.),
-    absorption_cross_section(1.),
-    fe(fe_degree),
-    dof_handler(triangulation)
+  Diffusion::Diffusion()
+    : fe_degree(2)
+    , diffusion_coefficient(1. / 30.)
+    , absorption_cross_section(1.)
+    , fe(fe_degree)
+    , dof_handler(triangulation)
   {}
 
 
@@ -164,8 +164,10 @@ namespace Step52
   {
     dof_handler.distribute_dofs(fe);
 
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, Functions::ZeroFunction<2>(), constraint_matrix);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             Functions::ZeroFunction<2>(),
+                                             constraint_matrix);
     constraint_matrix.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -240,10 +242,12 @@ namespace Step52
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraint_matrix.distribute_local_to_global(
-          cell_matrix, local_dof_indices, system_matrix);
-        constraint_matrix.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraint_matrix.distribute_local_to_global(cell_matrix,
+                                                     local_dof_indices,
+                                                     system_matrix);
+        constraint_matrix.distribute_local_to_global(cell_mass_matrix,
+                                                     local_dof_indices,
+                                                     mass_matrix);
       }
 
     inverse_mass_matrix.initialize(mass_matrix);
@@ -325,8 +329,9 @@ namespace Step52
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraint_matrix.distribute_local_to_global(
-          cell_source, local_dof_indices, tmp);
+        constraint_matrix.distribute_local_to_global(cell_source,
+                                                     local_dof_indices,
+                                                     tmp);
       }
 
     Vector<double> value(dof_handler.n_dofs());
@@ -655,13 +660,17 @@ namespace Step52
     const double       final_time   = 10.;
 
     std::cout << "Explicit methods:" << std::endl;
-    explicit_method(
-      TimeStepping::FORWARD_EULER, n_time_steps, initial_time, final_time);
+    explicit_method(TimeStepping::FORWARD_EULER,
+                    n_time_steps,
+                    initial_time,
+                    final_time);
     std::cout << "Forward Euler:            error=" << solution.l2_norm()
               << std::endl;
 
-    explicit_method(
-      TimeStepping::RK_THIRD_ORDER, n_time_steps, initial_time, final_time);
+    explicit_method(TimeStepping::RK_THIRD_ORDER,
+                    n_time_steps,
+                    initial_time,
+                    final_time);
     std::cout << "Third order Runge-Kutta:  error=" << solution.l2_norm()
               << std::endl;
 
@@ -675,55 +684,73 @@ namespace Step52
 
 
     std::cout << "Implicit methods:" << std::endl;
-    implicit_method(
-      TimeStepping::BACKWARD_EULER, n_time_steps, initial_time, final_time);
+    implicit_method(TimeStepping::BACKWARD_EULER,
+                    n_time_steps,
+                    initial_time,
+                    final_time);
     std::cout << "Backward Euler:           error=" << solution.l2_norm()
               << std::endl;
 
-    implicit_method(
-      TimeStepping::IMPLICIT_MIDPOINT, n_time_steps, initial_time, final_time);
+    implicit_method(TimeStepping::IMPLICIT_MIDPOINT,
+                    n_time_steps,
+                    initial_time,
+                    final_time);
     std::cout << "Implicit Midpoint:        error=" << solution.l2_norm()
               << std::endl;
 
-    implicit_method(
-      TimeStepping::CRANK_NICOLSON, n_time_steps, initial_time, final_time);
+    implicit_method(TimeStepping::CRANK_NICOLSON,
+                    n_time_steps,
+                    initial_time,
+                    final_time);
     std::cout << "Crank-Nicolson:           error=" << solution.l2_norm()
               << std::endl;
 
-    implicit_method(
-      TimeStepping::SDIRK_TWO_STAGES, n_time_steps, initial_time, final_time);
+    implicit_method(TimeStepping::SDIRK_TWO_STAGES,
+                    n_time_steps,
+                    initial_time,
+                    final_time);
     std::cout << "SDIRK:                    error=" << solution.l2_norm()
               << std::endl;
     std::cout << std::endl;
 
 
     std::cout << "Embedded explicit methods:" << std::endl;
-    n_steps = embedded_explicit_method(
-      TimeStepping::HEUN_EULER, n_time_steps, initial_time, final_time);
+    n_steps = embedded_explicit_method(TimeStepping::HEUN_EULER,
+                                       n_time_steps,
+                                       initial_time,
+                                       final_time);
     std::cout << "Heun-Euler:               error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(
-      TimeStepping::BOGACKI_SHAMPINE, n_time_steps, initial_time, final_time);
+    n_steps = embedded_explicit_method(TimeStepping::BOGACKI_SHAMPINE,
+                                       n_time_steps,
+                                       initial_time,
+                                       final_time);
     std::cout << "Bogacki-Shampine:         error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(
-      TimeStepping::DOPRI, n_time_steps, initial_time, final_time);
+    n_steps = embedded_explicit_method(TimeStepping::DOPRI,
+                                       n_time_steps,
+                                       initial_time,
+                                       final_time);
     std::cout << "Dopri:                    error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(
-      TimeStepping::FEHLBERG, n_time_steps, initial_time, final_time);
+    n_steps = embedded_explicit_method(TimeStepping::FEHLBERG,
+                                       n_time_steps,
+                                       initial_time,
+                                       final_time);
     std::cout << "Fehlberg:                 error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(
-      TimeStepping::CASH_KARP, n_time_steps, initial_time, final_time);
+    n_steps = embedded_explicit_method(TimeStepping::CASH_KARP,
+                                       n_time_steps,
+                                       initial_time,
+                                       final_time);
     std::cout << "Cash-Karp:                error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;

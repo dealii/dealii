@@ -110,8 +110,10 @@ namespace NonMatching
     std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
     std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
 
-    FEValues<dim1, spacedim> fe_v(
-      immersed_mapping, immersed_fe, quad, update_quadrature_points);
+    FEValues<dim1, spacedim> fe_v(immersed_mapping,
+                                  immersed_fe,
+                                  quad,
+                                  update_quadrature_points);
 
     // Take care of components
     const ComponentMask space_c =
@@ -315,8 +317,10 @@ namespace NonMatching
                 const std::vector<Point<dim0>> & qps = qpoints[c];
                 const std::vector<unsigned int> &ids = maps[c];
 
-                FEValues<dim0, spacedim> o_fe_v(
-                  cache.get_mapping(), space_dh.get_fe(), qps, update_values);
+                FEValues<dim0, spacedim> o_fe_v(cache.get_mapping(),
+                                                space_dh.get_fe(),
+                                                qps,
+                                                update_values);
                 o_fe_v.reinit(ocell);
                 ocell->get_dof_indices(odofs);
 
@@ -352,8 +356,10 @@ namespace NonMatching
                   }
 
                 // Now assemble the matrices
-                constraints.distribute_local_to_global(
-                  cell_matrix, odofs, dofs, matrix);
+                constraints.distribute_local_to_global(cell_matrix,
+                                                       odofs,
+                                                       dofs,
+                                                       matrix);
               }
           }
       }

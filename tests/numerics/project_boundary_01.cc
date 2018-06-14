@@ -49,9 +49,9 @@ template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
-  MySquareFunction(const unsigned int n_components) :
-    Function<dim>(n_components),
-    scaling(1)
+  MySquareFunction(const unsigned int n_components)
+    : Function<dim>(n_components)
+    , scaling(1)
   {}
 
   void

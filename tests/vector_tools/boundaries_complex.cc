@@ -50,14 +50,16 @@ template <int dim>
 class MySquareFunction : public Function<dim, std::complex<double>>
 {
 public:
-  MySquareFunction() : Function<dim, std::complex<double>>(2)
+  MySquareFunction()
+    : Function<dim, std::complex<double>>(2)
   {}
 
   virtual std::complex<double>
   value(const Point<dim> &p, const unsigned int component) const
   {
-    return std::complex<double>(
-      100 * (component + 1) * p.square() * std::sin(p.square()), 0);
+    return std::complex<double>(100 * (component + 1) * p.square() *
+                                  std::sin(p.square()),
+                                0);
   }
 
   virtual void

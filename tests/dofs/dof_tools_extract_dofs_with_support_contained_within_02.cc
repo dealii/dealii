@@ -67,8 +67,9 @@ test(const unsigned int flag)
   // Setup system
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<dim>(0, 0), Point<dim>(1, 1));
+  GridGenerator::hyper_rectangle(triangulation,
+                                 Point<dim>(0, 0),
+                                 Point<dim>(1, 1));
 
   if (flag == 0)
     triangulation.refine_global(2);
@@ -132,8 +133,9 @@ test(const unsigned int flag)
       for (unsigned int i = 0; i < dh.n_dofs(); ++i)
         {
           LinearAlgebra::distributed::Vector<double> &s = shape_functions[i];
-          s.reinit(
-            dh.locally_owned_dofs(), locally_relevant_set, MPI_COMM_WORLD);
+          s.reinit(dh.locally_owned_dofs(),
+                   locally_relevant_set,
+                   MPI_COMM_WORLD);
           s = 0.;
           if (dh.locally_owned_dofs().is_element(i))
             s[i] = 1.0;
@@ -141,8 +143,9 @@ test(const unsigned int flag)
           cm.distribute(s);
           s.update_ghost_values();
 
-          data_out.add_data_vector(
-            s, std::string("N_") + Utilities::int_to_string(i));
+          data_out.add_data_vector(s,
+                                   std::string("N_") +
+                                     Utilities::int_to_string(i));
         }
 
       Vector<float> subdomain(triangulation.n_active_cells());

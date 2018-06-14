@@ -44,8 +44,9 @@ for (S1, S2 : REAL_SCALARS)
     template S2 ChunkSparseMatrix<S1>::matrix_scalar_product<S2>(
       const Vector<S2> &, const Vector<S2> &) const;
 
-    template S2 ChunkSparseMatrix<S1>::residual<S2>(
-      Vector<S2> &, const Vector<S2> &, const Vector<S2> &) const;
+    template S2 ChunkSparseMatrix<S1>::residual<S2>(Vector<S2> &,
+                                                    const Vector<S2> &,
+                                                    const Vector<S2> &) const;
 
     template void ChunkSparseMatrix<S1>::precondition_SSOR<S2>(
       Vector<S2> &, const Vector<S2> &, const S1) const;
@@ -72,12 +73,15 @@ for (S1, S2 : REAL_SCALARS)
       const std::vector<types::global_dof_index> &,
       const std::vector<types::global_dof_index> &,
       const S1) const;
-    template void ChunkSparseMatrix<S1>::SOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void ChunkSparseMatrix<S1>::TSOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void ChunkSparseMatrix<S1>::SSOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void ChunkSparseMatrix<S1>::SOR_step<S2>(Vector<S2> &,
+                                                      const Vector<S2> &,
+                                                      const S1) const;
+    template void ChunkSparseMatrix<S1>::TSOR_step<S2>(Vector<S2> &,
+                                                       const Vector<S2> &,
+                                                       const S1) const;
+    template void ChunkSparseMatrix<S1>::SSOR_step<S2>(Vector<S2> &,
+                                                       const Vector<S2> &,
+                                                       const S1) const;
   }
 
 

@@ -113,11 +113,13 @@ check()
 
   deallog << static_cast<typename numbers::NumberTraits<T>::real_type>(1)
           << "   -->   ";
-  deallog << is_finite(T(
-               static_cast<typename numbers::NumberTraits<T>::real_type>(1), 0))
+  deallog << is_finite(
+               T(static_cast<typename numbers::NumberTraits<T>::real_type>(1),
+                 0))
           << ' ';
-  deallog << is_finite(T(
-               0, static_cast<typename numbers::NumberTraits<T>::real_type>(1)))
+  deallog << is_finite(
+               T(0,
+                 static_cast<typename numbers::NumberTraits<T>::real_type>(1)))
           << std::endl;
 
   deallog << static_cast<typename numbers::NumberTraits<T>::real_type>(-1)

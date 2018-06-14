@@ -54,7 +54,8 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   // make function virtual to allow derived
   // classes to define a different function
@@ -178,8 +179,10 @@ test()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 1, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           1,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double>(dof, constraints);

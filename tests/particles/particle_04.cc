@@ -46,8 +46,9 @@ test()
 
     const types::particle_index index(7);
 
-    Particles::Particle<dim, spacedim> particle(
-      position, reference_position, index);
+    Particles::Particle<dim, spacedim> particle(position,
+                                                reference_position,
+                                                index);
 
     deallog << "Particle location: " << particle.get_location() << std::endl
             << "Particle reference location: "

@@ -73,7 +73,8 @@ gradient_power(const Tensor<1, dim> &v, const unsigned int n)
 class InitializationValues : public Function<1>
 {
 public:
-  InitializationValues() : Function<1>()
+  InitializationValues()
+    : Function<1>()
   {}
 
   virtual double
@@ -140,10 +141,10 @@ private:
 
 
 template <int dim>
-MinimizationProblem<dim>::MinimizationProblem(const unsigned int run_number) :
-  run_number(run_number),
-  fe(FE_Q<dim>(1)),
-  dof_handler(triangulation)
+MinimizationProblem<dim>::MinimizationProblem(const unsigned int run_number)
+  : run_number(run_number)
+  , fe(FE_Q<dim>(1))
+  , dof_handler(triangulation)
 {}
 
 
@@ -152,8 +153,9 @@ void
 MinimizationProblem<1>::initialize_solution()
 {
   present_solution.reinit(dof_handler.n_dofs());
-  VectorTools::interpolate(
-    dof_handler, InitializationValues(), present_solution);
+  VectorTools::interpolate(dof_handler,
+                           InitializationValues(),
+                           present_solution);
 
   hp::DoFHandler<1>::cell_iterator cell;
   cell = dof_handler.begin(0);
@@ -266,8 +268,9 @@ MinimizationProblem<dim>::assemble_step()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            matrix.add(local_dof_indices[i],
+                       local_dof_indices[j],
+                       cell_matrix(i, j));
 
           residual(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -277,11 +280,15 @@ MinimizationProblem<dim>::assemble_step()
   hanging_node_constraints.condense(residual);
 
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           boundary_values);
   if (dim == 1)
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, Functions::ZeroFunction<dim>(), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             Functions::ZeroFunction<dim>(),
+                                             boundary_values);
   Vector<double> dummy(residual.size());
   MatrixTools::apply_boundary_values(boundary_values, matrix, dummy, residual);
 }
@@ -489,8 +496,10 @@ MinimizationProblem<1>::refine_grid()
         }
     }
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, error_indicators, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  error_indicators,
+                                                  0.3,
+                                                  0.03);
   triangulation.prepare_coarsening_and_refinement();
 
   SolutionTransfer<dim> solution_transfer(dof_handler);

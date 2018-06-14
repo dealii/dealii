@@ -61,7 +61,9 @@ main(int argc, char **argv)
     PETScWrappers::SolverChebychev    solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);
 
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 1050, 1141);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner),
+                              control.last_step(),
+                              1050,
+                              1141);
   }
 }

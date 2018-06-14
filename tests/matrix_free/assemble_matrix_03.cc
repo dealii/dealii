@@ -49,26 +49,26 @@ namespace Assembly
     template <int dim, int fe_degree>
     struct Data
     {
-      Data(const FiniteElement<dim> &fe) :
-        fe_values(fe,
-                  QGauss<dim>(fe.degree + 1),
-                  update_values | update_gradients | update_JxW_values),
-        fe_eval(1,
-                FEEvaluation<dim, fe_degree>(fe,
-                                             QGauss<1>(fe.degree + 1),
-                                             fe_values.get_update_flags())),
-        cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell),
-        test_matrix(cell_matrix)
+      Data(const FiniteElement<dim> &fe)
+        : fe_values(fe,
+                    QGauss<dim>(fe.degree + 1),
+                    update_values | update_gradients | update_JxW_values)
+        , fe_eval(1,
+                  FEEvaluation<dim, fe_degree>(fe,
+                                               QGauss<1>(fe.degree + 1),
+                                               fe_values.get_update_flags()))
+        , cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell)
+        , test_matrix(cell_matrix)
       {}
 
-      Data(const Data &data) :
-        fe_values(data.fe_values.get_mapping(),
-                  data.fe_values.get_fe(),
-                  data.fe_values.get_quadrature(),
-                  data.fe_values.get_update_flags()),
-        fe_eval(data.fe_eval),
-        cell_matrix(data.cell_matrix),
-        test_matrix(data.test_matrix)
+      Data(const Data &data)
+        : fe_values(data.fe_values.get_mapping(),
+                    data.fe_values.get_fe(),
+                    data.fe_values.get_quadrature(),
+                    data.fe_values.get_update_flags())
+        , fe_eval(data.fe_eval)
+        , cell_matrix(data.cell_matrix)
+        , test_matrix(data.test_matrix)
       {}
 
       FEValues<dim> fe_values;

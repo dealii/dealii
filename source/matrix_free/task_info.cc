@@ -55,20 +55,20 @@ namespace internal
       public:
         ActualCellWork(MFWorkerInterface **worker_pointer,
                        const unsigned int  partition,
-                       const TaskInfo &    task_info) :
-          worker(nullptr),
-          worker_pointer(worker_pointer),
-          partition(partition),
-          task_info(task_info)
+                       const TaskInfo &    task_info)
+          : worker(nullptr)
+          , worker_pointer(worker_pointer)
+          , partition(partition)
+          , task_info(task_info)
         {}
 
         ActualCellWork(MFWorkerInterface &worker,
                        const unsigned int partition,
-                       const TaskInfo &   task_info) :
-          worker(&worker),
-          worker_pointer(nullptr),
-          partition(partition),
-          task_info(task_info)
+                       const TaskInfo &   task_info)
+          : worker(&worker)
+          , worker_pointer(nullptr)
+          , partition(partition)
+          , task_info(task_info)
         {}
 
         void
@@ -106,10 +106,10 @@ namespace internal
         CellWork(MFWorkerInterface &worker,
                  const unsigned int partition,
                  const TaskInfo &   task_info,
-                 const bool         is_blocked) :
-          dummy(nullptr),
-          work(worker, partition, task_info),
-          is_blocked(is_blocked)
+                 const bool         is_blocked)
+          : dummy(nullptr)
+          , work(worker, partition, task_info)
+          , is_blocked(is_blocked)
         {}
 
         tbb::task *
@@ -137,12 +137,12 @@ namespace internal
         PartitionWork(MFWorkerInterface &function_in,
                       const unsigned int partition_in,
                       const TaskInfo &   task_info_in,
-                      const bool         is_blocked_in = false) :
-          dummy(nullptr),
-          function(function_in),
-          partition(partition_in),
-          task_info(task_info_in),
-          is_blocked(is_blocked_in)
+                      const bool         is_blocked_in = false)
+          : dummy(nullptr)
+          , function(function_in)
+          , partition(partition_in)
+          , task_info(task_info_in)
+          , is_blocked(is_blocked_in)
         {}
 
         tbb::task *
@@ -233,10 +233,10 @@ namespace internal
       public:
         CellWork(MFWorkerInterface &worker_in,
                  const TaskInfo &   task_info_in,
-                 const unsigned int partition_in) :
-          worker(worker_in),
-          task_info(task_info_in),
-          partition(partition_in)
+                 const unsigned int partition_in)
+          : worker(worker_in)
+          , task_info(task_info_in)
+          , partition(partition_in)
         {}
 
         void
@@ -270,12 +270,12 @@ namespace internal
         PartitionWork(MFWorkerInterface &worker_in,
                       const unsigned int partition_in,
                       const TaskInfo &   task_info_in,
-                      const bool         is_blocked_in) :
-          dummy(nullptr),
-          worker(worker_in),
-          partition(partition_in),
-          task_info(task_info_in),
-          is_blocked(is_blocked_in)
+                      const bool         is_blocked_in)
+          : dummy(nullptr)
+          , worker(worker_in)
+          , partition(partition_in)
+          , task_info(task_info_in)
+          , is_blocked(is_blocked_in)
         {}
 
         tbb::task *
@@ -309,9 +309,9 @@ namespace internal
     class MPICommunication : public tbb::task
     {
     public:
-      MPICommunication(MFWorkerInterface &worker_in, const bool do_compress) :
-        worker(worker_in),
-        do_compress(do_compress)
+      MPICommunication(MFWorkerInterface &worker_in, const bool do_compress)
+        : worker(worker_in)
+        , do_compress(do_compress)
       {}
 
       tbb::task *
@@ -388,8 +388,10 @@ namespace internal
                       if (odds == evens)
                         {
                           worker[evens] = new (worker[j]->allocate_child())
-                            partition::PartitionWork(
-                              funct, 2 * j + 1, *this, false);
+                            partition::PartitionWork(funct,
+                                                     2 * j + 1,
+                                                     *this,
+                                                     false);
                           worker[j]->spawn(*worker[evens]);
                         }
                       else
@@ -434,12 +436,16 @@ namespace internal
                       if (part == 0)
                         worker[worker_index] =
                           new (worker_compr->allocate_child())
-                            color::PartitionWork(
-                              funct, slice_index, *this, false);
+                            color::PartitionWork(funct,
+                                                 slice_index,
+                                                 *this,
+                                                 false);
                       else
-                        worker[worker_index] =
-                          new (root->allocate_child()) color::PartitionWork(
-                            funct, slice_index, *this, false);
+                        worker[worker_index] = new (root->allocate_child())
+                          color::PartitionWork(funct,
+                                               slice_index,
+                                               *this,
+                                               false);
                       slice_index++;
                       for (; slice_index < partition_row_index[part + 1];
                            slice_index++)
@@ -448,8 +454,10 @@ namespace internal
                           worker_index++;
                           worker[worker_index] =
                             new (worker[worker_index - 1]->allocate_child())
-                              color::PartitionWork(
-                                funct, slice_index, *this, false);
+                              color::PartitionWork(funct,
+                                                   slice_index,
+                                                   *this,
+                                                   false);
                         }
                       worker[worker_index]->set_ref_count(2);
                       if (part > 0)
@@ -486,16 +494,20 @@ namespace internal
                             {
                               blocked_worker[part / 2] =
                                 new (worker[worker_index - 1]->allocate_child())
-                                  color::PartitionWork(
-                                    funct, slice_index, *this, true);
+                                  color::PartitionWork(funct,
+                                                       slice_index,
+                                                       *this,
+                                                       true);
                               slice_index++;
                               if (slice_index < partition_row_index[part + 1])
                                 {
                                   blocked_worker[part / 2]->set_ref_count(1);
                                   worker[worker_index] = new (
                                     blocked_worker[part / 2]->allocate_child())
-                                    color::PartitionWork(
-                                      funct, slice_index, *this, false);
+                                    color::PartitionWork(funct,
+                                                         slice_index,
+                                                         *this,
+                                                         false);
                                   slice_index++;
                                 }
                               else
@@ -514,8 +526,10 @@ namespace internal
                                 }
                               worker[worker_index] =
                                 new (worker[worker_index - 1]->allocate_child())
-                                  color::PartitionWork(
-                                    funct, slice_index, *this, false);
+                                  color::PartitionWork(funct,
+                                                       slice_index,
+                                                       *this,
+                                                       false);
                             }
                           spawn_index_child = worker_index;
                           worker_index++;
@@ -1061,8 +1075,9 @@ namespace internal
       // Create connectivity graph for blocks based on connectivity graph for
       // cells.
       DynamicSparsityPattern connectivity(n_blocks, n_blocks);
-      make_connectivity_cells_to_blocks(
-        irregular_cells, connectivity_large, connectivity);
+      make_connectivity_cells_to_blocks(irregular_cells,
+                                        connectivity_large,
+                                        connectivity);
 
       // Create cell-block  partitioning.
 
@@ -1206,8 +1221,9 @@ namespace internal
       // if we want to block before partitioning, create connectivity graph
       // for blocks based on connectivity graph for cells.
       DynamicSparsityPattern connectivity_blocks(n_blocks, n_blocks);
-      make_connectivity_cells_to_blocks(
-        irregular_cells, connectivity, connectivity_blocks);
+      make_connectivity_cells_to_blocks(irregular_cells,
+                                        connectivity,
+                                        connectivity_blocks);
 
       unsigned int n_blocks = 0;
       if (scheme == partition_color ||

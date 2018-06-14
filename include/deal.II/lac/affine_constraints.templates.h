@@ -278,10 +278,11 @@ AffineConstraints<number>::add_entries(
         if (p->first == col_val_pair->first)
           {
             // entry exists, break innermost loop
-            Assert(
-              p->second == col_val_pair->second,
-              ExcEntryAlreadyExists(
-                line, col_val_pair->first, p->second, col_val_pair->second));
+            Assert(p->second == col_val_pair->second,
+                   ExcEntryAlreadyExists(line,
+                                         col_val_pair->first,
+                                         p->second,
+                                         col_val_pair->second));
             break;
           }
 
@@ -638,10 +639,11 @@ AffineConstraints<number>::merge(
   const bool                       allow_different_local_lines)
 {
   (void)allow_different_local_lines;
-  Assert(
-    allow_different_local_lines || local_lines == other_constraints.local_lines,
-    ExcMessage("local_lines for this and the other objects are not the same "
-               "although allow_different_local_lines is false."));
+  Assert(allow_different_local_lines ||
+           local_lines == other_constraints.local_lines,
+         ExcMessage(
+           "local_lines for this and the other objects are not the same "
+           "although allow_different_local_lines is false."));
 
   // store the previous state with respect to sorting
   const bool object_was_sorted = sorted;
@@ -708,8 +710,9 @@ AffineConstraints<number>::merge(
   {
     // do not bother to resize the lines cache exactly since it is pretty
     // cheap to adjust it along the way.
-    std::fill(
-      lines_cache.begin(), lines_cache.end(), numbers::invalid_size_type);
+    std::fill(lines_cache.begin(),
+              lines_cache.end(),
+              numbers::invalid_size_type);
 
     // reset lines_cache for our own constraints
     size_type index = 0;
@@ -1645,8 +1648,9 @@ AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
                       // complex<float>' for 3rd argument
                       number v = static_cast<number>(entry->value());
                       v *= lines[distribute[row]].entries[q].second;
-                      uncondensed.add(
-                        lines[distribute[row]].entries[q].first, column, v);
+                      uncondensed.add(lines[distribute[row]].entries[q].first,
+                                      column,
+                                      v);
                     }
 
                   // set old entry to zero
@@ -2126,11 +2130,11 @@ AffineConstraints<number>::distribute_local_to_global(
 
               for (size_type q = 0; q < position_j.entries.size(); ++q)
                 {
-                  Assert(
-                    !(!local_lines.size() ||
-                      local_lines.is_element(position_j.entries[q].first)) ||
-                      is_constrained(position_j.entries[q].first) == false,
-                    ExcMessage("Tried to distribute to a fixed dof."));
+                  Assert(!(!local_lines.size() ||
+                           local_lines.is_element(
+                             position_j.entries[q].first)) ||
+                           is_constrained(position_j.entries[q].first) == false,
+                         ExcMessage("Tried to distribute to a fixed dof."));
                   global_vector(position_j.entries[q].first) -=
                     val * position_j.entries[q].second * matrix_entry;
                 }
@@ -2195,8 +2199,9 @@ namespace internal
       PETScWrappers::MPI::Vector &      output,
       const std::integral_constant<bool, false> /*is_block_vector*/)
     {
-      output.reinit(
-        locally_owned_elements, needed_elements, vec.get_mpi_communicator());
+      output.reinit(locally_owned_elements,
+                    needed_elements,
+                    vec.get_mpi_communicator());
       output = vec;
     }
 #endif
@@ -2214,8 +2219,9 @@ namespace internal
       // way to efficiently avoid the copy then
       const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
         .zero_out_ghosts();
-      output.reinit(
-        locally_owned_elements, needed_elements, vec.get_mpi_communicator());
+      output.reinit(locally_owned_elements,
+                    needed_elements,
+                    vec.get_mpi_communicator());
       output = vec;
       output.update_ghost_values();
     }
@@ -2358,8 +2364,9 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                               vec, next_constraint->entries[i].first)) *
                           next_constraint->entries[i].second);
           AssertIsFinite(new_value);
-          internal::ElementAccess<VectorType>::set(
-            new_value, next_constraint->index, vec);
+          internal::ElementAccess<VectorType>::set(new_value,
+                                                   next_constraint->index,
+                                                   vec);
         }
     }
 }
@@ -2403,14 +2410,14 @@ namespace internals
   };
 
   inline Distributing::Distributing(const size_type global_row,
-                                    const size_type local_row) :
-    global_row(global_row),
-    local_row(local_row),
-    constraint_position(numbers::invalid_size_type)
+                                    const size_type local_row)
+    : global_row(global_row)
+    , local_row(local_row)
+    , constraint_position(numbers::invalid_size_type)
   {}
 
-  inline Distributing::Distributing(const Distributing &in) :
-    constraint_position(numbers::invalid_size_type)
+  inline Distributing::Distributing(const Distributing &in)
+    : constraint_position(numbers::invalid_size_type)
   {
     *this = (in);
   }
@@ -2444,7 +2451,8 @@ namespace internals
   template <typename number>
   struct DataCache
   {
-    DataCache() : row_length(8)
+    DataCache()
+      : row_length(8)
     {}
 
     void
@@ -2541,7 +2549,9 @@ namespace internals
   class GlobalRowsFromLocal
   {
   public:
-    GlobalRowsFromLocal() : n_active_rows(0), n_inhomogeneous_rows(0)
+    GlobalRowsFromLocal()
+      : n_active_rows(0)
+      , n_inhomogeneous_rows(0)
     {}
 
     void
@@ -2845,13 +2855,15 @@ namespace internals
       /**
        * Constructor, does nothing.
        */
-      ScratchData() : in_use(false)
+      ScratchData()
+        : in_use(false)
       {}
 
       /**
        * Copy constructor, does nothing
        */
-      ScratchData(const ScratchData &) : in_use(false)
+      ScratchData(const ScratchData &)
+        : in_use(false)
       {}
 
       /**
@@ -2907,8 +2919,8 @@ namespace internals
        * Constructor. Grabs a scratch data object on the current thread and
        * mark it as used
        */
-      ScratchDataAccessor() :
-        my_scratch_data(&AffineConstraintsData::scratch_data.get())
+      ScratchDataAccessor()
+        : my_scratch_data(&AffineConstraintsData::scratch_data.get())
       {
         Assert(my_scratch_data->in_use == false,
                ExcMessage(
@@ -3155,10 +3167,10 @@ namespace internals
         {
           while (matrix_values->column() < column)
             ++matrix_values;
-          Assert(
-            matrix_values->column() == column,
-            typename SparseMatrix<typename SparseMatrixIterator::MatrixType::
-                                    value_type>::ExcInvalidIndex(row, column));
+          Assert(matrix_values->column() == column,
+                 typename SparseMatrix<
+                   typename SparseMatrixIterator::MatrixType::value_type>::
+                   ExcInvalidIndex(row, column));
           matrix_values->value() += value;
         }
     }
@@ -3207,8 +3219,10 @@ namespace internals
               {
                 const size_type loc_col = global_rows.local_row(j);
                 const number    col_val = matrix_ptr[loc_col];
-                dealiiSparseMatrix::add_value(
-                  col_val, row, global_rows.global_row(j), matrix_values);
+                dealiiSparseMatrix::add_value(col_val,
+                                              row,
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
           }
         else
@@ -3217,8 +3231,10 @@ namespace internals
               {
                 number col_val = resolve_matrix_entry(
                   global_rows, global_rows, i, j, loc_row, local_matrix);
-                dealiiSparseMatrix::add_value(
-                  col_val, row, global_rows.global_row(j), matrix_values);
+                dealiiSparseMatrix::add_value(col_val,
+                                              row,
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
           }
       }
@@ -3235,15 +3251,19 @@ namespace internals
               {
                 const size_type loc_col = global_rows.local_row(j);
                 const number    col_val = matrix_ptr[loc_col];
-                dealiiSparseMatrix::add_value(
-                  col_val, row, global_rows.global_row(j), matrix_values);
+                dealiiSparseMatrix::add_value(col_val,
+                                              row,
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
             for (size_type j = i + 1; j < column_end; ++j)
               {
                 const size_type loc_col = global_rows.local_row(j);
                 const number    col_val = matrix_ptr[loc_col];
-                dealiiSparseMatrix::add_value(
-                  col_val, row, global_rows.global_row(j), matrix_values);
+                dealiiSparseMatrix::add_value(col_val,
+                                              row,
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
           }
         else
@@ -3254,15 +3274,19 @@ namespace internals
               {
                 number col_val = resolve_matrix_entry(
                   global_rows, global_rows, i, j, loc_row, local_matrix);
-                dealiiSparseMatrix::add_value(
-                  col_val, row, global_rows.global_row(j), matrix_values);
+                dealiiSparseMatrix::add_value(col_val,
+                                              row,
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
             for (size_type j = i + 1; j < column_end; ++j)
               {
                 number col_val = resolve_matrix_entry(
                   global_rows, global_rows, i, j, loc_row, local_matrix);
-                dealiiSparseMatrix::add_value(
-                  col_val, row, global_rows.global_row(j), matrix_values);
+                dealiiSparseMatrix::add_value(col_val,
+                                              row,
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
           }
       }
@@ -3280,8 +3304,10 @@ namespace internals
             if (row == global_rows.global_row(j))
               sparse_matrix->begin(row)->value() += col_val;
             else
-              dealiiSparseMatrix::add_value(
-                col_val, row, global_rows.global_row(j), matrix_values);
+              dealiiSparseMatrix::add_value(col_val,
+                                            row,
+                                            global_rows.global_row(j),
+                                            matrix_values);
           }
       }
     else
@@ -3294,8 +3320,10 @@ namespace internals
             if (row == global_rows.global_row(j))
               sparse_matrix->begin(row)->value() += col_val;
             else
-              dealiiSparseMatrix::add_value(
-                col_val, row, global_rows.global_row(j), matrix_values);
+              dealiiSparseMatrix::add_value(col_val,
+                                            row,
+                                            global_rows.global_row(j),
+                                            matrix_values);
           }
       }
   }
@@ -3533,8 +3561,9 @@ AffineConstraints<number>::make_sorted_row_list(
       if (position.inhomogeneity != number(0.))
         global_rows.set_ith_constraint_inhomogeneous(i);
       for (size_type q = 0; q < position.entries.size(); ++q)
-        global_rows.insert_index(
-          position.entries[q].first, local_row, position.entries[q].second);
+        global_rows.insert_index(position.entries[q].first,
+                                 local_row,
+                                 position.entries[q].second);
     }
 }
 
@@ -3581,8 +3610,10 @@ AffineConstraints<number>::make_sorted_row_list(
           // keep the list sorted
           else
             {
-              std::vector<size_type>::iterator it = Utilities::lower_bound(
-                active_dofs.begin(), active_dofs.end() - i + 1, new_index);
+              std::vector<size_type>::iterator it =
+                Utilities::lower_bound(active_dofs.begin(),
+                                       active_dofs.end() - i + 1,
+                                       new_index);
               if (*it != new_index)
                 active_dofs.insert(it, new_index);
             }
@@ -3765,9 +3796,9 @@ AffineConstraints<number>::distribute_local_to_global(
   // Vector, LinearAlgebra::distributed::vector, etc.
   if (std::is_same<typename VectorType::value_type, number>::value)
     {
-      global_vector.add(
-        vector_indices,
-        *reinterpret_cast<std::vector<number> *>(&vector_values));
+      global_vector.add(vector_indices,
+                        *reinterpret_cast<std::vector<number> *>(
+                          &vector_values));
     }
   else
     {
@@ -4189,8 +4220,9 @@ AffineConstraints<number>::add_entries_local_to_global(
       // additional construct that also takes care of block indices.
       std::vector<size_type> &block_starts = scratch_data->block_starts;
       block_starts.resize(num_blocks + 1);
-      internals::make_block_starts(
-        sparsity_pattern, actual_dof_indices, block_starts);
+      internals::make_block_starts(sparsity_pattern,
+                                   actual_dof_indices,
+                                   block_starts);
 
       for (size_type block = 0; block < num_blocks; ++block)
         {

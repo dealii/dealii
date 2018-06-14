@@ -1342,9 +1342,9 @@ namespace TrilinosWrappers
   namespace internal
   {
     inline VectorReference::VectorReference(MPI::Vector &   vector,
-                                            const size_type index) :
-      vector(vector),
-      index(index)
+                                            const size_type index)
+      : vector(vector)
+      , index(index)
     {}
 
 
@@ -1686,11 +1686,11 @@ namespace TrilinosWrappers
               const TrilinosWrappers::types::int_type my_row =
                 nonlocal_vector->Map().LID(
                   static_cast<TrilinosWrappers::types::int_type>(row));
-              Assert(
-                my_row != -1,
-                ExcMessage("Attempted to write into off-processor vector entry "
-                           "that has not be specified as being writable upon "
-                           "initialization"));
+              Assert(my_row != -1,
+                     ExcMessage(
+                       "Attempted to write into off-processor vector entry "
+                       "that has not be specified as being writable upon "
+                       "initialization"));
               (*nonlocal_vector)[0][my_row] += values[i];
               compressed = false;
             }

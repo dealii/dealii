@@ -111,10 +111,10 @@ namespace Step53
   // member functions we call here are static because (i) they do not
   // access any member variables of the class, and (ii) because they are
   // called at a time when the object is not initialized fully anyway.
-  AfricaTopography::AfricaTopography() :
-    topography_data(get_endpoints(),
-                    n_intervals(),
-                    Table<2, double>(380, 220, get_data().begin()))
+  AfricaTopography::AfricaTopography()
+    : topography_data(get_endpoints(),
+                      n_intervals(),
+                      Table<2, double>(380, 220, get_data().begin()))
   {}
 
 
@@ -285,14 +285,15 @@ namespace Step53
 
   Point<3> AfricaGeometry::pull_back_wgs84(const Point<3> &x) const
   {
-    const double b     = std::sqrt(R * R * (1 - ellipticity * ellipticity));
-    const double ep    = std::sqrt((R * R - b * b) / (b * b));
-    const double p     = std::sqrt(x(0) * x(0) + x(1) * x(1));
-    const double th    = std::atan2(R * x(2), b * p);
-    const double phi   = std::atan2(x(1), x(0));
-    const double theta = std::atan2(
-      x(2) + ep * ep * b * std::pow(std::sin(th), 3),
-      (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
+    const double b   = std::sqrt(R * R * (1 - ellipticity * ellipticity));
+    const double ep  = std::sqrt((R * R - b * b) / (b * b));
+    const double p   = std::sqrt(x(0) * x(0) + x(1) * x(1));
+    const double th  = std::atan2(R * x(2), b * p);
+    const double phi = std::atan2(x(1), x(0));
+    const double theta =
+      std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th), 3),
+                 (p -
+                  (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
     const double R_bar =
       R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) *
                            std::sin(theta)));

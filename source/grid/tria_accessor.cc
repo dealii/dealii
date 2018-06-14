@@ -1616,8 +1616,9 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point(
       w[i] = GeometryInfo<structdim>::d_linear_shape_function(coordinates, i);
     }
 
-  return this->get_manifold().get_new_point(
-    make_array_view(p.begin(), p.end()), make_array_view(w.begin(), w.end()));
+  return this->get_manifold().get_new_point(make_array_view(p.begin(), p.end()),
+                                            make_array_view(w.begin(),
+                                                            w.end()));
 }
 
 
@@ -1662,9 +1663,8 @@ namespace
                                         [1] = {{-1.000000}, {1.000000}};
 
   template <>
-  const double TransformR2UAffine<1>::Kb[GeometryInfo<1>::vertices_per_cell] = {
-    1.000000,
-    0.000000};
+  const double TransformR2UAffine<1>::Kb[GeometryInfo<1>::vertices_per_cell] =
+    {1.000000, 0.000000};
 
 
   /*
@@ -2132,8 +2132,9 @@ CellAccessor<dim, spacedim>::parent() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
-  TriaIterator<CellAccessor<dim, spacedim>> q(
-    this->tria, this->present_level - 1, parent_index());
+  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
+                                              this->present_level - 1,
+                                              parent_index());
 
   return q;
 }
@@ -2415,9 +2416,9 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                   // call a helper function, that translates the current
                   // subface number to a subface number for the current
                   // FaceRefineCase
-                  return std::make_pair(
-                    face_no_guess,
-                    translate_subface_no(face_guess, subface_no));
+                  return std::make_pair(face_no_guess,
+                                        translate_subface_no(face_guess,
+                                                             subface_no));
 
                 if (face_guess->child(subface_no)->has_children())
                   for (unsigned int subsub_no = 0;
@@ -2456,8 +2457,9 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                     // call a helper function, that translates the current
                     // subface number to a subface number for the current
                     // FaceRefineCase
-                    return std::make_pair(
-                      face_no, translate_subface_no(face, subface_no));
+                    return std::make_pair(face_no,
+                                          translate_subface_no(face,
+                                                               subface_no));
 
                   if (face->child(subface_no)->has_children())
                     for (unsigned int subsub_no = 0;
@@ -2468,9 +2470,10 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
                         // call a helper function, that translates the current
                         // subface number and subsubface number to a subface
                         // number for the current FaceRefineCase
-                        return std::make_pair(
-                          face_no,
-                          translate_subface_no(face, subface_no, subsub_no));
+                        return std::make_pair(face_no,
+                                              translate_subface_no(face,
+                                                                   subface_no,
+                                                                   subsub_no));
                 }
             }
 
@@ -2523,8 +2526,9 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
   typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
   // my_it : is the iterator to the current cell.
   cell_iterator my_it(*this);
-  if (this->tria->periodic_face_map.find(std::pair<cell_iterator, unsigned int>(
-        my_it, i_face)) != this->tria->periodic_face_map.end())
+  if (this->tria->periodic_face_map.find(
+        std::pair<cell_iterator, unsigned int>(my_it, i_face)) !=
+      this->tria->periodic_face_map.end())
     return true;
   return false;
 }

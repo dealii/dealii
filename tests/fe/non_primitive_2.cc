@@ -69,8 +69,9 @@ create_stokes_matrix_2(const DoFHandler<dim> &dof_handler,
   QGauss<dim>        quadrature(3);
   const unsigned int n_q_points = quadrature.size();
 
-  FEValues<dim> fe_values(
-    fe, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_JxW_values);
 
   const double nu = 3.14159265358e-2;
 
@@ -142,8 +143,9 @@ create_stokes_matrix_3(const DoFHandler<dim> &dof_handler,
   QGauss<dim>        quadrature(3);
   const unsigned int n_q_points = quadrature.size();
 
-  FEValues<dim> fe_values(
-    fe, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_JxW_values);
 
   const double nu = 3.14159265358e-2;
 
@@ -172,8 +174,9 @@ create_stokes_matrix_3(const DoFHandler<dim> &dof_handler,
                       // velocity-pressure coupling
                       if ((comp_i < dim) && (comp_j == dim))
                         local_matrix(i, j) +=
-                          (-fe_values.shape_grad_component(
-                             i, q, comp_i)[comp_i] *
+                          (-fe_values.shape_grad_component(i,
+                                                           q,
+                                                           comp_i)[comp_i] *
                            fe_values.shape_value_component(j, q, comp_j) *
                            fe_values.JxW(q));
 
@@ -181,8 +184,9 @@ create_stokes_matrix_3(const DoFHandler<dim> &dof_handler,
                       if ((comp_i == dim) && (comp_j < dim))
                         local_matrix(i, j) +=
                           (fe_values.shape_value_component(i, q, comp_i) *
-                           fe_values.shape_grad_component(
-                             j, q, comp_j)[comp_j] *
+                           fe_values.shape_grad_component(j,
+                                                          q,
+                                                          comp_j)[comp_j] *
                            fe_values.JxW(q));
                     };
 

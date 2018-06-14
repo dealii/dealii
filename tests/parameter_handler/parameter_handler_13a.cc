@@ -25,11 +25,13 @@ void
 check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry(
-    "test_13",
-    "-1:a xyz 0:b xyz 1:c",
-    Patterns::Map(
-      Patterns::Integer(-1, 1), Patterns::Selection("a|b|c"), 2, 3, "xyz"));
+  prm.declare_entry("test_13",
+                    "-1:a xyz 0:b xyz 1:c",
+                    Patterns::Map(Patterns::Integer(-1, 1),
+                                  Patterns::Selection("a|b|c"),
+                                  2,
+                                  3,
+                                  "xyz"));
 
   std::ifstream in(p);
   prm.parse_input(in);

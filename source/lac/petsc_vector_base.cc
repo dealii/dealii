@@ -112,11 +112,11 @@ namespace PETScWrappers
     }
   } // namespace internal
 
-  VectorBase::VectorBase() :
-    vector(nullptr),
-    ghosted(false),
-    last_action(::dealii::VectorOperation::unknown),
-    obtained_ownership(true)
+  VectorBase::VectorBase()
+    : vector(nullptr)
+    , ghosted(false)
+    , last_action(::dealii::VectorOperation::unknown)
+    , obtained_ownership(true)
   {
     Assert(MultithreadInfo::is_running_single_threaded(),
            ExcMessage("PETSc does not support multi-threaded access, set "
@@ -125,12 +125,12 @@ namespace PETScWrappers
 
 
 
-  VectorBase::VectorBase(const VectorBase &v) :
-    Subscriptor(),
-    ghosted(v.ghosted),
-    ghost_indices(v.ghost_indices),
-    last_action(::dealii::VectorOperation::unknown),
-    obtained_ownership(true)
+  VectorBase::VectorBase(const VectorBase &v)
+    : Subscriptor()
+    , ghosted(v.ghosted)
+    , ghost_indices(v.ghost_indices)
+    , last_action(::dealii::VectorOperation::unknown)
+    , obtained_ownership(true)
   {
     Assert(MultithreadInfo::is_running_single_threaded(),
            ExcMessage("PETSc does not support multi-threaded access, set "
@@ -145,12 +145,12 @@ namespace PETScWrappers
 
 
 
-  VectorBase::VectorBase(const Vec &v) :
-    Subscriptor(),
-    vector(v),
-    ghosted(false),
-    last_action(::dealii::VectorOperation::unknown),
-    obtained_ownership(false)
+  VectorBase::VectorBase(const Vec &v)
+    : Subscriptor()
+    , vector(v)
+    , ghosted(false)
+    , last_action(::dealii::VectorOperation::unknown)
+    , obtained_ownership(false)
   {
     Assert(MultithreadInfo::is_running_single_threaded(),
            ExcMessage("PETSc does not support multi-threaded access, set "

@@ -30,12 +30,12 @@ template <class PolynomialType, int dim, int spacedim>
 FE_PolyFace<PolynomialType, dim, spacedim>::FE_PolyFace(
   const PolynomialType &        poly_space,
   const FiniteElementData<dim> &fe_data,
-  const std::vector<bool> &     restriction_is_additive_flags) :
-  FiniteElement<dim, spacedim>(
-    fe_data,
-    restriction_is_additive_flags,
-    std::vector<ComponentMask>(1, ComponentMask(1, true))),
-  poly_space(poly_space)
+  const std::vector<bool> &     restriction_is_additive_flags)
+  : FiniteElement<dim, spacedim>(
+      fe_data,
+      restriction_is_additive_flags,
+      std::vector<ComponentMask>(1, ComponentMask(1, true)))
+  , poly_space(poly_space)
 {
   AssertDimension(dim, PolynomialType::dimension + 1);
 }

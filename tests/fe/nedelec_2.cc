@@ -162,14 +162,16 @@ plot(const Triangulation<dim> &tr, const unsigned int p)
             std::pair<unsigned int, unsigned int> neighbor_face =
               c->neighbor_of_coarser_neighbor(face);
 
-            fesubface.reinit(
-              c->neighbor(face), neighbor_face.first, neighbor_face.second);
+            fesubface.reinit(c->neighbor(face),
+                             neighbor_face.first,
+                             neighbor_face.second);
             fesubface.get_function_values(values, shape_values2);
             for (unsigned int k = 0; k < feface.n_quadrature_points; ++k)
               {
                 deallog << feface.quadrature_point(k);
-                plot_diff(
-                  shape_values1[k], shape_values2[k], feface.normal_vector(k));
+                plot_diff(shape_values1[k],
+                          shape_values2[k],
+                          feface.normal_vector(k));
               }
           }
         else
@@ -179,8 +181,9 @@ plot(const Triangulation<dim> &tr, const unsigned int p)
             for (unsigned int k = 0; k < feface.n_quadrature_points; ++k)
               {
                 deallog << feface.quadrature_point(k);
-                plot_diff(
-                  shape_values1[k], shape_values2[k], feface.normal_vector(k));
+                plot_diff(shape_values1[k],
+                          shape_values2[k],
+                          feface.normal_vector(k));
               }
           }
       }

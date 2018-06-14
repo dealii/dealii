@@ -25,12 +25,12 @@ DEAL_II_NAMESPACE_OPEN
 using namespace LAPACKSupport;
 
 template <typename number>
-TridiagonalMatrix<number>::TridiagonalMatrix(size_type size, bool symmetric) :
-  diagonal(size, 0.),
-  left((symmetric ? 0 : size), 0.),
-  right(size, 0.),
-  is_symmetric(symmetric),
-  state(matrix)
+TridiagonalMatrix<number>::TridiagonalMatrix(size_type size, bool symmetric)
+  : diagonal(size, 0.)
+  , left((symmetric ? 0 : size), 0.)
+  , right(size, 0.)
+  , is_symmetric(symmetric)
+  , state(matrix)
 {}
 
 

@@ -39,10 +39,12 @@ main()
     {
       ParameterHandler prm;
       prm.enter_subsection("Testing");
-      prm.declare_entry(
-        "Function_1", "a", Patterns::List(Patterns::Selection("a|b|c")));
-      prm.declare_entry(
-        "Function_2", "d", Patterns::List(Patterns::Selection("d|e|f")));
+      prm.declare_entry("Function_1",
+                        "a",
+                        Patterns::List(Patterns::Selection("a|b|c")));
+      prm.declare_entry("Function_2",
+                        "d",
+                        Patterns::List(Patterns::Selection("d|e|f")));
       prm.leave_subsection();
 
 

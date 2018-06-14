@@ -79,8 +79,9 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
         try
           {
             face_constraints.reinit(fe2.dofs_per_face, fe1.dofs_per_face);
-            fe1.get_subface_interpolation_matrix(
-              fe2, subface, face_constraints);
+            fe1.get_subface_interpolation_matrix(fe2,
+                                                 subface,
+                                                 face_constraints);
 
             deallog << fe1.get_name() << "  vs.  " << fe2.get_name()
                     << std::endl;
@@ -93,8 +94,9 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
         try
           {
             face_constraints.reinit(fe1.dofs_per_face, fe2.dofs_per_face);
-            fe2.get_subface_interpolation_matrix(
-              fe1, subface, face_constraints);
+            fe2.get_subface_interpolation_matrix(fe1,
+                                                 subface,
+                                                 face_constraints);
 
             deallog << fe2.get_name() << "  vs.  " << fe1.get_name()
                     << std::endl;

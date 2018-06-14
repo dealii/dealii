@@ -23,8 +23,8 @@ namespace Particles
   const PropertyPool::Handle PropertyPool::invalid_handle = nullptr;
 
 
-  PropertyPool::PropertyPool(const unsigned int n_properties_per_slot) :
-    n_properties(n_properties_per_slot)
+  PropertyPool::PropertyPool(const unsigned int n_properties_per_slot)
+    : n_properties(n_properties_per_slot)
   {}
 
 

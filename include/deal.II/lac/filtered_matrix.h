@@ -578,9 +578,9 @@ private:
 template <typename VectorType>
 inline FilteredMatrix<VectorType>::Accessor::Accessor(
   const FilteredMatrix<VectorType> *matrix,
-  const size_type                   index) :
-  matrix(matrix),
-  index(index)
+  const size_type                   index)
+  : matrix(matrix)
+  , index(index)
 {
   Assert(index <= matrix->constraints.size(),
          ExcIndexRange(index, 0, matrix->constraints.size()));
@@ -628,8 +628,8 @@ FilteredMatrix<VectorType>::Accessor::advance()
 template <typename VectorType>
 inline FilteredMatrix<VectorType>::const_iterator::const_iterator(
   const FilteredMatrix<VectorType> *matrix,
-  const size_type                   index) :
-  accessor(matrix, index)
+  const size_type                   index)
+  : accessor(matrix, index)
 {}
 
 
@@ -720,18 +720,18 @@ FilteredMatrix<VectorType>::initialize(const MatrixType &m, bool ecs)
 
 
 template <typename VectorType>
-inline FilteredMatrix<VectorType>::FilteredMatrix() :
-  expect_constrained_source(false)
+inline FilteredMatrix<VectorType>::FilteredMatrix()
+  : expect_constrained_source(false)
 {}
 
 
 
 template <typename VectorType>
-inline FilteredMatrix<VectorType>::FilteredMatrix(const FilteredMatrix &fm) :
-  Subscriptor(),
-  expect_constrained_source(fm.expect_constrained_source),
-  matrix(fm.matrix),
-  constraints(fm.constraints)
+inline FilteredMatrix<VectorType>::FilteredMatrix(const FilteredMatrix &fm)
+  : Subscriptor()
+  , expect_constrained_source(fm.expect_constrained_source)
+  , matrix(fm.matrix)
+  , constraints(fm.constraints)
 {}
 
 
@@ -739,8 +739,8 @@ inline FilteredMatrix<VectorType>::FilteredMatrix(const FilteredMatrix &fm) :
 template <typename VectorType>
 template <typename MatrixType>
 inline FilteredMatrix<VectorType>::FilteredMatrix(const MatrixType &m,
-                                                  const bool        ecs) :
-  expect_constrained_source(false)
+                                                  const bool        ecs)
+  : expect_constrained_source(false)
 {
   initialize(m, ecs);
 }
@@ -779,8 +779,9 @@ FilteredMatrix<VectorType>::add_constraints(
   // add new constraints to end
   const size_type old_size = constraints.size();
   constraints.reserve(old_size + new_constraints.size());
-  constraints.insert(
-    constraints.end(), new_constraints.begin(), new_constraints.end());
+  constraints.insert(constraints.end(),
+                     new_constraints.begin(),
+                     new_constraints.end());
   // then merge the two arrays to
   // form one sorted one
   std::inplace_merge(constraints.begin(),

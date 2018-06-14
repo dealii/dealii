@@ -839,9 +839,9 @@ namespace PETScWrappers
   namespace internal
   {
     inline VectorReference::VectorReference(const VectorBase &vector,
-                                            const size_type   index) :
-      vector(vector),
-      index(index)
+                                            const size_type   index)
+      : vector(vector)
+      , index(index)
     {}
 
 
@@ -1132,8 +1132,9 @@ namespace PETScWrappers
   VectorBase::extract_subvector_to(const std::vector<size_type> &indices,
                                    std::vector<PetscScalar> &    values) const
   {
-    extract_subvector_to(
-      &(indices[0]), &(indices[0]) + indices.size(), &(values[0]));
+    extract_subvector_to(&(indices[0]),
+                         &(indices[0]) + indices.size(),
+                         &(values[0]));
   }
 
   template <typename ForwardIterator, typename OutputIterator>

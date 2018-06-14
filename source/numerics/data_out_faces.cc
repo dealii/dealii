@@ -49,15 +49,15 @@ namespace internal
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &               finite_elements,
-      const UpdateFlags update_flags) :
-      internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
-        n_datasets,
-        n_subdivisions,
-        n_postprocessor_outputs,
-        mapping,
-        finite_elements,
-        update_flags,
-        true)
+      const UpdateFlags update_flags)
+      : internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
+          n_datasets,
+          n_subdivisions,
+          n_postprocessor_outputs,
+          mapping,
+          finite_elements,
+          update_flags,
+          true)
     {}
 
 
@@ -81,8 +81,8 @@ namespace internal
 
 
 template <int dim, typename DoFHandlerType>
-DataOutFaces<dim, DoFHandlerType>::DataOutFaces(const bool so) :
-  surface_only(so)
+DataOutFaces<dim, DoFHandlerType>::DataOutFaces(const bool so)
+  : surface_only(so)
 {
   Assert(dim == DoFHandlerType::dimension, ExcNotImplemented());
 }
@@ -119,8 +119,9 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
 
   if (data.n_datasets > 0)
     {
-      data.reinit_all_fe_values(
-        this->dof_data, cell_and_face->first, cell_and_face->second);
+      data.reinit_all_fe_values(this->dof_data,
+                                cell_and_face->first,
+                                cell_and_face->second);
       const FEValuesBase<dimension> &fe_patch_values =
         data.get_present_fe_values(0);
 

@@ -73,8 +73,9 @@ check()
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(v, std::vector<std::string>{"field_a", "field_b"});
-  data_out.add_data_vector(
-    w, std::vector<std::string>{"real_field_a", "real_field_b"});
+  data_out.add_data_vector(w,
+                           std::vector<std::string>{"real_field_a",
+                                                    "real_field_b"});
   data_out.build_patches();
 
   data_out.write_gnuplot(deallog.get_file_stream());

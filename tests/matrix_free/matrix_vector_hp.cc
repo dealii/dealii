@@ -37,7 +37,8 @@ template <int dim, typename Number>
 class MatrixFreeTestHP
 {
 public:
-  MatrixFreeTestHP(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTestHP(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   local_apply(const MatrixFree<dim, Number> &              data,
@@ -49,32 +50,46 @@ public:
     std::pair<unsigned int, unsigned int> subrange_deg =
       data.create_cell_subrange_hp(cell_range, 1);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 1, Vector<Number>, 2>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 1, Vector<Number>, 2>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 2);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 2, Vector<Number>, 3>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 2, Vector<Number>, 3>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 3);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 3, Vector<Number>, 4>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 3, Vector<Number>, 4>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 4);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 4, Vector<Number>, 5>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 4, Vector<Number>, 5>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 5);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 5, Vector<Number>, 6>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 5, Vector<Number>, 6>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 6);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 6, Vector<Number>, 7>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 6, Vector<Number>, 7>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 7);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 7, Vector<Number>, 8>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 7, Vector<Number>, 8>(data,
+                                                    dst,
+                                                    src,
+                                                    subrange_deg);
   }
 
   void
@@ -153,8 +168,10 @@ test()
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
   DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
   DoFTools::make_sparsity_pattern(dof, csp, constraints, false);
@@ -210,8 +227,9 @@ test()
         local_dof_indices.resize(dofs_per_cell);
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
   }
 

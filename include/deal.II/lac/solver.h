@@ -449,11 +449,11 @@ protected:
    * signal is called, but not the vector that will be returned if the
    * signal's return value indicates that the iteration should be terminated.
    */
-  boost::signals2::signal<SolverControl::State(
-                            const unsigned int iteration,
-                            const double       check_value,
-                            const VectorType & current_iterate),
-                          StateCombiner>
+  boost::signals2::signal<
+    SolverControl::State(const unsigned int iteration,
+                         const double       check_value,
+                         const VectorType & current_iterate),
+    StateCombiner>
     iteration_status;
 };
 
@@ -499,8 +499,8 @@ Solver<VectorType>::StateCombiner::operator()(const Iterator begin,
 
 template <class VectorType>
 inline Solver<VectorType>::Solver(SolverControl &           solver_control,
-                                  VectorMemory<VectorType> &vector_memory) :
-  memory(vector_memory)
+                                  VectorMemory<VectorType> &vector_memory)
+  : memory(vector_memory)
 {
   // connect the solver control object to the signal. SolverControl::check
   // only takes two arguments, the iteration and the check_value, and so
@@ -515,8 +515,8 @@ inline Solver<VectorType>::Solver(SolverControl &           solver_control,
 
 
 template <class VectorType>
-inline Solver<VectorType>::Solver(SolverControl &solver_control) :
-  // use the static memory object this class owns
+inline Solver<VectorType>::Solver(SolverControl &solver_control)
+  : // use the static memory object this class owns
   memory(static_vector_memory)
 {
   // connect the solver control object to the signal. SolverControl::check

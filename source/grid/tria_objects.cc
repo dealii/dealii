@@ -93,14 +93,16 @@ namespace internal
           used.insert(used.end(), new_size - used.size(), false);
 
           user_flags.reserve(new_size);
-          user_flags.insert(
-            user_flags.end(), new_size - user_flags.size(), false);
+          user_flags.insert(user_flags.end(),
+                            new_size - user_flags.size(),
+                            false);
 
           const unsigned int factor =
             GeometryInfo<G::dimension>::max_children_per_cell / 2;
           children.reserve(factor * new_size);
-          children.insert(
-            children.end(), factor * new_size - children.size(), -1);
+          children.insert(children.end(),
+                          factor * new_size - children.size(),
+                          -1);
 
           if (G::dimension > 1)
             {
@@ -157,8 +159,10 @@ namespace internal
       else
         next_free_pair = pos + 2;
 
-      return typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator(
-        &tria, level, pos);
+      return
+        typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator(&tria,
+                                                                        level,
+                                                                        pos);
     }
 
 
@@ -166,11 +170,11 @@ namespace internal
     TriaObjectsHex::reserve_space(const unsigned int new_hexes)
     {
       const unsigned int new_size =
-        new_hexes +
-        std::count_if(
-          used.begin(),
-          used.end(),
-          std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+        new_hexes + std::count_if(used.begin(),
+                                  used.end(),
+                                  std::bind(std::equal_to<bool>(),
+                                            std::placeholders::_1,
+                                            true));
 
       // see above...
       if (new_size > cells.size())
@@ -182,8 +186,9 @@ namespace internal
           used.insert(used.end(), new_size - used.size(), false);
 
           user_flags.reserve(new_size);
-          user_flags.insert(
-            user_flags.end(), new_size - user_flags.size(), false);
+          user_flags.insert(user_flags.end(),
+                            new_size - user_flags.size(),
+                            false);
 
           children.reserve(4 * new_size);
           children.insert(children.end(), 4 * new_size - children.size(), -1);

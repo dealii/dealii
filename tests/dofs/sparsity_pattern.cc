@@ -70,8 +70,9 @@ check_boundary(const DoFHandler<dim> &dof)
   // first way: direct generation
   SparsityPattern sparsity_1(dof.n_boundary_dofs(),
                              dof.max_couplings_between_boundary_dofs());
-  DoFTools::make_boundary_sparsity_pattern(
-    dof, dof_to_boundary_mapping, sparsity_1);
+  DoFTools::make_boundary_sparsity_pattern(dof,
+                                           dof_to_boundary_mapping,
+                                           sparsity_1);
   sparsity_1.compress();
 
   // second way: via a DynamicSparsityPattern

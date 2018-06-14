@@ -131,16 +131,16 @@ private:
 template <class ACCESSOR>
 inline MatrixIterator<ACCESSOR>::MatrixIterator(MatrixType *    matrix,
                                                 const size_type r,
-                                                const size_type i) :
-  accessor(matrix, r, i)
+                                                const size_type i)
+  : accessor(matrix, r, i)
 {}
 
 
 template <class ACCESSOR>
 template <class OtherAccessor>
 inline MatrixIterator<ACCESSOR>::MatrixIterator(
-  const MatrixIterator<OtherAccessor> &other) :
-  accessor(other.accessor)
+  const MatrixIterator<OtherAccessor> &other)
+  : accessor(other.accessor)
 {}
 
 

@@ -67,10 +67,10 @@ test()
   Vector<float>  error(triangulation.n_active_cells());
 
   // interpolate the function
-  VectorTools::interpolate(
-    dof_handler,
-    Functions::ZeroFunction<dim>(hp_fe[0].n_components()),
-    interpolant);
+  VectorTools::interpolate(dof_handler,
+                           Functions::ZeroFunction<dim>(
+                             hp_fe[0].n_components()),
+                           interpolant);
   deallog << interpolant.l2_norm() << std::endl;
 }
 

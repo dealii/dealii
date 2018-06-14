@@ -1037,10 +1037,10 @@ Vector<int>::lp_norm(const real_type) const;
 //------------------------ inline functions
 
 template <typename Number>
-inline Vector<Number>::Vector() :
-  vec_size(0),
-  max_vec_size(0),
-  values(nullptr, &free)
+inline Vector<Number>::Vector()
+  : vec_size(0)
+  , max_vec_size(0)
+  , values(nullptr, &free)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -1052,10 +1052,10 @@ inline Vector<Number>::Vector() :
 
 template <typename Number>
 template <typename InputIterator>
-Vector<Number>::Vector(const InputIterator first, const InputIterator last) :
-  vec_size(0),
-  max_vec_size(0),
-  values(nullptr, &free)
+Vector<Number>::Vector(const InputIterator first, const InputIterator last)
+  : vec_size(0)
+  , max_vec_size(0)
+  , values(nullptr, &free)
 {
   // allocate memory. do not initialize it, as we will copy over to it in a
   // second
@@ -1066,10 +1066,10 @@ Vector<Number>::Vector(const InputIterator first, const InputIterator last) :
 
 
 template <typename Number>
-inline Vector<Number>::Vector(const size_type n) :
-  vec_size(0),
-  max_vec_size(0),
-  values(nullptr, &free)
+inline Vector<Number>::Vector(const size_type n)
+  : vec_size(0)
+  , max_vec_size(0)
+  , values(nullptr, &free)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class

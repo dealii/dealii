@@ -508,8 +508,9 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
         mg_dof.get_triangulation().n_levels(),
         std::vector<types::global_dof_index>(n_components));
 
-      MGTools::count_dofs_per_block(
-        mg_dof, dofs_per_component, mg_target_component);
+      MGTools::count_dofs_per_block(mg_dof,
+                                    dofs_per_component,
+                                    mg_target_component);
       for (unsigned int level = 0; level < n_levels - 1; ++level)
         {
           if (boundary_indices[level].size() == 0)

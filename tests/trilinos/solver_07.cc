@@ -73,7 +73,9 @@ main(int argc, char **argv)
 
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 40, 42);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner),
+                              control.last_step(),
+                              40,
+                              42);
   }
 }

@@ -148,8 +148,9 @@ do_test(const DoFHandler<dim> & dof,
             }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, sparse_matrix);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               local_dof_indices,
+                                               sparse_matrix);
       }
   }
 

@@ -97,14 +97,14 @@ namespace Step39
 
   template <int dim>
   InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(
-    const FiniteElement<dim> &fe) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    mapping(1),
-    fe(fe),
-    dof_handler(triangulation)
+    const FiniteElement<dim> &fe)
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
+    , mapping(1)
+    , fe(fe)
+    , dof_handler(triangulation)
   {
     GridGenerator::hyper_cube_slit(triangulation, -1, 1);
   }
@@ -122,8 +122,10 @@ namespace Step39
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(),
                                       dof_handler.n_dofs());
     DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
-    matrix.reinit(
-      dof_handler.locally_owned_dofs(), c_sparsity, MPI_COMM_WORLD, true);
+    matrix.reinit(dof_handler.locally_owned_dofs(),
+                  c_sparsity,
+                  MPI_COMM_WORLD,
+                  true);
 
     const unsigned int n_levels = triangulation.n_global_levels();
     mg_matrix.resize(0, n_levels - 1);
@@ -150,8 +152,9 @@ namespace Step39
             DynamicSparsityPattern ci_sparsity;
             ci_sparsity.reinit(dof_handler.n_dofs(level - 1),
                                dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(
-              dof_handler, ci_sparsity, level);
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler,
+                                                     ci_sparsity,
+                                                     level);
 
             mg_matrix_dg_up[level].reinit(
               dof_handler.locally_owned_mg_dofs(level - 1),

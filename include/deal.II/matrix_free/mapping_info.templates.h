@@ -39,8 +39,8 @@ namespace internal
 
     template <int structdim, int spacedim, typename Number>
     MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      QuadratureDescriptor() :
-      n_q_points(numbers::invalid_unsigned_int)
+      QuadratureDescriptor()
+      : n_q_points(numbers::invalid_unsigned_int)
     {}
 
 
@@ -312,8 +312,8 @@ namespace internal
       template <int dim, typename Number>
       struct CompressedCellData
       {
-        CompressedCellData(const double expected_size) :
-          data(FPArrayComparator<Number>(expected_size))
+        CompressedCellData(const double expected_size)
+          : data(FPArrayComparator<Number>(expected_size))
         {}
 
         std::map<
@@ -347,8 +347,8 @@ namespace internal
 
 
       template <int dim, typename Number>
-      LocalData<dim, Number>::LocalData(const double jac_size_in) :
-        jac_size(jac_size_in)
+      LocalData<dim, Number>::LocalData(const double jac_size_in)
+        : jac_size(jac_size_in)
       {}
 
 
@@ -1176,9 +1176,9 @@ namespace internal
         // select the inverse of the Jacobian (not the Jacobian as in the
         // CompressedCellData) and add another factor of 512 to account for
         // some roundoff effects.
-        CompressedFaceData(const Number jacobian_size) :
-          data(FPArrayComparator<Number>(512. / jacobian_size)),
-          jacobian_size(jacobian_size)
+        CompressedFaceData(const Number jacobian_size)
+          : data(FPArrayComparator<Number>(512. / jacobian_size))
+          , jacobian_size(jacobian_size)
         {}
 
         // Store the Jacobians on both sides of a face (2*(dim*dim) entries),
@@ -1223,9 +1223,9 @@ namespace internal
         else if (dim == 1)
           return 0;
         else
-          Assert(
-            false,
-            ExcNotImplemented("Not possible in dim=" + std::to_string(dim)));
+          Assert(false,
+                 ExcNotImplemented("Not possible in dim=" +
+                                   std::to_string(dim)));
 
         return numbers::invalid_unsigned_int;
       }
@@ -1848,13 +1848,14 @@ namespace internal
 
           // finally compute the normal times the jacobian
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
-            tasks += Threads::new_task(
-              &compute_normal_times_jacobian<dim, Number>,
-              work_per_chunk * i,
-              std::min(work_per_chunk * (i + 1), (unsigned int)faces.size()),
-              face_type,
-              faces,
-              face_data[my_q]);
+            tasks +=
+              Threads::new_task(&compute_normal_times_jacobian<dim, Number>,
+                                work_per_chunk * i,
+                                std::min(work_per_chunk * (i + 1),
+                                         (unsigned int)faces.size()),
+                                face_type,
+                                faces,
+                                face_data[my_q]);
           tasks.join_all();
         }
     }
@@ -2098,11 +2099,13 @@ namespace internal
       const SizeInfo &task_info) const
     {
       out << "    Cell types:                      ";
-      task_info.print_memory_statistics(
-        out, cell_type.capacity() * sizeof(GeometryType));
+      task_info.print_memory_statistics(out,
+                                        cell_type.capacity() *
+                                          sizeof(GeometryType));
       out << "    Face types:                      ";
-      task_info.print_memory_statistics(
-        out, face_type.capacity() * sizeof(GeometryType));
+      task_info.print_memory_statistics(out,
+                                        face_type.capacity() *
+                                          sizeof(GeometryType));
       for (unsigned int j = 0; j < cell_data.size(); ++j)
         {
           out << "    Data component " << j << std::endl;
@@ -2116,8 +2119,8 @@ namespace internal
     /* ------------------------------------------------------------------ */
 
     template <typename Number>
-    FPArrayComparator<Number>::FPArrayComparator(const Number scaling) :
-      tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
+    FPArrayComparator<Number>::FPArrayComparator(const Number scaling)
+      : tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
     {}
 
 

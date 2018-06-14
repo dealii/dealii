@@ -84,8 +84,10 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     p2[0] = 1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
     repetitoins[0] = 2;
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitoins, p1, p2);
+    GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                              repetitoins,
+                                              p1,
+                                              p2);
   }
 
   hp::DoFHandler<dim> dof_handler(triangulation);

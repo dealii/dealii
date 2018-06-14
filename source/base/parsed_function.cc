@@ -24,9 +24,9 @@ namespace Functions
 {
   template <int dim>
   ParsedFunction<dim>::ParsedFunction(const unsigned int n_components,
-                                      const double       h) :
-    AutoDerivativeFunction<dim>(h, n_components),
-    function_object(n_components)
+                                      const double       h)
+    : AutoDerivativeFunction<dim>(h, n_components)
+    , function_object(n_components)
   {}
 
 
@@ -149,14 +149,14 @@ namespace Functions
           function_object.initialize(vnames, expression, constants, true);
           break;
         default:
-          AssertThrow(
-            false,
-            ExcMessage("The list of variables specified is <" + vnames +
-                       "> which is a list of length " +
-                       Utilities::int_to_string(nn) +
-                       " but it has to be a list of length equal to" +
-                       " either dim (for a time-independent function)" +
-                       " or dim+1 (for a time-dependent function)."));
+          AssertThrow(false,
+                      ExcMessage(
+                        "The list of variables specified is <" + vnames +
+                        "> which is a list of length " +
+                        Utilities::int_to_string(nn) +
+                        " but it has to be a list of length equal to" +
+                        " either dim (for a time-independent function)" +
+                        " or dim+1 (for a time-dependent function)."));
       }
   }
 

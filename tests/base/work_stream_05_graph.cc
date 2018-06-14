@@ -75,16 +75,16 @@ test()
   for (unsigned int i = 0; i < 200; ++i)
     v.push_back(i);
 
-  WorkStream::run(
-    GraphColoring::make_graph_coloring(
-      v.begin(),
-      v.end(),
-      std::function<std::vector<types::global_dof_index>(
-        const std::vector<unsigned int>::iterator &)>(&conflictor)),
-    &worker,
-    &copier,
-    ScratchData(),
-    CopyData());
+  WorkStream::run(GraphColoring::make_graph_coloring(
+                    v.begin(),
+                    v.end(),
+                    std::function<std::vector<types::global_dof_index>(
+                      const std::vector<unsigned int>::iterator &)>(
+                      &conflictor)),
+                  &worker,
+                  &copier,
+                  ScratchData(),
+                  CopyData());
 
   // now simulate what we should have gotten
   Vector<double> comp(result.size());

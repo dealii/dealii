@@ -26,13 +26,13 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k) :
-  polynomial_space(Polynomials::Legendre::generate_complete_basis(k)),
-  monomials((dim == 2) ? (1) : (k + 2)),
-  n_pols(compute_n_pols(k)),
-  p_values(polynomial_space.n()),
-  p_grads(polynomial_space.n()),
-  p_grad_grads(polynomial_space.n())
+PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
+  : polynomial_space(Polynomials::Legendre::generate_complete_basis(k))
+  , monomials((dim == 2) ? (1) : (k + 2))
+  , n_pols(compute_n_pols(k))
+  , p_values(polynomial_space.n())
+  , p_grads(polynomial_space.n())
+  , p_grad_grads(polynomial_space.n())
 {
   switch (dim)
     {

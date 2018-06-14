@@ -115,7 +115,8 @@ namespace Step50
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient() : Function<dim>()
+    Coefficient()
+      : Function<dim>()
     {}
 
     virtual double
@@ -159,14 +160,14 @@ namespace Step50
   }
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    fe(degree),
-    mg_dof_handler(triangulation),
-    degree(degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
+    , fe(degree)
+    , mg_dof_handler(triangulation)
+    , degree(degree)
   {}
 
 
@@ -204,8 +205,10 @@ namespace Step50
     DynamicSparsityPattern csp(mg_dof_handler.n_dofs(),
                                mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(mg_dof_handler, csp, constraints);
-    system_matrix.reinit(
-      mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
+    system_matrix.reinit(mg_dof_handler.locally_owned_dofs(),
+                         csp,
+                         MPI_COMM_WORLD,
+                         true);
 
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
@@ -458,14 +461,16 @@ namespace Step50
     temp_solution.reinit(idx, MPI_COMM_WORLD);
     temp_solution = solution;
 
-    KellyErrorEstimator<dim>::estimate(
-      static_cast<DoFHandler<dim> &>(mg_dof_handler),
-      QGauss<dim - 1>(3),
-      typename FunctionMap<dim>::type(),
-      temp_solution,
-      estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.03);
+    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(
+                                         mg_dof_handler),
+                                       QGauss<dim - 1>(3),
+                                       typename FunctionMap<dim>::type(),
+                                       temp_solution,
+                                       estimated_error_per_cell);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
     triangulation.execute_coarsening_and_refinement();
   }
 

@@ -40,7 +40,8 @@ template <int dim>
 class X : public Function<dim>
 {
 public:
-  X() : Function<dim>(dim)
+  X()
+    : Function<dim>(dim)
   {}
 
   double
@@ -71,8 +72,10 @@ test()
   for (unsigned int boundary_id = 0; boundary_id < 2; ++boundary_id)
     {
       std::map<types::global_dof_index, double> bv;
-      VectorTools::interpolate_boundary_values(
-        dof_handler, boundary_id, X<spacedim>(), bv);
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               boundary_id,
+                                               X<spacedim>(),
+                                               bv);
       deallog << bv.size() << " boundary degrees of freedom" << std::endl;
 
       for (std::map<types::global_dof_index, double>::const_iterator i =
@@ -95,10 +98,10 @@ test()
                   AssertThrow(bv.find(cell->face(f)->vertex_dof_index(v, i)) !=
                                 bv.end(),
                               ExcInternalError());
-                  AssertThrow(
-                    bv[cell->face(f)->vertex_dof_index(v, i)] ==
-                      X<spacedim>().value(cell->face(f)->vertex(v), i),
-                    ExcInternalError());
+                  AssertThrow(bv[cell->face(f)->vertex_dof_index(v, i)] ==
+                                X<spacedim>().value(cell->face(f)->vertex(v),
+                                                    i),
+                              ExcInternalError());
                 }
     }
 }

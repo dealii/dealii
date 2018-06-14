@@ -122,7 +122,8 @@ namespace Step41
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -145,7 +146,8 @@ namespace Step41
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>()
+    BoundaryValues()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -170,7 +172,8 @@ namespace Step41
   class Obstacle : public Function<dim>
   {
   public:
-    Obstacle() : Function<dim>()
+    Obstacle()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -204,7 +207,9 @@ namespace Step41
   // To everyone who has taken a look at the first few tutorial programs, the
   // constructor is completely obvious:
   template <int dim>
-  ObstacleProblem<dim>::ObstacleProblem() : fe(1), dof_handler(triangulation)
+  ObstacleProblem<dim>::ObstacleProblem()
+    : fe(1)
+    , dof_handler(triangulation)
   {}
 
 
@@ -242,8 +247,10 @@ namespace Step41
               << std::endl
               << std::endl;
 
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, BoundaryValues<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -368,8 +375,9 @@ namespace Step41
     Assert(fe.degree == 1, ExcNotImplemented());
 
     const QTrapez<dim> quadrature_formula;
-    FEValues<dim>      fe_values(
-      fe, quadrature_formula, update_values | update_JxW_values);
+    FEValues<dim>      fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -394,8 +402,9 @@ namespace Step41
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               local_dof_indices,
+                                               mass_matrix);
       }
   }
 
@@ -528,8 +537,10 @@ namespace Step41
     // In a final step, we add to the set of constraints on DoFs we have so
     // far from the active set those that result from Dirichlet boundary
     // values, and close the constraints object:
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, BoundaryValues<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             constraints);
     constraints.close();
   }
 
@@ -659,9 +670,9 @@ int main(int argc, char *argv[])
         argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(
-        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-        ExcMessage("This program can only be run in serial, use ./step-41"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+                  ExcMessage(
+                    "This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run();

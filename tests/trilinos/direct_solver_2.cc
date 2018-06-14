@@ -85,7 +85,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -97,7 +98,8 @@ template <int dim>
 class RightHandSideTwo : public Function<dim>
 {
 public:
-  RightHandSideTwo() : Function<dim>()
+  RightHandSideTwo()
+    : Function<dim>()
   {}
 
   virtual double
@@ -110,7 +112,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -156,13 +159,13 @@ BoundaryValues<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-Step4<dim>::Step4() :
-  triangulation(MPI_COMM_WORLD,
-                typename Triangulation<dim>::MeshSmoothing(
-                  Triangulation<dim>::smoothing_on_refinement |
-                  Triangulation<dim>::smoothing_on_coarsening)),
-  fe(1),
-  dof_handler(triangulation)
+Step4<dim>::Step4()
+  : triangulation(MPI_COMM_WORLD,
+                  typename Triangulation<dim>::MeshSmoothing(
+                    Triangulation<dim>::smoothing_on_refinement |
+                    Triangulation<dim>::smoothing_on_coarsening))
+  , fe(1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -184,8 +187,10 @@ Step4<dim>::setup_system()
 
   constraints.clear();
   std::map<unsigned int, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           constraints);
   constraints.close();
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
@@ -202,16 +207,22 @@ Step4<dim>::setup_system()
     MPI_COMM_WORLD,
     locally_relevant_dofs);
 
-  system_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, dsp, MPI_COMM_WORLD);
+  system_matrix.reinit(locally_owned_dofs,
+                       locally_owned_dofs,
+                       dsp,
+                       MPI_COMM_WORLD);
 
   solution.reinit(locally_relevant_dofs, MPI_COMM_WORLD);
 
-  system_rhs.reinit(
-    locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD, true);
+  system_rhs.reinit(locally_owned_dofs,
+                    locally_relevant_dofs,
+                    MPI_COMM_WORLD,
+                    true);
 
-  system_rhs_two.reinit(
-    locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD, true);
+  system_rhs_two.reinit(locally_owned_dofs,
+                        locally_relevant_dofs,
+                        MPI_COMM_WORLD,
+                        true);
 }
 
 
@@ -276,8 +287,9 @@ Step4<dim>::assemble_system()
                                                  system_matrix,
                                                  system_rhs);
 
-          constraints.distribute_local_to_global(
-            cell_rhs_two, local_dof_indices, system_rhs_two);
+          constraints.distribute_local_to_global(cell_rhs_two,
+                                                 local_dof_indices,
+                                                 system_rhs_two);
         }
     }
   system_matrix.compress(VectorOperation::add);

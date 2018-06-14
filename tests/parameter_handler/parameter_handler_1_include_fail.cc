@@ -26,8 +26,9 @@ void
 check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry(
-    "test_1", "-1,0", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
+  prm.declare_entry("test_1",
+                    "-1,0",
+                    Patterns::List(Patterns::Integer(-1, 1), 2, 3));
 
   std::ifstream in(p);
   try

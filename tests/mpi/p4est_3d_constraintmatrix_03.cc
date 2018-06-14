@@ -60,7 +60,8 @@ template <int dim>
 class FilteredDataOut : public DataOut<dim>
 {
 public:
-  FilteredDataOut(const unsigned int subdomain_id) : subdomain_id(subdomain_id)
+  FilteredDataOut(const unsigned int subdomain_id)
+    : subdomain_id(subdomain_id)
   {}
 
   virtual typename DataOut<dim>::cell_iterator
@@ -97,7 +98,8 @@ template <int dim>
 class TemperatureInitialValues : public Function<dim>
 {
 public:
-  TemperatureInitialValues() : Function<dim>(1)
+  TemperatureInitialValues()
+    : Function<dim>(1)
   {}
 
   virtual double

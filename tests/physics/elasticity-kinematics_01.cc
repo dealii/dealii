@@ -121,11 +121,11 @@ test_kinematic_tensors()
           Assert((F_t1 - unit_symmetric_tensor<dim>()).norm() < tol,
                  ExcMessage("Incorrect computation of F_t1"));
           const Tensor<2, dim> F = Kinematics::F(Grad_u);
-          Assert(
-            (F - (static_cast<Tensor<2, dim>>(unit_symmetric_tensor<dim>()) +
-                  Grad_u))
-                .norm() < tol,
-            ExcMessage("Incorrect computation of F"));
+          Assert((F -
+                  (static_cast<Tensor<2, dim>>(unit_symmetric_tensor<dim>()) +
+                   Grad_u))
+                     .norm() < tol,
+                 ExcMessage("Incorrect computation of F"));
 
           // Volumetric / isochoric split of deformation gradient
           Assert(determinant(F) != 1.0,
@@ -137,16 +137,16 @@ test_kinematic_tensors()
                  ExcMessage("F_vol has no dilatating action"));
 
           // Right Cauchy-Green tensor
-          Assert(
-            (static_cast<Tensor<2, dim>>(Kinematics::C(F)) - transpose(F) * F)
-                .norm() < tol,
-            ExcMessage("Incorrect computation of C"));
+          Assert((static_cast<Tensor<2, dim>>(Kinematics::C(F)) -
+                  transpose(F) * F)
+                     .norm() < tol,
+                 ExcMessage("Incorrect computation of C"));
 
           // Left Cauchy-Green tensor
-          Assert(
-            (static_cast<Tensor<2, dim>>(Kinematics::b(F)) - F * transpose(F))
-                .norm() < tol,
-            ExcMessage("Incorrect computation of b"));
+          Assert((static_cast<Tensor<2, dim>>(Kinematics::b(F)) -
+                  F * transpose(F))
+                     .norm() < tol,
+                 ExcMessage("Incorrect computation of b"));
 
           // Small strain tensor
           Assert((static_cast<Tensor<2, dim>>(Kinematics::epsilon(Grad_u)) -
@@ -155,11 +155,11 @@ test_kinematic_tensors()
                  ExcMessage("Incorrect computation of epsilon"));
 
           // Green-Lagrange strain tensor
-          Assert(
-            (static_cast<Tensor<2, dim>>(Kinematics::E(F)) -
-             0.5 * (Grad_u + transpose(Grad_u) + transpose(Grad_u) * Grad_u))
-                .norm() < tol,
-            ExcMessage("Incorrect computation of E"));
+          Assert((static_cast<Tensor<2, dim>>(Kinematics::E(F)) -
+                  0.5 *
+                    (Grad_u + transpose(Grad_u) + transpose(Grad_u) * Grad_u))
+                     .norm() < tol,
+                 ExcMessage("Incorrect computation of E"));
 
           // Almansi strain tensor
           // Holzapfel 2.82
@@ -182,10 +182,10 @@ test_kinematic_tensors()
           const Tensor<2, dim> &dot_grad_u = qp_dot_grad_u_t[q_point];
 
           // Spatial velocity gradient
-          Assert(
-            (static_cast<Tensor<2, dim>>(Kinematics::l(F, F_dot)) - dot_grad_u)
-                .norm() < tol,
-            ExcMessage("Incorrect computation of l"));
+          Assert((static_cast<Tensor<2, dim>>(Kinematics::l(F, F_dot)) -
+                  dot_grad_u)
+                     .norm() < tol,
+                 ExcMessage("Incorrect computation of l"));
 
           // Rate of deformation tensor
           Assert((static_cast<Tensor<2, dim>>(Kinematics::d(F, F_dot)) -

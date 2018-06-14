@@ -61,7 +61,8 @@ public:
   typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
   typedef double                                         Number;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   local_apply(const MatrixFree<dim, Number> &              data,
@@ -117,8 +118,10 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &MatrixFreeTest<dim, degree_p, VectorType>::local_apply, this, dst, src);
+    data.cell_loop(&MatrixFreeTest<dim, degree_p, VectorType>::local_apply,
+                   this,
+                   dst,
+                   src);
   };
 
 private:
@@ -185,8 +188,9 @@ test()
   constraints_p.close();
 
   std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(
-    dof_handler, dofs_per_block, stokes_sub_blocks);
+  DoFTools::count_dofs_per_block(dof_handler,
+                                 dofs_per_block,
+                                 stokes_sub_blocks);
 
   // std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -268,8 +272,9 @@ test()
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               system_matrix);
       }
   }
 

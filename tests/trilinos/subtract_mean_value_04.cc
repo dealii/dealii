@@ -72,8 +72,9 @@ main(int argc, char *argv[])
         deallog << "OK" << std::endl;
       }
       {
-        TrilinosWrappers::MPI::BlockVector v(
-          std::vector<IndexSet>(1, local_range), MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::BlockVector v(std::vector<IndexSet>(1,
+                                                                   local_range),
+                                             MPI_COMM_WORLD);
         test(v);
       }
     }

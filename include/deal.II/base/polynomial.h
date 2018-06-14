@@ -764,9 +764,9 @@ namespace Polynomials
 namespace Polynomials
 {
   template <typename number>
-  inline Polynomial<number>::Polynomial() :
-    in_lagrange_product_form(false),
-    lagrange_weight(1.)
+  inline Polynomial<number>::Polynomial()
+    : in_lagrange_product_form(false)
+    , lagrange_weight(1.)
   {}
 
 

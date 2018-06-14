@@ -353,8 +353,10 @@ unify_pretty_function(const std::string &text)
  * steps.
  */
 
-#define check_solver_within_range(                                   \
-  SolverType_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED)     \
+#define check_solver_within_range(SolverType_COMMAND,                \
+                                  CONTROL_COMMAND,                   \
+                                  MIN_ALLOWED,                       \
+                                  MAX_ALLOWED)                       \
   {                                                                  \
     const unsigned int previous_depth = deallog.depth_file(0);       \
     try                                                              \

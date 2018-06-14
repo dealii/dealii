@@ -266,26 +266,26 @@ private:
 
 template <typename ElementType>
 inline ArrayView<ElementType>::ArrayView(value_type *      starting_element,
-                                         const std::size_t n_elements) :
-  starting_element(starting_element),
-  n_elements(n_elements)
+                                         const std::size_t n_elements)
+  : starting_element(starting_element)
+  , n_elements(n_elements)
 {}
 
 
 
 template <typename ElementType>
 inline ArrayView<ElementType>::ArrayView(
-  const ArrayView<typename std::remove_cv<value_type>::type> &view) :
-  starting_element(view.starting_element),
-  n_elements(view.n_elements)
+  const ArrayView<typename std::remove_cv<value_type>::type> &view)
+  : starting_element(view.starting_element)
+  , n_elements(view.n_elements)
 {}
 
 
 
 template <typename ElementType>
 inline ArrayView<ElementType>::ArrayView(
-  const std::vector<typename std::remove_cv<value_type>::type> &vector) :
-  // use delegating constructor
+  const std::vector<typename std::remove_cv<value_type>::type> &vector)
+  : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {
   // the following static_assert is not strictly necessary because,
@@ -308,8 +308,8 @@ inline ArrayView<ElementType>::ArrayView(
 
 template <typename ElementType>
 inline ArrayView<ElementType>::ArrayView(
-  std::vector<typename std::remove_cv<value_type>::type> &vector) :
-  // use delegating constructor
+  std::vector<typename std::remove_cv<value_type>::type> &vector)
+  : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {}
 
@@ -493,9 +493,9 @@ make_array_view(const Iterator begin, const Iterator end)
     std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
                  typename std::random_access_iterator_tag>::value,
     "The provided iterator should be a random access iterator.");
-  Assert(
-    begin <= end,
-    ExcMessage("The beginning of the array view should be before the end."));
+  Assert(begin <= end,
+         ExcMessage(
+           "The beginning of the array view should be before the end."));
   Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
          ExcMessage("The provided range isn't contiguous in memory!"));
   // the reference type, not the value type, knows the constness of the iterator
@@ -519,9 +519,9 @@ template <typename ElementType>
 ArrayView<ElementType>
 make_array_view(ElementType *const begin, ElementType *const end)
 {
-  Assert(
-    begin <= end,
-    ExcMessage("The beginning of the array view should be before the end."));
+  Assert(begin <= end,
+         ExcMessage(
+           "The beginning of the array view should be before the end."));
   return ArrayView<ElementType>(begin, end - begin);
 }
 

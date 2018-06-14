@@ -43,11 +43,11 @@ main()
   {
     prm.enter_subsection("section_2&3");
     {
-      prm.declare_entry(
-        "list",
-        "default_1",
-        Patterns::List(Patterns::Selection("default_1|b|c|d|e|f|g|h")),
-        "docs 1");
+      prm.declare_entry("list",
+                        "default_1",
+                        Patterns::List(
+                          Patterns::Selection("default_1|b|c|d|e|f|g|h")),
+                        "docs 1");
       prm.declare_entry("int_hello", "1", Patterns::Integer());
       prm.declare_entry("text",
                         "default text with _ ~ \\ # & { }",

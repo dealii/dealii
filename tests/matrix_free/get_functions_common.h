@@ -61,19 +61,19 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) :
-    data(data_in),
-    fe_val(data.get_dof_handler().get_fe(),
-           Quadrature<dim>(data.get_quadrature(0)),
-           update_values | update_gradients | update_hessians){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in)
+    , fe_val(data.get_dof_handler().get_fe(),
+             Quadrature<dim>(data.get_quadrature(0)),
+             update_values | update_gradients | update_hessians){};
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in,
-                 const Mapping<dim> &           mapping) :
-    data(data_in),
-    fe_val(mapping,
-           data.get_dof_handler().get_fe(),
-           Quadrature<dim>(data.get_quadrature(0)),
-           update_values | update_gradients | update_hessians){};
+                 const Mapping<dim> &           mapping)
+    : data(data_in)
+    , fe_val(mapping,
+             data.get_dof_handler().get_fe(),
+             Quadrature<dim>(data.get_quadrature(0)),
+             update_values | update_gradients | update_hessians){};
 
   virtual ~MatrixFreeTest()
   {}

@@ -134,8 +134,10 @@ void grid_2()
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = 3;
   repetitions[1] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    tria2, repetitions, Point<2>(1.0, -1.0), Point<2>(4.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(tria2,
+                                            repetitions,
+                                            Point<2>(1.0, -1.0),
+                                            Point<2>(4.0, 1.0));
 
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations(tria1, tria2, triangulation);
@@ -242,8 +244,10 @@ void grid_5()
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = 14;
   repetitions[1] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(10.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            repetitions,
+                                            Point<2>(0.0, 0.0),
+                                            Point<2>(10.0, 1.0));
 
   GridTools::transform(
     [](const Point<2> &in) -> Point<2> {
@@ -284,8 +288,10 @@ void grid_6()
   Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 40;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(1.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            repetitions,
+                                            Point<2>(0.0, 0.0),
+                                            Point<2>(1.0, 1.0));
 
   GridTools::transform(Grid6Func(), triangulation);
   print_mesh_info(triangulation, "grid-6.eps");
@@ -305,8 +311,10 @@ void grid_7()
   Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 16;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(1.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            repetitions,
+                                            Point<2>(0.0, 0.0),
+                                            Point<2>(1.0, 1.0));
 
   GridTools::distort_random(0.3, triangulation, true);
   print_mesh_info(triangulation, "grid-7.eps");

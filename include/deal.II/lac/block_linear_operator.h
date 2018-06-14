@@ -213,9 +213,9 @@ public:
    * class LinearOperator are initialized with default variants that throw an
    * exception upon invocation.
    */
-  BlockLinearOperator(const BlockPayload &payload) :
-    LinearOperator<Range, Domain, typename BlockPayload::BlockType>(
-      typename BlockPayload::BlockType(payload, payload))
+  BlockLinearOperator(const BlockPayload &payload)
+    : LinearOperator<Range, Domain, typename BlockPayload::BlockType>(
+        typename BlockPayload::BlockType(payload, payload))
   {
     n_block_rows = []() -> unsigned int {
       Assert(

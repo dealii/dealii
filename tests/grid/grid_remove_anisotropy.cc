@@ -43,8 +43,9 @@ check_remove_anisotropy()
   const unsigned int n_subdivisions = 1;
 
   Triangulation<3> triangulation;
-  GridGenerator::subdivided_parallelepiped(
-    triangulation, n_subdivisions, corners);
+  GridGenerator::subdivided_parallelepiped(triangulation,
+                                           n_subdivisions,
+                                           corners);
   dealii::GridTools::remove_anisotropy<3>(triangulation,
                                           /*max ratio =*/1.2);
 

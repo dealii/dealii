@@ -49,8 +49,9 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_owned,
+                                               MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)

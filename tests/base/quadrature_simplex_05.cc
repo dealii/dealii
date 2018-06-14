@@ -33,8 +33,9 @@ test(int n, const Point<dim> &split_point, stream_type &deallog)
   deallog << std::endl
           << "# dim = " << dim << ", quad size = " << quad.size()
           << ", computed area = "
-          << std::accumulate(
-               quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+          << std::accumulate(quad.get_weights().begin(),
+                             quad.get_weights().end(),
+                             0.0)
           << std::endl
           << std::endl;
 

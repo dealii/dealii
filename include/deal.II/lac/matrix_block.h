@@ -629,27 +629,27 @@ namespace internal
 
 
 template <typename MatrixType>
-inline MatrixBlock<MatrixType>::MatrixBlock() :
-  row(numbers::invalid_size_type),
-  column(numbers::invalid_size_type)
+inline MatrixBlock<MatrixType>::MatrixBlock()
+  : row(numbers::invalid_size_type)
+  , column(numbers::invalid_size_type)
 {}
 
 
 template <typename MatrixType>
-inline MatrixBlock<MatrixType>::MatrixBlock(const MatrixBlock<MatrixType> &M) :
-  Subscriptor(),
-  row(M.row),
-  column(M.column),
-  matrix(M.matrix),
-  row_indices(M.row_indices),
-  column_indices(M.column_indices)
+inline MatrixBlock<MatrixType>::MatrixBlock(const MatrixBlock<MatrixType> &M)
+  : Subscriptor()
+  , row(M.row)
+  , column(M.column)
+  , matrix(M.matrix)
+  , row_indices(M.row_indices)
+  , column_indices(M.column_indices)
 {}
 
 
 template <typename MatrixType>
-inline MatrixBlock<MatrixType>::MatrixBlock(size_type i, size_type j) :
-  row(i),
-  column(j)
+inline MatrixBlock<MatrixType>::MatrixBlock(size_type i, size_type j)
+  : row(i)
+  , column(j)
 {}
 
 
@@ -914,9 +914,9 @@ MatrixBlockVector<MatrixType>::matrix(size_type i)
 
 template <typename MatrixType>
 inline MGMatrixBlockVector<MatrixType>::MGMatrixBlockVector(const bool e,
-                                                            const bool f) :
-  edge_matrices(e),
-  edge_flux_matrices(f)
+                                                            const bool f)
+  : edge_matrices(e)
+  , edge_flux_matrices(f)
 {}
 
 

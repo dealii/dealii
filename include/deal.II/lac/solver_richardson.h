@@ -165,27 +165,27 @@ protected:
 template <class VectorType>
 inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
   const double omega,
-  const bool   use_preconditioned_residual) :
-  omega(omega),
-  use_preconditioned_residual(use_preconditioned_residual)
+  const bool   use_preconditioned_residual)
+  : omega(omega)
+  , use_preconditioned_residual(use_preconditioned_residual)
 {}
 
 
 template <class VectorType>
 SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
                                                VectorMemory<VectorType> &mem,
-                                               const AdditionalData &    data) :
-  Solver<VectorType>(cn, mem),
-  additional_data(data)
+                                               const AdditionalData &    data)
+  : Solver<VectorType>(cn, mem)
+  , additional_data(data)
 {}
 
 
 
 template <class VectorType>
 SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
-                                               const AdditionalData &data) :
-  Solver<VectorType>(cn),
-  additional_data(data)
+                                               const AdditionalData &data)
+  : Solver<VectorType>(cn)
+  , additional_data(data)
 {}
 
 

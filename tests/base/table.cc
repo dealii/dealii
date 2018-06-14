@@ -251,11 +251,11 @@ main()
       for (unsigned int i = 0; i < I; ++i)
         for (unsigned int j = 0; j < J; ++j)
           for (unsigned int k = 0; k < K; ++k)
-            AssertThrow(
-              Td[i][j][k].end() - Td[i][j][k].begin() ==
-                static_cast<signed int>(L),
-              ExcDimensionMismatch(Td[i][j][k].end() - Td[i][j][k].begin(),
-                                   static_cast<signed int>(L)));
+            AssertThrow(Td[i][j][k].end() - Td[i][j][k].begin() ==
+                          static_cast<signed int>(L),
+                        ExcDimensionMismatch(Td[i][j][k].end() -
+                                               Td[i][j][k].begin(),
+                                             static_cast<signed int>(L)));
     };
 
   // 5d-table

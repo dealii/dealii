@@ -90,8 +90,9 @@ namespace internal
               {
                 typename dealii::parallel::distributed::
                   Triangulation<dim, spacedim>::cell_iterator cell =
-                    cell_from_quad(
-                      triangulation, sides[i].treeid, *(sides[i].quad));
+                    cell_from_quad(triangulation,
+                                   sides[i].treeid,
+                                   *(sides[i].quad));
                 Assert(cell->is_ghost(),
                        ExcMessage("ghost quad did not find ghost cell"));
                 dealii::types::subdomain_id *subid =
@@ -115,8 +116,9 @@ namespace internal
               {
                 typename dealii::parallel::distributed::
                   Triangulation<dim, spacedim>::cell_iterator cell =
-                    cell_from_quad(
-                      triangulation, sides[i].treeid, *(sides[i].quad));
+                    cell_from_quad(triangulation,
+                                   sides[i].treeid,
+                                   *(sides[i].quad));
 
                 Assert(!cell->is_ghost(),
                        ExcMessage("local quad found ghost cell"));

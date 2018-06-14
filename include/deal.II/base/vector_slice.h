@@ -171,20 +171,20 @@ make_slice(VectorType &v, const unsigned int start, const unsigned int length)
 //---------------------------------------------------------------------------
 
 template <typename VectorType>
-inline VectorSlice<VectorType>::VectorSlice(VectorType &v) :
-  v(v),
-  start(0),
-  length(v.size())
+inline VectorSlice<VectorType>::VectorSlice(VectorType &v)
+  : v(v)
+  , start(0)
+  , length(v.size())
 {}
 
 
 template <typename VectorType>
 inline VectorSlice<VectorType>::VectorSlice(VectorType & v,
                                             unsigned int start,
-                                            unsigned int length) :
-  v(v),
-  start(start),
-  length(length)
+                                            unsigned int length)
+  : v(v)
+  , start(start)
+  , length(length)
 {
   Assert((start + length <= v.size()),
          ExcIndexRange(length, 0, v.size() - start + 1));

@@ -83,8 +83,9 @@ check(const unsigned int        level,
   Vector<double> u(dof.n_dofs());
   Vector<double> f(dof.n_dofs());
 
-  SparsityPattern A_pattern(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern A_pattern(dof.n_dofs(),
+                            dof.n_dofs(),
+                            dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, A_pattern);
   A_pattern.compress();
 

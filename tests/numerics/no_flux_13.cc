@@ -53,8 +53,10 @@ test()
   deal_II_exceptions::disable_abort_on_exception();
   try
     {
-      VectorTools::compute_no_normal_flux_constraints(
-        dof_handler, 0, no_normal_flux_boundaries, constraints);
+      VectorTools::compute_no_normal_flux_constraints(dof_handler,
+                                                      0,
+                                                      no_normal_flux_boundaries,
+                                                      constraints);
     }
   catch (ExceptionBase &e)
     {

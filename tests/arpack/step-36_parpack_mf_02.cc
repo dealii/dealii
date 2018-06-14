@@ -89,8 +89,10 @@ test()
   ConstraintMatrix constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   std::shared_ptr<MatrixFree<dim, double>> mf_data(
@@ -138,17 +140,17 @@ test()
     typedef LinearAlgebra::distributed::Vector<double> VectorType;
     SolverCG<VectorType> solver_c(inner_control_c);
     PreconditionIdentity preconditioner;
-    const auto           invert = inverse_operator(
-      linear_operator<VectorType>(mass), solver_c, preconditioner);
+    const auto invert = inverse_operator(linear_operator<VectorType>(mass),
+                                         solver_c,
+                                         preconditioner);
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 40;
     PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-    additional_data(
-      num_arnoldi_vectors,
-      PArpackSolver<
-        LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
-      true,
-      2);
+    additional_data(num_arnoldi_vectors,
+                    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::
+                      largest_magnitude,
+                    true,
+                    2);
 
     SolverControl solver_control(dof_handler.n_dofs(),
                                  1e-10,
@@ -195,11 +197,11 @@ test()
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
             {
               const double err = std::abs(eigenfunctions[j] * Bx - (i == j));
-              Assert(
-                err < precision,
-                ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
-                           " and " + Utilities::int_to_string(j) +
-                           " are not orthonormal: " + std::to_string(err)));
+              Assert(err < precision,
+                     ExcMessage(
+                       "Eigenvectors " + Utilities::int_to_string(i) + " and " +
+                       Utilities::int_to_string(j) +
+                       " are not orthonormal: " + std::to_string(err)));
             }
 
           laplace.vmult(Ax, eigenfunctions[i]);

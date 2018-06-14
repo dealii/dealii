@@ -72,10 +72,12 @@ test()
   // v has ghosts, w has none. set some entries
   // on w, copy into v and check if they are
   // there
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<double> w(
-    local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> w(local_owned,
+                                               local_owned,
+                                               MPI_COMM_WORLD);
 
   // set a few of the local elements
   for (unsigned i = 0; i < local_size; ++i)

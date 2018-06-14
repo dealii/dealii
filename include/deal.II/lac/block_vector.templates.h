@@ -51,8 +51,8 @@ BlockVector<Number>::BlockVector(const BlockIndices &n)
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector(const BlockVector<Number> &v) :
-  BlockVectorBase<Vector<Number>>()
+BlockVector<Number>::BlockVector(const BlockVector<Number> &v)
+  : BlockVectorBase<Vector<Number>>()
 {
   this->components.resize(v.n_blocks());
   this->block_indices = v.block_indices;

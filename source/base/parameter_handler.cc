@@ -39,8 +39,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-ParameterHandler::ParameterHandler() :
-  entries(new boost::property_tree::ptree())
+ParameterHandler::ParameterHandler()
+  : entries(new boost::property_tree::ptree())
 {}
 
 
@@ -383,8 +383,9 @@ ParameterHandler::parse_input(std::istream &     input,
 
       if (!is_concatenated)
         {
-          scan_line_or_cleanup(
-            fully_concatenated_line, filename, current_logical_line_n);
+          scan_line_or_cleanup(fully_concatenated_line,
+                               filename,
+                               current_logical_line_n);
 
           fully_concatenated_line.clear();
         }
@@ -634,9 +635,9 @@ ParameterHandler::declare_entry(const std::string &          entry,
                patterns.back()->description());
 
   // as documented, do the default value checking at the very end
-  AssertThrow(
-    pattern.match(default_value),
-    ExcValueDoesNotMatchPattern(default_value, pattern.description()));
+  AssertThrow(pattern.match(default_value),
+              ExcValueDoesNotMatchPattern(default_value,
+                                          pattern.description()));
 }
 
 
@@ -690,13 +691,13 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
                     ">, but the latter does not exist."));
   // then also make sure that what is being referred to is in
   // fact a parameter (not an alias or subsection)
-  Assert(
-    entries->get_optional<std::string>(
-      get_current_full_path(existing_entry_name) + path_separator + "value"),
-    ExcMessage("You are trying to declare an alias entry <" + alias_name +
-               "> that references an entry <" + existing_entry_name +
-               ">, but the latter does not seem to be a "
-               "parameter declaration."));
+  Assert(entries->get_optional<std::string>(
+           get_current_full_path(existing_entry_name) + path_separator +
+           "value"),
+         ExcMessage("You are trying to declare an alias entry <" + alias_name +
+                    "> that references an entry <" + existing_entry_name +
+                    ">, but the latter does not seem to be a "
+                    "parameter declaration."));
 
 
   // now also make sure that if the alias has already been
@@ -704,29 +705,29 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
   // entry
   if (entries->get_optional<std::string>(get_current_full_path(alias_name)))
     {
-      Assert(
-        entries->get_optional<std::string>(get_current_full_path(alias_name) +
-                                           path_separator + "alias"),
-        ExcMessage("You are trying to declare an alias entry <" + alias_name +
-                   "> but a non-alias entry already exists in this "
-                   "subsection (i.e., there is either a preexisting "
-                   "further subsection, or a parameter entry, with "
-                   "the same name as the alias)."));
-      Assert(
-        entries->get<std::string>(get_current_full_path(alias_name) +
-                                  path_separator + "alias") ==
-          existing_entry_name,
-        ExcMessage("You are trying to declare an alias entry <" + alias_name +
-                   "> but an alias entry already exists in this "
-                   "subsection and this existing alias references a "
-                   "different parameter entry. Specifically, "
-                   "you are trying to reference the entry <" +
-                   existing_entry_name +
-                   "> whereas the existing alias references "
-                   "the entry <" +
-                   entries->get<std::string>(get_current_full_path(alias_name) +
-                                             path_separator + "alias") +
-                   ">."));
+      Assert(entries->get_optional<std::string>(
+               get_current_full_path(alias_name) + path_separator + "alias"),
+             ExcMessage("You are trying to declare an alias entry <" +
+                        alias_name +
+                        "> but a non-alias entry already exists in this "
+                        "subsection (i.e., there is either a preexisting "
+                        "further subsection, or a parameter entry, with "
+                        "the same name as the alias)."));
+      Assert(entries->get<std::string>(get_current_full_path(alias_name) +
+                                       path_separator + "alias") ==
+               existing_entry_name,
+             ExcMessage(
+               "You are trying to declare an alias entry <" + alias_name +
+               "> but an alias entry already exists in this "
+               "subsection and this existing alias references a "
+               "different parameter entry. Specifically, "
+               "you are trying to reference the entry <" +
+               existing_entry_name +
+               "> whereas the existing alias references "
+               "the entry <" +
+               entries->get<std::string>(get_current_full_path(alias_name) +
+                                         path_separator + "alias") +
+               ">."));
     }
 
   entries->put(get_current_full_path(alias_name) + path_separator + "alias",
@@ -857,10 +858,10 @@ ParameterHandler::set(const std::string &entry_string,
       const unsigned int pattern_index =
         entries->get<unsigned int>(path + path_separator + "pattern");
       AssertThrow(patterns[pattern_index]->match(new_value),
-                  ExcValueDoesNotMatchPattern(
-                    new_value,
-                    entries->get<std::string>(path + path_separator +
-                                              "pattern_description")));
+                  ExcValueDoesNotMatchPattern(new_value,
+                                              entries->get<std::string>(
+                                                path + path_separator +
+                                                "pattern_description")));
 
       // then also execute the actions associated with this
       // parameter (if any have been provided)
@@ -1046,8 +1047,9 @@ ParameterHandler::recursively_print_parameters(
               {
                 longest_name =
                   std::max(longest_name, demangle(p->first).length());
-                longest_value = std::max(
-                  longest_value, p->second.get<std::string>("value").length());
+                longest_value =
+                  std::max(longest_value,
+                           p->second.get<std::string>("value").length());
               }
 
           // print entries one by one. make sure they are sorted by using
@@ -1396,8 +1398,10 @@ ParameterHandler::recursively_print_parameters(
         std::vector<std::string> directory_path = target_subsection_path;
         directory_path.emplace_back(subsection);
 
-        recursively_print_parameters(
-          directory_path, style, overall_indent_level + 1, out);
+        recursively_print_parameters(directory_path,
+                                     style,
+                                     overall_indent_level + 1,
+                                     out);
 
         switch (style)
           {
@@ -1530,8 +1534,9 @@ ParameterHandler::print_parameters_section(
                p != current_section.end();
                ++p)
             if (is_parameter_node(p->second) == true)
-              longest_value = std::max(
-                longest_value, p->second.get<std::string>("value").length());
+              longest_value =
+                std::max(longest_value,
+                         p->second.get<std::string>("value").length());
 
 
           // print entries one by one. make sure they are sorted by using
@@ -1994,11 +1999,11 @@ ParameterHandler::scan_line(std::string        line,
       const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
-      AssertThrow(
-        entries->get_child_optional(get_current_full_path(subsection)),
-        ExcNoSubsection(current_line_n,
-                        input_filename,
-                        demangle(get_current_full_path(subsection))));
+      AssertThrow(entries->get_child_optional(
+                    get_current_full_path(subsection)),
+                  ExcNoSubsection(current_line_n,
+                                  input_filename,
+                                  demangle(get_current_full_path(subsection))));
 
       // subsection exists
       subsection_path.push_back(subsection);
@@ -2133,8 +2138,9 @@ ParameterHandler::scan_line(std::string        line,
 
       std::ifstream input(line.c_str());
       AssertThrow(input,
-                  ExcCannotOpenIncludeStatementFile(
-                    current_line_n, input_filename, line));
+                  ExcCannotOpenIncludeStatementFile(current_line_n,
+                                                    input_filename,
+                                                    line));
       parse_input(input);
     }
   else
@@ -2190,7 +2196,8 @@ ParameterHandler::operator==(const ParameterHandler &prm2) const
 
 
 
-MultipleParameterLoop::MultipleParameterLoop() : n_branches(0)
+MultipleParameterLoop::MultipleParameterLoop()
+  : n_branches(0)
 {}
 
 
@@ -2288,8 +2295,9 @@ MultipleParameterLoop::init_branches_current_section()
       {
         const std::string value = p->second.get<std::string>("value");
         if (value.find('{') != std::string::npos)
-          multiple_choices.emplace_back(
-            subsection_path, demangle(p->first), value);
+          multiple_choices.emplace_back(subsection_path,
+                                        demangle(p->first),
+                                        value);
       }
 
   // then loop over all subsections
@@ -2368,11 +2376,11 @@ MultipleParameterLoop::memory_consumption() const
 
 MultipleParameterLoop::Entry::Entry(const std::vector<std::string> &ssp,
                                     const std::string &             Name,
-                                    const std::string &             Value) :
-  subsection_path(ssp),
-  entry_name(Name),
-  entry_value(Value),
-  type(Entry::array)
+                                    const std::string &             Value)
+  : subsection_path(ssp)
+  , entry_name(Name)
+  , entry_value(Value)
+  , type(Entry::array)
 {}
 
 
@@ -2388,8 +2396,9 @@ MultipleParameterLoop::Entry::split_different_values()
   std::string multiple(entry_value,
                        entry_value.find('{') + 1,
                        entry_value.rfind('}') - entry_value.find('{') - 1);
-  std::string postfix(
-    entry_value, entry_value.rfind('}') + 1, std::string::npos);
+  std::string postfix(entry_value,
+                      entry_value.rfind('}') + 1,
+                      std::string::npos);
   // if array entry {{..}}: delete inner
   // pair of braces
   if (multiple[0] == '{')

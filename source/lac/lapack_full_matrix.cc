@@ -31,27 +31,26 @@ DEAL_II_NAMESPACE_OPEN
 using namespace LAPACKSupport;
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n) :
-  TransposeTable<number>(n, n),
-  state(matrix),
-  property(general)
+LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n)
+  : TransposeTable<number>(n, n)
+  , state(matrix)
+  , property(general)
 {}
 
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type m,
-                                           const size_type n) :
-  TransposeTable<number>(m, n),
-  state(matrix),
-  property(general)
+LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type m, const size_type n)
+  : TransposeTable<number>(m, n)
+  , state(matrix)
+  , property(general)
 {}
 
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M) :
-  TransposeTable<number>(M),
-  state(matrix),
-  property(general)
+LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M)
+  : TransposeTable<number>(M)
+  , state(matrix)
+  , property(general)
 {}
 
 
@@ -1491,9 +1490,9 @@ LAPACKFullMatrix<number>::solve(Vector<number> &v, const bool transposed) const
     }
   else
     {
-      Assert(
-        false,
-        ExcMessage("The matrix has to be either factorized or triangular."));
+      Assert(false,
+             ExcMessage(
+               "The matrix has to be either factorized or triangular."));
     }
 
   Assert(info == 0, ExcInternalError());
@@ -1546,9 +1545,9 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
     }
   else
     {
-      Assert(
-        false,
-        ExcMessage("The matrix has to be either factorized or triangular."));
+      Assert(false,
+             ExcMessage(
+               "The matrix has to be either factorized or triangular."));
     }
 
   Assert(info == 0, ExcInternalError());

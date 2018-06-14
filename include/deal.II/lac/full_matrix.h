@@ -1373,10 +1373,10 @@ FullMatrix<number>::Tvmult_add(Vector<number2> &      w,
 template <typename number>
 inline FullMatrix<number>::Accessor::Accessor(const FullMatrix<number> *matrix,
                                               const size_type           r,
-                                              const size_type           c) :
-  matrix(matrix),
-  a_row(r),
-  a_col(c)
+                                              const size_type           c)
+  : matrix(matrix)
+  , a_row(r)
+  , a_col(c)
 {}
 
 
@@ -1409,8 +1409,8 @@ template <typename number>
 inline FullMatrix<number>::const_iterator::const_iterator(
   const FullMatrix<number> *matrix,
   const size_type           r,
-  const size_type           c) :
-  accessor(matrix, r, c)
+  const size_type           c)
+  : accessor(matrix, r, c)
 {}
 
 

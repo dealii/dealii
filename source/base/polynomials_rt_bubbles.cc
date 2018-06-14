@@ -26,11 +26,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k) :
-  my_degree(k),
-  raviart_thomas_space(k - 1),
-  monomials(k + 2),
-  n_pols(compute_n_pols(k))
+PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
+  : my_degree(k)
+  , raviart_thomas_space(k - 1)
+  , monomials(k + 2)
+  , n_pols(compute_n_pols(k))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
@@ -124,8 +124,9 @@ PolynomialsRT_Bubbles<dim>::compute(
       //  monoval_i = x^i,
       //  monoval_plus = x^(k+1)
       for (unsigned int d = 0; d < dim; ++d)
-        monomials[my_degree + 1].value(
-          unit_point(d), n_derivatives, monoval_plus[d]);
+        monomials[my_degree + 1].value(unit_point(d),
+                                       n_derivatives,
+                                       monoval_plus[d]);
 
       for (unsigned int i = 0; i <= my_degree; ++i, ++start)
         {
@@ -209,8 +210,9 @@ PolynomialsRT_Bubbles<dim>::compute(
       //  monoval_* = x^*, monoval_jplus = x^(j+1)
       for (unsigned int d = 0; d < dim; ++d)
         {
-          monomials[my_degree + 1].value(
-            unit_point(d), n_derivatives, monoval_plus[d]);
+          monomials[my_degree + 1].value(unit_point(d),
+                                         n_derivatives,
+                                         monoval_plus[d]);
           monomials[my_degree].value(unit_point(d), n_derivatives, monoval[d]);
         }
 
@@ -225,10 +227,12 @@ PolynomialsRT_Bubbles<dim>::compute(
             {
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  monomials[j].value(
-                    unit_point(d), n_derivatives, monoval_j[d]);
-                  monomials[j + 1].value(
-                    unit_point(d), n_derivatives, monoval_jplus[d]);
+                  monomials[j].value(unit_point(d),
+                                     n_derivatives,
+                                     monoval_j[d]);
+                  monomials[j + 1].value(unit_point(d),
+                                         n_derivatives,
+                                         monoval_jplus[d]);
                 }
 
               if (values.size() != 0)

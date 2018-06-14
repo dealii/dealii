@@ -67,8 +67,10 @@ main(int argc, char **argv)
     SolverQMRS<PETScWrappers::MPI::Vector>          solver(control, mem);
     PreconditionIdentity                            preconditioner;
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 45, 47);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner),
+                              control.last_step(),
+                              45,
+                              47);
   }
   GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
 }

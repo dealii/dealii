@@ -150,9 +150,9 @@ public:
 
 template <int dim>
 QuadraticTimeCircle<dim>::QuadraticTimeCircle(
-  const unsigned int n_global_refines) :
-  n_global_refines(n_global_refines),
-  dof_handler(triangulation)
+  const unsigned int n_global_refines)
+  : n_global_refines(n_global_refines)
+  , dof_handler(triangulation)
 {
   boundary_manifold = ladutenko_circle(triangulation);
   typename Triangulation<dim>::active_cell_iterator cell = triangulation

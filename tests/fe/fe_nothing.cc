@@ -30,15 +30,18 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   {
     Triangulation<dim> triangulationL;
     Triangulation<dim> triangulationR;
-    GridGenerator::hyper_cube(
-      triangulationL, -1, 0); // create a square [-1,0]^d domain
-    GridGenerator::hyper_cube(
-      triangulationR, -1, 0); // create a square [-1,0]^d domain
+    GridGenerator::hyper_cube(triangulationL,
+                              -1,
+                              0); // create a square [-1,0]^d domain
+    GridGenerator::hyper_cube(triangulationR,
+                              -1,
+                              0); // create a square [-1,0]^d domain
     Point<dim> shift_vector;
     shift_vector[0] = 1.0;
     GridTools::shift(shift_vector, triangulationR);
-    GridGenerator::merge_triangulations(
-      triangulationL, triangulationR, triangulation);
+    GridGenerator::merge_triangulations(triangulationL,
+                                        triangulationR,
+                                        triangulation);
   }
 
   hp::DoFHandler<dim> dof_handler(triangulation);

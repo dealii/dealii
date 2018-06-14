@@ -923,9 +923,9 @@ namespace Utilities
     // verify that the two iterators are properly ordered. since
     // we need operator- for the iterator type anyway, do the
     // test as follows, rather than via 'last >= first'
-    Assert(
-      last - first >= 0,
-      ExcMessage("The given iterators do not satisfy the proper ordering."));
+    Assert(last - first >= 0,
+           ExcMessage(
+             "The given iterators do not satisfy the proper ordering."));
 
     unsigned int len = static_cast<unsigned int>(last - first);
 

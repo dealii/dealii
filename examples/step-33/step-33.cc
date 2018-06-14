@@ -452,8 +452,10 @@ namespace Step33
 
       const QMidpoint<dim> quadrature_formula;
       const UpdateFlags    update_flags = update_gradients;
-      FEValues<dim>        fe_v(
-        mapping, dof_handler.get_fe(), quadrature_formula, update_flags);
+      FEValues<dim>        fe_v(mapping,
+                         dof_handler.get_fe(),
+                         quadrature_formula,
+                         update_flags);
 
       std::vector<std::vector<Tensor<1, dim>>> dU(
         1, std::vector<Tensor<1, dim>>(n_components));
@@ -542,8 +544,8 @@ namespace Step33
 
   template <int dim>
   EulerEquations<dim>::Postprocessor::Postprocessor(
-    const bool do_schlieren_plot) :
-    do_schlieren_plot(do_schlieren_plot)
+    const bool do_schlieren_plot)
+    : do_schlieren_plot(do_schlieren_plot)
   {}
 
 
@@ -766,12 +768,18 @@ namespace Step33
                           Patterns::Selection("gmres|direct"),
                           "The kind of solver for the linear system. "
                           "Choices are <gmres|direct>.");
-        prm.declare_entry(
-          "residual", "1e-10", Patterns::Double(), "Linear solver residual");
-        prm.declare_entry(
-          "max iters", "300", Patterns::Integer(), "Maximum solver iterations");
-        prm.declare_entry(
-          "ilut fill", "2", Patterns::Double(), "Ilut preconditioner fill");
+        prm.declare_entry("residual",
+                          "1e-10",
+                          Patterns::Double(),
+                          "Linear solver residual");
+        prm.declare_entry("max iters",
+                          "300",
+                          Patterns::Integer(),
+                          "Maximum solver iterations");
+        prm.declare_entry("ilut fill",
+                          "2",
+                          Patterns::Double(),
+                          "Ilut preconditioner fill");
         prm.declare_entry("ilut absolute tolerance",
                           "1e-9",
                           Patterns::Double(),
@@ -919,8 +927,10 @@ namespace Step33
           Patterns::Selection("constant|mesh"),
           "Whether to use a constant stabilization parameter or "
           "a mesh-dependent one");
-        prm.declare_entry(
-          "stab value", "1", Patterns::Double(), "alpha stabilization");
+        prm.declare_entry("stab value",
+                          "1",
+                          Patterns::Double(),
+                          "alpha stabilization");
       }
       prm.leave_subsection();
     }
@@ -970,8 +980,10 @@ namespace Step33
                           "true",
                           Patterns::Bool(),
                           "Whether or not to produce schlieren plots");
-        prm.declare_entry(
-          "step", "-1", Patterns::Double(), "Output once per this period");
+        prm.declare_entry("step",
+                          "-1",
+                          Patterns::Double(),
+                          "Output once per this period");
       }
       prm.leave_subsection();
     }
@@ -1075,8 +1087,8 @@ namespace Step33
 
 
     template <int dim>
-    AllParameters<dim>::BoundaryConditions::BoundaryConditions() :
-      values(EulerEquations<dim>::n_components)
+    AllParameters<dim>::BoundaryConditions::BoundaryConditions()
+      : values(EulerEquations<dim>::n_components)
     {
       for (unsigned int c = 0; c < EulerEquations<dim>::n_components; ++c)
         kind[c] = EulerEquations<dim>::no_penetration_boundary;
@@ -1084,21 +1096,23 @@ namespace Step33
 
 
     template <int dim>
-    AllParameters<dim>::AllParameters() :
-      diffusion_power(0.),
-      time_step(1.),
-      final_time(1.),
-      theta(.5),
-      is_stationary(true),
-      initial_conditions(EulerEquations<dim>::n_components)
+    AllParameters<dim>::AllParameters()
+      : diffusion_power(0.)
+      , time_step(1.)
+      , final_time(1.)
+      , theta(.5)
+      , is_stationary(true)
+      , initial_conditions(EulerEquations<dim>::n_components)
     {}
 
 
     template <int dim>
     void AllParameters<dim>::declare_parameters(ParameterHandler &prm)
     {
-      prm.declare_entry(
-        "mesh", "grid.inp", Patterns::Anything(), "intput file name");
+      prm.declare_entry("mesh",
+                        "grid.inp",
+                        Patterns::Anything(),
+                        "intput file name");
 
       prm.declare_entry("diffusion power",
                         "2.0",
@@ -1107,10 +1121,14 @@ namespace Step33
 
       prm.enter_subsection("time stepping");
       {
-        prm.declare_entry(
-          "time step", "0.1", Patterns::Double(0), "simulation time step");
-        prm.declare_entry(
-          "final time", "10.0", Patterns::Double(0), "simulation end time");
+        prm.declare_entry("time step",
+                          "0.1",
+                          Patterns::Double(0),
+                          "simulation time step");
+        prm.declare_entry("final time",
+                          "10.0",
+                          Patterns::Double(0),
+                          "simulation end time");
         prm.declare_entry("theta scheme value",
                           "0.5",
                           Patterns::Double(0, 1),
@@ -1134,11 +1152,11 @@ namespace Step33
             for (unsigned int di = 0; di < EulerEquations<dim>::n_components;
                  ++di)
               {
-                prm.declare_entry(
-                  "w_" + Utilities::int_to_string(di),
-                  "outflow",
-                  Patterns::Selection("inflow|outflow|pressure"),
-                  "<inflow|outflow|pressure>");
+                prm.declare_entry("w_" + Utilities::int_to_string(di),
+                                  "outflow",
+                                  Patterns::Selection(
+                                    "inflow|outflow|pressure"),
+                                  "<inflow|outflow|pressure>");
 
                 prm.declare_entry("w_" + Utilities::int_to_string(di) +
                                     " value",
@@ -1356,13 +1374,13 @@ namespace Step33
   // There is nothing much to say about the constructor. Essentially, it reads
   // the input file and fills the parameter object with the parsed values:
   template <int dim>
-  ConservationLaw<dim>::ConservationLaw(const char *input_filename) :
-    mapping(),
-    fe(FE_Q<dim>(1), EulerEquations<dim>::n_components),
-    dof_handler(triangulation),
-    quadrature(2),
-    face_quadrature(2),
-    verbose_cout(std::cout, false)
+  ConservationLaw<dim>::ConservationLaw(const char *input_filename)
+    : mapping()
+    , fe(FE_Q<dim>(1), EulerEquations<dim>::n_components)
+    , dof_handler(triangulation)
+    , quadrature(2)
+    , face_quadrature(2)
+    , verbose_cout(std::cout, false)
   {
     ParameterHandler prm;
     Parameters::AllParameters<dim>::declare_parameters(prm);
@@ -1430,15 +1448,23 @@ namespace Step33
                                           update_normal_vectors,
                       neighbor_face_update_flags = update_values;
 
-    FEValues<dim>     fe_v(mapping, fe, quadrature, update_flags);
-    FEFaceValues<dim> fe_v_face(
-      mapping, fe, face_quadrature, face_update_flags);
-    FESubfaceValues<dim> fe_v_subface(
-      mapping, fe, face_quadrature, face_update_flags);
-    FEFaceValues<dim> fe_v_face_neighbor(
-      mapping, fe, face_quadrature, neighbor_face_update_flags);
-    FESubfaceValues<dim> fe_v_subface_neighbor(
-      mapping, fe, face_quadrature, neighbor_face_update_flags);
+    FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
+    FEFaceValues<dim>    fe_v_face(mapping,
+                                fe,
+                                face_quadrature,
+                                face_update_flags);
+    FESubfaceValues<dim> fe_v_subface(mapping,
+                                      fe,
+                                      face_quadrature,
+                                      face_update_flags);
+    FEFaceValues<dim>    fe_v_face_neighbor(mapping,
+                                         fe,
+                                         face_quadrature,
+                                         neighbor_face_update_flags);
+    FESubfaceValues<dim> fe_v_subface_neighbor(mapping,
+                                               fe,
+                                               face_quadrature,
+                                               neighbor_face_update_flags);
 
     // Then loop over all cells, initialize the FEValues object for the
     // current cell and call the function that assembles the problem on this
@@ -1574,8 +1600,9 @@ namespace Step33
                          ExcInternalError());
 
                   fe_v_face.reinit(cell, face_no);
-                  fe_v_subface_neighbor.reinit(
-                    neighbor, neighbor_face_no, neighbor_subface_no);
+                  fe_v_subface_neighbor.reinit(neighbor,
+                                               neighbor_face_no,
+                                               neighbor_subface_no);
 
                   assemble_face_term(face_no,
                                      fe_v_face,
@@ -1665,8 +1692,9 @@ namespace Step33
     Table<3, Sacado::Fad::DFad<double>> grad_W(
       n_q_points, EulerEquations<dim>::n_components, dim);
 
-    Table<3, double> grad_W_old(
-      n_q_points, EulerEquations<dim>::n_components, dim);
+    Table<3, double> grad_W_old(n_q_points,
+                                EulerEquations<dim>::n_components,
+                                dim);
 
     std::vector<double> residual_derivatives(dofs_per_cell);
 
@@ -2077,8 +2105,9 @@ namespace Step33
             {
               for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 residual_derivatives[k] = R_i.fastAccessDx(dofs_per_cell + k);
-              system_matrix.add(
-                dof_indices[i], dof_indices_neighbor, residual_derivatives);
+              system_matrix.add(dof_indices[i],
+                                dof_indices_neighbor,
+                                residual_derivatives);
             }
 
           right_hand_side(dof_indices[i]) -= R_i.val();
@@ -2203,8 +2232,10 @@ namespace Step33
   void ConservationLaw<dim>::compute_refinement_indicators(
     Vector<double> &refinement_indicators) const
   {
-    EulerEquations<dim>::compute_refinement_indicators(
-      dof_handler, mapping, predictor, refinement_indicators);
+    EulerEquations<dim>::compute_refinement_indicators(dof_handler,
+                                                       mapping,
+                                                       predictor,
+                                                       refinement_indicators);
   }
 
 
@@ -2357,8 +2388,9 @@ namespace Step33
 
     setup_system();
 
-    VectorTools::interpolate(
-      dof_handler, parameters.initial_conditions, old_solution);
+    VectorTools::interpolate(dof_handler,
+                             parameters.initial_conditions,
+                             old_solution);
     current_solution = old_solution;
     predictor        = old_solution;
 
@@ -2372,8 +2404,9 @@ namespace Step33
 
           setup_system();
 
-          VectorTools::interpolate(
-            dof_handler, parameters.initial_conditions, old_solution);
+          VectorTools::interpolate(dof_handler,
+                                   parameters.initial_conditions,
+                                   old_solution);
           current_solution = old_solution;
           predictor        = old_solution;
         }

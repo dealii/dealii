@@ -49,7 +49,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q) : Function<dim>(3), q(q)
+  F(const unsigned int q)
+    : Function<dim>(3)
+    , q(q)
   {}
 
   virtual void

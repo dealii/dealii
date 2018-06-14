@@ -85,14 +85,16 @@ public:
         DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_dofs);
         constraints.reinit(relevant_dofs);
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-        VectorTools::interpolate_boundary_values(
-          dof_handler, dirichlet_boundary, constraints);
+        VectorTools::interpolate_boundary_values(dof_handler,
+                                                 dirichlet_boundary,
+                                                 constraints);
       }
     else
       {
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, relevant_dofs);
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                      level,
+                                                      relevant_dofs);
         constraints.reinit(relevant_dofs);
         constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
 
@@ -437,10 +439,10 @@ class MGTransferMF
 {
 public:
   MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
-               const MGConstrainedDoFs &             mg_constrained_dofs) :
-    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>(
-      mg_constrained_dofs),
-    laplace_operator(laplace)
+               const MGConstrainedDoFs &             mg_constrained_dofs)
+    : MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>(
+        mg_constrained_dofs)
+    , laplace_operator(laplace)
   {}
 
   /**

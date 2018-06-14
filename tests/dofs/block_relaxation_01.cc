@@ -93,8 +93,9 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
                 fe_values.JxW(q);
         }
       cell->get_dof_indices(local_dof_indices);
-      constraints.distribute_local_to_global(
-        local_matrix, local_dof_indices, system_matrix);
+      constraints.distribute_local_to_global(local_matrix,
+                                             local_dof_indices,
+                                             system_matrix);
     }
 }
 
@@ -130,8 +131,10 @@ check()
     Smoother::AdditionalData smoother_data;
     Smoother                 smoother;
 
-    DoFTools::make_vertex_patches(
-      smoother_data.block_list, dof, tr.n_levels() - 1, exclude_boundary_dofs);
+    DoFTools::make_vertex_patches(smoother_data.block_list,
+                                  dof,
+                                  tr.n_levels() - 1,
+                                  exclude_boundary_dofs);
     smoother_data.block_list.compress();
     smoother_data.inversion = PreconditionBlockBase<double>::svd;
     smoother_data.threshold = 1.e-8;
@@ -143,8 +146,10 @@ check()
     Smoother::AdditionalData smoother_data;
     Smoother                 smoother;
 
-    DoFTools::make_vertex_patches(
-      smoother_data.block_list, dof, tr.n_levels() - 1, exclude_boundary_dofs);
+    DoFTools::make_vertex_patches(smoother_data.block_list,
+                                  dof,
+                                  tr.n_levels() - 1,
+                                  exclude_boundary_dofs);
     smoother_data.block_list.compress();
     smoother_data.inversion   = PreconditionBlockBase<double>::svd;
     smoother_data.kernel_size = 1;

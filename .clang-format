@@ -45,14 +45,13 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: false
 BreakBeforeTernaryOperators: false
-BreakConstructorInitializers: AfterColon
+BreakConstructorInitializers: BeforeComma
 BreakStringLiterals: false
 
 ColumnLimit: 80
 
 CompactNamespaces: false
 
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 2
 
 ContinuationIndentWidth: 2
@@ -140,6 +139,8 @@ Language: Cpp
 MaxEmptyLinesToKeep: 3
 
 NamespaceIndentation: All
+
+PenaltyBreakBeforeFirstCallParameter: 90
 
 PointerAlignment: Right
 

@@ -269,27 +269,27 @@ namespace internal
 
 
 template <typename number>
-ChunkSparseMatrix<number>::ChunkSparseMatrix() :
-  cols(nullptr, "ChunkSparseMatrix"),
-  val(nullptr),
-  max_len(0)
+ChunkSparseMatrix<number>::ChunkSparseMatrix()
+  : cols(nullptr, "ChunkSparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {}
 
 
 
 template <typename number>
-ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparseMatrix &m) :
-  Subscriptor(m),
-  cols(nullptr, "ChunkSparseMatrix"),
-  val(nullptr),
-  max_len(0)
+ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparseMatrix &m)
+  : Subscriptor(m)
+  , cols(nullptr, "ChunkSparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {
-  Assert(
-    m.cols == nullptr && m.val == nullptr && m.max_len == 0,
-    ExcMessage("This constructor can only be called if the provided argument "
-               "is an empty matrix. This constructor can not be used to "
-               "copy-construct a non-empty matrix. Use the "
-               "ChunkSparseMatrix::copy_from() function for that purpose."));
+  Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
+         ExcMessage(
+           "This constructor can only be called if the provided argument "
+           "is an empty matrix. This constructor can not be used to "
+           "copy-construct a non-empty matrix. Use the "
+           "ChunkSparseMatrix::copy_from() function for that purpose."));
 }
 
 
@@ -299,12 +299,12 @@ ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator=(const ChunkSparseMatrix<number> &m)
 {
   (void)m;
-  Assert(
-    m.cols == nullptr && m.val == nullptr && m.max_len == 0,
-    ExcMessage("This operator can only be called if the provided right "
-               "hand side is an empty matrix. This operator can not be "
-               "used to copy a non-empty matrix. Use the "
-               "ChunkSparseMatrix::copy_from() function for that purpose."));
+  Assert(m.cols == nullptr && m.val == nullptr && m.max_len == 0,
+         ExcMessage(
+           "This operator can only be called if the provided right "
+           "hand side is an empty matrix. This operator can not be "
+           "used to copy a non-empty matrix. Use the "
+           "ChunkSparseMatrix::copy_from() function for that purpose."));
 
   return *this;
 }
@@ -312,10 +312,10 @@ ChunkSparseMatrix<number>::operator=(const ChunkSparseMatrix<number> &m)
 
 
 template <typename number>
-ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c) :
-  cols(nullptr, "ChunkSparseMatrix"),
-  val(nullptr),
-  max_len(0)
+ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c)
+  : cols(nullptr, "ChunkSparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -327,10 +327,10 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c) :
 
 template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c,
-                                             const IdentityMatrix &      id) :
-  cols(nullptr, "ChunkSparseMatrix"),
-  val(nullptr),
-  max_len(0)
+                                             const IdentityMatrix &      id)
+  : cols(nullptr, "ChunkSparseMatrix")
+  , val(nullptr)
+  , max_len(0)
 {
   (void)id;
   Assert(c.n_rows() == id.m(), ExcDimensionMismatch(c.n_rows(), id.m()));
@@ -396,12 +396,11 @@ ChunkSparseMatrix<number>::operator=(const double d)
     parallel::apply_to_subranges(
       0U,
       matrix_size,
-      std::bind(
-        &internal::ChunkSparseMatrixImplementation::template zero_subrange<
-          number>,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        val.get()),
+      std::bind(&internal::ChunkSparseMatrixImplementation::
+                  template zero_subrange<number>,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                val.get()),
       grain_size);
   else if (matrix_size > 0)
     std::memset(val.get(), 0, matrix_size * sizeof(number));
@@ -505,11 +504,12 @@ ChunkSparseMatrix<number>::n_actually_nonzero_elements() const
   // around the matrix. since we have the invariant that padding elements are
   // zero, nothing bad can happen here
   const size_type chunk_size = cols->get_chunk_size();
-  return std::count_if(
-    val.get(),
-    val.get() +
-      cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size,
-    std::bind(std::not_equal_to<double>(), std::placeholders::_1, 0));
+  return std::count_if(val.get(),
+                       val.get() + cols->sparsity_pattern.n_nonzero_elements() *
+                                     chunk_size * chunk_size,
+                       std::bind(std::not_equal_to<double>(),
+                                 std::placeholders::_1,
+                                 0));
 }
 
 
@@ -851,11 +851,12 @@ ChunkSparseMatrix<number>::matrix_norm_square(const Vector<somenumber> &v) const
           if ((cols_have_padding == false) ||
               (*colnum_ptr != cols->sparsity_pattern.n_cols() - 1))
             result += internal::ChunkSparseMatrixImplementation::
-              chunk_matrix_scalar_product<somenumber>(
-                cols->chunk_size,
-                val_ptr,
-                v_ptr,
-                v.begin() + *colnum_ptr * cols->chunk_size);
+              chunk_matrix_scalar_product<somenumber>(cols->chunk_size,
+                                                      val_ptr,
+                                                      v_ptr,
+                                                      v.begin() +
+                                                        *colnum_ptr *
+                                                          cols->chunk_size);
           else
             // we're at a chunk column that has padding
             for (size_type r = 0; r < cols->chunk_size; ++r)
@@ -949,11 +950,12 @@ ChunkSparseMatrix<number>::matrix_scalar_product(
           if ((cols_have_padding == false) ||
               (*colnum_ptr != cols->sparsity_pattern.n_cols() - 1))
             result += internal::ChunkSparseMatrixImplementation::
-              chunk_matrix_scalar_product<somenumber>(
-                cols->chunk_size,
-                val_ptr,
-                u_ptr,
-                v.begin() + *colnum_ptr * cols->chunk_size);
+              chunk_matrix_scalar_product<somenumber>(cols->chunk_size,
+                                                      val_ptr,
+                                                      u_ptr,
+                                                      v.begin() +
+                                                        *colnum_ptr *
+                                                          cols->chunk_size);
           else
             // we're at a chunk column that has padding
             for (size_type r = 0; r < cols->chunk_size; ++r)

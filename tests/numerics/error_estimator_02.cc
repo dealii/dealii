@@ -120,7 +120,9 @@ private:
 };
 
 template <int dim>
-MyFunction<dim>::MyFunction(const double k) : dealii::Function<dim>(1), k(k)
+MyFunction<dim>::MyFunction(const double k)
+  : dealii::Function<dim>(1)
+  , k(k)
 {}
 
 template <int dim>
@@ -162,7 +164,9 @@ private:
 };
 
 template <int dim>
-NeumanBC<dim>::NeumanBC(const double c) : dealii::Function<dim>(1), c(c)
+NeumanBC<dim>::NeumanBC(const double c)
+  : dealii::Function<dim>(1)
+  , c(c)
 {}
 
 template <int dim>
@@ -614,7 +618,8 @@ public:
 };
 
 template <int dim>
-MySecondFunction<dim>::MySecondFunction() : dealii::Function<dim>(1)
+MySecondFunction<dim>::MySecondFunction()
+  : dealii::Function<dim>(1)
 {}
 
 template <int dim>

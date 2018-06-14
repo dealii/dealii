@@ -73,8 +73,9 @@ test_1d()
   Table<dim, std::complex<double>> fourier_coefficients;
   fourier_coefficients.reinit(TableIndices<1>(N));
 
-  fourier.calculate(
-    local_dof_values, cell_active_fe_index, fourier_coefficients);
+  fourier.calculate(local_dof_values,
+                    cell_active_fe_index,
+                    fourier_coefficients);
 
   deallog << "calculated:" << std::endl;
   for (unsigned int i = 0; i < N; i++)

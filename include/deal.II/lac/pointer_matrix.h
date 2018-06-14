@@ -630,21 +630,21 @@ new_pointer_matrix_base(const TridiagonalMatrix<numberm> &matrix,
 
 
 template <typename MatrixType, typename VectorType>
-PointerMatrix<MatrixType, VectorType>::PointerMatrix(const MatrixType *M) :
-  m(M, typeid(*this).name())
+PointerMatrix<MatrixType, VectorType>::PointerMatrix(const MatrixType *M)
+  : m(M, typeid(*this).name())
 {}
 
 
 template <typename MatrixType, typename VectorType>
-PointerMatrix<MatrixType, VectorType>::PointerMatrix(const char *name) :
-  m(nullptr, name)
+PointerMatrix<MatrixType, VectorType>::PointerMatrix(const char *name)
+  : m(nullptr, name)
 {}
 
 
 template <typename MatrixType, typename VectorType>
 PointerMatrix<MatrixType, VectorType>::PointerMatrix(const MatrixType *M,
-                                                     const char *      name) :
-  m(M, name)
+                                                     const char *      name)
+  : m(M, name)
 {}
 
 
@@ -721,9 +721,9 @@ PointerMatrix<MatrixType, VectorType>::Tvmult_add(VectorType &      dst,
 template <typename MatrixType, typename VectorType>
 PointerMatrixAux<MatrixType, VectorType>::PointerMatrixAux(
   VectorMemory<VectorType> *mem,
-  const MatrixType *        M) :
-  mem(mem, typeid(*this).name()),
-  m(M, typeid(*this).name())
+  const MatrixType *        M)
+  : mem(mem, typeid(*this).name())
+  , m(M, typeid(*this).name())
 {
   if (mem == 0)
     mem = &my_memory;
@@ -733,9 +733,9 @@ PointerMatrixAux<MatrixType, VectorType>::PointerMatrixAux(
 template <typename MatrixType, typename VectorType>
 PointerMatrixAux<MatrixType, VectorType>::PointerMatrixAux(
   VectorMemory<VectorType> *mem,
-  const char *              name) :
-  mem(mem, name),
-  m(0, name)
+  const char *              name)
+  : mem(mem, name)
+  , m(0, name)
 {
   if (mem == 0)
     mem = &my_memory;
@@ -746,9 +746,9 @@ template <typename MatrixType, typename VectorType>
 PointerMatrixAux<MatrixType, VectorType>::PointerMatrixAux(
   VectorMemory<VectorType> *mem,
   const MatrixType *        M,
-  const char *              name) :
-  mem(mem, name),
-  m(M, name)
+  const char *              name)
+  : mem(mem, name)
+  , m(M, name)
 {
   if (mem == nullptr)
     mem = &my_memory;
@@ -857,20 +857,21 @@ PointerMatrixAux<MatrixType, VectorType>::Tvmult_add(
 
 
 template <typename number>
-PointerMatrixVector<number>::PointerMatrixVector(const Vector<number> *M) :
-  m(M, typeid(*this).name())
+PointerMatrixVector<number>::PointerMatrixVector(const Vector<number> *M)
+  : m(M, typeid(*this).name())
 {}
 
 
 template <typename number>
-PointerMatrixVector<number>::PointerMatrixVector(const char *name) : m(0, name)
+PointerMatrixVector<number>::PointerMatrixVector(const char *name)
+  : m(0, name)
 {}
 
 
 template <typename number>
 PointerMatrixVector<number>::PointerMatrixVector(const Vector<number> *M,
-                                                 const char *          name) :
-  m(M, name)
+                                                 const char *          name)
+  : m(M, name)
 {}
 
 

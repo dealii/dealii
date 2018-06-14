@@ -49,11 +49,13 @@ test()
   local_relevant.add_range(1, 2);
 
   PETScWrappers::MPI::Vector vb_one(local_active, MPI_COMM_WORLD);
-  PETScWrappers::MPI::Vector v_one(
-    local_active, local_relevant, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector v_one(local_active,
+                                   local_relevant,
+                                   MPI_COMM_WORLD);
 
-  LinearAlgebra::distributed::Vector<double> copied_one(
-    local_active, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> copied_one(local_active,
+                                                        local_relevant,
+                                                        MPI_COMM_WORLD);
 
   // set local values
   vb_one(myid * 2)     = myid * 2.0;

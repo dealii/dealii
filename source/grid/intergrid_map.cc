@@ -34,9 +34,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <class MeshType>
-InterGridMap<MeshType>::InterGridMap() :
-  source_grid(nullptr, typeid(*this).name()),
-  destination_grid(nullptr, typeid(*this).name())
+InterGridMap<MeshType>::InterGridMap()
+  : source_grid(nullptr, typeid(*this).name())
+  , destination_grid(nullptr, typeid(*this).name())
 {}
 
 

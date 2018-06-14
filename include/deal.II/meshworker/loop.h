@@ -84,12 +84,12 @@ namespace MeshWorker
     /**
      * Constructor.
      */
-    LoopControl() :
-      own_cells(true),
-      ghost_cells(false),
-      faces_to_ghost(LoopControl::one),
-      own_faces(LoopControl::one),
-      cells_first(true)
+    LoopControl()
+      : own_cells(true)
+      , ghost_cells(false)
+      , faces_to_ghost(LoopControl::one)
+      , own_faces(LoopControl::one)
+      , cells_first(true)
     {}
 
     /**
@@ -390,10 +390,10 @@ namespace MeshWorker
                   dof_info.exterior_face_available[face_no] = true;
                   dof_info.interior[face_no].reinit(cell, face, face_no);
                   info.face.reinit(dof_info.interior[face_no]);
-                  dof_info.exterior[face_no].reinit(
-                    neighbor,
-                    neighbor->face(neighbor_face_no),
-                    neighbor_face_no);
+                  dof_info.exterior[face_no].reinit(neighbor,
+                                                    neighbor->face(
+                                                      neighbor_face_no),
+                                                    neighbor_face_no);
                   info.neighbor.reinit(dof_info.exterior[face_no]);
 
                   face_worker(dof_info.interior[face_no],

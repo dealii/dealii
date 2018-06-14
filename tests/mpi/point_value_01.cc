@@ -86,8 +86,10 @@ test()
     {
       try
         {
-          VectorTools::point_value(
-            dof_handler, locally_owned_solution, *point_iterator, value);
+          VectorTools::point_value(dof_handler,
+                                   locally_owned_solution,
+                                   *point_iterator,
+                                   value);
           if (std::abs(value[0] - 1.) > 1e-8)
             ExcInternalError();
         }

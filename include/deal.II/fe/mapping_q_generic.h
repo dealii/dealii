@@ -752,8 +752,9 @@ MappingQGeneric<dim, spacedim>::InternalData::shape(
   const unsigned int shape_nr) const
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_values.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_values.size()));
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -765,8 +766,9 @@ MappingQGeneric<dim, spacedim>::InternalData::shape(const unsigned int qpoint,
                                                     const unsigned int shape_nr)
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_values.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_values.size()));
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -778,8 +780,9 @@ MappingQGeneric<dim, spacedim>::InternalData::derivative(
   const unsigned int shape_nr) const
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_derivatives.size()));
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -792,8 +795,9 @@ MappingQGeneric<dim, spacedim>::InternalData::derivative(
   const unsigned int shape_nr)
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_derivatives.size()));
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 

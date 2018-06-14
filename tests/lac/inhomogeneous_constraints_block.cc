@@ -97,7 +97,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -118,9 +119,9 @@ RightHandSide<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-AdvectionProblem<dim>::AdvectionProblem() :
-  dof_handler(triangulation),
-  fe(FE_Q<dim>(2), 2)
+AdvectionProblem<dim>::AdvectionProblem()
+  : dof_handler(triangulation)
+  , fe(FE_Q<dim>(2), 2)
 {}
 
 
@@ -326,8 +327,10 @@ AdvectionProblem<dim>::assemble_reference()
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(
     dof_handler, 0, Functions::ConstantFunction<dim>(1., 2), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, reference_matrix, test_rhs, reference_rhs);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     reference_matrix,
+                                     test_rhs,
+                                     reference_rhs);
 }
 
 

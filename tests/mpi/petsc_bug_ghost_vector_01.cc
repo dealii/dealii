@@ -137,16 +137,17 @@ test()
     for (unsigned int i = 0; i < v_space_cells; ++i)
       step_sizes[1].push_back(cell_size_y);
 
-    GridGenerator::subdivided_hyper_rectangle(
-      tmp_rectangle,
-      step_sizes,
-      Point<2>(h_distance, 0),
-      Point<2>(length + h_distance, v_distance),
-      false);
+    GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
+                                              step_sizes,
+                                              Point<2>(h_distance, 0),
+                                              Point<2>(length + h_distance,
+                                                       v_distance),
+                                              false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
-    GridGenerator::merge_triangulations(
-      tmp_tria_buffer, tmp_rectangle, tmp_tria_fluid);
+    GridGenerator::merge_triangulations(tmp_tria_buffer,
+                                        tmp_rectangle,
+                                        tmp_tria_fluid);
 
     tmp_tria_buffer.clear();
     tmp_rectangle.clear();
@@ -158,16 +159,17 @@ test()
     for (unsigned int i = 0; i < (h_cells - v_space_cells - solid_cells_y); ++i)
       step_sizes[1].push_back(cell_size_y);
 
-    GridGenerator::subdivided_hyper_rectangle(
-      tmp_rectangle,
-      step_sizes,
-      Point<2>(h_distance, solid_top),
-      Point<2>(h_distance + length, height),
-      false);
+    GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
+                                              step_sizes,
+                                              Point<2>(h_distance, solid_top),
+                                              Point<2>(h_distance + length,
+                                                       height),
+                                              false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
-    GridGenerator::merge_triangulations(
-      tmp_tria_buffer, tmp_rectangle, tmp_tria_fluid);
+    GridGenerator::merge_triangulations(tmp_tria_buffer,
+                                        tmp_rectangle,
+                                        tmp_tria_fluid);
     tmp_tria_buffer.clear();
     tmp_rectangle.clear();
     //
@@ -185,8 +187,9 @@ test()
                                               false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
-    GridGenerator::merge_triangulations(
-      tmp_tria_buffer, tmp_rectangle, tmp_tria_fluid);
+    GridGenerator::merge_triangulations(tmp_tria_buffer,
+                                        tmp_rectangle,
+                                        tmp_tria_fluid);
 
     //-----------COPY to distributed
     fluid_triangulation.copy_triangulation(tmp_tria_fluid);

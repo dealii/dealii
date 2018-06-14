@@ -101,7 +101,11 @@ private:
 };
 
 template <int spacedim>
-BEM<spacedim>::BEM() : fe(0), dof_handler(tria), fe_q(1), dof_handler_q(tria)
+BEM<spacedim>::BEM()
+  : fe(0)
+  , dof_handler(tria)
+  , fe_q(1)
+  , dof_handler_q(tria)
 {
   velocity[0] = 1.;
 }
@@ -176,10 +180,11 @@ BEM<spacedim>::assemble_system()
 {
   const QGauss<spacedim - 1>       quadrature_formula(2);
   const QGaussLog<1>               qlog(1);
-  FEValues<spacedim - 1, spacedim> fe_values_i(
-    fe,
-    quadrature_formula,
-    update_JxW_values | update_normal_vectors | update_quadrature_points),
+  FEValues<spacedim - 1, spacedim> fe_values_i(fe,
+                                               quadrature_formula,
+                                               update_JxW_values |
+                                                 update_normal_vectors |
+                                                 update_quadrature_points),
     fe_values_j(fe,
                 quadrature_formula,
                 update_JxW_values | update_normal_vectors |

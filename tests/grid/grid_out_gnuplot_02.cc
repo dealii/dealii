@@ -37,7 +37,8 @@ template <int spacedim>
 class Shift : public Function<spacedim>
 {
 public:
-  Shift() : Function<spacedim>(spacedim)
+  Shift()
+    : Function<spacedim>(spacedim)
   {}
 
   virtual double
@@ -90,8 +91,9 @@ gnuplot_output(const GridOutFlags::Gnuplot &flags)
   displacement_dof_handler.initialize(triangulation, displacement_fe);
 
   Vector<double> displacements(displacement_dof_handler.n_dofs());
-  VectorTools::interpolate(
-    displacement_dof_handler, Shift<spacedim>(), displacements);
+  VectorTools::interpolate(displacement_dof_handler,
+                           Shift<spacedim>(),
+                           displacements);
   MappingQ1Eulerian<dim, Vector<double>, spacedim> mapping(
     displacement_dof_handler, displacements);
 

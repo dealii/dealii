@@ -74,7 +74,8 @@ template <int dim>
 class SimpleField : public Function<dim>
 {
 public:
-  SimpleField() : Function<dim>(1)
+  SimpleField()
+    : Function<dim>(1)
   {}
 
   double
@@ -143,8 +144,9 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
 
   // interpolate:
   LinearAlgebra::distributed::Vector<LevelNumberType> fine_projection;
-  fine_projection.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  fine_projection.reinit(locally_owned_dofs,
+                         locally_relevant_dofs,
+                         mpi_communicator);
   VectorTools::project(dof_handler,
                        constraints,
                        QGauss<dim>(n_q_points + 2),
@@ -171,8 +173,10 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
 
       const std::string mg_mesh = "mg_mesh";
       GridOut           grid_out;
-      grid_out.write_mesh_per_processor_as_vtu(
-        triangulation, mg_mesh, true, true);
+      grid_out.write_mesh_per_processor_as_vtu(triangulation,
+                                               mg_mesh,
+                                               true,
+                                               true);
     }
 
   // MG hanging node constraints
@@ -197,8 +201,9 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   QGauss<dim>                  quadrature(n_q_points);
   std::vector<LevelNumberType> q_values(quadrature.size());
 
-  FEValues<dim> fe_values(
-    fe, quadrature, update_values | update_quadrature_points);
+  FEValues<dim> fe_values(fe,
+                          quadrature,
+                          update_values | update_quadrature_points);
   for (unsigned int level = max_level + 1; level != min_level;)
     {
       --level;
@@ -211,8 +216,9 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
           {
             fe_values.reinit(cell);
             cell->get_mg_dof_indices(dof_indices);
-            fe_values.get_function_values(
-              level_projection[level], dof_indices, q_values);
+            fe_values.get_function_values(level_projection[level],
+                                          dof_indices,
+                                          q_values);
 
             const std::vector<Point<dim>> &q_points =
               fe_values.get_quadrature_points();

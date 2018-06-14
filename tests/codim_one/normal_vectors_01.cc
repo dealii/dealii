@@ -50,8 +50,10 @@ test()
 
   dh.distribute_dofs(fe);
 
-  FEFaceValues<dim - 1, dim> fe_face_values(
-    mapping, fe, QTrapez<dim - 2>(), update_normal_vectors);
+  FEFaceValues<dim - 1, dim> fe_face_values(mapping,
+                                            fe,
+                                            QTrapez<dim - 2>(),
+                                            update_normal_vectors);
 
   for (typename DoFHandler<dim - 1, dim>::active_cell_iterator cell =
          dh.begin_active();

@@ -44,9 +44,9 @@ namespace internal
      */
     struct FaceIdentifier
     {
-      FaceIdentifier() :
-        n_hanging_faces_smaller_subdomain(0),
-        n_hanging_faces_larger_subdomain(0)
+      FaceIdentifier()
+        : n_hanging_faces_smaller_subdomain(0)
+        , n_hanging_faces_larger_subdomain(0)
       {}
 
       std::vector<std::pair<CellId, CellId>> shared_faces;
@@ -154,7 +154,8 @@ namespace internal
 #ifndef DOXYGEN
 
     template <int dim>
-    FaceSetup<dim>::FaceSetup() : use_active_cells(true)
+    FaceSetup<dim>::FaceSetup()
+      : use_active_cells(true)
     {}
 
 
@@ -973,9 +974,9 @@ namespace internal
       if (left_face_orientation != 0)
         {
           info.face_orientation = 8 + left_face_orientation;
-          Assert(
-            right_face_orientation == 0,
-            ExcMessage("Face seems to be wrongly oriented from both sides"));
+          Assert(right_face_orientation == 0,
+                 ExcMessage(
+                   "Face seems to be wrongly oriented from both sides"));
         }
       else
         info.face_orientation = right_face_orientation;
@@ -1136,8 +1137,9 @@ namespace internal
                           is_contiguous = false;
                     if (is_contiguous)
                       {
-                        AssertIndexRange(
-                          f, faces_type[type].size() - vectorization_width + 1);
+                        AssertIndexRange(f,
+                                         faces_type[type].size() -
+                                           vectorization_width + 1);
                         for (unsigned int v = 0; v < vectorization_width; ++v)
                           {
                             macro_face.cells_interior[v] =

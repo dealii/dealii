@@ -97,10 +97,10 @@ DoFPrintSolverStep<dim, SolverType, VectorType>::DoFPrintSolverStep(
   SolverControl &           control,
   VectorMemory<VectorType> &mem,
   DataOut<dim> &            data_out,
-  const std::string &       basename) :
-  SolverType(control, mem),
-  out(data_out),
-  basename(basename)
+  const std::string &       basename)
+  : SolverType(control, mem)
+  , out(data_out)
+  , basename(basename)
 {}
 
 

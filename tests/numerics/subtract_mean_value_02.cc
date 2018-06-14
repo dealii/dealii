@@ -61,14 +61,16 @@ main(int argc, char *argv[])
       IndexSet ghost_indices(10);
       ghost_indices.add_range(3, 8);
       {
-        LinearAlgebra::distributed::Vector<double> v(
-          local_range, ghost_indices, MPI_COMM_WORLD);
+        LinearAlgebra::distributed::Vector<double> v(local_range,
+                                                     ghost_indices,
+                                                     MPI_COMM_WORLD);
         test(v);
       }
 
       {
-        LinearAlgebra::distributed::Vector<float> v(
-          local_range, ghost_indices, MPI_COMM_WORLD);
+        LinearAlgebra::distributed::Vector<float> v(local_range,
+                                                    ghost_indices,
+                                                    MPI_COMM_WORLD);
         test(v);
       }
 

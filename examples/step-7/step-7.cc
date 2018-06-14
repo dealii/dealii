@@ -124,19 +124,15 @@ namespace Step7
   // <code>dim</code>, but can immediately use the following definition:
   template <>
   const Point<1>
-    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] = {
-      Point<1>(-1.0 / 3.0),
-      Point<1>(0.0),
-      Point<1>(+1.0 / 3.0)};
+    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] =
+      {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
 
   // Likewise, we can provide an explicit specialization for
   // <code>dim=2</code>. We place the centers for the 2d case as follows:
   template <>
   const Point<2>
-    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] = {
-      Point<2>(-0.5, +0.5),
-      Point<2>(-0.5, -0.5),
-      Point<2>(+0.5, -0.5)};
+    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] =
+      {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
 
   // There remains to assign a value to the half-width of the exponentials. We
   // would like to use the same value for all dimensions. In this case, we
@@ -185,7 +181,8 @@ namespace Step7
   class Solution : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    Solution() : Function<dim>()
+    Solution()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -284,7 +281,8 @@ namespace Step7
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -480,12 +478,11 @@ namespace Step7
   // arguments, and associate the DoF handler object with the triangulation
   // (which is empty at present, however).
   template <int dim>
-  HelmholtzProblem<dim>::HelmholtzProblem(
-    const FiniteElement<dim> &fe,
-    const RefinementMode      refinement_mode) :
-    dof_handler(triangulation),
-    fe(&fe),
-    refinement_mode(refinement_mode)
+  HelmholtzProblem<dim>::HelmholtzProblem(const FiniteElement<dim> &fe,
+                                          const RefinementMode refinement_mode)
+    : dof_handler(triangulation)
+    , fe(&fe)
+    , refinement_mode(refinement_mode)
   {}
 
 
@@ -720,8 +717,9 @@ namespace Step7
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(
-                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+              system_matrix.add(local_dof_indices[i],
+                                local_dof_indices[j],
+                                cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -741,10 +739,14 @@ namespace Step7
     hanging_node_constraints.condense(system_rhs);
 
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Solution<dim>(), boundary_values);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Solution<dim>(),
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
   }
 
 
@@ -874,8 +876,10 @@ namespace Step7
                                       difference_per_cell,
                                       QGauss<dim>(3),
                                       VectorTools::L2_norm);
-    const double L2_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::L2_norm);
+    const double L2_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     // By same procedure we get the H1 semi-norm. We re-use the
     // <code>difference_per_cell</code> vector since it is no longer used
@@ -890,8 +894,10 @@ namespace Step7
                                       difference_per_cell,
                                       QGauss<dim>(3),
                                       VectorTools::H1_seminorm);
-    const double H1_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::H1_seminorm);
+    const double H1_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::H1_seminorm);
 
     // Finally, we compute the maximum norm. Of course, we can't actually
     // compute the true maximum, but only the maximum at the quadrature
@@ -915,8 +921,10 @@ namespace Step7
                                       difference_per_cell,
                                       q_iterated,
                                       VectorTools::Linfty_norm);
-    const double Linfty_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::Linfty_norm);
+    const double Linfty_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::Linfty_norm);
 
     // After all these errors have been computed, we finally write some
     // output. In addition, we add the important data to the TableHandler by

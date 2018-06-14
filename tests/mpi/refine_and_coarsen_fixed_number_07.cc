@@ -45,8 +45,10 @@ test(const double max_n_cell_ratio)
   std::vector<unsigned int> sub(2);
   sub[0] = 5 * Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   sub[1] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    static_cast<Triangulation<2> &>(tr), sub, Point<2>(0, 0), Point<2>(1, 1));
+  GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<2> &>(tr),
+                                            sub,
+                                            Point<2>(0, 0),
+                                            Point<2>(1, 1));
   tr.refine_global(3);
 
   Vector<float> indicators(tr.n_active_cells());

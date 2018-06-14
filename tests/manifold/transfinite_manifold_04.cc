@@ -53,10 +53,11 @@ do_test(const Triangulation<dim, spacedim> &tria)
             points.push_back(cell->face(face)->vertex(0));
             points.push_back(cell->face(face)->vertex(1));
             std::vector<double> weights(2);
-            weights[0]        = 0.1;
-            weights[1]        = 0.9;
-            Point<spacedim> p = cell->get_manifold().get_new_point(
-              make_array_view(points), make_array_view(weights));
+            weights[0] = 0.1;
+            weights[1] = 0.9;
+            Point<spacedim> p =
+              cell->get_manifold().get_new_point(make_array_view(points),
+                                                 make_array_view(weights));
             Point<spacedim> pref =
               cell->face(face)->get_manifold().get_new_point(
                 make_array_view(points), make_array_view(weights));

@@ -85,14 +85,16 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
   locally_relevant_partitioning.push_back(
     locally_relevant_dofs.get_view(0, dofs_per_block[0]));
-  locally_relevant_partitioning.push_back(locally_relevant_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+  locally_relevant_partitioning.push_back(
+    locally_relevant_dofs.get_view(dofs_per_block[0],
+                                   dofs_per_block[0] + dofs_per_block[1]));
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
   locally_owned_partitioning.push_back(
     locally_owned_dofs.get_view(0, dofs_per_block[0]));
-  locally_owned_partitioning.push_back(locally_owned_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+  locally_owned_partitioning.push_back(
+    locally_owned_dofs.get_view(dofs_per_block[0],
+                                dofs_per_block[0] + dofs_per_block[1]));
 
   deallog << "owned: ";
   locally_owned_dofs.print(deallog);
@@ -141,8 +143,9 @@ test()
           }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, A);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               A);
       }
 
   A.compress(VectorOperation::add);
@@ -188,14 +191,16 @@ test_alt()
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
   locally_relevant_partitioning.push_back(
     locally_relevant_dofs.get_view(0, dofs_per_block[0]));
-  locally_relevant_partitioning.push_back(locally_relevant_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+  locally_relevant_partitioning.push_back(
+    locally_relevant_dofs.get_view(dofs_per_block[0],
+                                   dofs_per_block[0] + dofs_per_block[1]));
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
   locally_owned_partitioning.push_back(
     locally_owned_dofs.get_view(0, dofs_per_block[0]));
-  locally_owned_partitioning.push_back(locally_owned_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+  locally_owned_partitioning.push_back(
+    locally_owned_dofs.get_view(dofs_per_block[0],
+                                dofs_per_block[0] + dofs_per_block[1]));
 
   deallog << "owned: ";
   locally_owned_dofs.print(deallog);
@@ -208,12 +213,12 @@ test_alt()
 
   TrilinosWrappers::BlockSparsityPattern sp(locally_owned_partitioning,
                                             MPI_COMM_WORLD);
-  DoFTools::make_sparsity_pattern(
-    dof_handler,
-    sp,
-    constraints,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  sp,
+                                  constraints,
+                                  false,
+                                  Utilities::MPI::this_mpi_process(
+                                    MPI_COMM_WORLD));
   sp.compress();
   typename LA::MPI::BlockSparseMatrix A;
   A.reinit(sp);
@@ -244,8 +249,9 @@ test_alt()
           }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, A);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               A);
       }
 
   A.compress(VectorOperation::add);

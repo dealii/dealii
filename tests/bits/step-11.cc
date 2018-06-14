@@ -88,10 +88,10 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree) :
-  fe(1),
-  dof_handler(triangulation),
-  mapping(mapping_degree)
+LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
+  : fe(1)
+  , dof_handler(triangulation)
+  , mapping(mapping_degree)
 {
   deallog << "Using mapping with degree " << mapping_degree << ":" << std::endl
           << "============================" << std::endl;
@@ -108,8 +108,9 @@ LaplaceProblem<dim>::setup_system()
   system_rhs.reinit(dof_handler.n_dofs());
 
   std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-  DoFTools::extract_boundary_dofs(
-    dof_handler, std::vector<bool>(1, true), boundary_dofs);
+  DoFTools::extract_boundary_dofs(dof_handler,
+                                  std::vector<bool>(1, true),
+                                  boundary_dofs);
 
   const unsigned int first_boundary_dof =
     std::distance(boundary_dofs.begin(),
@@ -136,23 +137,26 @@ template <int dim>
 void
 LaplaceProblem<dim>::assemble_and_solve()
 {
-  const unsigned int gauss_degree = std::max(
-    static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)),
-    2U);
-  MatrixTools::create_laplace_matrix(
-    mapping, dof_handler, QGauss<dim>(gauss_degree), system_matrix);
+  const unsigned int gauss_degree =
+    std::max(static_cast<unsigned int>(
+               std::ceil(1. * (mapping.get_degree() + 1) / 2)),
+             2U);
+  MatrixTools::create_laplace_matrix(mapping,
+                                     dof_handler,
+                                     QGauss<dim>(gauss_degree),
+                                     system_matrix);
   VectorTools::create_right_hand_side(mapping,
                                       dof_handler,
                                       QGauss<dim>(gauss_degree),
                                       Functions::ConstantFunction<dim>(-2),
                                       system_rhs);
   Vector<double> tmp(system_rhs.size());
-  VectorTools::create_boundary_right_hand_side(
-    mapping,
-    dof_handler,
-    QGauss<dim - 1>(gauss_degree),
-    Functions::ConstantFunction<dim>(1),
-    tmp);
+  VectorTools::create_boundary_right_hand_side(mapping,
+                                               dof_handler,
+                                               QGauss<dim - 1>(gauss_degree),
+                                               Functions::ConstantFunction<dim>(
+                                                 1),
+                                               tmp);
   system_rhs += tmp;
 
   mean_value_constraints.condense(system_matrix);

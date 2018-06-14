@@ -97,8 +97,10 @@ test_real_to_unit_cell()
         break;
     }
 
-  const FESystem<dim, spacedim> fesystem(
-    FE_Q<dim, spacedim>(1), 1, FE_Bernstein<dim, spacedim>(2), spacedim);
+  const FESystem<dim, spacedim> fesystem(FE_Q<dim, spacedim>(1),
+                                         1,
+                                         FE_Bernstein<dim, spacedim>(2),
+                                         spacedim);
 
   DoFHandler<dim, spacedim> dhb(triangulation);
   dhb.distribute_dofs(fesystem);

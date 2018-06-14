@@ -420,8 +420,9 @@ test_rank_3_tensors()
     Tensor<3, dim, double> C;
     initialize(A);
     initialize(C);
-    const Tensor<1, dim, double> B = double_contract<0, 0, 1, 1>(
-      C, A); // This implies that a Tvmult is necessary
+    const Tensor<1, dim, double> B =
+      double_contract<0, 0, 1, 1>(C,
+                                  A); // This implies that a Tvmult is necessary
 
     const Vector<double>     vA = Notation::Kelvin::to_vector(A);
     const FullMatrix<double> mC = Notation::Kelvin::to_matrix(C);

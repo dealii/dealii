@@ -61,12 +61,12 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData::
   InternalData(const FiniteElement<dim, spacedim> &fe,
-               const ComponentMask &               mask) :
-  unit_tangentials(),
-  n_shape_functions(fe.dofs_per_cell),
-  mask(mask),
-  local_dof_indices(fe.dofs_per_cell),
-  local_dof_values(fe.dofs_per_cell)
+               const ComponentMask &               mask)
+  : unit_tangentials()
+  , n_shape_functions(fe.dofs_per_cell)
+  , mask(mask)
+  , local_dof_indices(fe.dofs_per_cell)
+  , local_dof_values(fe.dofs_per_cell)
 {}
 
 
@@ -89,8 +89,9 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::shape(
   const unsigned int shape_nr)
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_values.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_values.size()));
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -101,8 +102,9 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   derivative(const unsigned int qpoint, const unsigned int shape_nr) const
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_derivatives.size()));
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -114,8 +116,9 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_derivatives.size()));
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -234,18 +237,18 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
   const DoFHandlerType &euler_dof_handler,
   const VectorType &    euler_vector,
-  const ComponentMask & mask) :
-  euler_vector(&euler_vector),
-  euler_dof_handler(&euler_dof_handler),
-  fe_mask(
-    mask.size() ?
-      mask :
-      ComponentMask(euler_dof_handler.get_fe().get_nonzero_components(0).size(),
-                    true)),
-  fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int),
-  fe_values(this->euler_dof_handler->get_fe(),
-            get_vertex_quadrature<dim>(),
-            update_values)
+  const ComponentMask & mask)
+  : euler_vector(&euler_vector)
+  , euler_dof_handler(&euler_dof_handler)
+  , fe_mask(mask.size() ?
+              mask :
+              ComponentMask(
+                euler_dof_handler.get_fe().get_nonzero_components(0).size(),
+                true))
+  , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  , fe_values(this->euler_dof_handler->get_fe(),
+              get_vertex_quadrature<dim>(),
+              update_values)
 {
   unsigned int size = 0;
   for (unsigned int i = 0; i < fe_mask.size(); ++i)
@@ -259,14 +262,14 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
 
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
-  const MappingFEField<dim, spacedim, VectorType, DoFHandlerType> &mapping) :
-  euler_vector(mapping.euler_vector),
-  euler_dof_handler(mapping.euler_dof_handler),
-  fe_mask(mapping.fe_mask),
-  fe_to_real(mapping.fe_to_real),
-  fe_values(mapping.euler_dof_handler->get_fe(),
-            get_vertex_quadrature<dim>(),
-            update_values)
+  const MappingFEField<dim, spacedim, VectorType, DoFHandlerType> &mapping)
+  : euler_vector(mapping.euler_vector)
+  , euler_dof_handler(mapping.euler_dof_handler)
+  , fe_mask(mapping.fe_mask)
+  , fe_to_real(mapping.fe_to_real)
+  , fe_values(mapping.euler_dof_handler->get_fe(),
+              get_vertex_quadrature<dim>(),
+              update_values)
 {}
 
 
@@ -278,8 +281,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData::shape(
   const unsigned int shape_nr) const
 {
   Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(
-           qpoint * n_shape_functions + shape_nr, 0, shape_values.size()));
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
+                       shape_values.size()));
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -1574,10 +1578,10 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(
-        !(update_flags & update_normal_vectors) ||
-          (output_data.normal_vectors.size() == n_q_points),
-        ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
+      Assert(!(update_flags & update_normal_vectors) ||
+               (output_data.normal_vectors.size() == n_q_points),
+             ExcDimensionMismatch(output_data.normal_vectors.size(),
+                                  n_q_points));
 
 
       if (cell_similarity != CellSimilarity::translation)
@@ -1627,9 +1631,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
                   {
                     if (update_flags & update_normal_vectors)
                       {
-                        Assert(
-                          spacedim - dim == 1,
-                          ExcMessage("There is no cell normal in codim 2."));
+                        Assert(spacedim - dim == 1,
+                               ExcMessage(
+                                 "There is no cell normal in codim 2."));
 
                         if (dim == 1)
                           output_data.normal_vectors[point] =
@@ -1818,14 +1822,14 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
       cell,
       face_no,
       numbers::invalid_unsigned_int,
-      QProjector<dim>::DataSetDescriptor::subface(
-        face_no,
-        subface_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
-        quadrature.size(),
-        cell->subface_case(face_no)),
+      QProjector<dim>::DataSetDescriptor::subface(face_no,
+                                                  subface_no,
+                                                  cell->face_orientation(
+                                                    face_no),
+                                                  cell->face_flip(face_no),
+                                                  cell->face_rotation(face_no),
+                                                  quadrature.size(),
+                                                  cell->subface_case(face_no)),
       quadrature,
       data,
       euler_dof_handler->get_fe(),
@@ -1989,8 +1993,10 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   AssertDimension(input.size(), output.size());
 
   internal::MappingFEFieldImplementation::
-    transform_fields<dim, spacedim, 1, VectorType, DoFHandlerType>(
-      input, mapping_type, mapping_data, output);
+    transform_fields<dim, spacedim, 1, VectorType, DoFHandlerType>(input,
+                                                                   mapping_type,
+                                                                   mapping_data,
+                                                                   output);
 }
 
 
@@ -2181,8 +2187,10 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
 
   update_internal_dofs(cell, dynamic_cast<InternalData &>(*mdata));
 
-  return do_transform_real_to_unit_cell(
-    cell, p, initial_p_unit, dynamic_cast<InternalData &>(*mdata));
+  return do_transform_real_to_unit_cell(cell,
+                                        p,
+                                        initial_p_unit,
+                                        dynamic_cast<InternalData &>(*mdata));
 }
 
 
@@ -2340,8 +2348,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::update_internal_dofs(
   dof_cell->get_dof_indices(data.local_dof_indices);
 
   for (unsigned int i = 0; i < data.local_dof_values.size(); ++i)
-    data.local_dof_values[i] = internal::ElementAccess<VectorType>::get(
-      *euler_vector, data.local_dof_indices[i]);
+    data.local_dof_values[i] =
+      internal::ElementAccess<VectorType>::get(*euler_vector,
+                                               data.local_dof_indices[i]);
 }
 
 // explicit instantiations

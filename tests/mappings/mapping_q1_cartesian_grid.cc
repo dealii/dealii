@@ -41,10 +41,10 @@ public:
   static constexpr int dim = 2;
 
 public:
-  RefineTest(const unsigned int refine_case) :
-    triangulation(),
-    dof_handler(triangulation),
-    refine_case(refine_case)
+  RefineTest(const unsigned int refine_case)
+    : triangulation()
+    , dof_handler(triangulation)
+    , refine_case(refine_case)
   {
     make_grid();
     test_mapping();

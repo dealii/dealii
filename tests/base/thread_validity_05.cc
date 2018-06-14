@@ -26,7 +26,8 @@
 
 struct X
 {
-  X(int i) : i(i)
+  X(int i)
+    : i(i)
   {}
   int i;
 
@@ -61,7 +62,8 @@ test1()
 
 struct Y
 {
-  Y(int i) : i(i)
+  Y(int i)
+    : i(i)
   {}
   int i;
 

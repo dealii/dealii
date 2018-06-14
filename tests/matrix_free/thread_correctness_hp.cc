@@ -38,7 +38,8 @@ template <int dim, typename Number>
 class MatrixFreeTestHP
 {
 public:
-  MatrixFreeTestHP(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTestHP(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   local_apply(const MatrixFree<dim, Number> &              data,
@@ -49,11 +50,13 @@ public:
     // Ask MatrixFree for cell_range for different
     // orders
     std::pair<unsigned int, unsigned int> subrange_deg;
-#define CALL_METHOD(degree)                                        \
-  subrange_deg = data.create_cell_subrange_hp(cell_range, degree); \
-  if (subrange_deg.second > subrange_deg.first)                    \
-  helmholtz_operator<dim, degree, Vector<Number>, degree + 1>(     \
-    data, dst, src, subrange_deg)
+#define CALL_METHOD(degree)                                         \
+  subrange_deg = data.create_cell_subrange_hp(cell_range, degree);  \
+  if (subrange_deg.second > subrange_deg.first)                     \
+  helmholtz_operator<dim, degree, Vector<Number>, degree + 1>(data, \
+                                                              dst,  \
+                                                              src,  \
+                                                              subrange_deg)
 
     CALL_METHOD(1);
     CALL_METHOD(2);
@@ -130,8 +133,10 @@ do_test(const unsigned int parallel_option)
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   // std::cout << "Number of cells: " <<

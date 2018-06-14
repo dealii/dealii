@@ -39,27 +39,27 @@ namespace TrilinosWrappers
 {
   SolverBase::AdditionalData::AdditionalData(
     const bool         output_solver_details,
-    const unsigned int gmres_restart_parameter) :
-    output_solver_details(output_solver_details),
-    gmres_restart_parameter(gmres_restart_parameter)
+    const unsigned int gmres_restart_parameter)
+    : output_solver_details(output_solver_details)
+    , gmres_restart_parameter(gmres_restart_parameter)
   {}
 
 
 
-  SolverBase::SolverBase(SolverControl &cn, const AdditionalData &data) :
-    solver_name(gmres),
-    solver_control(cn),
-    additional_data(data)
+  SolverBase::SolverBase(SolverControl &cn, const AdditionalData &data)
+    : solver_name(gmres)
+    , solver_control(cn)
+    , additional_data(data)
   {}
 
 
 
   SolverBase::SolverBase(const SolverBase::SolverName solver_name,
                          SolverControl &              cn,
-                         const AdditionalData &       data) :
-    solver_name(solver_name),
-    solver_control(cn),
-    additional_data(data)
+                         const AdditionalData &       data)
+    : solver_name(solver_name)
+    , solver_control(cn)
+    , additional_data(data)
   {}
 
 
@@ -186,8 +186,9 @@ namespace TrilinosWrappers
            ExcMessage("Matrix is not compressed. Call compress() method."));
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View,
+                       A.range_partitioner(),
+                       const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -206,8 +207,9 @@ namespace TrilinosWrappers
                     const PreconditionBase &      preconditioner)
   {
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.OperatorRangeMap(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View,
+                       A.OperatorRangeMap(),
+                       const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -227,16 +229,17 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
-      A.domain_partitioner().NumMyElements());
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
-      A.range_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                      x.local_size()),
+                    A.domain_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                      b.local_size()),
+                    A.range_partitioner().NumMyElements());
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View,
+                       A.range_partitioner(),
+                       const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -254,16 +257,17 @@ namespace TrilinosWrappers
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                     const PreconditionBase &preconditioner)
   {
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
-      A.OperatorDomainMap().NumMyElements());
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
-      A.OperatorRangeMap().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                      x.local_size()),
+                    A.OperatorDomainMap().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                      b.local_size()),
+                    A.OperatorRangeMap().NumMyElements());
 
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.OperatorRangeMap(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View,
+                       A.OperatorRangeMap(),
+                       const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -319,8 +323,10 @@ namespace TrilinosWrappers
           if (CurrentIter == 0)
             initial_residual = current_residual;
 
-          return status_test_collection->CheckStatus(
-            CurrentIter, CurrentResVector, CurrentResNormEst, SolutionUpdated);
+          return status_test_collection->CheckStatus(CurrentIter,
+                                                     CurrentResVector,
+                                                     CurrentResNormEst,
+                                                     SolutionUpdated);
         }
 
         virtual AztecOO_StatusType
@@ -361,9 +367,9 @@ namespace TrilinosWrappers
         const int &                 max_steps,
         const double &              tolerance,
         const double &              reduction,
-        const Epetra_LinearProblem &linear_problem) :
-        initial_residual(std::numeric_limits<double>::max()),
-        current_residual(std::numeric_limits<double>::max())
+        const Epetra_LinearProblem &linear_problem)
+        : initial_residual(std::numeric_limits<double>::max())
+        , current_residual(std::numeric_limits<double>::max())
       {
         // Consider linear problem converged if any of the collection
         // of criterion are met
@@ -447,8 +453,9 @@ namespace TrilinosWrappers
     set_preconditioner(solver, preconditioner);
 
     // ... set some options, ...
-    solver.SetAztecOption(
-      AZ_output, additional_data.output_solver_details ? AZ_all : AZ_none);
+    solver.SetAztecOption(AZ_output,
+                          additional_data.output_solver_details ? AZ_all :
+                                                                  AZ_none);
     solver.SetAztecOption(AZ_conv, AZ_noscaled);
 
     // By default, the Trilinos solver chooses convergence criterion based on
@@ -591,15 +598,15 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverCG ------------------------ */
 
-  SolverCG::AdditionalData::AdditionalData(const bool output_solver_details) :
-    SolverBase::AdditionalData(output_solver_details)
+  SolverCG::AdditionalData::AdditionalData(const bool output_solver_details)
+    : SolverBase::AdditionalData(output_solver_details)
   {}
 
 
 
-  SolverCG::SolverCG(SolverControl &cn, const AdditionalData &data) :
-    SolverBase(cn, data),
-    additional_data(data)
+  SolverCG::SolverCG(SolverControl &cn, const AdditionalData &data)
+    : SolverBase(cn, data)
+    , additional_data(data)
   {
     solver_name = cg;
   }
@@ -609,15 +616,15 @@ namespace TrilinosWrappers
 
   SolverGMRES::AdditionalData::AdditionalData(
     const bool         output_solver_details,
-    const unsigned int restart_parameter) :
-    SolverBase::AdditionalData(output_solver_details, restart_parameter)
+    const unsigned int restart_parameter)
+    : SolverBase::AdditionalData(output_solver_details, restart_parameter)
   {}
 
 
 
-  SolverGMRES::SolverGMRES(SolverControl &cn, const AdditionalData &data) :
-    SolverBase(cn, data),
-    additional_data(data)
+  SolverGMRES::SolverGMRES(SolverControl &cn, const AdditionalData &data)
+    : SolverBase(cn, data)
+    , additional_data(data)
   {
     solver_name = gmres;
   }
@@ -626,16 +633,15 @@ namespace TrilinosWrappers
   /* ---------------------- SolverBicgstab ------------------------ */
 
   SolverBicgstab::AdditionalData::AdditionalData(
-    const bool output_solver_details) :
-    SolverBase::AdditionalData(output_solver_details)
+    const bool output_solver_details)
+    : SolverBase::AdditionalData(output_solver_details)
   {}
 
 
 
-  SolverBicgstab::SolverBicgstab(SolverControl &       cn,
-                                 const AdditionalData &data) :
-    SolverBase(cn, data),
-    additional_data(data)
+  SolverBicgstab::SolverBicgstab(SolverControl &cn, const AdditionalData &data)
+    : SolverBase(cn, data)
+    , additional_data(data)
   {
     solver_name = bicgstab;
   }
@@ -643,15 +649,15 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverCGS ------------------------ */
 
-  SolverCGS::AdditionalData::AdditionalData(const bool output_solver_details) :
-    SolverBase::AdditionalData(output_solver_details)
+  SolverCGS::AdditionalData::AdditionalData(const bool output_solver_details)
+    : SolverBase::AdditionalData(output_solver_details)
   {}
 
 
 
-  SolverCGS::SolverCGS(SolverControl &cn, const AdditionalData &data) :
-    SolverBase(cn, data),
-    additional_data(data)
+  SolverCGS::SolverCGS(SolverControl &cn, const AdditionalData &data)
+    : SolverBase(cn, data)
+    , additional_data(data)
   {
     solver_name = cgs;
   }
@@ -659,16 +665,15 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverTFQMR ------------------------ */
 
-  SolverTFQMR::AdditionalData::AdditionalData(
-    const bool output_solver_details) :
-    SolverBase::AdditionalData(output_solver_details)
+  SolverTFQMR::AdditionalData::AdditionalData(const bool output_solver_details)
+    : SolverBase::AdditionalData(output_solver_details)
   {}
 
 
 
-  SolverTFQMR::SolverTFQMR(SolverControl &cn, const AdditionalData &data) :
-    SolverBase(cn, data),
-    additional_data(data)
+  SolverTFQMR::SolverTFQMR(SolverControl &cn, const AdditionalData &data)
+    : SolverBase(cn, data)
+    , additional_data(data)
   {
     solver_name = tfqmr;
   }
@@ -678,16 +683,16 @@ namespace TrilinosWrappers
   /* ---------------------- SolverDirect ------------------------ */
 
   SolverDirect::AdditionalData::AdditionalData(const bool output_solver_details,
-                                               const std::string &solver_type) :
-    output_solver_details(output_solver_details),
-    solver_type(solver_type)
+                                               const std::string &solver_type)
+    : output_solver_details(output_solver_details)
+    , solver_type(solver_type)
   {}
 
 
 
-  SolverDirect::SolverDirect(SolverControl &cn, const AdditionalData &data) :
-    solver_control(cn),
-    additional_data(data.output_solver_details, data.solver_type)
+  SolverDirect::SolverDirect(SolverControl &cn, const AdditionalData &data)
+    : solver_control(cn)
+    , additional_data(data.output_solver_details, data.solver_type)
   {}
 
 
@@ -724,13 +729,13 @@ namespace TrilinosWrappers
     // solver, if possible.
     Amesos Factory;
 
-    AssertThrow(
-      Factory.Query(additional_data.solver_type.c_str()),
-      ExcMessage(std::string("You tried to select the solver type <") +
-                 additional_data.solver_type +
-                 "> but this solver is not supported by Trilinos either "
-                 "because it does not exist, or because Trilinos was not "
-                 "configured for its use."));
+    AssertThrow(Factory.Query(additional_data.solver_type.c_str()),
+                ExcMessage(
+                  std::string("You tried to select the solver type <") +
+                  additional_data.solver_type +
+                  "> but this solver is not supported by Trilinos either "
+                  "because it does not exist, or because Trilinos was not "
+                  "configured for its use."));
 
     solver.reset(
       Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
@@ -778,8 +783,9 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    Epetra_Vector ep_x(
-      View, linear_problem->GetOperator()->OperatorDomainMap(), x.begin());
+    Epetra_Vector ep_x(View,
+                       linear_problem->GetOperator()->OperatorDomainMap(),
+                       x.begin());
     Epetra_Vector ep_b(View,
                        linear_problem->GetOperator()->OperatorRangeMap(),
                        const_cast<double *>(b.begin()));
@@ -823,13 +829,13 @@ namespace TrilinosWrappers
     // solver, if possible.
     Amesos Factory;
 
-    AssertThrow(
-      Factory.Query(additional_data.solver_type.c_str()),
-      ExcMessage(std::string("You tried to select the solver type <") +
-                 additional_data.solver_type +
-                 "> but this solver is not supported by Trilinos either "
-                 "because it does not exist, or because Trilinos was not "
-                 "configured for its use."));
+    AssertThrow(Factory.Query(additional_data.solver_type.c_str()),
+                ExcMessage(
+                  std::string("You tried to select the solver type <") +
+                  additional_data.solver_type +
+                  "> but this solver is not supported by Trilinos either "
+                  "because it does not exist, or because Trilinos was not "
+                  "configured for its use."));
 
     solver.reset(
       Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
@@ -887,8 +893,9 @@ namespace TrilinosWrappers
     Assert(A.local_range().second == A.m(),
            ExcMessage("Can only work in serial when using deal.II vectors."));
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View,
+                       A.range_partitioner(),
+                       const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
@@ -906,15 +913,16 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
-      A.domain_partitioner().NumMyElements());
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
-      A.range_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                      x.local_size()),
+                    A.domain_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                      b.local_size()),
+                    A.range_partitioner().NumMyElements());
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View,
+                       A.range_partitioner(),
+                       const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.

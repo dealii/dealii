@@ -74,28 +74,29 @@ test()
 
   // send everything to processor 0 for output
   std::vector<types::global_dof_index> complete_renumbering(dofh.n_dofs());
-  std::copy(
-    renumbering.begin(), renumbering.end(), complete_renumbering.begin());
+  std::copy(renumbering.begin(),
+            renumbering.end(),
+            complete_renumbering.begin());
   unsigned int offset = renumbering.size();
   for (unsigned int i = 1; i < nprocs; ++i)
     {
       if (myid == i)
-        MPI_Send(
-          &renumbering[0],
-          renumbering.size(),
-          Utilities::MPI::internal::mpi_type_id(&complete_renumbering[0]),
-          0,
-          i,
-          MPI_COMM_WORLD);
+        MPI_Send(&renumbering[0],
+                 renumbering.size(),
+                 Utilities::MPI::internal::mpi_type_id(
+                   &complete_renumbering[0]),
+                 0,
+                 i,
+                 MPI_COMM_WORLD);
       else if (myid == 0)
-        MPI_Recv(
-          &complete_renumbering[offset],
-          dofh.locally_owned_dofs_per_processor()[i].n_elements(),
-          Utilities::MPI::internal::mpi_type_id(&complete_renumbering[0]),
-          i,
-          i,
-          MPI_COMM_WORLD,
-          MPI_STATUSES_IGNORE);
+        MPI_Recv(&complete_renumbering[offset],
+                 dofh.locally_owned_dofs_per_processor()[i].n_elements(),
+                 Utilities::MPI::internal::mpi_type_id(
+                   &complete_renumbering[0]),
+                 i,
+                 i,
+                 MPI_COMM_WORLD,
+                 MPI_STATUSES_IGNORE);
       offset += dofh.locally_owned_dofs_per_processor()[i].n_elements();
     }
 

@@ -32,16 +32,16 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree) :
-  FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
-    TensorProductPolynomialsConst<dim>(
-      Polynomials::generate_complete_Lagrange_basis(
-        QGaussLobatto<1>(degree + 1).get_points())),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
-    get_riaf_vector(degree))
+FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
+  : FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
+      TensorProductPolynomialsConst<dim>(
+        Polynomials::generate_complete_Lagrange_basis(
+          QGaussLobatto<1>(degree + 1).get_points())),
+      FiniteElementData<dim>(get_dpo_vector(degree),
+                             1,
+                             degree,
+                             FiniteElementData<dim>::L2),
+      get_riaf_vector(degree))
 {
   Assert(degree > 0,
          ExcMessage("This element can only be used for polynomial degrees "
@@ -60,15 +60,15 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree) :
 
 
 template <int dim, int spacedim>
-FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points) :
-  FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
-    TensorProductPolynomialsConst<dim>(
-      Polynomials::generate_complete_Lagrange_basis(points.get_points())),
-    FiniteElementData<dim>(get_dpo_vector(points.size() - 1),
-                           1,
-                           points.size() - 1,
-                           FiniteElementData<dim>::L2),
-    get_riaf_vector(points.size() - 1))
+FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
+  : FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
+      TensorProductPolynomialsConst<dim>(
+        Polynomials::generate_complete_Lagrange_basis(points.get_points())),
+      FiniteElementData<dim>(get_dpo_vector(points.size() - 1),
+                             1,
+                             points.size() - 1,
+                             FiniteElementData<dim>::L2),
+      get_riaf_vector(points.size() - 1))
 {
   const int degree = points.size() - 1;
   (void)degree;
@@ -124,9 +124,9 @@ FE_Q_DG0<dim, spacedim>::get_name() const
         }
     }
   // Do not consider the discontinuous node for dimension 1
-  Assert(
-    index == n_points || (dim == 1 && index == n_points + 1),
-    ExcMessage("Could not decode support points in one coordinate direction."));
+  Assert(index == n_points || (dim == 1 && index == n_points + 1),
+         ExcMessage(
+           "Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j < n_points; j++)
@@ -188,9 +188,9 @@ FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
                               this->unit_support_points.size()));
   Assert(nodal_dofs.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_dofs.size(), this->dofs_per_cell));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(),
+                              this->n_components()));
 
   for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
     {
@@ -221,9 +221,9 @@ FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
 
   Assert(interpolation_matrix.m() == this->dofs_per_cell,
          ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(
-    interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_cell));
+  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_cell));
 
   this->FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
     get_interpolation_matrix(x_source_fe, interpolation_matrix);

@@ -38,10 +38,10 @@ DEAL_II_NAMESPACE_OPEN
 
 #  ifdef DEAL_II_WITH_64BIT_INDICES
 
-IndexSet::IndexSet(const Epetra_Map &map) :
-  is_compressed(true),
-  index_space_size(1 + map.MaxAllGID64()),
-  largest_range(numbers::invalid_unsigned_int)
+IndexSet::IndexSet(const Epetra_Map &map)
+  : is_compressed(true)
+  , index_space_size(1 + map.MaxAllGID64())
+  , largest_range(numbers::invalid_unsigned_int)
 {
   Assert(map.MinAllGID64() == 0,
          ExcMessage("The Epetra_Map does not contain the global index 0, which "
@@ -64,10 +64,10 @@ IndexSet::IndexSet(const Epetra_Map &map) :
 
 // this is the standard 32-bit implementation
 
-IndexSet::IndexSet(const Epetra_Map &map) :
-  is_compressed(true),
-  index_space_size(1 + map.MaxAllGID()),
-  largest_range(numbers::invalid_unsigned_int)
+IndexSet::IndexSet(const Epetra_Map &map)
+  : is_compressed(true)
+  , index_space_size(1 + map.MaxAllGID())
+  , largest_range(numbers::invalid_unsigned_int)
 {
   Assert(map.MinAllGID() == 0,
          ExcMessage("The Epetra_Map does not contain the global index 0, which "
@@ -111,9 +111,10 @@ IndexSet::add_range(const size_type begin, const size_type end)
       if (ranges.size() == 0 || begin > ranges.back().end)
         ranges.push_back(new_range);
       else
-        ranges.insert(
-          Utilities::lower_bound(ranges.begin(), ranges.end(), new_range),
-          new_range);
+        ranges.insert(Utilities::lower_bound(ranges.begin(),
+                                             ranges.end(),
+                                             new_range),
+                      new_range);
       is_compressed = false;
     }
 }
@@ -380,8 +381,9 @@ IndexSet::add_indices(const IndexSet &other, const unsigned int offset)
 
   Assert(other.ranges.size() == 0 ||
            other.ranges.back().end - 1 < index_space_size,
-         ExcIndexRangeType<size_type>(
-           other.ranges.back().end - 1, 0, index_space_size));
+         ExcIndexRangeType<size_type>(other.ranges.back().end - 1,
+                                      0,
+                                      index_space_size));
 
   compress();
   other.compress();

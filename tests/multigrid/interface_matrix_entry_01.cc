@@ -100,8 +100,9 @@ test()
   Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(0.0);
   dirichlet_boundary_ids.insert(0);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  VectorTools::interpolate_boundary_values(
-    mg_dof_handler, dirichlet_boundary, constraints);
+  VectorTools::interpolate_boundary_values(mg_dof_handler,
+                                           dirichlet_boundary,
+                                           constraints);
   constraints.close();
 
   mg_constrained_dofs.clear();
@@ -113,8 +114,10 @@ test()
     {
       DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(level),
                                  mg_dof_handler.n_dofs(level));
-      MGTools::make_interface_sparsity_pattern(
-        mg_dof_handler, mg_constrained_dofs, dsp, level);
+      MGTools::make_interface_sparsity_pattern(mg_dof_handler,
+                                               mg_constrained_dofs,
+                                               dsp,
+                                               level);
       dsp.print(deallog.get_file_stream());
     }
 }

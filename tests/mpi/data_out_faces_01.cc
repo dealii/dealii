@@ -79,11 +79,11 @@ namespace pdd
 
   // The constructor and destructor of the class
   template <int dim>
-  PDDProblem<dim>::PDDProblem() :
-    mpi_communicator(MPI_COMM_WORLD),
-    triangulation(mpi_communicator),
-    dof_handler(triangulation),
-    fe(1)
+  PDDProblem<dim>::PDDProblem()
+    : mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator)
+    , dof_handler(triangulation)
+    , fe(1)
   {}
 
 
@@ -139,8 +139,9 @@ namespace pdd
     // First generate an output for the cells
     const unsigned int cycle = 1;
 
-    PETScWrappers::MPI::Vector solution(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    PETScWrappers::MPI::Vector solution(locally_owned_dofs,
+                                        locally_relevant_dofs,
+                                        mpi_communicator);
     solution = locally_relevant_solution;
 
     DataOut<dim> data_out;

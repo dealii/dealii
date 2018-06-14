@@ -572,8 +572,9 @@ namespace MeshWorker
                                                  info.indices_by_block[i];
 
               if (constraints != nullptr)
-                constraints->distribute_local_to_global(
-                  info.vector(k).block(i), ldi, *v);
+                constraints->distribute_local_to_global(info.vector(k).block(i),
+                                                        ldi,
+                                                        *v);
               else
                 v->add(ldi, info.vector(k).block(i));
             }
@@ -594,8 +595,8 @@ namespace MeshWorker
     //----------------------------------------------------------------------//
 
     template <typename MatrixType>
-    inline MatrixSimple<MatrixType>::MatrixSimple(double threshold) :
-      threshold(threshold)
+    inline MatrixSimple<MatrixType>::MatrixSimple(double threshold)
+      : threshold(threshold)
     {}
 
 
@@ -726,14 +727,22 @@ namespace MeshWorker
         {
           for (unsigned int m = 0; m < matrix.size(); ++m)
             {
-              assemble(
-                info1.matrix(m, false).matrix, m, info1.indices, info1.indices);
-              assemble(
-                info1.matrix(m, true).matrix, m, info1.indices, info2.indices);
-              assemble(
-                info2.matrix(m, false).matrix, m, info2.indices, info2.indices);
-              assemble(
-                info2.matrix(m, true).matrix, m, info2.indices, info1.indices);
+              assemble(info1.matrix(m, false).matrix,
+                       m,
+                       info1.indices,
+                       info1.indices);
+              assemble(info1.matrix(m, true).matrix,
+                       m,
+                       info1.indices,
+                       info2.indices);
+              assemble(info2.matrix(m, false).matrix,
+                       m,
+                       info2.indices,
+                       info2.indices);
+              assemble(info2.matrix(m, true).matrix,
+                       m,
+                       info2.indices,
+                       info1.indices);
             }
         }
       else
@@ -769,8 +778,8 @@ namespace MeshWorker
     //----------------------------------------------------------------------//
 
     template <typename MatrixType>
-    inline MGMatrixSimple<MatrixType>::MGMatrixSimple(double threshold) :
-      threshold(threshold)
+    inline MGMatrixSimple<MatrixType>::MGMatrixSimple(double threshold)
+      : threshold(threshold)
     {}
 
 
@@ -1219,8 +1228,8 @@ namespace MeshWorker
     //----------------------------------------------------------------------//
 
     template <typename MatrixType, typename VectorType>
-    SystemSimple<MatrixType, VectorType>::SystemSimple(double t) :
-      MatrixSimple<MatrixType>(t)
+    SystemSimple<MatrixType, VectorType>::SystemSimple(double t)
+      : MatrixSimple<MatrixType>(t)
     {}
 
 
@@ -1278,8 +1287,9 @@ namespace MeshWorker
           for (unsigned int j = 0; j < indices.size(); ++j)
             for (unsigned int k = 0; k < indices.size(); ++k)
               if (std::fabs(M(j, k)) >= MatrixSimple<MatrixType>::threshold)
-                MatrixSimple<MatrixType>::matrix[index]->add(
-                  indices[j], indices[k], M(j, k));
+                MatrixSimple<MatrixType>::matrix[index]->add(indices[j],
+                                                             indices[k],
+                                                             M(j, k));
         }
       else
         {
@@ -1313,8 +1323,9 @@ namespace MeshWorker
           for (unsigned int j = 0; j < i1.size(); ++j)
             for (unsigned int k = 0; k < i2.size(); ++k)
               if (std::fabs(M(j, k)) >= MatrixSimple<MatrixType>::threshold)
-                MatrixSimple<MatrixType>::matrix[index]->add(
-                  i1[j], i2[k], M(j, k));
+                MatrixSimple<MatrixType>::matrix[index]->add(i1[j],
+                                                             i2[k],
+                                                             M(j, k));
         }
       else
         {

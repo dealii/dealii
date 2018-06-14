@@ -50,8 +50,10 @@ test()
   std::vector<unsigned int> ref(2);
   ref[0] = 100;
   ref[1] = 3;
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, ref, Point<2>(), Point<2>(100, 3));
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            ref,
+                                            Point<2>(),
+                                            Point<2>(100, 3));
 
   // refine all cells at the lower
   // boundary. we then have 600 cells

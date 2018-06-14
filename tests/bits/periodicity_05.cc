@@ -85,7 +85,9 @@ private:
   ConstraintMatrix constraints;
 };
 
-Deal2PeriodicBug::Deal2PeriodicBug() : fe(2), dof_handler(triangulation)
+Deal2PeriodicBug::Deal2PeriodicBug()
+  : fe(2)
+  , dof_handler(triangulation)
 {}
 
 

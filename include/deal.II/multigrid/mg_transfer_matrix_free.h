@@ -492,8 +492,9 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
   MGLevelObject<IndexSet> relevant_dofs(min_level, max_level);
   for (unsigned int level = min_level; level <= max_level; ++level)
     {
-      DoFTools::extract_locally_relevant_level_dofs(
-        dof_handler, level, relevant_dofs[level]);
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                    level,
+                                                    relevant_dofs[level]);
       if (dst[level].size() !=
             dof_handler.locally_owned_mg_dofs(level).size() ||
           dst[level].local_size() !=
@@ -574,11 +575,11 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
   const LinearAlgebra::distributed::BlockVector<Number2> &        src) const
 {
   AssertDimension(matrix_free_transfer_vector.size(), 1);
-  Assert(
-    same_for_all,
-    ExcMessage("This object was initialized with support for usage with one "
-               "DoFHandler for each block, but this method assumes that "
-               "the same DoFHandler is used for all the blocks!"));
+  Assert(same_for_all,
+         ExcMessage(
+           "This object was initialized with support for usage with one "
+           "DoFHandler for each block, but this method assumes that "
+           "the same DoFHandler is used for all the blocks!"));
   const std::vector<const DoFHandler<dim, spacedim> *> mg_dofs(src.n_blocks(),
                                                                &mg_dof);
 
@@ -647,8 +648,9 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
       for (unsigned int l = min_level; l <= max_level; ++l)
         dst_non_block[l].reinit(dst[l].block(b));
       const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].copy_to_mg(
-        *mg_dof[b], dst_non_block, src.block(b));
+      matrix_free_transfer_vector[data_block].copy_to_mg(*mg_dof[b],
+                                                         dst_non_block,
+                                                         src.block(b));
 
       for (unsigned int l = min_level; l <= max_level; ++l)
         dst[l].block(b) = dst_non_block[l];
@@ -704,8 +706,9 @@ MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
           src_non_block[l] = src[l].block(b);
         }
       const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].copy_from_mg(
-        *mg_dof[b], dst.block(b), src_non_block);
+      matrix_free_transfer_vector[data_block].copy_from_mg(*mg_dof[b],
+                                                           dst.block(b),
+                                                           src_non_block);
     }
 }
 

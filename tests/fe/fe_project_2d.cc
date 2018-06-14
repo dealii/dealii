@@ -99,7 +99,8 @@ template <int dim>
 class VectorFunction : public Function<dim>
 {
 public:
-  VectorFunction() : Function<dim>(dim)
+  VectorFunction()
+    : Function<dim>(dim)
   {}
   virtual double
   value(const Point<dim> &p, const unsigned int component) const;
@@ -237,8 +238,10 @@ test(const FiniteElement<dim> &fe,
         triangulation.refine_global();
       else
         {
-          GridRefinement::refine_and_coarsen_fixed_number(
-            triangulation, diff, 0.3, 0.0);
+          GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                          diff,
+                                                          0.3,
+                                                          0.0);
           triangulation.prepare_coarsening_and_refinement();
           triangulation.execute_coarsening_and_refinement();
         }

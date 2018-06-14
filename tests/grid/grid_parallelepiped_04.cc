@@ -78,8 +78,10 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
 
   Triangulation<dim> triangulation;
 
-  GridGenerator::subdivided_parallelepiped(
-    triangulation, subd, corners, colorize);
+  GridGenerator::subdivided_parallelepiped(triangulation,
+                                           subd,
+                                           corners,
+                                           colorize);
 
   {
     std::map<unsigned int, unsigned int>              boundary_count;

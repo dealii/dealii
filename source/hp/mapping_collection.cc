@@ -35,8 +35,9 @@ namespace hp
 
   template <int dim, int spacedim>
   MappingCollection<dim, spacedim>::MappingCollection(
-    const MappingCollection<dim, spacedim> &mapping_collection) :
-    Subscriptor(),
+    const MappingCollection<dim, spacedim> &mapping_collection)
+    : Subscriptor()
+    ,
     // copy the array
     // of shared
     // pointers. nothing

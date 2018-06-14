@@ -424,13 +424,13 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
                                  interpolant_1);
 
             // then compute the interpolation error
-            VectorTools::integrate_difference(
-              dof_handler,
-              interpolant_1,
-              test_function,
-              error,
-              hp::QCollection<dim>(QGauss<dim>(min_degree)),
-              VectorTools::L2_norm);
+            VectorTools::integrate_difference(dof_handler,
+                                              interpolant_1,
+                                              test_function,
+                                              error,
+                                              hp::QCollection<dim>(
+                                                QGauss<dim>(min_degree)),
+                                              VectorTools::L2_norm);
             Assert(error.l2_norm() < 1e-12 * interpolant_1.l2_norm(),
                    ExcInternalError());
             deallog << "  Relative interpolation error before constraints: "

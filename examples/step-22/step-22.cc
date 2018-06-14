@@ -180,7 +180,8 @@ namespace Step22
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>(dim + 1)
+    BoundaryValues()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -220,7 +221,8 @@ namespace Step22
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -284,9 +286,9 @@ namespace Step22
   template <class MatrixType, class PreconditionerType>
   InverseMatrix<MatrixType, PreconditionerType>::InverseMatrix(
     const MatrixType &        m,
-    const PreconditionerType &preconditioner) :
-    matrix(&m),
-    preconditioner(&preconditioner)
+    const PreconditionerType &preconditioner)
+    : matrix(&m)
+    , preconditioner(&preconditioner)
   {}
 
 
@@ -348,11 +350,11 @@ namespace Step22
   template <class PreconditionerType>
   SchurComplement<PreconditionerType>::SchurComplement(
     const BlockSparseMatrix<double> &system_matrix,
-    const InverseMatrix<SparseMatrix<double>, PreconditionerType> &A_inverse) :
-    system_matrix(&system_matrix),
-    A_inverse(&A_inverse),
-    tmp1(system_matrix.block(0, 0).m()),
-    tmp2(system_matrix.block(0, 0).m())
+    const InverseMatrix<SparseMatrix<double>, PreconditionerType> &A_inverse)
+    : system_matrix(&system_matrix)
+    , A_inverse(&A_inverse)
+    , tmp1(system_matrix.block(0, 0).m())
+    , tmp2(system_matrix.block(0, 0).m())
   {}
 
 
@@ -386,11 +388,11 @@ namespace Step22
   // grids are too unstructured), see the documentation of
   // <code>Triangulation::MeshSmoothing</code> for details.
   template <int dim>
-  StokesProblem<dim>::StokesProblem(const unsigned int degree) :
-    degree(degree),
-    triangulation(Triangulation<dim>::maximum_smoothing),
-    fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1),
-    dof_handler(triangulation)
+  StokesProblem<dim>::StokesProblem(const unsigned int degree)
+    : degree(degree)
+    , triangulation(Triangulation<dim>::maximum_smoothing)
+    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , dof_handler(triangulation)
   {}
 
 
@@ -493,8 +495,9 @@ namespace Step22
     // <code>DoFTools::count_dofs_per_component</code>, but now grouped as
     // velocity and pressure block via <code>block_component</code>.
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     std::cout << "   Number of active cells: " << triangulation.n_active_cells()
@@ -943,8 +946,10 @@ namespace Step22
                                        estimated_error_per_cell,
                                        fe.component_mask(pressure));
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.0);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.0);
     triangulation.execute_coarsening_and_refinement();
   }
 
@@ -975,8 +980,10 @@ namespace Step22
       const Point<dim> top_right =
         (dim == 2 ? Point<dim>(2, 0) : Point<dim>(2, 1, 0));
 
-      GridGenerator::subdivided_hyper_rectangle(
-        triangulation, subdivisions, bottom_left, top_right);
+      GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                                subdivisions,
+                                                bottom_left,
+                                                top_right);
     }
 
     // A boundary indicator of 1 is set to all boundaries that are subject to

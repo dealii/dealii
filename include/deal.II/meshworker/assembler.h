@@ -593,8 +593,9 @@ namespace MeshWorker
     ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble(const DOFINFO &info)
     {
       for (unsigned int i = 0; i < residuals.size(); ++i)
-        assemble(
-          *(residuals.entry<VectorType>(i)), info.vector(i), info.indices);
+        assemble(*(residuals.entry<VectorType>(i)),
+                 info.vector(i),
+                 info.indices);
     }
 
 
@@ -607,10 +608,12 @@ namespace MeshWorker
     {
       for (unsigned int i = 0; i < residuals.size(); ++i)
         {
-          assemble(
-            *(residuals.entry<VectorType>(i)), info1.vector(i), info1.indices);
-          assemble(
-            *(residuals.entry<VectorType>(i)), info2.vector(i), info2.indices);
+          assemble(*(residuals.entry<VectorType>(i)),
+                   info1.vector(i),
+                   info1.indices);
+          assemble(*(residuals.entry<VectorType>(i)),
+                   info2.vector(i),
+                   info2.indices);
         }
     }
 
@@ -619,8 +622,8 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::
-      MatrixLocalBlocksToGlobalBlocks(double threshold) :
-      threshold(threshold)
+      MatrixLocalBlocksToGlobalBlocks(double threshold)
+      : threshold(threshold)
     {}
 
 
@@ -703,8 +706,10 @@ namespace MeshWorker
           for (unsigned int i = 0; i < sliced_col_indices.size(); ++i)
             sliced_col_indices[i] = dof2[bi.block_start(block_col) + i];
 
-          constraints->distribute_local_to_global(
-            local, sliced_row_indices, sliced_col_indices, global);
+          constraints->distribute_local_to_global(local,
+                                                  sliced_row_indices,
+                                                  sliced_col_indices,
+                                                  global);
         }
     }
 
@@ -778,8 +783,8 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::
-      MGMatrixLocalBlocksToGlobalBlocks(double threshold) :
-      threshold(threshold)
+      MGMatrixLocalBlocksToGlobalBlocks(double threshold)
+      : threshold(threshold)
     {}
 
 

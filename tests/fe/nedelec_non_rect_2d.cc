@@ -77,7 +77,8 @@ namespace polytest
   class SimplePolynomial : public Function<dim>
   {
   public:
-    SimplePolynomial() : Function<dim>(2)
+    SimplePolynomial()
+      : Function<dim>(2)
     {}
     void
     vector_value_list(const std::vector<Point<dim>> &points,
@@ -159,11 +160,11 @@ namespace polytest
   };
 
   template <int dim>
-  polytest<dim>::polytest(unsigned int degree) :
-    p_order(degree),
-    quad_order(2 * degree + 3),
-    dof_handler(tria),
-    fe(degree)
+  polytest<dim>::polytest(unsigned int degree)
+    : p_order(degree)
+    , quad_order(2 * degree + 3)
+    , dof_handler(tria)
+    , fe(degree)
   {}
   template <int dim>
   polytest<dim>::~polytest()
@@ -187,8 +188,10 @@ namespace polytest
       dof_handler, 0, boundary_function, 0, constraints);
     constraints.close();
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_sparsity_pattern(dof_handler,
+                                    c_sparsity,
+                                    constraints,
+                                    false);
 
     sparsity_pattern.copy_from(c_sparsity);
     system_matrix.reinit(sparsity_pattern);

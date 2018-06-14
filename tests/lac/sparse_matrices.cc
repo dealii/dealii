@@ -57,10 +57,12 @@ check_vmult_quadratic(std::vector<double> &residuals,
   GrowingVectorMemory<> mem;
 
   SolverControl      control(10, 1.e-13, false);
-  SolverRichardson<> rich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
-  SolverRichardson<> prich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
+  SolverRichardson<> rich(control,
+                          mem,
+                          SolverRichardson<>::AdditionalData(/*omega=*/.01));
+  SolverRichardson<> prich(control,
+                           mem,
+                           SolverRichardson<>::AdditionalData(/*omega=*/1.));
 
   const types::global_dof_index block_size =
     (types::global_dof_index)std::sqrt(A.n() + .3);
@@ -135,11 +137,13 @@ check_vmult_quadratic(std::vector<double> &            residuals,
   Vector<double>        f(A.m());
   GrowingVectorMemory<> mem;
 
-  SolverControl      control(10, 1.e-13, false);
-  SolverRichardson<> rich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
-  SolverRichardson<> prich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
+  SolverControl                                 control(10, 1.e-13, false);
+  SolverRichardson<>                            rich(control,
+                          mem,
+                          SolverRichardson<>::AdditionalData(/*omega=*/.01));
+  SolverRichardson<>                            prich(control,
+                           mem,
+                           SolverRichardson<>::AdditionalData(/*omega=*/1.));
   PreconditionIdentity                          identity;
   PreconditionJacobi<BlockSparseMatrix<double>> jacobi;
   jacobi.initialize(A, .5);

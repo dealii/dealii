@@ -442,10 +442,10 @@ namespace internal
                   {
                     const Point<dim> ei = Point<dim>::unit_vector(i);
                     const double     pi = p[i];
-                    Assert(
-                      pi >= 0 && pi <= 1.0,
-                      ExcInternalError("Was expecting a quadrature point "
-                                       "inside the unit reference element."));
+                    Assert(pi >= 0 && pi <= 1.0,
+                           ExcInternalError(
+                             "Was expecting a quadrature point "
+                             "inside the unit reference element."));
 
                     // In the length L, we store also the direction sign,
                     // which is positive, if the coordinate is < .5,
@@ -537,10 +537,10 @@ MappingManifold<dim, spacedim>::fill_fe_values(
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(
-        !(update_flags & update_normal_vectors) ||
-          (output_data.normal_vectors.size() == n_q_points),
-        ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
+      Assert(!(update_flags & update_normal_vectors) ||
+               (output_data.normal_vectors.size() == n_q_points),
+             ExcDimensionMismatch(output_data.normal_vectors.size(),
+                                  n_q_points));
 
 
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -589,15 +589,15 @@ MappingManifold<dim, spacedim>::fill_fe_values(
                 {
                   if (update_flags & update_normal_vectors)
                     {
-                      Assert(
-                        spacedim == dim + 1,
-                        ExcMessage("There is no (unique) cell normal for " +
-                                   Utilities::int_to_string(dim) +
-                                   "-dimensional cells in " +
-                                   Utilities::int_to_string(spacedim) +
-                                   "-dimensional space. This only works if the "
-                                   "space dimension is one greater than the "
-                                   "dimensionality of the mesh cells."));
+                      Assert(spacedim == dim + 1,
+                             ExcMessage(
+                               "There is no (unique) cell normal for " +
+                               Utilities::int_to_string(dim) +
+                               "-dimensional cells in " +
+                               Utilities::int_to_string(spacedim) +
+                               "-dimensional space. This only works if the "
+                               "space dimension is one greater than the "
+                               "dimensionality of the mesh cells."));
 
                       if (dim == 1)
                         output_data.normal_vectors[point] =
@@ -846,8 +846,9 @@ namespace internal
 
         data.manifold = &cell->face(face_no)->get_manifold();
 
-        maybe_compute_q_points<dim, spacedim>(
-          data_set, data, output_data.quadrature_points);
+        maybe_compute_q_points<dim, spacedim>(data_set,
+                                              data,
+                                              output_data.quadrature_points);
         maybe_update_Jacobians<dim, spacedim>(data_set, data);
 
         maybe_compute_face_data(mapping,
@@ -869,10 +870,10 @@ namespace internal
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingManifold<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -947,10 +948,10 @@ namespace internal
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingManifold<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -972,8 +973,9 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A = apply_transformation(
-                      data.contravariant[i], transpose(input[i]));
+                    DerivativeForm<1, spacedim, dim> A =
+                      apply_transformation(data.contravariant[i],
+                                           transpose(input[i]));
                     output[i] =
                       apply_transformation(data.covariant[i], A.transpose());
                   }
@@ -991,8 +993,9 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A = apply_transformation(
-                      data.covariant[i], transpose(input[i]));
+                    DerivativeForm<1, spacedim, dim> A =
+                      apply_transformation(data.covariant[i],
+                                           transpose(input[i]));
                     output[i] =
                       apply_transformation(data.covariant[i], A.transpose());
                   }
@@ -1020,8 +1023,9 @@ namespace internal
                   {
                     DerivativeForm<1, spacedim, dim> A =
                       apply_transformation(data.covariant[i], input[i]);
-                    Tensor<2, spacedim> T = apply_transformation(
-                      data.contravariant[i], A.transpose());
+                    Tensor<2, spacedim> T =
+                      apply_transformation(data.contravariant[i],
+                                           A.transpose());
 
                     output[i] = transpose(T);
                     output[i] /= data.volume_elements[i];
@@ -1046,10 +1050,10 @@ namespace internal
         const ArrayView<Tensor<3, spacedim>> &                   output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingManifold<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -1215,10 +1219,10 @@ namespace internal
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
         AssertDimension(input.size(), output.size());
-        Assert(
-          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
-                          InternalData *>(&mapping_data) != nullptr),
-          ExcInternalError());
+        Assert((dynamic_cast<const typename dealii::
+                               MappingManifold<dim, spacedim>::InternalData *>(
+                  &mapping_data) != nullptr),
+               ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -1323,8 +1327,10 @@ MappingManifold<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
-  internal::MappingManifoldImplementation::transform_fields(
-    input, mapping_type, mapping_data, output);
+  internal::MappingManifoldImplementation::transform_fields(input,
+                                                            mapping_type,
+                                                            mapping_data,
+                                                            output);
 }
 
 
@@ -1354,8 +1360,10 @@ MappingManifold<dim, spacedim>::transform(
   switch (mapping_type)
     {
       case mapping_contravariant:
-        internal::MappingManifoldImplementation::transform_fields(
-          input, mapping_type, mapping_data, output);
+        internal::MappingManifoldImplementation::transform_fields(input,
+                                                                  mapping_type,
+                                                                  mapping_data,
+                                                                  output);
         return;
 
       case mapping_piola_gradient:

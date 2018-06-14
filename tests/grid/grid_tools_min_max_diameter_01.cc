@@ -77,8 +77,9 @@ test(const unsigned int degree)
 
   // By using MappingQEulerian with the position vector, we are making
   // everything bigger by a factor 2.
-  MappingQEulerian<dim, Vector<double>, spacedim> map_fe(
-    degree, dof_sys, euler);
+  MappingQEulerian<dim, Vector<double>, spacedim> map_fe(degree,
+                                                         dof_sys,
+                                                         euler);
 
   deallog << "Min diameter        : " << GridTools::minimal_cell_diameter(tria)
           << std::endl

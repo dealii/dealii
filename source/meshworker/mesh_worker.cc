@@ -58,20 +58,20 @@ namespace MeshWorker
   template class LocalResults<double>;
 
   template <int dim, int spacedim, typename number>
-  LocalIntegrator<dim, spacedim, number>::LocalIntegrator() :
-    use_cell(true),
-    use_boundary(true),
-    use_face(true)
+  LocalIntegrator<dim, spacedim, number>::LocalIntegrator()
+    : use_cell(true)
+    , use_boundary(true)
+    , use_face(true)
   {}
 
 
   template <int dim, int spacedim, typename number>
   LocalIntegrator<dim, spacedim, number>::LocalIntegrator(bool c,
                                                           bool b,
-                                                          bool f) :
-    use_cell(c),
-    use_boundary(b),
-    use_face(f)
+                                                          bool f)
+    : use_cell(c)
+    , use_boundary(b)
+    , use_face(f)
   {}
 
 

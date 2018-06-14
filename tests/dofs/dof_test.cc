@@ -200,7 +200,9 @@ private:
 
 
 template <int dim>
-TestCases<dim>::TestCases() : tria(nullptr), dof(nullptr)
+TestCases<dim>::TestCases()
+  : tria(nullptr)
+  , dof(nullptr)
 {}
 
 

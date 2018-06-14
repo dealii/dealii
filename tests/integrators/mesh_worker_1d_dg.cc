@@ -115,11 +115,12 @@ namespace Advection
 
 
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem() :
-    mapping(1),
-    wavespeed(1.0),
-    dof_handler(triangulation),
-    fe(FE_DGQ<dim>(0), 1), // p=0, and solving for a scalar
+  AdvectionProblem<dim>::AdvectionProblem()
+    : mapping(1)
+    , wavespeed(1.0)
+    , dof_handler(triangulation)
+    , fe(FE_DGQ<dim>(0), 1)
+    , // p=0, and solving for a scalar
     upos(0)
   {}
 
@@ -219,8 +220,9 @@ namespace Advection
 
     MeshWorker::IntegrationInfoBox<dim> info_box;
 
-    info_box.initialize_gauss_quadrature(
-      n_gauss_points, n_gauss_points, n_gauss_points);
+    info_box.initialize_gauss_quadrature(n_gauss_points,
+                                         n_gauss_points,
+                                         n_gauss_points);
 
     info_box.initialize_update_flags();
     UpdateFlags update_flags =

@@ -217,7 +217,8 @@ namespace MeshWorker
     //----------------------------------------------------------------------//
 
     template <typename number>
-    inline CellsAndFaces<number>::CellsAndFaces() : separate_faces(true)
+    inline CellsAndFaces<number>::CellsAndFaces()
+      : separate_faces(true)
     {}
 
 

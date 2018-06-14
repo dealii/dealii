@@ -53,11 +53,13 @@ for (S1, S2 : REAL_SCALARS)
     template S2 SparseMatrix<S1>::matrix_norm_square<S2>(const Vector<S2> &)
       const;
 
-    template S2 SparseMatrix<S1>::matrix_scalar_product<S2>(
-      const Vector<S2> &, const Vector<S2> &) const;
+    template S2 SparseMatrix<S1>::matrix_scalar_product<S2>(const Vector<S2> &,
+                                                            const Vector<S2> &)
+      const;
 
-    template S2 SparseMatrix<S1>::residual<S2>(
-      Vector<S2> &, const Vector<S2> &, const Vector<S2> &) const;
+    template S2 SparseMatrix<S1>::residual<S2>(Vector<S2> &,
+                                               const Vector<S2> &,
+                                               const Vector<S2> &) const;
 
     template void SparseMatrix<S1>::precondition_SSOR<S2>(
       Vector<S2> &,
@@ -65,14 +67,17 @@ for (S1, S2 : REAL_SCALARS)
       const S1,
       const std::vector<std::size_t> &) const;
 
-    template void SparseMatrix<S1>::precondition_SOR<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::precondition_SOR<S2>(Vector<S2> &,
+                                                         const Vector<S2> &,
+                                                         const S1) const;
 
-    template void SparseMatrix<S1>::precondition_TSOR<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::precondition_TSOR<S2>(Vector<S2> &,
+                                                          const Vector<S2> &,
+                                                          const S1) const;
 
-    template void SparseMatrix<S1>::precondition_Jacobi<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::precondition_Jacobi<S2>(Vector<S2> &,
+                                                            const Vector<S2> &,
+                                                            const S1) const;
 
     template void SparseMatrix<S1>::SOR<S2>(Vector<S2> &, const S1) const;
     template void SparseMatrix<S1>::TSOR<S2>(Vector<S2> &, const S1) const;
@@ -85,14 +90,18 @@ for (S1, S2 : REAL_SCALARS)
                                               const std::vector<size_type> &,
                                               const std::vector<size_type> &,
                                               const S1) const;
-    template void SparseMatrix<S1>::Jacobi_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrix<S1>::SOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrix<S1>::TSOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrix<S1>::SSOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::Jacobi_step<S2>(Vector<S2> &,
+                                                    const Vector<S2> &,
+                                                    const S1) const;
+    template void SparseMatrix<S1>::SOR_step<S2>(Vector<S2> &,
+                                                 const Vector<S2> &,
+                                                 const S1) const;
+    template void SparseMatrix<S1>::TSOR_step<S2>(Vector<S2> &,
+                                                  const Vector<S2> &,
+                                                  const S1) const;
+    template void SparseMatrix<S1>::SSOR_step<S2>(Vector<S2> &,
+                                                  const Vector<S2> &,
+                                                  const S1) const;
   }
 
 for (S1, S2, S3 : REAL_SCALARS; V1, V2 : DEAL_II_VEC_TEMPLATES)
@@ -180,11 +189,13 @@ for (S1, S2 : COMPLEX_SCALARS)
     template S2 SparseMatrix<S1>::matrix_norm_square<S2>(const Vector<S2> &)
       const;
 
-    template S2 SparseMatrix<S1>::matrix_scalar_product<S2>(
-      const Vector<S2> &, const Vector<S2> &) const;
+    template S2 SparseMatrix<S1>::matrix_scalar_product<S2>(const Vector<S2> &,
+                                                            const Vector<S2> &)
+      const;
 
-    template S2 SparseMatrix<S1>::residual<S2>(
-      Vector<S2> &, const Vector<S2> &, const Vector<S2> &) const;
+    template S2 SparseMatrix<S1>::residual<S2>(Vector<S2> &,
+                                               const Vector<S2> &,
+                                               const Vector<S2> &) const;
 
     template void SparseMatrix<S1>::precondition_SSOR<S2>(
       Vector<S2> &,
@@ -192,14 +203,17 @@ for (S1, S2 : COMPLEX_SCALARS)
       const S1,
       const std::vector<std::size_t> &) const;
 
-    template void SparseMatrix<S1>::precondition_SOR<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::precondition_SOR<S2>(Vector<S2> &,
+                                                         const Vector<S2> &,
+                                                         const S1) const;
 
-    template void SparseMatrix<S1>::precondition_TSOR<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::precondition_TSOR<S2>(Vector<S2> &,
+                                                          const Vector<S2> &,
+                                                          const S1) const;
 
-    template void SparseMatrix<S1>::precondition_Jacobi<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::precondition_Jacobi<S2>(Vector<S2> &,
+                                                            const Vector<S2> &,
+                                                            const S1) const;
 
     template void SparseMatrix<S1>::SOR<S2>(Vector<S2> &, const S1) const;
     template void SparseMatrix<S1>::TSOR<S2>(Vector<S2> &, const S1) const;
@@ -212,14 +226,18 @@ for (S1, S2 : COMPLEX_SCALARS)
                                               const std::vector<size_type> &,
                                               const std::vector<size_type> &,
                                               const S1) const;
-    template void SparseMatrix<S1>::Jacobi_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrix<S1>::SOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrix<S1>::TSOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrix<S1>::SSOR_step<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrix<S1>::Jacobi_step<S2>(Vector<S2> &,
+                                                    const Vector<S2> &,
+                                                    const S1) const;
+    template void SparseMatrix<S1>::SOR_step<S2>(Vector<S2> &,
+                                                 const Vector<S2> &,
+                                                 const S1) const;
+    template void SparseMatrix<S1>::TSOR_step<S2>(Vector<S2> &,
+                                                  const Vector<S2> &,
+                                                  const S1) const;
+    template void SparseMatrix<S1>::SSOR_step<S2>(Vector<S2> &,
+                                                  const Vector<S2> &,
+                                                  const S1) const;
   }
 
 for (S1, S2, S3 : COMPLEX_SCALARS; V1, V2 : DEAL_II_VEC_TEMPLATES)

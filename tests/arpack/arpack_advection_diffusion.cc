@@ -107,10 +107,10 @@ private:
 
 
 template <int dim>
-EigenvalueProblem<dim>::EigenvalueProblem(unsigned int n_eigenvalues) :
-  fe(1),
-  dof_handler(triangulation),
-  n_eigenvalues(n_eigenvalues)
+EigenvalueProblem<dim>::EigenvalueProblem(unsigned int n_eigenvalues)
+  : fe(1)
+  , dof_handler(triangulation)
+  , n_eigenvalues(n_eigenvalues)
 {}
 
 
@@ -200,10 +200,12 @@ EigenvalueProblem<dim>::assemble_system()
 
       cell->get_dof_indices(local_dof_indices);
 
-      constraints.distribute_local_to_global(
-        cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-      constraints.distribute_local_to_global(
-        cell_mass_matrix, local_dof_indices, mass_matrix);
+      constraints.distribute_local_to_global(cell_stiffness_matrix,
+                                             local_dof_indices,
+                                             stiffness_matrix);
+      constraints.distribute_local_to_global(cell_mass_matrix,
+                                             local_dof_indices,
+                                             mass_matrix);
     }
 
   stiffness_matrix.compress(VectorOperation::add);

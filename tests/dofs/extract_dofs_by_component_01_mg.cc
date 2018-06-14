@@ -70,8 +70,10 @@ check()
           deallog << "level=" << level << std::endl;
 
           std::vector<bool> dofs(dof.n_dofs(level));
-          DoFTools::extract_level_dofs(
-            level, dof, ComponentMask(component_mask), dofs);
+          DoFTools::extract_level_dofs(level,
+                                       dof,
+                                       ComponentMask(component_mask),
+                                       dofs);
 
           for (unsigned int d = 0; d < dofs.size(); ++d)
             deallog << dofs[d];

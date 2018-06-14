@@ -72,11 +72,13 @@ helmholtz_operator(
       fe_eval.evaluate(true, true, false);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
-          fe_eval.submit_value(
-            make_vectorized_array(Number(10)) * fe_eval.get_value(q), q);
+          fe_eval.submit_value(make_vectorized_array(Number(10)) *
+                                 fe_eval.get_value(q),
+                               q);
           fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
-          fe_eval2.submit_value(
-            make_vectorized_array(Number(10)) * fe_eval2.get_value(q), q);
+          fe_eval2.submit_value(make_vectorized_array(Number(10)) *
+                                  fe_eval2.get_value(q),
+                                q);
           fe_eval2.submit_gradient(fe_eval2.get_gradient(q), q);
         }
       fe_eval2.integrate(true, true);
@@ -97,7 +99,8 @@ public:
   static const std::size_t        n_vectors =
     VectorizedArray<Number>::n_array_elements;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   vmult(
@@ -106,11 +109,11 @@ public:
   {
     for (unsigned int i = 0; i < dst.size(); ++i)
       *dst[i] = 0;
-    const std::function<void(
-      const MatrixFree<dim, Number> &,
-      std::vector<LinearAlgebra::distributed::Vector<Number> *> &,
-      const std::vector<LinearAlgebra::distributed::Vector<Number> *> &,
-      const std::pair<unsigned int, unsigned int> &)>
+    const std::function<
+      void(const MatrixFree<dim, Number> &,
+           std::vector<LinearAlgebra::distributed::Vector<Number> *> &,
+           const std::vector<LinearAlgebra::distributed::Vector<Number> *> &,
+           const std::pair<unsigned int, unsigned int> &)>
       wrap = helmholtz_operator<dim, fe_degree, Number>;
     data.cell_loop(wrap, dst, src);
   };
@@ -169,8 +172,10 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -224,12 +229,12 @@ test()
   TrilinosWrappers::SparseMatrix sparse_matrix;
   {
     TrilinosWrappers::SparsityPattern csp(owned_set, MPI_COMM_WORLD);
-    DoFTools::make_sparsity_pattern(
-      dof,
-      csp,
-      constraints,
-      true,
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    DoFTools::make_sparsity_pattern(dof,
+                                    csp,
+                                    constraints,
+                                    true,
+                                    Utilities::MPI::this_mpi_process(
+                                      MPI_COMM_WORLD));
     csp.compress();
     sparse_matrix.reinit(csp);
   }
@@ -268,8 +273,9 @@ test()
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, sparse_matrix);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 local_dof_indices,
+                                                 sparse_matrix);
         }
   }
   sparse_matrix.compress(VectorOperation::add);

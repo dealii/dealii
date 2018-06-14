@@ -166,14 +166,14 @@ namespace Step28
   //
   // At present, material data is stored for 8 different types of
   // material. This, as well, may easily be extended in the future.
-  MaterialData::MaterialData(const unsigned int n_groups) :
-    n_groups(n_groups),
-    n_materials(8),
-    diffusion(n_materials, n_groups),
-    sigma_r(n_materials, n_groups),
-    nu_sigma_f(n_materials, n_groups),
-    sigma_s(n_materials, n_groups, n_groups),
-    chi(n_materials, n_groups)
+  MaterialData::MaterialData(const unsigned int n_groups)
+    : n_groups(n_groups)
+    , n_materials(8)
+    , diffusion(n_materials, n_groups)
+    , sigma_r(n_materials, n_groups)
+    , nu_sigma_f(n_materials, n_groups)
+    , sigma_s(n_materials, n_groups, n_groups)
+    , chi(n_materials, n_groups)
   {
     switch (this->n_groups)
       {
@@ -240,9 +240,9 @@ namespace Step28
 
 
         default:
-          Assert(
-            false,
-            ExcMessage("Presently, only data for 2 groups is implemented"));
+          Assert(false,
+                 ExcMessage(
+                   "Presently, only data for 2 groups is implemented"));
       }
   }
 
@@ -532,11 +532,11 @@ namespace Step28
   EnergyGroup<dim>::EnergyGroup(const unsigned int        group,
                                 const MaterialData &      material_data,
                                 const Triangulation<dim> &coarse_grid,
-                                const FiniteElement<dim> &fe) :
-    group(group),
-    material_data(material_data),
-    fe(fe),
-    dof_handler(triangulation)
+                                const FiniteElement<dim> &fe)
+    : group(group)
+    , material_data(material_data)
+    , fe(fe)
+    , dof_handler(triangulation)
   {
     triangulation.copy_triangulation(coarse_grid);
     dof_handler.distribute_dofs(fe);
@@ -697,8 +697,9 @@ namespace Step28
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
       }
 
     hanging_node_constraints.condense(system_matrix);
@@ -811,8 +812,10 @@ namespace Step28
         FullMatrix<double> unit_matrix(fe.dofs_per_cell);
         for (unsigned int i = 0; i < unit_matrix.m(); ++i)
           unit_matrix(i, i) = 1;
-        assemble_cross_group_rhs_recursive(
-          g_prime, cell_iter->first, cell_iter->second, unit_matrix);
+        assemble_cross_group_rhs_recursive(g_prime,
+                                           cell_iter->first,
+                                           cell_iter->second,
+                                           unit_matrix);
       }
   }
 
@@ -861,19 +864,24 @@ namespace Step28
         const QGauss<dim>  quadrature_formula(fe.degree + 1);
         const unsigned int n_q_points = quadrature_formula.size();
 
-        FEValues<dim> fe_values(
-          fe, quadrature_formula, update_values | update_JxW_values);
+        FEValues<dim> fe_values(fe,
+                                quadrature_formula,
+                                update_values | update_JxW_values);
 
         if (cell_g->level() > cell_g_prime->level())
           fe_values.reinit(cell_g);
         else
           fe_values.reinit(cell_g_prime);
 
-        const double fission_dist_XS = material_data.get_fission_dist_XS(
-          group, g_prime.group, cell_g_prime->material_id());
+        const double fission_dist_XS =
+          material_data.get_fission_dist_XS(group,
+                                            g_prime.group,
+                                            cell_g_prime->material_id());
 
-        const double scattering_XS = material_data.get_scattering_XS(
-          g_prime.group, group, cell_g_prime->material_id());
+        const double scattering_XS =
+          material_data.get_scattering_XS(g_prime.group,
+                                          group,
+                                          cell_g_prime->material_id());
 
         FullMatrix<double> local_mass_matrix_f(fe.dofs_per_cell,
                                                fe.dofs_per_cell);
@@ -953,11 +961,15 @@ namespace Step28
                                                   prolongation_matrix);
 
           if (cell_g->has_children())
-            assemble_cross_group_rhs_recursive(
-              g_prime, cell_g->child(child), cell_g_prime, new_matrix);
+            assemble_cross_group_rhs_recursive(g_prime,
+                                               cell_g->child(child),
+                                               cell_g_prime,
+                                               new_matrix);
           else
-            assemble_cross_group_rhs_recursive(
-              g_prime, cell_g, cell_g_prime->child(child), new_matrix);
+            assemble_cross_group_rhs_recursive(g_prime,
+                                               cell_g,
+                                               cell_g_prime->child(child),
+                                               new_matrix);
         }
   }
 
@@ -973,8 +985,9 @@ namespace Step28
     const QGauss<dim>  quadrature_formula(fe.degree + 1);
     const unsigned int n_q_points = quadrature_formula.size();
 
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values);
 
     std::vector<double> solution_values(n_q_points);
 
@@ -1011,8 +1024,10 @@ namespace Step28
   void EnergyGroup<dim>::solve()
   {
     hanging_node_constraints.condense(system_rhs);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
 
     SolverControl solver_control(system_matrix.m(),
                                  1e-12 * system_rhs.l2_norm());
@@ -1226,11 +1241,11 @@ namespace Step28
   // parameters classes using the ParameterHandler capabilities. We will
   // therefore not comment further on this:
   template <int dim>
-  NeutronDiffusionProblem<dim>::Parameters::Parameters() :
-    n_groups(2),
-    n_refinement_cycles(5),
-    fe_degree(2),
-    convergence_tolerance(1e-12)
+  NeutronDiffusionProblem<dim>::Parameters::Parameters()
+    : n_groups(2)
+    , n_refinement_cycles(5)
+    , fe_degree(2)
+    , convergence_tolerance(1e-12)
   {}
 
 
@@ -1279,11 +1294,11 @@ namespace Step28
   // and destructor have nothing of much interest:
   template <int dim>
   NeutronDiffusionProblem<dim>::NeutronDiffusionProblem(
-    const Parameters &parameters) :
-    parameters(parameters),
-    material_data(parameters.n_groups),
-    fe(parameters.fe_degree),
-    k_eff(std::numeric_limits<double>::quiet_NaN())
+    const Parameters &parameters)
+    : parameters(parameters)
+    , material_data(parameters.n_groups)
+    , fe(parameters.fe_degree)
+    , k_eff(std::numeric_limits<double>::quiet_NaN())
   {}
 
 
@@ -1507,8 +1522,9 @@ namespace Step28
   {
     std::vector<Threads::Thread<double>> threads;
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      threads.push_back(Threads::new_thread(
-        &EnergyGroup<dim>::get_fission_source, *energy_groups[group]));
+      threads.push_back(
+        Threads::new_thread(&EnergyGroup<dim>::get_fission_source,
+                            *energy_groups[group]));
 
     double fission_source = 0;
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
@@ -1625,8 +1641,9 @@ namespace Step28
 
         Threads::ThreadGroup<> threads;
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
-          threads += Threads::new_thread(
-            &EnergyGroup<dim>::assemble_system_matrix, *energy_groups[group]);
+          threads +=
+            Threads::new_thread(&EnergyGroup<dim>::assemble_system_matrix,
+                                *energy_groups[group]);
         threads.join_all();
 
         double       error;

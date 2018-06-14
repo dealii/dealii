@@ -99,7 +99,8 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  Coefficient() : Function<dim>()
+  Coefficient()
+    : Function<dim>()
   {}
 
   virtual double
@@ -150,7 +151,9 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 
 
 template <int dim>
-Step6<dim>::Step6() : dof_handler(triangulation), fe(2)
+Step6<dim>::Step6()
+  : dof_handler(triangulation)
+  , fe(2)
 {}
 
 
@@ -177,8 +180,10 @@ Step6<dim>::setup_system()
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
 
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
 
 
   constraints.close();
@@ -278,8 +283,10 @@ Step6<dim>::refine_grid()
                                      solution,
                                      estimated_error_per_cell);
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
 
   triangulation.execute_coarsening_and_refinement();
 }

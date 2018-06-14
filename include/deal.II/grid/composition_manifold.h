@@ -139,12 +139,11 @@ template <int dim,
           int dim1,
           int dim2>
 CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
-  CompositionManifold(
-    const ChartManifold<dim1, intermediate_dim, chartdim> &F,
-    const ChartManifold<dim2, spacedim, intermediate_dim> &G) :
-  ChartManifold<dim, spacedim, chartdim>(F.get_periodicity()),
-  F(&F),
-  G(&G)
+  CompositionManifold(const ChartManifold<dim1, intermediate_dim, chartdim> &F,
+                      const ChartManifold<dim2, spacedim, intermediate_dim> &G)
+  : ChartManifold<dim, spacedim, chartdim>(F.get_periodicity())
+  , F(&F)
+  , G(&G)
 {
   // We don't know what to do with a periodicity in the second manifold, so
   // throw an assertion if the second manifold is periodic

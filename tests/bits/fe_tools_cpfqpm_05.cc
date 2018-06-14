@@ -116,8 +116,10 @@ check_this(const FiniteElement<dim, spacedim> &fe,
 
   FullMatrix<double> X(fe.dofs_per_cell, q_rhs.size());
 
-  FETools::compute_projection_from_quadrature_points_matrix(
-    fe, q_lhs, q_rhs, X);
+  FETools::compute_projection_from_quadrature_points_matrix(fe,
+                                                            q_lhs,
+                                                            q_rhs,
+                                                            X);
 
   // then compute the matrix that
   // interpolates back to the quadrature

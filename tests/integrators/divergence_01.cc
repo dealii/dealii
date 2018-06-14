@@ -177,10 +177,12 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fv, FiniteElement<dim> &fs)
   deallog << fv.get_name() << " x " << fs.get_name() << std::endl
           << "cell matrix" << std::endl;
   QGauss<dim>   quadrature(fv.tensor_degree() + 1);
-  FEValues<dim> fev(
-    fv, quadrature, update_values | update_gradients | update_JxW_values);
-  FEValues<dim> fes(
-    fs, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fev(fv,
+                    quadrature,
+                    update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fes(fs,
+                    quadrature,
+                    update_values | update_gradients | update_JxW_values);
 
   typename Triangulation<dim>::cell_iterator cell1 = tr.begin(1);
   fev.reinit(cell1);
@@ -204,10 +206,12 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fv, FiniteElement<dim> &fs)
       test_boundary(fev1, fes1);
     }
 
-  FEFaceValues<dim> fev2(
-    fv, face_quadrature, update_values | update_gradients | update_JxW_values);
-  FEFaceValues<dim> fes2(
-    fs, face_quadrature, update_values | update_gradients | update_JxW_values);
+  FEFaceValues<dim>                          fev2(fv,
+                         face_quadrature,
+                         update_values | update_gradients | update_JxW_values);
+  FEFaceValues<dim>                          fes2(fs,
+                         face_quadrature,
+                         update_values | update_gradients | update_JxW_values);
   typename Triangulation<dim>::cell_iterator cell2 = cell1->neighbor(1);
 
   deallog << "face_matrix " << 0 << std::endl;

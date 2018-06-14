@@ -52,7 +52,8 @@ public:
 
 
 template <int dim>
-AutoSinExp<dim>::AutoSinExp() : AutoDerivativeFunction<dim>(1e-6, 2)
+AutoSinExp<dim>::AutoSinExp()
+  : AutoDerivativeFunction<dim>(1e-6, 2)
 {}
 
 

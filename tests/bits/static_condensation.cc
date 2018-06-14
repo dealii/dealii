@@ -74,17 +74,13 @@ protected:
 
 template <>
 const Point<1>
-  SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] = {
-    Point<1>(-1.0 / 3.0),
-    Point<1>(0.0),
-    Point<1>(+1.0 / 3.0)};
+  SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] =
+    {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
 
 template <>
 const Point<2>
-  SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] = {
-    Point<2>(-0.5, +0.5),
-    Point<2>(-0.5, -0.5),
-    Point<2>(+0.5, -0.5)};
+  SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] =
+    {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
 
 template <>
 const Point<3>
@@ -102,7 +98,8 @@ template <int dim>
 class Solution : public Function<dim>, protected SolutionBase<dim>
 {
 public:
-  Solution() : Function<dim>()
+  Solution()
+    : Function<dim>()
   {}
 
   virtual double
@@ -154,7 +151,8 @@ template <int dim>
 class RightHandSide : public Function<dim>, protected SolutionBase<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -240,12 +238,12 @@ private:
 
 template <int dim>
 HelmholtzProblem<dim>::HelmholtzProblem(const unsigned int   fe_degree,
-                                        const RefinementMode refinement_mode) :
-  fe(fe_degree),
-  dof_handler(triangulation),
-  fe_trace(fe_degree),
-  dof_handler_trace(triangulation),
-  refinement_mode(refinement_mode)
+                                        const RefinementMode refinement_mode)
+  : fe(fe_degree)
+  , dof_handler(triangulation)
+  , fe_trace(fe_degree)
+  , dof_handler_trace(triangulation)
+  , refinement_mode(refinement_mode)
 {
   deallog << "Solving with Q" << fe_degree << " elements, "
           << (refinement_mode == global_refinement ? "global" : "adaptive")
@@ -265,8 +263,10 @@ HelmholtzProblem<dim>::setup_system()
 
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Solution<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Solution<dim>(),
+                                           constraints);
   constraints.close();
 
   {
@@ -285,14 +285,18 @@ HelmholtzProblem<dim>::setup_system()
 
   constraints_trace.clear();
   DoFTools::make_hanging_node_constraints(dof_handler_trace, constraints_trace);
-  VectorTools::interpolate_boundary_values(
-    dof_handler_trace, 0, Solution<dim>(), constraints_trace);
+  VectorTools::interpolate_boundary_values(dof_handler_trace,
+                                           0,
+                                           Solution<dim>(),
+                                           constraints_trace);
   constraints_trace.close();
 
   {
     DynamicSparsityPattern csp(dof_handler_trace.n_dofs());
-    DoFTools::make_sparsity_pattern(
-      dof_handler_trace, csp, constraints_trace, false);
+    DoFTools::make_sparsity_pattern(dof_handler_trace,
+                                    csp,
+                                    constraints_trace,
+                                    false);
     sparsity_pattern_trace.copy_from(csp);
   }
 
@@ -507,8 +511,10 @@ HelmholtzProblem<dim>::solve()
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix_trace, 1.2);
 
-    cg.solve(
-      system_matrix_trace, solution_trace, system_rhs_trace, preconditioner);
+    cg.solve(system_matrix_trace,
+             solution_trace,
+             system_rhs_trace,
+             preconditioner);
 
     constraints_trace.distribute(solution_trace);
   }

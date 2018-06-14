@@ -79,7 +79,8 @@ class MatrixFreeTest
 public:
   typedef VectorizedArray<Number> vector_t;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
 
   void
   vmult(Vector<Number> &dst, const Vector<Number> &src) const
@@ -127,8 +128,10 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
   MatrixFreeTest<dim, fe_degree, number> mf(mf_data);
   Vector<number>                         in(dof.n_dofs()), out(dof.n_dofs());
 
-  VectorTools::create_right_hand_side(
-    dof, QGauss<dim>(fe_degree + 1), Functions::CosineFunction<dim>(), in);
+  VectorTools::create_right_hand_side(dof,
+                                      QGauss<dim>(fe_degree + 1),
+                                      Functions::CosineFunction<dim>(),
+                                      in);
 
   // prescribe number of iterations in CG instead of tolerance. This is needed
   // to get the same test output on different platforms where roundoff errors

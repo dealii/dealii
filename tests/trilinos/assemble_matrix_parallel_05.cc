@@ -69,18 +69,18 @@ namespace Assembly
     template <int dim>
     struct Data
     {
-      Data(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature) :
-        fe_values(fe,
-                  quadrature,
-                  update_values | update_gradients | update_quadrature_points |
-                    update_JxW_values)
+      Data(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature)
+        : fe_values(fe,
+                    quadrature,
+                    update_values | update_gradients |
+                      update_quadrature_points | update_JxW_values)
       {}
 
-      Data(const Data &data) :
-        fe_values(data.fe_values.get_mapping(),
-                  data.fe_values.get_fe(),
-                  data.fe_values.get_quadrature(),
-                  data.fe_values.get_update_flags())
+      Data(const Data &data)
+        : fe_values(data.fe_values.get_mapping(),
+                    data.fe_values.get_fe(),
+                    data.fe_values.get_quadrature(),
+                    data.fe_values.get_update_flags())
       {}
 
       FEValues<dim> fe_values;
@@ -91,8 +91,8 @@ namespace Assembly
   {
     struct Data
     {
-      Data(const bool assemble_reference) :
-        assemble_reference(assemble_reference)
+      Data(const bool assemble_reference)
+        : assemble_reference(assemble_reference)
       {}
       std::vector<types::global_dof_index> local_dof_indices;
       FullMatrix<double>                   local_matrix;
@@ -167,7 +167,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>()
+  BoundaryValues()
+    : Function<dim>()
   {}
 
   virtual double
@@ -191,7 +192,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -212,11 +214,11 @@ RightHandSide<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  triangulation(MPI_COMM_WORLD),
-  dof_handler(triangulation),
-  fe(1),
-  quadrature(fe.degree + 1)
+LaplaceProblem<dim>::LaplaceProblem()
+  : triangulation(MPI_COMM_WORLD)
+  , dof_handler(triangulation)
+  , fe(1)
+  , quadrature(fe.degree + 1)
 {}
 
 
@@ -258,8 +260,10 @@ LaplaceProblem<dim>::setup_system()
   // having added the hanging node constraints in order to be consistent and
   // skip dofs that are already constrained (i.e., are hanging nodes on the
   // boundary in 3D). In contrast to step-27, we choose a sine function.
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           constraints);
   constraints.close();
 
   typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
@@ -288,8 +292,9 @@ LaplaceProblem<dim>::setup_system()
   {
     IndexSet relevant_set;
     DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_set);
-    DynamicSparsityPattern csp(
-      dof_handler.n_dofs(), dof_handler.n_dofs(), relevant_set);
+    DynamicSparsityPattern csp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs(),
+                               relevant_set);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     test_matrix.reinit(locally_owned, csp, MPI_COMM_WORLD, true);
     test_rhs.reinit(locally_owned, relevant_set, MPI_COMM_WORLD, true);
@@ -429,8 +434,10 @@ LaplaceProblem<dim>::postprocess()
   for (unsigned int i = 0; i < estimated_error_per_cell.size(); ++i)
     estimated_error_per_cell(i) = i;
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
   triangulation.execute_coarsening_and_refinement();
 }
 

@@ -40,7 +40,8 @@ public:
 };
 
 template <int dim>
-BoundaryFunction<dim>::BoundaryFunction() : Function<dim>(dim)
+BoundaryFunction<dim>::BoundaryFunction()
+  : Function<dim>(dim)
 {}
 
 template <int dim>

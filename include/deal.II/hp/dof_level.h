@@ -450,11 +450,11 @@ namespace internal
       // the index is so large that we cannot accept it. (but this
       // will not likely happen because it requires someone using an
       // FECollection that has more than 32k entries.)
-      Assert(
-        is_compressed_entry(fe_index) == false,
-        ExcMessage("You are using an active_fe_index that is larger than an "
-                   "internal limitation for these objects. Try to work with "
-                   "hp::FECollection objects that have a more modest size."));
+      Assert(is_compressed_entry(fe_index) == false,
+             ExcMessage(
+               "You are using an active_fe_index that is larger than an "
+               "internal limitation for these objects. Try to work with "
+               "hp::FECollection objects that have a more modest size."));
 
       active_fe_indices[obj_index] = fe_index;
     }

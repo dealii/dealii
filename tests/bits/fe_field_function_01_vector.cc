@@ -40,7 +40,8 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F() : Function<dim>(2)
+  F()
+    : Function<dim>(2)
   {}
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &v) const

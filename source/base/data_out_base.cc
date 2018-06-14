@@ -448,11 +448,11 @@ namespace DataOutBase
                                         (n_data_sets + spacedim) :
                                         n_data_sets,
                                       patch->data.n_rows()));
-          Assert(
-            (n_data_sets == 0) ||
-              (patch->data.n_cols() ==
-               Utilities::fixed_power<dim>(n_subdivisions + 1)),
-            ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+          Assert((n_data_sets == 0) ||
+                   (patch->data.n_cols() ==
+                    Utilities::fixed_power<dim>(n_subdivisions + 1)),
+                 ExcInvalidDatasetSize(patch->data.n_cols(),
+                                       n_subdivisions + 1));
 
           for (unsigned int i = 0; i < patch->data.n_cols(); ++i, ++next_value)
             for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -466,18 +466,18 @@ namespace DataOutBase
 
 
 
-  DataOutFilter::DataOutFilter() :
-    flags(false, true),
-    node_dim(numbers::invalid_unsigned_int),
-    vertices_per_cell(numbers::invalid_unsigned_int)
+  DataOutFilter::DataOutFilter()
+    : flags(false, true)
+    , node_dim(numbers::invalid_unsigned_int)
+    , vertices_per_cell(numbers::invalid_unsigned_int)
   {}
 
 
 
-  DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags) :
-    flags(flags),
-    node_dim(numbers::invalid_unsigned_int),
-    vertices_per_cell(numbers::invalid_unsigned_int)
+  DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
+    : flags(flags)
+    , node_dim(numbers::invalid_unsigned_int)
+    , vertices_per_cell(numbers::invalid_unsigned_int)
   {}
 
 
@@ -827,10 +827,10 @@ namespace
     /*
      * Constructor. Stores a reference to the output stream for immediate use.
      */
-    StreamBase(std::ostream &stream, const FlagsType &flags) :
-      selected_component(numbers::invalid_unsigned_int),
-      stream(stream),
-      flags(flags)
+    StreamBase(std::ostream &stream, const FlagsType &flags)
+      : selected_component(numbers::invalid_unsigned_int)
+      , stream(stream)
+      , flags(flags)
     {}
 
     /**
@@ -1193,8 +1193,8 @@ namespace
 
   //----------------------------------------------------------------------//
 
-  DXStream::DXStream(std::ostream &out, const DataOutBase::DXFlags &f) :
-    StreamBase<DataOutBase::DXFlags>(out, f)
+  DXStream::DXStream(std::ostream &out, const DataOutBase::DXFlags &f)
+    : StreamBase<DataOutBase::DXFlags>(out, f)
   {}
 
 
@@ -1283,8 +1283,8 @@ namespace
 
   //----------------------------------------------------------------------//
 
-  GmvStream::GmvStream(std::ostream &out, const DataOutBase::GmvFlags &f) :
-    StreamBase<DataOutBase::GmvFlags>(out, f)
+  GmvStream::GmvStream(std::ostream &out, const DataOutBase::GmvFlags &f)
+    : StreamBase<DataOutBase::GmvFlags>(out, f)
   {}
 
 
@@ -1332,8 +1332,8 @@ namespace
 
 
   TecplotStream::TecplotStream(std::ostream &                   out,
-                               const DataOutBase::TecplotFlags &f) :
-    StreamBase<DataOutBase::TecplotFlags>(out, f)
+                               const DataOutBase::TecplotFlags &f)
+    : StreamBase<DataOutBase::TecplotFlags>(out, f)
   {}
 
 
@@ -1377,8 +1377,8 @@ namespace
 
 
 
-  UcdStream::UcdStream(std::ostream &out, const DataOutBase::UcdFlags &f) :
-    StreamBase<DataOutBase::UcdFlags>(out, f)
+  UcdStream::UcdStream(std::ostream &out, const DataOutBase::UcdFlags &f)
+    : StreamBase<DataOutBase::UcdFlags>(out, f)
   {}
 
 
@@ -1454,8 +1454,8 @@ namespace
 
   //----------------------------------------------------------------------//
 
-  VtkStream::VtkStream(std::ostream &out, const DataOutBase::VtkFlags &f) :
-    StreamBase<DataOutBase::VtkFlags>(out, f)
+  VtkStream::VtkStream(std::ostream &out, const DataOutBase::VtkFlags &f)
+    : StreamBase<DataOutBase::VtkFlags>(out, f)
   {}
 
 
@@ -1500,8 +1500,8 @@ namespace
 
 
 
-  VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags &f) :
-    StreamBase<DataOutBase::VtkFlags>(out, f)
+  VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags &f)
+    : StreamBase<DataOutBase::VtkFlags>(out, f)
   {}
 
 
@@ -1635,10 +1635,10 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  Patch<dim, spacedim>::Patch() :
-    patch_index(no_neighbor),
-    n_subdivisions(1),
-    points_are_available(false)
+  Patch<dim, spacedim>::Patch()
+    : patch_index(no_neighbor)
+    , n_subdivisions(1)
+    , points_are_available(false)
   // all the other data has a constructor of its own, except for the
   // "neighbors" field, which we set to invalid values.
   {
@@ -1736,9 +1736,9 @@ namespace DataOutBase
   unsigned int Patch<0, spacedim>::n_subdivisions = 1;
 
   template <int spacedim>
-  Patch<0, spacedim>::Patch() :
-    patch_index(no_neighbor),
-    points_are_available(false)
+  Patch<0, spacedim>::Patch()
+    : patch_index(no_neighbor)
+    , points_are_available(false)
   {
     Assert(spacedim <= 3, ExcNotImplemented());
   }
@@ -1802,7 +1802,8 @@ namespace DataOutBase
 
 
 
-  UcdFlags::UcdFlags(const bool write_preamble) : write_preamble(write_preamble)
+  UcdFlags::UcdFlags(const bool write_preamble)
+    : write_preamble(write_preamble)
   {}
 
 
@@ -1816,8 +1817,8 @@ namespace DataOutBase
 
 
 
-  GnuplotFlags::GnuplotFlags(const std::vector<std::string> &labels) :
-    space_dimension_labels(labels)
+  GnuplotFlags::GnuplotFlags(const std::vector<std::string> &labels)
+    : space_dimension_labels(labels)
   {}
 
 
@@ -1832,17 +1833,17 @@ namespace DataOutBase
 
   PovrayFlags::PovrayFlags(const bool smooth,
                            const bool bicubic_patch,
-                           const bool external_data) :
-    smooth(smooth),
-    bicubic_patch(bicubic_patch),
-    external_data(external_data)
+                           const bool external_data)
+    : smooth(smooth)
+    , bicubic_patch(bicubic_patch)
+    , external_data(external_data)
   {}
 
 
   DataOutFilterFlags::DataOutFilterFlags(const bool filter_duplicate_vertices,
-                                         const bool xdmf_hdf5_output) :
-    filter_duplicate_vertices(filter_duplicate_vertices),
-    xdmf_hdf5_output(xdmf_hdf5_output)
+                                         const bool xdmf_hdf5_output)
+    : filter_duplicate_vertices(filter_duplicate_vertices)
+    , xdmf_hdf5_output(xdmf_hdf5_output)
   {}
 
 
@@ -1896,12 +1897,12 @@ namespace DataOutBase
   DXFlags::DXFlags(const bool write_neighbors,
                    const bool int_binary,
                    const bool coordinates_binary,
-                   const bool data_binary) :
-    write_neighbors(write_neighbors),
-    int_binary(int_binary),
-    coordinates_binary(coordinates_binary),
-    data_binary(data_binary),
-    data_double(false)
+                   const bool data_binary)
+    : write_neighbors(write_neighbors)
+    , int_binary(int_binary)
+    , coordinates_binary(coordinates_binary)
+    , data_binary(data_binary)
+    , data_double(false)
   {}
 
 
@@ -1972,15 +1973,15 @@ namespace DataOutBase
                      const int          polar_angle,
                      const unsigned int line_thickness,
                      const bool         margin,
-                     const bool         draw_colorbar) :
-    height(4000),
-    width(0),
-    height_vector(height_vector),
-    azimuth_angle(azimuth_angle),
-    polar_angle(polar_angle),
-    line_thickness(line_thickness),
-    margin(margin),
-    draw_colorbar(draw_colorbar)
+                     const bool         draw_colorbar)
+    : height(4000)
+    , width(0)
+    , height_vector(height_vector)
+    , azimuth_angle(azimuth_angle)
+    , polar_angle(polar_angle)
+    , line_thickness(line_thickness)
+    , margin(margin)
+    , draw_colorbar(draw_colorbar)
   {}
 
 
@@ -2028,19 +2029,19 @@ namespace DataOutBase
                      const bool          draw_mesh,
                      const bool          draw_cells,
                      const bool          shade_cells,
-                     const ColorFunction color_function) :
-    height_vector(height_vector),
-    color_vector(color_vector),
-    size_type(size_type),
-    size(size),
-    line_width(line_width),
-    azimut_angle(azimut_angle),
-    turn_angle(turn_angle),
-    z_scaling(z_scaling),
-    draw_mesh(draw_mesh),
-    draw_cells(draw_cells),
-    shade_cells(shade_cells),
-    color_function(color_function)
+                     const ColorFunction color_function)
+    : height_vector(height_vector)
+    , color_vector(color_vector)
+    , size_type(size_type)
+    , size(size)
+    , line_width(line_width)
+    , azimut_angle(azimut_angle)
+    , turn_angle(turn_angle)
+    , z_scaling(z_scaling)
+    , draw_mesh(draw_mesh)
+    , draw_cells(draw_cells)
+    , shade_cells(shade_cells)
+    , color_function(color_function)
   {}
 
 
@@ -2226,12 +2227,12 @@ namespace DataOutBase
                       "true",
                       Patterns::Bool(),
                       "Whether the interior of cells shall be shaded");
-    prm.declare_entry(
-      "Color function",
-      "default",
-      Patterns::Selection("default|grey scale|reverse grey scale"),
-      "Name of a color function used to colorize mesh lines "
-      "and/or cell interiors");
+    prm.declare_entry("Color function",
+                      "default",
+                      Patterns::Selection(
+                        "default|grey scale|reverse grey scale"),
+                      "Name of a color function used to colorize mesh lines "
+                      "and/or cell interiors");
   }
 
 
@@ -2271,10 +2272,10 @@ namespace DataOutBase
 
   TecplotFlags::TecplotFlags(const char * tecplot_binary_file_name,
                              const char * zone_name,
-                             const double solution_time) :
-    tecplot_binary_file_name(tecplot_binary_file_name),
-    zone_name(zone_name),
-    solution_time(solution_time)
+                             const double solution_time)
+    : tecplot_binary_file_name(tecplot_binary_file_name)
+    , zone_name(zone_name)
+    , solution_time(solution_time)
   {}
 
 
@@ -2292,11 +2293,11 @@ namespace DataOutBase
   VtkFlags::VtkFlags(const double                         time,
                      const unsigned int                   cycle,
                      const bool                           print_date_and_time,
-                     const VtkFlags::ZlibCompressionLevel compression_level) :
-    time(time),
-    cycle(cycle),
-    print_date_and_time(print_date_and_time),
-    compression_level(compression_level)
+                     const VtkFlags::ZlibCompressionLevel compression_level)
+    : time(time)
+    , cycle(cycle)
+    , print_date_and_time(print_date_and_time)
+    , compression_level(compression_level)
   {}
 
 
@@ -3912,8 +3913,9 @@ namespace DataOutBase
                   case 2:
                     Assert((flags.height_vector < patch->data.n_rows()) ||
                              patch->data.n_rows() == 0,
-                           ExcIndexRange(
-                             flags.height_vector, 0, patch->data.n_rows()));
+                           ExcIndexRange(flags.height_vector,
+                                         0,
+                                         patch->data.n_rows()));
                     heights[0] =
                       patch->data.n_rows() != 0 ?
                         patch->data(flags.height_vector, i1 * d1 + i2 * d2) *
@@ -4016,10 +4018,11 @@ namespace DataOutBase
 
               if (flags.draw_cells && flags.shade_cells)
                 {
-                  Assert(
-                    (flags.color_vector < patch->data.n_rows()) ||
-                      patch->data.n_rows() == 0,
-                    ExcIndexRange(flags.color_vector, 0, patch->data.n_rows()));
+                  Assert((flags.color_vector < patch->data.n_rows()) ||
+                           patch->data.n_rows() == 0,
+                         ExcIndexRange(flags.color_vector,
+                                       0,
+                                       patch->data.n_rows()));
                   const double color_values[4] = {
                     patch->data.n_rows() != 0 ?
                       patch->data(flags.color_vector, i1 * d1 + i2 * d2) :
@@ -4161,8 +4164,10 @@ namespace DataOutBase
           {
             if (flags.shade_cells)
               {
-                const EpsFlags::RgbValues rgb_values = (*flags.color_function)(
-                  cell->color_value, min_color_value, max_color_value);
+                const EpsFlags::RgbValues rgb_values =
+                  (*flags.color_function)(cell->color_value,
+                                          min_color_value,
+                                          max_color_value);
 
                 // write out color
                 if (rgb_values.is_grey())
@@ -4567,11 +4572,11 @@ namespace DataOutBase
     inline TecplotMacros::TecplotMacros(const unsigned int n_nodes,
                                         const unsigned int n_vars,
                                         const unsigned int n_cells,
-                                        const unsigned int n_vert) :
-      n_nodes(n_nodes),
-      n_vars(n_vars),
-      n_cells(n_cells),
-      n_vert(n_vert)
+                                        const unsigned int n_vert)
+      : n_nodes(n_nodes)
+      , n_vars(n_vars)
+      , n_cells(n_cells)
+      , n_vert(n_vert)
     {
       nodalData.resize(n_nodes * n_vars);
       connData.resize(n_cells * n_vert);
@@ -5132,21 +5137,21 @@ namespace DataOutBase
     for (unsigned int n_th_vector = 0; n_th_vector < vector_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(
-          std::get<1>(vector_data_ranges[n_th_vector]) >=
-            std::get<0>(vector_data_ranges[n_th_vector]),
-          ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                        std::get<0>(vector_data_ranges[n_th_vector])));
+        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) >=
+                      std::get<0>(vector_data_ranges[n_th_vector]),
+                    ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
+                                  std::get<0>(
+                                    vector_data_ranges[n_th_vector])));
         AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
                     ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
                                   0,
                                   n_data_sets));
-        AssertThrow(
-          std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
-              std::get<0>(vector_data_ranges[n_th_vector]) <=
-            3,
-          ExcMessage("Can't declare a vector with more than 3 components "
-                     "in VTK"));
+        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
+                        std::get<0>(vector_data_ranges[n_th_vector]) <=
+                      3,
+                    ExcMessage(
+                      "Can't declare a vector with more than 3 components "
+                      "in VTK"));
 
         // mark these components as already written:
         for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
@@ -5565,21 +5570,21 @@ namespace DataOutBase
     for (unsigned int n_th_vector = 0; n_th_vector < vector_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(
-          std::get<1>(vector_data_ranges[n_th_vector]) >=
-            std::get<0>(vector_data_ranges[n_th_vector]),
-          ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                        std::get<0>(vector_data_ranges[n_th_vector])));
+        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) >=
+                      std::get<0>(vector_data_ranges[n_th_vector]),
+                    ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
+                                  std::get<0>(
+                                    vector_data_ranges[n_th_vector])));
         AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
                     ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
                                   0,
                                   n_data_sets));
-        AssertThrow(
-          std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
-              std::get<0>(vector_data_ranges[n_th_vector]) <=
-            3,
-          ExcMessage("Can't declare a vector with more than 3 components "
-                     "in VTK"));
+        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
+                        std::get<0>(vector_data_ranges[n_th_vector]) <=
+                      3,
+                    ExcMessage(
+                      "Can't declare a vector with more than 3 components "
+                      "in VTK"));
 
         // mark these components as already
         // written:
@@ -5621,22 +5626,25 @@ namespace DataOutBase
                     std::get<0>(vector_data_ranges[n_th_vector]))
               {
                 case 0:
-                  data.push_back(data_vectors(
-                    std::get<0>(vector_data_ranges[n_th_vector]), n));
+                  data.push_back(
+                    data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),
+                                 n));
                   data.push_back(0);
                   data.push_back(0);
                   break;
 
                 case 1:
-                  data.push_back(data_vectors(
-                    std::get<0>(vector_data_ranges[n_th_vector]), n));
+                  data.push_back(
+                    data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),
+                                 n));
                   data.push_back(data_vectors(
                     std::get<0>(vector_data_ranges[n_th_vector]) + 1, n));
                   data.push_back(0);
                   break;
                 case 2:
-                  data.push_back(data_vectors(
-                    std::get<0>(vector_data_ranges[n_th_vector]), n));
+                  data.push_back(
+                    data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),
+                                 n));
                   data.push_back(data_vectors(
                     std::get<0>(vector_data_ranges[n_th_vector]) + 1, n));
                   data.push_back(data_vectors(
@@ -5716,21 +5724,21 @@ namespace DataOutBase
     for (unsigned int n_th_vector = 0; n_th_vector < vector_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(
-          std::get<1>(vector_data_ranges[n_th_vector]) >=
-            std::get<0>(vector_data_ranges[n_th_vector]),
-          ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                        std::get<0>(vector_data_ranges[n_th_vector])));
+        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) >=
+                      std::get<0>(vector_data_ranges[n_th_vector]),
+                    ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
+                                  std::get<0>(
+                                    vector_data_ranges[n_th_vector])));
         AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
                     ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
                                   0,
                                   n_data_sets));
-        AssertThrow(
-          std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
-              std::get<0>(vector_data_ranges[n_th_vector]) <=
-            3,
-          ExcMessage("Can't declare a vector with more than 3 components "
-                     "in VTK"));
+        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
+                        std::get<0>(vector_data_ranges[n_th_vector]) <=
+                      3,
+                    ExcMessage(
+                      "Can't declare a vector with more than 3 components "
+                      "in VTK"));
 
         // mark these components as already
         // written:
@@ -6018,14 +6026,15 @@ namespace DataOutBase
                 y_max = std::max(y_max, (double)projected_points[2][1]);
                 y_max = std::max(y_max, (double)projected_points[3][1]);
 
-                Assert(
-                  (flags.height_vector < patch->data.n_rows()) ||
-                    patch->data.n_rows() == 0,
-                  ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+                Assert((flags.height_vector < patch->data.n_rows()) ||
+                         patch->data.n_rows() == 0,
+                       ExcIndexRange(flags.height_vector,
+                                     0,
+                                     patch->data.n_rows()));
 
-                z_min = std::min(
-                  z_min,
-                  (double)patch->data(flags.height_vector, i1 * d1 + i2 * d2));
+                z_min = std::min(z_min,
+                                 (double)patch->data(flags.height_vector,
+                                                     i1 * d1 + i2 * d2));
                 z_min = std::min(z_min,
                                  (double)patch->data(flags.height_vector,
                                                      (i1 + 1) * d1 + i2 * d2));
@@ -6037,9 +6046,9 @@ namespace DataOutBase
                            (double)patch->data(flags.height_vector,
                                                (i1 + 1) * d1 + (i2 + 1) * d2));
 
-                z_max = std::max(
-                  z_max,
-                  (double)patch->data(flags.height_vector, i1 * d1 + i2 * d2));
+                z_max = std::max(z_max,
+                                 (double)patch->data(flags.height_vector,
+                                                     i1 * d1 + i2 * d2));
                 z_max = std::max(z_max,
                                  (double)patch->data(flags.height_vector,
                                                      (i1 + 1) * d1 + i2 * d2));
@@ -6226,10 +6235,11 @@ namespace DataOutBase
                              0,
                              n_subdivisions);
 
-                Assert(
-                  (flags.height_vector < patch->data.n_rows()) ||
-                    patch->data.n_rows() == 0,
-                  ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+                Assert((flags.height_vector < patch->data.n_rows()) ||
+                         patch->data.n_rows() == 0,
+                       ExcIndexRange(flags.height_vector,
+                                     0,
+                                     patch->data.n_rows()));
 
                 vertices[0][0] = projected_vertices[0][0];
                 vertices[0][1] = projected_vertices[0][1];
@@ -6281,41 +6291,57 @@ namespace DataOutBase
                                     camera_horizontal,
                                     camera_focus);
 
-                x_min_perspective = std::min(
-                  x_min_perspective, (double)projection_decompositions[0][0]);
-                x_min_perspective = std::min(
-                  x_min_perspective, (double)projection_decompositions[1][0]);
-                x_min_perspective = std::min(
-                  x_min_perspective, (double)projection_decompositions[2][0]);
-                x_min_perspective = std::min(
-                  x_min_perspective, (double)projection_decompositions[3][0]);
+                x_min_perspective =
+                  std::min(x_min_perspective,
+                           (double)projection_decompositions[0][0]);
+                x_min_perspective =
+                  std::min(x_min_perspective,
+                           (double)projection_decompositions[1][0]);
+                x_min_perspective =
+                  std::min(x_min_perspective,
+                           (double)projection_decompositions[2][0]);
+                x_min_perspective =
+                  std::min(x_min_perspective,
+                           (double)projection_decompositions[3][0]);
 
-                x_max_perspective = std::max(
-                  x_max_perspective, (double)projection_decompositions[0][0]);
-                x_max_perspective = std::max(
-                  x_max_perspective, (double)projection_decompositions[1][0]);
-                x_max_perspective = std::max(
-                  x_max_perspective, (double)projection_decompositions[2][0]);
-                x_max_perspective = std::max(
-                  x_max_perspective, (double)projection_decompositions[3][0]);
+                x_max_perspective =
+                  std::max(x_max_perspective,
+                           (double)projection_decompositions[0][0]);
+                x_max_perspective =
+                  std::max(x_max_perspective,
+                           (double)projection_decompositions[1][0]);
+                x_max_perspective =
+                  std::max(x_max_perspective,
+                           (double)projection_decompositions[2][0]);
+                x_max_perspective =
+                  std::max(x_max_perspective,
+                           (double)projection_decompositions[3][0]);
 
-                y_min_perspective = std::min(
-                  y_min_perspective, (double)projection_decompositions[0][1]);
-                y_min_perspective = std::min(
-                  y_min_perspective, (double)projection_decompositions[1][1]);
-                y_min_perspective = std::min(
-                  y_min_perspective, (double)projection_decompositions[2][1]);
-                y_min_perspective = std::min(
-                  y_min_perspective, (double)projection_decompositions[3][1]);
+                y_min_perspective =
+                  std::min(y_min_perspective,
+                           (double)projection_decompositions[0][1]);
+                y_min_perspective =
+                  std::min(y_min_perspective,
+                           (double)projection_decompositions[1][1]);
+                y_min_perspective =
+                  std::min(y_min_perspective,
+                           (double)projection_decompositions[2][1]);
+                y_min_perspective =
+                  std::min(y_min_perspective,
+                           (double)projection_decompositions[3][1]);
 
-                y_max_perspective = std::max(
-                  y_max_perspective, (double)projection_decompositions[0][1]);
-                y_max_perspective = std::max(
-                  y_max_perspective, (double)projection_decompositions[1][1]);
-                y_max_perspective = std::max(
-                  y_max_perspective, (double)projection_decompositions[2][1]);
-                y_max_perspective = std::max(
-                  y_max_perspective, (double)projection_decompositions[3][1]);
+                y_max_perspective =
+                  std::max(y_max_perspective,
+                           (double)projection_decompositions[0][1]);
+                y_max_perspective =
+                  std::max(y_max_perspective,
+                           (double)projection_decompositions[1][1]);
+                y_max_perspective =
+                  std::max(y_max_perspective,
+                           (double)projection_decompositions[2][1]);
+                y_max_perspective =
+                  std::max(y_max_perspective,
+                           (double)projection_decompositions[3][1]);
               }
           }
       }
@@ -6358,10 +6384,11 @@ namespace DataOutBase
                              0,
                              n_subdivisions);
 
-                Assert(
-                  (flags.height_vector < patch->data.n_rows()) ||
-                    patch->data.n_rows() == 0,
-                  ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+                Assert((flags.height_vector < patch->data.n_rows()) ||
+                         patch->data.n_rows() == 0,
+                       ExcIndexRange(flags.height_vector,
+                                     0,
+                                     patch->data.n_rows()));
 
                 cell.vertices[0][0] = projected_vertices[0][0];
                 cell.vertices[0][1] = projected_vertices[0][1];
@@ -6957,9 +6984,9 @@ namespace DataOutBase
 
 
 template <int dim, int spacedim>
-DataOutInterface<dim, spacedim>::DataOutInterface() :
-  default_subdivisions(1),
-  default_fmt(DataOutBase::default_format)
+DataOutInterface<dim, spacedim>::DataOutInterface()
+  : default_subdivisions(1)
+  , default_fmt(DataOutBase::default_format)
 {}
 
 
@@ -7201,8 +7228,10 @@ DataOutInterface<dim, spacedim>::write_pvtu_record(
   std::ostream &                  out,
   const std::vector<std::string> &piece_names) const
 {
-  DataOutBase::write_pvtu_record(
-    out, piece_names, get_dataset_names(), get_vector_data_ranges());
+  DataOutBase::write_pvtu_record(out,
+                                 piece_names,
+                                 get_dataset_names(),
+                                 get_vector_data_ranges());
 }
 
 
@@ -7444,8 +7473,9 @@ DataOutBase::write_filtered_data(
                           std::get<0>(vector_data_ranges[n_th_vector])));
           AssertThrow(
             std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-            ExcIndexRange(
-              std::get<1>(vector_data_ranges[n_th_vector]), 0, n_data_sets));
+            ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
+                          0,
+                          n_data_sets));
 
           // Determine the vector name
           // Concatenate all the
@@ -7475,8 +7505,10 @@ DataOutBase::write_filtered_data(
         }
 
       // Write data to the filter object
-      filtered_data.write_data_set(
-        vector_name, pt_data_vector_dim, data_set, data_vectors);
+      filtered_data.write_data_set(vector_name,
+                                   pt_data_vector_dim,
+                                   data_set,
+                                   data_vectors);
 
       // Advance the current data set
       data_set += pt_data_vector_dim;
@@ -7648,8 +7680,10 @@ DataOutBase::write_hdf5_parallel(
   if (write_mesh_file)
     {
       // Overwrite any existing files (change this to an option?)
-      h5_mesh_file_id = H5Fcreate(
-        mesh_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, file_plist_id);
+      h5_mesh_file_id = H5Fcreate(mesh_filename.c_str(),
+                                  H5F_ACC_TRUNC,
+                                  H5P_DEFAULT,
+                                  file_plist_id);
       AssertThrow(h5_mesh_file_id >= 0, ExcIO());
 
       // Create the dataspace for the nodes and cells
@@ -7789,8 +7823,10 @@ DataOutBase::write_hdf5_parallel(
   else
     {
       // Otherwise we need to open a new file
-      h5_solution_file_id = H5Fcreate(
-        solution_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, file_plist_id);
+      h5_solution_file_id = H5Fcreate(solution_filename.c_str(),
+                                      H5F_ACC_TRUNC,
+                                      H5P_DEFAULT,
+                                      file_plist_id);
       AssertThrow(h5_solution_file_id >= 0, ExcIO());
     }
 
@@ -8163,11 +8199,11 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
         const std::string &name = std::get<2>(ranges[n_th_vector]);
         if (name != "")
           {
-            Assert(
-              all_names.find(name) == all_names.end(),
-              ExcMessage("Error: names of fields in DataOut need to be unique, "
-                         "but '" +
-                         name + "' is used more than once."));
+            Assert(all_names.find(name) == all_names.end(),
+                   ExcMessage(
+                     "Error: names of fields in DataOut need to be unique, "
+                     "but '" +
+                     name + "' is used more than once."));
             all_names.insert(name);
             for (unsigned int i = std::get<0>(ranges[n_th_vector]);
                  i <= std::get<1>(ranges[n_th_vector]);
@@ -8180,11 +8216,11 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
       if (data_set_written[data_set] == false)
         {
           const std::string &name = data_names[data_set];
-          Assert(
-            all_names.find(name) == all_names.end(),
-            ExcMessage("Error: names of fields in DataOut need to be unique, "
-                       "but '" +
-                       name + "' is used more than once."));
+          Assert(all_names.find(name) == all_names.end(),
+                 ExcMessage(
+                   "Error: names of fields in DataOut need to be unique, "
+                   "but '" +
+                   name + "' is used more than once."));
           all_names.insert(name);
         }
   }
@@ -8263,11 +8299,11 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
     s << "[Version: "
       << dealii::DataOutBase::Deal_II_IntermediateFlags::format_version << "]";
 
-    Assert(
-      header == s.str(),
-      ExcMessage("Invalid or incompatible file format. Intermediate format "
-                 "files can only be read by the same deal.II version as they "
-                 "are written by."));
+    Assert(header == s.str(),
+           ExcMessage(
+             "Invalid or incompatible file format. Intermediate format "
+             "files can only be read by the same deal.II version as they "
+             "are written by."));
   }
 
   // then read the rest of the data
@@ -8405,15 +8441,15 @@ DataOutReader<dim, spacedim>::get_vector_data_ranges() const
 
 // ---------------------------------------------- XDMFEntry ----------
 
-XDMFEntry::XDMFEntry() :
-  valid(false),
-  h5_sol_filename(""),
-  h5_mesh_filename(""),
-  entry_time(0.0),
-  num_nodes(numbers::invalid_unsigned_int),
-  num_cells(numbers::invalid_unsigned_int),
-  dimension(numbers::invalid_unsigned_int),
-  space_dimension(numbers::invalid_unsigned_int)
+XDMFEntry::XDMFEntry()
+  : valid(false)
+  , h5_sol_filename("")
+  , h5_mesh_filename("")
+  , entry_time(0.0)
+  , num_nodes(numbers::invalid_unsigned_int)
+  , num_cells(numbers::invalid_unsigned_int)
+  , dimension(numbers::invalid_unsigned_int)
+  , space_dimension(numbers::invalid_unsigned_int)
 {}
 
 
@@ -8422,8 +8458,8 @@ XDMFEntry::XDMFEntry(const std::string &filename,
                      const double       time,
                      const unsigned int nodes,
                      const unsigned int cells,
-                     const unsigned int dim) :
-  XDMFEntry(filename, filename, time, nodes, cells, dim, dim)
+                     const unsigned int dim)
+  : XDMFEntry(filename, filename, time, nodes, cells, dim, dim)
 {}
 
 
@@ -8433,8 +8469,8 @@ XDMFEntry::XDMFEntry(const std::string &mesh_filename,
                      const double       time,
                      const unsigned int nodes,
                      const unsigned int cells,
-                     const unsigned int dim) :
-  XDMFEntry(mesh_filename, solution_filename, time, nodes, cells, dim, dim)
+                     const unsigned int dim)
+  : XDMFEntry(mesh_filename, solution_filename, time, nodes, cells, dim, dim)
 {}
 
 
@@ -8445,15 +8481,15 @@ XDMFEntry::XDMFEntry(const std::string &mesh_filename,
                      const unsigned int nodes,
                      const unsigned int cells,
                      const unsigned int dim,
-                     const unsigned int spacedim) :
-  valid(true),
-  h5_sol_filename(solution_filename),
-  h5_mesh_filename(mesh_filename),
-  entry_time(time),
-  num_nodes(nodes),
-  num_cells(cells),
-  dimension(dim),
-  space_dimension(spacedim)
+                     const unsigned int spacedim)
+  : valid(true)
+  , h5_sol_filename(solution_filename)
+  , h5_mesh_filename(mesh_filename)
+  , entry_time(time)
+  , num_nodes(nodes)
+  , num_cells(cells)
+  , dimension(dim)
+  , space_dimension(spacedim)
 {}
 
 

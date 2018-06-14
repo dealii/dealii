@@ -66,8 +66,10 @@ main(int argc, char **argv)
   try
     {
       std::cerr << "TimerOutput::Scope with MPI_COMM_SELF\n";
-      TimerOutput timer_out(
-        MPI_COMM_SELF, std::cerr, TimerOutput::summary, TimerOutput::cpu_times);
+      TimerOutput        timer_out(MPI_COMM_SELF,
+                            std::cerr,
+                            TimerOutput::summary,
+                            TimerOutput::cpu_times);
       TimerOutput::Scope timer_scope(timer_out, "Section1");
 
       throw Timer07Exception();
@@ -85,8 +87,9 @@ main(int argc, char **argv)
       // convert everything between the |s to xs so that we have consistent
       // output.
       const std::string::iterator start_pipe =
-        std::find(
-          std::string::reverse_iterator(next_number), output.rend(), '|')
+        std::find(std::string::reverse_iterator(next_number),
+                  output.rend(),
+                  '|')
           .base();
       Assert(start_pipe != output.end(), ExcInternalError());
       const std::string::iterator end_pipe =

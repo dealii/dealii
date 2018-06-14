@@ -92,8 +92,9 @@ test()
       const IteratorFilters::LevelEqualTo predicate(3);
       FilteredIterator<active_cell_iterator>
         begin = make_filtered_iterator(tria.begin_active(), predicate),
-        end   = make_filtered_iterator(
-          static_cast<active_cell_iterator>(tria.end()), predicate);
+        end =
+          make_filtered_iterator(static_cast<active_cell_iterator>(tria.end()),
+                                 predicate);
 
       Assert(std::distance(begin, end) ==
                static_cast<signed int>(tria.n_active_cells(3)),
@@ -165,16 +166,16 @@ test()
                               tria.end())) ==
                static_cast<signed int>(tria.n_active_cells(3)),
              ExcInternalError());
-      logfile << "Check 4: "
-              << (std::distance(
-                    FI(std::bind(predicate, std::placeholders::_1, 3))
-                      .set_to_next_positive(tria.begin_active()),
-                    FI(std::bind(predicate, std::placeholders::_1, 3),
-                       tria.end())) ==
-                      static_cast<signed int>(tria.n_active_cells(3)) ?
-                    "OK" :
-                    "Failed")
-              << std::endl;
+      logfile
+        << "Check 4: "
+        << (std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
+                            .set_to_next_positive(tria.begin_active()),
+                          FI(std::bind(predicate, std::placeholders::_1, 3),
+                             tria.end())) ==
+                static_cast<signed int>(tria.n_active_cells(3)) ?
+              "OK" :
+              "Failed")
+        << std::endl;
     };
 
 

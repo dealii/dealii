@@ -103,12 +103,14 @@ TensorProductPolynomialsConst<dim>::compute(
          ExcDimensionMismatch2(grad_grads.size(), this->n_tensor_pols + 1, 0));
   Assert(third_derivatives.size() == this->n_tensor_pols + 1 ||
            third_derivatives.size() == 0,
-         ExcDimensionMismatch2(
-           third_derivatives.size(), this->n_tensor_pols + 1, 0));
+         ExcDimensionMismatch2(third_derivatives.size(),
+                               this->n_tensor_pols + 1,
+                               0));
   Assert(fourth_derivatives.size() == this->n_tensor_pols + 1 ||
            fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(
-           fourth_derivatives.size(), this->n_tensor_pols + 1, 0));
+         ExcDimensionMismatch2(fourth_derivatives.size(),
+                               this->n_tensor_pols + 1,
+                               0));
 
   // remove slot for const value, go into the base class compute method and
   // finally append the const value again

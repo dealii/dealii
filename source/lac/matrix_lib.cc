@@ -18,7 +18,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-MeanValueFilter::MeanValueFilter(size_type component) : component(component)
+MeanValueFilter::MeanValueFilter(size_type component)
+  : component(component)
 {}
 
 template void

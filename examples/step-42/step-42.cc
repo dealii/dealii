@@ -151,19 +151,19 @@ namespace Step42
   ConstitutiveLaw<dim>::ConstitutiveLaw(double E,
                                         double nu,
                                         double sigma_0,
-                                        double gamma) :
-    kappa(E / (3 * (1 - 2 * nu))),
-    mu(E / (2 * (1 + nu))),
-    sigma_0(sigma_0),
-    gamma(gamma),
-    stress_strain_tensor_kappa(kappa *
-                               outer_product(unit_symmetric_tensor<dim>(),
-                                             unit_symmetric_tensor<dim>())),
-    stress_strain_tensor_mu(
-      2 * mu *
-      (identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(),
-                                              unit_symmetric_tensor<dim>()) /
-                                  3.0))
+                                        double gamma)
+    : kappa(E / (3 * (1 - 2 * nu)))
+    , mu(E / (2 * (1 + nu)))
+    , sigma_0(sigma_0)
+    , gamma(gamma)
+    , stress_strain_tensor_kappa(kappa *
+                                 outer_product(unit_symmetric_tensor<dim>(),
+                                               unit_symmetric_tensor<dim>()))
+    , stress_strain_tensor_mu(
+        2 * mu *
+        (identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(),
+                                                unit_symmetric_tensor<dim>()) /
+                                    3.0))
   {}
 
 
@@ -286,7 +286,8 @@ namespace Step42
     };
 
     template <int dim>
-    BoundaryForce<dim>::BoundaryForce() : Function<dim>(dim)
+    BoundaryForce<dim>::BoundaryForce()
+      : Function<dim>(dim)
     {}
 
 
@@ -322,7 +323,8 @@ namespace Step42
 
 
     template <int dim>
-    BoundaryValues<dim>::BoundaryValues() : Function<dim>(dim)
+    BoundaryValues<dim>::BoundaryValues()
+      : Function<dim>(dim)
     {}
 
 
@@ -371,9 +373,9 @@ namespace Step42
 
 
     template <int dim>
-    SphereObstacle<dim>::SphereObstacle(const double z_surface) :
-      Function<dim>(dim),
-      z_surface(z_surface)
+    SphereObstacle<dim>::SphereObstacle(const double z_surface)
+      : Function<dim>(dim)
+      , z_surface(z_surface)
     {}
 
 
@@ -452,16 +454,17 @@ namespace Step42
     // The constructor of this class reads in the data that describes
     // the obstacle from the given file name.
     template <int dim>
-    BitmapFile<dim>::BitmapFile(const std::string &name) :
-      obstacle_data(0),
-      hx(0),
-      hy(0),
-      nx(0),
-      ny(0)
+    BitmapFile<dim>::BitmapFile(const std::string &name)
+      : obstacle_data(0)
+      , hx(0)
+      , hy(0)
+      , nx(0)
+      , ny(0)
     {
       std::ifstream f(name);
-      AssertThrow(
-        f, ExcMessage(std::string("Can't read from file <") + name + ">!"));
+      AssertThrow(f,
+                  ExcMessage(std::string("Can't read from file <") + name +
+                             ">!"));
 
       std::string temp;
       f >> temp >> nx >> ny;
@@ -548,10 +551,10 @@ namespace Step42
 
     template <int dim>
     ChineseObstacle<dim>::ChineseObstacle(const std::string &filename,
-                                          const double       z_surface) :
-      Function<dim>(dim),
-      input_obstacle(filename),
-      z_surface(z_surface)
+                                          const double       z_surface)
+      : Function<dim>(dim)
+      , input_obstacle(filename)
+      , z_surface(z_surface)
     {}
 
 
@@ -816,40 +819,45 @@ namespace Step42
   // creating such a directory if necessary.
   template <int dim>
   PlasticityContactProblem<dim>::PlasticityContactProblem(
-    const ParameterHandler &prm) :
-    mpi_communicator(MPI_COMM_WORLD),
-    pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-    computing_timer(MPI_COMM_WORLD,
-                    pcout,
-                    TimerOutput::never,
-                    TimerOutput::wall_times),
+    const ParameterHandler &prm)
+    : mpi_communicator(MPI_COMM_WORLD)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(MPI_COMM_WORLD,
+                      pcout,
+                      TimerOutput::never,
+                      TimerOutput::wall_times)
+    ,
 
     n_initial_global_refinements(
-      prm.get_integer("number of initial refinements")),
-    triangulation(mpi_communicator),
-    fe_degree(prm.get_integer("polynomial degree")),
-    fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim),
-    dof_handler(triangulation),
+      prm.get_integer("number of initial refinements"))
+    , triangulation(mpi_communicator)
+    , fe_degree(prm.get_integer("polynomial degree"))
+    , fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim)
+    , dof_handler(triangulation)
+    ,
 
-    e_modulus(200000),
-    nu(0.3),
-    gamma(0.01),
-    sigma_0(400.0),
-    constitutive_law(e_modulus, nu, sigma_0, gamma),
+    e_modulus(200000)
+    , nu(0.3)
+    , gamma(0.01)
+    , sigma_0(400.0)
+    , constitutive_law(e_modulus, nu, sigma_0, gamma)
+    ,
 
-    base_mesh(prm.get("base mesh")),
-    obstacle(prm.get("obstacle") == "read from file" ?
-               static_cast<const Function<dim> *>(
-                 new EquationData::ChineseObstacle<dim>(
-                   "obstacle.pbm",
-                   (base_mesh == "box" ? 1.0 : 0.5))) :
-               static_cast<const Function<dim> *>(
-                 new EquationData::SphereObstacle<dim>(
-                   base_mesh == "box" ? 1.0 : 0.5))),
+    base_mesh(prm.get("base mesh"))
+    , obstacle(prm.get("obstacle") == "read from file" ?
+                 static_cast<const Function<dim> *>(
+                   new EquationData::ChineseObstacle<dim>(
+                     "obstacle.pbm",
+                     (base_mesh == "box" ? 1.0 : 0.5))) :
+                 static_cast<const Function<dim> *>(
+                   new EquationData::SphereObstacle<dim>(
+                     base_mesh == "box" ? 1.0 : 0.5)))
+    ,
 
-    transfer_solution(prm.get_bool("transfer solution")),
-    n_refinement_cycles(prm.get_integer("number of cycles")),
-    current_refinement_cycle(0)
+    transfer_solution(prm.get_bool("transfer solution"))
+    , n_refinement_cycles(prm.get_integer("number of cycles"))
+    , current_refinement_cycle(0)
 
   {
     std::string strat = prm.get("refinement strategy");
@@ -1040,12 +1048,12 @@ namespace Step42
       TrilinosWrappers::SparsityPattern sp(locally_owned_dofs,
                                            mpi_communicator);
 
-      DoFTools::make_sparsity_pattern(
-        dof_handler,
-        sp,
-        constraints_dirichlet_and_hanging_nodes,
-        false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      sp,
+                                      constraints_dirichlet_and_hanging_nodes,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(
+                                        mpi_communicator));
       sp.compress();
       newton_matrix.reinit(sp);
 
@@ -1147,8 +1155,9 @@ namespace Step42
   {
     QGaussLobatto<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-    FEFaceValues<dim> fe_values_face(
-      fe, face_quadrature_formula, update_values | update_JxW_values);
+    FEFaceValues<dim> fe_values_face(fe,
+                                     face_quadrature_formula,
+                                     update_values | update_JxW_values);
 
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_face_q_points = face_quadrature_formula.size();
@@ -1244,8 +1253,9 @@ namespace Step42
     // looping over quadrature points is equivalent to looping over shape
     // functions defined on a face. With this, the code looks as follows:
     Quadrature<dim - 1> face_quadrature(fe.get_unit_face_support_points());
-    FEFaceValues<dim>   fe_values_face(
-      fe, face_quadrature, update_quadrature_points);
+    FEFaceValues<dim>   fe_values_face(fe,
+                                     face_quadrature,
+                                     update_quadrature_points);
 
     const unsigned int dofs_per_face   = fe.dofs_per_face;
     const unsigned int n_face_q_points = face_quadrature.size();
@@ -1666,8 +1676,9 @@ namespace Step42
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
 
       std::vector<std::vector<bool>> constant_modes;
-      DoFTools::extract_constant_modes(
-        dof_handler, ComponentMask(), constant_modes);
+      DoFTools::extract_constant_modes(dof_handler,
+                                       ComponentMask(),
+                                       constant_modes);
 
       TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
       additional_data.constant_modes        = constant_modes;
@@ -1693,8 +1704,10 @@ namespace Step42
 
       SolverControl solver_control(newton_matrix.m(), solver_tolerance);
       SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control);
-      solver.solve(
-        newton_matrix, distributed_solution, newton_rhs, preconditioner);
+      solver.solve(newton_matrix,
+                   distributed_solution,
+                   newton_rhs,
+                   preconditioner);
 
       pcout << "         Error: " << solver_control.initial_value() << " -> "
             << solver_control.last_value() << " in "
@@ -2133,8 +2146,9 @@ namespace Step42
     double contact_force = 0.0;
 
     QGauss<dim - 1>   face_quadrature_formula(fe.degree + 1);
-    FEFaceValues<dim> fe_values_face(
-      fe, face_quadrature_formula, update_values | update_JxW_values);
+    FEFaceValues<dim> fe_values_face(fe,
+                                     face_quadrature_formula,
+                                     update_values | update_JxW_values);
 
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 

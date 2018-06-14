@@ -34,9 +34,9 @@ const unsigned int Function<dim, RangeNumberType>::dimension;
 
 template <int dim, typename RangeNumberType>
 Function<dim, RangeNumberType>::Function(const unsigned int    n_components,
-                                         const RangeNumberType initial_time) :
-  FunctionTime<RangeNumberType>(initial_time),
-  n_components(n_components)
+                                         const RangeNumberType initial_time)
+  : FunctionTime<RangeNumberType>(initial_time)
+  , n_components(n_components)
 {
   // avoid the construction of function objects that don't return any
   // values. This doesn't make much sense in the first place, but will lead
@@ -319,8 +319,8 @@ namespace Functions
 {
   template <int dim, typename RangeNumberType>
   ZeroFunction<dim, RangeNumberType>::ZeroFunction(
-    const unsigned int n_components) :
-    ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
+    const unsigned int n_components)
+    : ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
   {}
 
 } // namespace Functions
@@ -332,24 +332,24 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
     const RangeNumberType value,
-    const unsigned int    n_components) :
-    Function<dim, RangeNumberType>(n_components),
-    function_value_vector(n_components, value)
+    const unsigned int    n_components)
+    : Function<dim, RangeNumberType>(n_components)
+    , function_value_vector(n_components, value)
   {}
 
   template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
-    const std::vector<RangeNumberType> &values) :
-    Function<dim, RangeNumberType>(values.size()),
-    function_value_vector(values)
+    const std::vector<RangeNumberType> &values)
+    : Function<dim, RangeNumberType>(values.size())
+    , function_value_vector(values)
   {}
 
 
   template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
-    const Vector<RangeNumberType> &values) :
-    Function<dim, RangeNumberType>(values.size()),
-    function_value_vector(values.size())
+    const Vector<RangeNumberType> &values)
+    : Function<dim, RangeNumberType>(values.size())
+    , function_value_vector(values.size())
   {
     Assert(values.size() == function_value_vector.size(),
            ExcDimensionMismatch(values.size(), function_value_vector.size()));
@@ -360,13 +360,14 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
     const RangeNumberType *begin_ptr,
-    const unsigned int     n_components) :
-    Function<dim, RangeNumberType>(n_components),
-    function_value_vector(n_components)
+    const unsigned int     n_components)
+    : Function<dim, RangeNumberType>(n_components)
+    , function_value_vector(n_components)
   {
     Assert(begin_ptr != nullptr, ExcMessage("Null pointer encountered!"));
-    std::copy(
-      begin_ptr, begin_ptr + n_components, function_value_vector.begin());
+    std::copy(begin_ptr,
+              begin_ptr + n_components,
+              function_value_vector.begin());
   }
 
 
@@ -432,9 +433,9 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(
-          return_values[i].size() == this->n_components,
-          ExcDimensionMismatch(return_values[i].size(), this->n_components));
+        Assert(return_values[i].size() == this->n_components,
+               ExcDimensionMismatch(return_values[i].size(),
+                                    this->n_components));
         std::copy(function_value_vector.begin(),
                   function_value_vector.end(),
                   return_values[i].begin());
@@ -517,9 +518,9 @@ template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const unsigned int    selected,
   const RangeNumberType value,
-  const unsigned int    n_components) :
-  ConstantFunction<dim, RangeNumberType>(value, n_components),
-  selected_components(std::make_pair(selected, selected + 1))
+  const unsigned int    n_components)
+  : ConstantFunction<dim, RangeNumberType>(value, n_components)
+  , selected_components(std::make_pair(selected, selected + 1))
 {}
 
 
@@ -527,9 +528,9 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
 template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const unsigned int selected,
-  const unsigned int n_components) :
-  ConstantFunction<dim, RangeNumberType>(1., n_components),
-  selected_components(std::make_pair(selected, selected + 1))
+  const unsigned int n_components)
+  : ConstantFunction<dim, RangeNumberType>(1., n_components)
+  , selected_components(std::make_pair(selected, selected + 1))
 {
   Assert(selected < n_components, ExcIndexRange(selected, 0, n_components));
 }
@@ -539,9 +540,9 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
 template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const std::pair<unsigned int, unsigned int> &selected,
-  const unsigned int                           n_components) :
-  ConstantFunction<dim, RangeNumberType>(1., n_components),
-  selected_components(selected)
+  const unsigned int                           n_components)
+  : ConstantFunction<dim, RangeNumberType>(1., n_components)
+  , selected_components(selected)
 {
   Assert(selected_components.first < selected_components.second,
          ExcMessage("The upper bound of the interval must be larger than "
@@ -614,9 +615,9 @@ ComponentSelectFunction<dim, RangeNumberType>::memory_consumption() const
 template <int dim, typename RangeNumberType>
 ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
   ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &function_object) :
-  Function<dim, RangeNumberType>(1),
-  function_object(function_object)
+    const std::function<RangeNumberType(const Point<dim> &)> &function_object)
+  : Function<dim, RangeNumberType>(1)
+  , function_object(function_object)
 {}
 
 
@@ -640,10 +641,10 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::
   VectorFunctionFromScalarFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object,
     const unsigned int selected_component,
-    const unsigned int n_components) :
-  Function<dim, RangeNumberType>(n_components),
-  function_object(function_object),
-  selected_component(selected_component)
+    const unsigned int n_components)
+  : Function<dim, RangeNumberType>(n_components)
+  , function_object(function_object)
+  , selected_component(selected_component)
 {
   Assert(selected_component < this->n_components,
          ExcIndexRange(selected_component, 0, this->n_components));
@@ -693,10 +694,10 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::
   VectorFunctionFromTensorFunction(
     const TensorFunction<1, dim, RangeNumberType> &tensor_function,
     const unsigned int                             selected_component,
-    const unsigned int                             n_components) :
-  Function<dim, RangeNumberType>(n_components),
-  tensor_function(tensor_function),
-  selected_component(selected_component)
+    const unsigned int                             n_components)
+  : Function<dim, RangeNumberType>(n_components)
+  , tensor_function(tensor_function)
+  , selected_component(selected_component)
 {
   // Verify that the Tensor<1,dim,RangeNumberType> will fit in the given length
   // selected_components and not hang over the end of the vector.

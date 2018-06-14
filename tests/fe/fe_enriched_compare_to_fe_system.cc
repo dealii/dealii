@@ -63,7 +63,8 @@ template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
-  EnrichmentFunction() : Function<dim>(1)
+  EnrichmentFunction()
+    : Function<dim>(1)
   {}
 
   virtual double
@@ -179,8 +180,10 @@ test(const FiniteElement<dim> & fe1,
         p2[d]          = 2.0;
         repetitions[d] = 3;
       }
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitions, p1, p2);
+    GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                              repetitions,
+                                              p1,
+                                              p2);
 
     if (distort)
       GridTools::distort_random(0.1, triangulation);

@@ -39,11 +39,15 @@ main()
     prm.enter_subsection("Testing%testing");
     {
       prm.declare_entry("double 2", "4.321", Patterns::Double(), "doc 4");
-      prm.declare_entry(
-        "string&list", "< & > ; /", Patterns::Anything(), "docs 1");
+      prm.declare_entry("string&list",
+                        "< & > ; /",
+                        Patterns::Anything(),
+                        "docs 1");
       prm.declare_entry("int*int", "2", Patterns::Integer());
-      prm.declare_entry(
-        "double+double", "6.1415926", Patterns::Double(), "docs 3");
+      prm.declare_entry("double+double",
+                        "6.1415926",
+                        Patterns::Double(),
+                        "docs 3");
     }
     prm.leave_subsection();
   }

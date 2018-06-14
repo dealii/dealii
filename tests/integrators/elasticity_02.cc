@@ -60,11 +60,11 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<double>>>(uval),
-          true);
+        fev.get_function_values(u,
+                                indices,
+                                VectorSlice<std::vector<std::vector<double>>>(
+                                  uval),
+                                true);
         fev.get_function_gradients(
           u,
           indices,

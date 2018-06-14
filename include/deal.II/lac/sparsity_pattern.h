@@ -1193,16 +1193,16 @@ private:
 namespace SparsityPatternIterators
 {
   inline Accessor::Accessor(const SparsityPattern *sparsity_pattern,
-                            const std::size_t      i) :
-    sparsity_pattern(sparsity_pattern),
-    index_within_sparsity(i)
+                            const std::size_t      i)
+    : sparsity_pattern(sparsity_pattern)
+    , index_within_sparsity(i)
   {}
 
 
 
-  inline Accessor::Accessor(const SparsityPattern *sparsity_pattern) :
-    sparsity_pattern(sparsity_pattern),
-    index_within_sparsity(sparsity_pattern->rowstart[sparsity_pattern->rows])
+  inline Accessor::Accessor(const SparsityPattern *sparsity_pattern)
+    : sparsity_pattern(sparsity_pattern)
+    , index_within_sparsity(sparsity_pattern->rowstart[sparsity_pattern->rows])
   {}
 
 
@@ -1223,10 +1223,11 @@ namespace SparsityPatternIterators
   {
     Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    const std::size_t *insert_point = std::upper_bound(
-      sparsity_pattern->rowstart.get(),
-      sparsity_pattern->rowstart.get() + sparsity_pattern->rows + 1,
-      index_within_sparsity);
+    const std::size_t *insert_point =
+      std::upper_bound(sparsity_pattern->rowstart.get(),
+                       sparsity_pattern->rowstart.get() +
+                         sparsity_pattern->rows + 1,
+                       index_within_sparsity);
     return insert_point - sparsity_pattern->rowstart.get() - 1;
   }
 
@@ -1292,8 +1293,8 @@ namespace SparsityPatternIterators
 
 
   inline Iterator::Iterator(const SparsityPattern *sparsity_pattern,
-                            const std::size_t      i) :
-    accessor(sparsity_pattern, i)
+                            const std::size_t      i)
+    : accessor(sparsity_pattern, i)
   {}
 
 

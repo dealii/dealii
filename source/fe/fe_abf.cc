@@ -45,17 +45,17 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-FE_ABF<dim>::FE_ABF(const unsigned int deg) :
-  FE_PolyTensor<PolynomialsABF<dim>, dim>(
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 2,
-                           FiniteElementData<dim>::Hdiv),
-    std::vector<bool>(PolynomialsABF<dim>::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(PolynomialsABF<dim>::compute_n_pols(deg),
-                               std::vector<bool>(dim, true))),
-  rt_order(deg)
+FE_ABF<dim>::FE_ABF(const unsigned int deg)
+  : FE_PolyTensor<PolynomialsABF<dim>, dim>(
+      deg,
+      FiniteElementData<dim>(get_dpo_vector(deg),
+                             dim,
+                             deg + 2,
+                             FiniteElementData<dim>::Hdiv),
+      std::vector<bool>(PolynomialsABF<dim>::compute_n_pols(deg), true),
+      std::vector<ComponentMask>(PolynomialsABF<dim>::compute_n_pols(deg),
+                                 std::vector<bool>(dim, true)))
+  , rt_order(deg)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -277,17 +277,19 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
   // TODO: Here the canonical extension of the principle
   // behind the ABF elements is implemented. It is unclear,
   // if this really leads to the ABF spaces in 3D!
-  interior_weights_abf.reinit(TableIndices<3>(
-    cell_quadrature.size(), polynomials_abf[0]->n() * dim, dim));
+  interior_weights_abf.reinit(TableIndices<3>(cell_quadrature.size(),
+                                              polynomials_abf[0]->n() * dim,
+                                              dim));
   Tensor<1, dim> poly_grad;
 
   for (unsigned int k = 0; k < cell_quadrature.size(); ++k)
     {
       for (unsigned int i = 0; i < polynomials_abf[0]->n() * dim; ++i)
         {
-          poly_grad = polynomials_abf[i % dim]->compute_grad(
-                        i / dim, cell_quadrature.point(k)) *
-                      cell_quadrature.weight(k);
+          poly_grad =
+            polynomials_abf[i % dim]->compute_grad(i / dim,
+                                                   cell_quadrature.point(k)) *
+            cell_quadrature.weight(k);
           // The minus sign comes from the use of the Gauss theorem to replace
           // the divergence.
           for (unsigned int d = 0; d < dim; ++d)
@@ -382,8 +384,9 @@ FE_ABF<dim>::initialize_restriction()
                   // subcell are NOT
                   // transformed, so we
                   // have to do it here.
-                  this->restriction[iso][child](
-                    face * this->dofs_per_face + i_face, i_child) +=
+                  this->restriction[iso][child](face * this->dofs_per_face +
+                                                  i_face,
+                                                i_child) +=
                     Utilities::fixed_power<dim - 1>(.5) * q_sub.weight(k) *
                     cached_values_face(i_child, k) *
                     this->shape_value_component(
@@ -436,8 +439,9 @@ FE_ABF<dim>::initialize_restriction()
             for (unsigned int i_weight = 0; i_weight < polynomials[d]->n();
                  ++i_weight)
               {
-                this->restriction[iso][child](
-                  start_cell_dofs + i_weight * dim + d, i_child) +=
+                this->restriction[iso][child](start_cell_dofs + i_weight * dim +
+                                                d,
+                                              i_child) +=
                   q_sub.weight(k) * cached_values_cell(i_child, k, d) *
                   polynomials[d]->compute_value(i_weight, q_sub.point(k));
               }
@@ -535,9 +539,9 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values.size() == this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(),
+                              this->n_components()));
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
 

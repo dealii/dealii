@@ -48,10 +48,11 @@ void check_this(Triangulation<3> &tria)
                                   quadrature,
                                   update_quadrature_points | update_JxW_values |
                                     update_normal_vectors);
-  FESubfaceValues<3> fe_face_values2(
-    fe,
-    quadrature,
-    update_quadrature_points | update_JxW_values | update_normal_vectors);
+  FESubfaceValues<3> fe_face_values2(fe,
+                                     quadrature,
+                                     update_quadrature_points |
+                                       update_JxW_values |
+                                       update_normal_vectors);
 
   DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fe);

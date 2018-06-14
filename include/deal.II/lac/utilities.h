@@ -228,10 +228,10 @@ namespace Utilities
     {
       Assert(f != 0, ExcDivideByZero());
       const NumberType tau = g / f;
-      AssertThrow(
-        std::abs(tau) < 1.,
-        ExcMessage("real-valued Hyperbolic rotation does not exist for (" +
-                   std::to_string(f) + "," + std::to_string(g) + ")"));
+      AssertThrow(std::abs(tau) < 1.,
+                  ExcMessage(
+                    "real-valued Hyperbolic rotation does not exist for (" +
+                    std::to_string(f) + "," + std::to_string(g) + ")"));
       const NumberType u =
         std::copysign(sqrt((1. - tau) * (1. + tau)),
                       f); // <-- more stable than std::sqrt(1.-tau*tau)

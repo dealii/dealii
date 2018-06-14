@@ -102,11 +102,11 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<double>>>(uval),
-          true);
+        fev.get_function_values(u,
+                                indices,
+                                VectorSlice<std::vector<std::vector<double>>>(
+                                  uval),
+                                true);
         fev.get_function_gradients(
           u,
           indices,
@@ -165,9 +165,9 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
     nullval(d, std::vector<double>(fev2.n_quadrature_points, 0.));
   std::vector<std::vector<Tensor<1, dim>>> u1grad(
     d, std::vector<Tensor<1, dim>>(fev1.n_quadrature_points)),
-    nullgrad(
-      d,
-      std::vector<Tensor<1, dim>>(fev2.n_quadrature_points, Tensor<1, dim>()));
+    nullgrad(d,
+             std::vector<Tensor<1, dim>>(fev2.n_quadrature_points,
+                                         Tensor<1, dim>()));
 
   std::vector<types::global_dof_index> indices1(n1), indices2(n2);
   for (unsigned int i = 0; i < n1; ++i)
@@ -183,11 +183,11 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
         u1(i1) = 1.;
         w1     = 0.;
         w2     = 0.;
-        fev1.get_function_values(
-          u1,
-          indices1,
-          VectorSlice<std::vector<std::vector<double>>>(u1val),
-          true);
+        fev1.get_function_values(u1,
+                                 indices1,
+                                 VectorSlice<std::vector<std::vector<double>>>(
+                                   u1val),
+                                 true);
         fev1.get_function_gradients(
           u1,
           indices1,
@@ -210,11 +210,11 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
 
         w1 = 0.;
         w2 = 0.;
-        fev2.get_function_values(
-          u1,
-          indices2,
-          VectorSlice<std::vector<std::vector<double>>>(u1val),
-          true);
+        fev2.get_function_values(u1,
+                                 indices2,
+                                 VectorSlice<std::vector<std::vector<double>>>(
+                                   u1val),
+                                 true);
         fev2.get_function_gradients(
           u1,
           indices2,
@@ -263,8 +263,9 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
       test_boundary(fef1);
     }
 
-  FEFaceValues<dim> fef2(
-    fe, face_quadrature, update_values | update_gradients | update_JxW_values);
+  FEFaceValues<dim>                          fef2(fe,
+                         face_quadrature,
+                         update_values | update_gradients | update_JxW_values);
   typename Triangulation<dim>::cell_iterator cell2 = cell1->neighbor(1);
 
   deallog << "face_matrix " << 0 << std::endl;

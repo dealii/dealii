@@ -48,11 +48,11 @@ plot_shape_functions(Mapping<dim> &      mapping,
 
   QTrapez<1>     q_trapez;
   QIterated<dim> q(q_trapez, div);
-  FEValues<dim>  fe(
-    mapping,
-    finel,
-    q,
-    UpdateFlags(update_values | update_gradients | update_hessians));
+  FEValues<dim>  fe(mapping,
+                   finel,
+                   q,
+                   UpdateFlags(update_values | update_gradients |
+                               update_hessians));
 
   sprintf(fname, "Cell%dd-%s", dim, name);
   //  cerr << "\n" << fname << "\n";
@@ -137,12 +137,16 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
 
   const unsigned int div = 4;
 
-  QTrapez<1>         q_trapez;
-  QIterated<dim - 1> q(q_trapez, div);
-  FEFaceValues<dim>  fe(
-    mapping, finel, q, UpdateFlags(uflags | update_quadrature_points));
-  FESubfaceValues<dim> sub(
-    mapping, finel, q, UpdateFlags(uflags | update_quadrature_points));
+  QTrapez<1>           q_trapez;
+  QIterated<dim - 1>   q(q_trapez, div);
+  FEFaceValues<dim>    fe(mapping,
+                       finel,
+                       q,
+                       UpdateFlags(uflags | update_quadrature_points));
+  FESubfaceValues<dim> sub(mapping,
+                           finel,
+                           q,
+                           UpdateFlags(uflags | update_quadrature_points));
 
   sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);
@@ -276,8 +280,10 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                                     {
                                       const Tensor<3, dim>
                                         t1 = sub.shape_3rd_derivative(i, k),
-                                        t2 = sub.shape_3rd_derivative_component(
-                                          i, k, c);
+                                        t2 =
+                                          sub.shape_3rd_derivative_component(i,
+                                                                             k,
+                                                                             c);
                                       Assert(t1 == t2, ExcInternalError());
                                     }
                                 }
@@ -376,13 +382,13 @@ check_values_and_derivatives(const FiniteElement<dim> &fe,
 
         if (fe.is_primitive(i))
           for (unsigned int c = 0; c < fe.n_components(); ++c)
-            Assert(
-              ((c == fe.system_to_component_index(i).first) &&
-               (fe_values.shape_grad(i, x) ==
-                fe_values.shape_grad_component(i, x, c))) ||
-                ((c != fe.system_to_component_index(i).first) &&
-                 (fe_values.shape_grad_component(i, x, c) == Tensor<1, dim>())),
-              ExcInternalError());
+            Assert(((c == fe.system_to_component_index(i).first) &&
+                    (fe_values.shape_grad(i, x) ==
+                     fe_values.shape_grad_component(i, x, c))) ||
+                     ((c != fe.system_to_component_index(i).first) &&
+                      (fe_values.shape_grad_component(i, x, c) ==
+                       Tensor<1, dim>())),
+                   ExcInternalError());
       }
 
   // check second derivatives

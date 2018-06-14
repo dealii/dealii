@@ -277,8 +277,8 @@ inline const Point<dim> &KDTree<dim>::operator[](const unsigned int i) const
 
 template <int dim>
 KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(
-  const std::vector<Point<dim>> &_points) :
-  points(_points)
+  const std::vector<Point<dim>> &_points)
+  : points(_points)
 {}
 
 

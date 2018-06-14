@@ -160,7 +160,8 @@ namespace Step46
   class StokesBoundaryValues : public Function<dim>
   {
   public:
-    StokesBoundaryValues() : Function<dim>(dim + 1 + dim)
+    StokesBoundaryValues()
+      : Function<dim>(dim + 1 + dim)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -207,7 +208,8 @@ namespace Step46
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -252,26 +254,26 @@ namespace Step46
   template <int dim>
   FluidStructureProblem<dim>::FluidStructureProblem(
     const unsigned int stokes_degree,
-    const unsigned int elasticity_degree) :
-    stokes_degree(stokes_degree),
-    elasticity_degree(elasticity_degree),
-    triangulation(Triangulation<dim>::maximum_smoothing),
-    stokes_fe(FE_Q<dim>(stokes_degree + 1),
-              dim,
-              FE_Q<dim>(stokes_degree),
-              1,
-              FE_Nothing<dim>(),
-              dim),
-    elasticity_fe(FE_Nothing<dim>(),
-                  dim,
-                  FE_Nothing<dim>(),
-                  1,
-                  FE_Q<dim>(elasticity_degree),
-                  dim),
-    dof_handler(triangulation),
-    viscosity(2),
-    lambda(1),
-    mu(1)
+    const unsigned int elasticity_degree)
+    : stokes_degree(stokes_degree)
+    , elasticity_degree(elasticity_degree)
+    , triangulation(Triangulation<dim>::maximum_smoothing)
+    , stokes_fe(FE_Q<dim>(stokes_degree + 1),
+                dim,
+                FE_Q<dim>(stokes_degree),
+                1,
+                FE_Nothing<dim>(),
+                dim)
+    , elasticity_fe(FE_Nothing<dim>(),
+                    dim,
+                    FE_Nothing<dim>(),
+                    1,
+                    FE_Q<dim>(elasticity_degree),
+                    dim)
+    , dof_handler(triangulation)
+    , viscosity(2)
+    , lambda(1)
+    , mu(1)
   {
     fe_collection.push_back(stokes_fe);
     fe_collection.push_back(elasticity_fe);
@@ -384,12 +386,12 @@ namespace Step46
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
       const FEValuesExtractors::Vector velocities(0);
-      VectorTools::interpolate_boundary_values(
-        dof_handler,
-        1,
-        StokesBoundaryValues<dim>(),
-        constraints,
-        fe_collection.component_mask(velocities));
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               1,
+                                               StokesBoundaryValues<dim>(),
+                                               constraints,
+                                               fe_collection.component_mask(
+                                                 velocities));
 
       const FEValuesExtractors::Vector displacements(dim + 1);
       VectorTools::interpolate_boundary_values(
@@ -477,8 +479,10 @@ namespace Step46
               face_coupling[c][d] = DoFTools::always;
           }
 
-      DoFTools::make_flux_sparsity_pattern(
-        dof_handler, dsp, cell_coupling, face_coupling);
+      DoFTools::make_flux_sparsity_pattern(dof_handler,
+                                           dsp,
+                                           cell_coupling,
+                                           face_coupling);
       constraints.condense(dsp);
       sparsity_pattern.copy_from(dsp);
     }
@@ -521,18 +525,22 @@ namespace Step46
     const QGauss<dim - 1> common_face_quadrature(
       std::max(stokes_degree + 2, elasticity_degree + 2));
 
-    FEFaceValues<dim> stokes_fe_face_values(
-      stokes_fe,
-      common_face_quadrature,
-      update_JxW_values | update_normal_vectors | update_gradients);
-    FEFaceValues<dim> elasticity_fe_face_values(
-      elasticity_fe, common_face_quadrature, update_values);
-    FESubfaceValues<dim> stokes_fe_subface_values(
-      stokes_fe,
-      common_face_quadrature,
-      update_JxW_values | update_normal_vectors | update_gradients);
-    FESubfaceValues<dim> elasticity_fe_subface_values(
-      elasticity_fe, common_face_quadrature, update_values);
+    FEFaceValues<dim>    stokes_fe_face_values(stokes_fe,
+                                            common_face_quadrature,
+                                            update_JxW_values |
+                                              update_normal_vectors |
+                                              update_gradients);
+    FEFaceValues<dim>    elasticity_fe_face_values(elasticity_fe,
+                                                common_face_quadrature,
+                                                update_values);
+    FESubfaceValues<dim> stokes_fe_subface_values(stokes_fe,
+                                                  common_face_quadrature,
+                                                  update_JxW_values |
+                                                    update_normal_vectors |
+                                                    update_gradients);
+    FESubfaceValues<dim> elasticity_fe_subface_values(elasticity_fe,
+                                                      common_face_quadrature,
+                                                      update_values);
 
     // ...to objects that are needed to describe the local contributions to
     // the global linear system...
@@ -941,22 +949,22 @@ namespace Step46
     face_q_collection.push_back(elasticity_face_quadrature);
 
     const FEValuesExtractors::Vector velocities(0);
-    KellyErrorEstimator<dim>::estimate(
-      dof_handler,
-      face_q_collection,
-      typename FunctionMap<dim>::type(),
-      solution,
-      stokes_estimated_error_per_cell,
-      fe_collection.component_mask(velocities));
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       face_q_collection,
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       stokes_estimated_error_per_cell,
+                                       fe_collection.component_mask(
+                                         velocities));
 
     const FEValuesExtractors::Vector displacements(dim + 1);
-    KellyErrorEstimator<dim>::estimate(
-      dof_handler,
-      face_q_collection,
-      typename FunctionMap<dim>::type(),
-      solution,
-      elasticity_estimated_error_per_cell,
-      fe_collection.component_mask(displacements));
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       face_q_collection,
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       elasticity_estimated_error_per_cell,
+                                       fe_collection.component_mask(
+                                         displacements));
 
     // We then normalize error estimates by dividing by their norm and scale
     // the fluid error indicators by a factor of 4 as discussed in the
@@ -1023,8 +1031,10 @@ namespace Step46
               estimated_error_per_cell(cell->active_cell_index()) = 0;
           }
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.0);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.0);
     triangulation.execute_coarsening_and_refinement();
   }
 

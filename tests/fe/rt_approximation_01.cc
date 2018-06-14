@@ -70,7 +70,8 @@ template <int dim>
 class TestMap1 : public Function<dim>
 {
 public:
-  TestMap1(const unsigned int n_components) : Function<dim>(n_components)
+  TestMap1(const unsigned int n_components)
+    : Function<dim>(n_components)
   {}
 
   virtual ~TestMap1()
@@ -125,9 +126,9 @@ private:
   const double phi;
 
 public:
-  TestDef1(const unsigned int n_components, const double ph) :
-    Function<dim>(n_components),
-    phi(ph)
+  TestDef1(const unsigned int n_components, const double ph)
+    : Function<dim>(n_components)
+    , phi(ph)
   {}
 
   virtual ~TestDef1()
@@ -181,9 +182,9 @@ private:
   const double scale;
 
 public:
-  TestDef2(const unsigned int n_components, const double sc) :
-    Function<dim>(n_components),
-    scale(sc)
+  TestDef2(const unsigned int n_components, const double sc)
+    : Function<dim>(n_components)
+    , scale(sc)
   {}
 
   virtual ~TestDef2()
@@ -233,9 +234,9 @@ private:
   const double scale;
 
 public:
-  TestDef3(const unsigned int n_components, const double sc) :
-    Function<dim>(n_components),
-    scale(sc)
+  TestDef3(const unsigned int n_components, const double sc)
+    : Function<dim>(n_components)
+    , scale(sc)
   {}
 
   virtual ~TestDef3()
@@ -282,7 +283,8 @@ private:
   std::vector<Polynomials::Polynomial<double>> polys;
 
 public:
-  TestPoly(unsigned int deg) : Function<dim>(2)
+  TestPoly(unsigned int deg)
+    : Function<dim>(2)
   {
     std::vector<double> coeff(deg, 0.0);
     for (unsigned int p = 0; p < 4; ++p)

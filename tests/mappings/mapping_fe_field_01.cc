@@ -74,8 +74,10 @@ test(const unsigned int degree)
 
   QIterated<dim> quadrature_formula(QTrapez<1>(), fe.degree);
 
-  FEValues<dim, spacedim> fe_values(
-    map_fe, fe_sys, quadrature_formula, update_values | update_JxW_values);
+  FEValues<dim, spacedim> fe_values(map_fe,
+                                    fe_sys,
+                                    quadrature_formula,
+                                    update_values | update_JxW_values);
 
   typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
                                                              dof_sys

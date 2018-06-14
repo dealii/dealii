@@ -105,14 +105,14 @@ private:
 // Constructor
 template <int dim>
 diffusionMechanics<dim>::diffusionMechanics(const unsigned int mech_degree,
-                                            const unsigned int diff_degree) :
-  mech_degree(mech_degree),
-  diff_degree(diff_degree),
-  omega1_fe(FE_Q<dim>(mech_degree), dim, FE_Q<dim>(diff_degree), 1),
-  omega2_fe(FE_Q<dim>(mech_degree), dim, FE_Nothing<dim>(), 1),
-  dof_handler(triangulation),
-  quadrature_formula(3),
-  face_quadrature_formula(2)
+                                            const unsigned int diff_degree)
+  : mech_degree(mech_degree)
+  , diff_degree(diff_degree)
+  , omega1_fe(FE_Q<dim>(mech_degree), dim, FE_Q<dim>(diff_degree), 1)
+  , omega2_fe(FE_Q<dim>(mech_degree), dim, FE_Nothing<dim>(), 1)
+  , dof_handler(triangulation)
+  , quadrature_formula(3)
+  , face_quadrature_formula(2)
 {
   // Nodal Solution names
   for (unsigned int i = 0; i < dim; ++i)
@@ -138,7 +138,8 @@ template <int dim>
 class InitialConditions : public Function<dim>
 {
 public:
-  InitialConditions() : Function<dim>(totalDOF)
+  InitialConditions()
+    : Function<dim>(totalDOF)
   {}
   void
   vector_value(const Point<dim> &p, Vector<double> &values) const

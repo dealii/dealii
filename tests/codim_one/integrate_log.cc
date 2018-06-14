@@ -65,8 +65,9 @@ test(const unsigned int n,
 
   DoFHandler<1> dh(tria);
 
-  FEValues<1> fe_values(
-    feq, qlog, update_JxW_values | update_quadrature_points),
+  FEValues<1> fe_values(feq,
+                        qlog,
+                        update_JxW_values | update_quadrature_points),
     fev_help(feq, qgauss, update_JxW_values | update_quadrature_points);
 
 

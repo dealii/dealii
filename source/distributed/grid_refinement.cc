@@ -253,10 +253,12 @@ namespace
 
           // count how many of our own elements would be above this threshold
           // and then add to it the number for all the others
-          unsigned int my_count = std::count_if(
-            criteria.begin(), criteria.end(), [test_threshold](const double c) {
-              return c > test_threshold;
-            });
+          unsigned int my_count =
+            std::count_if(criteria.begin(),
+                          criteria.end(),
+                          [test_threshold](const double c) {
+                            return c > test_threshold;
+                          });
 
           unsigned int total_count;
           ierr = MPI_Reduce(&my_count,

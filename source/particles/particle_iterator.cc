@@ -23,8 +23,8 @@ namespace Particles
   ParticleIterator<dim, spacedim>::ParticleIterator(
     const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
     const typename std::multimap<internal::LevelInd,
-                                 Particle<dim, spacedim>>::iterator &particle) :
-    accessor(map, particle)
+                                 Particle<dim, spacedim>>::iterator & particle)
+    : accessor(map, particle)
   {}
 
 

@@ -100,7 +100,8 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  Coefficient() : Function<dim>()
+  Coefficient()
+    : Function<dim>()
   {}
 
   virtual double
@@ -151,7 +152,9 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() : dof_handler(triangulation), fe(2)
+LaplaceProblem<dim>::LaplaceProblem()
+  : dof_handler(triangulation)
+  , fe(2)
 {}
 
 
@@ -246,8 +249,9 @@ LaplaceProblem<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -257,10 +261,14 @@ LaplaceProblem<dim>::assemble_system()
   hanging_node_constraints.condense(system_rhs);
 
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 

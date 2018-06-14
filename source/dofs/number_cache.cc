@@ -26,25 +26,27 @@ namespace internal
 {
   namespace DoFHandlerImplementation
   {
-    NumberCache::NumberCache() : n_global_dofs(0), n_locally_owned_dofs(0)
+    NumberCache::NumberCache()
+      : n_global_dofs(0)
+      , n_locally_owned_dofs(0)
     {}
 
 
 
-    NumberCache::NumberCache(const types::global_dof_index n_global_dofs) :
-      n_global_dofs(n_global_dofs),
-      n_locally_owned_dofs(n_global_dofs),
-      locally_owned_dofs(complete_index_set(n_global_dofs)),
-      n_locally_owned_dofs_per_processor(1, n_global_dofs),
-      locally_owned_dofs_per_processor(1, complete_index_set(n_global_dofs))
+    NumberCache::NumberCache(const types::global_dof_index n_global_dofs)
+      : n_global_dofs(n_global_dofs)
+      , n_locally_owned_dofs(n_global_dofs)
+      , locally_owned_dofs(complete_index_set(n_global_dofs))
+      , n_locally_owned_dofs_per_processor(1, n_global_dofs)
+      , locally_owned_dofs_per_processor(1, complete_index_set(n_global_dofs))
     {}
 
 
 
     NumberCache::NumberCache(
       const std::vector<IndexSet> &locally_owned_dofs_per_processor,
-      const unsigned int           my_rank) :
-      locally_owned_dofs_per_processor(locally_owned_dofs_per_processor)
+      const unsigned int           my_rank)
+      : locally_owned_dofs_per_processor(locally_owned_dofs_per_processor)
     {
       const unsigned int n_procs = locally_owned_dofs_per_processor.size();
 

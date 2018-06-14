@@ -246,8 +246,10 @@ do_copy_from(
   const std::list<std::set<unsigned int, std::greater<unsigned int>>> &sparsity,
   SparsityPattern &                                                    sp4)
 {
-  sp4.copy_from(
-    (N - 1) * (N - 1), (N - 1) * (N - 1), sparsity.begin(), sparsity.end());
+  sp4.copy_from((N - 1) * (N - 1),
+                (N - 1) * (N - 1),
+                sparsity.begin(),
+                sparsity.end());
 }
 
 
@@ -415,21 +417,21 @@ copy_from_4()
   // and copy
   if (sp4.stores_only_added_elements() == true)
     {
-      AssertThrow(
-        sp4.n_nonzero_elements() ==
-          static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-                                      sparsity_pattern.frobenius_norm() +
-                                    0.5),
-        ExcInternalError());
+      AssertThrow(sp4.n_nonzero_elements() ==
+                    static_cast<unsigned int>(
+                      sparsity_pattern.frobenius_norm() *
+                        sparsity_pattern.frobenius_norm() +
+                      0.5),
+                  ExcInternalError());
     }
   else
     {
-      AssertThrow(
-        sp4.n_nonzero_elements() >=
-          static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-                                      sparsity_pattern.frobenius_norm() +
-                                    0.5),
-        ExcInternalError());
+      AssertThrow(sp4.n_nonzero_elements() >=
+                    static_cast<unsigned int>(
+                      sparsity_pattern.frobenius_norm() *
+                        sparsity_pattern.frobenius_norm() +
+                      0.5),
+                  ExcInternalError());
     }
 
   for (unsigned int i = 0; i < M; ++i)

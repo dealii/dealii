@@ -55,7 +55,8 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q) : q(q)
+  F(const unsigned int q)
+    : q(q)
   {}
 
   virtual double
@@ -90,8 +91,10 @@ test(Triangulation<dim> &triangulation)
       for (unsigned int q = 0; q <= p + 2; ++q)
         {
           // interpolate the function
-          VectorTools::interpolate(
-            mapping, dof_handler, F<dim>(q), interpolant);
+          VectorTools::interpolate(mapping,
+                                   dof_handler,
+                                   F<dim>(q),
+                                   interpolant);
 
           // then compute the interpolation error
           VectorTools::integrate_difference(mapping,

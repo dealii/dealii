@@ -51,16 +51,18 @@ check(const Triangulation<dim> &tria)
 
   QGauss<dim - 1> q_face(3);
 
-  FEFaceValues<dim> fe_face_values(
-    mapping,
-    fe,
-    q_face,
-    update_normal_vectors | update_quadrature_points | update_JxW_values);
-  FESubfaceValues<dim> fe_subface_values(
-    mapping,
-    fe,
-    q_face,
-    update_normal_vectors | update_quadrature_points | update_JxW_values);
+  FEFaceValues<dim>    fe_face_values(mapping,
+                                   fe,
+                                   q_face,
+                                   update_normal_vectors |
+                                     update_quadrature_points |
+                                     update_JxW_values);
+  FESubfaceValues<dim> fe_subface_values(mapping,
+                                         fe,
+                                         q_face,
+                                         update_normal_vectors |
+                                           update_quadrature_points |
+                                           update_JxW_values);
 
   double v1 = 0, v2 = 0;
   for (typename DoFHandler<dim>::active_cell_iterator cell =

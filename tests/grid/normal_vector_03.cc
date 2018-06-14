@@ -94,8 +94,9 @@ main()
                   {
                     p += face->vertex(v) *
                          linear_interpolator.shape_value(v, Point<2>(xi, eta));
-                    normal += normals[v] * linear_interpolator.shape_value(
-                                             v, Point<2>(xi, eta));
+                    normal +=
+                      normals[v] *
+                      linear_interpolator.shape_value(v, Point<2>(xi, eta));
                   }
                 normal /= normal.norm();
 

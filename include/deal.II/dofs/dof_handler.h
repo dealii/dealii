@@ -1313,9 +1313,9 @@ template <int dim, int spacedim>
 inline types::global_dof_index
 DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 {
-  Assert(
-    has_level_dofs(),
-    ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
+  Assert(has_level_dofs(),
+         ExcMessage(
+           "n_dofs(level) can only be called after distribute_mg_dofs()"));
   Assert(level < mg_number_cache.size(), ExcInvalidLevel(level));
   return mg_number_cache[level].n_global_dofs;
 }
@@ -1556,22 +1556,22 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
   ar &n_cells &fe_name &policy_name;
 
-  AssertThrow(
-    n_cells == tria->n_cells(),
-    ExcMessage("The object being loaded into does not match the triangulation "
-               "that has been stored previously."));
+  AssertThrow(n_cells == tria->n_cells(),
+              ExcMessage(
+                "The object being loaded into does not match the triangulation "
+                "that has been stored previously."));
   AssertThrow(
     fe_name == this->get_fe(0).get_name(),
     ExcMessage(
       "The finite element associated with this DoFHandler does not match "
       "the one that was associated with the DoFHandler previously stored."));
-  AssertThrow(
-    policy_name == internal::policy_to_string(*policy),
-    ExcMessage("The policy currently associated with this DoFHandler (" +
-               internal::policy_to_string(*policy) +
-               ") does not match the one that was associated with the "
-               "DoFHandler previously stored (" +
-               policy_name + ")."));
+  AssertThrow(policy_name == internal::policy_to_string(*policy),
+              ExcMessage(
+                "The policy currently associated with this DoFHandler (" +
+                internal::policy_to_string(*policy) +
+                ") does not match the one that was associated with the "
+                "DoFHandler previously stored (" +
+                policy_name + ")."));
 }
 
 

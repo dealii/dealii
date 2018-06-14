@@ -37,8 +37,9 @@ for (deal_II_dimension : DIMENSIONS)
       const bool                          closed,
       const double                        tolerance);
 
-    template Point<deal_II_dimension> push_forward(
-      const TopoDS_Shape &in_shape, const double u, const double v);
+    template Point<deal_II_dimension> push_forward(const TopoDS_Shape &in_shape,
+                                                   const double        u,
+                                                   const double        v);
 
     template Point<deal_II_dimension> line_intersection(
       const TopoDS_Shape &                in_shape,

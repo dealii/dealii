@@ -112,7 +112,8 @@ public:
 
 
 template <int dim>
-BoundaryFunction<dim>::BoundaryFunction() : Function<dim>(dim + 1)
+BoundaryFunction<dim>::BoundaryFunction()
+  : Function<dim>(dim + 1)
 {}
 
 
@@ -134,9 +135,9 @@ BoundaryFunction<dim>::vector_value(const Point<dim> &,
 // Construct FE with first component: Nedelec-Element,
 // second component: Q1_Element
 template <int dim>
-ImposeBC<dim>::ImposeBC() :
-  fe(FE_Nedelec<dim>(0), 1, FE_Q<dim>(1), 1),
-  dof_handler(triangulation)
+ImposeBC<dim>::ImposeBC()
+  : fe(FE_Nedelec<dim>(0), 1, FE_Q<dim>(1), 1)
+  , dof_handler(triangulation)
 {}
 
 
@@ -182,8 +183,10 @@ ImposeBC<dim>::test_extract_boundary_DoFs()
   std::vector<bool>            ned_boundary_dofs(dof_handler.n_dofs());
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
-  DoFTools::extract_boundary_dofs(
-    dof_handler, bc_component_select, ned_boundary_dofs, boundary_ids);
+  DoFTools::extract_boundary_dofs(dof_handler,
+                                  bc_component_select,
+                                  ned_boundary_dofs,
+                                  boundary_ids);
 
 
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
@@ -219,8 +222,10 @@ ImposeBC<dim>::test_interpolate_BC()
   std::vector<bool>            p_boundary_dofs(dof_handler.n_dofs());
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
-  DoFTools::extract_boundary_dofs(
-    dof_handler, bc_component_select, p_boundary_dofs, boundary_ids);
+  DoFTools::extract_boundary_dofs(dof_handler,
+                                  bc_component_select,
+                                  p_boundary_dofs,
+                                  boundary_ids);
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     {
       // error: pressure boundary DoF

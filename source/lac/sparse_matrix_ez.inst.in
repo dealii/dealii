@@ -37,10 +37,12 @@ for (S1, S2 : REAL_SCALARS)
       const Vector<S2> &,
       const S1,
       const std::vector<std::size_t> &) const;
-    template void SparseMatrixEZ<S1>::precondition_SOR<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
-    template void SparseMatrixEZ<S1>::precondition_TSOR<S2>(
-      Vector<S2> &, const Vector<S2> &, const S1) const;
+    template void SparseMatrixEZ<S1>::precondition_SOR<S2>(Vector<S2> &,
+                                                           const Vector<S2> &,
+                                                           const S1) const;
+    template void SparseMatrixEZ<S1>::precondition_TSOR<S2>(Vector<S2> &,
+                                                            const Vector<S2> &,
+                                                            const S1) const;
     template void SparseMatrixEZ<S1>::precondition_Jacobi<S2>(
       Vector<S2> &, const Vector<S2> &, const S1) const;
   }

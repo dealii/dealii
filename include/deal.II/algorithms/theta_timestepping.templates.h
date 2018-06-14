@@ -30,11 +30,11 @@ namespace Algorithms
 {
   template <typename VectorType>
   ThetaTimestepping<VectorType>::ThetaTimestepping(OperatorBase &e,
-                                                   OperatorBase &i) :
-    vtheta(0.5),
-    adaptive(false),
-    op_explicit(&e),
-    op_implicit(&i)
+                                                   OperatorBase &i)
+    : vtheta(0.5)
+    , adaptive(false)
+    , op_explicit(&e)
+    , op_implicit(&i)
   {
     d_explicit.step = numbers::signaling_nan<double>();
     d_explicit.time = numbers::signaling_nan<double>();

@@ -59,8 +59,9 @@ create_regular_particle_distribution(
                             static_cast<double>(particles_per_direction - 1);
               id = i * particles_per_direction * particles_per_direction +
                    j * particles_per_direction + k;
-              Particles::Particle<dim, spacedim> particle(
-                position, reference_position, id);
+              Particles::Particle<dim, spacedim> particle(position,
+                                                          reference_position,
+                                                          id);
 
               typename parallel::distributed::Triangulation<dim, spacedim>::
                 active_cell_iterator cell =
@@ -71,8 +72,9 @@ create_regular_particle_distribution(
             }
         else
           {
-            Particles::Particle<dim, spacedim> particle(
-              position, reference_position, id);
+            Particles::Particle<dim, spacedim> particle(position,
+                                                        reference_position,
+                                                        id);
 
             typename parallel::distributed::Triangulation<dim, spacedim>::
               active_cell_iterator cell =

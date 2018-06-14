@@ -83,7 +83,8 @@ namespace Step
 
 
   template <int dim>
-  Problem<dim>::Problem() : dof_handler(triangulation)
+  Problem<dim>::Problem()
+    : dof_handler(triangulation)
   {
     GridGenerator::hyper_cube(triangulation);
     for (unsigned int degree = 1; degree <= 7; ++degree)

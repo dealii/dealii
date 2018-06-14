@@ -33,14 +33,14 @@ namespace Algorithms
 {
   template <typename VectorType>
   Newton<VectorType>::Newton(OperatorBase &residual,
-                             OperatorBase &inverse_derivative) :
-    residual(&residual),
-    inverse_derivative(&inverse_derivative),
-    assemble_now(false),
-    n_stepsize_iterations(21),
-    assemble_threshold(0.),
-    debug_vectors(false),
-    debug(0)
+                             OperatorBase &inverse_derivative)
+    : residual(&residual)
+    , inverse_derivative(&inverse_derivative)
+    , assemble_now(false)
+    , n_stepsize_iterations(21)
+    , assemble_threshold(0.)
+    , debug_vectors(false)
+    , debug(0)
   {}
 
 

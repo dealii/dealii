@@ -76,7 +76,8 @@ template <int dim>
 class Displacement : public Function<dim>
 {
 public:
-  Displacement() : Function<dim>(dim)
+  Displacement()
+    : Function<dim>(dim)
   {}
 
   double
@@ -188,8 +189,9 @@ test(const unsigned int n_ref = 0)
 
   // Displacement vector
   LinearAlgebra::distributed::Vector<NumberType> displacement;
-  displacement.reinit(
-    locally_owned_dofs_euler, locally_relevant_dofs_euler, mpi_communicator);
+  displacement.reinit(locally_owned_dofs_euler,
+                      locally_relevant_dofs_euler,
+                      mpi_communicator);
 
   VectorTools::project<dim,
                        LinearAlgebra::distributed::Vector<NumberType>,
@@ -210,8 +212,9 @@ test(const unsigned int n_ref = 0)
   const unsigned int min_level = 0;
   MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
     displacement_level(min_level, max_level);
-  mg_transfer_euler.interpolate_to_mg(
-    dof_handler_euler, displacement_level, displacement);
+  mg_transfer_euler.interpolate_to_mg(dof_handler_euler,
+                                      displacement_level,
+                                      displacement);
 
   // First, check fine-level only:
   {
@@ -284,8 +287,9 @@ test(const unsigned int n_ref = 0)
 
       ConstraintMatrix level_constraints;
       IndexSet         relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(
-        dof_handler, level, relevant_dofs);
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                    level,
+                                                    relevant_dofs);
       level_constraints.reinit(relevant_dofs);
       level_constraints.add_lines(
         mg_constrained_dofs.get_boundary_indices(level));
@@ -294,8 +298,10 @@ test(const unsigned int n_ref = 0)
       MatrixFree<dim, LevelNumberType> mg_level_euler;
 
       MappingQEulerian<dim, LinearAlgebra::distributed::Vector<LevelNumberType>>
-        euler_level(
-          euler_fe_degree, dof_handler_euler, displacement_level[level], level);
+        euler_level(euler_fe_degree,
+                    dof_handler_euler,
+                    displacement_level[level],
+                    level);
 
       mg_level_euler.reinit(euler_level,
                             dof_handler,
@@ -304,8 +310,10 @@ test(const unsigned int n_ref = 0)
                             mg_additional_data);
 
       MatrixFree<dim, LevelNumberType> mg_level;
-      mg_level.reinit(
-        dof_handler, level_constraints, quadrature_formula, mg_additional_data);
+      mg_level.reinit(dof_handler,
+                      level_constraints,
+                      quadrature_formula,
+                      mg_additional_data);
 
       // go through all cells and quadrature points:
       {
@@ -330,10 +338,10 @@ test(const unsigned int n_ref = 0)
                 for (unsigned int v = 0;
                      v < VectorizedArray<NumberType>::n_array_elements;
                      ++v)
-                  AssertThrow(
-                    dist[v] < 1e-8,
-                    ExcMessage("Level " + std::to_string(level) +
-                               " distance: " + std::to_string(dist[v])));
+                  AssertThrow(dist[v] < 1e-8,
+                              ExcMessage(
+                                "Level " + std::to_string(level) +
+                                " distance: " + std::to_string(dist[v])));
               }
           }
       }

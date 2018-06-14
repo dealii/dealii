@@ -65,8 +65,9 @@ test()
   IndexSet locally_relevant_dofs2;
   DoFTools::extract_locally_relevant_dofs(dof2, locally_relevant_dofs2);
 
-  LinearAlgebra::distributed::Vector<double> v2(
-    dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD),
+  LinearAlgebra::distributed::Vector<double> v2(dof2.locally_owned_dofs(),
+                                                locally_relevant_dofs2,
+                                                MPI_COMM_WORLD),
     v2_interpolated(v2);
 
   // set first vector to 1

@@ -91,7 +91,8 @@ namespace Step37
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient() : Function<dim>()
+    Coefficient()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -283,8 +284,9 @@ namespace Step37
   // class that asserts that this class cannot go out of scope while still in
   // use in e.g. a preconditioner.
   template <int dim, int fe_degree, typename number>
-  LaplaceOperator<dim, fe_degree, number>::LaplaceOperator() :
-    MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>()
+  LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
+    : MatrixFreeOperators::Base<dim,
+                                LinearAlgebra::distributed::Vector<number>>()
   {}
 
 
@@ -570,8 +572,10 @@ namespace Step37
       this->inverse_diagonal_entries->get_vector();
     this->data->initialize_dof_vector(inverse_diagonal);
     unsigned int dummy = 0;
-    this->data->cell_loop(
-      &LaplaceOperator::local_compute_diagonal, this, inverse_diagonal, dummy);
+    this->data->cell_loop(&LaplaceOperator::local_compute_diagonal,
+                          this,
+                          inverse_diagonal,
+                          dummy);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
@@ -743,19 +747,23 @@ namespace Step37
   // convergence of the geometric multigrid routines. For the distributed
   // grid, we also need to specifically enable the multigrid hierarchy.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
+  LaplaceProblem<dim>::LaplaceProblem()
+    :
 #ifdef DEAL_II_WITH_P4EST
     triangulation(
       MPI_COMM_WORLD,
       Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy)
+    ,
 #else
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
+    triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+    ,
 #endif
-    fe(degree_finite_element),
-    dof_handler(triangulation),
-    setup_time(0.),
-    pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
+    fe(degree_finite_element)
+    , dof_handler(triangulation)
+    , setup_time(0.)
+    , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    ,
     // The LaplaceProblem class holds an additional output stream that
     // collects detailed timings about the setup phase. This stream, called
     // time_details, is disabled by default through the @p false argument
@@ -818,8 +826,10 @@ namespace Step37
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
@@ -834,8 +844,10 @@ namespace Step37
         (update_gradients | update_JxW_values | update_quadrature_points);
       std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
         new MatrixFree<dim, double>());
-      system_mf_storage->reinit(
-        dof_handler, constraints, QGauss<1>(fe.degree + 1), additional_data);
+      system_mf_storage->reinit(dof_handler,
+                                constraints,
+                                QGauss<1>(fe.degree + 1),
+                                additional_data);
       system_matrix.initialize(system_mf_storage);
     }
 
@@ -870,8 +882,9 @@ namespace Step37
     for (unsigned int level = 0; level < nlevels; ++level)
       {
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, relevant_dofs);
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                      level,
+                                                      relevant_dofs);
         ConstraintMatrix level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
@@ -891,8 +904,9 @@ namespace Step37
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
 
-        mg_matrices[level].initialize(
-          mg_mf_storage_level, mg_constrained_dofs, level);
+        mg_matrices[level].initialize(mg_mf_storage_level,
+                                      mg_constrained_dofs,
+                                      level);
         mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
       }
     setup_time += time.wall_time();

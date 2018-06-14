@@ -49,8 +49,10 @@ test(const unsigned int size, const unsigned int block_size)
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size, size, block_size, block_size);
-  ScaLAPACKMatrix<NumberType> scalapack_A(
-    size, grid, block_size, LAPACKSupport::Property::symmetric);
+  ScaLAPACKMatrix<NumberType> scalapack_A(size,
+                                          grid,
+                                          block_size,
+                                          LAPACKSupport::Property::symmetric);
 
   pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
         << " " << grid->get_process_grid_columns() << std::endl;

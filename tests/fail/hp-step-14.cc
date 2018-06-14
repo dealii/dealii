@@ -118,8 +118,8 @@ namespace Evaluation
 
   template <int dim>
   PointValueEvaluation<dim>::PointValueEvaluation(
-    const Point<dim> &evaluation_point) :
-    evaluation_point(evaluation_point)
+    const Point<dim> &evaluation_point)
+    : evaluation_point(evaluation_point)
   {}
 
 
@@ -178,8 +178,8 @@ namespace Evaluation
 
   template <int dim>
   PointXDerivativeEvaluation<dim>::PointXDerivativeEvaluation(
-    const Point<dim> &evaluation_point) :
-    evaluation_point(evaluation_point)
+    const Point<dim> &evaluation_point)
+    : evaluation_point(evaluation_point)
   {}
 
 
@@ -249,8 +249,8 @@ namespace Evaluation
 
 
   template <int dim>
-  GridOutput<dim>::GridOutput(const std::string &output_name_base) :
-    output_name_base(output_name_base)
+  GridOutput<dim>::GridOutput(const std::string &output_name_base)
+    : output_name_base(output_name_base)
   {}
 
 
@@ -307,7 +307,8 @@ namespace LaplaceSolver
 
 
   template <int dim>
-  Base<dim>::Base(Triangulation<dim> &coarse_grid) : triangulation(&coarse_grid)
+  Base<dim>::Base(Triangulation<dim> &coarse_grid)
+    : triangulation(&coarse_grid)
   {}
 
 
@@ -389,13 +390,13 @@ namespace LaplaceSolver
                       const hp::FECollection<dim> &   fe,
                       const hp::QCollection<dim> &    quadrature,
                       const hp::QCollection<dim - 1> &face_quadrature,
-                      const Function<dim> &           boundary_values) :
-    Base<dim>(triangulation),
-    fe(&fe),
-    quadrature(&quadrature),
-    face_quadrature(&face_quadrature),
-    dof_handler(triangulation),
-    boundary_values(&boundary_values)
+                      const Function<dim> &           boundary_values)
+    : Base<dim>(triangulation)
+    , fe(&fe)
+    , quadrature(&quadrature)
+    , face_quadrature(&face_quadrature)
+    , dof_handler(triangulation)
+    , boundary_values(&boundary_values)
   {}
 
 
@@ -445,8 +446,10 @@ namespace LaplaceSolver
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
-      thread_ranges = Threads::split_range<active_cell_iterator>(
-        dof_handler.begin_active(), dof_handler.end(), n_threads);
+      thread_ranges =
+        Threads::split_range<active_cell_iterator>(dof_handler.begin_active(),
+                                                   dof_handler.end(),
+                                                   n_threads);
 
     Threads::Mutex         mutex;
     Threads::ThreadGroup<> threads;
@@ -462,14 +465,18 @@ namespace LaplaceSolver
     linear_system.hanging_node_constraints.condense(linear_system.rhs);
 
     std::map<types::global_dof_index, double> boundary_value_map;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, *boundary_values, boundary_value_map);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             *boundary_values,
+                                             boundary_value_map);
 
     threads.join_all();
     linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
-    MatrixTools::apply_boundary_values(
-      boundary_value_map, linear_system.matrix, solution, linear_system.rhs);
+    MatrixTools::apply_boundary_values(boundary_value_map,
+                                       linear_system.matrix,
+                                       solution,
+                                       linear_system.rhs);
   }
 
 
@@ -481,8 +488,9 @@ namespace LaplaceSolver
     const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
     Threads::Mutex &                                          mutex) const
   {
-    hp::FEValues<dim> fe_values(
-      *fe, *quadrature, update_gradients | update_JxW_values);
+    hp::FEValues<dim> fe_values(*fe,
+                                *quadrature,
+                                update_gradients | update_JxW_values);
 
     const unsigned int dofs_per_cell = (*fe)[0].dofs_per_cell;
     const unsigned int n_q_points    = (*quadrature)[0].size();
@@ -512,8 +520,9 @@ namespace LaplaceSolver
         Threads::Mutex::ScopedLock lock(mutex);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            linear_system.matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            linear_system.matrix.add(local_dof_indices[i],
+                                     local_dof_indices[j],
+                                     cell_matrix(i, j));
       };
   }
 
@@ -602,14 +611,14 @@ namespace LaplaceSolver
     const hp::QCollection<dim> &    quadrature,
     const hp::QCollection<dim - 1> &face_quadrature,
     const Function<dim> &           rhs_function,
-    const Function<dim> &           boundary_values) :
-    Base<dim>(triangulation),
-    Solver<dim>(triangulation,
-                fe,
-                quadrature,
-                face_quadrature,
-                boundary_values),
-    rhs_function(&rhs_function)
+    const Function<dim> &           boundary_values)
+    : Base<dim>(triangulation)
+    , Solver<dim>(triangulation,
+                  fe,
+                  quadrature,
+                  face_quadrature,
+                  boundary_values)
+    , rhs_function(&rhs_function)
   {}
 
 
@@ -724,14 +733,14 @@ namespace LaplaceSolver
     const hp::QCollection<dim> &    quadrature,
     const hp::QCollection<dim - 1> &face_quadrature,
     const Function<dim> &           rhs_function,
-    const Function<dim> &           boundary_values) :
-    Base<dim>(coarse_grid),
-    PrimalSolver<dim>(coarse_grid,
-                      fe,
-                      quadrature,
-                      face_quadrature,
-                      rhs_function,
-                      boundary_values)
+    const Function<dim> &           boundary_values)
+    : Base<dim>(coarse_grid)
+    , PrimalSolver<dim>(coarse_grid,
+                        fe,
+                        quadrature,
+                        face_quadrature,
+                        rhs_function,
+                        boundary_values)
   {}
 
 
@@ -769,14 +778,14 @@ namespace LaplaceSolver
     const hp::QCollection<dim> &    quadrature,
     const hp::QCollection<dim - 1> &face_quadrature,
     const Function<dim> &           rhs_function,
-    const Function<dim> &           boundary_values) :
-    Base<dim>(coarse_grid),
-    PrimalSolver<dim>(coarse_grid,
-                      fe,
-                      quadrature,
-                      face_quadrature,
-                      rhs_function,
-                      boundary_values)
+    const Function<dim> &           boundary_values)
+    : Base<dim>(coarse_grid)
+    , PrimalSolver<dim>(coarse_grid,
+                        fe,
+                        quadrature,
+                        face_quadrature,
+                        rhs_function,
+                        boundary_values)
   {}
 
 
@@ -792,8 +801,10 @@ namespace LaplaceSolver
                                        typename FunctionMap<dim>::type(),
                                        this->solution,
                                        estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number(
-      *this->triangulation, estimated_error_per_cell, 0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(*this->triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
     this->triangulation->execute_coarsening_and_refinement();
   }
 
@@ -828,15 +839,15 @@ namespace LaplaceSolver
     const hp::QCollection<dim - 1> &face_quadrature,
     const Function<dim> &           rhs_function,
     const Function<dim> &           boundary_values,
-    const Function<dim> &           weighting_function) :
-    Base<dim>(coarse_grid),
-    PrimalSolver<dim>(coarse_grid,
-                      fe,
-                      quadrature,
-                      face_quadrature,
-                      rhs_function,
-                      boundary_values),
-    weighting_function(&weighting_function)
+    const Function<dim> &           weighting_function)
+    : Base<dim>(coarse_grid)
+    , PrimalSolver<dim>(coarse_grid,
+                        fe,
+                        quadrature,
+                        face_quadrature,
+                        rhs_function,
+                        boundary_values)
+    , weighting_function(&weighting_function)
   {}
 
 
@@ -858,8 +869,10 @@ namespace LaplaceSolver
     for (unsigned int cell_index = 0; cell != endc; ++cell, ++cell_index)
       estimated_error(cell_index) *= weighting_function->value(cell->center());
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      *this->triangulation, estimated_error, 0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(*this->triangulation,
+                                                    estimated_error,
+                                                    0.3,
+                                                    0.03);
     this->triangulation->execute_coarsening_and_refinement();
   }
 
@@ -939,7 +952,8 @@ namespace Data
     class BoundaryValues : public Function<dim>
     {
     public:
-      BoundaryValues() : Function<dim>()
+      BoundaryValues()
+        : Function<dim>()
       {}
 
       virtual double
@@ -950,7 +964,8 @@ namespace Data
     class RightHandSide : public Function<dim>
     {
     public:
-      RightHandSide() : Function<dim>()
+      RightHandSide()
+        : Function<dim>()
       {}
 
       virtual double
@@ -1021,7 +1036,8 @@ namespace Data
     class RightHandSide : public Functions::ConstantFunction<dim>
     {
     public:
-      RightHandSide() : Functions::ConstantFunction<dim>(1.)
+      RightHandSide()
+        : Functions::ConstantFunction<dim>(1.)
       {}
     };
 
@@ -1126,8 +1142,8 @@ namespace DualFunctional
 
   template <int dim>
   PointValueEvaluation<dim>::PointValueEvaluation(
-    const Point<dim> &evaluation_point) :
-    evaluation_point(evaluation_point)
+    const Point<dim> &evaluation_point)
+    : evaluation_point(evaluation_point)
   {}
 
 
@@ -1180,8 +1196,8 @@ namespace DualFunctional
 
   template <int dim>
   PointXDerivativeEvaluation<dim>::PointXDerivativeEvaluation(
-    const Point<dim> &evaluation_point) :
-    evaluation_point(evaluation_point)
+    const Point<dim> &evaluation_point)
+    : evaluation_point(evaluation_point)
   {}
 
 
@@ -1280,14 +1296,14 @@ namespace LaplaceSolver
     const hp::FECollection<dim> &                  fe,
     const hp::QCollection<dim> &                   quadrature,
     const hp::QCollection<dim - 1> &               face_quadrature,
-    const DualFunctional::DualFunctionalBase<dim> &dual_functional) :
-    Base<dim>(triangulation),
-    Solver<dim>(triangulation,
-                fe,
-                quadrature,
-                face_quadrature,
-                boundary_values),
-    dual_functional(&dual_functional)
+    const DualFunctional::DualFunctionalBase<dim> &dual_functional)
+    : Base<dim>(triangulation)
+    , Solver<dim>(triangulation,
+                  fe,
+                  quadrature,
+                  face_quadrature,
+                  boundary_values)
+    , dual_functional(&dual_functional)
   {}
 
 
@@ -1440,12 +1456,12 @@ namespace LaplaceSolver
   WeightedResidual<dim>::CellData::CellData(
     const hp::FECollection<dim> &fe,
     const hp::QCollection<dim> & quadrature,
-    const Function<dim> &        right_hand_side) :
-    fe_values(fe,
-              quadrature,
-              update_values | update_hessians | update_quadrature_points |
-                update_JxW_values),
-    right_hand_side(&right_hand_side)
+    const Function<dim> &        right_hand_side)
+    : fe_values(fe,
+                quadrature,
+                update_values | update_hessians | update_quadrature_points |
+                  update_JxW_values)
+    , right_hand_side(&right_hand_side)
   {
     const unsigned int n_q_points = quadrature[0].size();
 
@@ -1460,16 +1476,16 @@ namespace LaplaceSolver
   template <int dim>
   WeightedResidual<dim>::FaceData::FaceData(
     const hp::FECollection<dim> &   fe,
-    const hp::QCollection<dim - 1> &face_quadrature) :
-    fe_face_values_cell(fe,
-                        face_quadrature,
-                        update_values | update_gradients | update_JxW_values |
-                          update_normal_vectors),
-    fe_face_values_neighbor(fe,
-                            face_quadrature,
-                            update_values | update_gradients |
-                              update_JxW_values | update_normal_vectors),
-    fe_subface_values_cell(fe, face_quadrature, update_gradients)
+    const hp::QCollection<dim - 1> &face_quadrature)
+    : fe_face_values_cell(fe,
+                          face_quadrature,
+                          update_values | update_gradients | update_JxW_values |
+                            update_normal_vectors)
+    , fe_face_values_neighbor(fe,
+                              face_quadrature,
+                              update_values | update_gradients |
+                                update_JxW_values | update_normal_vectors)
+    , fe_subface_values_cell(fe, face_quadrature, update_gradients)
   {
     const unsigned int n_face_q_points = face_quadrature[0].size();
 
@@ -1490,19 +1506,19 @@ namespace LaplaceSolver
     const hp::QCollection<dim - 1> &               face_quadrature,
     const Function<dim> &                          rhs_function,
     const Function<dim> &                          bv,
-    const DualFunctional::DualFunctionalBase<dim> &dual_functional) :
-    Base<dim>(coarse_grid),
-    PrimalSolver<dim>(coarse_grid,
-                      primal_fe,
+    const DualFunctional::DualFunctionalBase<dim> &dual_functional)
+    : Base<dim>(coarse_grid)
+    , PrimalSolver<dim>(coarse_grid,
+                        primal_fe,
+                        quadrature,
+                        face_quadrature,
+                        rhs_function,
+                        bv)
+    , DualSolver<dim>(coarse_grid,
+                      dual_fe,
                       quadrature,
                       face_quadrature,
-                      rhs_function,
-                      bv),
-    DualSolver<dim>(coarse_grid,
-                    dual_fe,
-                    quadrature,
-                    face_quadrature,
-                    dual_functional)
+                      dual_functional)
   {}
 
 
@@ -1564,8 +1580,10 @@ namespace LaplaceSolver
          ++i)
       *i = std::fabs(*i);
 
-    GridRefinement::refine_and_coarsen_fixed_fraction(
-      *this->triangulation, error_indicators, 0.8, 0.02);
+    GridRefinement::refine_and_coarsen_fixed_fraction(*this->triangulation,
+                                                      error_indicators,
+                                                      0.8,
+                                                      0.02);
     this->triangulation->execute_coarsening_and_refinement();
   }
 
@@ -1675,8 +1693,9 @@ namespace LaplaceSolver
             0.5 * face_integrals[cell->face(face_no)];
         };
     deallog << "   Estimated error="
-            << std::accumulate(
-                 error_indicators.begin(), error_indicators.end(), 0.)
+            << std::accumulate(error_indicators.begin(),
+                               error_indicators.end(),
+                               0.)
             << std::endl;
   }
 
@@ -1694,8 +1713,9 @@ namespace LaplaceSolver
     const PrimalSolver<dim> &primal_solver = *this;
     const DualSolver<dim> &  dual_solver   = *this;
 
-    CellData cell_data(
-      *dual_solver.fe, *dual_solver.quadrature, *primal_solver.rhs_function);
+    CellData cell_data(*dual_solver.fe,
+                       *dual_solver.quadrature,
+                       *primal_solver.rhs_function);
     FaceData face_data(*dual_solver.fe, *dual_solver.face_quadrature);
 
     active_cell_iterator cell = dual_solver.dof_handler.begin_active();
@@ -1961,11 +1981,11 @@ public:
 
 
 template <int dim>
-Framework<dim>::ProblemDescription::ProblemDescription() :
-  primal_fe_degree(1),
-  dual_fe_degree(2),
-  refinement_criterion(dual_weighted_error_estimator),
-  max_degrees_of_freedom(5000)
+Framework<dim>::ProblemDescription::ProblemDescription()
+  : primal_fe_degree(1)
+  , dual_fe_degree(2)
+  , refinement_criterion(dual_weighted_error_estimator)
+  , max_degrees_of_freedom(5000)
 {}
 
 

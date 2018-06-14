@@ -49,18 +49,24 @@ test()
   static const Point<3> vertices_1[] = {
     // points on the lower surface
     Point<dim>(0, 0, -4),
-    Point<dim>(
-      std::cos(0 * numbers::PI / 6), std::sin(0 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), -4),
-    Point<dim>(
-      std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), -4),
+    Point<dim>(std::cos(0 * numbers::PI / 6),
+               std::sin(0 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(2 * numbers::PI / 6),
+               std::sin(2 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(4 * numbers::PI / 6),
+               std::sin(4 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(6 * numbers::PI / 6),
+               std::sin(6 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(8 * numbers::PI / 6),
+               std::sin(8 * numbers::PI / 6),
+               -4),
+    Point<dim>(std::cos(10 * numbers::PI / 6),
+               std::sin(10 * numbers::PI / 6),
+               -4),
 
     // same points on the top
     // of the stem, with
@@ -71,8 +77,9 @@ test()
     Point<dim>(std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), 4),
     Point<dim>(std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 4),
     Point<dim>(std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), 4),
-    Point<dim>(
-      std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 4),
+    Point<dim>(std::cos(10 * numbers::PI / 6),
+               std::sin(10 * numbers::PI / 6),
+               4),
 
     // point at top of chevron
     Point<dim>(0, 0, 4 + std::sqrt(2.) / 2),
@@ -84,20 +91,26 @@ test()
                                      std::sin(2 * numbers::PI / 6),
                                      0) *
                             4.0,
-    Point<dim>(
-      std::cos(0 * numbers::PI / 6), std::sin(0 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(0 * numbers::PI / 6),
+               std::sin(0 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(2 * numbers::PI / 6),
+                 std::sin(2 * numbers::PI / 6),
+                 0) *
         4.0,
-    Point<dim>(
-      std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(2 * numbers::PI / 6),
+               std::sin(2 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(2 * numbers::PI / 6),
+                 std::sin(2 * numbers::PI / 6),
+                 0) *
         4.0,
-    Point<dim>(
-      std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(2 * numbers::PI / 6), std::sin(2 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(4 * numbers::PI / 6),
+               std::sin(4 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(2 * numbers::PI / 6),
+                 std::sin(2 * numbers::PI / 6),
+                 0) *
         4.0,
 
     // points at the top of the
@@ -107,20 +120,26 @@ test()
                                      std::sin(6 * numbers::PI / 6),
                                      0) *
                             4.0,
-    Point<dim>(
-      std::cos(4 * numbers::PI / 6), std::sin(4 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(4 * numbers::PI / 6),
+               std::sin(4 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(6 * numbers::PI / 6),
+                 std::sin(6 * numbers::PI / 6),
+                 0) *
         4.0,
-    Point<dim>(
-      std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(6 * numbers::PI / 6),
+               std::sin(6 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(6 * numbers::PI / 6),
+                 std::sin(6 * numbers::PI / 6),
+                 0) *
         4.0,
-    Point<dim>(
-      std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(6 * numbers::PI / 6), std::sin(6 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(8 * numbers::PI / 6),
+               std::sin(8 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(6 * numbers::PI / 6),
+                 std::sin(6 * numbers::PI / 6),
+                 0) *
         4.0,
 
     // points at the top of the
@@ -130,20 +149,26 @@ test()
                                      std::sin(10 * numbers::PI / 6),
                                      0) *
                             4.0,
-    Point<dim>(
-      std::cos(8 * numbers::PI / 6), std::sin(8 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(8 * numbers::PI / 6),
+               std::sin(8 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(10 * numbers::PI / 6),
+                 std::sin(10 * numbers::PI / 6),
+                 0) *
         4.0,
-    Point<dim>(
-      std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(10 * numbers::PI / 6),
+               std::sin(10 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(10 * numbers::PI / 6),
+                 std::sin(10 * numbers::PI / 6),
+                 0) *
         4.0,
-    Point<dim>(
-      std::cos(0 * numbers::PI / 6), std::sin(0 * numbers::PI / 6), 7) +
-      Point<dim>(
-        std::cos(10 * numbers::PI / 6), std::sin(10 * numbers::PI / 6), 0) *
+    Point<dim>(std::cos(0 * numbers::PI / 6),
+               std::sin(0 * numbers::PI / 6),
+               7) +
+      Point<dim>(std::cos(10 * numbers::PI / 6),
+                 std::sin(10 * numbers::PI / 6),
+                 0) *
         4.0,
 
   };

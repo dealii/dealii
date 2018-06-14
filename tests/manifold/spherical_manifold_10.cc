@@ -65,8 +65,9 @@ main()
         const double tolerance = 1e-8;
         for (unsigned int q = 0; q < quadrature.size(); ++q)
           {
-            const Tensor<1, dim> normal_manifold = spherical.normal_vector(
-              cell->face(f), fe_values.quadrature_point(q));
+            const Tensor<1, dim> normal_manifold =
+              spherical.normal_vector(cell->face(f),
+                                      fe_values.quadrature_point(q));
             const Tensor<1, dim> normal_feval = fe_values.normal_vector(q);
             if (std::abs(1.0 - std::abs(normal_manifold * normal_feval)) >
                 tolerance)

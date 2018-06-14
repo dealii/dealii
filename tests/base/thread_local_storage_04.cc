@@ -27,7 +27,8 @@ struct X
 {
   Threads::ThreadLocalStorage<int> tls_data;
 
-  X() : tls_data(42)
+  X()
+    : tls_data(42)
   {}
 
   int

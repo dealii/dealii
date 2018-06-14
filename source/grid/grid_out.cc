@@ -48,12 +48,12 @@ namespace GridOutFlags
          const bool write_faces,
          const bool write_diameter,
          const bool write_measure,
-         const bool write_all_faces) :
-    write_cells(write_cells),
-    write_faces(write_faces),
-    write_diameter(write_diameter),
-    write_measure(write_measure),
-    write_all_faces(write_all_faces)
+         const bool write_all_faces)
+    : write_cells(write_cells)
+    , write_faces(write_faces)
+    , write_diameter(write_diameter)
+    , write_measure(write_measure)
+    , write_all_faces(write_all_faces)
   {}
 
   void
@@ -95,9 +95,9 @@ namespace GridOutFlags
   }
 
 
-  Msh::Msh(const bool write_faces, const bool write_lines) :
-    write_faces(write_faces),
-    write_lines(write_lines)
+  Msh::Msh(const bool write_faces, const bool write_lines)
+    : write_faces(write_faces)
+    , write_lines(write_lines)
   {}
 
   void
@@ -118,10 +118,10 @@ namespace GridOutFlags
 
   Ucd::Ucd(const bool write_preamble,
            const bool write_faces,
-           const bool write_lines) :
-    write_preamble(write_preamble),
-    write_faces(write_faces),
-    write_lines(write_lines)
+           const bool write_lines)
+    : write_preamble(write_preamble)
+    , write_faces(write_faces)
+    , write_lines(write_lines)
   {}
 
 
@@ -148,22 +148,22 @@ namespace GridOutFlags
   Gnuplot::Gnuplot(const bool         write_cell_numbers,
                    const unsigned int n_extra_curved_line_points,
                    const bool         curved_inner_cells,
-                   const bool         write_additional_boundary_lines) :
-    write_cell_numbers(write_cell_numbers),
-    n_extra_curved_line_points(n_extra_curved_line_points),
-    n_boundary_face_points(this->n_extra_curved_line_points),
-    curved_inner_cells(curved_inner_cells),
-    write_additional_boundary_lines(write_additional_boundary_lines)
+                   const bool         write_additional_boundary_lines)
+    : write_cell_numbers(write_cell_numbers)
+    , n_extra_curved_line_points(n_extra_curved_line_points)
+    , n_boundary_face_points(this->n_extra_curved_line_points)
+    , curved_inner_cells(curved_inner_cells)
+    , write_additional_boundary_lines(write_additional_boundary_lines)
   {}
 
 
   // TODO we can get rid of these extra constructors and assignment operators
   // once we remove the reference member variable.
-  Gnuplot::Gnuplot(const Gnuplot &flags) :
-    Gnuplot(flags.write_cell_numbers,
-            flags.n_extra_curved_line_points,
-            flags.curved_inner_cells,
-            flags.write_additional_boundary_lines)
+  Gnuplot::Gnuplot(const Gnuplot &flags)
+    : Gnuplot(flags.write_cell_numbers,
+              flags.n_extra_curved_line_points,
+              flags.curved_inner_cells,
+              flags.write_additional_boundary_lines)
   {}
 
 
@@ -202,13 +202,13 @@ namespace GridOutFlags
                              const double       line_width,
                              const bool         color_lines_on_user_flag,
                              const unsigned int n_boundary_face_points,
-                             const bool         color_lines_level) :
-    size_type(size_type),
-    size(size),
-    line_width(line_width),
-    color_lines_on_user_flag(color_lines_on_user_flag),
-    n_boundary_face_points(n_boundary_face_points),
-    color_lines_level(color_lines_level)
+                             const bool         color_lines_level)
+    : size_type(size_type)
+    , size(size)
+    , line_width(line_width)
+    , color_lines_on_user_flag(color_lines_on_user_flag)
+    , n_boundary_face_points(n_boundary_face_points)
+    , color_lines_level(color_lines_level)
   {}
 
 
@@ -221,8 +221,10 @@ namespace GridOutFlags
                         "Depending on this parameter, either the"
                         "width or height "
                         "of the eps is scaled to \"Size\"");
-    param.declare_entry(
-      "Size", "300", Patterns::Integer(), "Size of the output in points");
+    param.declare_entry("Size",
+                        "300",
+                        Patterns::Integer(),
+                        "Size of the output in points");
     param.declare_entry("Line width",
                         "0.5",
                         Patterns::Double(),
@@ -263,12 +265,12 @@ namespace GridOutFlags
               const unsigned int size,
               const double       line_width,
               const bool         color_lines_on_user_flag,
-              const unsigned int n_boundary_face_points) :
-    EpsFlagsBase(size_type,
-                 size,
-                 line_width,
-                 color_lines_on_user_flag,
-                 n_boundary_face_points)
+              const unsigned int n_boundary_face_points)
+    : EpsFlagsBase(size_type,
+                   size,
+                   line_width,
+                   color_lines_on_user_flag,
+                   n_boundary_face_points)
   {}
 
 
@@ -293,16 +295,16 @@ namespace GridOutFlags
               const bool         write_cell_numbers,
               const bool         write_cell_number_level,
               const bool         write_vertex_numbers,
-              const bool         color_lines_level) :
-    EpsFlagsBase(size_type,
-                 size,
-                 line_width,
-                 color_lines_on_user_flag,
-                 n_boundary_face_points,
-                 color_lines_level),
-    write_cell_numbers(write_cell_numbers),
-    write_cell_number_level(write_cell_number_level),
-    write_vertex_numbers(write_vertex_numbers)
+              const bool         color_lines_level)
+    : EpsFlagsBase(size_type,
+                   size,
+                   line_width,
+                   color_lines_on_user_flag,
+                   n_boundary_face_points,
+                   color_lines_level)
+    , write_cell_numbers(write_cell_numbers)
+    , write_cell_number_level(write_cell_number_level)
+    , write_vertex_numbers(write_vertex_numbers)
   {}
 
 
@@ -343,14 +345,14 @@ namespace GridOutFlags
               const bool         color_lines_on_user_flag,
               const unsigned int n_boundary_face_points,
               const double       azimut_angle,
-              const double       turn_angle) :
-    EpsFlagsBase(size_type,
-                 size,
-                 line_width,
-                 color_lines_on_user_flag,
-                 n_boundary_face_points),
-    azimut_angle(azimut_angle),
-    turn_angle(turn_angle)
+              const double       turn_angle)
+    : EpsFlagsBase(size_type,
+                   size,
+                   line_width,
+                   color_lines_on_user_flag,
+                   n_boundary_face_points)
+    , azimut_angle(azimut_angle)
+    , turn_angle(turn_angle)
   {}
 
 
@@ -379,17 +381,17 @@ namespace GridOutFlags
 
 
 
-  XFig::XFig() :
-    draw_boundary(true),
-    color_by(material_id),
-    level_depth(true),
-    n_boundary_face_points(0),
-    scaling(1., 1.),
-    fill_style(20),
-    line_style(0),
-    line_thickness(1),
-    boundary_style(0),
-    boundary_thickness(3)
+  XFig::XFig()
+    : draw_boundary(true)
+    , color_by(material_id)
+    , level_depth(true)
+    , n_boundary_face_points(0)
+    , scaling(1., 1.)
+    , fill_style(20)
+    , line_style(0)
+    , line_thickness(1)
+    , boundary_style(0)
+    , boundary_thickness(3)
   {}
 
 
@@ -435,29 +437,30 @@ namespace GridOutFlags
            const bool         label_material_id,
            const bool         label_subdomain_id,
            const bool         draw_colorbar,
-           const bool         draw_legend) :
-    height(1000),
-    width(0),
-    line_thickness(line_thickness),
-    boundary_line_thickness(boundary_line_thickness),
-    margin(margin),
-    background(background),
-    azimuth_angle(azimuth_angle),
-    polar_angle(polar_angle),
-    coloring(coloring),
-    convert_level_number_to_height(convert_level_number_to_height),
-    level_height_factor(0.3f),
-    cell_font_scaling(1.f),
-    label_level_number(label_level_number),
-    label_cell_index(label_cell_index),
-    label_material_id(label_material_id),
-    label_subdomain_id(label_subdomain_id),
-    label_level_subdomain_id(false),
-    draw_colorbar(draw_colorbar),
-    draw_legend(draw_legend)
+           const bool         draw_legend)
+    : height(1000)
+    , width(0)
+    , line_thickness(line_thickness)
+    , boundary_line_thickness(boundary_line_thickness)
+    , margin(margin)
+    , background(background)
+    , azimuth_angle(azimuth_angle)
+    , polar_angle(polar_angle)
+    , coloring(coloring)
+    , convert_level_number_to_height(convert_level_number_to_height)
+    , level_height_factor(0.3f)
+    , cell_font_scaling(1.f)
+    , label_level_number(label_level_number)
+    , label_cell_index(label_cell_index)
+    , label_material_id(label_material_id)
+    , label_subdomain_id(label_subdomain_id)
+    , label_level_subdomain_id(false)
+    , draw_colorbar(draw_colorbar)
+    , draw_legend(draw_legend)
   {}
 
-  MathGL::MathGL() : draw_bounding_box(false) // box
+  MathGL::MathGL()
+    : draw_bounding_box(false) // box
   {}
 
   void
@@ -475,7 +478,8 @@ namespace GridOutFlags
 
 
 
-GridOut::GridOut() : default_format(none)
+GridOut::GridOut()
+  : default_format(none)
 {}
 
 
@@ -662,8 +666,9 @@ GridOut::get_output_format_names()
 void
 GridOut::declare_parameters(ParameterHandler &param)
 {
-  param.declare_entry(
-    "Format", "none", Patterns::Selection(get_output_format_names()));
+  param.declare_entry("Format",
+                      "none",
+                      Patterns::Selection(get_output_format_names()));
 
   param.enter_subsection("DX");
   GridOutFlags::DX::declare_parameters(param);
@@ -4036,11 +4041,11 @@ namespace internal
       LineEntry(const Point<2> &   f,
                 const Point<2> &   s,
                 const bool         c,
-                const unsigned int l) :
-        first(f),
-        second(s),
-        colorize(c),
-        level(l)
+                const unsigned int l)
+        : first(f)
+        , second(s)
+        , colorize(c)
+        , level(l)
       {}
     };
 
@@ -4239,16 +4244,20 @@ namespace internal
                                     cell, q_projector.point(offset + i)));
                                 const Point<2> p1(p1_dim(0), p1_dim(1));
 
-                                line_list.emplace_back(
-                                  p0, p1, face->user_flag_set(), cell->level());
+                                line_list.emplace_back(p0,
+                                                       p1,
+                                                       face->user_flag_set(),
+                                                       cell->level());
                                 p0 = p1;
                               }
 
                             // generate last piece
                             const Point<dim> p1_dim(face->vertex(1));
                             const Point<2>   p1(p1_dim(0), p1_dim(1));
-                            line_list.emplace_back(
-                              p0, p1, face->user_flag_set(), cell->level());
+                            line_list.emplace_back(p0,
+                                                   p1,
+                                                   face->user_flag_set(),
+                                                   cell->level());
                           }
                       }
                 }

@@ -139,21 +139,24 @@ namespace Step37
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
+  LaplaceProblem<dim>::LaplaceProblem()
+    :
 #ifdef DEAL_II_WITH_P4EST
     triangulation(
       MPI_COMM_WORLD,
       Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy)
+    ,
 #else
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
+    triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+    ,
 #endif
-    fe(degree_finite_element),
-    dof_handler(triangulation),
-    fe_euler(degree_finite_element),
-    fe_system(fe_euler, dim),
-    dof_euler(triangulation),
-    pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    fe(degree_finite_element)
+    , dof_handler(triangulation)
+    , fe_euler(degree_finite_element)
+    , fe_system(fe_euler, dim)
+    , dof_euler(triangulation)
+    , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
@@ -182,8 +185,9 @@ namespace Step37
       IndexSet locally_relevant_euler;
       DoFTools::extract_locally_relevant_dofs(dof_euler,
                                               locally_relevant_euler);
-      euler_positions.reinit(
-        dof_euler.locally_owned_dofs(), locally_relevant_euler, MPI_COMM_WORLD);
+      euler_positions.reinit(dof_euler.locally_owned_dofs(),
+                             locally_relevant_euler,
+                             MPI_COMM_WORLD);
     }
 
     // Set up a quadrature formula based on the support points of FE_Q and go
@@ -212,8 +216,10 @@ namespace Step37
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
     {
@@ -249,8 +255,9 @@ namespace Step37
     for (unsigned int level = 0; level < nlevels; ++level)
       {
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, relevant_dofs);
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                      level,
+                                                      relevant_dofs);
         ConstraintMatrix level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
@@ -270,8 +277,9 @@ namespace Step37
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
 
-        mg_matrices[level].initialize(
-          mg_mf_storage_level, mg_constrained_dofs, level);
+        mg_matrices[level].initialize(mg_mf_storage_level,
+                                      mg_constrained_dofs,
+                                      level);
         mg_matrices[level].compute_diagonal();
       }
   }
@@ -282,10 +290,10 @@ namespace Step37
   class PotentialBCFunction : public Function<dim>
   {
   public:
-    PotentialBCFunction(const double &charge, const Point<dim> &dipole) :
-      Function<dim>(1),
-      charge(charge),
-      x0(std::abs(charge) < 1e-10 ? Point<dim>() : dipole / charge)
+    PotentialBCFunction(const double &charge, const Point<dim> &dipole)
+      : Function<dim>(1)
+      , charge(charge)
+      , x0(std::abs(charge) < 1e-10 ? Point<dim>() : dipole / charge)
     {}
 
     virtual ~PotentialBCFunction() = default;
@@ -481,8 +489,9 @@ namespace Step37
       {
         std::map<types::global_dof_index, Point<dim>> support_points;
         MappingQ<dim> mapping(degree_finite_element);
-        DoFTools::map_dofs_to_support_points(
-          mapping, dof_handler, support_points);
+        DoFTools::map_dofs_to_support_points(mapping,
+                                             dof_handler,
+                                             support_points);
 
         const std::string base_filename =
           "grid" + dealii::Utilities::int_to_string(dim) + "_" +

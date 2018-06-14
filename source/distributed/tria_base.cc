@@ -44,12 +44,12 @@ namespace parallel
     MPI_Comm mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                smooth_grid,
-    const bool check_for_distorted_cells) :
-    dealii::Triangulation<dim, spacedim>(smooth_grid,
-                                         check_for_distorted_cells),
-    mpi_communicator(mpi_communicator),
-    my_subdomain(Utilities::MPI::this_mpi_process(this->mpi_communicator)),
-    n_subdomains(Utilities::MPI::n_mpi_processes(this->mpi_communicator))
+    const bool check_for_distorted_cells)
+    : dealii::Triangulation<dim, spacedim>(smooth_grid,
+                                           check_for_distorted_cells)
+    , mpi_communicator(mpi_communicator)
+    , my_subdomain(Utilities::MPI::this_mpi_process(this->mpi_communicator))
+    , n_subdomains(Utilities::MPI::n_mpi_processes(this->mpi_communicator))
   {
 #ifndef DEAL_II_WITH_MPI
     Assert(false,
@@ -116,9 +116,9 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  Triangulation<dim, spacedim>::NumberCache::NumberCache() :
-    n_global_active_cells(0),
-    n_global_levels(0)
+  Triangulation<dim, spacedim>::NumberCache::NumberCache()
+    : n_global_active_cells(0)
+    , n_global_levels(0)
   {}
 
   template <int dim, int spacedim>

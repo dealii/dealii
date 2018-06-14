@@ -200,19 +200,20 @@ namespace Step40
   // use to determine how much compute time the different parts of the program
   // take:
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    mpi_communicator(MPI_COMM_WORLD),
-    triangulation(mpi_communicator,
-                  typename Triangulation<dim>::MeshSmoothing(
-                    Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
-    dof_handler(triangulation),
-    fe(2),
-    pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-    computing_timer(mpi_communicator,
-                    pcout,
-                    TimerOutput::summary,
-                    TimerOutput::wall_times)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator,
+                    typename Triangulation<dim>::MeshSmoothing(
+                      Triangulation<dim>::smoothing_on_refinement |
+                      Triangulation<dim>::smoothing_on_coarsening))
+    , dof_handler(triangulation)
+    , fe(2)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(mpi_communicator,
+                      pcout,
+                      TimerOutput::summary,
+                      TimerOutput::wall_times)
   {}
 
 
@@ -268,8 +269,9 @@ namespace Step40
     // locally owned cells (of course the linear solvers will read from it,
     // but they do not care about the geometric location of degrees of
     // freedom).
-    locally_relevant_solution.reinit(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    locally_relevant_solution.reinit(locally_owned_dofs,
+                                     locally_relevant_dofs,
+                                     mpi_communicator);
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     // The next step is to compute hanging node and boundary value
@@ -293,8 +295,10 @@ namespace Step40
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
     constraints.close();
 
     // The last part of this function deals with initializing the matrix with
@@ -328,8 +332,10 @@ namespace Step40
       mpi_communicator,
       locally_relevant_dofs);
 
-    system_matrix.reinit(
-      locally_owned_dofs, locally_owned_dofs, dsp, mpi_communicator);
+    system_matrix.reinit(locally_owned_dofs,
+                         locally_owned_dofs,
+                         dsp,
+                         mpi_communicator);
   }
 
 

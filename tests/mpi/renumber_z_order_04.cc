@@ -55,8 +55,10 @@ test()
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<2> tr(MPI_COMM_WORLD);
-  GridGenerator::subdivided_hyper_rectangle(
-    tr, std::vector<unsigned int>{{2, 2}}, Point<2>(), Point<2>(2, 2));
+  GridGenerator::subdivided_hyper_rectangle(tr,
+                                            std::vector<unsigned int>{{2, 2}},
+                                            Point<2>(),
+                                            Point<2>(2, 2));
 
   const FE_Q<2> fe(1);
 

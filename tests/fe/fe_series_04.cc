@@ -61,7 +61,8 @@ template <int dim>
 class LegendreFunction : public Function<dim>
 {
 public:
-  LegendreFunction() : Function<dim>(1)
+  LegendreFunction()
+    : Function<dim>(1)
   {}
 
   virtual double

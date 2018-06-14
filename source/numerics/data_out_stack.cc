@@ -305,8 +305,9 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
   const hp::QCollection<dim>   q_collection(patch_points);
   const hp::FECollection<dim> &fe_collection = dof_handler->get_fe_collection();
 
-  hp::FEValues<dim> x_fe_patch_values(
-    fe_collection, q_collection, update_values);
+  hp::FEValues<dim> x_fe_patch_values(fe_collection,
+                                      q_collection,
+                                      update_values);
 
   const unsigned int          n_q_points = patch_points.size();
   std::vector<double>         patch_values(n_q_points);

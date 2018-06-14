@@ -149,7 +149,8 @@ namespace Step57
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>(dim + 1)
+    BoundaryValues()
+      : Function<dim>(dim + 1)
     {}
     virtual double value(const Point<dim> & p,
                          const unsigned int component) const override;
@@ -227,12 +228,12 @@ namespace Step57
     double                           viscosity,
     const BlockSparseMatrix<double> &S,
     const SparseMatrix<double> &     P,
-    const PreconditionerMp &         Mppreconditioner) :
-    gamma(gamma),
-    viscosity(viscosity),
-    stokes_matrix(S),
-    pressure_mass_matrix(P),
-    mp_preconditioner(Mppreconditioner)
+    const PreconditionerMp &         Mppreconditioner)
+    : gamma(gamma)
+    , viscosity(viscosity)
+    , stokes_matrix(S)
+    , pressure_mass_matrix(P)
+    , mp_preconditioner(Mppreconditioner)
   {
     A_inverse.initialize(stokes_matrix.block(0, 0));
   }
@@ -249,8 +250,10 @@ namespace Step57
       SolverCG<>    cg(solver_control);
 
       dst.block(1) = 0.0;
-      cg.solve(
-        pressure_mass_matrix, dst.block(1), src.block(1), mp_preconditioner);
+      cg.solve(pressure_mass_matrix,
+               dst.block(1),
+               src.block(1),
+               mp_preconditioner);
       dst.block(1) *= -(viscosity + gamma);
     }
 
@@ -271,14 +274,13 @@ namespace Step57
   //
 
   template <int dim>
-  StationaryNavierStokes<dim>::StationaryNavierStokes(
-    const unsigned int degree) :
-    viscosity(1.0 / 7500.0),
-    gamma(1.0),
-    degree(degree),
-    triangulation(Triangulation<dim>::maximum_smoothing),
-    fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1),
-    dof_handler(triangulation)
+  StationaryNavierStokes<dim>::StationaryNavierStokes(const unsigned int degree)
+    : viscosity(1.0 / 7500.0)
+    , gamma(1.0)
+    , degree(degree)
+    , triangulation(Triangulation<dim>::maximum_smoothing)
+    , fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1)
+    , dof_handler(triangulation)
   {}
 
   // @sect4{StationaryNavierStokes::setup_dofs}
@@ -303,8 +305,9 @@ namespace Step57
     DoFRenumbering::component_wise(dof_handler, block_component);
 
     dofs_per_block.resize(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     unsigned int dof_u = dofs_per_block[0];
     unsigned int dof_p = dofs_per_block[1];
 
@@ -331,12 +334,12 @@ namespace Step57
       zero_constraints.clear();
 
       DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
-      VectorTools::interpolate_boundary_values(
-        dof_handler,
-        0,
-        Functions::ZeroFunction<dim>(dim + 1),
-        zero_constraints,
-        fe.component_mask(velocities));
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               Functions::ZeroFunction<dim>(
+                                                 dim + 1),
+                                               zero_constraints,
+                                               fe.component_mask(velocities));
     }
     zero_constraints.close();
 
@@ -500,8 +503,9 @@ namespace Step57
           }
         else
           {
-            constraints_used.distribute_local_to_global(
-              local_rhs, local_dof_indices, system_rhs);
+            constraints_used.distribute_local_to_global(local_rhs,
+                                                        local_dof_indices,
+                                                        system_rhs);
           }
       }
 
@@ -549,8 +553,9 @@ namespace Step57
     const ConstraintMatrix &constraints_used =
       initial_step ? nonzero_constraints : zero_constraints;
 
-    SolverControl solver_control(
-      system_matrix.m(), 1e-4 * system_rhs.l2_norm(), true);
+    SolverControl                     solver_control(system_matrix.m(),
+                                 1e-4 * system_rhs.l2_norm(),
+                                 true);
     SolverFGMRES<BlockVector<double>> gmres(solver_control);
 
     SparseILU<double> pmass_preconditioner;
@@ -590,8 +595,10 @@ namespace Step57
                                        estimated_error_per_cell,
                                        fe.component_mask(velocity));
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.0);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.0);
 
     triangulation.prepare_coarsening_and_refinement();
     SolutionTransfer<dim, BlockVector<double>> solution_transfer(dof_handler);

@@ -250,7 +250,8 @@ namespace Functions
 
 
   template <int dim>
-  PillowFunction<dim>::PillowFunction(const double offset) : offset(offset)
+  PillowFunction<dim>::PillowFunction(const double offset)
+    : offset(offset)
   {}
 
 
@@ -420,8 +421,8 @@ namespace Functions
   //////////////////////////////////////////////////////////////////////
 
   template <int dim>
-  CosineFunction<dim>::CosineFunction(const unsigned int n_components) :
-    Function<dim>(n_components)
+  CosineFunction<dim>::CosineFunction(const unsigned int n_components)
+    : Function<dim>(n_components)
   {}
 
 
@@ -714,7 +715,8 @@ namespace Functions
   //////////////////////////////////////////////////////////////////////
 
   template <int dim>
-  CosineGradFunction<dim>::CosineGradFunction() : Function<dim>(dim)
+  CosineGradFunction<dim>::CosineGradFunction()
+    : Function<dim>(dim)
   {}
 
 
@@ -1336,7 +1338,8 @@ namespace Functions
 
   //////////////////////////////////////////////////////////////////////
 
-  LSingularityGradFunction::LSingularityGradFunction() : Function<2>(2)
+  LSingularityGradFunction::LSingularityGradFunction()
+    : Function<2>(2)
   {}
 
 
@@ -1793,9 +1796,9 @@ namespace Functions
 
   template <int dim>
   JumpFunction<dim>::JumpFunction(const Point<dim> &direction,
-                                  const double      steepness) :
-    direction(direction),
-    steepness(steepness)
+                                  const double      steepness)
+    : direction(direction)
+    , steepness(steepness)
   {
     switch (dim)
       {
@@ -1922,9 +1925,9 @@ namespace Functions
 
   template <int dim>
   FourierCosineFunction<dim>::FourierCosineFunction(
-    const Tensor<1, dim> &fourier_coefficients) :
-    Function<dim>(1),
-    fourier_coefficients(fourier_coefficients)
+    const Tensor<1, dim> &fourier_coefficients)
+    : Function<dim>(1)
+    , fourier_coefficients(fourier_coefficients)
   {}
 
 
@@ -1972,9 +1975,9 @@ namespace Functions
 
   template <int dim>
   FourierSineFunction<dim>::FourierSineFunction(
-    const Tensor<1, dim> &fourier_coefficients) :
-    Function<dim>(1),
-    fourier_coefficients(fourier_coefficients)
+    const Tensor<1, dim> &fourier_coefficients)
+    : Function<dim>(1)
+    , fourier_coefficients(fourier_coefficients)
   {}
 
 
@@ -2023,10 +2026,10 @@ namespace Functions
   template <int dim>
   FourierSineSum<dim>::FourierSineSum(
     const std::vector<Point<dim>> &fourier_coefficients,
-    const std::vector<double> &    weights) :
-    Function<dim>(1),
-    fourier_coefficients(fourier_coefficients),
-    weights(weights)
+    const std::vector<double> &    weights)
+    : Function<dim>(1)
+    , fourier_coefficients(fourier_coefficients)
+    , weights(weights)
   {
     Assert(fourier_coefficients.size() > 0, ExcZero());
     Assert(fourier_coefficients.size() == weights.size(),
@@ -2097,10 +2100,10 @@ namespace Functions
   template <int dim>
   FourierCosineSum<dim>::FourierCosineSum(
     const std::vector<Point<dim>> &fourier_coefficients,
-    const std::vector<double> &    weights) :
-    Function<dim>(1),
-    fourier_coefficients(fourier_coefficients),
-    weights(weights)
+    const std::vector<double> &    weights)
+    : Function<dim>(1)
+    , fourier_coefficients(fourier_coefficients)
+    , weights(weights)
   {
     Assert(fourier_coefficients.size() > 0, ExcZero());
     Assert(fourier_coefficients.size() == weights.size(),
@@ -2170,9 +2173,9 @@ namespace Functions
 
   template <int dim>
   Monomial<dim>::Monomial(const Tensor<1, dim> &exponents,
-                          const unsigned int    n_components) :
-    Function<dim>(n_components),
-    exponents(exponents)
+                          const unsigned int    n_components)
+    : Function<dim>(n_components)
+    , exponents(exponents)
   {}
 
 
@@ -2234,10 +2237,10 @@ namespace Functions
             else
               {
                 if (p[s] < 0)
-                  Assert(
-                    std::floor(exponents[s]) == exponents[s],
-                    ExcMessage("Exponentiation of a negative base number with "
-                               "a real exponent can't be performed."));
+                  Assert(std::floor(exponents[s]) == exponents[s],
+                         ExcMessage(
+                           "Exponentiation of a negative base number with "
+                           "a real exponent can't be performed."));
                 prod *=
                   (s == d ? exponents[s] * std::pow(p[s], exponents[s] - 1) :
                             std::pow(p[s], exponents[s]));
@@ -2268,10 +2271,10 @@ namespace Functions
   template <int dim>
   Bessel1<dim>::Bessel1(const unsigned int order,
                         const double       wave_number,
-                        const Point<dim>   center) :
-    order(order),
-    wave_number(wave_number),
-    center(center)
+                        const Point<dim>   center)
+    : order(order)
+    , wave_number(wave_number)
+    , center(center)
   {}
 
   template <int dim>
@@ -2496,9 +2499,9 @@ namespace Functions
   template <int dim>
   InterpolatedTensorProductGridData<dim>::InterpolatedTensorProductGridData(
     const std::array<std::vector<double>, dim> &coordinate_values,
-    const Table<dim, double> &                  data_values) :
-    coordinate_values(coordinate_values),
-    data_values(data_values)
+    const Table<dim, double> &                  data_values)
+    : coordinate_values(coordinate_values)
+    , data_values(data_values)
   {
     for (unsigned int d = 0; d < dim; ++d)
       {
@@ -2512,9 +2515,9 @@ namespace Functions
             ExcMessage(
               "Coordinate arrays must be sorted in strictly ascending order."));
 
-        Assert(
-          data_values.size()[d] == coordinate_values[d].size(),
-          ExcMessage("Data and coordinate tables do not have the same size."));
+        Assert(data_values.size()[d] == coordinate_values[d].size(),
+               ExcMessage(
+                 "Data and coordinate tables do not have the same size."));
       }
   }
 
@@ -2534,10 +2537,10 @@ namespace Functions
       {
         // get the index of the first element of the coordinate arrays that is
         // larger than p[d]
-        ix[d] =
-          (std::lower_bound(
-             coordinate_values[d].begin(), coordinate_values[d].end(), p[d]) -
-           coordinate_values[d].begin());
+        ix[d] = (std::lower_bound(coordinate_values[d].begin(),
+                                  coordinate_values[d].end(),
+                                  p[d]) -
+                 coordinate_values[d].begin());
 
         // the one we want is the index of the coordinate to the left, however,
         // so decrease it by one (unless we have a point to the left of all, in
@@ -2609,8 +2612,9 @@ namespace Functions
 
     Point<dim> p_unit;
     for (unsigned int d = 0; d < dim; ++d)
-      p_unit[d] = std::max(
-        std::min((p[d] - coordinate_values[d][ix[d]]) / dx[d], 1.), 0.0);
+      p_unit[d] =
+        std::max(std::min((p[d] - coordinate_values[d][ix[d]]) / dx[d], 1.),
+                 0.0);
 
     return gradient_interpolate(data_values, ix, p_unit, dx);
   }
@@ -2621,10 +2625,10 @@ namespace Functions
   InterpolatedUniformGridData<dim>::InterpolatedUniformGridData(
     const std::array<std::pair<double, double>, dim> &interval_endpoints,
     const std::array<unsigned int, dim> &             n_subintervals,
-    const Table<dim, double> &                        data_values) :
-    interval_endpoints(interval_endpoints),
-    n_subintervals(n_subintervals),
-    data_values(data_values)
+    const Table<dim, double> &                        data_values)
+    : interval_endpoints(interval_endpoints)
+    , n_subintervals(n_subintervals)
+    , data_values(data_values)
   {
     for (unsigned int d = 0; d < dim; ++d)
       {
@@ -2677,11 +2681,11 @@ namespace Functions
         const double delta_x =
           ((interval_endpoints[d].second - interval_endpoints[d].first) /
            n_subintervals[d]);
-        p_unit[d] = std::max(
-          std::min((p[d] - interval_endpoints[d].first - ix[d] * delta_x) /
-                     delta_x,
-                   1.),
-          0.);
+        p_unit[d] = std::max(std::min((p[d] - interval_endpoints[d].first -
+                                       ix[d] * delta_x) /
+                                        delta_x,
+                                      1.),
+                             0.);
       }
 
     return interpolate(data_values, ix, p_unit);
@@ -2693,10 +2697,10 @@ namespace Functions
 
   template <int dim>
   Polynomial<dim>::Polynomial(const Table<2, double> &   exponents,
-                              const std::vector<double> &coefficients) :
-    Function<dim>(1),
-    exponents(exponents),
-    coefficients(coefficients)
+                              const std::vector<double> &coefficients)
+    : Function<dim>(1)
+    , exponents(exponents)
+    , coefficients(coefficients)
   {
     Assert(exponents.n_rows() == coefficients.size(),
            ExcDimensionMismatch(exponents.n_rows(), coefficients.size()));

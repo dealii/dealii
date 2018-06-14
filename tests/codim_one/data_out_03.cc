@@ -45,7 +45,8 @@ template <int dim>
 class Identity : public Function<dim>
 {
 public:
-  Identity() : Function<dim>(dim)
+  Identity()
+    : Function<dim>(dim)
   {}
 
 

@@ -876,8 +876,8 @@ namespace MatrixFreeOperators
   template <int dim, int fe_degree, int n_components, typename Number>
   inline CellwiseInverseMassMatrix<dim, fe_degree, n_components, Number>::
     CellwiseInverseMassMatrix(
-      const FEEvaluationBase<dim, n_components, Number> &fe_eval) :
-    fe_eval(fe_eval)
+      const FEEvaluationBase<dim, n_components, Number> &fe_eval)
+    : fe_eval(fe_eval)
   {
     FullMatrix<double> shapes_1d(fe_degree + 1, fe_degree + 1);
     for (unsigned int i = 0, c = 0; i < shapes_1d.m(); ++i)
@@ -908,9 +908,9 @@ namespace MatrixFreeOperators
       AlignedVector<VectorizedArray<Number>> &inverse_jxw) const
   {
     constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
-    Assert(
-      inverse_jxw.size() > 0 && inverse_jxw.size() % dofs_per_cell == 0,
-      ExcMessage("Expected diagonal to be a multiple of scalar dof per cells"));
+    Assert(inverse_jxw.size() > 0 && inverse_jxw.size() % dofs_per_cell == 0,
+           ExcMessage(
+             "Expected diagonal to be a multiple of scalar dof per cells"));
 
     // temporarily reduce size of inverse_jxw to dofs_per_cell to get JxW values
     // from fe_eval (will not reallocate any memory)
@@ -939,10 +939,10 @@ namespace MatrixFreeOperators
     VectorizedArray<Number> *                     out_array) const
   {
     constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
-    Assert(
-      inverse_coefficients.size() > 0 &&
-        inverse_coefficients.size() % dofs_per_cell == 0,
-      ExcMessage("Expected diagonal to be a multiple of scalar dof per cells"));
+    Assert(inverse_coefficients.size() > 0 &&
+             inverse_coefficients.size() % dofs_per_cell == 0,
+           ExcMessage(
+             "Expected diagonal to be a multiple of scalar dof per cells"));
     if (inverse_coefficients.size() != dofs_per_cell)
       AssertDimension(n_actual_components * dofs_per_cell,
                       inverse_coefficients.size());
@@ -989,7 +989,9 @@ namespace MatrixFreeOperators
 
   //----------------- Base operator -----------------------------
   template <int dim, typename VectorType>
-  Base<dim, VectorType>::Base() : Subscriptor(), have_interface_matrices(false)
+  Base<dim, VectorType>::Base()
+    : Subscriptor()
+    , have_interface_matrices(false)
   {}
 
 
@@ -1539,9 +1541,9 @@ namespace MatrixFreeOperators
   //------------------------- MGInterfaceOperator ------------------------------
 
   template <typename OperatorType>
-  MGInterfaceOperator<OperatorType>::MGInterfaceOperator() :
-    Subscriptor(),
-    mf_base_operator(nullptr)
+  MGInterfaceOperator<OperatorType>::MGInterfaceOperator()
+    : Subscriptor()
+    , mf_base_operator(nullptr)
   {}
 
 
@@ -1625,8 +1627,8 @@ namespace MatrixFreeOperators
             int n_components,
             typename VectorType>
   MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    MassOperator() :
-    Base<dim, VectorType>()
+    MassOperator()
+    : Base<dim, VectorType>()
   {}
 
 
@@ -1676,8 +1678,10 @@ namespace MatrixFreeOperators
   MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
     apply_add(VectorType &dst, const VectorType &src) const
   {
-    Base<dim, VectorType>::data->cell_loop(
-      &MassOperator::local_apply_cell, this, dst, src);
+    Base<dim, VectorType>::data->cell_loop(&MassOperator::local_apply_cell,
+                                           this,
+                                           dst,
+                                           src);
   }
 
 
@@ -1719,8 +1723,8 @@ namespace MatrixFreeOperators
             int n_components,
             typename VectorType>
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    LaplaceOperator() :
-    Base<dim, VectorType>()
+    LaplaceOperator()
+    : Base<dim, VectorType>()
   {}
 
 
@@ -1799,8 +1803,10 @@ namespace MatrixFreeOperators
     this->initialize_dof_vector(inverse_diagonal_vector);
     this->initialize_dof_vector(diagonal_vector);
 
-    this->data->cell_loop(
-      &LaplaceOperator::local_diagonal_cell, this, diagonal_vector, dummy);
+    this->data->cell_loop(&LaplaceOperator::local_diagonal_cell,
+                          this,
+                          diagonal_vector,
+                          dummy);
     this->set_constrained_entries_to_one(diagonal_vector);
 
     inverse_diagonal_vector = diagonal_vector;
@@ -1828,8 +1834,10 @@ namespace MatrixFreeOperators
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
     apply_add(VectorType &dst, const VectorType &src) const
   {
-    Base<dim, VectorType>::data->cell_loop(
-      &LaplaceOperator::local_apply_cell, this, dst, src);
+    Base<dim, VectorType>::data->cell_loop(&LaplaceOperator::local_apply_cell,
+                                           this,
+                                           dst,
+                                           src);
   }
 
   namespace
@@ -1871,8 +1879,9 @@ namespace MatrixFreeOperators
           {
             Assert(non_negative((*scalar_coefficient)(cell, q)),
                    ExcMessage("Coefficient must be non-negative"));
-            phi.submit_gradient(
-              (*scalar_coefficient)(cell, q) * phi.get_gradient(q), q);
+            phi.submit_gradient((*scalar_coefficient)(cell, q) *
+                                  phi.get_gradient(q),
+                                q);
           }
       }
     else

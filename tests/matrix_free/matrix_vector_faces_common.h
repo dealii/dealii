@@ -71,7 +71,8 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const MatrixFree<dim, number> &data) : data(data)
+  MatrixFreeTest(const MatrixFree<dim, number> &data)
+    : data(data)
   {}
 
   void
@@ -223,10 +224,10 @@ class MatrixFreeVariant
 public:
   MatrixFreeVariant(const MatrixFree<dim, number> &data,
                     const bool                     zero_within_loop = true,
-                    const unsigned int             start_vector_component = 0) :
-    data(data),
-    zero_within_loop(zero_within_loop),
-    start_vector_component(start_vector_component)
+                    const unsigned int             start_vector_component = 0)
+    : data(data)
+    , zero_within_loop(zero_within_loop)
+    , start_vector_component(start_vector_component)
   {}
 
   void
@@ -416,10 +417,10 @@ class MatrixFreeAdvection
 public:
   MatrixFreeAdvection(const MatrixFree<dim, number> &data,
                       const bool                     zero_within_loop = true,
-                      const unsigned int start_vector_component       = 0) :
-    data(data),
-    zero_within_loop(zero_within_loop),
-    start_vector_component(start_vector_component)
+                      const unsigned int             start_vector_component = 0)
+    : data(data)
+    , zero_within_loop(zero_within_loop)
+    , start_vector_component(start_vector_component)
   {
     for (unsigned int d = 0; d < dim; ++d)
       advection[d] = 0.4 + 0.12 * d;
@@ -470,8 +471,9 @@ private:
         phi.reinit(cell);
         phi.gather_evaluate(src, true, false);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          phi.submit_gradient(
-            multiply_by_advection(advection, phi.get_value(q)), q);
+          phi.submit_gradient(multiply_by_advection(advection,
+                                                    phi.get_value(q)),
+                              q);
         phi.integrate_scatter(false, true, dst);
       }
   }
@@ -647,8 +649,9 @@ MatrixIntegrator<dim>::boundary(
                 [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
               info.fe_values(0).normal_vector(0)));
   double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::nitsche_matrix(
-    dinfo.matrix(0, false).matrix, info.fe_values(0), penalty);
+  LocalIntegrators::Laplace ::nitsche_matrix(dinfo.matrix(0, false).matrix,
+                                             info.fe_values(0),
+                                             penalty);
 }
 
 
@@ -697,8 +700,9 @@ do_test(const DoFHandler<dim> & dof,
   UpdateFlags                         update_flags =
     update_values | update_gradients | update_jacobians;
   info_box.add_update_flags_all(update_flags);
-  info_box.initialize_gauss_quadrature(
-    n_q_points_1d, n_q_points_1d, n_q_points_1d);
+  info_box.initialize_gauss_quadrature(n_q_points_1d,
+                                       n_q_points_1d,
+                                       n_q_points_1d);
   info_box.initialize(dof.get_fe(), mapping);
 
   MeshWorker::DoFInfo<dim> dof_info(dof);
@@ -758,8 +762,9 @@ do_test(const DoFHandler<dim> & dof,
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc,
+                                            argv,
+                                            testing_max_num_threads());
   mpi_initlog();
 #else
 int

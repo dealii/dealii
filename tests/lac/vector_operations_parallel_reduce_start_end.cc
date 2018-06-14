@@ -38,8 +38,9 @@ check()
         new ::dealii::parallel::internal::TBBPartitioner());
 
       Number *val;
-      Utilities::System::posix_memalign(
-        (void **)&val, 64, sizeof(Number) * size);
+      Utilities::System::posix_memalign((void **)&val,
+                                        64,
+                                        sizeof(Number) * size);
 
       for (unsigned int i = 0; i < size; ++i)
         val[i] = random_value<double>();

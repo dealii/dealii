@@ -72,8 +72,9 @@ test()
   DoFTools::extract_locally_relevant_dofs(dofh2, dof2_locally_relevant_dofs);
   DoFTools::extract_locally_relevant_dofs(dofh1, dof1_locally_relevant_dofs);
 
-  PETScWrappers::MPI::Vector u1(
-    dof1_locally_owned_dofs, dof1_locally_relevant_dofs, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector u1(dof1_locally_owned_dofs,
+                                dof1_locally_relevant_dofs,
+                                MPI_COMM_WORLD);
 
   PETScWrappers::MPI::Vector out(dof1_locally_owned_dofs, MPI_COMM_WORLD);
 

@@ -9,8 +9,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 KDTree<dim>::KDTree(const unsigned int &           max_leaf_size,
-                    const std::vector<Point<dim>> &pts) :
-  max_leaf_size(max_leaf_size)
+                    const std::vector<Point<dim>> &pts)
+  : max_leaf_size(max_leaf_size)
 {
   if (pts.size() > 0)
     set_points(pts);

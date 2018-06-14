@@ -158,8 +158,9 @@ main()
       SolverGMRES<> solver_gmres(solver_control);
       // Attach all possible slots.
       solver_gmres.connect_condition_number_slot(
-        std::bind(
-          output_double_number, std::placeholders::_1, "Condition number: "),
+        std::bind(output_double_number,
+                  std::placeholders::_1,
+                  "Condition number: "),
         true);
       solver_gmres.connect_condition_number_slot(
         std::bind(output_double_number,

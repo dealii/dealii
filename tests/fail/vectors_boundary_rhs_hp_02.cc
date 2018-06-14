@@ -54,7 +54,8 @@ template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
-  MySquareFunction() : Function<dim>(dim)
+  MySquareFunction()
+    : Function<dim>(dim)
   {}
 
   virtual double
@@ -115,8 +116,10 @@ check()
     quadrature.push_back(QGauss<dim - 1>(3 + i));
 
   Vector<double> rhs(dof.n_dofs());
-  VectorTools::create_boundary_right_hand_side(
-    dof, quadrature, MySquareFunction<dim>(), rhs);
+  VectorTools::create_boundary_right_hand_side(dof,
+                                               quadrature,
+                                               MySquareFunction<dim>(),
+                                               rhs);
   for (unsigned int i = 0; i < rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }

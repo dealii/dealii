@@ -68,8 +68,9 @@ private:
 
 
 template <int dim>
-TestPointValueHistory<dim>::TestPointValueHistory() :
-  finite_element(FE_Q<dim>(1 + 1), dim, FE_Q<dim>(1), 1),
+TestPointValueHistory<dim>::TestPointValueHistory()
+  : finite_element(FE_Q<dim>(1 + 1), dim, FE_Q<dim>(1), 1)
+  ,
 
   dof_handler(triangulation)
 {}

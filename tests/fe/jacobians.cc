@@ -104,8 +104,10 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   }
   {
     deallog << dim << "D Jacobian pushed forward gradients:" << std::endl;
-    FEValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_grads);
+    FEValues<dim>                                     fe_val(mapping,
+                         dummy,
+                         quad,
+                         update_jacobian_pushed_forward_grads);
     typename Triangulation<dim>::active_cell_iterator cell =
                                                         tria.begin_active(),
                                                       endc = tria.end();
@@ -142,8 +144,10 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   }
   {
     deallog << dim << "D Jacobian pushed forward hessians:" << std::endl;
-    FEValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
+    FEValues<dim>                                     fe_val(mapping,
+                         dummy,
+                         quad,
+                         update_jacobian_pushed_forward_2nd_derivatives);
     typename Triangulation<dim>::active_cell_iterator cell =
                                                         tria.begin_active(),
                                                       endc = tria.end();
@@ -186,8 +190,10 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim
             << "D Jacobian pushed forward hessian gradients:" << std::endl;
-    FEValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
+    FEValues<dim>                                     fe_val(mapping,
+                         dummy,
+                         quad,
+                         update_jacobian_pushed_forward_3rd_derivatives);
     typename Triangulation<dim>::active_cell_iterator cell =
                                                         tria.begin_active(),
                                                       endc = tria.end();

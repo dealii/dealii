@@ -141,10 +141,10 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
                 penv + ">"));
           }
 
-        AssertThrow(
-          max_threads_env > 0,
-          ExcMessage("When specifying the <DEAL_II_NUM_THREADS> environment "
-                     "variable, it needs to be a positive number."));
+        AssertThrow(max_threads_env > 0,
+                    ExcMessage(
+                      "When specifying the <DEAL_II_NUM_THREADS> environment "
+                      "variable, it needs to be a positive number."));
 
         if (n_max_threads != numbers::invalid_unsigned_int)
           n_max_threads = std::min(n_max_threads, max_threads_env);

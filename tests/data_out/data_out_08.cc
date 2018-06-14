@@ -63,7 +63,8 @@ template <int dim>
 class FilteredDataOut : public DataOut<dim>
 {
 public:
-  FilteredDataOut(const unsigned int subdomain_id) : subdomain_id(subdomain_id)
+  FilteredDataOut(const unsigned int subdomain_id)
+    : subdomain_id(subdomain_id)
   {}
 
   virtual typename DataOut<dim>::cell_iterator
@@ -125,8 +126,9 @@ check()
   FilteredDataOut<dim> data_out(0);
   data_out.attach_dof_handler(dof_handler);
 
-  data_out.add_data_vector(
-    cell_data, "cell_data", DataOut<dim>::type_cell_data);
+  data_out.add_data_vector(cell_data,
+                           "cell_data",
+                           DataOut<dim>::type_cell_data);
   data_out.build_patches();
 
   data_out.write_deal_II_intermediate(deallog.get_file_stream());

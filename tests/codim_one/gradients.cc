@@ -84,8 +84,9 @@ test(std::string filename)
   const FE_DGQ<dim, spacedim> fe_help(0);
   DoFHandler<dim, spacedim>   dof_handler_help(triangulation);
   dof_handler_help.distribute_dofs(fe_help);
-  FEValues<dim, spacedim> fe_values_help(
-    fe_help, q_midpoint, update_normal_vectors);
+  FEValues<dim, spacedim> fe_values_help(fe_help,
+                                         q_midpoint,
+                                         update_normal_vectors);
 
   deallog << "no. of cells " << triangulation.n_cells() << std::endl;
   deallog << "no. of dofs " << dof_handler.n_dofs() << std::endl;

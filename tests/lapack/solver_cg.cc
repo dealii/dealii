@@ -111,8 +111,9 @@ main()
                                              std::placeholders::_1,
                                              "Condition number estimate: "),
                                    true);
-  cg.connect_eigenvalues_slot(std::bind(
-    output_eigenvalues<double>, std::placeholders::_1, "Final Eigenvalues: "));
+  cg.connect_eigenvalues_slot(std::bind(output_eigenvalues<double>,
+                                        std::placeholders::_1,
+                                        "Final Eigenvalues: "));
 
 
   for (unsigned int size = 4; size <= 30; size *= 3)

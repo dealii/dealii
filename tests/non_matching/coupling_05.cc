@@ -94,8 +94,9 @@ test()
   QGauss<dim> quad(3); // Quadrature for coupling
 
 
-  TrilinosWrappers::SparsityPattern sparsity(
-    space_locally_owned_dofs, locally_owned_dofs, comm);
+  TrilinosWrappers::SparsityPattern sparsity(space_locally_owned_dofs,
+                                             locally_owned_dofs,
+                                             comm);
   NonMatching::create_coupling_sparsity_pattern(space_dh, dh, quad, sparsity);
   sparsity.compress();
 
@@ -127,8 +128,9 @@ test()
               for (unsigned int q = 0; q < quad.size(); ++q)
                 cell_matrix(i, j) +=
                   fev.shape_value(i, q) * fev.shape_value(j, q) * fev.JxW(q);
-          constraints.distribute_local_to_global(
-            cell_matrix, dofs, mass_matrix);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 dofs,
+                                                 mass_matrix);
         }
     mass_matrix.compress(VectorOperation::add);
   }
@@ -140,8 +142,9 @@ test()
   TrilinosWrappers::MPI::Vector Mprojected_squares(locally_owned_dofs, comm);
   TrilinosWrappers::MPI::Vector projected_squares(locally_owned_dofs, comm);
 
-  VectorTools::interpolate(
-    space_dh, Functions::SquareFunction<spacedim>(), space_square);
+  VectorTools::interpolate(space_dh,
+                           Functions::SquareFunction<spacedim>(),
+                           space_square);
   VectorTools::interpolate(dh, Functions::SquareFunction<spacedim>(), squares);
 
   coupling.Tvmult(Mprojected_squares, space_square);

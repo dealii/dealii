@@ -162,8 +162,9 @@ test(const unsigned int size,
         << " eigenvalues computed using LAPACK and ScaLAPACK p_syevr:"
         << std::endl;
   const std::vector<NumberType> eigenvalues_psyer =
-    scalapack_syevr.eigenpairs_symmetric_by_index_MRRR(
-      std::make_pair(0, size - 1), false);
+    scalapack_syevr.eigenpairs_symmetric_by_index_MRRR(std::make_pair(0,
+                                                                      size - 1),
+                                                       false);
   scalapack_syevr.copy_to(p_eigenvectors);
   for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
     AssertThrow(std::abs(eigenvalues_psyer[n_eigenvalues - i - 1] -

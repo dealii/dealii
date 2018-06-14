@@ -195,10 +195,10 @@ namespace Step30
   // the quadrature points on faces or subfaces represented by the two objects
   // correspond to the same points in physical space.
   template <int dim>
-  DGTransportEquation<dim>::DGTransportEquation() :
-    beta_function(),
-    rhs_function(),
-    boundary_function()
+  DGTransportEquation<dim>::DGTransportEquation()
+    : beta_function()
+    , rhs_function()
+    , boundary_function()
   {}
 
 
@@ -366,22 +366,24 @@ namespace Step30
 
 
   template <int dim>
-  DGMethod<dim>::DGMethod(const bool anisotropic) :
-    mapping(),
+  DGMethod<dim>::DGMethod(const bool anisotropic)
+    : mapping()
+    ,
     // Change here for DG methods of different degrees.
-    degree(1),
-    fe(degree),
-    dof_handler(triangulation),
-    anisotropic_threshold_ratio(3.),
-    anisotropic(anisotropic),
+    degree(1)
+    , fe(degree)
+    , dof_handler(triangulation)
+    , anisotropic_threshold_ratio(3.)
+    , anisotropic(anisotropic)
+    ,
     // As beta is a linear function, we can choose the degree of the
     // quadrature for which the resulting integration is correct. Thus, we
     // choose to use <code>degree+1</code> Gauss points, which enables us to
     // integrate exactly polynomials of degree <code>2*degree+1</code>, enough
     // for all the integrals we will perform in this program.
-    quadrature(degree + 1),
-    face_quadrature(degree + 1),
-    dg()
+    quadrature(degree + 1)
+    , face_quadrature(degree + 1)
+    , dg()
   {}
 
 
@@ -441,13 +443,19 @@ namespace Step30
 
     const UpdateFlags neighbor_face_update_flags = update_values;
 
-    FEValues<dim>     fe_v(mapping, fe, quadrature, update_flags);
-    FEFaceValues<dim> fe_v_face(
-      mapping, fe, face_quadrature, face_update_flags);
-    FESubfaceValues<dim> fe_v_subface(
-      mapping, fe, face_quadrature, face_update_flags);
-    FEFaceValues<dim> fe_v_face_neighbor(
-      mapping, fe, face_quadrature, neighbor_face_update_flags);
+    FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
+    FEFaceValues<dim>    fe_v_face(mapping,
+                                fe,
+                                face_quadrature,
+                                face_update_flags);
+    FESubfaceValues<dim> fe_v_subface(mapping,
+                                      fe,
+                                      face_quadrature,
+                                      face_update_flags);
+    FEFaceValues<dim>    fe_v_face_neighbor(mapping,
+                                         fe,
+                                         face_quadrature,
+                                         neighbor_face_update_flags);
 
 
     FullMatrix<double> ui_vi_matrix(dofs_per_cell, dofs_per_cell);
@@ -539,10 +547,12 @@ namespace Step30
                         for (unsigned int i = 0; i < dofs_per_cell; ++i)
                           for (unsigned int j = 0; j < dofs_per_cell; ++j)
                             {
-                              system_matrix.add(
-                                dofs[i], dofs_neighbor[j], ue_vi_matrix(i, j));
-                              system_matrix.add(
-                                dofs_neighbor[i], dofs[j], ui_ve_matrix(i, j));
+                              system_matrix.add(dofs[i],
+                                                dofs_neighbor[j],
+                                                ue_vi_matrix(i, j));
+                              system_matrix.add(dofs_neighbor[i],
+                                                dofs[j],
+                                                ui_ve_matrix(i, j));
                               system_matrix.add(dofs_neighbor[i],
                                                 dofs_neighbor[j],
                                                 ue_ve_matrix(i, j));
@@ -592,10 +602,12 @@ namespace Step30
                         for (unsigned int i = 0; i < dofs_per_cell; ++i)
                           for (unsigned int j = 0; j < dofs_per_cell; ++j)
                             {
-                              system_matrix.add(
-                                dofs[i], dofs_neighbor[j], ue_vi_matrix(i, j));
-                              system_matrix.add(
-                                dofs_neighbor[i], dofs[j], ui_ve_matrix(i, j));
+                              system_matrix.add(dofs[i],
+                                                dofs_neighbor[j],
+                                                ue_vi_matrix(i, j));
+                              system_matrix.add(dofs_neighbor[i],
+                                                dofs[j],
+                                                ui_ve_matrix(i, j));
                               system_matrix.add(dofs_neighbor[i],
                                                 dofs_neighbor[j],
                                                 ue_ve_matrix(i, j));
@@ -646,8 +658,10 @@ namespace Step30
     Vector<float> gradient_indicator(triangulation.n_active_cells());
 
     // We approximate the gradient,
-    DerivativeApproximation::approximate_gradient(
-      mapping, dof_handler, solution2, gradient_indicator);
+    DerivativeApproximation::approximate_gradient(mapping,
+                                                  dof_handler,
+                                                  solution2,
+                                                  gradient_indicator);
 
     // and scale it to obtain an error indicator.
     typename DoFHandler<dim>::active_cell_iterator cell =
@@ -658,8 +672,10 @@ namespace Step30
         std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
     // Then we use this indicator to flag the 30 percent of the cells with
     // highest error indicator to be refined.
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, gradient_indicator, 0.3, 0.1);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    gradient_indicator,
+                                                    0.3,
+                                                    0.1);
     // Now the refinement flags are set for those cells with a large error
     // indicator. If nothing is done to change this, those cells will be
     // refined isotropically. If the @p anisotropic flag given to this
@@ -686,12 +702,18 @@ namespace Step30
     UpdateFlags face_update_flags =
       UpdateFlags(update_values | update_JxW_values);
 
-    FEFaceValues<dim> fe_v_face(
-      mapping, fe, face_quadrature, face_update_flags);
-    FESubfaceValues<dim> fe_v_subface(
-      mapping, fe, face_quadrature, face_update_flags);
-    FEFaceValues<dim> fe_v_face_neighbor(
-      mapping, fe, face_quadrature, update_values);
+    FEFaceValues<dim>    fe_v_face(mapping,
+                                fe,
+                                face_quadrature,
+                                face_update_flags);
+    FESubfaceValues<dim> fe_v_subface(mapping,
+                                      fe,
+                                      face_quadrature,
+                                      face_update_flags);
+    FEFaceValues<dim>    fe_v_face_neighbor(mapping,
+                                         fe,
+                                         face_quadrature,
+                                         update_values);
 
     // Now we need to loop over all active cells.
     typename DoFHandler<dim>::active_cell_iterator cell =
@@ -741,8 +763,9 @@ namespace Step30
                           // get an iterator pointing to the cell behind the
                           // present subface...
                           typename DoFHandler<dim>::cell_iterator
-                            neighbor_child = cell->neighbor_child_on_subface(
-                              face_no, subface_no);
+                            neighbor_child =
+                              cell->neighbor_child_on_subface(face_no,
+                                                              subface_no);
                           Assert(!neighbor_child->has_children(),
                                  ExcInternalError());
                           // ... and reinit the respective FEFaceValues and
@@ -956,8 +979,10 @@ namespace Step30
             // completely isotropic cells for the original mesh.
             std::vector<unsigned int> repetitions(dim, 1);
             repetitions[0] = 2;
-            GridGenerator::subdivided_hyper_rectangle(
-              triangulation, repetitions, p1, p2);
+            GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                                      repetitions,
+                                                      p1,
+                                                      p2);
 
             triangulation.refine_global(5 - dim);
           }

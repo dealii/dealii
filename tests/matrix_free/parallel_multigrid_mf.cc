@@ -82,8 +82,9 @@ public:
          ++it)
       functions[*it] = &zero;
     if (level == numbers::invalid_unsigned_int)
-      VectorTools::interpolate_boundary_values(
-        dof_handler, functions, constraints);
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               functions,
+                                               constraints);
     else
       {
         std::vector<types::global_dof_index>    local_dofs;
@@ -280,10 +281,10 @@ class MGTransferPrebuiltMF
 {
 public:
   MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace,
-                       const MGConstrainedDoFs &        mg_constrained_dofs) :
-    MGTransferMatrixFree<dim, typename MatrixType::value_type>(
-      mg_constrained_dofs),
-    laplace_operator(laplace){};
+                       const MGConstrainedDoFs &        mg_constrained_dofs)
+    : MGTransferMatrixFree<dim, typename MatrixType::value_type>(
+        mg_constrained_dofs)
+    , laplace_operator(laplace){};
 
   /**
    * Overload copy_to_mg from MGTransferPrebuilt to get the vectors compatible

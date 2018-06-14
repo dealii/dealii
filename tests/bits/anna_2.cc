@@ -69,9 +69,9 @@ private:
 };
 
 template <int dim>
-SystemTest<dim>::SystemTest() :
-  fe(FE_Nedelec<dim>(0), 2, FE_Q<dim>(1), 1),
-  dof_handler(triangulation)
+SystemTest<dim>::SystemTest()
+  : fe(FE_Nedelec<dim>(0), 2, FE_Q<dim>(1), 1)
+  , dof_handler(triangulation)
 {}
 
 

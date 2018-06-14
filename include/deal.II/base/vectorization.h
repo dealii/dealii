@@ -2492,12 +2492,12 @@ vectorized_transpose_and_store(const bool                     add_into,
           __m128d u1   = in[2 * i + 1].data;
           __m128d res0 = _mm_unpacklo_pd(u0, u1);
           __m128d res1 = _mm_unpackhi_pd(u0, u1);
-          _mm_storeu_pd(
-            out + 2 * i + offsets[0],
-            _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[0]), res0));
-          _mm_storeu_pd(
-            out + 2 * i + offsets[1],
-            _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[1]), res1));
+          _mm_storeu_pd(out + 2 * i + offsets[0],
+                        _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[0]),
+                                   res0));
+          _mm_storeu_pd(out + 2 * i + offsets[1],
+                        _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[1]),
+                                   res1));
         }
       for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 2; ++v)

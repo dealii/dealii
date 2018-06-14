@@ -75,8 +75,9 @@ test()
   // Setup system
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<dim>(0, 0), Point<dim>(1, 1));
+  GridGenerator::hyper_rectangle(triangulation,
+                                 Point<dim>(0, 0),
+                                 Point<dim>(1, 1));
 
   triangulation.refine_global(1);
 
@@ -266,8 +267,9 @@ test()
             s = 0.;
             s = sl;
 
-            data_out.add_data_vector(
-              s, std::string("N_") + dealii::Utilities::int_to_string(i));
+            data_out.add_data_vector(s,
+                                     std::string("N_") +
+                                       dealii::Utilities::int_to_string(i));
           }
 
         Vector<float> subdomain(triangulation.n_active_cells());
@@ -301,12 +303,12 @@ test()
     {
       const unsigned int ind = locally_owned_set.nth_index_in_set(i);
       const double       v   = rhs[ind];
-      AssertThrow(
-        std::abs(v) < 1e-12,
-        ExcMessage("Element " + std::to_string(ind) + " has an error " +
-                   std::to_string(v) + " on the process " +
-                   std::to_string(dealii::Utilities::MPI::this_mpi_process(
-                     MPI_COMM_WORLD))));
+      AssertThrow(std::abs(v) < 1e-12,
+                  ExcMessage(
+                    "Element " + std::to_string(ind) + " has an error " +
+                    std::to_string(v) + " on the process " +
+                    std::to_string(dealii::Utilities::MPI::this_mpi_process(
+                      MPI_COMM_WORLD))));
     }
 
   if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

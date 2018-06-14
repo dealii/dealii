@@ -144,9 +144,9 @@ public:
      * parameter 1e-10.
      */
     explicit AdditionalData(const bool   exact_residual = true,
-                            const double breakdown      = 1.e-10) :
-      exact_residual(exact_residual),
-      breakdown(breakdown)
+                            const double breakdown      = 1.e-10)
+      : exact_residual(exact_residual)
+      , breakdown(breakdown)
     {}
     /**
      * Flag for exact computation of residual.
@@ -301,11 +301,11 @@ SolverBicgstab<VectorType>::IterationResult::IterationResult(
   const bool                 breakdown,
   const SolverControl::State state,
   const unsigned int         last_step,
-  const double               last_residual) :
-  breakdown(breakdown),
-  state(state),
-  last_step(last_step),
-  last_residual(last_residual)
+  const double               last_residual)
+  : breakdown(breakdown)
+  , state(state)
+  , last_step(last_step)
+  , last_residual(last_residual)
 {}
 
 
@@ -313,22 +313,22 @@ SolverBicgstab<VectorType>::IterationResult::IterationResult(
 template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &           cn,
                                            VectorMemory<VectorType> &mem,
-                                           const AdditionalData &    data) :
-  Solver<VectorType>(cn, mem),
-  Vx(nullptr),
-  Vb(nullptr),
-  additional_data(data)
+                                           const AdditionalData &    data)
+  : Solver<VectorType>(cn, mem)
+  , Vx(nullptr)
+  , Vb(nullptr)
+  , additional_data(data)
 {}
 
 
 
 template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &       cn,
-                                           const AdditionalData &data) :
-  Solver<VectorType>(cn),
-  Vx(nullptr),
-  Vb(nullptr),
-  additional_data(data)
+                                           const AdditionalData &data)
+  : Solver<VectorType>(cn)
+  , Vx(nullptr)
+  , Vb(nullptr)
+  , additional_data(data)
 {}
 
 
@@ -515,9 +515,9 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   while (state.breakdown == true);
 
   // in case of failure: throw exception
-  AssertThrow(
-    state.state == SolverControl::success,
-    SolverControl::NoConvergence(state.last_step, state.last_residual));
+  AssertThrow(state.state == SolverControl::success,
+              SolverControl::NoConvergence(state.last_step,
+                                           state.last_residual));
   // otherwise exit as normal
 }
 

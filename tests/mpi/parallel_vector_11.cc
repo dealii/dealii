@@ -53,8 +53,9 @@ test()
   local_relevant = local_owned;
   local_relevant.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                               local_relevant,
+                                               MPI_COMM_WORLD);
   AssertDimension(static_cast<unsigned int>(actual_local_size), v.local_size());
   LinearAlgebra::distributed::Vector<double> w(v), x(v), y(v);
 

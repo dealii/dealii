@@ -370,10 +370,10 @@ namespace
   double
   complex_mean_value(const std::complex<T> &value)
   {
-    AssertThrow(
-      false,
-      ExcMessage("FESeries::process_coefficients() can not be used with"
-                 "complex-valued coefficients and VectorTools::mean norm."));
+    AssertThrow(false,
+                ExcMessage(
+                  "FESeries::process_coefficients() can not be used with"
+                  "complex-valued coefficients and VectorTools::mean norm."));
     return std::abs(value);
   }
 

@@ -104,7 +104,8 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  Coefficient() : Function<dim>()
+  Coefficient()
+    : Function<dim>()
   {}
 
   virtual double
@@ -150,12 +151,12 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-  triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
-  fe(degree),
-  mg_dof_handler(triangulation),
-  degree(degree),
-  min_level(2)
+LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+  : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
+  , fe(degree)
+  , mg_dof_handler(triangulation)
+  , degree(degree)
+  , min_level(2)
 {}
 
 
@@ -181,8 +182,10 @@ LaplaceProblem<dim>::setup_system()
   Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   MappingQGeneric<dim> mapping(1);
-  VectorTools::interpolate_boundary_values(
-    mapping, mg_dof_handler, dirichlet_boundary, constraints);
+  VectorTools::interpolate_boundary_values(mapping,
+                                           mg_dof_handler,
+                                           dirichlet_boundary,
+                                           constraints);
   constraints.close();
   constraints.condense(sparsity_pattern);
   sparsity_pattern.compress();
@@ -342,11 +345,12 @@ LaplaceProblem<dim>::assemble_multigrid()
                 !mg_constrained_dofs.is_boundary_index(
                   lvl,
                   local_dof_indices[j])) // ( !boundary(i) && !boundary(j) )
-               || (mg_constrained_dofs.is_boundary_index(
-                     lvl, local_dof_indices[i]) &&
-                   local_dof_indices[i] ==
-                     local_dof_indices[j]) // ( boundary(i) && boundary(j) &&
-                                           // i==j )
+               ||
+               (mg_constrained_dofs.is_boundary_index(lvl,
+                                                      local_dof_indices[i]) &&
+                local_dof_indices[i] ==
+                  local_dof_indices[j]) // ( boundary(i) && boundary(j) &&
+                                        // i==j )
                ))
             {
               // do nothing, so add entries to interface matrix
@@ -440,14 +444,16 @@ LaplaceProblem<dim>::refine_grid()
 {
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate(
-    static_cast<DoFHandler<dim> &>(mg_dof_handler),
-    QGauss<dim - 1>(3),
-    typename FunctionMap<dim>::type(),
-    solution,
-    estimated_error_per_cell);
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(
+                                       mg_dof_handler),
+                                     QGauss<dim - 1>(3),
+                                     typename FunctionMap<dim>::type(),
+                                     solution,
+                                     estimated_error_per_cell);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
   triangulation.execute_coarsening_and_refinement();
 }
 

@@ -34,8 +34,9 @@ test()
 
   // test 1: check trace-like operator
   {
-    const SymmetricTensor<4, dim> T = outer_product<dim>(
-      unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
+    const SymmetricTensor<4, dim> T =
+      outer_product<dim>(unit_symmetric_tensor<dim>(),
+                         unit_symmetric_tensor<dim>());
 
     // T*t should yield a diagonal tensor
     // where the diagonal elements are the

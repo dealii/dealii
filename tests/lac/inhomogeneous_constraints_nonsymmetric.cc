@@ -96,7 +96,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>()
+  RightHandSide()
+    : Function<dim>()
   {}
 
   virtual double
@@ -117,7 +118,9 @@ RightHandSide<dim>::value(const Point<dim> &p,
 
 
 template <int dim>
-AdvectionProblem<dim>::AdvectionProblem() : dof_handler(triangulation), fe(2)
+AdvectionProblem<dim>::AdvectionProblem()
+  : dof_handler(triangulation)
+  , fe(2)
 {}
 
 
@@ -146,8 +149,10 @@ AdvectionProblem<dim>::setup_system()
   // boundary function
   {
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, RightHandSide<dim>(), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             RightHandSide<dim>(),
+                                             boundary_values);
     std::map<types::global_dof_index, double>::const_iterator boundary_value =
       boundary_values.begin();
     for (; boundary_value != boundary_values.end(); ++boundary_value)
@@ -281,10 +286,14 @@ AdvectionProblem<dim>::assemble_reference()
   // use some other rhs vector as dummy for
   // application of Dirichlet conditions
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, RightHandSide<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, reference_matrix, test_rhs, reference_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           RightHandSide<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     reference_matrix,
+                                     test_rhs,
+                                     reference_rhs);
 }
 
 

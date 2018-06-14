@@ -153,8 +153,9 @@ test()
       if (cell->subdomain_id() == triangulation.locally_owned_subdomain())
         {
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            local_vector, local_dof_indices, vector);
+          constraints.distribute_local_to_global(local_vector,
+                                                 local_dof_indices,
+                                                 vector);
         }
     vector.compress(VectorOperation::add);
   }

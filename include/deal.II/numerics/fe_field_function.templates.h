@@ -45,14 +45,14 @@ namespace Functions
   FEFieldFunction<dim, DoFHandlerType, VectorType>::FEFieldFunction(
     const DoFHandlerType &mydh,
     const VectorType &    myv,
-    const Mapping<dim> &  mymapping) :
-    Function<dim, typename VectorType::value_type>(
-      mydh.get_fe(0).n_components()),
-    dh(&mydh, "FEFieldFunction"),
-    data_vector(myv),
-    mapping(mymapping),
-    cache(dh->get_triangulation(), mymapping),
-    cell_hint(dh->end())
+    const Mapping<dim> &  mymapping)
+    : Function<dim, typename VectorType::value_type>(
+        mydh.get_fe(0).n_components())
+    , dh(&mydh, "FEFieldFunction")
+    , data_vector(myv)
+    , mapping(mymapping)
+    , cache(dh->get_triangulation(), mymapping)
+    , cell_hint(dh->end())
   {}
 
 
@@ -287,8 +287,10 @@ namespace Functions
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
     // Get a function value object
-    hp::FEValues<dim> fe_v(
-      mapping_collection, fe_collection, quadrature_collection, update_values);
+    hp::FEValues<dim> fe_v(mapping_collection,
+                           fe_collection,
+                           quadrature_collection,
+                           update_values);
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {

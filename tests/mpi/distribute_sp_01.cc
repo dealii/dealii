@@ -57,8 +57,10 @@ test_mpi()
   for (unsigned int i = 0; i < n; ++i)
     csp.add(i, myid);
 
-  SparsityTools::distribute_sparsity_pattern(
-    csp, rows_per_cpu, MPI_COMM_WORLD, locally_rel);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             rows_per_cpu,
+                                             MPI_COMM_WORLD,
+                                             locally_rel);
   /*  {
       std::ofstream
      f((std::string("after")+Utilities::int_to_string(myid)).c_str());

@@ -1105,10 +1105,10 @@ void
 LAPACKFullMatrix<number>::Tvmult_add(Vector<number2> &,
                                      const Vector<number2> &) const
 {
-  Assert(
-    false,
-    ExcMessage("LAPACKFullMatrix<number>::Tvmult_add must be called with a "
-               "matching Vector<double> vector type."));
+  Assert(false,
+         ExcMessage(
+           "LAPACKFullMatrix<number>::Tvmult_add must be called with a "
+           "matching Vector<double> vector type."));
 }
 
 

@@ -42,7 +42,8 @@ template <int dim>
 class RadialFunction : public Function<dim>
 {
 public:
-  RadialFunction() : Function<dim>(dim)
+  RadialFunction()
+    : Function<dim>(dim)
   {}
 
   virtual void

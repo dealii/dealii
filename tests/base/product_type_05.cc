@@ -50,15 +50,15 @@ main()
           << std::endl;
 
   check<std::complex<double>, std::complex<double>, std::complex<double>>();
-  deallog << (ProductType<std::complex<double>, std::complex<double>>::type(
-                2.345, 1.23) *
-              ProductType<std::complex<double>, std::complex<double>>::type(
-                3.456, 2.45))
-          << ' '
-          << (ProductType<std::complex<double>, std::complex<double>>::type(
-               std::complex<double>(2.345, 1.23) *
-               std::complex<double>(3.456, 2.45)))
-          << std::endl;
+  deallog
+    << (ProductType<std::complex<double>, std::complex<double>>::type(2.345,
+                                                                      1.23) *
+        ProductType<std::complex<double>, std::complex<double>>::type(3.456,
+                                                                      2.45))
+    << ' '
+    << (ProductType<std::complex<double>, std::complex<double>>::type(
+         std::complex<double>(2.345, 1.23) * std::complex<double>(3.456, 2.45)))
+    << std::endl;
 
   deallog << "OK" << std::endl;
 }

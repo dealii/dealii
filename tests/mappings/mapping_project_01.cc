@@ -52,8 +52,9 @@ dim2_grid()
     for (unsigned int face = 0; face < GeometryInfo<2>::faces_per_cell; ++face)
       {
         deallog << "For face: " << face << ", the test point projects to: "
-                << mapping.project_real_point_to_unit_point_on_face(
-                     cell, face, testp)
+                << mapping.project_real_point_to_unit_point_on_face(cell,
+                                                                    face,
+                                                                    testp)
                 << std::endl;
       }
 }
@@ -82,8 +83,9 @@ dim3_grid()
     for (unsigned int face = 0; face < GeometryInfo<3>::faces_per_cell; ++face)
       {
         deallog << "For face: " << face << ", the test point projects to: "
-                << mapping.project_real_point_to_unit_point_on_face(
-                     cell, face, testp)
+                << mapping.project_real_point_to_unit_point_on_face(cell,
+                                                                    face,
+                                                                    testp)
                 << std::endl;
       }
 }
@@ -116,8 +118,9 @@ dim3_parallelepiped_grid()
     for (unsigned int face = 0; face < GeometryInfo<3>::faces_per_cell; ++face)
       {
         deallog << "For face: " << face << ", the test point projects to: "
-                << mapping.project_real_point_to_unit_point_on_face(
-                     cell, face, testp)
+                << mapping.project_real_point_to_unit_point_on_face(cell,
+                                                                    face,
+                                                                    testp)
                 << std::endl;
       }
 }

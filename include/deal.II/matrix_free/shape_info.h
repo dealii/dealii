@@ -363,18 +363,17 @@ namespace internal
 
     template <typename Number>
     template <int dim>
-    inline ShapeInfo<Number>::ShapeInfo(
-      const Quadrature<1> &     quad,
-      const FiniteElement<dim> &fe_in,
-      const unsigned int        base_element_number) :
-      element_type(tensor_general),
-      fe_degree(0),
-      n_q_points_1d(0),
-      n_q_points(0),
-      dofs_per_component_on_cell(0),
-      n_q_points_face(0),
-      dofs_per_component_on_face(0),
-      nodal_at_cell_boundaries(false)
+    inline ShapeInfo<Number>::ShapeInfo(const Quadrature<1> &     quad,
+                                        const FiniteElement<dim> &fe_in,
+                                        const unsigned int base_element_number)
+      : element_type(tensor_general)
+      , fe_degree(0)
+      , n_q_points_1d(0)
+      , n_q_points(0)
+      , dofs_per_component_on_cell(0)
+      , n_q_points_face(0)
+      , dofs_per_component_on_face(0)
+      , nodal_at_cell_boundaries(false)
     {
       reinit(quad, fe_in, base_element_number);
     }

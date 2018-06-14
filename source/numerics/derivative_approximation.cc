@@ -800,8 +800,10 @@ namespace DerivativeApproximation
       // ...and get the value of the
       // projected derivative...
       const typename DerivativeDescription::ProjectedDerivative
-        this_midpoint_value = DerivativeDescription::get_projected_derivative(
-          fe_midpoint_value, solution, component);
+        this_midpoint_value =
+          DerivativeDescription::get_projected_derivative(fe_midpoint_value,
+                                                          solution,
+                                                          component);
       // ...and the place where it lives
       const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
 

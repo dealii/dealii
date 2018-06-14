@@ -175,10 +175,10 @@ private:
 
 
 template <int dim>
-DGTransportEquation<dim>::DGTransportEquation() :
-  beta_function(),
-  rhs_function(),
-  boundary_function()
+DGTransportEquation<dim>::DGTransportEquation()
+  : beta_function()
+  , rhs_function()
+  , boundary_function()
 {}
 
 
@@ -367,13 +367,13 @@ private:
 
 
 template <int dim>
-DGMethod<dim>::DGMethod() :
-  mapping(1),
-  fe(1),
-  dof_handler(triangulation),
-  quadrature(4),
-  face_quadrature(4),
-  dg()
+DGMethod<dim>::DGMethod()
+  : mapping(1)
+  , fe(1)
+  , dof_handler(triangulation)
+  , quadrature(4)
+  , face_quadrature(4)
+  , dg()
 {}
 
 
@@ -429,12 +429,18 @@ DGMethod<dim>::assemble_system1()
   FEValues<dim> fe_v(mapping, fe, quadrature, update_flags);
 
   FEFaceValues<dim> fe_v_face(mapping, fe, face_quadrature, face_update_flags);
-  FESubfaceValues<dim> fe_v_subface(
-    mapping, fe, face_quadrature, face_update_flags);
-  FEFaceValues<dim> fe_v_face_neighbor(
-    mapping, fe, face_quadrature, neighbor_face_update_flags);
-  FESubfaceValues<dim> fe_v_subface_neighbor(
-    mapping, fe, face_quadrature, neighbor_face_update_flags);
+  FESubfaceValues<dim> fe_v_subface(mapping,
+                                    fe,
+                                    face_quadrature,
+                                    face_update_flags);
+  FEFaceValues<dim>    fe_v_face_neighbor(mapping,
+                                       fe,
+                                       face_quadrature,
+                                       neighbor_face_update_flags);
+  FESubfaceValues<dim> fe_v_subface_neighbor(mapping,
+                                             fe,
+                                             face_quadrature,
+                                             neighbor_face_update_flags);
 
   FullMatrix<double> ui_vi_matrix(dofs_per_cell, dofs_per_cell);
   FullMatrix<double> ue_vi_matrix(dofs_per_cell, dofs_per_cell);
@@ -510,8 +516,9 @@ DGMethod<dim>::assemble_system1()
 
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
                         for (unsigned int k = 0; k < dofs_per_cell; ++k)
-                          system_matrix.add(
-                            dofs[i], dofs_neighbor[k], ue_vi_matrix(i, k));
+                          system_matrix.add(dofs[i],
+                                            dofs_neighbor[k],
+                                            ue_vi_matrix(i, k));
                     }
                 }
               else
@@ -547,8 +554,9 @@ DGMethod<dim>::assemble_system1()
                              ExcInternalError());
 
                       fe_v_face.reinit(cell, face_no);
-                      fe_v_subface_neighbor.reinit(
-                        neighbor, neighbor_face_no, neighbor_subface_no);
+                      fe_v_subface_neighbor.reinit(neighbor,
+                                                   neighbor_face_no,
+                                                   neighbor_subface_no);
 
                       dg.assemble_face_term1(fe_v_face,
                                              fe_v_subface_neighbor,
@@ -560,8 +568,9 @@ DGMethod<dim>::assemble_system1()
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     for (unsigned int k = 0; k < dofs_per_cell; ++k)
-                      system_matrix.add(
-                        dofs[i], dofs_neighbor[k], ue_vi_matrix(i, k));
+                      system_matrix.add(dofs[i],
+                                        dofs_neighbor[k],
+                                        ue_vi_matrix(i, k));
                 }
             }
         }
@@ -596,10 +605,14 @@ DGMethod<dim>::assemble_system2()
 
   FEValues<dim>     fe_v(mapping, fe, quadrature, update_flags);
   FEFaceValues<dim> fe_v_face(mapping, fe, face_quadrature, face_update_flags);
-  FESubfaceValues<dim> fe_v_subface(
-    mapping, fe, face_quadrature, face_update_flags);
-  FEFaceValues<dim> fe_v_face_neighbor(
-    mapping, fe, face_quadrature, neighbor_face_update_flags);
+  FESubfaceValues<dim> fe_v_subface(mapping,
+                                    fe,
+                                    face_quadrature,
+                                    face_update_flags);
+  FEFaceValues<dim>    fe_v_face_neighbor(mapping,
+                                       fe,
+                                       face_quadrature,
+                                       neighbor_face_update_flags);
 
 
   FullMatrix<double> ui_vi_matrix(dofs_per_cell, dofs_per_cell);
@@ -678,10 +691,12 @@ DGMethod<dim>::assemble_system2()
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
                         for (unsigned int j = 0; j < dofs_per_cell; ++j)
                           {
-                            system_matrix.add(
-                              dofs[i], dofs_neighbor[j], ue_vi_matrix(i, j));
-                            system_matrix.add(
-                              dofs_neighbor[i], dofs[j], ui_ve_matrix(i, j));
+                            system_matrix.add(dofs[i],
+                                              dofs_neighbor[j],
+                                              ue_vi_matrix(i, j));
+                            system_matrix.add(dofs_neighbor[i],
+                                              dofs[j],
+                                              ui_ve_matrix(i, j));
                             system_matrix.add(dofs_neighbor[i],
                                               dofs_neighbor[j],
                                               ue_ve_matrix(i, j));
@@ -715,10 +730,12 @@ DGMethod<dim>::assemble_system2()
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
                         for (unsigned int j = 0; j < dofs_per_cell; ++j)
                           {
-                            system_matrix.add(
-                              dofs[i], dofs_neighbor[j], ue_vi_matrix(i, j));
-                            system_matrix.add(
-                              dofs_neighbor[i], dofs[j], ui_ve_matrix(i, j));
+                            system_matrix.add(dofs[i],
+                                              dofs_neighbor[j],
+                                              ue_vi_matrix(i, j));
+                            system_matrix.add(dofs_neighbor[i],
+                                              dofs[j],
+                                              ui_ve_matrix(i, j));
                             system_matrix.add(dofs_neighbor[i],
                                               dofs_neighbor[j],
                                               ue_ve_matrix(i, j));
@@ -759,8 +776,10 @@ DGMethod<dim>::refine_grid()
 {
   Vector<float> gradient_indicator(triangulation.n_active_cells());
 
-  DerivativeApproximation::approximate_gradient(
-    mapping, dof_handler, solution2, gradient_indicator);
+  DerivativeApproximation::approximate_gradient(mapping,
+                                                dof_handler,
+                                                solution2,
+                                                gradient_indicator);
 
   typename DoFHandler<dim>::active_cell_iterator cell =
                                                    dof_handler.begin_active(),
@@ -769,8 +788,10 @@ DGMethod<dim>::refine_grid()
     gradient_indicator(cell_no) *=
       std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
 
-  GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, gradient_indicator, 0.3, 0.1);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  gradient_indicator,
+                                                  0.3,
+                                                  0.1);
 
   triangulation.execute_coarsening_and_refinement();
 }

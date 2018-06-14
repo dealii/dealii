@@ -308,15 +308,16 @@ KellyErrorEstimator<1, spacedim>::estimate(
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)
-    Assert(
-      (subdomain_id_ == numbers::invalid_subdomain_id) ||
-        (subdomain_id_ ==
-         dynamic_cast<const parallel::distributed::Triangulation<1, spacedim>
-                        &>(dof_handler.get_triangulation())
-           .locally_owned_subdomain()),
-      ExcMessage("For parallel distributed triangulations, the only "
-                 "valid subdomain_id that can be passed here is the "
-                 "one that corresponds to the locally owned subdomain id."));
+    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
+             (subdomain_id_ ==
+              dynamic_cast<
+                const parallel::distributed::Triangulation<1, spacedim> &>(
+                dof_handler.get_triangulation())
+                .locally_owned_subdomain()),
+           ExcMessage(
+             "For parallel distributed triangulations, the only "
+             "valid subdomain_id that can be passed here is the "
+             "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id =
     ((dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
@@ -344,8 +345,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
        i != neumann_bc.end();
        ++i)
     Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(
-             i->first, i->second->n_components, n_components));
+           ExcInvalidBoundaryFunction(i->first,
+                                      i->second->n_components,
+                                      n_components));
 
   Assert(component_mask.represents_n_components(n_components),
          ExcInvalidComponentMask());
@@ -374,8 +376,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
        i != neumann_bc.end();
        ++i)
     Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(
-             i->first, i->second->n_components, n_components));
+           ExcInvalidBoundaryFunction(i->first,
+                                      i->second->n_components,
+                                      n_components));
 
   // reserve one slot for each cell and set it to zero
   for (unsigned int n = 0; n < n_solution_vectors; ++n)
@@ -386,16 +389,16 @@ KellyErrorEstimator<1, spacedim>::estimate(
   // for the neighbor gradient, we need several auxiliary fields, depending on
   // the way we get it (see below)
   std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
-    gradients_here(
-      n_solution_vectors,
-      std::vector<std::vector<Tensor<1, spacedim, number>>>(
-        2, std::vector<Tensor<1, spacedim, number>>(n_components)));
+    gradients_here(n_solution_vectors,
+                   std::vector<std::vector<Tensor<1, spacedim, number>>>(
+                     2,
+                     std::vector<Tensor<1, spacedim, number>>(n_components)));
   std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
     gradients_neighbor(gradients_here);
   std::vector<Vector<typename ProductType<number, double>::type>>
-  grad_dot_n_neighbor(
-    n_solution_vectors,
-    Vector<typename ProductType<number, double>::type>(n_components));
+  grad_dot_n_neighbor(n_solution_vectors,
+                      Vector<typename ProductType<number, double>::type>(
+                        n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
@@ -415,8 +418,10 @@ KellyErrorEstimator<1, spacedim>::estimate(
   hp::MappingCollection<1, spacedim> mapping_collection;
   mapping_collection.push_back(mapping);
 
-  hp::FEValues<1, spacedim> fe_values(
-    mapping_collection, fe, q_collection, update_gradients);
+  hp::FEValues<1, spacedim>     fe_values(mapping_collection,
+                                      fe,
+                                      q_collection,
+                                      update_gradients);
   hp::FEFaceValues<1, spacedim> fe_face_values(
     /*mapping_collection,*/ fe, q_face_collection, update_normal_vectors);
 

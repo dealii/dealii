@@ -36,12 +36,13 @@ check()
     for (unsigned int j = 0; j < dim; ++j)
       for (unsigned int k = 0; k < dim; ++k)
         {
-          AssertThrow(
-            TableIndices<3>(i, j, k) ==
-              T::unrolled_to_component_indices(i * dim * dim + j * dim + k),
-            ExcInternalError());
-          AssertThrow(T::component_to_unrolled_index(TableIndices<3>(
-                        i, j, k)) == i * dim * dim + j * dim + k,
+          AssertThrow(TableIndices<3>(i, j, k) ==
+                        T::unrolled_to_component_indices(i * dim * dim +
+                                                         j * dim + k),
+                      ExcInternalError());
+          AssertThrow(T::component_to_unrolled_index(
+                        TableIndices<3>(i, j, k)) ==
+                        i * dim * dim + j * dim + k,
                       ExcInternalError());
           AssertThrow(t[TableIndices<3>(i, j, k)] == t[i][j][k],
                       ExcInternalError());

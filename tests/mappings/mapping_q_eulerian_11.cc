@@ -67,7 +67,8 @@ template <int dim>
 class Displacement : public Function<dim>
 {
 public:
-  Displacement() : Function<dim>(dim)
+  Displacement()
+    : Function<dim>(dim)
   {}
 
   double
@@ -113,14 +114,16 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   TrilinosWrappers::MPI::Vector x(locally_owned_dofs, MPI_COMM_WORLD);
-  TrilinosWrappers::MPI::Vector x_relevant(
-    locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector x_relevant(locally_owned_dofs,
+                                           locally_relevant_dofs,
+                                           MPI_COMM_WORLD);
 
   VectorTools::interpolate(dof_handler, Displacement<dim>(), x);
   x_relevant = x;
 
-  MappingQEulerian<dim, TrilinosWrappers::MPI::Vector> euler(
-    2, dof_handler, x_relevant);
+  MappingQEulerian<dim, TrilinosWrappers::MPI::Vector> euler(2,
+                                                             dof_handler,
+                                                             x_relevant);
 
   // now the actual test
   std::map<unsigned int, Point<dim>> active_vertices =

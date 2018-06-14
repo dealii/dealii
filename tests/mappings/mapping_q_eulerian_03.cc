@@ -66,7 +66,8 @@ template <int dim>
 class Displacement : public Function<dim>
 {
 public:
-  Displacement() : Function<dim>(dim)
+  Displacement()
+    : Function<dim>(dim)
   {}
 
   double

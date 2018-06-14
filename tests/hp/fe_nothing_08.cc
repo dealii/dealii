@@ -71,8 +71,10 @@ test()
   deallog << dof_handler.n_dofs() << " dofs" << std::endl;
 
   std::map<types::global_dof_index, double> bv;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<dim>(1), bv);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(1),
+                                           bv);
   for (std::map<types::global_dof_index, double>::iterator p = bv.begin();
        p != bv.end();
        ++p)

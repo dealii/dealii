@@ -102,12 +102,12 @@ namespace FETools
             &                                                      tree_index_,
           const typename DoFHandler<dim, spacedim>::cell_iterator &dealii_cell_,
           const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell_) :
-          forest(forest_),
-          tree(tree_),
-          tree_index(tree_index_),
-          dealii_cell(dealii_cell_),
-          p4est_cell(p4est_cell_)
+            &p4est_cell_)
+          : forest(forest_)
+          , tree(tree_)
+          , tree_index(tree_index_)
+          , dealii_cell(dealii_cell_)
+          , p4est_cell(p4est_cell_)
         {}
       };
 
@@ -468,25 +468,25 @@ namespace FETools
 
     template <int dim, int spacedim, class OutVector>
     ExtrapolateImplementation<dim, spacedim, OutVector>::
-      ExtrapolateImplementation() :
-      round(0)
+      ExtrapolateImplementation()
+      : round(0)
     {}
 
 
 
     template <int dim, int spacedim, class OutVector>
-    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::CellData() :
-      tree_index(0),
-      receiver(0)
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::CellData()
+      : tree_index(0)
+      , receiver(0)
     {}
 
 
 
     template <int dim, int spacedim, class OutVector>
     ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::CellData(
-      const unsigned int dofs_per_cell) :
-      tree_index(0),
-      receiver(0)
+      const unsigned int dofs_per_cell)
+      : tree_index(0)
+      , receiver(0)
     {
       dof_values.reinit(dofs_per_cell);
     }
@@ -564,8 +564,10 @@ namespace FETools
           // needs should come up
           Assert(new_needs.size() == 0, ExcInternalError());
 
-          set_dof_values_by_interpolation(
-            dealii_cell, p4est_cell, interpolated_values, u2);
+          set_dof_values_by_interpolation(dealii_cell,
+                                          p4est_cell,
+                                          interpolated_values,
+                                          u2);
         }
     }
 
@@ -606,9 +608,9 @@ namespace FETools
             dealii_cell->get_dof_handler().get_fe();
           const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-          Assert(
-            interpolated_values.size() == dofs_per_cell,
-            ExcDimensionMismatch(interpolated_values.size(), dofs_per_cell));
+          Assert(interpolated_values.size() == dofs_per_cell,
+                 ExcDimensionMismatch(interpolated_values.size(),
+                                      dofs_per_cell));
           Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
                  ExcDimensionMismatch(u.size(),
                                       dealii_cell->get_dof_handler().n_dofs()));
@@ -770,8 +772,10 @@ namespace FETools
                 fe.get_prolongation_matrix(c, dealii_cell->refinement_case())
                   .vmult(tmp, local_values);
 
-              set_dof_values_by_interpolation(
-                dealii_cell->child(c), p4est_child[c], tmp, u);
+              set_dof_values_by_interpolation(dealii_cell->child(c),
+                                              p4est_child[c],
+                                              tmp,
+                                              u);
             }
         }
     }
@@ -1317,8 +1321,9 @@ namespace FETools
           compute_cells(dof2, u, cells_to_compute, computed_cells, new_needs);
 
           // if there are no cells to compute and no new needs, stop
-          ready = Utilities::MPI::sum(
-            new_needs.size() + cells_to_compute.size(), communicator);
+          ready =
+            Utilities::MPI::sum(new_needs.size() + cells_to_compute.size(),
+                                communicator);
 
           for (typename std::vector<CellData>::const_iterator comp =
                  computed_cells.begin();

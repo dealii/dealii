@@ -61,9 +61,9 @@ compare_meshes(parallel::shared::Triangulation<dim> &     shared_tria,
        it != p4est_map.end();
        ++it)
     {
-      AssertThrow(
-        shared_map[it->first] == it->second,
-        ExcMessage("Not all CellIds map to correct level subdomain_ids."))
+      AssertThrow(shared_map[it->first] == it->second,
+                  ExcMessage(
+                    "Not all CellIds map to correct level subdomain_ids."))
     }
 
 

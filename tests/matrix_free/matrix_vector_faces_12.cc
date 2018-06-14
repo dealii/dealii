@@ -97,12 +97,12 @@ template <int dim>
 class PeriodicHillManifold : public ChartManifold<dim>
 {
 public:
-  PeriodicHillManifold() :
-    ChartManifold<dim>(),
-    h(0.028),
-    x_max(9.0 * h),
-    y_max(2.036 * h),
-    y_FoR(h)
+  PeriodicHillManifold()
+    : ChartManifold<dim>()
+    , h(0.028)
+    , x_max(9.0 * h)
+    , y_max(2.036 * h)
+    , y_FoR(h)
   {}
 
   virtual std::unique_ptr<Manifold<dim>>
@@ -177,9 +177,9 @@ public:
             Y   = Yn;
             iter++;
           }
-        AssertThrow(
-          iter < maxiter,
-          ExcMessage("Newton within PullBack did not find the solution. "));
+        AssertThrow(iter < maxiter,
+                    ExcMessage(
+                      "Newton within PullBack did not find the solution. "));
         xi[1] = Y;
       }
     else if (x[0] > x_max / 2.0)
@@ -206,9 +206,9 @@ public:
             Y   = Yn;
             iter++;
           }
-        AssertThrow(
-          iter < maxiter,
-          ExcMessage("Newton within PullBack did not find the solution. "));
+        AssertThrow(iter < maxiter,
+                    ExcMessage(
+                      "Newton within PullBack did not find the solution. "));
         xi[1] = Y;
       }
     return xi;
@@ -247,8 +247,10 @@ test()
   if (dim == 3)
     p[2] = -2.25 * h;
 
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, refinements, p, coordinates);
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            refinements,
+                                            p,
+                                            coordinates);
 
   triangulation.last()->vertex(0)[1] = 0.;
   if (dim == 3)

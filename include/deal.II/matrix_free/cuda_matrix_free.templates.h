@@ -172,19 +172,19 @@ namespace CUDAWrappers
       const Quadrature<1> &     quad,
       const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
         &                shape_info,
-      const UpdateFlags &update_flags) :
-      data(data),
-      fe_degree(data->fe_degree),
-      dofs_per_cell(data->dofs_per_cell),
-      q_points_per_cell(data->q_points_per_cell),
-      fe_values(mapping,
-                fe,
-                Quadrature<dim>(quad),
-                update_inverse_jacobians | update_quadrature_points |
-                  update_values | update_gradients | update_JxW_values),
-      lexicographic_inv(shape_info.lexicographic_numbering),
-      update_flags(update_flags),
-      padding_length(data->get_padding_length())
+      const UpdateFlags &update_flags)
+      : data(data)
+      , fe_degree(data->fe_degree)
+      , dofs_per_cell(data->dofs_per_cell)
+      , q_points_per_cell(data->q_points_per_cell)
+      , fe_values(mapping,
+                  fe,
+                  Quadrature<dim>(quad),
+                  update_inverse_jacobians | update_quadrature_points |
+                    update_values | update_gradients | update_JxW_values)
+      , lexicographic_inv(shape_info.lexicographic_numbering)
+      , update_flags(update_flags)
+      , padding_length(data->get_padding_length())
     {
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
@@ -323,8 +323,9 @@ namespace CUDAWrappers
       // Local-to-global mapping
       if (data->parallelization_scheme ==
           MatrixFree<dim, Number>::parallel_over_elem)
-        internal::transpose_in_place(
-          local_to_global_host, n_cells, padding_length);
+        internal::transpose_in_place(local_to_global_host,
+                                     n_cells,
+                                     padding_length);
 
       alloc_and_copy(&data->local_to_global[color],
                      local_to_global_host,
@@ -335,11 +336,13 @@ namespace CUDAWrappers
         {
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(
-              q_points_host, n_cells, padding_length);
+            internal::transpose_in_place(q_points_host,
+                                         n_cells,
+                                         padding_length);
 
-          alloc_and_copy(
-            &data->q_points[color], q_points_host, n_cells * padding_length);
+          alloc_and_copy(&data->q_points[color],
+                         q_points_host,
+                         n_cells * padding_length);
         }
 
       // Jacobian determinants/quadrature weights
@@ -359,24 +362,27 @@ namespace CUDAWrappers
           // are together, etc., i.e., reorder indices from
           // cell_id*q_points_per_cell*dim*dim + q*dim*dim +i to
           // i*q_points_per_cell*n_cells + cell_id*q_points_per_cell+q
-          internal::transpose_in_place(
-            inv_jacobian_host, padding_length * n_cells, dim * dim);
+          internal::transpose_in_place(inv_jacobian_host,
+                                       padding_length * n_cells,
+                                       dim * dim);
 
           // Transpose second time means we get the following index order:
           // q*n_cells*dim*dim + i*n_cells + cell_id which is good for an
           // element-level parallelization
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(
-              inv_jacobian_host, n_cells * dim * dim, padding_length);
+            internal::transpose_in_place(inv_jacobian_host,
+                                         n_cells * dim * dim,
+                                         padding_length);
 
           alloc_and_copy(&data->inv_jacobian[color],
                          inv_jacobian_host,
                          n_cells * dim * dim * padding_length);
         }
 
-      alloc_and_copy(
-        &data->constraint_mask[color], constraint_mask_host, n_cells);
+      alloc_and_copy(&data->constraint_mask[color],
+                     constraint_mask_host,
+                     n_cells);
     }
 
 
@@ -467,9 +473,9 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  MatrixFree<dim, Number>::MatrixFree() :
-    constrained_dofs(nullptr),
-    padding_length(0)
+  MatrixFree<dim, Number>::MatrixFree()
+    : constrained_dofs(nullptr)
+    , padding_length(0)
   {}
 
 
@@ -736,8 +742,10 @@ namespace CUDAWrappers
                                                   CUDAVector<Number> &dst) const
   {
     internal::set_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(
-        constrained_dofs, n_constrained_dofs, val, dst.get_values());
+      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
+                                                      n_constrained_dofs,
+                                                      val,
+                                                      dst.get_values());
   }
 
 
@@ -760,8 +768,10 @@ namespace CUDAWrappers
   {
     for (unsigned int i = 0; i < n_colors; ++i)
       internal::apply_kernel_shmem<dim, Number, functor>
-        <<<grid_dim[i], block_dim[i]>>>(
-          func, get_data(i), src.get_values(), dst.get_values());
+        <<<grid_dim[i], block_dim[i]>>>(func,
+                                        get_data(i),
+                                        src.get_values(),
+                                        dst.get_values());
   }
 
 

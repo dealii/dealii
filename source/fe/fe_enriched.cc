@@ -77,9 +77,9 @@ namespace internal
             &)>>> &                                              functions)
       {
         AssertThrow(fes.size() > 0, ExcMessage("FEs size should be >=1"));
-        AssertThrow(
-          fes.size() == multiplicities.size(),
-          ExcMessage("FEs and multiplicities should have the same size"));
+        AssertThrow(fes.size() == multiplicities.size(),
+                    ExcMessage(
+                      "FEs and multiplicities should have the same size"));
 
         AssertThrow(functions.size() == fes.size() - 1,
                     ExcDimensionMismatch(functions.size(), fes.size() - 1));
@@ -133,11 +133,11 @@ namespace internal
 
 template <int dim, int spacedim>
 FE_Enriched<dim, spacedim>::FE_Enriched(
-  const FiniteElement<dim, spacedim> &fe_base) :
-  FE_Enriched<dim, spacedim>(
-    fe_base,
-    FE_Nothing<dim, spacedim>(fe_base.n_components(), true),
-    nullptr)
+  const FiniteElement<dim, spacedim> &fe_base)
+  : FE_Enriched<dim, spacedim>(fe_base,
+                               FE_Nothing<dim, spacedim>(fe_base.n_components(),
+                                                         true),
+                               nullptr)
 {}
 
 
@@ -145,18 +145,18 @@ template <int dim, int spacedim>
 FE_Enriched<dim, spacedim>::FE_Enriched(
   const FiniteElement<dim, spacedim> &fe_base,
   const FiniteElement<dim, spacedim> &fe_enriched,
-  const Function<spacedim> *          enrichment_function) :
-  FE_Enriched<dim, spacedim>(
-    &fe_base,
-    std::vector<const FiniteElement<dim, spacedim> *>(1, &fe_enriched),
-    std::vector<std::vector<std::function<const Function<spacedim> *(
-      const typename Triangulation<dim, spacedim>::cell_iterator &)>>>(
-      1,
-      std::vector<std::function<const Function<spacedim> *(
-        const typename Triangulation<dim, spacedim>::cell_iterator &)>>(
+  const Function<spacedim> *          enrichment_function)
+  : FE_Enriched<dim, spacedim>(
+      &fe_base,
+      std::vector<const FiniteElement<dim, spacedim> *>(1, &fe_enriched),
+      std::vector<std::vector<std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>>>(
         1,
-        [=](const typename Triangulation<dim, spacedim>::cell_iterator &)
-          -> const Function<spacedim> * { return enrichment_function; })))
+        std::vector<std::function<const Function<spacedim> *(
+          const typename Triangulation<dim, spacedim>::cell_iterator &)>>(
+          1,
+          [=](const typename Triangulation<dim, spacedim>::cell_iterator &)
+            -> const Function<spacedim> * { return enrichment_function; })))
 {}
 
 
@@ -165,12 +165,11 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
   const FiniteElement<dim, spacedim> *                     fe_base,
   const std::vector<const FiniteElement<dim, spacedim> *> &fe_enriched,
   const std::vector<std::vector<std::function<const Function<spacedim> *(
-    const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
-    &functions) :
-  FE_Enriched<dim, spacedim>(
-    internal::FE_Enriched::build_fes(fe_base, fe_enriched),
-    internal::FE_Enriched::build_multiplicities(functions),
-    functions)
+    const typename Triangulation<dim, spacedim>::cell_iterator &)>>> &functions)
+  : FE_Enriched<dim, spacedim>(
+      internal::FE_Enriched::build_fes(fe_base, fe_enriched),
+      internal::FE_Enriched::build_multiplicities(functions),
+      functions)
 {}
 
 
@@ -179,24 +178,25 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
   const std::vector<unsigned int> &                        multiplicities,
   const std::vector<std::vector<std::function<const Function<spacedim> *(
-    const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
-    &functions) :
-  FiniteElement<dim, spacedim>(
-    FETools::Compositing::multiply_dof_numbers(fes, multiplicities, false),
-    FETools::Compositing::compute_restriction_is_additive_flags(fes,
-                                                                multiplicities),
-    FETools::Compositing::compute_nonzero_components(fes,
-                                                     multiplicities,
-                                                     false)),
-  enrichments(functions),
-  is_enriched(internal::FE_Enriched::check_if_enriched(fes)),
-  fe_system(
-    std_cxx14::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
+    const typename Triangulation<dim, spacedim>::cell_iterator &)>>> &functions)
+  : FiniteElement<dim, spacedim>(
+      FETools::Compositing::multiply_dof_numbers(fes, multiplicities, false),
+      FETools::Compositing::compute_restriction_is_additive_flags(
+        fes,
+        multiplicities),
+      FETools::Compositing::compute_nonzero_components(fes,
+                                                       multiplicities,
+                                                       false))
+  , enrichments(functions)
+  , is_enriched(internal::FE_Enriched::check_if_enriched(fes))
+  , fe_system(
+      std_cxx14::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
 {
   // descriptive error are thrown within the function.
-  Assert(
-    internal::FE_Enriched::consistency_check(fes, multiplicities, functions),
-    ExcInternalError());
+  Assert(internal::FE_Enriched::consistency_check(fes,
+                                                  multiplicities,
+                                                  functions),
+         ExcInternalError());
 
   initialize(fes, multiplicities);
 
@@ -371,11 +371,11 @@ FE_Enriched<dim, spacedim>::get_face_data(
 {
   auto data =
     fe_system->get_face_data(update_flags, mapping, quadrature, output_data);
-  return setup_data(
-    Utilities::dynamic_unique_cast<
-      typename FESystem<dim, spacedim>::InternalData>(std::move(data)),
-    update_flags,
-    quadrature);
+  return setup_data(Utilities::dynamic_unique_cast<
+                      typename FESystem<dim, spacedim>::InternalData>(
+                      std::move(data)),
+                    update_flags,
+                    quadrature);
 }
 
 
@@ -391,11 +391,11 @@ FE_Enriched<dim, spacedim>::get_subface_data(
 {
   auto data =
     fe_system->get_subface_data(update_flags, mapping, quadrature, output_data);
-  return setup_data(
-    Utilities::dynamic_unique_cast<
-      typename FESystem<dim, spacedim>::InternalData>(std::move(data)),
-    update_flags,
-    quadrature);
+  return setup_data(Utilities::dynamic_unique_cast<
+                      typename FESystem<dim, spacedim>::InternalData>(
+                      std::move(data)),
+                    update_flags,
+                    quadrature);
 }
 
 
@@ -409,11 +409,11 @@ FE_Enriched<dim, spacedim>::get_data(
     &output_data) const
 {
   auto data = fe_system->get_data(flags, mapping, quadrature, output_data);
-  return setup_data(
-    Utilities::dynamic_unique_cast<
-      typename FESystem<dim, spacedim>::InternalData>(std::move(data)),
-    flags,
-    quadrature);
+  return setup_data(Utilities::dynamic_unique_cast<
+                      typename FESystem<dim, spacedim>::InternalData>(
+                      std::move(data)),
+                    flags,
+                    quadrature);
 }
 
 
@@ -728,16 +728,17 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
           Assert(enrichments[base_no - 1][m](cell) != nullptr,
                  ExcMessage("The pointer to the enrichment function is NULL"));
 
-          Assert(
-            enrichments[base_no - 1][m](cell)->n_components == 1,
-            ExcMessage("Only scalar-valued enrichment functions are allowed"));
+          Assert(enrichments[base_no - 1][m](cell)->n_components == 1,
+                 ExcMessage(
+                   "Only scalar-valued enrichment functions are allowed"));
 
           if (flags & update_hessians)
             {
-              Assert(
-                fe_data.enrichment[base_no][m].hessians.size() == n_q_points,
-                ExcDimensionMismatch(
-                  fe_data.enrichment[base_no][m].hessians.size(), n_q_points));
+              Assert(fe_data.enrichment[base_no][m].hessians.size() ==
+                       n_q_points,
+                     ExcDimensionMismatch(
+                       fe_data.enrichment[base_no][m].hessians.size(),
+                       n_q_points));
               for (unsigned int q = 0; q < n_q_points; q++)
                 fe_data.enrichment[base_no][m].hessians[q] =
                   enrichments[base_no - 1][m](cell)->hessian(
@@ -746,10 +747,11 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
           if (flags & update_gradients)
             {
-              Assert(
-                fe_data.enrichment[base_no][m].gradients.size() == n_q_points,
-                ExcDimensionMismatch(
-                  fe_data.enrichment[base_no][m].gradients.size(), n_q_points));
+              Assert(fe_data.enrichment[base_no][m].gradients.size() ==
+                       n_q_points,
+                     ExcDimensionMismatch(
+                       fe_data.enrichment[base_no][m].gradients.size(),
+                       n_q_points));
               for (unsigned int q = 0; q < n_q_points; q++)
                 fe_data.enrichment[base_no][m].gradients[q] =
                   enrichments[base_no - 1][m](cell)->gradient(
@@ -758,10 +760,10 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
           if (flags & update_values)
             {
-              Assert(
-                fe_data.enrichment[base_no][m].values.size() == n_q_points,
-                ExcDimensionMismatch(
-                  fe_data.enrichment[base_no][m].values.size(), n_q_points));
+              Assert(fe_data.enrichment[base_no][m].values.size() == n_q_points,
+                     ExcDimensionMismatch(
+                       fe_data.enrichment[base_no][m].values.size(),
+                       n_q_points));
               for (unsigned int q = 0; q < n_q_points; q++)
                 fe_data.enrichment[base_no][m].values[q] =
                   enrichments[base_no - 1][m](cell)->value(
@@ -902,8 +904,9 @@ FE_Enriched<dim, spacedim>::get_subface_interpolation_matrix(
   if (const FE_Enriched<dim, spacedim> *fe_enr_other =
         dynamic_cast<const FE_Enriched<dim, spacedim> *>(&source))
     {
-      fe_system->get_subface_interpolation_matrix(
-        fe_enr_other->get_fe_system(), subface, matrix);
+      fe_system->get_subface_interpolation_matrix(fe_enr_other->get_fe_system(),
+                                                  subface,
+                                                  matrix);
     }
   else
     {
@@ -1022,9 +1025,8 @@ FE_Enriched<dim, spacedim>::get_restriction_matrix(
 
 template <int dim, int spacedim>
 FE_Enriched<dim, spacedim>::InternalData::InternalData(
-  std::unique_ptr<typename FESystem<dim, spacedim>::InternalData>
-    fesystem_data) :
-  fesystem_data(std::move(fesystem_data))
+  std::unique_ptr<typename FESystem<dim, spacedim>::InternalData> fesystem_data)
+  : fesystem_data(std::move(fesystem_data))
 {}
 
 

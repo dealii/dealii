@@ -128,19 +128,19 @@ namespace internal
 
 
 template <int dim>
-FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree) :
-  FE_Poly<PolynomialsP<dim>, dim>(
-    PolynomialsP<dim>(degree),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      true),
-    std::vector<ComponentMask>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      std::vector<bool>(1, true)))
+FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
+  : FE_Poly<PolynomialsP<dim>, dim>(
+      PolynomialsP<dim>(degree),
+      FiniteElementData<dim>(get_dpo_vector(degree),
+                             1,
+                             degree,
+                             FiniteElementData<dim>::L2),
+      std::vector<bool>(
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        true),
+      std::vector<ComponentMask>(
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        std::vector<bool>(1, true)))
 {
   Assert(this->poly_space.n() == this->dofs_per_cell, ExcInternalError());
   Assert(this->poly_space.degree() == this->degree, ExcInternalError());
@@ -285,10 +285,10 @@ FE_DGPMonomial<dim>::get_face_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow(
-    (x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
-      (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) != nullptr),
-    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  AssertThrow((x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
+                (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) !=
+                 nullptr),
+              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
@@ -312,10 +312,10 @@ FE_DGPMonomial<dim>::get_subface_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow(
-    (x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
-      (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) != nullptr),
-    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  AssertThrow((x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
+                (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) !=
+                 nullptr),
+              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
   Assert(interpolation_matrix.m() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));

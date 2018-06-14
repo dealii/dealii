@@ -27,11 +27,13 @@
 class X
 {
 public:
-  X(int i) : value(i)
+  X(int i)
+    : value(i)
   {}
 
   // default constructor
-  X() : value(13)
+  X()
+    : value(13)
   {}
 
   // delete the copy constructor

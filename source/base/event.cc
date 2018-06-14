@@ -40,7 +40,9 @@ namespace Algorithms
   }
 
 
-  Event::Event() : all_true(false), flags(names.size(), false)
+  Event::Event()
+    : all_true(false)
+    , flags(names.size(), false)
   {}
 
 

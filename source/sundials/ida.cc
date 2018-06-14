@@ -111,8 +111,10 @@ namespace SUNDIALS
       copy(*src_yy, yy);
       copy(*src_yp, yp);
 
-      int err = solver.setup_jacobian(
-        IDA_mem->ida_tn, *src_yy, *src_yp, IDA_mem->ida_cj);
+      int err = solver.setup_jacobian(IDA_mem->ida_tn,
+                                      *src_yy,
+                                      *src_yp,
+                                      IDA_mem->ida_cj);
 
       return err;
     }
@@ -152,16 +154,16 @@ namespace SUNDIALS
   } // namespace
 
   template <typename VectorType>
-  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm mpi_comm) :
-    data(data),
-    ida_mem(nullptr),
-    yy(nullptr),
-    yp(nullptr),
-    abs_tolls(nullptr),
-    diff_id(nullptr),
-    communicator(is_serial_vector<VectorType>::value ?
-                   MPI_COMM_SELF :
-                   Utilities::MPI::duplicate_communicator(mpi_comm))
+  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm mpi_comm)
+    : data(data)
+    , ida_mem(nullptr)
+    , yy(nullptr)
+    , yp(nullptr)
+    , abs_tolls(nullptr)
+    , diff_id(nullptr)
+    , communicator(is_serial_vector<VectorType>::value ?
+                     MPI_COMM_SELF :
+                     Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }
@@ -351,8 +353,9 @@ namespace SUNDIALS
       }
     else
       {
-        status = IDASStolerances(
-          ida_mem, data.relative_tolerance, data.absolute_tolerance);
+        status = IDASStolerances(ida_mem,
+                                 data.relative_tolerance,
+                                 data.absolute_tolerance);
         AssertIDA(status);
       }
 

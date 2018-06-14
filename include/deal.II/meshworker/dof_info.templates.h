@@ -27,11 +27,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template <int dim, int spacedim, typename number>
-  DoFInfo<dim, spacedim, number>::DoFInfo(const BlockInfo &info) :
-    face_number(numbers::invalid_unsigned_int),
-    sub_number(numbers::invalid_unsigned_int),
-    block_info(&info, typeid(*this).name()),
-    level_cell(false)
+  DoFInfo<dim, spacedim, number>::DoFInfo(const BlockInfo &info)
+    : face_number(numbers::invalid_unsigned_int)
+    , sub_number(numbers::invalid_unsigned_int)
+    , block_info(&info, typeid(*this).name())
+    , level_cell(false)
   {
     indices_by_block.resize(info.local().size());
     for (unsigned int i = 0; i < indices_by_block.size(); ++i)

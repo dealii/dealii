@@ -40,7 +40,8 @@ template <int dim>
 class X : public Function<dim>
 {
 public:
-  X() : Function<dim>(dim)
+  X()
+    : Function<dim>(dim)
   {}
 
   double

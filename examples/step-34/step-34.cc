@@ -315,16 +315,16 @@ namespace Step34
   // knowledge of the number of components.
   template <int dim>
   BEMProblem<dim>::BEMProblem(const unsigned int fe_degree,
-                              const unsigned int mapping_degree) :
-    fe(fe_degree),
-    dh(tria),
-    mapping(mapping_degree, true),
-    wind(dim),
-    singular_quadrature_order(5),
-    n_cycles(4),
-    external_refinement(5),
-    run_in_this_dimension(true),
-    extend_solution(true)
+                              const unsigned int mapping_degree)
+    : fe(fe_degree)
+    , dh(tria)
+    , mapping(mapping_degree, true)
+    , wind(dim)
+    , singular_quadrature_order(5)
+    , n_cycles(4)
+    , external_refinement(5)
+    , run_in_this_dimension(true)
+    , extend_solution(true)
   {}
 
 
@@ -339,8 +339,9 @@ namespace Step34
 
     prm.declare_entry("Number of cycles", "4", Patterns::Integer());
     prm.declare_entry("External refinement", "5", Patterns::Integer());
-    prm.declare_entry(
-      "Extend solution on the -2,2 box", "true", Patterns::Bool());
+    prm.declare_entry("Extend solution on the -2,2 box",
+                      "true",
+                      Patterns::Bool());
     prm.declare_entry("Run 2d simulation", "true", Patterns::Bool());
     prm.declare_entry("Run 3d simulation", "true", Patterns::Bool());
 
@@ -428,9 +429,9 @@ namespace Step34
 
     prm.enter_subsection("Quadrature rules");
     {
-      quadrature =
-        std::shared_ptr<Quadrature<dim - 1>>(new QuadratureSelector<dim - 1>(
-          prm.get("Quadrature type"), prm.get_integer("Quadrature order")));
+      quadrature = std::shared_ptr<Quadrature<dim - 1>>(
+        new QuadratureSelector<dim - 1>(prm.get("Quadrature type"),
+                                        prm.get_integer("Quadrature order")));
       singular_quadrature_order = prm.get_integer("Singular quadrature order");
     }
     prm.leave_subsection();
@@ -585,8 +586,9 @@ namespace Step34
     // We construct a vector of support points which will be used in the local
     // integrations:
     std::vector<Point<dim>> support_points(dh.n_dofs());
-    DoFTools::map_dofs_to_support_points<dim - 1, dim>(
-      mapping, dh, support_points);
+    DoFTools::map_dofs_to_support_points<dim - 1, dim>(mapping,
+                                                       dh,
+                                                       support_points);
 
 
     // After doing so, we can start the integration loop over all cells, where
@@ -771,8 +773,10 @@ namespace Step34
                                       difference_per_cell,
                                       QGauss<(dim - 1)>(2 * fe.degree + 1),
                                       VectorTools::L2_norm);
-    const double L2_error = VectorTools::compute_global_error(
-      tria, difference_per_cell, VectorTools::L2_norm);
+    const double L2_error =
+      VectorTools::compute_global_error(tria,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     // The error in the alpha vector can be computed directly using the
     // Vector::linfty_norm() function, since on each node, the value should be
@@ -872,8 +876,9 @@ namespace Step34
     static std::vector<QGaussOneOverR<2>> quadratures;
     if (quadratures.size() == 0)
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        quadratures.emplace_back(
-          singular_quadrature_order, fe.get_unit_support_points()[i], true);
+        quadratures.emplace_back(singular_quadrature_order,
+                                 fe.get_unit_support_points()[i],
+                                 true);
     return quadratures[index];
   }
 
@@ -948,8 +953,9 @@ namespace Step34
     std::vector<Vector<double>> local_wind(n_q_points, Vector<double>(dim));
 
     std::vector<Point<dim>> external_support_points(external_dh.n_dofs());
-    DoFTools::map_dofs_to_support_points<dim>(
-      StaticMappingQ1<dim>::mapping, external_dh, external_support_points);
+    DoFTools::map_dofs_to_support_points<dim>(StaticMappingQ1<dim>::mapping,
+                                              external_dh,
+                                              external_support_points);
 
     for (cell = dh.begin_active(); cell != endc; ++cell)
       {

@@ -125,9 +125,9 @@ private:
 
 template <int dim>
 DerivativeTestFunction<dim>::DerivativeTestFunction(const Function<dim> &f,
-                                                    const double         h) :
-  AutoDerivativeFunction<dim>(h, f.n_components),
-  func(f)
+                                                    const double         h)
+  : AutoDerivativeFunction<dim>(h, f.n_components)
+  , func(f)
 {
   this->set_formula(AutoDerivativeFunction<dim>::FourthOrder);
 }

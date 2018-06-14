@@ -153,8 +153,8 @@ namespace Step25
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution(const unsigned int n_components = 1, const double time = 0.) :
-      Function<dim>(n_components, time)
+    ExactSolution(const unsigned int n_components = 1, const double time = 0.)
+      : Function<dim>(n_components, time)
     {}
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
@@ -219,8 +219,8 @@ namespace Step25
   class InitialValues : public Function<dim>
   {
   public:
-    InitialValues(const unsigned int n_components = 1, const double time = 0.) :
-      Function<dim>(n_components, time)
+    InitialValues(const unsigned int n_components = 1, const double time = 0.)
+      : Function<dim>(n_components, time)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -264,15 +264,15 @@ namespace Step25
   // technique in step-24 using GridTools::minimal_cell_diameter would work as
   // well.
   template <int dim>
-  SineGordonProblem<dim>::SineGordonProblem() :
-    fe(1),
-    dof_handler(triangulation),
-    n_global_refinements(6),
-    time(-5.4414),
-    final_time(2.7207),
-    time_step(10 * 1. / std::pow(2., 1. * n_global_refinements)),
-    theta(0.5),
-    output_timestep_skip(1)
+  SineGordonProblem<dim>::SineGordonProblem()
+    : fe(1)
+    , dof_handler(triangulation)
+    , n_global_refinements(6)
+    , time(-5.4414)
+    , final_time(2.7207)
+    , time_step(10 * 1. / std::pow(2., 1. * n_global_refinements))
+    , theta(0.5)
+    , output_timestep_skip(1)
   {}
 
   // @sect4{SineGordonProblem::make_grid_and_dofs}
@@ -309,8 +309,9 @@ namespace Step25
     laplace_matrix.reinit(sparsity_pattern);
 
     MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(3), laplace_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler,
+                                         QGauss<dim>(3),
+                                         laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
     solution_update.reinit(dof_handler.n_dofs());

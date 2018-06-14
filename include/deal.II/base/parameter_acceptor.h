@@ -640,9 +640,9 @@ template <class SourceClass>
 template <typename... Args>
 ParameterAcceptorProxy<SourceClass>::ParameterAcceptorProxy(
   const std::string section_name,
-  Args... args) :
-  SourceClass(args...),
-  ParameterAcceptor(section_name)
+  Args... args)
+  : SourceClass(args...)
+  , ParameterAcceptor(section_name)
 {}
 
 

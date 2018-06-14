@@ -27,17 +27,15 @@ for (deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension> &,
       const std::vector<bool> &);
 
-    template void
-    MGTransferBlockSelect<float>::build_matrices<deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &,
-      const DoFHandler<deal_II_dimension> &,
-      const unsigned int);
+    template void MGTransferBlockSelect<float>::build_matrices<
+      deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                         const DoFHandler<deal_II_dimension> &,
+                         const unsigned int);
 
-    template void
-    MGTransferBlockSelect<double>::build_matrices<deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &,
-      const DoFHandler<deal_II_dimension> &,
-      const unsigned int);
+    template void MGTransferBlockSelect<double>::build_matrices<
+      deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                         const DoFHandler<deal_II_dimension> &,
+                         const unsigned int);
 
     template void MGTransferBlock<float>::copy_to_mg(
       const DoFHandler<deal_II_dimension> &,

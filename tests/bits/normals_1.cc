@@ -46,8 +46,9 @@ check(const Triangulation<dim> &tria)
 
   QGauss<dim - 1> q_face(3);
 
-  FEFaceValues<dim> fe_face_values(
-    fe, q_face, update_normal_vectors | update_JxW_values);
+  FEFaceValues<dim>    fe_face_values(fe,
+                                   q_face,
+                                   update_normal_vectors | update_JxW_values);
   FESubfaceValues<dim> fe_subface_values(
     fe, q_face, update_normal_vectors | update_JxW_values);
 

@@ -681,9 +681,9 @@ namespace SLEPcWrappers
 
     if (n_converged > n_eigenpairs)
       n_converged = n_eigenpairs;
-    AssertThrow(
-      n_converged == n_eigenpairs,
-      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    AssertThrow(n_converged == n_eigenpairs,
+                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged,
+                                                            n_eigenpairs));
 
     AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
     eigenvectors.resize(n_converged, eigenvectors.front());
@@ -719,9 +719,9 @@ namespace SLEPcWrappers
     if (n_converged >= n_eigenpairs)
       n_converged = n_eigenpairs;
 
-    AssertThrow(
-      n_converged == n_eigenpairs,
-      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    AssertThrow(n_converged == n_eigenpairs,
+                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged,
+                                                            n_eigenpairs));
     AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
 
     eigenvectors.resize(n_converged, eigenvectors.front());
@@ -746,12 +746,12 @@ namespace SLEPcWrappers
     AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 
     // and incompatible eigenvalue/eigenvector sizes
-    AssertThrow(
-      real_eigenvalues.size() == imag_eigenvalues.size(),
-      ExcDimensionMismatch(real_eigenvalues.size(), imag_eigenvalues.size()));
-    AssertThrow(
-      real_eigenvectors.size() == imag_eigenvectors.size(),
-      ExcDimensionMismatch(real_eigenvectors.size(), imag_eigenvectors.size()));
+    AssertThrow(real_eigenvalues.size() == imag_eigenvalues.size(),
+                ExcDimensionMismatch(real_eigenvalues.size(),
+                                     imag_eigenvalues.size()));
+    AssertThrow(real_eigenvectors.size() == imag_eigenvectors.size(),
+                ExcDimensionMismatch(real_eigenvectors.size(),
+                                     imag_eigenvectors.size()));
 
     // Panic if the number of eigenpairs wanted is out of bounds.
     AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
@@ -767,9 +767,9 @@ namespace SLEPcWrappers
     if (n_converged >= n_eigenpairs)
       n_converged = n_eigenpairs;
 
-    AssertThrow(
-      n_converged == n_eigenpairs,
-      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    AssertThrow(n_converged == n_eigenpairs,
+                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged,
+                                                            n_eigenpairs));
     AssertThrow((real_eigenvectors.size() != 0) &&
                   (imag_eigenvectors.size() != 0),
                 ExcSLEPcWrappersUsageError());

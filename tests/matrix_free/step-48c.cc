@@ -88,9 +88,9 @@ namespace Step48
   template <int dim, int fe_degree>
   SineGordonOperation<dim, fe_degree>::SineGordonOperation(
     const MatrixFree<dim, double> &data_in,
-    const double                   time_step) :
-    data(data_in),
-    delta_t_sqr(make_vectorized_array(time_step * time_step))
+    const double                   time_step)
+    : data(data_in)
+    , delta_t_sqr(make_vectorized_array(time_step * time_step))
   {
     VectorizedArray<double> one = make_vectorized_array(1.);
 
@@ -163,8 +163,10 @@ namespace Step48
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &SineGordonOperation<dim, fe_degree>::local_apply, this, dst, src);
+    data.cell_loop(&SineGordonOperation<dim, fe_degree>::local_apply,
+                   this,
+                   dst,
+                   src);
     dst.scale(inv_mass_matrix);
   }
 
@@ -174,9 +176,8 @@ namespace Step48
   class InitialSolution : public Function<dim>
   {
   public:
-    InitialSolution(const unsigned int n_components = 1,
-                    const double       time         = 0.) :
-      Function<dim>(n_components, time)
+    InitialSolution(const unsigned int n_components = 1, const double time = 0.)
+      : Function<dim>(n_components, time)
     {}
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const;
@@ -231,17 +232,19 @@ namespace Step48
 
 
   template <int dim>
-  SineGordonProblem<dim>::SineGordonProblem() :
+  SineGordonProblem<dim>::SineGordonProblem()
+    :
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(MPI_COMM_WORLD),
+    triangulation(MPI_COMM_WORLD)
+    ,
 #endif
-    fe(QGaussLobatto<1>(fe_degree + 1)),
-    dof_handler(triangulation),
-    n_global_refinements(9 - 2 * dim),
-    time(-10),
-    final_time(-9),
-    cfl_number(.1 / fe_degree),
-    output_timestep_skip(200)
+    fe(QGaussLobatto<1>(fe_degree + 1))
+    , dof_handler(triangulation)
+    , n_global_refinements(9 - 2 * dim)
+    , time(-10)
+    , final_time(-9)
+    , cfl_number(.1 / fe_degree)
+    , output_timestep_skip(200)
   {}
 
 
@@ -277,8 +280,10 @@ namespace Step48
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::partition_partition;
 
-    matrix_free_data.reinit(
-      dof_handler, constraints, quadrature, additional_data);
+    matrix_free_data.reinit(dof_handler,
+                            constraints,
+                            quadrature,
+                            additional_data);
 
     matrix_free_data.initialize_dof_vector(solution);
     old_solution.reinit(solution);
@@ -328,10 +333,12 @@ namespace Step48
             << std::endl;
 
 
-    VectorTools::interpolate(
-      dof_handler, InitialSolution<dim>(1, time), solution);
-    VectorTools::interpolate(
-      dof_handler, InitialSolution<dim>(1, time - time_step), old_solution);
+    VectorTools::interpolate(dof_handler,
+                             InitialSolution<dim>(1, time),
+                             solution);
+    VectorTools::interpolate(dof_handler,
+                             InitialSolution<dim>(1, time - time_step),
+                             old_solution);
     output_results(0);
 
     std::vector<LinearAlgebra::distributed::Vector<double> *>

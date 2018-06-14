@@ -62,8 +62,9 @@ test_non_default_constructor()
   std::vector<double>         weights(1, 1);
   std::vector<Tensor<1, dim>> normals;
   normals.push_back(Point<dim>::unit_vector(dim - 1));
-  NonMatching::ImmersedSurfaceQuadrature<dim> quadrature(
-    points, weights, normals);
+  NonMatching::ImmersedSurfaceQuadrature<dim> quadrature(points,
+                                                         weights,
+                                                         normals);
 
   print_quadrature(quadrature);
 }

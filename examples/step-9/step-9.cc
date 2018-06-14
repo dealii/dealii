@@ -196,7 +196,8 @@ namespace Step9
   class AdvectionField : public TensorFunction<1, dim>
   {
   public:
-    AdvectionField() : TensorFunction<1, dim>()
+    AdvectionField()
+      : TensorFunction<1, dim>()
     {}
 
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
@@ -288,7 +289,8 @@ namespace Step9
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
+    RightHandSide()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -358,7 +360,8 @@ namespace Step9
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>()
+    BoundaryValues()
+      : Function<dim>()
     {}
 
     virtual double value(const Point<dim> & p,
@@ -516,7 +519,9 @@ namespace Step9
   // the function <code>setup_system</code> follow the same pattern that was
   // used previously, so we need not comment on these three function:
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem() : dof_handler(triangulation), fe(1)
+  AdvectionProblem<dim>::AdvectionProblem()
+    : dof_handler(triangulation)
+    , fe(1)
   {}
 
 
@@ -608,30 +613,30 @@ namespace Step9
   // class:
   template <int dim>
   AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
-    const FiniteElement<dim> &fe) :
-    fe_values(fe,
-              QGauss<dim>(2),
-              update_values | update_gradients | update_quadrature_points |
-                update_JxW_values),
-    fe_face_values(fe,
-                   QGauss<dim - 1>(2),
-                   update_values | update_quadrature_points |
-                     update_JxW_values | update_normal_vectors)
+    const FiniteElement<dim> &fe)
+    : fe_values(fe,
+                QGauss<dim>(2),
+                update_values | update_gradients | update_quadrature_points |
+                  update_JxW_values)
+    , fe_face_values(fe,
+                     QGauss<dim - 1>(2),
+                     update_values | update_quadrature_points |
+                       update_JxW_values | update_normal_vectors)
   {}
 
 
 
   template <int dim>
   AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
-    const AssemblyScratchData &scratch_data) :
-    fe_values(scratch_data.fe_values.get_fe(),
-              scratch_data.fe_values.get_quadrature(),
-              update_values | update_gradients | update_quadrature_points |
-                update_JxW_values),
-    fe_face_values(scratch_data.fe_face_values.get_fe(),
-                   scratch_data.fe_face_values.get_quadrature(),
-                   update_values | update_quadrature_points |
-                     update_JxW_values | update_normal_vectors)
+    const AssemblyScratchData &scratch_data)
+    : fe_values(scratch_data.fe_values.get_fe(),
+                scratch_data.fe_values.get_quadrature(),
+                update_values | update_gradients | update_quadrature_points |
+                  update_JxW_values)
+    , fe_face_values(scratch_data.fe_face_values.get_fe(),
+                     scratch_data.fe_face_values.get_quadrature(),
+                     update_values | update_quadrature_points |
+                       update_JxW_values | update_normal_vectors)
   {}
 
 
@@ -872,11 +877,14 @@ namespace Step9
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    GradientEstimation::estimate(
-      dof_handler, solution, estimated_error_per_cell);
+    GradientEstimation::estimate(dof_handler,
+                                 solution,
+                                 estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.5, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.5,
+                                                    0.03);
 
     triangulation.execute_coarsening_and_refinement();
   }
@@ -951,23 +959,23 @@ namespace Step9
   GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
     const FiniteElement<dim> &fe,
     const Vector<double> &    solution,
-    Vector<float> &           error_per_cell) :
-    fe_midpoint_value(fe,
-                      QMidpoint<dim>(),
-                      update_values | update_quadrature_points),
-    solution(solution),
-    error_per_cell(error_per_cell)
+    Vector<float> &           error_per_cell)
+    : fe_midpoint_value(fe,
+                        QMidpoint<dim>(),
+                        update_values | update_quadrature_points)
+    , solution(solution)
+    , error_per_cell(error_per_cell)
   {}
 
 
   template <int dim>
   GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
-    const EstimateScratchData &scratch_data) :
-    fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
-                      scratch_data.fe_midpoint_value.get_quadrature(),
-                      update_values | update_quadrature_points),
-    solution(scratch_data.solution),
-    error_per_cell(scratch_data.error_per_cell)
+    const EstimateScratchData &scratch_data)
+    : fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
+                        scratch_data.fe_midpoint_value.get_quadrature(),
+                        update_values | update_quadrature_points)
+    , solution(scratch_data.solution)
+    , error_per_cell(scratch_data.error_per_cell)
   {}
 
 
@@ -992,13 +1000,14 @@ namespace Step9
       ExcInvalidVectorLength(error_per_cell.size(),
                              dof_handler.get_triangulation().n_active_cells()));
 
-    WorkStream::run(
-      dof_handler.begin_active(),
-      dof_handler.end(),
-      &GradientEstimation::template estimate_cell<dim>,
-      std::function<void(const EstimateCopyData &)>(),
-      EstimateScratchData<dim>(dof_handler.get_fe(), solution, error_per_cell),
-      EstimateCopyData());
+    WorkStream::run(dof_handler.begin_active(),
+                    dof_handler.end(),
+                    &GradientEstimation::template estimate_cell<dim>,
+                    std::function<void(const EstimateCopyData &)>(),
+                    EstimateScratchData<dim>(dof_handler.get_fe(),
+                                             solution,
+                                             error_per_cell),
+                    EstimateCopyData());
   }
 
 

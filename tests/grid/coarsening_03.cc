@@ -48,10 +48,12 @@ satisfies_level1_at_vertex_rule(const Triangulation<dim> &tr)
        ++cell)
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        min_adjacent_cell_level[cell->vertex_index(v)] = std::min<unsigned int>(
-          min_adjacent_cell_level[cell->vertex_index(v)], cell->level());
-        max_adjacent_cell_level[cell->vertex_index(v)] = std::max<unsigned int>(
-          min_adjacent_cell_level[cell->vertex_index(v)], cell->level());
+        min_adjacent_cell_level[cell->vertex_index(v)] =
+          std::min<unsigned int>(min_adjacent_cell_level[cell->vertex_index(v)],
+                                 cell->level());
+        max_adjacent_cell_level[cell->vertex_index(v)] =
+          std::max<unsigned int>(min_adjacent_cell_level[cell->vertex_index(v)],
+                                 cell->level());
       }
 
   for (unsigned int k = 0; k < tr.n_vertices(); ++k)

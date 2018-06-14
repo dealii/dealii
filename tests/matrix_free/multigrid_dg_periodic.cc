@@ -496,8 +496,8 @@ class MGTransferMF
       LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type>>
 {
 public:
-  MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace) :
-    laplace_operator(laplace){};
+  MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace)
+    : laplace_operator(laplace){};
 
   /**
    * Overload copy_to_mg from MGTransferPrebuilt

@@ -43,9 +43,9 @@ test()
     {
       deallog << index_set.nth_index_in_set(i) << std::endl;
 
-      AssertThrow(
-        index_set.index_within_set(index_set.nth_index_in_set(i) == i),
-        ExcInternalError());
+      AssertThrow(index_set.index_within_set(index_set.nth_index_in_set(i) ==
+                                             i),
+                  ExcInternalError());
     }
   deallog << "OK" << std::endl;
 

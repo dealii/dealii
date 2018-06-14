@@ -57,8 +57,9 @@ main()
 
   // three patterns
   {
-    const auto &pattern = Patterns::Tuple(
-      Patterns::Double(), Patterns::Anything(), Patterns::Bool());
+    const auto &pattern = Patterns::Tuple(Patterns::Double(),
+                                          Patterns::Anything(),
+                                          Patterns::Bool());
 
     deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine)
             << '\n'

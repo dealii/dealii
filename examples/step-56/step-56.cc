@@ -105,7 +105,8 @@ namespace Step56
   class Solution : public Function<dim>
   {
   public:
-    Solution() : Function<dim>(dim + 1)
+    Solution()
+      : Function<dim>(dim + 1)
     {}
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
@@ -233,7 +234,8 @@ namespace Step56
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -339,14 +341,14 @@ namespace Step56
       const SparseMatrix<double> &     schur_complement_matrix,
       const PreconditionerAType &      preconditioner_A,
       const PreconditionerSType &      preconditioner_S,
-      const bool                       do_solve_A) :
-    n_iterations_A(0),
-    n_iterations_S(0),
-    system_matrix(system_matrix),
-    schur_complement_matrix(schur_complement_matrix),
-    preconditioner_A(preconditioner_A),
-    preconditioner_S(preconditioner_S),
-    do_solve_A(do_solve_A)
+      const bool                       do_solve_A)
+    : n_iterations_A(0)
+    , n_iterations_S(0)
+    , system_matrix(system_matrix)
+    , schur_complement_matrix(schur_complement_matrix)
+    , preconditioner_A(preconditioner_A)
+    , preconditioner_S(preconditioner_S)
+    , do_solve_A(do_solve_A)
   {}
 
 
@@ -365,8 +367,10 @@ namespace Step56
       SolverCG<>    cg(solver_control);
 
       dst.block(1) = 0.0;
-      cg.solve(
-        schur_complement_matrix, dst.block(1), src.block(1), preconditioner_S);
+      cg.solve(schur_complement_matrix,
+               dst.block(1),
+               src.block(1),
+               preconditioner_S);
 
       n_iterations_S += solver_control.last_step();
       dst.block(1) *= -1.0;
@@ -387,8 +391,10 @@ namespace Step56
         SolverCG<>    cg(solver_control);
 
         dst.block(0) = 0.0;
-        cg.solve(
-          system_matrix.block(0, 0), dst.block(0), utmp, preconditioner_A);
+        cg.solve(system_matrix.block(0, 0),
+                 dst.block(0),
+                 utmp,
+                 preconditioner_A);
 
         n_iterations_A += solver_control.last_step();
       }
@@ -448,17 +454,19 @@ namespace Step56
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(const unsigned int pressure_degree,
-                                    SolverType::type   solver_type) :
-    pressure_degree(pressure_degree),
-    solver_type(solver_type),
-    triangulation(Triangulation<dim>::maximum_smoothing),
+                                    SolverType::type   solver_type)
+    : pressure_degree(pressure_degree)
+    , solver_type(solver_type)
+    , triangulation(Triangulation<dim>::maximum_smoothing)
+    ,
     // Finite element for the velocity only:
-    velocity_fe(FE_Q<dim>(pressure_degree + 1), dim),
+    velocity_fe(FE_Q<dim>(pressure_degree + 1), dim)
+    ,
     // Finite element for the whole system:
-    fe(velocity_fe, 1, FE_Q<dim>(pressure_degree), 1),
-    dof_handler(triangulation),
-    velocity_dof_handler(triangulation),
-    computing_timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
+    fe(velocity_fe, 1, FE_Q<dim>(pressure_degree), 1)
+    , dof_handler(triangulation)
+    , velocity_dof_handler(triangulation)
+    , computing_timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
   {}
 
 
@@ -548,8 +556,9 @@ namespace Step56
       }
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -980,8 +989,10 @@ namespace Step56
                                       VectorTools::L2_norm,
                                       &velocity_mask);
 
-    const double Velocity_L2_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::L2_norm);
+    const double Velocity_L2_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
@@ -991,8 +1002,10 @@ namespace Step56
                                       VectorTools::L2_norm,
                                       &pressure_mask);
 
-    const double Pressure_L2_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::L2_norm);
+    const double Pressure_L2_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::L2_norm);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
@@ -1002,8 +1015,10 @@ namespace Step56
                                       VectorTools::H1_norm,
                                       &velocity_mask);
 
-    const double Velocity_H1_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::H1_norm);
+    const double Velocity_H1_error =
+      VectorTools::compute_global_error(triangulation,
+                                        difference_per_cell,
+                                        VectorTools::H1_norm);
 
     std::cout << std::endl
               << "   Velocity L2 Error: " << Velocity_L2_error << std::endl

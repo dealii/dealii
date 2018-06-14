@@ -36,8 +36,8 @@ template <int dim, int spacedim>
 class MyFlatManifold : public ChartManifold<dim, spacedim, spacedim + 1>
 {
 public:
-  MyFlatManifold(const Tensor<1, spacedim + 1> &periodicity) :
-    ChartManifold<dim, spacedim, spacedim + 1>(periodicity)
+  MyFlatManifold(const Tensor<1, spacedim + 1> &periodicity)
+    : ChartManifold<dim, spacedim, spacedim + 1>(periodicity)
   {}
 
   virtual std::unique_ptr<Manifold<dim, spacedim>>

@@ -30,9 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 #define INSTANTIATE_DLTG_VECTOR(VectorType)                                    \
-  template void                                                                \
-  AffineConstraints<VectorType::value_type>::condense<VectorType>(             \
-    const VectorType &, VectorType &) const;                                   \
+  template void AffineConstraints<VectorType::value_type>::condense<           \
+    VectorType>(const VectorType &, VectorType &) const;                       \
   template void                                                                \
   AffineConstraints<VectorType::value_type>::condense<VectorType>(             \
     VectorType &) const;                                                       \
@@ -75,20 +74,20 @@ DEAL_II_NAMESPACE_OPEN
       bool,                                                         \
       std::integral_constant<bool, true>) const
 
-#define INSTANTIATE_DLTG_MATRIX(MatrixType)                 \
-  template void AffineConstraints<MatrixType::value_type>:: \
-    distribute_local_to_global<MatrixType>(                 \
-      const FullMatrix<MatrixType::value_type> &,           \
-      const std::vector<AffineConstraints::size_type> &,    \
-      const std::vector<AffineConstraints::size_type> &,    \
-      MatrixType &) const;                                  \
-  template void AffineConstraints<MatrixType::value_type>:: \
-    distribute_local_to_global<MatrixType>(                 \
-      const FullMatrix<MatrixType::value_type> &,           \
-      const std::vector<AffineConstraints::size_type> &,    \
-      const AffineConstraints<MatrixType::value_type> &,    \
-      const std::vector<AffineConstraints::size_type> &,    \
-      MatrixType &) const
+#define INSTANTIATE_DLTG_MATRIX(MatrixType)                              \
+  template void                                                          \
+  AffineConstraints<MatrixType::value_type>::distribute_local_to_global< \
+    MatrixType>(const FullMatrix<MatrixType::value_type> &,              \
+                const std::vector<AffineConstraints::size_type> &,       \
+                const std::vector<AffineConstraints::size_type> &,       \
+                MatrixType &) const;                                     \
+  template void                                                          \
+  AffineConstraints<MatrixType::value_type>::distribute_local_to_global< \
+    MatrixType>(const FullMatrix<MatrixType::value_type> &,              \
+                const std::vector<AffineConstraints::size_type> &,       \
+                const AffineConstraints<MatrixType::value_type> &,       \
+                const std::vector<AffineConstraints::size_type> &,       \
+                MatrixType &) const
 
 #ifdef DEAL_II_WITH_PETSC
 INSTANTIATE_DLTG_VECTOR(PETScWrappers::MPI::Vector);

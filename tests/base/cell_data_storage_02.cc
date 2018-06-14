@@ -40,7 +40,8 @@ template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
-  MyFunction() : Function<dim>(1)
+  MyFunction()
+    : Function<dim>(1)
   {}
 
   double
@@ -58,7 +59,8 @@ const double default_value = 0.;
 class MyQData
 {
 public:
-  MyQData() : value(default_value){};
+  MyQData()
+    : value(default_value){};
   virtual ~MyQData(){};
 
   double value;

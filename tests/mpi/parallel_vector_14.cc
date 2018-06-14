@@ -53,8 +53,9 @@ test()
   // and once where they have not
   for (unsigned int run = 0; run < 2; ++run)
     {
-      LinearAlgebra::distributed::Vector<double> v(
-        local_owned, local_relevant, MPI_COMM_WORLD);
+      LinearAlgebra::distributed::Vector<double> v(local_owned,
+                                                   local_relevant,
+                                                   MPI_COMM_WORLD);
 
       // set local values
       if (myid < 2)

@@ -140,7 +140,8 @@ namespace Step21
   class PressureRightHandSide : public Function<dim>
   {
   public:
-    PressureRightHandSide() : Function<dim>(1)
+    PressureRightHandSide()
+      : Function<dim>(1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -166,7 +167,8 @@ namespace Step21
   class PressureBoundaryValues : public Function<dim>
   {
   public:
-    PressureBoundaryValues() : Function<dim>(1)
+    PressureBoundaryValues()
+      : Function<dim>(1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -194,7 +196,8 @@ namespace Step21
   class SaturationBoundaryValues : public Function<dim>
   {
   public:
-    SaturationBoundaryValues() : Function<dim>(1)
+    SaturationBoundaryValues()
+      : Function<dim>(1)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -233,7 +236,8 @@ namespace Step21
   class InitialValues : public Function<dim>
   {
   public:
-    InitialValues() : Function<dim>(dim + 2)
+    InitialValues()
+      : Function<dim>(dim + 2)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -281,7 +285,8 @@ namespace Step21
     class KInverse : public TensorFunction<2, dim>
     {
     public:
-      KInverse() : TensorFunction<2, dim>()
+      KInverse()
+        : TensorFunction<2, dim>()
       {}
 
       virtual void value_list(const std::vector<Point<dim>> &points,
@@ -353,7 +358,8 @@ namespace Step21
     class KInverse : public TensorFunction<2, dim>
     {
     public:
-      KInverse() : TensorFunction<2, dim>()
+      KInverse()
+        : TensorFunction<2, dim>()
       {}
 
       virtual void
@@ -462,7 +468,8 @@ namespace Step21
 
 
   template <class MatrixType>
-  InverseMatrix<MatrixType>::InverseMatrix(const MatrixType &m) : matrix(&m)
+  InverseMatrix<MatrixType>::InverseMatrix(const MatrixType &m)
+    : matrix(&m)
   {}
 
 
@@ -501,11 +508,11 @@ namespace Step21
 
   SchurComplement::SchurComplement(
     const BlockSparseMatrix<double> &          A,
-    const InverseMatrix<SparseMatrix<double>> &Minv) :
-    system_matrix(&A),
-    m_inverse(&Minv),
-    tmp1(A.block(0, 0).m()),
-    tmp2(A.block(0, 0).m())
+    const InverseMatrix<SparseMatrix<double>> &Minv)
+    : system_matrix(&A)
+    , m_inverse(&Minv)
+    , tmp1(A.block(0, 0).m())
+    , tmp2(A.block(0, 0).m())
   {}
 
 
@@ -534,10 +541,10 @@ namespace Step21
 
 
   ApproximateSchurComplement::ApproximateSchurComplement(
-    const BlockSparseMatrix<double> &A) :
-    system_matrix(&A),
-    tmp1(A.block(0, 0).m()),
-    tmp2(A.block(0, 0).m())
+    const BlockSparseMatrix<double> &A)
+    : system_matrix(&A)
+    , tmp1(A.block(0, 0).m())
+    , tmp2(A.block(0, 0).m())
   {}
 
 
@@ -565,19 +572,19 @@ namespace Step21
   // before it is needed first, as described in a subsection of the
   // introduction.
   template <int dim>
-  TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem(const unsigned int degree) :
-    degree(degree),
-    fe(FE_RaviartThomas<dim>(degree),
-       1,
-       FE_DGQ<dim>(degree),
-       1,
-       FE_DGQ<dim>(degree),
-       1),
-    dof_handler(triangulation),
-    n_refinement_steps(5),
-    time_step(0),
-    timestep_number(1),
-    viscosity(0.2)
+  TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem(const unsigned int degree)
+    : degree(degree)
+    , fe(FE_RaviartThomas<dim>(degree),
+         1,
+         FE_DGQ<dim>(degree),
+         1,
+         FE_DGQ<dim>(degree),
+         1)
+    , dof_handler(triangulation)
+    , n_refinement_steps(5)
+    , time_step(0)
+    , timestep_number(1)
+    , viscosity(0.2)
   {}
 
 
@@ -807,8 +814,9 @@ namespace Step21
         cell->get_dof_indices(local_dof_indices);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], local_matrix(i, j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              local_matrix(i, j));
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           system_rhs(local_dof_indices[i]) += local_rhs(i);
@@ -840,8 +848,9 @@ namespace Step21
                                      update_values | update_normal_vectors |
                                        update_quadrature_points |
                                        update_JxW_values);
-    FEFaceValues<dim> fe_face_values_neighbor(
-      fe, face_quadrature_formula, update_values);
+    FEFaceValues<dim> fe_face_values_neighbor(fe,
+                                              face_quadrature_formula,
+                                              update_values);
 
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_q_points      = quadrature_formula.size();
@@ -851,12 +860,14 @@ namespace Step21
 
     std::vector<Vector<double>> old_solution_values(n_q_points,
                                                     Vector<double>(dim + 2));
-    std::vector<Vector<double>> old_solution_values_face(
-      n_face_q_points, Vector<double>(dim + 2));
+    std::vector<Vector<double>> old_solution_values_face(n_face_q_points,
+                                                         Vector<double>(dim +
+                                                                        2));
     std::vector<Vector<double>> old_solution_values_face_neighbor(
       n_face_q_points, Vector<double>(dim + 2));
-    std::vector<Vector<double>> present_solution_values(
-      n_q_points, Vector<double>(dim + 2));
+    std::vector<Vector<double>> present_solution_values(n_q_points,
+                                                        Vector<double>(dim +
+                                                                       2));
     std::vector<Vector<double>> present_solution_values_face(
       n_face_q_points, Vector<double>(dim + 2));
 

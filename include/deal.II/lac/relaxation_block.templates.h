@@ -32,13 +32,13 @@ inline RelaxationBlock<MatrixType, InverseNumberType, VectorType>::
     const typename PreconditionBlockBase<InverseNumberType>::Inversion
                  inversion,
     const double threshold,
-    VectorType * temp_ghost_vector) :
-  relaxation(relaxation),
-  invert_diagonal(invert_diagonal),
-  same_diagonal(same_diagonal),
-  inversion(inversion),
-  threshold(threshold),
-  temp_ghost_vector(temp_ghost_vector)
+    VectorType * temp_ghost_vector)
+  : relaxation(relaxation)
+  , invert_diagonal(invert_diagonal)
+  , same_diagonal(same_diagonal)
+  , inversion(inversion)
+  , threshold(threshold)
+  , temp_ghost_vector(temp_ghost_vector)
 {}
 
 

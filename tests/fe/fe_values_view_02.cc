@@ -49,8 +49,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(
-    fe, quadrature, update_values | update_gradients | update_hessians);
+  FEValues<dim>     fe_values(fe,
+                          quadrature,
+                          update_values | update_gradients | update_hessians);
   fe_values.reinit(dof.begin_active());
 
   for (unsigned int c = 0; c < fe.n_components(); ++c)
@@ -72,9 +73,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
               deallog << fe_values[vec_components].divergence(i, q) << ' ';
               for (unsigned int k = 0; k < dim; ++k)
                 for (unsigned int l = 0; l < dim; ++l)
-                  deallog << fe_values[vec_components].symmetric_gradient(
-                               i, q)[k][l]
-                          << ' ';
+                  deallog
+                    << fe_values[vec_components].symmetric_gradient(i, q)[k][l]
+                    << ' ';
               deallog << std::endl;
               for (unsigned int k = 0; k < dim; ++k)
                 for (unsigned int l = 0; l < dim; ++l)

@@ -443,8 +443,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         std::vector<VEC::value_type> &) const;
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_laplacians<VEC>(
-        const VEC &, std::vector<Vector<VEC::value_type>> &) const;
+      get_function_laplacians<VEC>(const VEC &,
+                                   std::vector<Vector<VEC::value_type>> &)
+        const;
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
       get_function_laplacians<VEC>(
@@ -650,8 +651,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         std::vector<IndexSet::value_type> &) const;
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<IndexSet>(
-        const IndexSet &, std::vector<Vector<IndexSet::value_type>> &) const;
+      get_function_values<IndexSet>(const IndexSet &,
+                                    std::vector<Vector<IndexSet::value_type>> &)
+        const;
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
       get_function_values<IndexSet>(
@@ -723,8 +725,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         bool) const;
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_laplacians<IndexSet>(
-        const IndexSet &, std::vector<IndexSet::value_type> &) const;
+      get_function_laplacians<IndexSet>(const IndexSet &,
+                                        std::vector<IndexSet::value_type> &)
+        const;
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
       get_function_laplacians<IndexSet>(
         const IndexSet &,

@@ -222,8 +222,9 @@ main()
         SolverCG<Vector<double>> solver_S_approx(solver_control_S_approx);
         PreconditionJacobi<SparseMatrix<double>> preconditioner_S_approx;
         preconditioner_S_approx.initialize(A.block(0, 0)); // Same space as S
-        const auto lo_S_inv_approx = inverse_operator(
-          lo_S_approx, solver_S_approx, preconditioner_S_approx);
+        const auto lo_S_inv_approx = inverse_operator(lo_S_approx,
+                                                      solver_S_approx,
+                                                      preconditioner_S_approx);
 
         // Setup outer solver: Exact inverse of Schur complement
         SolverControl            solver_control_S(11, 1.0e-10, false, false);

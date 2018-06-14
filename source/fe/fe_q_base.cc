@@ -210,10 +210,10 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     const std::vector<unsigned int> face_index_map =
       internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
         q_deg);
-    Assert(
-      std::abs(fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
-               1.) < 1e-14,
-      ExcInternalError());
+    Assert(std::abs(
+             fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
+             1.) < 1e-14,
+           ExcInternalError());
 
     for (unsigned int i = 0; i < constraint_points.size(); ++i)
       for (unsigned int j = 0; j < q_deg + 1; ++j)
@@ -310,10 +310,13 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
                subface < GeometryInfo<dim - 1>::max_children_per_face;
                ++subface)
             {
-              QProjector<dim - 1>::project_to_subface(
-                qline, face, subface, p_line);
-              constraint_points.insert(
-                constraint_points.end(), p_line.begin(), p_line.end());
+              QProjector<dim - 1>::project_to_subface(qline,
+                                                      face,
+                                                      subface,
+                                                      p_line);
+              constraint_points.insert(constraint_points.end(),
+                                       p_line.begin(),
+                                       p_line.end());
             }
 
         // Create constraints for interior nodes
@@ -343,10 +346,10 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     const std::vector<unsigned int> face_index_map =
       internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
         q_deg);
-    Assert(
-      std::abs(fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
-               1.) < 1e-14,
-      ExcInternalError());
+    Assert(std::abs(
+             fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
+             1.) < 1e-14,
+           ExcInternalError());
 
     fe.interface_constraints.TableBase<2, double>::reinit(
       fe.interface_constraints_size());
@@ -430,16 +433,16 @@ template <class PolynomialType, int dim, int spacedim>
 FE_Q_Base<PolynomialType, dim, spacedim>::FE_Q_Base(
   const PolynomialType &        poly_space,
   const FiniteElementData<dim> &fe_data,
-  const std::vector<bool> &     restriction_is_additive_flags) :
-  FE_Poly<PolynomialType, dim, spacedim>(
-    poly_space,
-    fe_data,
-    restriction_is_additive_flags,
-    std::vector<ComponentMask>(1, std::vector<bool>(1, true))),
-  q_degree(
-    std::is_same<PolynomialType, TensorProductPolynomialsBubbles<dim>>::value ?
-      this->degree - 1 :
-      this->degree)
+  const std::vector<bool> &     restriction_is_additive_flags)
+  : FE_Poly<PolynomialType, dim, spacedim>(
+      poly_space,
+      fe_data,
+      restriction_is_additive_flags,
+      std::vector<ComponentMask>(1, std::vector<bool>(1, true)))
+  , q_degree(std::is_same<PolynomialType,
+                          TensorProductPolynomialsBubbles<dim>>::value ?
+               this->degree - 1 :
+               this->degree)
 {}
 
 
@@ -503,9 +506,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
           &x_source_fe))
     {
       // ok, source is a Q element, so we will be able to do the work
-      Assert(
-        interpolation_matrix.m() == this->dofs_per_cell,
-        ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
+      Assert(interpolation_matrix.m() == this->dofs_per_cell,
+             ExcDimensionMismatch(interpolation_matrix.m(),
+                                  this->dofs_per_cell));
       Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
              ExcDimensionMismatch(interpolation_matrix.m(),
                                   x_source_fe.dofs_per_cell));
@@ -596,8 +599,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_face_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix) const
 {
   Assert(dim > 1, ExcImpossibleInDim(1));
-  get_subface_interpolation_matrix(
-    source_fe, numbers::invalid_unsigned_int, interpolation_matrix);
+  get_subface_interpolation_matrix(source_fe,
+                                   numbers::invalid_unsigned_int,
+                                   interpolation_matrix);
 }
 
 
@@ -609,9 +613,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
   const unsigned int                  subface,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  Assert(
-    interpolation_matrix.m() == x_source_fe.dofs_per_face,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
+  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.dofs_per_face));
 
   // see if source is a Q element
   if (const FE_Q_Base<PolynomialType, dim, spacedim> *source_fe =
@@ -620,9 +624,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(
-        interpolation_matrix.n() == this->dofs_per_face,
-        ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+      Assert(interpolation_matrix.n() == this->dofs_per_face,
+             ExcDimensionMismatch(interpolation_matrix.n(),
+                                  this->dofs_per_face));
 
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
@@ -1214,14 +1218,16 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Prolongation matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Prolongation matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -1260,15 +1266,15 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                                   "prevents the sum to be one."));
           for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
             if (j != i)
-              Assert(
-                std::fabs(this->poly_space.compute_value(
-                  i, this->unit_support_points[j])) < eps,
-                ExcInternalError("The Lagrange polynomial does not evaluate "
-                                 "to one or zero in a nodal point. "
-                                 "This typically indicates that the "
-                                 "polynomial interpolation is "
-                                 "ill-conditioned such that round-off "
-                                 "prevents the sum to be one."));
+              Assert(std::fabs(this->poly_space.compute_value(
+                       i, this->unit_support_points[j])) < eps,
+                     ExcInternalError(
+                       "The Lagrange polynomial does not evaluate "
+                       "to one or zero in a nodal point. "
+                       "This typically indicates that the "
+                       "polynomial interpolation is "
+                       "ill-conditioned such that round-off "
+                       "prevents the sum to be one."));
         }
 #endif
 
@@ -1303,8 +1309,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
           const unsigned int diag_comp = index_map_inverse[j * step_size_diag];
           const Point<dim>   p_subcell = this->unit_support_points[diag_comp];
           const Point<dim>   p_cell =
-            GeometryInfo<dim>::child_to_cell_coordinates(
-              p_subcell, child, refinement_case);
+            GeometryInfo<dim>::child_to_cell_coordinates(p_subcell,
+                                                         child,
+                                                         refinement_case);
           for (unsigned int i = 0; i < dofs1d; ++i)
             for (unsigned int d = 0; d < dim; ++d)
               {
@@ -1413,14 +1420,16 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case,
+                       0,
+                       RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Restriction matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child,
+                       0,
+                       GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -1472,8 +1481,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
 
           // check whether this interpolation point is inside this child cell
           const Point<dim> p_subcell =
-            GeometryInfo<dim>::cell_to_child_coordinates(
-              p_cell, child, refinement_case);
+            GeometryInfo<dim>::cell_to_child_coordinates(p_cell,
+                                                         child,
+                                                         refinement_case);
           if (GeometryInfo<dim>::is_inside_unit_cell(p_subcell))
             {
               // same logic as in initialize_embedding to evaluate the
@@ -1485,9 +1495,10 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
                 for (unsigned int d = 0; d < dim; ++d)
                   {
                     Point<dim> point;
-                    point[0]            = p_subcell[d];
-                    evaluations1d[j][d] = this->poly_space.compute_value(
-                      index_map_inverse[j], point);
+                    point[0] = p_subcell[d];
+                    evaluations1d[j][d] =
+                      this->poly_space.compute_value(index_map_inverse[j],
+                                                     point);
                   }
               unsigned int j_indices[dim];
               internal::FE_Q_Base::zero_indices<dim>(j_indices);

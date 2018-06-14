@@ -522,8 +522,9 @@ namespace internal
               Assert(min_level[vertex] < n_levels, ExcInternalError());
               Assert(max_level[vertex] >= min_level[vertex],
                      ExcInternalError());
-              dof_handler.mg_vertex_dofs[vertex].init(
-                min_level[vertex], max_level[vertex], fe.dofs_per_vertex);
+              dof_handler.mg_vertex_dofs[vertex].init(min_level[vertex],
+                                                      max_level[vertex],
+                                                      fe.dofs_per_vertex);
             }
 
           else
@@ -598,8 +599,9 @@ namespace internal
               Assert(min_level[vertex] < n_levels, ExcInternalError());
               Assert(max_level[vertex] >= min_level[vertex],
                      ExcInternalError());
-              dof_handler.mg_vertex_dofs[vertex].init(
-                min_level[vertex], max_level[vertex], fe.dofs_per_vertex);
+              dof_handler.mg_vertex_dofs[vertex].init(min_level[vertex],
+                                                      max_level[vertex],
+                                                      fe.dofs_per_vertex);
             }
 
           else
@@ -625,8 +627,10 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 1>)
       {
-        return mg_level->dof_object.get_dof_index(
-          dof_handler, obj_index, fe_index, local_index);
+        return mg_level->dof_object.get_dof_index(dof_handler,
+                                                  obj_index,
+                                                  fe_index,
+                                                  local_index);
       }
 
       template <int spacedim>
@@ -642,8 +646,10 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 1>)
       {
-        return mg_faces->lines.get_dof_index(
-          dof_handler, obj_index, fe_index, local_index);
+        return mg_faces->lines.get_dof_index(dof_handler,
+                                             obj_index,
+                                             fe_index,
+                                             local_index);
       }
 
       template <int spacedim>
@@ -659,8 +665,10 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 2>)
       {
-        return mg_level->dof_object.get_dof_index(
-          dof_handler, obj_index, fe_index, local_index);
+        return mg_level->dof_object.get_dof_index(dof_handler,
+                                                  obj_index,
+                                                  fe_index,
+                                                  local_index);
       }
 
       template <int spacedim>
@@ -676,8 +684,10 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 1>)
       {
-        return mg_faces->lines.get_dof_index(
-          dof_handler, obj_index, fe_index, local_index);
+        return mg_faces->lines.get_dof_index(dof_handler,
+                                             obj_index,
+                                             fe_index,
+                                             local_index);
       }
 
       template <int spacedim>
@@ -693,8 +703,10 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 2>)
       {
-        return mg_faces->quads.get_dof_index(
-          dof_handler, obj_index, fe_index, local_index);
+        return mg_faces->quads.get_dof_index(dof_handler,
+                                             obj_index,
+                                             fe_index,
+                                             local_index);
       }
 
       template <int spacedim>
@@ -710,8 +722,10 @@ namespace internal
         const unsigned int local_index,
         const std::integral_constant<int, 3>)
       {
-        return mg_level->dof_object.get_dof_index(
-          dof_handler, obj_index, fe_index, local_index);
+        return mg_level->dof_object.get_dof_index(dof_handler,
+                                                  obj_index,
+                                                  fe_index,
+                                                  local_index);
       }
 
       template <int spacedim>
@@ -828,11 +842,10 @@ namespace internal
 
 
 template <int dim, int spacedim>
-DoFHandler<dim, spacedim>::DoFHandler(
-  const Triangulation<dim, spacedim> &tria) :
-  tria(&tria, typeid(*this).name()),
-  faces(nullptr),
-  mg_faces(nullptr)
+DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
+  : tria(&tria, typeid(*this).name())
+  , faces(nullptr)
+  , mg_faces(nullptr)
 {
   // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
@@ -856,7 +869,8 @@ DoFHandler<dim, spacedim>::DoFHandler(
 
 
 template <int dim, int spacedim>
-DoFHandler<dim, spacedim>::DoFHandler() : tria(nullptr, typeid(*this).name())
+DoFHandler<dim, spacedim>::DoFHandler()
+  : tria(nullptr, typeid(*this).name())
 {}
 
 
@@ -1316,9 +1330,9 @@ void
 DoFHandler<dim, spacedim>::renumber_dofs(
   const std::vector<types::global_dof_index> &new_numbers)
 {
-  Assert(
-    levels.size() > 0,
-    ExcMessage("You need to distribute DoFs before you can renumber them."));
+  Assert(levels.size() > 0,
+         ExcMessage(
+           "You need to distribute DoFs before you can renumber them."));
 
 #ifdef DEBUG
   if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
@@ -1359,9 +1373,9 @@ DoFHandler<dim, spacedim>::renumber_dofs(
     }
   else
     for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-      Assert(
-        new_numbers[i] < n_dofs(),
-        ExcMessage("New DoF index is not less than the total number of dofs."));
+      Assert(new_numbers[i] < n_dofs(),
+             ExcMessage(
+               "New DoF index is not less than the total number of dofs."));
 #endif
 
   number_cache = policy->renumber_dofs(new_numbers);
@@ -1398,9 +1412,9 @@ DoFHandler<dim, spacedim>::renumber_dofs(
     }
   else
     for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-      Assert(
-        new_numbers[i] < n_dofs(level),
-        ExcMessage("New DoF index is not less than the total number of dofs."));
+      Assert(new_numbers[i] < n_dofs(level),
+             ExcMessage(
+               "New DoF index is not less than the total number of dofs."));
 #endif
 
   mg_number_cache[level] = policy->renumber_mg_dofs(level, new_numbers);
@@ -1514,9 +1528,9 @@ DoFHandler<dim, spacedim>::set_dof_index(
 
 
 template <int dim, int spacedim>
-DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs() :
-  coarsest_level(numbers::invalid_unsigned_int),
-  finest_level(0)
+DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs()
+  : coarsest_level(numbers::invalid_unsigned_int)
+  , finest_level(0)
 {}
 
 
@@ -1537,8 +1551,9 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::init(
       const unsigned int n_indices = n_levels * dofs_per_vertex;
 
       indices = std_cxx14::make_unique<types::global_dof_index[]>(n_indices);
-      std::fill(
-        indices.get(), indices.get() + n_indices, numbers::invalid_dof_index);
+      std::fill(indices.get(),
+                indices.get() + n_indices,
+                numbers::invalid_dof_index);
     }
   else
     indices.reset();

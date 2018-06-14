@@ -117,8 +117,10 @@ test()
   no_normal_flux_boundaries.insert(1);
 
 
-  VectorTools::compute_no_normal_flux_constraints(
-    dofh, 0, no_normal_flux_boundaries, cm);
+  VectorTools::compute_no_normal_flux_constraints(dofh,
+                                                  0,
+                                                  no_normal_flux_boundaries,
+                                                  cm);
 
   cm.close();
 

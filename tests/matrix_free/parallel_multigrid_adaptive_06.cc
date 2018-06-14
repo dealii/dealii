@@ -83,7 +83,8 @@ public:
   typedef typename BlockVectorType::value_type value_type;
   typedef typename BlockVectorType::size_type  size_type;
 
-  BlockLaplace() : Subscriptor()
+  BlockLaplace()
+    : Subscriptor()
   {}
 
   void
@@ -232,8 +233,9 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   ConstraintMatrix constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, dirichlet_boundary, constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           dirichlet_boundary,
+                                           constraints);
   constraints.close();
 
   // level constraints:
@@ -324,10 +326,10 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
                                   level_constraints,
                                   QGauss<1>(n_q_points_1d),
                                   mg_additional_data);
-      mg_matrices[level].initialize(
-        std::make_shared<MatrixFree<dim, number>>(mg_level_data[level]),
-        mg_constrained_dofs,
-        level);
+      mg_matrices[level].initialize(std::make_shared<MatrixFree<dim, number>>(
+                                      mg_level_data[level]),
+                                    mg_constrained_dofs,
+                                    level);
       mg_matrices[level].compute_diagonal();
     }
 

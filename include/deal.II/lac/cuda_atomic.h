@@ -59,10 +59,10 @@ namespace LinearAlgebra
       do
         {
           assumed = old;
-          old     = atomicCAS(
-            address_as_ull,
-            assumed,
-            __double_as_longlong(val + __longlong_as_double(assumed)));
+          old     = atomicCAS(address_as_ull,
+                          assumed,
+                          __double_as_longlong(val +
+                                               __longlong_as_double(assumed)));
         }
       while (assumed != old);
 

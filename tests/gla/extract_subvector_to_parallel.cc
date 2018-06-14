@@ -93,8 +93,9 @@ main(int argc, char **argv)
       deallog.push("deal.II");
       LinearAlgebra::distributed::Vector<double> w(local, MPI_COMM_WORLD);
       set(w);
-      LinearAlgebra::distributed::Vector<double> v(
-        local, dense_local, MPI_COMM_WORLD);
+      LinearAlgebra::distributed::Vector<double> v(local,
+                                                   dense_local,
+                                                   MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();
@@ -157,8 +158,9 @@ main(int argc, char **argv)
       LinearAlgebra::distributed::BlockVector<double> w(partitioning,
                                                         MPI_COMM_WORLD);
       set(w);
-      LinearAlgebra::distributed::BlockVector<double> v(
-        partitioning, dense_partitioning, MPI_COMM_WORLD);
+      LinearAlgebra::distributed::BlockVector<double> v(partitioning,
+                                                        dense_partitioning,
+                                                        MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();
@@ -168,8 +170,9 @@ main(int argc, char **argv)
       deallog.push("PETSc");
       PETScWrappers::MPI::BlockVector w(partitioning, MPI_COMM_WORLD);
       set(w);
-      PETScWrappers::MPI::BlockVector v(
-        partitioning, dense_partitioning, MPI_COMM_WORLD);
+      PETScWrappers::MPI::BlockVector v(partitioning,
+                                        dense_partitioning,
+                                        MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();
@@ -179,8 +182,9 @@ main(int argc, char **argv)
       deallog.push("Trilinos");
       TrilinosWrappers::MPI::BlockVector w(partitioning, MPI_COMM_WORLD);
       set(w);
-      TrilinosWrappers::MPI::BlockVector v(
-        partitioning, dense_partitioning, MPI_COMM_WORLD);
+      TrilinosWrappers::MPI::BlockVector v(partitioning,
+                                           dense_partitioning,
+                                           MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();

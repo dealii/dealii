@@ -166,8 +166,10 @@ test()
 
   do_boundary(tria);
 
-  FESystem<dim, spacedim> fe(
-    FE_Q<dim, spacedim>(2), dim, FE_Q<dim, spacedim>(1), 1);
+  FESystem<dim, spacedim> fe(FE_Q<dim, spacedim>(2),
+                             dim,
+                             FE_Q<dim, spacedim>(1),
+                             1);
 
   DoFHandler<dim, spacedim> dof_1(tria);
   DoFHandler<dim, spacedim> dof_2(tria);

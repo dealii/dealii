@@ -23,7 +23,8 @@
 
 struct X
 {
-  X(int i) : i(i)
+  X(int i)
+    : i(i)
   {}
   int i;
 

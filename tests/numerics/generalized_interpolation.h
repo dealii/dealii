@@ -34,9 +34,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int n_comp, const unsigned int q) :
-    Function<dim>(n_comp),
-    q(q)
+  F(const unsigned int n_comp, const unsigned int q)
+    : Function<dim>(n_comp)
+    , q(q)
   {}
 
   virtual double

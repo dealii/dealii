@@ -2870,8 +2870,9 @@ namespace GridTools
             {
               const std::vector<typename MeshType::active_cell_iterator>
                 children = get_active_child_cells<MeshType>(cell->child(child));
-              child_cells.insert(
-                child_cells.end(), children.begin(), children.end());
+              child_cells.insert(child_cells.end(),
+                                 children.begin(),
+                                 children.end());
             }
           else
             child_cells.push_back(cell->child(child));
@@ -2962,9 +2963,9 @@ namespace GridTools
       };
 
       inline CrossDerivative::CrossDerivative(const unsigned int d0,
-                                              const unsigned int d1) :
-        direction_0(d0),
-        direction_1(d1)
+                                              const unsigned int d1)
+        : direction_0(d0)
+        , direction_1(d1)
       {}
 
 
@@ -3050,10 +3051,10 @@ namespace GridTools
                ExcMessage("This function assumes that the last weight is a "
                           "dependent variable (and hence we cannot take its "
                           "derivative directly)."));
-        Assert(
-          row_n != dependent_direction,
-          ExcMessage("We cannot differentiate with respect to the variable "
-                     "that is assumed to be dependent."));
+        Assert(row_n != dependent_direction,
+               ExcMessage(
+                 "We cannot differentiate with respect to the variable "
+                 "that is assumed to be dependent."));
 
         const Point<spacedim>     manifold_point = f(center);
         const Tensor<1, spacedim> stencil_value  = cross_stencil<structdim>(
@@ -3122,9 +3123,10 @@ namespace GridTools
             for (unsigned int i = 0;
                  i < GeometryInfo<structdim>::vertices_per_cell;
                  ++i)
-              F_k += (x_k - trial_point) * object->vertex(i) *
-                     GeometryInfo<structdim>::d_linear_shape_function_gradient(
-                       xi, i);
+              F_k +=
+                (x_k - trial_point) * object->vertex(i) *
+                GeometryInfo<structdim>::d_linear_shape_function_gradient(xi,
+                                                                          i);
 
             Tensor<2, structdim> H_k;
             for (unsigned int i = 0;
@@ -3540,9 +3542,9 @@ namespace GridTools
     (void)mesh;
     (void)pack;
     (void)unpack;
-    Assert(
-      false,
-      ExcMessage("GridTools::exchange_cell_data_to_ghosts() requires MPI."));
+    Assert(false,
+           ExcMessage(
+             "GridTools::exchange_cell_data_to_ghosts() requires MPI."));
 #    else
     constexpr int dim      = MeshType::dimension;
     constexpr int spacedim = MeshType::space_dimension;
@@ -3589,8 +3591,10 @@ namespace GridTools
           if (send_to.size() > 0)
             {
               // this cell's data needs to be sent to someone
-              typename MeshType::active_cell_iterator mesh_it(
-                tria, cell->level(), cell->index(), &mesh);
+              typename MeshType::active_cell_iterator mesh_it(tria,
+                                                              cell->level(),
+                                                              cell->index(),
+                                                              &mesh);
 
               const boost::optional<DataType> data = pack(mesh_it);
 

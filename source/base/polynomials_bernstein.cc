@@ -43,9 +43,9 @@ namespace
 
 template <typename number>
 PolynomialsBernstein<number>::PolynomialsBernstein(const unsigned int index,
-                                                   const unsigned int degree) :
-  Polynomials::Polynomial<number>(
-    get_bernstein_coefficients<number>(index, degree))
+                                                   const unsigned int degree)
+  : Polynomials::Polynomial<number>(
+      get_bernstein_coefficients<number>(index, degree))
 {}
 
 

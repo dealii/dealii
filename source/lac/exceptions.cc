@@ -26,7 +26,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LACExceptions
 {
-  ExcPETScError::ExcPETScError(const int error_code) : error_code(error_code)
+  ExcPETScError::ExcPETScError(const int error_code)
+    : error_code(error_code)
   {}
 
   void

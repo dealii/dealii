@@ -101,8 +101,10 @@ check()
 
   std::string output_basename = std::to_string(dim) + std::to_string(spacedim);
 
-  DataOutBase::write_hdf5_parallel(
-    patches, data_filter, output_basename + ".h5", MPI_COMM_WORLD);
+  DataOutBase::write_hdf5_parallel(patches,
+                                   data_filter,
+                                   output_basename + ".h5",
+                                   MPI_COMM_WORLD);
 
   const double current_time = 0.0;
   XDMFEntry    entry(output_basename + ".h5",

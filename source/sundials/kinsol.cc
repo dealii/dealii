@@ -152,15 +152,15 @@ namespace SUNDIALS
 
   template <typename VectorType>
   KINSOL<VectorType>::KINSOL(const AdditionalData &data,
-                             const MPI_Comm        mpi_comm) :
-    data(data),
-    kinsol_mem(nullptr),
-    solution(nullptr),
-    u_scale(nullptr),
-    f_scale(nullptr),
-    communicator(is_serial_vector<VectorType>::value ?
-                   MPI_COMM_SELF :
-                   Utilities::MPI::duplicate_communicator(mpi_comm))
+                             const MPI_Comm        mpi_comm)
+    : data(data)
+    , kinsol_mem(nullptr)
+    , solution(nullptr)
+    , u_scale(nullptr)
+    , f_scale(nullptr)
+    , communicator(is_serial_vector<VectorType>::value ?
+                     MPI_COMM_SELF :
+                     Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }

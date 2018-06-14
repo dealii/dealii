@@ -893,10 +893,10 @@ namespace parallel
          */
         unsigned int n_attached_deserialize;
 
-        using pack_callback_t = std::function<void(
-          typename Triangulation<dim, spacedim>::cell_iterator,
-          CellStatus,
-          void *)>;
+        using pack_callback_t = std::function<
+          void(typename Triangulation<dim, spacedim>::cell_iterator,
+               CellStatus,
+               void *)>;
 
         /**
          * List of callback functions registered by register_data_attach() that

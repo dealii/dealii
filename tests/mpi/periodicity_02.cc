@@ -109,7 +109,8 @@ namespace Step22
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>(dim + 1)
+    BoundaryValues()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double
@@ -151,7 +152,8 @@ namespace Step22
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim + 1)
+    RightHandSide()
+      : Function<dim>(dim + 1)
     {}
 
     virtual double
@@ -209,11 +211,11 @@ namespace Step22
     const Matrix &        m,
     const Preconditioner &preconditioner,
     const IndexSet &      locally_owned,
-    const MPI_Comm &      mpi_communicator) :
-    matrix(&m),
-    preconditioner(&preconditioner),
-    mpi_communicator(&mpi_communicator),
-    tmp(locally_owned, mpi_communicator)
+    const MPI_Comm &      mpi_communicator)
+    : matrix(&m)
+    , preconditioner(&preconditioner)
+    , mpi_communicator(&mpi_communicator)
+    , tmp(locally_owned, mpi_communicator)
   {}
 
 
@@ -224,8 +226,10 @@ namespace Step22
     TrilinosWrappers::MPI::Vector &      dst,
     const TrilinosWrappers::MPI::Vector &src) const
   {
-    SolverControl solver_control(
-      src.size(), 1e-6 * src.l2_norm(), false, false);
+    SolverControl              solver_control(src.size(),
+                                 1e-6 * src.l2_norm(),
+                                 false,
+                                 false);
     TrilinosWrappers::SolverCG cg(solver_control,
                                   TrilinosWrappers::SolverCG::AdditionalData());
 
@@ -268,11 +272,11 @@ namespace Step22
       &             A_inverse,
     const IndexSet &owned_vel,
     const IndexSet &relevant_vel,
-    const MPI_Comm &mpi_communicator) :
-    system_matrix(&system_matrix),
-    A_inverse(&A_inverse),
-    tmp1(owned_vel, mpi_communicator),
-    tmp2(tmp1)
+    const MPI_Comm &mpi_communicator)
+    : system_matrix(&system_matrix)
+    , A_inverse(&A_inverse)
+    , tmp1(owned_vel, mpi_communicator)
+    , tmp2(tmp1)
   {}
 
 
@@ -322,8 +326,9 @@ namespace Step22
     DoFRenumbering::component_wise(dof_handler, block_component);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
+                                   dofs_per_block,
+                                   block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -398,12 +403,12 @@ namespace Step22
                                                  relevant_partitioning,
                                                  mpi_communicator);
 
-      DoFTools::make_sparsity_pattern(
-        dof_handler,
-        bsp,
-        constraints,
-        false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      bsp,
+                                      constraints,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(
+                                        mpi_communicator));
 
       bsp.compress();
 
@@ -411,8 +416,9 @@ namespace Step22
     }
 
     system_rhs.reinit(owned_partitioning, mpi_communicator);
-    solution.reinit(
-      owned_partitioning, relevant_partitioning, mpi_communicator);
+    solution.reinit(owned_partitioning,
+                    relevant_partitioning,
+                    mpi_communicator);
   }
 
 
@@ -543,8 +549,10 @@ namespace Step22
         relevant_partitioning[0],
         mpi_communicator);
 
-      SolverControl solver_control(
-        solution.block(1).size(), 1e-6 * schur_rhs.l2_norm(), false, false);
+      SolverControl solver_control(solution.block(1).size(),
+                                   1e-6 * schur_rhs.l2_norm(),
+                                   false,
+                                   false);
       //       TrilinosWrappers::SolverCG    cg (solver_control,
       //                                         TrilinosWrappers::SolverCG::AdditionalData(true));
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
@@ -685,11 +693,10 @@ namespace Step22
     data_out.build_patches(degree + 1);
 
     std::ostringstream filename;
-    filename << "solution-" << Utilities::int_to_string(refinement_cycle, 2)
-             << "."
-             << Utilities::int_to_string(
-                  triangulation.locally_owned_subdomain(), 2)
-             << ".vtu";
+    filename
+      << "solution-" << Utilities::int_to_string(refinement_cycle, 2) << "."
+      << Utilities::int_to_string(triangulation.locally_owned_subdomain(), 2)
+      << ".vtu";
 
     std::ofstream output(filename.str().c_str());
     data_out.write_vtu(output);

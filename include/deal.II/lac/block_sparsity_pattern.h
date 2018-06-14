@@ -982,8 +982,9 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
       unsigned int rowlen =
         sub_objects[row_index.first][b]->row_length(row_index.second);
       if (index < c + rowlen)
-        return block_columns + sub_objects[row_index.first][b]->column_number(
-                                 row_index.second, index - c);
+        return block_columns +
+               sub_objects[row_index.first][b]->column_number(row_index.second,
+                                                              index - c);
       c += rowlen;
       block_columns += sub_objects[row_index.first][b]->n_cols();
     }
