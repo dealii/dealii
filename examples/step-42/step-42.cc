@@ -791,7 +791,7 @@ namespace Step42
       "output directory",
       "",
       Patterns::Anything(),
-      "Directory for output files (graphical output and benchmark "
+      "Directory for output files(graphical output and benchmark "
       "statistics). If empty, use the current directory.");
     prm.declare_entry(
       "transfer solution",

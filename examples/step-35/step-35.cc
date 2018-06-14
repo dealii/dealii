@@ -473,7 +473,7 @@ namespace Step35
                    double,
                    << " The time step " << arg1 << " is out of range."
                    << std::endl
-                   << " The permitted range is (0," << arg2 << "]");
+                   << " The permitted range is(0," << arg2 << "]");
 
     void create_triangulation_and_dofs(const unsigned int n_refines);
 
@@ -744,9 +744,9 @@ namespace Step35
     v_tmp.reinit(dof_handler_velocity.n_dofs());
     rot_u.reinit(dof_handler_velocity.n_dofs());
 
-    std::cout << "dim (X_h) = " << (dof_handler_velocity.n_dofs() * dim)
+    std::cout << "dim(X_h) = " << (dof_handler_velocity.n_dofs() * dim)
               << std::endl
-              << "dim (M_h) = " << dof_handler_pressure.n_dofs() << std::endl
+              << "dim(M_h) = " << dof_handler_pressure.n_dofs() << std::endl
               << "Re        = " << Re << std::endl
               << std::endl;
   }

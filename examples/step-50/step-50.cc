@@ -801,9 +801,9 @@ namespace Step50
          Amg_data.aggregation_threshold = 0.02;
          // Amg_data.symmetric = true;
 
-         prec.initialize (system_matrix,
+         prec.initialize(system_matrix,
                           Amg_data);
-         solver.solve (system_matrix, solution, system_rhs, prec);
+         solver.solve(system_matrix, solution, system_rhs, prec);
         */
       }
     else

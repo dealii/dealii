@@ -213,7 +213,7 @@ namespace Step29
       prm.declare_entry("Output file",
                         "solution",
                         Patterns::Anything(),
-                        "Name of the output file (without extension)");
+                        "Name of the output file(without extension)");
 
       // Since different output formats may require different parameters for
       // generating output (like for example, postscript output needs
@@ -491,7 +491,7 @@ namespace Step29
     // query the number of CPU seconds elapsed since the beginning of the
     // function:
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    deallog << "done(" << timer.cpu_time() << "s)" << std::endl;
 
     deallog << "  Number of active cells:  " << triangulation.n_active_cells()
             << std::endl;
@@ -521,7 +521,7 @@ namespace Step29
     solution.reinit(dof_handler.n_dofs());
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    deallog << "done(" << timer.cpu_time() << "s)" << std::endl;
 
     deallog << "  Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
@@ -749,7 +749,7 @@ namespace Step29
       boundary_values, system_matrix, solution, system_rhs);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    deallog << "done(" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -789,7 +789,7 @@ namespace Step29
     A_direct.vmult(solution, system_rhs);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    deallog << "done(" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -856,7 +856,7 @@ namespace Step29
     data_out.write(output);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    deallog << "done(" << timer.cpu_time() << "s)" << std::endl;
   }
 
 

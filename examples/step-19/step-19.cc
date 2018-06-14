@@ -82,7 +82,7 @@ namespace Step19
       "missing parameters.\n"
       "\n"
       "The parameter file has the following format and allows the following\n"
-      "values (you can cut and paste this and use it for your own parameter\n"
+      "values(you can cut and paste this and use it for your own parameter\n"
       "file):\n"
       "\n";
     std::cout << message;

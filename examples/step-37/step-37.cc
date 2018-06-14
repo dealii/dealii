@@ -1107,7 +1107,7 @@ namespace Step37
 
     constraints.distribute(solution);
 
-    pcout << "Time solve (" << solver_control.last_step()
+    pcout << "Time solve(" << solver_control.last_step()
           << " iterations)  (CPU/wall) " << time.cpu_time() << "s/"
           << time.wall_time() << "s\n";
   }
@@ -1176,7 +1176,7 @@ namespace Step37
       const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
 
       pcout << "Vectorization over " << n_vect_doubles
-            << " doubles = " << n_vect_bits << " bits ("
+            << " doubles = " << n_vect_bits << " bits("
             << Utilities::System::get_current_vectorization_level()
             << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
             << std::endl;

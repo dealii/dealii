@@ -1116,7 +1116,7 @@ namespace Step32
         "Whether to use a Stokes discretization that is locally "
         "conservative at the expense of a larger number of degrees "
         "of freedom, or to go with a cheaper discretization "
-        "that does not locally conserve mass (although it is "
+        "that does not locally conserve mass(although it is "
         "globally conservative.");
     }
     prm.leave_subsection();

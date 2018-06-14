@@ -1115,8 +1115,8 @@ namespace Step33
                           "0.5",
                           Patterns::Double(0, 1),
                           "value for theta that interpolated between explicit "
-                          "Euler (theta=0), Crank-Nicolson (theta=0.5), and "
-                          "implicit Euler (theta=1).");
+                          "Euler(theta=0), Crank-Nicolson(theta=0.5), and "
+                          "implicit Euler(theta=1).");
       }
       prm.leave_subsection();
 
@@ -2437,7 +2437,7 @@ namespace Step33
             const double res_norm = right_hand_side.l2_norm();
             if (std::fabs(res_norm) < 1e-10)
               {
-                std::printf("   %-16.3e (converged)\n\n", res_norm);
+                std::printf("   %-16.3e(converged)\n\n", res_norm);
                 break;
               }
             else

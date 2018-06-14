@@ -1508,7 +1508,7 @@ namespace Step43
 
     if (solve_for_pressure_and_velocity == true)
       {
-        std::cout << "   Solving Darcy (pressure-velocity) system..."
+        std::cout << "   Solving Darcy(pressure-velocity) system..."
                   << std::endl;
 
         assemble_darcy_system();

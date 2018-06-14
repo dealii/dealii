@@ -286,13 +286,13 @@ namespace Step54
             break;
           }
 
-        // @p If surface_projection_kind value is @p DirectionalProjection, we select the
-        // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points
-        // will then initially be generated at the barycenter of the cell/edge
-        // considered, and then projected on the CAD surface along a
-        // direction that is specified to the
-        // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
-        // the projection is done along the y-axis.
+          // @p If surface_projection_kind value is @p DirectionalProjection, we select the
+          // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh
+          // points will then initially be generated at the barycenter of the
+          // cell/edge considered, and then projected on the CAD surface along a
+          // direction that is specified to the
+          // OpenCASCADE::DirectionalProjectionBoundary constructor. In this
+          // case, the projection is done along the y-axis.
         case DirectionalProjection:
           {
             OpenCASCADE::DirectionalProjectionBoundary<2, 3>

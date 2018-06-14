@@ -262,13 +262,13 @@ namespace Step44
         prm.declare_entry("Residual",
                           "1e-6",
                           Patterns::Double(0.0),
-                          "Linear solver residual (scaled by residual norm)");
+                          "Linear solver residual(scaled by residual norm)");
 
         prm.declare_entry(
           "Max iteration multiplier",
           "1",
           Patterns::Double(0.0),
-          "Linear solver iterations (multiples of the system matrix size)");
+          "Linear solver iterations(multiples of the system matrix size)");
 
         prm.declare_entry("Use static condensation",
                           "true",
@@ -1800,8 +1800,8 @@ namespace Step44
         error_residual_norm = error_residual;
         error_residual_norm.normalize(error_residual_0);
 
-        if (newton_iteration > 0 && error_update_norm.u <= parameters.tol_u &&
-            error_residual_norm.u <= parameters.tol_f)
+        if (newton_iteration > 0 &&error_update_norm.u <
+            = parameters.tol_u && error_residual_norm.u <= parameters.tol_f)
           {
             std::cout << " CONVERGED! " << std::endl;
             print_conv_footer();
@@ -2897,8 +2897,8 @@ namespace Step44
         //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
         //              \bigl[
         //                      \mathsf{\mathbf{F}}_{\widetilde{p}}
-        //                      - \mathsf{\mathbf{K}}_{\widetilde{p}u} d
-        //                      \mathsf{\mathbf{u}} \bigr]
+        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d
+        //              \mathsf{\mathbf{u}} \bigr]
         //               \\ \Rightarrow d \widetilde{\mathsf{\mathbf{p}}}
         //              &= \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
         //              \mathsf{\mathbf{F}}_{\widetilde{J}}
