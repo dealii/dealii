@@ -36,11 +36,11 @@ checks() {
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
   if ! [ -x "$(command -v clang-format)" ]; then
-    echo "*** No clang-format program found."
+    echo "***   No clang-format program found."
     echo "***"
-    echo "*** You can run the 'download_clang_format' script or the"
-    echo "*** 'compile_clang_format' script for obtaining a compatible"
-    echo "*** binary and installing to an appropriate directory."
+    echo "***   You can run the './contrib/utilities/download_clang_format'"
+    echo "***   script, or the './contrib/utilities/compile_clang_format' script "
+    echo "***   to install a compatible binary into './contrib/utilities/programs'."
     exit 1
   fi
 
@@ -51,7 +51,12 @@ checks() {
   CLANG_FORMAT_MINOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
 
   if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 6 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 0 ]; then
-    echo "*** Found a version of clang-format different than the required version 6.0."
+    echo "***   This indent script requires clang-format version 6.0,"
+    echo "***   but version ${CLANG_FORMAT_MAJOR_VERSION}.${CLANG_FORMAT_MINOR_VERSION} was found instead."
+    echo "***"
+    echo "***   You can run the './contrib/utilities/download_clang_format'"
+    echo "***   script, or the './contrib/utilities/compile_clang_format' script "
+    echo "***   to install a compatible binary into './contrib/utilities/programs'."
     exit 1
   fi
 }
