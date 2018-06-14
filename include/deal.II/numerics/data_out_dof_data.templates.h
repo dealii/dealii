@@ -629,23 +629,19 @@ namespace internal
     {}
 
 
-    namespace
+    template <typename VectorType>
+    inline typename VectorType::value_type
+    get_vector_element(const VectorType &vector, const unsigned int cell_number)
     {
-      template <typename VectorType>
-      inline typename VectorType::value_type
-      get_vector_element(const VectorType & vector,
-                         const unsigned int cell_number)
-      {
-        return internal::ElementAccess<VectorType>::get(vector, cell_number);
-      }
+      return internal::ElementAccess<VectorType>::get(vector, cell_number);
+    }
 
 
-      inline double
-      get_vector_element(const IndexSet &is, const unsigned int cell_number)
-      {
-        return (is.is_element(cell_number) ? 1 : 0);
-      }
-    } // namespace
+    inline double
+    get_vector_element(const IndexSet &is, const unsigned int cell_number)
+    {
+      return (is.is_element(cell_number) ? 1 : 0);
+    }
 
 
 

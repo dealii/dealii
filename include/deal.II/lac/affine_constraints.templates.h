@@ -1905,120 +1905,116 @@ namespace internal
 {
   namespace AffineConstraintsImplementation
   {
-    namespace
+    typedef types::global_dof_index size_type;
+
+    template <class VectorType>
+    void
+    set_zero_parallel(const std::vector<size_type> &cm,
+                      VectorType &                  vec,
+                      size_type                     shift = 0)
     {
-      typedef types::global_dof_index size_type;
+      Assert(!vec.has_ghost_elements(), ExcInternalError());
+      IndexSet locally_owned = vec.locally_owned_elements();
+      for (typename std::vector<size_type>::const_iterator it = cm.begin();
+           it != cm.end();
+           ++it)
+        {
+          // If shift>0 then we are working on a part of a BlockVector
+          // so vec(i) is actually the global entry i+shift.
+          // We first make sure the line falls into the range of vec,
+          // then check if is part of the local part of the vector, before
+          // finally setting it to 0.
+          if ((*it) < shift)
+            continue;
+          size_type idx = *it - shift;
+          if (idx < vec.size() && locally_owned.is_element(idx))
+            internal::ElementAccess<VectorType>::set(0., idx, vec);
+        }
+    }
 
-      template <class VectorType>
-      void
-      set_zero_parallel(const std::vector<size_type> &cm,
-                        VectorType &                  vec,
-                        size_type                     shift = 0)
-      {
-        Assert(!vec.has_ghost_elements(), ExcInternalError());
-        IndexSet locally_owned = vec.locally_owned_elements();
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end();
-             ++it)
-          {
-            // If shift>0 then we are working on a part of a BlockVector
-            // so vec(i) is actually the global entry i+shift.
-            // We first make sure the line falls into the range of vec,
-            // then check if is part of the local part of the vector, before
-            // finally setting it to 0.
-            if ((*it) < shift)
-              continue;
-            size_type idx = *it - shift;
-            if (idx < vec.size() && locally_owned.is_element(idx))
-              internal::ElementAccess<VectorType>::set(0., idx, vec);
-          }
-      }
+    template <typename number>
+    void
+    set_zero_parallel(const std::vector<size_type> &              cm,
+                      LinearAlgebra::distributed::Vector<number> &vec,
+                      size_type                                   shift = 0)
+    {
+      for (typename std::vector<size_type>::const_iterator it = cm.begin();
+           it != cm.end();
+           ++it)
+        {
+          // If shift>0 then we are working on a part of a BlockVector
+          // so vec(i) is actually the global entry i+shift.
+          // We first make sure the line falls into the range of vec,
+          // then check if is part of the local part of the vector, before
+          // finally setting it to 0.
+          if ((*it) < shift)
+            continue;
+          size_type idx = *it - shift;
+          if (vec.in_local_range(idx))
+            vec(idx) = 0.;
+        }
+      vec.zero_out_ghosts();
+    }
 
-      template <typename number>
-      void
-      set_zero_parallel(const std::vector<size_type> &              cm,
-                        LinearAlgebra::distributed::Vector<number> &vec,
-                        size_type                                   shift = 0)
-      {
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end();
-             ++it)
-          {
-            // If shift>0 then we are working on a part of a BlockVector
-            // so vec(i) is actually the global entry i+shift.
-            // We first make sure the line falls into the range of vec,
-            // then check if is part of the local part of the vector, before
-            // finally setting it to 0.
-            if ((*it) < shift)
-              continue;
-            size_type idx = *it - shift;
-            if (vec.in_local_range(idx))
-              vec(idx) = 0.;
-          }
-        vec.zero_out_ghosts();
-      }
+    template <class VectorType>
+    void
+    set_zero_in_parallel(const std::vector<size_type> &cm,
+                         VectorType &                  vec,
+                         std::integral_constant<bool, false>)
+    {
+      set_zero_parallel(cm, vec, 0);
+    }
 
-      template <class VectorType>
-      void
-      set_zero_in_parallel(const std::vector<size_type> &cm,
-                           VectorType &                  vec,
-                           std::integral_constant<bool, false>)
-      {
-        set_zero_parallel(cm, vec, 0);
-      }
+    // in parallel for BlockVectors
+    template <class VectorType>
+    void
+    set_zero_in_parallel(const std::vector<size_type> &cm,
+                         VectorType &                  vec,
+                         std::integral_constant<bool, true>)
+    {
+      size_type start_shift = 0;
+      for (size_type j = 0; j < vec.n_blocks(); ++j)
+        {
+          set_zero_parallel(cm, vec.block(j), start_shift);
+          start_shift += vec.block(j).size();
+        }
+    }
 
-      // in parallel for BlockVectors
-      template <class VectorType>
-      void
-      set_zero_in_parallel(const std::vector<size_type> &cm,
-                           VectorType &                  vec,
-                           std::integral_constant<bool, true>)
-      {
-        size_type start_shift = 0;
-        for (size_type j = 0; j < vec.n_blocks(); ++j)
-          {
-            set_zero_parallel(cm, vec.block(j), start_shift);
-            start_shift += vec.block(j).size();
-          }
-      }
+    template <class VectorType>
+    void
+    set_zero_serial(const std::vector<size_type> &cm, VectorType &vec)
+    {
+      for (typename std::vector<size_type>::const_iterator it = cm.begin();
+           it != cm.end();
+           ++it)
+        vec(*it) = 0.;
+    }
 
-      template <class VectorType>
-      void
-      set_zero_serial(const std::vector<size_type> &cm, VectorType &vec)
-      {
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end();
-             ++it)
-          vec(*it) = 0.;
-      }
+    template <class VectorType>
+    void
+    set_zero_all(const std::vector<size_type> &cm, VectorType &vec)
+    {
+      set_zero_in_parallel<VectorType>(
+        cm,
+        vec,
+        std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+      vec.compress(VectorOperation::insert);
+    }
 
-      template <class VectorType>
-      void
-      set_zero_all(const std::vector<size_type> &cm, VectorType &vec)
-      {
-        set_zero_in_parallel<VectorType>(
-          cm,
-          vec,
-          std::integral_constant<bool, IsBlockVector<VectorType>::value>());
-        vec.compress(VectorOperation::insert);
-      }
+    template <class T>
+    void
+    set_zero_all(const std::vector<size_type> &cm, dealii::Vector<T> &vec)
+    {
+      set_zero_serial(cm, vec);
+    }
 
-      template <class T>
-      void
-      set_zero_all(const std::vector<size_type> &cm, dealii::Vector<T> &vec)
-      {
-        set_zero_serial(cm, vec);
-      }
-
-      template <class T>
-      void
-      set_zero_all(const std::vector<size_type> &cm,
-                   dealii::BlockVector<T> &      vec)
-      {
-        set_zero_serial(cm, vec);
-      }
-    } // namespace
-  }   // namespace AffineConstraintsImplementation
+    template <class T>
+    void
+    set_zero_all(const std::vector<size_type> &cm, dealii::BlockVector<T> &vec)
+    {
+      set_zero_serial(cm, vec);
+    }
+  } // namespace AffineConstraintsImplementation
 } // namespace internal
 
 template <typename number>
@@ -2160,115 +2156,112 @@ AffineConstraints<number>::distribute_local_to_global(
 
 namespace internal
 {
-  namespace
-  {
-    // create an output vector that consists of the input vector's locally owned
-    // elements plus some ghost elements that need to be imported from elsewhere
-    //
-    // this is an operation that is different for all vector types and so we
-    // need a few overloads
+  // create an output vector that consists of the input vector's locally owned
+  // elements plus some ghost elements that need to be imported from elsewhere
+  //
+  // this is an operation that is different for all vector types and so we
+  // need a few overloads
 #ifdef DEAL_II_WITH_TRILINOS
-    void
-    import_vector_with_ghost_elements(
-      const TrilinosWrappers::MPI::Vector &vec,
-      const IndexSet & /*locally_owned_elements*/,
-      const IndexSet &               needed_elements,
-      TrilinosWrappers::MPI::Vector &output,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
-    {
-      Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
+  void
+  import_vector_with_ghost_elements(
+    const TrilinosWrappers::MPI::Vector &vec,
+    const IndexSet & /*locally_owned_elements*/,
+    const IndexSet &               needed_elements,
+    TrilinosWrappers::MPI::Vector &output,
+    const std::integral_constant<bool, false> /*is_block_vector*/)
+  {
+    Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
 #  ifdef DEAL_II_WITH_MPI
-      const Epetra_MpiComm *mpi_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
+    const Epetra_MpiComm *mpi_comm =
+      dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
-      Assert(mpi_comm != nullptr, ExcInternalError());
-      output.reinit(needed_elements, mpi_comm->GetMpiComm());
+    Assert(mpi_comm != nullptr, ExcInternalError());
+    output.reinit(needed_elements, mpi_comm->GetMpiComm());
 #  else
-      output.reinit(needed_elements, MPI_COMM_SELF);
+    output.reinit(needed_elements, MPI_COMM_SELF);
 #  endif
-      output = vec;
-    }
+    output = vec;
+  }
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-    void
-    import_vector_with_ghost_elements(
-      const PETScWrappers::MPI::Vector &vec,
-      const IndexSet &                  locally_owned_elements,
-      const IndexSet &                  needed_elements,
-      PETScWrappers::MPI::Vector &      output,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
-    {
-      output.reinit(locally_owned_elements,
-                    needed_elements,
-                    vec.get_mpi_communicator());
-      output = vec;
-    }
+  void
+  import_vector_with_ghost_elements(
+    const PETScWrappers::MPI::Vector &vec,
+    const IndexSet &                  locally_owned_elements,
+    const IndexSet &                  needed_elements,
+    PETScWrappers::MPI::Vector &      output,
+    const std::integral_constant<bool, false> /*is_block_vector*/)
+  {
+    output.reinit(locally_owned_elements,
+                  needed_elements,
+                  vec.get_mpi_communicator());
+    output = vec;
+  }
 #endif
 
-    template <typename number>
-    void
-    import_vector_with_ghost_elements(
-      const LinearAlgebra::distributed::Vector<number> &vec,
-      const IndexSet &                                  locally_owned_elements,
-      const IndexSet &                                  needed_elements,
-      LinearAlgebra::distributed::Vector<number> &      output,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
-    {
-      // TODO: the in vector might already have all elements. need to find a
-      // way to efficiently avoid the copy then
-      const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
-        .zero_out_ghosts();
-      output.reinit(locally_owned_elements,
-                    needed_elements,
-                    vec.get_mpi_communicator());
-      output = vec;
-      output.update_ghost_values();
-    }
+  template <typename number>
+  void
+  import_vector_with_ghost_elements(
+    const LinearAlgebra::distributed::Vector<number> &vec,
+    const IndexSet &                                  locally_owned_elements,
+    const IndexSet &                                  needed_elements,
+    LinearAlgebra::distributed::Vector<number> &      output,
+    const std::integral_constant<bool, false> /*is_block_vector*/)
+  {
+    // TODO: the in vector might already have all elements. need to find a
+    // way to efficiently avoid the copy then
+    const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
+      .zero_out_ghosts();
+    output.reinit(locally_owned_elements,
+                  needed_elements,
+                  vec.get_mpi_communicator());
+    output = vec;
+    output.update_ghost_values();
+  }
 
-    // all other vector non-block vector types are sequential and we should
-    // not have this function called at all -- so throw an exception
-    template <typename Vector>
-    void
-    import_vector_with_ghost_elements(
-      const Vector & /*vec*/,
-      const IndexSet & /*locally_owned_elements*/,
-      const IndexSet & /*needed_elements*/,
-      Vector & /*output*/,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
-    {
-      Assert(false, ExcMessage("We shouldn't even get here!"));
-    }
+  // all other vector non-block vector types are sequential and we should
+  // not have this function called at all -- so throw an exception
+  template <typename Vector>
+  void
+  import_vector_with_ghost_elements(
+    const Vector & /*vec*/,
+    const IndexSet & /*locally_owned_elements*/,
+    const IndexSet & /*needed_elements*/,
+    Vector & /*output*/,
+    const std::integral_constant<bool, false> /*is_block_vector*/)
+  {
+    Assert(false, ExcMessage("We shouldn't even get here!"));
+  }
 
-    // for block vectors, simply dispatch to the individual blocks
-    template <class VectorType>
-    void
-    import_vector_with_ghost_elements(
-      const VectorType &vec,
-      const IndexSet &  locally_owned_elements,
-      const IndexSet &  needed_elements,
-      VectorType &      output,
-      const std::integral_constant<bool, true> /*is_block_vector*/)
-    {
-      output.reinit(vec.n_blocks());
+  // for block vectors, simply dispatch to the individual blocks
+  template <class VectorType>
+  void
+  import_vector_with_ghost_elements(
+    const VectorType &vec,
+    const IndexSet &  locally_owned_elements,
+    const IndexSet &  needed_elements,
+    VectorType &      output,
+    const std::integral_constant<bool, true> /*is_block_vector*/)
+  {
+    output.reinit(vec.n_blocks());
 
-      types::global_dof_index block_start = 0;
-      for (unsigned int b = 0; b < vec.n_blocks(); ++b)
-        {
-          import_vector_with_ghost_elements(
-            vec.block(b),
-            locally_owned_elements.get_view(block_start,
-                                            block_start + vec.block(b).size()),
-            needed_elements.get_view(block_start,
-                                     block_start + vec.block(b).size()),
-            output.block(b),
-            std::integral_constant<bool, false>());
-          block_start += vec.block(b).size();
-        }
+    types::global_dof_index block_start = 0;
+    for (unsigned int b = 0; b < vec.n_blocks(); ++b)
+      {
+        import_vector_with_ghost_elements(
+          vec.block(b),
+          locally_owned_elements.get_view(block_start,
+                                          block_start + vec.block(b).size()),
+          needed_elements.get_view(block_start,
+                                   block_start + vec.block(b).size()),
+          output.block(b),
+          std::integral_constant<bool, false>());
+        block_start += vec.block(b).size();
+      }
 
-      output.collect_sizes();
-    }
-  } // namespace
+    output.collect_sizes();
+  }
 } // namespace internal
 
 template <typename number>

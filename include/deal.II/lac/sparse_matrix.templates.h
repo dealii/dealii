@@ -1383,35 +1383,39 @@ SparseMatrix<number>::residual(Vector<somenumber> &      dst,
 }
 
 
-namespace
+namespace internal
 {
-  // assert that the matrix has no zeros on the diagonal. this is important
-  // for preconditioners such as Jacobi or SSOR
-  template <typename number>
-  void
-  AssertNoZerosOnDiagonal(const SparseMatrix<number> &matrix)
+  namespace SparseMatrixImplementation
   {
+    // assert that the matrix has no zeros on the diagonal. this is important
+    // for preconditioners such as Jacobi or SSOR
+    template <typename number>
+    void
+    AssertNoZerosOnDiagonal(const SparseMatrix<number> &matrix)
+    {
 #ifdef DEBUG
-    for (typename SparseMatrix<number>::size_type row = 0; row < matrix.m();
-         ++row)
-      Assert(matrix.diag_element(row) != number(),
-             ExcMessage("There is a zero on the diagonal of this matrix "
-                        "in row " +
-                        Utilities::to_string(row) +
-                        ". The preconditioner you selected cannot work if that "
-                        "is the case because one of its steps requires "
-                        "division by the diagonal elements of the matrix."
-                        "\n\n"
-                        "You should check whether you have correctly "
-                        "assembled the matrix that you use for this "
-                        "preconditioner. If it is correct that there are "
-                        "zeros on the diagonal, then you will have to chose "
-                        "a different preconditioner."));
+      for (typename SparseMatrix<number>::size_type row = 0; row < matrix.m();
+           ++row)
+        Assert(matrix.diag_element(row) != number(),
+               ExcMessage(
+                 "There is a zero on the diagonal of this matrix "
+                 "in row " +
+                 Utilities::to_string(row) +
+                 ". The preconditioner you selected cannot work if that "
+                 "is the case because one of its steps requires "
+                 "division by the diagonal elements of the matrix."
+                 "\n\n"
+                 "You should check whether you have correctly "
+                 "assembled the matrix that you use for this "
+                 "preconditioner. If it is correct that there are "
+                 "zeros on the diagonal, then you will have to chose "
+                 "a different preconditioner."));
 #else
-    (void)matrix;
+      (void)matrix;
 #endif
-  }
-} // namespace
+    }
+  } // namespace SparseMatrixImplementation
+} // namespace internal
 
 
 template <typename number>
@@ -1427,7 +1431,7 @@ SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
   AssertDimension(dst.size(), n());
   AssertDimension(src.size(), n());
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   const size_type    n            = src.size();
   somenumber *       dst_ptr      = dst.begin();
@@ -1474,7 +1478,7 @@ SparseMatrix<number>::precondition_SSOR(
   AssertDimension(dst.size(), n());
   AssertDimension(src.size(), n());
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   const size_type    n            = src.size();
   const std::size_t *rowstart_ptr = &cols->rowstart[0];
@@ -1628,7 +1632,7 @@ SparseMatrix<number>::SOR(Vector<somenumber> &dst, const number om) const
   AssertDimension(m(), n());
   AssertDimension(dst.size(), n());
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   for (size_type row = 0; row < m(); ++row)
     {
@@ -1655,7 +1659,7 @@ SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number om) const
   AssertDimension(m(), n());
   AssertDimension(dst.size(), n());
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   size_type row = m() - 1;
   while (true)
@@ -1693,7 +1697,7 @@ SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
   Assert(m() == inverse_permutation.size(),
          ExcDimensionMismatch(m(), inverse_permutation.size()));
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   for (size_type urow = 0; urow < m(); ++urow)
     {
@@ -1732,7 +1736,7 @@ SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
   Assert(m() == inverse_permutation.size(),
          ExcDimensionMismatch(m(), inverse_permutation.size()));
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   for (size_type urow = m(); urow != 0;)
     {
@@ -1796,7 +1800,7 @@ SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
   Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
   Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   for (size_type row = 0; row < m(); ++row)
     {
@@ -1824,7 +1828,7 @@ SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
   Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
   Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   for (int row = m() - 1; row >= 0; --row)
     {
@@ -1866,7 +1870,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
   AssertDimension(m(), n());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
 
-  AssertNoZerosOnDiagonal(*this);
+  internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   const size_type n = dst.size();
   size_type       j;

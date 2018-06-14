@@ -984,7 +984,7 @@ namespace internal
 
 
 
-    namespace
+    namespace internal
     {
       // rudimentary version of a vector that keeps entries always ordered
       class ordered_vector : public std::vector<types::global_dof_index>
@@ -1146,7 +1146,7 @@ namespace internal
                                      row_entries.end());
           }
       }
-    } // namespace
+    } // namespace internal
 
 
 
@@ -1166,10 +1166,11 @@ namespace internal
 
       // first determine row lengths
       std::vector<unsigned int>   row_lengths(n_rows);
-      std::vector<Threads::Mutex> mutexes(n_rows / bucket_size_threading + 1);
+      std::vector<Threads::Mutex> mutexes(
+        n_rows / internal::bucket_size_threading + 1);
       parallel::apply_to_subranges(0,
                                    task_info.n_active_cells,
-                                   std::bind(&compute_row_lengths,
+                                   std::bind(&internal::compute_row_lengths,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              std::cref(*this),
@@ -1191,7 +1192,7 @@ namespace internal
                                        row_lengths);
       parallel::apply_to_subranges(0,
                                    task_info.n_active_cells,
-                                   std::bind(&fill_connectivity_dofs,
+                                   std::bind(&internal::fill_connectivity_dofs,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              std::cref(*this),
@@ -1212,7 +1213,7 @@ namespace internal
       // for cell renumbering[j] in the original ordering.
       parallel::apply_to_subranges(0,
                                    task_info.n_active_cells,
-                                   std::bind(&fill_connectivity,
+                                   std::bind(&internal::fill_connectivity,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              std::cref(*this),

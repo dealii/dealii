@@ -43,151 +43,154 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  /**
-   * Adjust vectors on all levels to correct size.  Here, we just count the
-   * numbers of degrees of freedom on each level and @p reinit each level
-   * vector to this length. For compatibility reasons with the next function
-   * the target_component is added here but is not used.
-   */
-  template <int dim, typename number, int spacedim>
-  void
-  reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-                const std::vector<unsigned int> &,
-                MGLevelObject<dealii::Vector<number>> &v)
+  namespace MGTransfer
   {
-    for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
-      {
-        unsigned int n = mg_dof.n_dofs(level);
-        v[level].reinit(n);
-      }
-  }
+    /**
+     * Adjust vectors on all levels to correct size.  Here, we just count the
+     * numbers of degrees of freedom on each level and @p reinit each level
+     * vector to this length. For compatibility reasons with the next function
+     * the target_component is added here but is not used.
+     */
+    template <int dim, typename number, int spacedim>
+    void
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+                  const std::vector<unsigned int> &,
+                  MGLevelObject<dealii::Vector<number>> &v)
+    {
+      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
+        {
+          unsigned int n = mg_dof.n_dofs(level);
+          v[level].reinit(n);
+        }
+    }
 
-  /**
-   * Adjust vectors on all levels to correct size.  Here, we just count the
-   * numbers of degrees of freedom on each level and @p reinit each level
-   * vector to this length. The target_component is handed to
-   * MGTools::count_dofs_per_block. See for documentation there.
-   */
-  template <int dim, typename number, int spacedim>
-  void
-  reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-                std::vector<unsigned int>                target_component,
-                MGLevelObject<BlockVector<number>> &     v)
-  {
-    const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
-    if (target_component.size() == 0)
-      {
-        target_component.resize(n_blocks);
-        for (unsigned int i = 0; i < n_blocks; ++i)
-          target_component[i] = i;
-      }
-    Assert(target_component.size() == n_blocks,
-           ExcDimensionMismatch(target_component.size(), n_blocks));
-    const unsigned int max_block =
-      *std::max_element(target_component.begin(), target_component.end());
-    const unsigned int n_target_blocks = max_block + 1;
+    /**
+     * Adjust vectors on all levels to correct size.  Here, we just count the
+     * numbers of degrees of freedom on each level and @p reinit each level
+     * vector to this length. The target_component is handed to
+     * MGTools::count_dofs_per_block. See for documentation there.
+     */
+    template <int dim, typename number, int spacedim>
+    void
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+                  std::vector<unsigned int>                target_component,
+                  MGLevelObject<BlockVector<number>> &     v)
+    {
+      const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+      if (target_component.size() == 0)
+        {
+          target_component.resize(n_blocks);
+          for (unsigned int i = 0; i < n_blocks; ++i)
+            target_component[i] = i;
+        }
+      Assert(target_component.size() == n_blocks,
+             ExcDimensionMismatch(target_component.size(), n_blocks));
+      const unsigned int max_block =
+        *std::max_element(target_component.begin(), target_component.end());
+      const unsigned int n_target_blocks = max_block + 1;
 
-    std::vector<std::vector<types::global_dof_index>> ndofs(
-      mg_dof.get_triangulation().n_levels(),
-      std::vector<types::global_dof_index>(n_target_blocks));
-    MGTools::count_dofs_per_block(mg_dof, ndofs, target_component);
+      std::vector<std::vector<types::global_dof_index>> ndofs(
+        mg_dof.get_triangulation().n_levels(),
+        std::vector<types::global_dof_index>(n_target_blocks));
+      MGTools::count_dofs_per_block(mg_dof, ndofs, target_component);
 
-    for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
-      {
-        v[level].reinit(n_target_blocks);
-        for (unsigned int b = 0; b < n_target_blocks; ++b)
-          v[level].block(b).reinit(ndofs[level][b]);
-        v[level].collect_sizes();
-      }
-  }
+      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
+        {
+          v[level].reinit(n_target_blocks);
+          for (unsigned int b = 0; b < n_target_blocks; ++b)
+            v[level].block(b).reinit(ndofs[level][b]);
+          v[level].collect_sizes();
+        }
+    }
 
-  /**
-   * Adjust vectors on all levels to correct size.  Here, we just count the
-   * numbers of degrees of freedom on each level and @p reinit each level
-   * vector to this length.
-   */
-  template <int dim, typename number, int spacedim>
-  void
-  reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-                const std::vector<unsigned int> &,
-                MGLevelObject<LinearAlgebra::distributed::Vector<number>> &v)
-  {
-    const parallel::Triangulation<dim, spacedim> *tria =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-        &mg_dof.get_triangulation()));
+    /**
+     * Adjust vectors on all levels to correct size.  Here, we just count the
+     * numbers of degrees of freedom on each level and @p reinit each level
+     * vector to this length.
+     */
+    template <int dim, typename number, int spacedim>
+    void
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+                  const std::vector<unsigned int> &,
+                  MGLevelObject<LinearAlgebra::distributed::Vector<number>> &v)
+    {
+      const parallel::Triangulation<dim, spacedim> *tria =
+        (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          &mg_dof.get_triangulation()));
 
-    for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
-      {
-        if (v[level].size() != mg_dof.locally_owned_mg_dofs(level).size() ||
-            v[level].local_size() !=
-              mg_dof.locally_owned_mg_dofs(level).n_elements())
-          v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
-                          tria != nullptr ? tria->get_communicator() :
-                                            MPI_COMM_SELF);
-        else
-          v[level] = 0.;
-      }
-  }
+      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
+        {
+          if (v[level].size() != mg_dof.locally_owned_mg_dofs(level).size() ||
+              v[level].local_size() !=
+                mg_dof.locally_owned_mg_dofs(level).n_elements())
+            v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
+                            tria != nullptr ? tria->get_communicator() :
+                                              MPI_COMM_SELF);
+          else
+            v[level] = 0.;
+        }
+    }
 
 
 #ifdef DEAL_II_WITH_TRILINOS
-  /**
-   * Adjust vectors on all levels to correct size.  Here, we just count the
-   * numbers of degrees of freedom on each level and @p reinit each level
-   * vector to this length.
-   */
-  template <int dim, int spacedim>
-  void
-  reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-                const std::vector<unsigned int> &,
-                MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
-  {
-    const dealii::parallel::Triangulation<dim, spacedim> *tria =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-        &mg_dof.get_triangulation()));
-    AssertThrow(
-      tria != nullptr,
-      ExcMessage(
-        "multigrid with Trilinos vectors only works with a parallel Triangulation!"));
+    /**
+     * Adjust vectors on all levels to correct size.  Here, we just count the
+     * numbers of degrees of freedom on each level and @p reinit each level
+     * vector to this length.
+     */
+    template <int dim, int spacedim>
+    void
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+                  const std::vector<unsigned int> &,
+                  MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
+    {
+      const dealii::parallel::Triangulation<dim, spacedim> *tria =
+        (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          &mg_dof.get_triangulation()));
+      AssertThrow(
+        tria != nullptr,
+        ExcMessage(
+          "multigrid with Trilinos vectors only works with a parallel Triangulation!"));
 
-    for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
-      {
-        v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
-                        tria->get_communicator());
-      }
-  }
+      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
+        {
+          v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
+                          tria->get_communicator());
+        }
+    }
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-  /**
-   * Adjust vectors on all levels to correct size.  Here, we just count the
-   * numbers of degrees of freedom on each level and @p reinit each level
-   * vector to this length.
-   */
-  template <int dim, int spacedim>
-  void
-  reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-                const std::vector<unsigned int> &,
-                MGLevelObject<PETScWrappers::MPI::Vector> &v)
-  {
-    const dealii::parallel::Triangulation<dim, spacedim> *tria =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-        &mg_dof.get_triangulation()));
-    AssertThrow(
-      tria != nullptr,
-      ExcMessage(
-        "multigrid with parallel PETSc vectors only works with a parallel Triangulation!"));
+    /**
+     * Adjust vectors on all levels to correct size.  Here, we just count the
+     * numbers of degrees of freedom on each level and @p reinit each level
+     * vector to this length.
+     */
+    template <int dim, int spacedim>
+    void
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+                  const std::vector<unsigned int> &,
+                  MGLevelObject<PETScWrappers::MPI::Vector> &v)
+    {
+      const dealii::parallel::Triangulation<dim, spacedim> *tria =
+        (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          &mg_dof.get_triangulation()));
+      AssertThrow(
+        tria != nullptr,
+        ExcMessage(
+          "multigrid with parallel PETSc vectors only works with a parallel Triangulation!"));
 
-    for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
-      {
-        v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
-                        tria->get_communicator());
-      }
-  }
+      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
+        {
+          v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
+                          tria->get_communicator());
+        }
+    }
 #endif
-} // namespace
+  } // namespace MGTransfer
+} // namespace internal
 
 
 
@@ -241,7 +244,9 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
   AssertIndexRange(dst.max_level(),
                    mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
-  reinit_vector(mg_dof_handler, component_to_block_map, dst);
+  internal::MGTransfer::reinit_vector(mg_dof_handler,
+                                      component_to_block_map,
+                                      dst);
 #ifdef DEBUG_OUTPUT
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
   int ierr = MPI_Barrier(MPI_COMM_WORLD);
@@ -456,7 +461,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   AssertIndexRange(dst.max_level(),
                    mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
-  reinit_vector(mg_dof_handler, component_to_block_map, dst);
+  internal::MGTransfer::reinit_vector(mg_dof_handler,
+                                      component_to_block_map,
+                                      dst);
 
   if (perform_plain_copy)
     {

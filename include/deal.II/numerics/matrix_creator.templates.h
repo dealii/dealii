@@ -1437,7 +1437,7 @@ namespace MatrixCreator
 
 
 
-  namespace
+  namespace internal
   {
     template <int dim, int spacedim, typename number>
     void
@@ -1799,7 +1799,7 @@ namespace MatrixCreator
             }
         }
     }
-  } // namespace
+  } // namespace internal
 
 
 
@@ -1888,25 +1888,27 @@ namespace MatrixCreator
         MatrixCreator::internal::AssemblerBoundary::Scratch const &,
         MatrixCreator::internal::AssemblerBoundary::
           CopyData<hp::DoFHandler<dim, spacedim>, number> &)>>(
-        std::bind(&create_hp_boundary_mass_matrix_1<dim, spacedim, number>,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3,
-                  std::cref(mapping),
-                  std::cref(fe_collection),
-                  std::cref(q),
-                  std::cref(boundary_functions),
-                  coefficient,
-                  std::cref(component_mapping))),
+        std::bind(
+          &internal::create_hp_boundary_mass_matrix_1<dim, spacedim, number>,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3,
+          std::cref(mapping),
+          std::cref(fe_collection),
+          std::cref(q),
+          std::cref(boundary_functions),
+          coefficient,
+          std::cref(component_mapping))),
       static_cast<std::function<void(
         MatrixCreator::internal::AssemblerBoundary ::
           CopyData<hp::DoFHandler<dim, spacedim>, number> const &)>>(
-        std::bind(&copy_hp_boundary_mass_matrix_1<dim, spacedim, number>,
-                  std::placeholders::_1,
-                  std::cref(boundary_functions),
-                  std::cref(dof_to_boundary_mapping),
-                  std::ref(matrix),
-                  std::ref(rhs_vector))),
+        std::bind(
+          &internal::copy_hp_boundary_mass_matrix_1<dim, spacedim, number>,
+          std::placeholders::_1,
+          std::cref(boundary_functions),
+          std::cref(dof_to_boundary_mapping),
+          std::ref(matrix),
+          std::ref(rhs_vector))),
       scratch,
       copy_data);
   }

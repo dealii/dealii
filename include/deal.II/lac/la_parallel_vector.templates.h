@@ -233,10 +233,8 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::Vector_copy<Number, Number>
             copier(v.values.get(), values.get());
-          internal::VectorOperations::parallel_for(copier,
-                                                   0,
-                                                   partitioner->local_size(),
-                                                   thread_loop_partitioner);
+          dealii::internal::VectorOperations::parallel_for(
+            copier, 0, partitioner->local_size(), thread_loop_partitioner);
         }
     }
 
@@ -372,10 +370,8 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::Vector_copy<Number, Number2>
             copier(c.values.get(), values.get());
-          internal::VectorOperations::parallel_for(copier,
-                                                   0,
-                                                   this_size,
-                                                   thread_loop_partitioner);
+          dealii::internal::VectorOperations::parallel_for(
+            copier, 0, this_size, thread_loop_partitioner);
         }
 
       if (must_update_ghost_values)
@@ -397,10 +393,8 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::Vector_copy<Number, Number2>
             copier(src.values.get(), values.get());
-          internal::VectorOperations::parallel_for(copier,
-                                                   0,
-                                                   partitioner->local_size(),
-                                                   thread_loop_partitioner);
+          dealii::internal::VectorOperations::parallel_for(
+            copier, 0, partitioner->local_size(), thread_loop_partitioner);
         }
     }
 
@@ -771,13 +765,11 @@ namespace LinearAlgebra
       const size_type this_size = local_size();
       if (this_size > 0)
         {
-          internal::VectorOperations::Vector_set<Number> setter(s,
-                                                                values.get());
+          dealii::internal::VectorOperations::Vector_set<Number> setter(
+            s, values.get());
 
-          internal::VectorOperations::parallel_for(setter,
-                                                   0,
-                                                   this_size,
-                                                   thread_loop_partitioner);
+          dealii::internal::VectorOperations::parallel_for(
+            setter, 0, this_size, thread_loop_partitioner);
         }
 
       // if we call Vector::operator=0, we want to zero out all the entries
@@ -816,12 +808,10 @@ namespace LinearAlgebra
 
       AssertDimension(local_size(), v.local_size());
 
-      internal::VectorOperations::Vectorization_add_v<Number> vector_add(
-        values.get(), v.values.get());
-      internal::VectorOperations::parallel_for(vector_add,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_add_v<Number>
+        vector_add(values.get(), v.values.get());
+      dealii::internal::VectorOperations::parallel_for(
+        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -842,12 +832,10 @@ namespace LinearAlgebra
 
       AssertDimension(local_size(), v.local_size());
 
-      internal::VectorOperations::Vectorization_subtract_v<Number>
+      dealii::internal::VectorOperations::Vectorization_subtract_v<Number>
         vector_subtract(values.get(), v.values.get());
-      internal::VectorOperations::parallel_for(vector_subtract,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_subtract, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -863,12 +851,10 @@ namespace LinearAlgebra
     {
       AssertIsFinite(a);
 
-      internal::VectorOperations::Vectorization_add_factor<Number> vector_add(
-        values.get(), a);
-      internal::VectorOperations::parallel_for(vector_add,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_add_factor<Number>
+        vector_add(values.get(), a);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -893,12 +879,10 @@ namespace LinearAlgebra
       if (a == Number(0.))
         return;
 
-      internal::VectorOperations::Vectorization_add_av<Number> vector_add(
-        values.get(), v.values.get(), a);
-      internal::VectorOperations::parallel_for(vector_add,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_add_av<Number>
+        vector_add(values.get(), v.values.get(), a);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
     }
 
 
@@ -936,12 +920,10 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
       AssertDimension(local_size(), w.local_size());
 
-      internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(
-        values.get(), v.values.get(), w.values.get(), a, b);
-      internal::VectorOperations::parallel_for(vector_add,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_add_avpbw<Number>
+        vector_add(values.get(), v.values.get(), w.values.get(), a, b);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_add, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -969,12 +951,10 @@ namespace LinearAlgebra
       AssertIsFinite(x);
       AssertDimension(local_size(), v.local_size());
 
-      internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(
-        values.get(), v.values.get(), x);
-      internal::VectorOperations::parallel_for(vector_sadd,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_sadd_xv<Number>
+        vector_sadd(values.get(), v.values.get(), x);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_sadd, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -997,12 +977,10 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension(local_size(), v.local_size());
 
-      internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd(
-        values.get(), v.values.get(), a, x);
-      internal::VectorOperations::parallel_for(vector_sadd,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_sadd_xav<Number>
+        vector_sadd(values.get(), v.values.get(), a, x);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_sadd, 0, partitioner->local_size(), thread_loop_partitioner);
     }
 
 
@@ -1036,12 +1014,10 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
       AssertDimension(local_size(), w.local_size());
 
-      internal::VectorOperations::Vectorization_sadd_xavbw<Number> vector_sadd(
-        values.get(), v.values.get(), w.values.get(), x, a, b);
-      internal::VectorOperations::parallel_for(vector_sadd,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_sadd_xavbw<Number>
+        vector_sadd(values.get(), v.values.get(), w.values.get(), x, a, b);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_sadd, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1054,13 +1030,11 @@ namespace LinearAlgebra
     Vector<Number>::operator*=(const Number factor)
     {
       AssertIsFinite(factor);
-      internal::VectorOperations::Vectorization_multiply_factor<Number>
+      dealii::internal::VectorOperations::Vectorization_multiply_factor<Number>
         vector_multiply(values.get(), factor);
 
-      internal::VectorOperations::parallel_for(vector_multiply,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_multiply, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1091,12 +1065,10 @@ namespace LinearAlgebra
 
       AssertDimension(local_size(), v.local_size());
 
-      internal::VectorOperations::Vectorization_scale<Number> vector_scale(
-        values.get(), v.values.get());
-      internal::VectorOperations::parallel_for(vector_scale,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_scale<Number>
+        vector_scale(values.get(), v.values.get());
+      dealii::internal::VectorOperations::parallel_for(
+        vector_scale, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1116,12 +1088,10 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension(local_size(), v.local_size());
 
-      internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
-        values.get(), v.values.get(), a);
-      internal::VectorOperations::parallel_for(vector_equ,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_equ_au<Number>
+        vector_equ(values.get(), v.values.get(), a);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_equ, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1142,12 +1112,10 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
       AssertDimension(local_size(), w.local_size());
 
-      internal::VectorOperations::Vectorization_equ_aubv<Number> vector_equ(
-        values.get(), v.values.get(), w.values.get(), a, b);
-      internal::VectorOperations::parallel_for(vector_equ,
-                                               0,
-                                               partitioner->local_size(),
-                                               thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vectorization_equ_aubv<Number>
+        vector_equ(values.get(), v.values.get(), w.values.get(), a, b);
+      dealii::internal::VectorOperations::parallel_for(
+        vector_equ, 0, partitioner->local_size(), thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1197,10 +1165,10 @@ namespace LinearAlgebra
 
       AssertDimension(partitioner->local_size(), v.partitioner->local_size());
 
-      Number                                           sum;
-      internal::VectorOperations::Dot<Number, Number2> dot(values.get(),
-                                                           v.values.get());
-      internal::VectorOperations::parallel_reduce(
+      Number                                                   sum;
+      dealii::internal::VectorOperations::Dot<Number, Number2> dot(
+        values.get(), v.values.get());
+      dealii::internal::VectorOperations::parallel_reduce(
         dot, 0, partitioner->local_size(), sum, thread_loop_partitioner);
       AssertIsFinite(sum);
 
@@ -1231,9 +1199,10 @@ namespace LinearAlgebra
     typename Vector<Number>::real_type
     Vector<Number>::norm_sqr_local() const
     {
-      real_type                                            sum;
-      internal::VectorOperations::Norm2<Number, real_type> norm2(values.get());
-      internal::VectorOperations::parallel_reduce(
+      real_type                                                    sum;
+      dealii::internal::VectorOperations::Norm2<Number, real_type> norm2(
+        values.get());
+      dealii::internal::VectorOperations::parallel_reduce(
         norm2, 0, partitioner->local_size(), sum, thread_loop_partitioner);
       AssertIsFinite(sum);
 
@@ -1251,9 +1220,9 @@ namespace LinearAlgebra
       if (partitioner->local_size() == 0)
         return Number();
 
-      Number                                        sum;
-      internal::VectorOperations::MeanValue<Number> mean(values.get());
-      internal::VectorOperations::parallel_reduce(
+      Number                                                sum;
+      dealii::internal::VectorOperations::MeanValue<Number> mean(values.get());
+      dealii::internal::VectorOperations::parallel_reduce(
         mean, 0, partitioner->local_size(), sum, thread_loop_partitioner);
 
       return sum / real_type(partitioner->local_size());
@@ -1281,9 +1250,10 @@ namespace LinearAlgebra
     typename Vector<Number>::real_type
     Vector<Number>::l1_norm_local() const
     {
-      real_type                                            sum;
-      internal::VectorOperations::Norm1<Number, real_type> norm1(values.get());
-      internal::VectorOperations::parallel_reduce(
+      real_type                                                    sum;
+      dealii::internal::VectorOperations::Norm1<Number, real_type> norm1(
+        values.get());
+      dealii::internal::VectorOperations::parallel_reduce(
         norm1, 0, partitioner->local_size(), sum, thread_loop_partitioner);
 
       return sum;
@@ -1332,10 +1302,10 @@ namespace LinearAlgebra
     typename Vector<Number>::real_type
     Vector<Number>::lp_norm_local(const real_type p) const
     {
-      real_type                                            sum;
-      internal::VectorOperations::NormP<Number, real_type> normp(values.get(),
-                                                                 p);
-      internal::VectorOperations::parallel_reduce(
+      real_type                                                    sum;
+      dealii::internal::VectorOperations::NormP<Number, real_type> normp(
+        values.get(), p);
+      dealii::internal::VectorOperations::parallel_reduce(
         normp, 0, partitioner->local_size(), sum, thread_loop_partitioner);
       return std::pow(sum, 1. / p);
     }
@@ -1397,12 +1367,10 @@ namespace LinearAlgebra
       AssertDimension(vec_size, v.local_size());
       AssertDimension(vec_size, w.local_size());
 
-      Number                                        sum;
-      internal::VectorOperations::AddAndDot<Number> adder(this->values.get(),
-                                                          v.values.get(),
-                                                          w.values.get(),
-                                                          a);
-      internal::VectorOperations::parallel_reduce(
+      Number                                                sum;
+      dealii::internal::VectorOperations::AddAndDot<Number> adder(
+        this->values.get(), v.values.get(), w.values.get(), a);
+      dealii::internal::VectorOperations::parallel_reduce(
         adder, 0, vec_size, sum, thread_loop_partitioner);
       AssertIsFinite(sum);
       return sum;

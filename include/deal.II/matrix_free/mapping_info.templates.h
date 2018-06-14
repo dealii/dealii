@@ -293,9 +293,9 @@ namespace internal
 
     /* ------------------------- initialization of cells ------------------- */
 
-    // Anonymous namespace with implementation of extraction of values on cell
+    // Namespace with implementation of extraction of values on cell
     // range
-    namespace
+    namespace ExtractCellHelper
     {
       template <int dim>
       double
@@ -991,7 +991,7 @@ namespace internal
           }
       }
 
-    } // end of anonymous namespace
+    } // namespace ExtractCellHelper
 
 
 
@@ -1039,7 +1039,7 @@ namespace internal
                    MultithreadInfo::n_threads());
 
       std::vector<std::pair<std::vector<MappingInfoStorage<dim, dim, Number>>,
-                            CompressedCellData<dim, Number>>>
+                            ExtractCellHelper::CompressedCellData<dim, Number>>>
         data_cells_local;
       // Reserve enough space to avoid re-allocation (which would break the
       // references to the data fields passed to the tasks!)
@@ -1052,17 +1052,19 @@ namespace internal
           {
             data_cells_local.push_back(std::make_pair(
               std::vector<MappingInfoStorage<dim, dim, Number>>(n_quads),
-              CompressedCellData<dim, Number>(get_jacobian_size(tria))));
-            tasks += Threads::new_task(&initialize_cell_range<dim, Number>,
-                                       cell_range,
-                                       tria,
-                                       cells,
-                                       active_fe_index,
-                                       mapping,
-                                       quad,
-                                       update_flags,
-                                       *this,
-                                       data_cells_local.back());
+              ExtractCellHelper::CompressedCellData<dim, Number>(
+                ExtractCellHelper::get_jacobian_size(tria))));
+            tasks += Threads::new_task(
+              &ExtractCellHelper::initialize_cell_range<dim, Number>,
+              cell_range,
+              tria,
+              cells,
+              active_fe_index,
+              mapping,
+              quad,
+              update_flags,
+              *this,
+              data_cells_local.back());
             cell_range.first = cell_range.second;
             cell_range.second += work_per_chunk;
           }
@@ -1074,9 +1076,10 @@ namespace internal
       std::vector<std::vector<unsigned int>> indices_compressed(
         data_cells_local.size());
       for (unsigned int i = 0; i < data_cells_local.size(); ++i)
-        merge_compressed_data(data_cells_local[i].second.data,
-                              data_cells_local[0].second.data,
-                              indices_compressed[i]);
+        ExtractCellHelper::merge_compressed_data(
+          data_cells_local[i].second.data,
+          data_cells_local[0].second.data,
+          indices_compressed[i]);
 
       // Collect all data in the final data fields.
       // First allocate the memory
@@ -1117,13 +1120,14 @@ namespace internal
           // Start tasks that copy the local data
           Threads::TaskGroup<> tasks;
           for (unsigned int i = 0; i < data_cells_local.size(); ++i)
-            tasks += Threads::new_task(&copy_data<dim, dim, Number>,
-                                       work_per_chunk * i,
-                                       shift[i],
-                                       indices_compressed[i],
-                                       cell_type,
-                                       data_cells_local[i].first[my_q],
-                                       cell_data[my_q]);
+            tasks +=
+              Threads::new_task(&ExtractCellHelper::copy_data<dim, dim, Number>,
+                                work_per_chunk * i,
+                                shift[i],
+                                indices_compressed[i],
+                                cell_type,
+                                data_cells_local[i].first[my_q],
+                                cell_data[my_q]);
 
           // finally, insert the constant cell data at the beginning (the
           // other tasks can already start copying the non-constant data)
@@ -1165,9 +1169,9 @@ namespace internal
 
     /* ------------------------- initialization of faces ------------------- */
 
-    // Anonymous namespace with implementation of extraction of values on cell
+    // Namespace with implementation of extraction of values on face
     // range
-    namespace
+    namespace ExtractFaceHelper
     {
       template <int dim, typename Number>
       struct CompressedFaceData
@@ -1270,7 +1274,8 @@ namespace internal
           fe_subface_values_container[my_q].resize(
             mapping_info.face_data[my_q].descriptor.size());
 
-        LocalData<dim, Number> face_data(get_jacobian_size(tria));
+        ExtractCellHelper::LocalData<dim, Number> face_data(
+          ExtractCellHelper::get_jacobian_size(tria));
 
         const unsigned int end_face =
           std::min(std::size_t(face_range.second), faces.size());
@@ -1641,7 +1646,7 @@ namespace internal
           }
       }
 
-    } // end of anonymous namespace
+    } // namespace ExtractFaceHelper
 
 
 
@@ -1697,7 +1702,7 @@ namespace internal
 
       std::vector<
         std::pair<std::vector<MappingInfoStorage<dim - 1, dim, Number>>,
-                  CompressedFaceData<dim, Number>>>
+                  ExtractFaceHelper::CompressedFaceData<dim, Number>>>
         data_faces_local;
       // Reserve enough space to avoid re-allocation (which would destroy the
       // references passed to the tasks!)
@@ -1711,17 +1716,19 @@ namespace internal
             data_faces_local.push_back(std::make_pair(
               std::vector<MappingInfoStorage<dim - 1, dim, Number>>(
                 quad.size()),
-              CompressedFaceData<dim, Number>(get_jacobian_size(tria))));
-            tasks += Threads::new_task(&initialize_face_range<dim, Number>,
-                                       face_range,
-                                       tria,
-                                       cells,
-                                       faces,
-                                       mapping,
-                                       update_flags_compute_boundary,
-                                       update_flags_compute_inner,
-                                       *this,
-                                       data_faces_local.back());
+              ExtractFaceHelper::CompressedFaceData<dim, Number>(
+                ExtractCellHelper::get_jacobian_size(tria))));
+            tasks += Threads::new_task(
+              &ExtractFaceHelper::initialize_face_range<dim, Number>,
+              face_range,
+              tria,
+              cells,
+              faces,
+              mapping,
+              update_flags_compute_boundary,
+              update_flags_compute_inner,
+              *this,
+              data_faces_local.back());
             face_range.first = face_range.second;
             face_range.second += work_per_chunk;
           }
@@ -1734,9 +1741,10 @@ namespace internal
       std::vector<std::vector<unsigned int>> indices_compressed(
         data_faces_local.size());
       for (unsigned int i = 0; i < data_faces_local.size(); ++i)
-        merge_compressed_data(data_faces_local[i].second.data,
-                              data_faces_local[0].second.data,
-                              indices_compressed[i]);
+        ExtractCellHelper::merge_compressed_data(
+          data_faces_local[i].second.data,
+          data_faces_local[0].second.data,
+          indices_compressed[i]);
 
       // Collect all data in the final data fields.
       // First allocate the memory
@@ -1789,18 +1797,20 @@ namespace internal
           // start the tasks to gather the data in parallel
           Threads::TaskGroup<> tasks;
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
-            tasks += Threads::new_task(&copy_data<dim - 1, dim, Number>,
-                                       work_per_chunk * i,
-                                       shift[i],
-                                       indices_compressed[i],
-                                       face_type,
-                                       data_faces_local[i].first[my_q],
-                                       face_data[my_q]);
+            tasks += Threads::new_task(
+              &ExtractCellHelper::copy_data<dim - 1, dim, Number>,
+              work_per_chunk * i,
+              shift[i],
+              indices_compressed[i],
+              face_type,
+              data_faces_local[i].first[my_q],
+              face_data[my_q]);
 
           // fill the constant data fields (in parallel to the loop above)
           if (my_q == 0)
             {
-              const Number jac_size = get_jacobian_size(tria);
+              const Number jac_size =
+                ExtractCellHelper::get_jacobian_size(tria);
               for (auto &it : data_faces_local[0].second.data)
                 {
                   // JxW values; invert previously applied scaling
@@ -1848,14 +1858,13 @@ namespace internal
 
           // finally compute the normal times the jacobian
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
-            tasks +=
-              Threads::new_task(&compute_normal_times_jacobian<dim, Number>,
-                                work_per_chunk * i,
-                                std::min(work_per_chunk * (i + 1),
-                                         (unsigned int)faces.size()),
-                                face_type,
-                                faces,
-                                face_data[my_q]);
+            tasks += Threads::new_task(
+              &ExtractFaceHelper::compute_normal_times_jacobian<dim, Number>,
+              work_per_chunk * i,
+              std::min(work_per_chunk * (i + 1), (unsigned int)faces.size()),
+              face_type,
+              faces,
+              face_data[my_q]);
           tasks.join_all();
         }
     }
@@ -1999,7 +2008,7 @@ namespace internal
                           for (unsigned int d = 0; d < dim; ++d)
                             for (unsigned int e = 0; e < dim; ++e)
                               {
-                                const unsigned int ee =
+                                const unsigned int ee = ExtractFaceHelper::
                                   reorder_face_derivative_indices<dim>(face, e);
                                 face_data_by_cells[my_q]
                                   .jacobians[0][offset][d][e][v] =
@@ -2033,7 +2042,7 @@ namespace internal
                             for (unsigned int d = 0; d < dim; ++d)
                               for (unsigned int e = 0; e < dim; ++e)
                                 {
-                                  const unsigned int ee =
+                                  const unsigned int ee = ExtractFaceHelper::
                                     reorder_face_derivative_indices<dim>(face,
                                                                          e);
                                   face_data_by_cells[my_q]

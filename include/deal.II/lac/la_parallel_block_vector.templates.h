@@ -829,7 +829,7 @@ namespace LinearAlgebra
 
 
 
-    namespace
+    namespace internal
     {
       template <typename FullMatrixType>
       inline void
@@ -845,7 +845,7 @@ namespace LinearAlgebra
         else
           matrix.set_property(LAPACKSupport::general);
       }
-    } // namespace
+    } // namespace internal
 
 
 
@@ -872,7 +872,7 @@ namespace LinearAlgebra
       // reset the matrix
       matrix = typename FullMatrixType::value_type(0.0);
 
-      set_symmetric(matrix, symmetric);
+      internal::set_symmetric(matrix, symmetric);
       if (symmetric)
         {
           Assert(m == n, ExcDimensionMismatch(m, n));

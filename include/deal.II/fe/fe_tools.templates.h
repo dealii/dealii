@@ -1138,247 +1138,252 @@ namespace FETools
   {
     return std_cxx14::make_unique<FE_DGQArbitraryNodes<3>>(quad);
   }
-} // namespace FETools
 
-namespace
-{
-  // The following three functions serve to fill the maps from element
-  // names to elements fe_name_map below. The first one exists because
-  // we have finite elements which are not implemented for nonzero
-  // codimension. These should be transferred to the second function
-  // eventually.
 
-  template <int dim>
-  void
-  fill_no_codim_fe_names(
-    std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
+
+  namespace internal
   {
-    result["FE_Q_Hierarchical"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_Hierarchical<dim>>>();
-    result["FE_ABF"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_ABF<dim>>>();
-    result["FE_Bernstein"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim>>>();
-    result["FE_BDM"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_BDM<dim>>>();
-    result["FE_DGBDM"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGBDM<dim>>>();
-    result["FE_DGNedelec"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGNedelec<dim>>>();
-    result["FE_DGRaviartThomas"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGRaviartThomas<dim>>>();
-    result["FE_RaviartThomas"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_RaviartThomas<dim>>>();
-    result["FE_RaviartThomasNodal"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_RaviartThomasNodal<dim>>>();
-    result["FE_RT_Bubbles"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_RT_Bubbles<dim>>>();
-    result["FE_Nedelec"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Nedelec<dim>>>();
-    result["FE_DGPNonparametric"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGPNonparametric<dim>>>();
-    result["FE_DGP"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim>>>();
-    result["FE_DGPMonomial"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGPMonomial<dim>>>();
-    result["FE_DGQ"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
-    result["FE_DGQArbitraryNodes"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
-    result["FE_DGQLegendre"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGQLegendre<dim>>>();
-    result["FE_DGQHermite"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGQHermite<dim>>>();
-    result["FE_FaceQ"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_FaceQ<dim>>>();
-    result["FE_FaceP"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_FaceP<dim>>>();
-    result["FE_Q"] = std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim>>>();
-    result["FE_Q_DG0"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim>>>();
-    result["FE_Q_Bubbles"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim>>>();
-    result["FE_Q_iso_Q1"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim>>>();
-    result["FE_Nothing"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Nothing<dim>>>();
-    result["FE_RannacherTurek"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_RannacherTurek<dim>>>();
-  }
+    // The following three functions serve to fill the maps from element
+    // names to elements fe_name_map below. The first one exists because
+    // we have finite elements which are not implemented for nonzero
+    // codimension. These should be transferred to the second function
+    // eventually.
+    namespace FEToolsAddFENameHelper
+    {
+      template <int dim>
+      void
+      fill_no_codim_fe_names(
+        std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
+      {
+        result["FE_Q_Hierarchical"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q_Hierarchical<dim>>>();
+        result["FE_ABF"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_ABF<dim>>>();
+        result["FE_Bernstein"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim>>>();
+        result["FE_BDM"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_BDM<dim>>>();
+        result["FE_DGBDM"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGBDM<dim>>>();
+        result["FE_DGNedelec"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGNedelec<dim>>>();
+        result["FE_DGRaviartThomas"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGRaviartThomas<dim>>>();
+        result["FE_RaviartThomas"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_RaviartThomas<dim>>>();
+        result["FE_RaviartThomasNodal"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_RaviartThomasNodal<dim>>>();
+        result["FE_RT_Bubbles"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_RT_Bubbles<dim>>>();
+        result["FE_Nedelec"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Nedelec<dim>>>();
+        result["FE_DGPNonparametric"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_DGPNonparametric<dim>>>();
+        result["FE_DGP"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim>>>();
+        result["FE_DGPMonomial"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGPMonomial<dim>>>();
+        result["FE_DGQ"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
+        result["FE_DGQArbitraryNodes"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
+        result["FE_DGQLegendre"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGQLegendre<dim>>>();
+        result["FE_DGQHermite"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGQHermite<dim>>>();
+        result["FE_FaceQ"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_FaceQ<dim>>>();
+        result["FE_FaceP"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_FaceP<dim>>>();
+        result["FE_Q"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim>>>();
+        result["FE_Q_DG0"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim>>>();
+        result["FE_Q_Bubbles"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim>>>();
+        result["FE_Q_iso_Q1"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim>>>();
+        result["FE_Nothing"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Nothing<dim>>>();
+        result["FE_RannacherTurek"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_RannacherTurek<dim>>>();
+      }
 
 
 
-  // This function fills a map from names to finite elements for any
-  // dimension and codimension for those elements which support
-  // nonzero codimension.
-  template <int dim, int spacedim>
-  void
-  fill_codim_fe_names(
-    std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
-  {
-    result["FE_Bernstein"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
-    result["FE_DGP"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim, spacedim>>>();
-    result["FE_DGQ"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
-    result["FE_Nothing"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Nothing<dim, spacedim>>>();
-    result["FE_DGQArbitraryNodes"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
-    result["FE_DGQLegendre"] = std_cxx14::make_unique<
-      FETools::FEFactory<FE_DGQLegendre<dim, spacedim>>>();
-    result["FE_DGQHermite"] = std_cxx14::make_unique<
-      FETools::FEFactory<FE_DGQHermite<dim, spacedim>>>();
-    result["FE_Q_Bubbles"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim, spacedim>>>();
-    result["FE_Q_DG0"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim, spacedim>>>();
-    result["FE_Q_iso_Q1"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim, spacedim>>>();
-    result["FE_Q"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim, spacedim>>>();
-    result["FE_Bernstein"] =
-      std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
-  }
+      // This function fills a map from names to finite elements for any
+      // dimension and codimension for those elements which support
+      // nonzero codimension.
+      template <int dim, int spacedim>
+      void
+      fill_codim_fe_names(
+        std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
+      {
+        result["FE_Bernstein"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
+        result["FE_DGP"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim, spacedim>>>();
+        result["FE_DGQ"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
+        result["FE_Nothing"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_Nothing<dim, spacedim>>>();
+        result["FE_DGQArbitraryNodes"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
+        result["FE_DGQLegendre"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_DGQLegendre<dim, spacedim>>>();
+        result["FE_DGQHermite"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_DGQHermite<dim, spacedim>>>();
+        result["FE_Q_Bubbles"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_Q_Bubbles<dim, spacedim>>>();
+        result["FE_Q_DG0"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim, spacedim>>>();
+        result["FE_Q_iso_Q1"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_Q_iso_Q1<dim, spacedim>>>();
+        result["FE_Q"] =
+          std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim, spacedim>>>();
+        result["FE_Bernstein"] = std_cxx14::make_unique<
+          FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
+      }
 
-  // The function filling the vector fe_name_map below. It iterates
-  // through all legal dimension/spacedimension pairs and fills
-  // fe_name_map[dimension][spacedimension] with the maps generated
-  // by the functions above.
-  std::array<
-    std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>, 4>,
-    4>
-  fill_default_map()
-  {
-    std::array<
-      std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>, 4>,
-      4>
-      result;
+      // The function filling the vector fe_name_map below. It iterates
+      // through all legal dimension/spacedimension pairs and fills
+      // fe_name_map[dimension][spacedimension] with the maps generated
+      // by the functions above.
+      std::array<
+        std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
+                   4>,
+        4>
+      fill_default_map()
+      {
+        std::array<
+          std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
+                     4>,
+          4>
+          result;
 
-    fill_no_codim_fe_names<1>(result[1][1]);
-    fill_no_codim_fe_names<2>(result[2][2]);
-    fill_no_codim_fe_names<3>(result[3][3]);
+        fill_no_codim_fe_names<1>(result[1][1]);
+        fill_no_codim_fe_names<2>(result[2][2]);
+        fill_no_codim_fe_names<3>(result[3][3]);
 
-    fill_codim_fe_names<1, 2>(result[1][2]);
-    fill_codim_fe_names<1, 3>(result[1][3]);
-    fill_codim_fe_names<2, 3>(result[2][3]);
+        fill_codim_fe_names<1, 2>(result[1][2]);
+        fill_codim_fe_names<1, 3>(result[1][3]);
+        fill_codim_fe_names<2, 3>(result[2][3]);
 
-    return result;
-  }
-
-
-  // have a lock that guarantees that at most one thread is changing
-  // and accessing the fe_name_map variable. make this lock local to
-  // this file.
-  //
-  // this and the next variable are declared static (even though
-  // they're in an anonymous namespace) in order to make icc happy
-  // (which otherwise reports a multiply defined symbol when linking
-  // libraries for more than one space dimension together
-  static Threads::Mutex fe_name_map_lock;
-
-  // This is the map used by FETools::get_fe_by_name and
-  // FETools::add_fe_name. It is only accessed by functions in this
-  // file, so it is safe to make it a static variable here. It must be
-  // static so that we can link several dimensions together.
-
-  // The organization of this storage is such that
-  // fe_name_map[dim][spacedim][name] points to an
-  // FEFactoryBase<dim,spacedim> with the name given. Since
-  // all entries of this vector are of different type, we store
-  // pointers to generic objects and cast them when needed.
-
-  // We use a unique pointer to factory objects, to ensure that they
-  // get deleted at the end of the program run and don't end up as
-  // apparent memory leaks to programs like valgrind.
-
-  // This vector is initialized at program start time using the
-  // function above. because at this time there are no threads
-  // running, there are no thread-safety issues here. since this is
-  // compiled for all dimensions at once, need to create objects for
-  // each dimension and then separate between them further down
-  static std::array<
-    std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>, 4>,
-    4>
-    fe_name_map = fill_default_map();
-} // namespace
+        return result;
+      }
 
 
+      // have a lock that guarantees that at most one thread is changing
+      // and accessing the fe_name_map variable. make this lock local to
+      // this file.
+      //
+      // this and the next variable are declared static (even though
+      // they're in an anonymous namespace) in order to make icc happy
+      // (which otherwise reports a multiply defined symbol when linking
+      // libraries for more than one space dimension together
+      static Threads::Mutex fe_name_map_lock;
 
-namespace
-{
-  // forwarder function for
-  // FE::get_interpolation_matrix. we
-  // will want to call that function
-  // for arbitrary FullMatrix<T>
-  // types, but it only accepts
-  // double arguments. since it is a
-  // virtual function, this can also
-  // not be changed. so have a
-  // forwarder function that calls
-  // that function directly if
-  // T==double, and otherwise uses a
-  // temporary
-  template <int dim, int spacedim>
-  inline void
-  gim_forwarder(const FiniteElement<dim, spacedim> &fe1,
-                const FiniteElement<dim, spacedim> &fe2,
-                FullMatrix<double> &                interpolation_matrix)
-  {
-    fe2.get_interpolation_matrix(fe1, interpolation_matrix);
-  }
+      // This is the map used by FETools::get_fe_by_name and
+      // FETools::add_fe_name. It is only accessed by functions in this
+      // file, so it is safe to make it a static variable here. It must be
+      // static so that we can link several dimensions together.
 
+      // The organization of this storage is such that
+      // fe_name_map[dim][spacedim][name] points to an
+      // FEFactoryBase<dim,spacedim> with the name given. Since
+      // all entries of this vector are of different type, we store
+      // pointers to generic objects and cast them when needed.
 
+      // We use a unique pointer to factory objects, to ensure that they
+      // get deleted at the end of the program run and don't end up as
+      // apparent memory leaks to programs like valgrind.
 
-  template <int dim, typename number, int spacedim>
-  inline void
-  gim_forwarder(const FiniteElement<dim, spacedim> &fe1,
-                const FiniteElement<dim, spacedim> &fe2,
-                FullMatrix<number> &                interpolation_matrix)
-  {
-    FullMatrix<double> tmp(interpolation_matrix.m(), interpolation_matrix.n());
-    fe2.get_interpolation_matrix(fe1, tmp);
-    interpolation_matrix = tmp;
-  }
+      // This vector is initialized at program start time using the
+      // function above. because at this time there are no threads
+      // running, there are no thread-safety issues here. since this is
+      // compiled for all dimensions at once, need to create objects for
+      // each dimension and then separate between them further down
+      static std::array<
+        std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
+                   4>,
+        4>
+        fe_name_map = fill_default_map();
+    } // namespace FEToolsAddFENameHelper
+
+    namespace FEToolsGetInterpolationMatrixHelper
+    {
+      // forwarder function for
+      // FE::get_interpolation_matrix. we
+      // will want to call that function
+      // for arbitrary FullMatrix<T>
+      // types, but it only accepts
+      // double arguments. since it is a
+      // virtual function, this can also
+      // not be changed. so have a
+      // forwarder function that calls
+      // that function directly if
+      // T==double, and otherwise uses a
+      // temporary
+      template <int dim, int spacedim>
+      inline void
+      gim_forwarder(const FiniteElement<dim, spacedim> &fe1,
+                    const FiniteElement<dim, spacedim> &fe2,
+                    FullMatrix<double> &                interpolation_matrix)
+      {
+        fe2.get_interpolation_matrix(fe1, interpolation_matrix);
+      }
 
 
 
-  // return how many characters
-  // starting at the given position
-  // of the string match either the
-  // generic string "<dim>" or the
-  // specialized string with "dim"
-  // replaced with the numeric value
-  // of the template argument
-  template <int dim, int spacedim>
-  inline unsigned int
-  match_dimension(const std::string &name, const unsigned int position)
-  {
-    if (position >= name.size())
-      return 0;
-
-    if ((position + 5 < name.size()) && (name[position] == '<') &&
-        (name[position + 1] == 'd') && (name[position + 2] == 'i') &&
-        (name[position + 3] == 'm') && (name[position + 4] == '>'))
-      return 5;
-
-    Assert(dim < 10, ExcNotImplemented());
-    const char dim_char = '0' + dim;
-
-    if ((position + 3 < name.size()) && (name[position] == '<') &&
-        (name[position + 1] == dim_char) && (name[position + 2] == '>'))
-      return 3;
-
-    // some other string that doesn't
-    // match
-    return 0;
-  }
-} // namespace
+      template <int dim, typename number, int spacedim>
+      inline void
+      gim_forwarder(const FiniteElement<dim, spacedim> &fe1,
+                    const FiniteElement<dim, spacedim> &fe2,
+                    FullMatrix<number> &                interpolation_matrix)
+      {
+        FullMatrix<double> tmp(interpolation_matrix.m(),
+                               interpolation_matrix.n());
+        fe2.get_interpolation_matrix(fe1, tmp);
+        interpolation_matrix = tmp;
+      }
 
 
-namespace FETools
-{
+
+      // return how many characters
+      // starting at the given position
+      // of the string match either the
+      // generic string "<dim>" or the
+      // specialized string with "dim"
+      // replaced with the numeric value
+      // of the template argument
+      template <int dim, int spacedim>
+      inline unsigned int
+      match_dimension(const std::string &name, const unsigned int position)
+      {
+        if (position >= name.size())
+          return 0;
+
+        if ((position + 5 < name.size()) && (name[position] == '<') &&
+            (name[position + 1] == 'd') && (name[position + 2] == 'i') &&
+            (name[position + 3] == 'm') && (name[position + 4] == '>'))
+          return 5;
+
+        Assert(dim < 10, ExcNotImplemented());
+        const char dim_char = '0' + dim;
+
+        if ((position + 3 < name.size()) && (name[position] == '<') &&
+            (name[position + 1] == dim_char) && (name[position + 2] == '>'))
+          return 3;
+
+        // some other string that doesn't
+        // match
+        return 0;
+      }
+    } // namespace FEToolsGetInterpolationMatrixHelper
+  }   // namespace internal
+
+
+
   template <int dim, int spacedim>
   void
   compute_component_wise(const FiniteElement<dim, spacedim> &    element,
@@ -1485,7 +1490,8 @@ namespace FETools
     bool fe_implements_interpolation = true;
     try
       {
-        gim_forwarder(fe1, fe2, interpolation_matrix);
+        internal::FEToolsGetInterpolationMatrixHelper::gim_forwarder(
+          fe1, fe2, interpolation_matrix);
       }
     catch (
       typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented &)
@@ -1631,8 +1637,8 @@ namespace FETools
               mass(i, j) += v * val2.shape_value(j, k) * dx;
           }
       }
-    // Invert the matrix. Gauss-Jordan should be sufficient since we expect the
-    // mass matrix to be well-conditioned
+    // Invert the matrix. Gauss-Jordan should be sufficient since we expect
+    // the mass matrix to be well-conditioned
     mass.gauss_jordan();
 
     // Now, test every function of fe1 with test functions of fe2 and
@@ -1674,9 +1680,9 @@ namespace FETools
 
     const std::vector<Point<dim>> &points = fe.get_generalized_support_points();
 
-    // We need the values of the polynomials in all generalized support points.
-    // This function specifically works for the case where shape functions
-    // have 'dim' vector components, so allocate that much space
+    // We need the values of the polynomials in all generalized support
+    // points. This function specifically works for the case where shape
+    // functions have 'dim' vector components, so allocate that much space
     std::vector<Vector<double>> support_point_values(points.size(),
                                                      Vector<double>(dim));
 
@@ -1717,241 +1723,213 @@ namespace FETools
 
 
 
-  /*
-    template <>
-    void
-    compute_embedding_matrices(const FiniteElement<1,2> &,
-                               std::vector<std::vector<FullMatrix<double> > > &,
-                               const bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-
-    template <>
-    void
-    compute_embedding_matrices(const FiniteElement<1,3> &,
-                               std::vector<std::vector<FullMatrix<double> > > &,
-                               const bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-
-
-    template <>
-    void
-    compute_embedding_matrices(const FiniteElement<2,3>&,
-                               std::vector<std::vector<FullMatrix<double> > >&,
-                               const bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-  */
-
-  namespace
+  namespace internal
   {
-    template <int dim, typename number, int spacedim>
-    void
-    compute_embedding_for_shape_function(const unsigned int                  i,
-                                         const FiniteElement<dim, spacedim> &fe,
-                                         const FEValues<dim, spacedim> &coarse,
-                                         const Householder<double> &    H,
-                                         FullMatrix<number> &this_matrix,
-                                         const double        threshold)
+    namespace FEToolsComputeEmbeddingMatricesHelper
     {
-      const unsigned int n  = fe.dofs_per_cell;
-      const unsigned int nd = fe.n_components();
-      const unsigned int nq = coarse.n_quadrature_points;
+      template <int dim, typename number, int spacedim>
+      void
+      compute_embedding_for_shape_function(
+        const unsigned int                  i,
+        const FiniteElement<dim, spacedim> &fe,
+        const FEValues<dim, spacedim> &     coarse,
+        const Householder<double> &         H,
+        FullMatrix<number> &                this_matrix,
+        const double                        threshold)
+      {
+        const unsigned int n  = fe.dofs_per_cell;
+        const unsigned int nd = fe.n_components();
+        const unsigned int nq = coarse.n_quadrature_points;
 
-      Vector<number> v_coarse(nq * nd);
-      Vector<number> v_fine(n);
+        Vector<number> v_coarse(nq * nd);
+        Vector<number> v_fine(n);
 
-      // The right hand side of
-      // the least squares
-      // problem consists of the
-      // function values of the
-      // coarse grid function in
-      // each quadrature point.
-      if (fe.is_primitive())
-        {
-          const unsigned int d     = fe.system_to_component_index(i).first;
-          const double *     phi_i = &coarse.shape_value(i, 0);
+        // The right hand side of
+        // the least squares
+        // problem consists of the
+        // function values of the
+        // coarse grid function in
+        // each quadrature point.
+        if (fe.is_primitive())
+          {
+            const unsigned int d     = fe.system_to_component_index(i).first;
+            const double *     phi_i = &coarse.shape_value(i, 0);
 
-          for (unsigned int k = 0; k < nq; ++k)
-            v_coarse(k * nd + d) = phi_i[k];
-        }
+            for (unsigned int k = 0; k < nq; ++k)
+              v_coarse(k * nd + d) = phi_i[k];
+          }
 
-      else
-        for (unsigned int d = 0; d < nd; ++d)
-          for (unsigned int k = 0; k < nq; ++k)
-            v_coarse(k * nd + d) = coarse.shape_value_component(i, k, d);
+        else
+          for (unsigned int d = 0; d < nd; ++d)
+            for (unsigned int k = 0; k < nq; ++k)
+              v_coarse(k * nd + d) = coarse.shape_value_component(i, k, d);
 
-      // solve the least squares
-      // problem.
-      const double result = H.least_squares(v_fine, v_coarse);
-      Assert(result <= threshold, ExcLeastSquaresError(result));
-      // Avoid warnings in release mode
-      (void)result;
-      (void)threshold;
+        // solve the least squares
+        // problem.
+        const double result = H.least_squares(v_fine, v_coarse);
+        Assert(result <= threshold, FETools::ExcLeastSquaresError(result));
+        // Avoid warnings in release mode
+        (void)result;
+        (void)threshold;
 
-      // Copy into the result
-      // matrix. Since the matrix
-      // maps a coarse grid
-      // function to a fine grid
-      // function, the columns
-      // are fine grid.
-      for (unsigned int j = 0; j < n; ++j)
-        this_matrix(j, i) = v_fine(j);
-    }
+        // Copy into the result
+        // matrix. Since the matrix
+        // maps a coarse grid
+        // function to a fine grid
+        // function, the columns
+        // are fine grid.
+        for (unsigned int j = 0; j < n; ++j)
+          this_matrix(j, i) = v_fine(j);
+      }
 
 
 
-    template <int dim, typename number, int spacedim>
-    void
-    compute_embedding_matrices_for_refinement_case(
-      const FiniteElement<dim, spacedim> &fe,
-      std::vector<FullMatrix<number>> &   matrices,
-      const unsigned int                  ref_case,
-      const double                        threshold)
-    {
-      const unsigned int n = fe.dofs_per_cell;
-      const unsigned int nc =
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-      for (unsigned int i = 0; i < nc; ++i)
-        {
-          Assert(matrices[i].n() == n,
-                 ExcDimensionMismatch(matrices[i].n(), n));
-          Assert(matrices[i].m() == n,
-                 ExcDimensionMismatch(matrices[i].m(), n));
-        }
+      template <int dim, typename number, int spacedim>
+      void
+      compute_embedding_matrices_for_refinement_case(
+        const FiniteElement<dim, spacedim> &fe,
+        std::vector<FullMatrix<number>> &   matrices,
+        const unsigned int                  ref_case,
+        const double                        threshold)
+      {
+        const unsigned int n = fe.dofs_per_cell;
+        const unsigned int nc =
+          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+        for (unsigned int i = 0; i < nc; ++i)
+          {
+            Assert(matrices[i].n() == n,
+                   ExcDimensionMismatch(matrices[i].n(), n));
+            Assert(matrices[i].m() == n,
+                   ExcDimensionMismatch(matrices[i].m(), n));
+          }
 
-      // Set up meshes, one with a single
-      // reference cell and refine it once
-      Triangulation<dim, spacedim> tria;
-      GridGenerator::hyper_cube(tria, 0, 1);
-      tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
-      tria.execute_coarsening_and_refinement();
+        // Set up meshes, one with a single
+        // reference cell and refine it once
+        Triangulation<dim, spacedim> tria;
+        GridGenerator::hyper_cube(tria, 0, 1);
+        tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
+        tria.execute_coarsening_and_refinement();
 
-      const unsigned int degree = fe.degree;
-      QGauss<dim>        q_fine(degree + 1);
-      const unsigned int nq = q_fine.size();
+        const unsigned int degree = fe.degree;
+        QGauss<dim>        q_fine(degree + 1);
+        const unsigned int nq = q_fine.size();
 
-      FEValues<dim, spacedim> fine(fe,
-                                   q_fine,
-                                   update_quadrature_points |
-                                     update_JxW_values | update_values);
+        FEValues<dim, spacedim> fine(fe,
+                                     q_fine,
+                                     update_quadrature_points |
+                                       update_JxW_values | update_values);
 
-      // We search for the polynomial on
-      // the small cell, being equal to
-      // the coarse polynomial in all
-      // quadrature points.
+        // We search for the polynomial on
+        // the small cell, being equal to
+        // the coarse polynomial in all
+        // quadrature points.
 
-      // First build the matrix for this
-      // least squares problem. This
-      // contains the values of the fine
-      // cell polynomials in the fine
-      // cell grid points.
+        // First build the matrix for this
+        // least squares problem. This
+        // contains the values of the fine
+        // cell polynomials in the fine
+        // cell grid points.
 
-      // This matrix is the same for all
-      // children.
-      fine.reinit(tria.begin_active());
-      const unsigned int nd = fe.n_components();
-      FullMatrix<number> A(nq * nd, n);
+        // This matrix is the same for all
+        // children.
+        fine.reinit(tria.begin_active());
+        const unsigned int nd = fe.n_components();
+        FullMatrix<number> A(nq * nd, n);
 
-      for (unsigned int j = 0; j < n; ++j)
-        for (unsigned int d = 0; d < nd; ++d)
-          for (unsigned int k = 0; k < nq; ++k)
-            A(k * nd + d, j) = fine.shape_value_component(j, k, d);
+        for (unsigned int j = 0; j < n; ++j)
+          for (unsigned int d = 0; d < nd; ++d)
+            for (unsigned int k = 0; k < nq; ++k)
+              A(k * nd + d, j) = fine.shape_value_component(j, k, d);
 
-      Householder<double> H(A);
-      unsigned int        cell_number = 0;
+        Householder<double> H(A);
+        unsigned int        cell_number = 0;
 
-      Threads::TaskGroup<void> task_group;
+        Threads::TaskGroup<void> task_group;
 
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator
-             fine_cell = tria.begin_active();
-           fine_cell != tria.end();
-           ++fine_cell, ++cell_number)
-        {
-          fine.reinit(fine_cell);
+        for (typename Triangulation<dim, spacedim>::active_cell_iterator
+               fine_cell = tria.begin_active();
+             fine_cell != tria.end();
+             ++fine_cell, ++cell_number)
+          {
+            fine.reinit(fine_cell);
 
-          // evaluate on the coarse cell (which
-          // is the first -- inactive -- cell on
-          // the lowest level of the
-          // triangulation we have created)
-          const std::vector<Point<spacedim>> &q_points_fine =
-            fine.get_quadrature_points();
-          std::vector<Point<dim>> q_points_coarse(q_points_fine.size());
-          for (unsigned int i = 0; i < q_points_fine.size(); ++i)
-            for (unsigned int j = 0; j < dim; ++j)
-              q_points_coarse[i](j) = q_points_fine[i](j);
-          const Quadrature<dim>   q_coarse(q_points_coarse,
-                                         fine.get_JxW_values());
-          FEValues<dim, spacedim> coarse(fe, q_coarse, update_values);
+            // evaluate on the coarse cell (which
+            // is the first -- inactive -- cell on
+            // the lowest level of the
+            // triangulation we have created)
+            const std::vector<Point<spacedim>> &q_points_fine =
+              fine.get_quadrature_points();
+            std::vector<Point<dim>> q_points_coarse(q_points_fine.size());
+            for (unsigned int i = 0; i < q_points_fine.size(); ++i)
+              for (unsigned int j = 0; j < dim; ++j)
+                q_points_coarse[i](j) = q_points_fine[i](j);
+            const Quadrature<dim>   q_coarse(q_points_coarse,
+                                           fine.get_JxW_values());
+            FEValues<dim, spacedim> coarse(fe, q_coarse, update_values);
 
-          coarse.reinit(tria.begin(0));
+            coarse.reinit(tria.begin(0));
 
-          FullMatrix<double> &this_matrix = matrices[cell_number];
+            FullMatrix<double> &this_matrix = matrices[cell_number];
 
-          // Compute this once for each
-          // coarse grid basis function. can
-          // spawn subtasks if n is
-          // sufficiently large so that there
-          // are more than about 5000
-          // operations in the inner loop
-          // (which is basically const * n^2
-          // operations).
-          if (n > 30)
-            {
-              for (unsigned int i = 0; i < n; ++i)
-                {
-                  task_group += Threads::new_task(
-                    &compute_embedding_for_shape_function<dim,
-                                                          number,
-                                                          spacedim>,
-                    i,
-                    fe,
-                    coarse,
-                    H,
-                    this_matrix,
-                    threshold);
-                }
-              task_group.join_all();
-            }
-          else
-            {
-              for (unsigned int i = 0; i < n; ++i)
-                {
-                  compute_embedding_for_shape_function<dim, number, spacedim>(
-                    i, fe, coarse, H, this_matrix, threshold);
-                }
-            }
+            // Compute this once for each
+            // coarse grid basis function. can
+            // spawn subtasks if n is
+            // sufficiently large so that there
+            // are more than about 5000
+            // operations in the inner loop
+            // (which is basically const * n^2
+            // operations).
+            if (n > 30)
+              {
+                for (unsigned int i = 0; i < n; ++i)
+                  {
+                    task_group += Threads::new_task(
+                      &compute_embedding_for_shape_function<dim,
+                                                            number,
+                                                            spacedim>,
+                      i,
+                      fe,
+                      coarse,
+                      H,
+                      this_matrix,
+                      threshold);
+                  }
+                task_group.join_all();
+              }
+            else
+              {
+                for (unsigned int i = 0; i < n; ++i)
+                  {
+                    compute_embedding_for_shape_function<dim, number, spacedim>(
+                      i, fe, coarse, H, this_matrix, threshold);
+                  }
+              }
 
-          // Remove small entries from
-          // the matrix
-          for (unsigned int i = 0; i < this_matrix.m(); ++i)
-            for (unsigned int j = 0; j < this_matrix.n(); ++j)
-              if (std::fabs(this_matrix(i, j)) < 1e-12)
-                this_matrix(i, j) = 0.;
-        }
+            // Remove small entries from
+            // the matrix
+            for (unsigned int i = 0; i < this_matrix.m(); ++i)
+              for (unsigned int j = 0; j < this_matrix.n(); ++j)
+                if (std::fabs(this_matrix(i, j)) < 1e-12)
+                  this_matrix(i, j) = 0.;
+          }
 
-      Assert(cell_number ==
-               GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)),
-             ExcInternalError());
-    }
-  } // namespace
+        Assert(cell_number ==
+                 GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)),
+               ExcInternalError());
+      }
+    } // namespace FEToolsComputeEmbeddingMatricesHelper
+  }   // namespace internal
 
 
 
   template <int dim, typename number, int spacedim>
   void
-  compute_embedding_matrices(
-    const FiniteElement<dim, spacedim> &          fe,
-    std::vector<std::vector<FullMatrix<number>>> &matrices,
-    const bool                                    isotropic_only,
-    const double                                  threshold)
+  compute_embedding_matrices(const FiniteElement<dim, spacedim> &fe,
+                             std::vector<std::vector<FullMatrix<number>>
+
+                                         > &                     matrices,
+                             const bool                          isotropic_only,
+                             const double                        threshold)
   {
     Threads::TaskGroup<void> task_group;
 
@@ -1962,7 +1940,8 @@ namespace FETools
 
     for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
       task_group += Threads::new_task(
-        &compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
+        &internal::FEToolsComputeEmbeddingMatricesHelper::
+          compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
         fe,
         matrices[ref_case - 1],
         ref_case,
@@ -1970,7 +1949,6 @@ namespace FETools
 
     task_group.join_all();
   }
-
 
 
   template <int dim, typename number, int spacedim>
@@ -2118,7 +2096,6 @@ namespace FETools
     Vector<number> v_fine(n);
 
 
-
     for (unsigned int cell_number = 0;
          cell_number < GeometryInfo<dim>::max_children_per_face;
          ++cell_number)
@@ -2165,7 +2142,7 @@ namespace FETools
             // solve the least squares
             // problem.
             const double result = H.least_squares(v_fine, v_coarse);
-            Assert(result <= threshold, ExcLeastSquaresError(result));
+            Assert(result <= threshold, FETools::ExcLeastSquaresError(result));
             // Avoid compiler warnings in Release mode
             (void)result;
             (void)threshold;
@@ -2189,13 +2166,13 @@ namespace FETools
   }
 
 
-
   template <int dim, typename number, int spacedim>
   void
-  compute_projection_matrices(
-    const FiniteElement<dim, spacedim> &          fe,
-    std::vector<std::vector<FullMatrix<number>>> &matrices,
-    const bool                                    isotropic_only)
+  compute_projection_matrices(const FiniteElement<dim, spacedim> &fe,
+                              std::vector<std::vector<FullMatrix<number>>
+
+                                          > &                     matrices,
+                              const bool isotropic_only)
   {
     const unsigned int n      = fe.dofs_per_cell;
     const unsigned int nd     = fe.n_components();
@@ -2224,7 +2201,11 @@ namespace FETools
       const std::vector<double> &JxW = coarse.get_JxW_values();
       for (unsigned int i = 0; i < n; ++i)
         for (unsigned int j = 0; j < n; ++j)
-          if (fe.is_primitive())
+          if (fe.
+
+              is_primitive()
+
+          )
             {
               const double *coarse_i = &coarse.shape_value(i, 0);
               const double *coarse_j = &coarse.shape_value(j, 0);
@@ -2244,7 +2225,9 @@ namespace FETools
             }
 
       // invert mass matrix
-      mass.gauss_jordan();
+      mass.
+
+        gauss_jordan();
     }
 
 
@@ -2257,17 +2240,42 @@ namespace FETools
 
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].n() == n,
-                   ExcDimensionMismatch(matrices[i].n(), n));
-            Assert(matrices[i].m() == n,
-                   ExcDimensionMismatch(matrices[i].m(), n));
+            Assert(matrices[i].
+
+                     n()
+
+                     == n,
+                   ExcDimensionMismatch(matrices[i].
+
+                                        n(),
+                                        n
+
+                                        ));
+            Assert(matrices[i].
+
+                     m()
+
+                     == n,
+                   ExcDimensionMismatch(matrices[i].
+
+                                        m(),
+                                        n
+
+                                        ));
           }
 
         // create a respective refinement on the triangulation
         Triangulation<dim, spacedim> tr;
         GridGenerator::hyper_cube(tr, 0, 1);
-        tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
-        tr.execute_coarsening_and_refinement();
+        tr.
+
+          begin_active()
+            ->
+
+          set_refine_flag(RefinementCase<dim>(ref_case));
+        tr.
+
+          execute_coarsening_and_refinement();
 
         FEValues<dim, spacedim> fine(StaticMappingQ1<dim, spacedim>::mapping,
                                      fe,
@@ -2290,8 +2298,16 @@ namespace FETools
             fine.reinit(coarse_cell->child(cell_number));
             const std::vector<Point<spacedim>> &q_points_fine =
               fine.get_quadrature_points();
-            std::vector<Point<dim>> q_points_coarse(q_points_fine.size());
-            for (unsigned int q = 0; q < q_points_fine.size(); ++q)
+            std::vector<Point<dim>> q_points_coarse(q_points_fine.
+
+                                                    size()
+
+            );
+            for (unsigned int q = 0; q < q_points_fine.
+
+                                         size();
+
+                 ++q)
               for (unsigned int j = 0; j < dim; ++j)
                 q_points_coarse[q](j) = q_points_fine[q](j);
             Quadrature<dim> q_coarse(q_points_coarse, fine.get_JxW_values());
@@ -2311,7 +2327,11 @@ namespace FETools
               {
                 for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
                   {
-                    if (fe.is_primitive())
+                    if (fe.
+
+                        is_primitive()
+
+                    )
                       {
                         const double *coarse_i = &coarse.shape_value(i, 0);
                         const double *fine_j   = &fine.shape_value(j, 0);
@@ -2340,8 +2360,16 @@ namespace FETools
               }
 
             // Remove small entries from the matrix
-            for (unsigned int i = 0; i < this_matrix.m(); ++i)
-              for (unsigned int j = 0; j < this_matrix.n(); ++j)
+            for (unsigned int i = 0; i < this_matrix.
+
+                                         m();
+
+                 ++i)
+              for (unsigned int j = 0; j < this_matrix.
+
+                                           n();
+
+                   ++j)
                 if (std::fabs(this_matrix(i, j)) < 1e-12)
                   this_matrix(i, j) = 0.;
           }
@@ -2358,9 +2386,10 @@ namespace FETools
         compute_one_case(ref_case, mass, matrices[ref_case - 1]);
       });
 
-    tasks.join_all();
-  }
+    tasks.
 
+      join_all();
+  }
 
 
   template <int dim, int spacedim>
@@ -2380,22 +2409,25 @@ namespace FETools
     // operation of this function;
     // for this, acquire the lock
     // until we quit this function
-    Threads::Mutex::ScopedLock lock(fe_name_map_lock);
+    Threads::Mutex::ScopedLock lock(
+      internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
     Assert(
-      fe_name_map[dim][spacedim].find(name) == fe_name_map[dim][spacedim].end(),
+      internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].find(name) ==
+        internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].end(),
       ExcMessage("Cannot change existing element in finite element name list"));
 
     // Insert the normalized name into
     // the map
-    fe_name_map[dim][spacedim][name] =
+    internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim][name] =
       std::unique_ptr<const Subscriptor>(factory);
   }
 
 
+
   namespace internal
   {
-    namespace
+    namespace FEToolsGetFEHelper
     {
       // TODO: this encapsulates the call to the
       // dimension-dependent fe_name_map so that we
@@ -2526,17 +2558,18 @@ namespace FETools
             // so this properly returns
             // FE_Nothing()
             const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
-            const FEFactoryBase<dim, spacedim> *fef =
-              dynamic_cast<const FEFactoryBase<dim, spacedim> *>(ptr);
+            const FETools::FEFactoryBase<dim, spacedim> *fef =
+              dynamic_cast<const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
             return fef->get(1);
           }
         else
           {
             // Make sure no other thread
             // is just adding an element
-            Threads::Mutex::ScopedLock lock(fe_name_map_lock);
+            Threads::Mutex::ScopedLock lock(
+              internal::FEToolsAddFENameHelper::fe_name_map_lock);
             AssertThrow(fe_name_map.find(name_part) != fe_name_map.end(),
-                        ExcInvalidFEName(name));
+                        FETools::ExcInvalidFEName(name));
 
             // Now, just the (degree)
             // or (Quadrature<1>(degree+1))
@@ -2551,8 +2584,9 @@ namespace FETools
                 name.erase(0, tmp.second + 1);
                 const Subscriptor *ptr =
                   fe_name_map.find(name_part)->second.get();
-                const FEFactoryBase<dim, spacedim> *fef =
-                  dynamic_cast<const FEFactoryBase<dim, spacedim> *>(ptr);
+                const FETools::FEFactoryBase<dim, spacedim> *fef =
+                  dynamic_cast<const FETools::FEFactoryBase<dim, spacedim> *>(
+                    ptr);
                 return fef->get(tmp.first);
               }
             else
@@ -2568,8 +2602,9 @@ namespace FETools
                     name.erase(0, tmp.second + 2);
                     const Subscriptor *ptr =
                       fe_name_map.find(name_part)->second.get();
-                    const FEFactoryBase<dim, spacedim> *fef =
-                      dynamic_cast<const FEFactoryBase<dim, spacedim> *>(ptr);
+                    const FETools::FEFactoryBase<dim, spacedim> *fef =
+                      dynamic_cast<
+                        const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
                     return fef->get(QGaussLobatto<1>(tmp.first));
                   }
                 else if (quadrature_name.compare("QGauss") == 0)
@@ -2580,8 +2615,9 @@ namespace FETools
                     name.erase(0, tmp.second + 2);
                     const Subscriptor *ptr =
                       fe_name_map.find(name_part)->second.get();
-                    const FEFactoryBase<dim, spacedim> *fef =
-                      dynamic_cast<const FEFactoryBase<dim, spacedim> *>(ptr);
+                    const FETools::FEFactoryBase<dim, spacedim> *fef =
+                      dynamic_cast<
+                        const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
                     return fef->get(QGauss<1>(tmp.first));
                   }
                 else if (quadrature_name.compare("QIterated") == 0)
@@ -2601,8 +2637,9 @@ namespace FETools
                     name.erase(0, tmp.second + 2);
                     const Subscriptor *ptr =
                       fe_name_map.find(name_part)->second.get();
-                    const FEFactoryBase<dim, spacedim> *fef =
-                      dynamic_cast<const FEFactoryBase<dim, spacedim> *>(ptr);
+                    const FETools::FEFactoryBase<dim, spacedim> *fef =
+                      dynamic_cast<
+                        const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
                     return fef->get(QIterated<1>(QTrapez<1>(), tmp.first));
                   }
                 else
@@ -2617,7 +2654,7 @@ namespace FETools
         // didn't know what to do with the
         // string we got. so do as the docs
         // say: raise an exception
-        AssertThrow(false, ExcInvalidFEName(name));
+        AssertThrow(false, FETools::ExcInvalidFEName(name));
 
         // make some compilers happy that
         // do not realize that we can't get
@@ -2631,10 +2668,10 @@ namespace FETools
       std::unique_ptr<FiniteElement<dim, spacedim>>
       get_fe_by_name(std::string &name)
       {
-        return get_fe_by_name_ext<dim, spacedim>(name,
-                                                 fe_name_map[dim][spacedim]);
+        return get_fe_by_name_ext<dim, spacedim>(
+          name, FEToolsAddFENameHelper::fe_name_map[dim][spacedim]);
       }
-    } // namespace
+    } // namespace FEToolsGetFEHelper
   }   // namespace internal
 
 
@@ -2713,7 +2750,8 @@ namespace FETools
 
     try
       {
-        auto fe = internal::get_fe_by_name<dim, spacedim>(name);
+        auto fe =
+          internal::FEToolsGetFEHelper::get_fe_by_name<dim, spacedim>(name);
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
@@ -2985,113 +3023,115 @@ namespace FETools
 
 
 
-  namespace
+  namespace internal
   {
-    // Helper functions for
-    // FETools::convert_generalized_support_point_values_to_dof_values
-
-    template <int dim, int spacedim, typename number>
-    static void
-    convert_helper(const FiniteElement<dim, spacedim> &finite_element,
-                   const std::vector<Vector<number>> & support_point_values,
-                   std::vector<number> &               dof_values)
+    namespace FEToolsConvertHelper
     {
-      static Threads::ThreadLocalStorage<std::vector<Vector<double>>>
-                                                              double_support_point_values;
-      static Threads::ThreadLocalStorage<std::vector<double>> double_dof_values;
+      // Helper functions for
+      // FETools::convert_generalized_support_point_values_to_dof_values
 
-      double_support_point_values.get().resize(support_point_values.size());
-      double_dof_values.get().resize(dof_values.size());
+      template <int dim, int spacedim, typename number>
+      static void
+      convert_helper(const FiniteElement<dim, spacedim> &finite_element,
+                     const std::vector<Vector<number>> & support_point_values,
+                     std::vector<number> &               dof_values)
+      {
+        static Threads::ThreadLocalStorage<std::vector<Vector<double>>>
+          double_support_point_values;
+        static Threads::ThreadLocalStorage<std::vector<double>>
+          double_dof_values;
 
-      for (unsigned int i = 0; i < support_point_values.size(); ++i)
-        {
-          double_support_point_values.get()[i].reinit(
-            finite_element.n_components(), false);
-          std::copy(std::begin(support_point_values[i]),
-                    std::end(support_point_values[i]),
-                    std::begin(double_support_point_values.get()[i]));
-        }
+        double_support_point_values.get().resize(support_point_values.size());
+        double_dof_values.get().resize(dof_values.size());
 
-      finite_element.convert_generalized_support_point_values_to_dof_values(
-        double_support_point_values.get(), double_dof_values.get());
+        for (unsigned int i = 0; i < support_point_values.size(); ++i)
+          {
+            double_support_point_values.get()[i].reinit(
+              finite_element.n_components(), false);
+            std::copy(std::begin(support_point_values[i]),
+                      std::end(support_point_values[i]),
+                      std::begin(double_support_point_values.get()[i]));
+          }
 
-      std::copy(std::begin(double_dof_values.get()),
-                std::end(double_dof_values.get()),
-                std::begin(dof_values));
-    }
+        finite_element.convert_generalized_support_point_values_to_dof_values(
+          double_support_point_values.get(), double_dof_values.get());
 
-
-    template <int dim, int spacedim, typename number>
-    static void
-    convert_helper(
-      const FiniteElement<dim, spacedim> &             finite_element,
-      const std::vector<Vector<std::complex<number>>> &support_point_values,
-      std::vector<std::complex<number>> &              dof_values)
-    {
-      static Threads::ThreadLocalStorage<std::vector<Vector<double>>>
-        double_support_point_values_real;
-      static Threads::ThreadLocalStorage<std::vector<double>>
-        double_dof_values_real;
-      static Threads::ThreadLocalStorage<std::vector<Vector<double>>>
-        double_support_point_values_imag;
-      static Threads::ThreadLocalStorage<std::vector<double>>
-        double_dof_values_imag;
-
-      double_support_point_values_real.get().resize(
-        support_point_values.size());
-      double_dof_values_real.get().resize(dof_values.size());
-      double_support_point_values_imag.get().resize(
-        support_point_values.size());
-      double_dof_values_imag.get().resize(dof_values.size());
-
-      for (unsigned int i = 0; i < support_point_values.size(); ++i)
-        {
-          double_support_point_values_real.get()[i].reinit(
-            finite_element.n_components(), false);
-          double_support_point_values_imag.get()[i].reinit(
-            finite_element.n_components(), false);
-
-          std::transform(std::begin(support_point_values[i]),
-                         std::end(support_point_values[i]),
-                         std::begin(double_support_point_values_real.get()[i]),
-                         [](std::complex<number> c) -> double {
-                           return c.real();
-                         });
-
-          std::transform(std::begin(support_point_values[i]),
-                         std::end(support_point_values[i]),
-                         std::begin(double_support_point_values_imag.get()[i]),
-                         [](std::complex<number> c) -> double {
-                           return c.imag();
-                         });
-        }
-
-      finite_element.convert_generalized_support_point_values_to_dof_values(
-        double_support_point_values_real.get(), double_dof_values_real.get());
-      finite_element.convert_generalized_support_point_values_to_dof_values(
-        double_support_point_values_imag.get(), double_dof_values_imag.get());
-
-      std::transform(std::begin(double_dof_values_real.get()),
-                     std::end(double_dof_values_real.get()),
-                     std::begin(double_dof_values_imag.get()),
-                     std::begin(dof_values),
-                     [](number real, number imag) -> std::complex<number> {
-                       return {real, imag};
-                     });
-    }
+        std::copy(std::begin(double_dof_values.get()),
+                  std::end(double_dof_values.get()),
+                  std::begin(dof_values));
+      }
 
 
-    template <int dim, int spacedim>
-    static void
-    convert_helper(const FiniteElement<dim, spacedim> &finite_element,
-                   const std::vector<Vector<double>> & support_point_values,
-                   std::vector<double> &               dof_values)
-    {
-      finite_element.convert_generalized_support_point_values_to_dof_values(
-        support_point_values, dof_values);
-    }
+      template <int dim, int spacedim, typename number>
+      static void
+      convert_helper(
+        const FiniteElement<dim, spacedim> &             finite_element,
+        const std::vector<Vector<std::complex<number>>> &support_point_values,
+        std::vector<std::complex<number>> &              dof_values)
+      {
+        static Threads::ThreadLocalStorage<std::vector<Vector<double>>>
+          double_support_point_values_real;
+        static Threads::ThreadLocalStorage<std::vector<double>>
+          double_dof_values_real;
+        static Threads::ThreadLocalStorage<std::vector<Vector<double>>>
+          double_support_point_values_imag;
+        static Threads::ThreadLocalStorage<std::vector<double>>
+          double_dof_values_imag;
 
-  } /* anonymous namespace */
+        double_support_point_values_real.get().resize(
+          support_point_values.size());
+        double_dof_values_real.get().resize(dof_values.size());
+        double_support_point_values_imag.get().resize(
+          support_point_values.size());
+        double_dof_values_imag.get().resize(dof_values.size());
+
+        for (unsigned int i = 0; i < support_point_values.size(); ++i)
+          {
+            double_support_point_values_real.get()[i].reinit(
+              finite_element.n_components(), false);
+            double_support_point_values_imag.get()[i].reinit(
+              finite_element.n_components(), false);
+
+            std::transform(
+              std::begin(support_point_values[i]),
+              std::end(support_point_values[i]),
+              std::begin(double_support_point_values_real.get()[i]),
+              [](std::complex<number> c) -> double { return c.real(); });
+
+            std::transform(
+              std::begin(support_point_values[i]),
+              std::end(support_point_values[i]),
+              std::begin(double_support_point_values_imag.get()[i]),
+              [](std::complex<number> c) -> double { return c.imag(); });
+          }
+
+        finite_element.convert_generalized_support_point_values_to_dof_values(
+          double_support_point_values_real.get(), double_dof_values_real.get());
+        finite_element.convert_generalized_support_point_values_to_dof_values(
+          double_support_point_values_imag.get(), double_dof_values_imag.get());
+
+        std::transform(std::begin(double_dof_values_real.get()),
+                       std::end(double_dof_values_real.get()),
+                       std::begin(double_dof_values_imag.get()),
+                       std::begin(dof_values),
+                       [](number real, number imag) -> std::complex<number> {
+                         return {real, imag};
+                       });
+      }
+
+
+      template <int dim, int spacedim>
+      static void
+      convert_helper(const FiniteElement<dim, spacedim> &finite_element,
+                     const std::vector<Vector<double>> & support_point_values,
+                     std::vector<double> &               dof_values)
+      {
+        finite_element.convert_generalized_support_point_values_to_dof_values(
+          support_point_values, dof_values);
+      }
+
+    } // namespace FEToolsConvertHelper
+  }   // namespace internal
 
 
 
@@ -3106,9 +3146,8 @@ namespace FETools
                     finite_element.get_generalized_support_points().size());
     AssertDimension(dof_values.size(), finite_element.dofs_per_cell);
 
-    convert_helper<dim, spacedim>(finite_element,
-                                  support_point_values,
-                                  dof_values);
+    internal::FEToolsConvertHelper::convert_helper<dim, spacedim>(
+      finite_element, support_point_values, dof_values);
   }
 
 
@@ -3321,7 +3360,7 @@ namespace FETools
       hierarchic_to_lexicographic_numbering(fe));
   }
 
-} // end of namespace FETools
+} // namespace FETools
 
 
 DEAL_II_NAMESPACE_CLOSE
