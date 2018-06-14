@@ -240,8 +240,8 @@ namespace LinearAlgebra
      * };
      * @endcode
      *
-     * @note This function requires that the header
-     * read_write_vector.templates.h be included.
+     * @note This function requires that the header read_write_vector.templates.h
+     * be included.
      */
     template <typename Functor>
     void

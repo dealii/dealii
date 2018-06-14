@@ -827,9 +827,9 @@ namespace DoFRenumbering
    * degrees of freedom on this cell <i>earlier</i> indices than
    * all of the indices owned by processor 1.
    *
-   * @note This function generates an ordering that is independent of the
-   * previous numbering of degrees of freedom. In other words, any information
-   * that may have been produced by a previous call to a renumbering function is
+   * @note This function generates an ordering that is independent of the previous
+   * numbering of degrees of freedom. In other words, any information that may
+   * have been produced by a previous call to a renumbering function is
    * ignored.
    */
   template <int dim>

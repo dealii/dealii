@@ -201,8 +201,8 @@ namespace Manifolds
  * between the two points in ${\mathbb R}^d$.
  *
  *
- * @note Unlike almost all other cases in the library, we here interpret the
- * points to be in real space, not on the reference cell.
+ * @note Unlike almost all other cases in the library, we here interpret the points
+ * to be in real space, not on the reference cell.
  *
  * Manifold::get_new_point() has a default implementation that can
  * simplify this process somewhat: Internally, the function calls the

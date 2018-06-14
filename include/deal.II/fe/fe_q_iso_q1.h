@@ -71,8 +71,8 @@ DEAL_II_NAMESPACE_OPEN
  * solution and stabilization techniques are used that work for linears but
  * not higher order elements. </li>
  *
- * <li> Stokes/Navier Stokes systems such as the one discussed in step-22 could
- * be solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
+ * <li> Stokes/Navier Stokes systems such as the one discussed in step-22 could be
+ * solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
  * Combined with Q1 pressures they give a stable mixed element pair. However,
  * they perform worse than the standard (Taylor-Hood $Q_2\times Q_1$)
  * approach in most situations.  </li>

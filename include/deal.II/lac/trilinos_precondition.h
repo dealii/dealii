@@ -1629,8 +1629,8 @@ namespace TrilinosWrappers
    * except for the higher_order_elements parameter which does not exist in
    * PreconditionerAMGMueLu.
    *
-   * @note This class requires Trilinos 11.14 or higher. At the moment
-   * 64bit-indices are not supported.
+   * @note This class requires Trilinos 11.14 or higher. At the moment 64bit-indices
+   * are not supported.
    *
    * @warning This interface should not be considered as stable.
    *

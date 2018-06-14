@@ -189,9 +189,9 @@ namespace Differentiation
        * default it is assumed that the input type does not satisfy the
        * necessary conditions to construct this class.
        *
-       * @tparam ADNumberTrait A class that examined whether it contains the
-       * necessary information to satisfy the requirements for being an
-       * internally supported auto-differentiable number.
+       * @tparam ADNumberTrait A class that examined whether it contains the necessary
+       *         information to satisfy the requirements for being an internally
+       *         supported auto-differentiable number.
        * @tparam T An arbitrary type resulting from the application of
        *         the SFINAE idiom to selectively specialize this class.
        *

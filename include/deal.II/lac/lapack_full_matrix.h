@@ -461,9 +461,8 @@ public:
    * @note It is assumed that @p A, @p B and @p V have compatible sizes and that
    * @p C already has the right size.
    *
-   * @note This function is not provided by LAPACK. The function first forms
-   * $\rm{diag}(\mathbf V) \cdot \mathbf B$ product and then uses Xgemm
-   * function.
+   * @note This function is not provided by LAPACK. The function first forms $\rm{diag}(\mathbf V) \cdot \mathbf B$ product and
+   * then uses Xgemm function.
    */
   void
   Tmmult(LAPACKFullMatrix<number> &      C,
@@ -546,8 +545,7 @@ public:
    * Compute the Cholesky factorization of the matrix using LAPACK function
    * Xpotrf.
    *
-   * @note The factorization is stored in the lower-triangular part of the
-   * matrix.
+   * @note The factorization is stored in the lower-triangular part of the matrix.
    */
   void
   compute_cholesky_factorization();
@@ -558,8 +556,8 @@ public:
    * positive definite matrix using Cholesky factorization. This function can
    * only be called if the matrix is already factorized.
    *
-   * @note The condition number $k(\mathbf A)$ can be used to estimate the
-   * numerical error related to the matrix inversion or the solution of the
+   * @note The condition number $k(\mathbf A)$ can be used to estimate the numerical
+   * error related to the matrix inversion or the solution of the
    * system of linear algebraic equations as
    * <code>error = std::numeric_limits<Number>::epsilon * k</code>.
    * Alternatively one can get the number of accurate digits

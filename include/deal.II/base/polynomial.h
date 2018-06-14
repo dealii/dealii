@@ -56,8 +56,7 @@ namespace Polynomials
    * must be used. In case a manipulation is done that changes the roots, the
    * representation is switched to the coefficient form.
    *
-   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, Martin Kronbichler,
-   * 2011, 2017
+   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, Martin Kronbichler, 2011, 2017
    */
   template <typename number>
   class Polynomial : public Subscriptor

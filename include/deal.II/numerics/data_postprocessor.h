@@ -716,8 +716,7 @@ private:
  *     // like above, but now also make sure that DataOut provides
  *     // us with coordinates of the evaluation points:
  *     DataPostprocessorVector<dim> ("heat_flux",
- *                                   update_gradients |
- * update_quadrature_points)
+ *                                   update_gradients | update_quadrature_points)
  *   {}
  *
  *   virtual

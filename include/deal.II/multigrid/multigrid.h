@@ -53,53 +53,55 @@ namespace mg
   struct Signals
   {
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
-     * false) the call to MGTransfer::copy_to_mg which transfers the vector
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the call to MGTransfer::copy_to_mg which transfers the vector
      * given to it to a multi-level vector.
      */
     boost::signals2::signal<void(const bool before)> transfer_to_mg;
 
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
-     * false) the call to MGTransfer::copy_from_mg which transfers the
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the call to MGTransfer::copy_from_mg which transfers the
      * multi-level vector given to it to a normal vector.
      */
     boost::signals2::signal<void(const bool before)> transfer_to_global;
 
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is
      * false) the call to the coarse solver on @p level.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       coarse_solve;
 
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
-     * false) the call to MGTransfer::restrict_and_add() which restricts a
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the call to MGTransfer::restrict_and_add() which restricts a
      * vector from @p level to the next coarser one (@p level - 1).
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       restriction;
 
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
-     * false) the call to MGTransfer::prolongate() which prolongs a vector to
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the call to MGTransfer::prolongate() which prolongs a vector to
      * @p level from the next coarser one (@p level - 1).
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       prolongation;
 
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
-     * false) the call to a pre-smoothing step via MGPreSmoother::apply() on
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the call to a pre-smoothing step via MGPreSmoother::apply() on
      * @p level.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       pre_smoother_step;
 
     /**
-     * This signal is triggered before (@p before is true) and after (@p before is
-     * false) the call to a post-smoothing step via MGPostSmoother::apply() on
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the call to a post-smoothing step via MGPostSmoother::apply()
+     * on
      * @p level.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>

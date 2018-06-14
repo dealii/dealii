@@ -682,7 +682,8 @@ namespace GridTools
    * If @p points[a] and @p points[b] are the only two points that fall in @p cells[c],
    * then @p qpoints[c][0] and @p qpoints[c][1] are the reference positions of
    * @p points[a] and @p points[b] in @p cells[c], and @p indices[c][0] = a,
-   * @p indices[c][1] = b. The function Mapping::transform_unit_to_real(qpoints[c][0])
+   * @p indices[c][1] = b. The function
+   * Mapping::transform_unit_to_real(qpoints[c][0])
    * returns @p points[a].
    *
    * The algorithm assumes it's easier to look for a point in the cell that was
@@ -721,8 +722,8 @@ namespace GridTools
 
   /**
    * Given a @p cache and a list of
-   * @p local_points for each process, find the points lying on the locally owned
-   * part of the mesh and compute the quadrature rules for them.
+   * @p local_points for each process, find the points lying on the locally
+   * owned part of the mesh and compute the quadrature rules for them.
    * Distributed compute point locations is a function similar to
    * GridTools::compute_point_locations but working for parallel::Triangulation
    * objects and, unlike its serial version, also for a distributed
@@ -1492,7 +1493,8 @@ namespace GridTools
    *  If @p max_boxes was left as default or bigger than 1 these two boxes would be returned.
    * - 4. Because @p max_boxes = 1 the smallest bounding box is merged to the bigger one.
    * Notice it is important to choose the parameters wisely. For instance, @p allow_merge = false and
-   * @p refinement_level = 1 returns the very same bounding box but with a fraction of the computational cost.
+   * @p refinement_level = 1 returns the very same bounding box but with a
+   * fraction of the computational cost.
    *
    * This function does not take into account the curvature of cells and thus it
    * is not suited for handling curved geometry: the mapping is assumed to be
