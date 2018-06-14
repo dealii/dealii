@@ -75,9 +75,19 @@ fi
 # - -n 50 calls the following script with up to 50 file names at a time
 # - -P 10 calls the following script up to 10 times in parallel
 #
+
+indent()
+{
+  f=$1
+  clang-format "$f" > "$f.tmp"
+  diff -q "$f" "$f.tmp" >/dev/null || mv "$f.tmp" "$f"
+  rm -f "$f.tmp"
+}
+export -f indent
+
 find tests include source examples \
   \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
-  xargs -0 -n 50 -P 10 clang-format -i
+  xargs -0 -n 1 -P 10 -I {} bash -c 'indent "$@"' _ {}
 
 #
 # Use the same process to set file permissions for all source files.
