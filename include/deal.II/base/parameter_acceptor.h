@@ -59,7 +59,8 @@ DEAL_II_NAMESPACE_OPEN
  * ParameterAcceptor::add_parameter() method for each parameter we want to
  * have, or by constructing a ParameterAcceptorProxy class with your own class,
  * provided that your class implements the @p declare_parameters and
- * @p parse_parameters functions (the first can be a static member in this case).
+ * @p parse_parameters functions (the first can be a static member in this
+ * case).
  *
  * By using the add_parameter method, ParameterAcceptor makes sure that the
  * given parameter is registered in the global parameter handler (by calling

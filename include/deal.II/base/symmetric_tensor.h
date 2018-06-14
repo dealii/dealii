@@ -2981,8 +2981,8 @@ namespace internal
      * @param[in] A The tensor of which the eigenvectors and eigenvalues are
      * to be computed.
      *
-     * @return An array containing the eigenvectors and the associated
-     * eigenvalues. The array is not sorted in any particular order.
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
      *
      * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
@@ -3023,8 +3023,8 @@ namespace internal
      * @param[in] A The tensor of which the eigenvectors and eigenvalues are
      * to be computed.
      *
-     * @return An array containing the eigenvectors and the associated
-     * eigenvalues. The array is not sorted in any particular order.
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
      *
      * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
@@ -3044,8 +3044,8 @@ namespace internal
      * @param[in] A The tensor of which the eigenvectors and eigenvalues are
      * to be computed.
      *
-     * @return An array containing the eigenvectors and the associated
-     * eigenvalues. The array is not sorted in any particular order.
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
      *
      * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
@@ -3081,8 +3081,8 @@ namespace internal
      * @param[in] A The tensor of which the eigenvectors and eigenvalues are
      * to be computed.
      *
-     * @return An array containing the eigenvectors and the associated
-     * eigenvalues. The array is not sorted in any particular order.
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
      *
      * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */

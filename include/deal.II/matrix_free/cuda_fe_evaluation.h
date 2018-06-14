@@ -53,8 +53,8 @@ namespace CUDAWrappers
    *
    * @tparam dim Dimension in which this class is to be used
    *
-   * @tparam fe_degree Degree of the tensor prodict finite element with
-   * fe_degree+1 degrees of freedom per coordinate direction
+   * @tparam fe_degree Degree of the tensor prodict finite element with fe_degree+1
+   * degrees of freedom per coordinate direction
    *
    * @tparam n_q_points_1d Number of points in the quadrature formular in 1D,
    * defaults to fe_degree+1

@@ -315,15 +315,15 @@ namespace parallel
      *
      * @note Currently coarsening is not supported.
      *
-     * @note The functionality provided by this class can alternatively be
-     * achieved using parallel::distributed::SolutionTransfer. However, that
-     * would require the following steps: (i) create an auxiliary DoFHandler
-     * with a (discontinuous Galerkin) FiniteElement which has enough components
-     * to represent all data stored at the quadrature points; (ii) project the
-     * data to the FiniteElement space and thereby store results in global
-     * vectors; (iii) use parallel::distributed::SolutionTransfer to project FE
-     * vectors to the new mesh; and (iv) finally project the data back to the
-     * quadrature points on the new mesh via FEValues class. The
+     * @note The functionality provided by this class can alternatively be achieved
+     * using parallel::distributed::SolutionTransfer. However, that would
+     * require the following steps: (i) create an auxiliary DoFHandler with a
+     * (discontinuous Galerkin) FiniteElement which has enough components to
+     * represent all data stored at the quadrature points; (ii) project the data
+     * to the FiniteElement space and thereby store results in global vectors;
+     * (iii) use parallel::distributed::SolutionTransfer to project FE vectors
+     * to the new mesh; and (iv) finally project the data back to the quadrature
+     * points on the new mesh via FEValues class. The
      * ContinuousQuadratureDataTransfer class aims at simplifying the whole
      * process by only requiring that the quadrature point data class is derived
      * from the TransferableQuadraturePointData. Everything else will be done
@@ -377,8 +377,8 @@ namespace parallel
 
       /**
        * Prepare for coarsening and refinement of a triangulation @p tria .
-       * @p data_storage represents the cell data which should be transferred and
-       * it should be initialized for each locally owned active cell.
+       * @p data_storage represents the cell data which should be transferred
+       * and it should be initialized for each locally owned active cell.
        *
        * @note Although CellDataStorage class allows storing on different cells
        * different objects derived from the base class, here we assume that

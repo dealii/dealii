@@ -1091,8 +1091,8 @@ namespace Threads
      * t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
-     * the function needs to return a writable (non-@p const) reference to support
-     * code such as this:
+     * the function needs to return a writable (non-@p const) reference to
+     * support code such as this:
      * @code
      *   std::unique_ptr<int> create_int (const std::string &s) { ... }
      *
@@ -1799,8 +1799,8 @@ namespace Threads
      * t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
-     * the function needs to return a writable (non-@p const) reference to support
-     * code such as this:
+     * the function needs to return a writable (non-@p const) reference to
+     * support code such as this:
      * @code
      *   std::unique_ptr<int> create_int (const std::string &s) { ... }
      *

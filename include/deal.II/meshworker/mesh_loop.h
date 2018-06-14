@@ -73,10 +73,10 @@ namespace MeshWorker
    * the same principles of WorkStream::run. Internally the function passes to
    * @p boundary_worker, in addition to the above, also a @p face_no parameter
    * that identifies the face on which the integration should be performed. The
-   * @p face_worker instead needs to identify the current face unambiguously both on
-   * the cell and on the neighboring cell, and it is therefore called with six
-   * arguments (three for each cell: the actual cell, the face index, and
-   * the subface_index. If no subface integration is needed, then the
+   * @p face_worker instead needs to identify the current face unambiguously
+   * both on the cell and on the neighboring cell, and it is therefore called
+   * with six arguments (three for each cell: the actual cell, the face index,
+   * and the subface_index. If no subface integration is needed, then the
    * subface_index is numbers::invalid_unsigned_int) in addition to the usual
    * ScratchData and CopyData objects.
    *

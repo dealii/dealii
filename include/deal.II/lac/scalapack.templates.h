@@ -609,7 +609,8 @@ extern "C"
    * It is not required that the matrices A and B have the same process grid or
    * block size, e.g. copying a matrix from a one-dimensional to a
    * two-dimensional process grid
-   * @p ictxt is a context which is at least a union of all processes in context A and B
+   * @p ictxt is a context which is at least a union of all processes in context
+   * A and B
    */
   void
   pdgemr2d_(const int *   m,

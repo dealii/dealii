@@ -65,9 +65,8 @@ DEAL_II_NAMESPACE_OPEN
  * </dl>
  * where $0 \le a_1, a_2, a_3 \le k$.
  *
- * @note Unlike the classical Raviart-Thomas space, the lowest order for the
- * enhanced space is 1, similarly to the Brezzi-Douglas-Marini (BDM) polynomial
- * space.
+ * @note Unlike the classical Raviart-Thomas space, the lowest order for the enhanced space
+ * is 1, similarly to the Brezzi-Douglas-Marini (BDM) polynomial space.
  *
  * The total dimension of the space <i>dim(V<sub>k</sub>) = d*(k+1)^d</i>, where
  * <i>d</i> is the space dimension. This allows to associate shape functions

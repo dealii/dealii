@@ -82,8 +82,7 @@ namespace GridGenerator
    * cells. See hyper_rectangle(), if different lengths in different ordinate
    * directions are required.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim, int spacedim>
   void
@@ -132,8 +131,7 @@ namespace GridGenerator
    * dimensional space with the remaining entries set to zero. For example, a
    * <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim, int spacedim>
   void
@@ -169,8 +167,7 @@ namespace GridGenerator
    * <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with
    * z=0, defined by the two opposing corners @p p1 and @p p2.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim, int spacedim>
   void
@@ -335,8 +332,7 @@ namespace GridGenerator
    *
    * @note This function is implemented in 2d only.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -356,8 +352,7 @@ namespace GridGenerator
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -373,8 +368,7 @@ namespace GridGenerator
    * of subdivisions in each of the @p dim directions. Colorizing is done
    * according to hyper_rectangle().
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -388,8 +382,7 @@ namespace GridGenerator
    * number of subdivisions in each of the @p dim directions may vary.
    * Colorizing is done according to hyper_rectangle().
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -445,8 +438,7 @@ namespace GridGenerator
    *
    * Presently only available in 2d and 3d.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -488,8 +480,7 @@ namespace GridGenerator
    * SphericalManifold manifold also to the boundary cells, and not only to the
    * boundary faces.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -520,8 +511,7 @@ namespace GridGenerator
    * @image html sphere.png
    * @image html sphere_section.png
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
 
   template <int spacedim>
@@ -555,8 +545,7 @@ namespace GridGenerator
    * boundary and 1 for the cut plane. The manifold id for the curved boundary
    * is set to zero, and a SphericalManifold is attached to it.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -585,8 +574,7 @@ namespace GridGenerator
    * The manifold id for the hull of the cylinder is set to zero, and a
    * CylindricalManifold is attached to it.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -614,8 +602,7 @@ namespace GridGenerator
    * In three dimensions, the manifold id of the hull is set to zero, and a
    * CylindricalManifold is attached to it.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    *
    * @author Markus B&uuml;rg, 2009
    */
@@ -691,8 +678,7 @@ namespace GridGenerator
    * This function exists for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -716,8 +702,7 @@ namespace GridGenerator
    * If @p colorize is set to @p true, the faces forming the slit are marked
    * with boundary id 1 and 2, respectively.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -761,8 +746,7 @@ namespace GridGenerator
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -795,8 +779,7 @@ namespace GridGenerator
    * All manifold ids are set to zero, and a SphericalManifold is attached
    * to the triangulation.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -829,8 +812,7 @@ namespace GridGenerator
    * All manifold ids are set to zero, and a SphericalManifold is attached
    * to the triangulation.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -858,8 +840,7 @@ namespace GridGenerator
    * All manifold ids are set to zero, and a CylindricalManifold is attached
    * to the triangulation.
    *
-   * @note The triangulation passed as argument needs to be empty when calling
-   * this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void

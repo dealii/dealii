@@ -239,8 +239,8 @@ namespace PETScWrappers
        * way, the ghost parameter can equal the set of locally relevant
        * degrees of freedom, see step-32.
        *
-       * @note This operation always creates a ghosted vector, which is
-       * considered read-only.
+       * @note This operation always creates a ghosted vector, which is considered
+       * read-only.
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"

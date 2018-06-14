@@ -792,8 +792,7 @@ class MultipleParameterLoop;
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011,
- * 2017
+ * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
  * @author Alberto Sartori, 2015
  * @author David Wells, 2016
  */

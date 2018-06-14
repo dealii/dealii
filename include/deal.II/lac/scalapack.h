@@ -252,12 +252,10 @@ public:
    * The operations based on the input parameter @p transpose_B and the
    * alignment conditions are summarized in the following table:
    *
-   * | transpose_B |          Block Sizes         |                    Operation
-   * | | :---------: | :--------------------------: |
-   * :-------------------------------------------: | |   false     | $MB_A=MB_B$
-   * <br> $NB_A=NB_B$ |  $\mathbf{A} = a \mathbf{A} + b \mathbf{B}$   | |   true
-   * | $MB_A=NB_B$ <br> $NB_A=MB_B$ | $\mathbf{A} = a \mathbf{A} + b
-   * \mathbf{B}^T$  |
+   * | transpose_B |          Block Sizes         |                    Operation                  |
+   * | :---------: | :--------------------------: | :-------------------------------------------: |
+   * |   false     | $MB_A=MB_B$ <br> $NB_A=NB_B$ |  $\mathbf{A} = a \mathbf{A} + b \mathbf{B}$   |
+   * |   true      | $MB_A=NB_B$ <br> $NB_A=MB_B$ | $\mathbf{A} = a \mathbf{A} + b \mathbf{B}^T$  |
    *
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
    */
@@ -297,17 +295,12 @@ public:
    * The operations based on the input parameters and the alignment conditions
    * are summarized in the following table:
    *
-   * | transpose_A | transpose_B |                  Block Sizes | Operation | |
-   * :---------: | :---------: | :-------------------------------------------: |
-   * :-------------------------------------------------------------: | | false
-   * |   false     | $MB_A=MB_C$ <br> $NB_A=MB_B$ <br> $NB_B=NB_C$ | $\mathbf{C}
-   * = b \mathbf{A} \cdot \mathbf{B} + c \mathbf{C}$   | | false       |   true
-   * | $MB_A=MB_C$ <br> $NB_A=NB_B$ <br> $MB_B=NB_C$ |  $\mathbf{C} = b
-   * \mathbf{A} \cdot \mathbf{B}^T + c \mathbf{C}$  | | true        |   false |
-   * $MB_A=MB_B$ <br> $NB_A=MB_C$ <br> $NB_B=NB_C$ | $\mathbf{C} = b
-   * \mathbf{A}^T \cdot \mathbf{B} + c \mathbf{C}$   | | true        |   true |
-   * $MB_A=NB_B$ <br> $NB_A=MB_C$ <br> $MB_B=NB_C$ | $\mathbf{C} = b
-   * \mathbf{A}^T \cdot \mathbf{B}^T + c \mathbf{C}$ |
+   * | transpose_A | transpose_B |                  Block Sizes                  |                             Operation                           |
+   * | :---------: | :---------: | :-------------------------------------------: | :-------------------------------------------------------------: |
+   * | false       |   false     | $MB_A=MB_C$ <br> $NB_A=MB_B$ <br> $NB_B=NB_C$ |   $\mathbf{C} = b \mathbf{A} \cdot \mathbf{B} + c \mathbf{C}$   |
+   * | false       |   true      | $MB_A=MB_C$ <br> $NB_A=NB_B$ <br> $MB_B=NB_C$ |  $\mathbf{C} = b \mathbf{A} \cdot \mathbf{B}^T + c \mathbf{C}$  |
+   * | true        |   false     | $MB_A=MB_B$ <br> $NB_A=MB_C$ <br> $NB_B=NB_C$ | $\mathbf{C} = b \mathbf{A}^T \cdot \mathbf{B} + c \mathbf{C}$   |
+   * | true        |   true      | $MB_A=NB_B$ <br> $NB_A=MB_C$ <br> $MB_B=NB_C$ | $\mathbf{C} = b \mathbf{A}^T \cdot \mathbf{B}^T + c \mathbf{C}$ |
    *
    * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and
    * that
@@ -816,8 +809,7 @@ private:
    *
    * If successful, the computed eigenvalues are arranged in ascending order.
    *
-   * @note Due to a bug in Netlib-ScaLAPACK, either all or no eigenvectors can
-   * be computed.
+   * @note Due to a bug in Netlib-ScaLAPACK, either all or no eigenvectors can be computed.
    * Therefore, the input @p index_limits has to be set accordingly. Using Intel-MKL this restriction is not required.
    */
   std::vector<NumberType>

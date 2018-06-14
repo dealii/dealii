@@ -549,8 +549,8 @@ make_array_view(const ArrayView<Number> &array_view)
 /**
  * Create a view from an ArrayView itself.
  *
- * This function is used for non-@p const references to objects of ArrayView type.
- * It only exists for compatibility purposes.
+ * This function is used for non-@p const references to objects of ArrayView
+ * type. It only exists for compatibility purposes.
  *
  * @param[in] array_view The ArrayView that we wish to make a copy of.
  *
