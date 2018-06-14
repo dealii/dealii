@@ -192,7 +192,7 @@ namespace Step51
   {
   public:
     SolutionAndGradient()
-      : Function<dim>(dim)
+      : Function<dim>(dim+1)
     {}
 
     virtual void vector_value(const Point<dim> &p,
