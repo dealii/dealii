@@ -247,11 +247,12 @@ SeventhProblem<dim>::run(unsigned int cycle)
   else
     {
       Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
-      KellyErrorEstimator<dim>::estimate(dof_handler,
-                                         QGauss<dim - 1>(3),
-                                         typename FunctionMap<dim>::type(),
-                                         locally_relevant_solution,
-                                         estimated_error_per_cell);
+      KellyErrorEstimator<dim>::estimate(
+        dof_handler,
+        QGauss<dim - 1>(3),
+        std::map<types::boundary_id, const Function<dim> *>(),
+        locally_relevant_solution,
+        estimated_error_per_cell);
 
       parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
         triangulation, estimated_error_per_cell, 0.5, 0.3);

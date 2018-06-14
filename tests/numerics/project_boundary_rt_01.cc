@@ -147,9 +147,9 @@ test_projection(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   QGauss<dim - 1>      quadrature(degree + 2);
   MappingQGeneric<dim> mapping(1);
 
-  TestFunction<dim>                         f(degree - 1);
-  std::map<types::global_dof_index, double> boundary_constraints;
-  typename FunctionMap<dim>::type           boundary_map;
+  TestFunction<dim>                                   f(degree - 1);
+  std::map<types::global_dof_index, double>           boundary_constraints;
+  std::map<types::boundary_id, const Function<dim> *> boundary_map;
   for (types::boundary_id i = 0; i < 255; ++i)
     boundary_map[i] = &f;
   VectorTools::project_boundary_values(

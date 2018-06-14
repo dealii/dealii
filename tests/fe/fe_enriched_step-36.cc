@@ -503,11 +503,12 @@ namespace Step36
       face_quadrature_formula.push_back(QGauss<dim - 1>(3));
       face_quadrature_formula.push_back(QGauss<dim - 1>(3));
 
-      KellyErrorEstimator<dim>::estimate(dof_handler,
-                                         face_quadrature_formula,
-                                         typename FunctionMap<dim>::type(),
-                                         sol,
-                                         error);
+      KellyErrorEstimator<dim>::estimate(
+        dof_handler,
+        face_quadrature_formula,
+        std::map<types::boundary_id, const Function<dim> *>(),
+        sol,
+        error);
     }
 
     // sum up for a global:

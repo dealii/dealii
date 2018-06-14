@@ -19,7 +19,6 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/function_map.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -77,8 +76,8 @@ check_fe(FiniteElement<dim> &fe)
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  Functions::ZeroFunction<dim>    zero;
-  typename FunctionMap<dim>::type fmap;
+  Functions::ZeroFunction<dim>                        zero;
+  std::map<types::boundary_id, const Function<dim> *> fmap;
   fmap.insert(std::make_pair(0, &zero));
 
   DoFHandler<dim> mgdof(tr);

@@ -300,7 +300,7 @@ test_neumann(const NeumanBC<dim> &func)
   dealii::deallog << std::endl;
 
   // call Kelly
-  typename dealii::FunctionMap<dim>::type function_map;
+  std::map<types::boundary_id, const Function<dim> *> function_map;
   function_map[0] = &func;
 
   dealii::Vector<float> error(dof_handler.n_dofs());
@@ -420,7 +420,7 @@ test_regular(const MyFunction<dim> &func)
   dealii::KellyErrorEstimator<dim>::estimate(
     dof_handler,
     face_quadrature_formula,
-    typename dealii::FunctionMap<dim>::type(),
+    std::map<types::boundary_id, const Function<dim> *>(),
     values,
     error,
     dealii::ComponentMask(),
@@ -550,7 +550,7 @@ test_irregular(const MyFunction<dim> &func)
   dealii::KellyErrorEstimator<dim>::estimate(
     dof_handler,
     face_quadrature_formula,
-    typename dealii::FunctionMap<dim>::type(),
+    std::map<types::boundary_id, const Function<dim> *>(),
     values,
     error,
     dealii::ComponentMask(),
@@ -719,7 +719,7 @@ test(const MySecondFunction<dim> &func)
   dealii::KellyErrorEstimator<dim>::estimate(
     dof_handler,
     face_quadrature_formula,
-    typename dealii::FunctionMap<dim>::type(),
+    std::map<types::boundary_id, const Function<dim> *>(),
     values,
     error,
     dealii::ComponentMask(),

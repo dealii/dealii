@@ -1,0 +1,4 @@
+Deprecated: FunctionMap is deprecated. It is recommended to
+use the aliased type directly.
+<br>
+(Daniel Arndt, 2018/06/11)

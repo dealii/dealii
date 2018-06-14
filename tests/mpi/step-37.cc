@@ -327,9 +327,10 @@ namespace Step37
       DoFTools::make_hanging_node_constraints(
         dof_handler, hanging_nodes_laplace_constraints);
 
-      std::set<types::boundary_id>    dirichlet_boundary_ids;
-      typename FunctionMap<dim>::type dirichlet_boundary_functions;
-      PotentialBCFunction<dim>        bc_func(240, Point<dim>());
+      std::set<types::boundary_id> dirichlet_boundary_ids;
+      std::map<types::boundary_id, const Function<dim> *>
+                               dirichlet_boundary_functions;
+      PotentialBCFunction<dim> bc_func(240, Point<dim>());
       dirichlet_boundary_ids.insert(0);
       dirichlet_boundary_functions[0] = &bc_func;
       VectorTools::interpolate_boundary_values(*mapping.get(),

@@ -21,7 +21,6 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/function_map.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -75,8 +74,8 @@ check_fe(FiniteElement<dim> &fe)
     parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   setup_tria(tr);
 
-  Functions::ZeroFunction<dim>    zero;
-  typename FunctionMap<dim>::type fmap;
+  Functions::ZeroFunction<dim>                        zero;
+  std::map<types::boundary_id, const Function<dim> *> fmap;
   fmap.insert(std::make_pair(0, &zero));
 
   DoFHandler<dim> dofh(tr);
@@ -125,8 +124,8 @@ check_fe(FiniteElement<dim> &fe)
         cell->update_cell_dof_indices_cache();
       }
 
-    typename FunctionMap<dim>::type dirichlet_boundary;
-    Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
+    std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+    Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     mg_constrained_dofs_ref.initialize(dofhref, dirichlet_boundary);
   }
@@ -135,8 +134,8 @@ check_fe(FiniteElement<dim> &fe)
 
   MGConstrainedDoFs mg_constrained_dofs;
 
-  typename FunctionMap<dim>::type dirichlet_boundary;
-  Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   mg_constrained_dofs.initialize(dofh, dirichlet_boundary);
 

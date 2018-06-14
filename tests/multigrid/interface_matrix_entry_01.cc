@@ -95,8 +95,8 @@ test()
   constraints.reinit(locally_relevant_set);
   DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
-  std::set<types::boundary_id>     dirichlet_boundary_ids;
-  typename FunctionMap<dim>::type  dirichlet_boundary;
+  std::set<types::boundary_id>                        dirichlet_boundary_ids;
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(0.0);
   dirichlet_boundary_ids.insert(0);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;

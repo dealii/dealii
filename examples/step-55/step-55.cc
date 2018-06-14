@@ -690,12 +690,13 @@ namespace Step55
         Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
         FEValuesExtractors::Vector velocities(0);
-        KellyErrorEstimator<dim>::estimate(dof_handler,
-                                           QGauss<dim - 1>(3),
-                                           typename FunctionMap<dim>::type(),
-                                           locally_relevant_solution,
-                                           estimated_error_per_cell,
-                                           fe.component_mask(velocities));
+        KellyErrorEstimator<dim>::estimate(
+          dof_handler,
+          QGauss<dim - 1>(3),
+          std::map<types::boundary_id, const Function<dim> *>(),
+          locally_relevant_solution,
+          estimated_error_per_cell,
+          fe.component_mask(velocities));
         parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
           triangulation, estimated_error_per_cell, 0.3, 0.0);
         triangulation.execute_coarsening_and_refinement();

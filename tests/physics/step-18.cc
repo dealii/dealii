@@ -673,15 +673,16 @@ namespace Step18
   TopLevel<dim>::refine_initial_grid()
   {
     Vector<float> error_per_cell(triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim - 1>(2),
-                                       typename FunctionMap<dim>::type(),
-                                       incremental_displacement,
-                                       error_per_cell,
-                                       ComponentMask(),
-                                       nullptr,
-                                       MultithreadInfo::n_threads(),
-                                       this_mpi_process);
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      QGauss<dim - 1>(2),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      incremental_displacement,
+      error_per_cell,
+      ComponentMask(),
+      nullptr,
+      MultithreadInfo::n_threads(),
+      this_mpi_process);
     const unsigned int n_local_cells =
       triangulation.n_locally_owned_active_cells();
     PETScWrappers::MPI::Vector distributed_error_per_cell(

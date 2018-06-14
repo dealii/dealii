@@ -73,9 +73,9 @@ public:
     addit_data.level_mg_handler = level;
 
     // extract the constraints due to Dirichlet boundary conditions
-    ConstraintMatrix                constraints;
-    Functions::ZeroFunction<dim>    zero;
-    typename FunctionMap<dim>::type functions;
+    ConstraintMatrix                                    constraints;
+    Functions::ZeroFunction<dim>                        zero;
+    std::map<types::boundary_id, const Function<dim> *> functions;
     for (std::set<types::boundary_id>::const_iterator it =
            dirichlet_boundaries.begin();
          it != dirichlet_boundaries.end();
@@ -375,9 +375,9 @@ do_test(const DoFHandler<dim> &dof)
       mg_matrices[level].initialize(mapping, dof, dirichlet_boundaries, level);
     }
 
-  MGConstrainedDoFs               mg_constrained_dofs;
-  Functions::ZeroFunction<dim>    zero_function;
-  typename FunctionMap<dim>::type dirichlet_boundary;
+  MGConstrainedDoFs                                   mg_constrained_dofs;
+  Functions::ZeroFunction<dim>                        zero_function;
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
   mg_constrained_dofs.initialize(dof, dirichlet_boundary);
 

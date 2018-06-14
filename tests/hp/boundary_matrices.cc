@@ -98,8 +98,8 @@ check()
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-  MySquareFunction<dim>           coefficient;
-  typename FunctionMap<dim>::type function_map;
+  MySquareFunction<dim>                               coefficient;
+  std::map<types::boundary_id, const Function<dim> *> function_map;
   function_map[0] = &coefficient;
 
   hp::QCollection<dim - 1> face_quadrature;

@@ -6916,8 +6916,8 @@ namespace VectorTools
     AffineConstraints<double> &          constraints,
     const Mapping<dim, spacedim> &       mapping)
   {
-    ZeroFunction<dim>                            zero_function(dim);
-    typename FunctionMap<spacedim>::type         function_map;
+    ZeroFunction<dim>                                        zero_function(dim);
+    std::map<types::boundary_id, const Function<spacedim> *> function_map;
     std::set<types::boundary_id>::const_iterator it = boundary_ids.begin();
     for (; it != boundary_ids.end(); ++it)
       function_map[*it] = &zero_function;
@@ -6932,12 +6932,13 @@ namespace VectorTools
   template <int dim, int spacedim, template <int, int> class DoFHandlerType>
   void
   compute_nonzero_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> & dof_handler,
-    const unsigned int                    first_vector_component,
-    const std::set<types::boundary_id> &  boundary_ids,
-    typename FunctionMap<spacedim>::type &function_map,
-    AffineConstraints<double> &           constraints,
-    const Mapping<dim, spacedim> &        mapping)
+    const DoFHandlerType<dim, spacedim> &dof_handler,
+    const unsigned int                   first_vector_component,
+    const std::set<types::boundary_id> & boundary_ids,
+    const std::map<types::boundary_id, const Function<spacedim> *>
+      &                           function_map,
+    AffineConstraints<double> &   constraints,
+    const Mapping<dim, spacedim> &mapping)
   {
     Assert(dim > 1,
            ExcMessage("This function is not useful in 1d because it amounts "
@@ -7117,7 +7118,7 @@ namespace VectorTools
 
                     const Point<dim> point = fe_values.quadrature_point(i);
                     Vector<double>   b_values(dim);
-                    function_map[*b_id]->vector_value(point, b_values);
+                    function_map.at(*b_id)->vector_value(point, b_values);
 
                     // now enter the (dofs,(normal_vector,cell)) entry into
                     // the map
@@ -7528,8 +7529,8 @@ namespace VectorTools
     AffineConstraints<double> &          constraints,
     const Mapping<dim, spacedim> &       mapping)
   {
-    ZeroFunction<dim>                            zero_function(dim);
-    typename FunctionMap<spacedim>::type         function_map;
+    ZeroFunction<dim>                                        zero_function(dim);
+    std::map<types::boundary_id, const Function<spacedim> *> function_map;
     std::set<types::boundary_id>::const_iterator it = boundary_ids.begin();
     for (; it != boundary_ids.end(); ++it)
       function_map[*it] = &zero_function;
@@ -7544,12 +7545,13 @@ namespace VectorTools
   template <int dim, int spacedim, template <int, int> class DoFHandlerType>
   void
   compute_nonzero_tangential_flux_constraints(
-    const DoFHandlerType<dim, spacedim> & dof_handler,
-    const unsigned int                    first_vector_component,
-    const std::set<types::boundary_id> &  boundary_ids,
-    typename FunctionMap<spacedim>::type &function_map,
-    AffineConstraints<double> &           constraints,
-    const Mapping<dim, spacedim> &        mapping)
+    const DoFHandlerType<dim, spacedim> &dof_handler,
+    const unsigned int                   first_vector_component,
+    const std::set<types::boundary_id> & boundary_ids,
+    const std::map<types::boundary_id, const Function<spacedim> *>
+      &                           function_map,
+    AffineConstraints<double> &   constraints,
+    const Mapping<dim, spacedim> &mapping)
   {
     AffineConstraints<double> no_normal_flux_constraints(
       constraints.get_local_lines());
@@ -7647,7 +7649,7 @@ namespace VectorTools
 
                       const Point<dim> point = fe_values.quadrature_point(i);
                       const double     b_value =
-                        function_map[*b_id]->value(point, component);
+                        function_map.at(*b_id)->value(point, component);
                       dof_to_b_value.insert(
                         std::make_pair(face_dofs[i], b_value));
                     }

@@ -207,8 +207,8 @@ namespace Step50
     constraints.reinit(locally_relevant_set);
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
-    typename FunctionMap<dim>::type dirichlet_boundary;
-    Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc;
+    std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+    Functions::ZeroFunction<dim> homogeneous_dirichlet_bc;
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values(mg_dof_handler,
                                              dirichlet_boundary,
@@ -490,12 +490,12 @@ namespace Step50
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
-    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(
-                                         mg_dof_handler),
-                                       QGauss<dim - 1>(degree + 1),
-                                       typename FunctionMap<dim>::type(),
-                                       temp_solution,
-                                       estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(
+      mg_dof_handler,
+      QGauss<dim - 1>(degree + 1),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      temp_solution,
+      estimated_error_per_cell);
 
     const double threshold =
       0.6 * Utilities::MPI::max(estimated_error_per_cell.linfty_norm(),

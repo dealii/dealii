@@ -64,7 +64,8 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> &mapping,
   const DoFHandlerType &      dof_handler,
   const Quadrature<0> &       quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
   const InputVector &       solution,
   Vector<float> &           error,
@@ -100,7 +101,8 @@ void
 KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandlerType &dof_handler,
   const Quadrature<0> & quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
   const InputVector &       solution,
   Vector<float> &           error,
@@ -133,7 +135,8 @@ void
 KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandlerType &dof_handler,
   const Quadrature<0> & quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
   const std::vector<const InputVector *> &solutions,
   std::vector<Vector<float> *> &          errors,
@@ -167,7 +170,8 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> &mapping,
   const DoFHandlerType &      dof_handler,
   const hp::QCollection<0> &  quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
   const InputVector &       solution,
   Vector<float> &           error,
@@ -202,7 +206,8 @@ void
 KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandlerType &    dof_handler,
   const hp::QCollection<0> &quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
   const InputVector &       solution,
   Vector<float> &           error,
@@ -235,7 +240,8 @@ void
 KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandlerType &    dof_handler,
   const hp::QCollection<0> &quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
   const std::vector<const InputVector *> &solutions,
   std::vector<Vector<float> *> &          errors,
@@ -269,7 +275,8 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> & /*mapping*/,
   const DoFHandlerType & /*dof_handler*/,
   const hp::QCollection<0> &,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     & /*neumann_bc*/,
   const std::vector<const InputVector *> & /*solutions*/,
   std::vector<Vector<float> *> & /*errors*/,
@@ -292,7 +299,8 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> &mapping,
   const DoFHandlerType &      dof_handler,
   const Quadrature<0> &,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
   const std::vector<const InputVector *> &solutions,
   std::vector<Vector<float> *> &          errors,
@@ -340,13 +348,10 @@ KellyErrorEstimator<1, spacedim>::estimate(
                     "indicator for internal boundaries in your boundary "
                     "value map."));
 
-  for (typename FunctionMap<spacedim, typename InputVector::value_type>::type::
-         const_iterator i = neumann_bc.begin();
-       i != neumann_bc.end();
-       ++i)
-    Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(i->first,
-                                      i->second->n_components,
+  for (const auto boundary_function : neumann_bc)
+    Assert(boundary_function.second->n_components == n_components,
+           ExcInvalidBoundaryFunction(boundary_function.first,
+                                      boundary_function.second->n_components,
                                       n_components));
 
   Assert(component_mask.represents_n_components(n_components),
@@ -371,13 +376,10 @@ KellyErrorEstimator<1, spacedim>::estimate(
            (coefficient->n_components == 1),
          ExcInvalidCoefficient());
 
-  for (typename FunctionMap<spacedim, typename InputVector::value_type>::type::
-         const_iterator i = neumann_bc.begin();
-       i != neumann_bc.end();
-       ++i)
-    Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(i->first,
-                                      i->second->n_components,
+  for (const auto &boundary_function : neumann_bc)
+    Assert(boundary_function.second->n_components == n_components,
+           ExcInvalidBoundaryFunction(boundary_function.first,
+                                      boundary_function.second->n_components,
                                       n_components));
 
   // reserve one slot for each cell and set it to zero

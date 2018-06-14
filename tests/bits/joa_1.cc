@@ -808,10 +808,8 @@ LaplaceProblem<dim>::solve()
 // list of boundaries where we have
 // imposed Neumann value, and the
 // corresponding Neumann values. This
-// information is represented by an
-// object of type
-// <code>FunctionMap@<dim@>::type</code> that is
-// essentially a map from boundary
+// information is represented by
+// a map from boundary
 // indicators to function objects
 // describing Neumann boundary values
 // (in the present example program,
@@ -841,11 +839,12 @@ LaplaceProblem<dim>::refine_grid()
 {
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate(dof_handler,
-                                     QGauss<dim - 1>(3),
-                                     typename FunctionMap<dim>::type(),
-                                     solution,
-                                     estimated_error_per_cell);
+  KellyErrorEstimator<dim>::estimate(
+    dof_handler,
+    QGauss<dim - 1>(3),
+    std::map<types::boundary_id, const Function<dim> *>(),
+    solution,
+    estimated_error_per_cell);
 
   // The above function returned one
   // error indicator value for each

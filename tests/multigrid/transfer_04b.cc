@@ -21,7 +21,6 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/function_map.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -121,8 +120,8 @@ check_fe(FiniteElement<dim> &fe)
     }
 
 
-  Functions::ZeroFunction<dim>    zero;
-  typename FunctionMap<dim>::type fmap;
+  Functions::ZeroFunction<dim>                        zero;
+  std::map<types::boundary_id, const Function<dim> *> fmap;
   fmap.insert(std::make_pair(0, &zero));
 
   DoFHandler<dim> dofh(tr);

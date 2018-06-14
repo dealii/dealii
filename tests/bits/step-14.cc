@@ -786,11 +786,12 @@ namespace LaplaceSolver
   {
     Vector<float> estimated_error_per_cell(
       this->triangulation->n_active_cells());
-    KellyErrorEstimator<dim>::estimate(this->dof_handler,
-                                       QGauss<dim - 1>(3),
-                                       typename FunctionMap<dim>::type(),
-                                       this->solution,
-                                       estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(
+      this->dof_handler,
+      QGauss<dim - 1>(3),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      this->solution,
+      estimated_error_per_cell);
     GridRefinement::refine_and_coarsen_fixed_number(*this->triangulation,
                                                     estimated_error_per_cell,
                                                     0.3,
@@ -847,11 +848,12 @@ namespace LaplaceSolver
   RefinementWeightedKelly<dim>::refine_grid()
   {
     Vector<float> estimated_error(this->triangulation->n_active_cells());
-    KellyErrorEstimator<dim>::estimate(this->dof_handler,
-                                       *this->face_quadrature,
-                                       typename FunctionMap<dim>::type(),
-                                       this->solution,
-                                       estimated_error);
+    KellyErrorEstimator<dim>::estimate(
+      this->dof_handler,
+      *this->face_quadrature,
+      std::map<types::boundary_id, const Function<dim> *>(),
+      this->solution,
+      estimated_error);
 
     typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
                                                             .begin_active(),

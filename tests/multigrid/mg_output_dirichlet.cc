@@ -206,8 +206,9 @@ check_simple(const FiniteElement<dim> &fe)
 
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr, -1, 1);
-  typename FunctionMap<dim>::type dirichlet_boundary_functions;
-  Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
+  std::map<types::boundary_id, const Function<dim> *>
+                               dirichlet_boundary_functions;
+  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
   dirichlet_boundary_functions[0] = &homogeneous_dirichlet_bc;
 
   tr.refine_global(1);

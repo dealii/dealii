@@ -20,11 +20,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/function_map.h>
 
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
@@ -1006,8 +1006,7 @@ namespace VectorTools
    * The keys of this map correspond to the number @p boundary_id of the face.
    * numbers::internal_face_boundary_id is an illegal value for this key since
    * it is reserved for interior faces. For an example of how to use this
-   * argument with a non-empty map, see the step-16 tutorial program. (Note
-   * that the argument type is equal to the FunctionMap type.)
+   * argument with a non-empty map, see the step-16 tutorial program.
    *
    * The flags in the last parameter, @p component_mask denote which
    * components of the finite element space shall be interpolated. If it is
@@ -1972,11 +1971,12 @@ namespace VectorTools
   template <int dim, int spacedim, template <int, int> class DoFHandlerType>
   void
   compute_nonzero_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> & dof_handler,
-    const unsigned int                    first_vector_component,
-    const std::set<types::boundary_id> &  boundary_ids,
-    typename FunctionMap<spacedim>::type &function_map,
-    AffineConstraints<double> &           constraints,
+    const DoFHandlerType<dim, spacedim> &dof_handler,
+    const unsigned int                   first_vector_component,
+    const std::set<types::boundary_id> & boundary_ids,
+    const std::map<types::boundary_id, const Function<spacedim> *>
+      &                           function_map,
+    AffineConstraints<double> &   constraints,
     const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
 
   /**
@@ -2019,11 +2019,12 @@ namespace VectorTools
   template <int dim, int spacedim, template <int, int> class DoFHandlerType>
   void
   compute_nonzero_tangential_flux_constraints(
-    const DoFHandlerType<dim, spacedim> & dof_handler,
-    const unsigned int                    first_vector_component,
-    const std::set<types::boundary_id> &  boundary_ids,
-    typename FunctionMap<spacedim>::type &function_map,
-    AffineConstraints<double> &           constraints,
+    const DoFHandlerType<dim, spacedim> &dof_handler,
+    const unsigned int                   first_vector_component,
+    const std::set<types::boundary_id> & boundary_ids,
+    const std::map<types::boundary_id, const Function<spacedim> *>
+      &                           function_map,
+    AffineConstraints<double> &   constraints,
     const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
 
   /**

@@ -78,8 +78,8 @@ void
 check_boundary(const hp::DoFHandler<dim> &       dof,
                const hp::MappingCollection<dim> &mapping)
 {
-  MySquareFunction<dim>           coefficient;
-  typename FunctionMap<dim>::type function_map;
+  MySquareFunction<dim>                               coefficient;
+  std::map<types::boundary_id, const Function<dim> *> function_map;
   function_map[0] = &coefficient;
 
   hp::QCollection<dim - 1> face_quadrature;
@@ -181,7 +181,7 @@ check()
 
   Functions::ExpFunction<dim> coefficient;
 
-  typename FunctionMap<dim>::type function_map;
+  std::map<types::boundary_id, const Function<dim> *> function_map;
   function_map[0] = &coefficient;
 
   for (unsigned int test = 0; test < 2; ++test)

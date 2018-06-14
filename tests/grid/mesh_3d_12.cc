@@ -56,7 +56,11 @@ void check_this(Triangulation<3> &tria)
   VectorTools::interpolate(dof_handler, Functions::SquareFunction<3>(), u);
 
   KellyErrorEstimator<3>::estimate(
-    dof_handler, QGauss<2>(2), FunctionMap<3>::type(), u, e);
+    dof_handler,
+    QGauss<2>(2),
+    std::map<types::boundary_id, const Function<3> *>(),
+    u,
+    e);
 
   deallog << "  " << static_cast<double>(e.l1_norm()) << std::endl;
   deallog << "  " << static_cast<double>(e.l2_norm()) << std::endl;

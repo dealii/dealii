@@ -949,22 +949,22 @@ namespace Step46
     face_q_collection.push_back(elasticity_face_quadrature);
 
     const FEValuesExtractors::Vector velocities(0);
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       face_q_collection,
-                                       typename FunctionMap<dim>::type(),
-                                       solution,
-                                       stokes_estimated_error_per_cell,
-                                       fe_collection.component_mask(
-                                         velocities));
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      face_q_collection,
+      std::map<types::boundary_id, const Function<dim> *>(),
+      solution,
+      stokes_estimated_error_per_cell,
+      fe_collection.component_mask(velocities));
 
     const FEValuesExtractors::Vector displacements(dim + 1);
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       face_q_collection,
-                                       typename FunctionMap<dim>::type(),
-                                       solution,
-                                       elasticity_estimated_error_per_cell,
-                                       fe_collection.component_mask(
-                                         displacements));
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      face_q_collection,
+      std::map<types::boundary_id, const Function<dim> *>(),
+      solution,
+      elasticity_estimated_error_per_cell,
+      fe_collection.component_mask(displacements));
 
     // We then normalize error estimates by dividing by their norm and scale
     // the fluid error indicators by a factor of 4 as discussed in the

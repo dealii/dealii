@@ -193,8 +193,8 @@ namespace Step50
     constraints.clear();
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
-    typename FunctionMap<dim>::type dirichlet_boundary;
-    Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
+    std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+    Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values(
       static_cast<const DoFHandler<dim> &>(mg_dof_handler),
@@ -442,12 +442,12 @@ namespace Step50
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(
-                                         mg_dof_handler),
-                                       QGauss<dim - 1>(3),
-                                       typename FunctionMap<dim>::type(),
-                                       solution,
-                                       estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(
+      mg_dof_handler,
+      QGauss<dim - 1>(3),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      solution,
+      estimated_error_per_cell);
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                     estimated_error_per_cell,
                                                     0.3,

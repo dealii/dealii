@@ -448,8 +448,8 @@ namespace Step51
 
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    typename FunctionMap<dim>::type boundary_functions;
-    Solution<dim>                   solution_function;
+    std::map<types::boundary_id, const Function<dim> *> boundary_functions;
+    Solution<dim>                                       solution_function;
     boundary_functions[0] = &solution_function;
     VectorTools::project_boundary_values(dof_handler,
                                          boundary_functions,
@@ -1329,8 +1329,9 @@ namespace Step51
               Vector<float> estimated_error_per_cell(
                 triangulation.n_active_cells());
 
-              FEValuesExtractors::Scalar      scalar(dim);
-              typename FunctionMap<dim>::type neumann_boundary;
+              FEValuesExtractors::Scalar scalar(dim);
+              std::map<types::boundary_id, const Function<dim> *>
+                neumann_boundary;
               KellyErrorEstimator<dim>::estimate(dof_handler_local,
                                                  QGauss<dim - 1>(3),
                                                  neumann_boundary,
