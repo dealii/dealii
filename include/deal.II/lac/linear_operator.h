@@ -1034,170 +1034,171 @@ namespace internal
       return EmptyPayload();
     }
 
+
+
+    // A trait class that determines whether type T provides public
+    // (templated or non-templated) vmult_add member functions
+    template <typename Range, typename Domain, typename T>
+    class has_vmult_add_and_Tvmult_add
+    {
+      template <typename C>
+      static std::false_type
+      test(...);
+
+      template <typename C>
+      static auto
+      test(Range *r, Domain *d)
+        -> decltype(std::declval<C>().vmult_add(*r, *d),
+                    std::declval<C>().Tvmult_add(*d, *r),
+                    std::true_type());
+
+    public:
+      // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
+      // otherwise it is std::false_type
+
+      typedef decltype(test<T>(nullptr, nullptr)) type;
+    };
+
+
+    // A helper function to apply a given vmult, or Tvmult to a vector with
+    // intermediate storage
+    template <typename Function, typename Range, typename Domain>
+    void
+    apply_with_intermediate_storage(Function      function,
+                                    Range &       v,
+                                    const Domain &u,
+                                    bool          add)
+    {
+      GrowingVectorMemory<Range> vector_memory;
+
+      typename VectorMemory<Range>::Pointer i(vector_memory);
+      i->reinit(v, /*bool omit_zeroing_entries =*/true);
+
+      function(*i, u);
+
+      if (add)
+        v += *i;
+      else
+        v = *i;
+    }
+
+
+    // A helper class to add a reduced matrix interface to a LinearOperator
+    // (typically provided by Preconditioner classes)
+    template <typename Range, typename Domain, typename Payload>
+    class MatrixInterfaceWithoutVmultAdd
+    {
+    public:
+      template <typename Matrix>
+      void
+      operator()(LinearOperator<Range, Domain, Payload> &op,
+                 const Matrix &                          matrix)
+      {
+        op.vmult = [&matrix](Range &v, const Domain &u) {
+          if (PointerComparison::equal(&v, &u))
+            {
+              // If v and u are the same memory location use intermediate
+              // storage
+              apply_with_intermediate_storage(
+                [&matrix](Range &b, const Domain &a) { matrix.vmult(b, a); },
+                v,
+                u,
+                /*bool add =*/false);
+            }
+          else
+            {
+              matrix.vmult(v, u);
+            }
+        };
+
+        op.vmult_add = [&matrix](Range &v, const Domain &u) {
+          // use intermediate storage to implement vmult_add with vmult
+          apply_with_intermediate_storage(
+            [&matrix](Range &b, const Domain &a) { matrix.vmult(b, a); },
+            v,
+            u,
+            /*bool add =*/true);
+        };
+
+        op.Tvmult = [&matrix](Domain &v, const Range &u) {
+          if (PointerComparison::equal(&v, &u))
+            {
+              // If v and u are the same memory location use intermediate
+              // storage
+              apply_with_intermediate_storage(
+                [&matrix](Domain &b, const Range &a) { matrix.Tvmult(b, a); },
+                v,
+                u,
+                /*bool add =*/false);
+            }
+          else
+            {
+              matrix.Tvmult(v, u);
+            }
+        };
+
+        op.Tvmult_add = [&matrix](Domain &v, const Range &u) {
+          // use intermediate storage to implement Tvmult_add with Tvmult
+          apply_with_intermediate_storage(
+            [&matrix](Domain &b, const Range &a) { matrix.Tvmult(b, a); },
+            v,
+            u,
+            /*bool add =*/true);
+        };
+      }
+    };
+
+
+    // A helper class to add the full matrix interface to a LinearOperator
+    template <typename Range, typename Domain, typename Payload>
+    class MatrixInterfaceWithVmultAdd
+    {
+    public:
+      template <typename Matrix>
+      void
+      operator()(LinearOperator<Range, Domain, Payload> &op,
+                 const Matrix &                          matrix)
+      {
+        // As above ...
+
+        MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>().operator()(
+          op, matrix);
+
+        // ... but add native vmult_add and Tvmult_add variants:
+
+        op.vmult_add = [&matrix](Range &v, const Domain &u) {
+          if (PointerComparison::equal(&v, &u))
+            {
+              apply_with_intermediate_storage(
+                [&matrix](Range &b, const Domain &a) { matrix.vmult(b, a); },
+                v,
+                u,
+                /*bool add =*/true);
+            }
+          else
+            {
+              matrix.vmult_add(v, u);
+            }
+        };
+
+        op.Tvmult_add = [&matrix](Domain &v, const Range &u) {
+          if (PointerComparison::equal(&v, &u))
+            {
+              apply_with_intermediate_storage(
+                [&matrix](Domain &b, const Range &a) { matrix.Tvmult(b, a); },
+                v,
+                u,
+                /*bool add =*/true);
+            }
+          else
+            {
+              matrix.Tvmult_add(v, u);
+            }
+        };
+      }
+    };
   } // namespace LinearOperatorImplementation
-} /* namespace internal */
-
-
-namespace
-{
-  // A trait class that determines whether type T provides public
-  // (templated or non-templated) vmult_add member functions
-  template <typename Range, typename Domain, typename T>
-  class has_vmult_add_and_Tvmult_add
-  {
-    template <typename C>
-    static std::false_type
-    test(...);
-
-    template <typename C>
-    static auto
-    test(Range *r, Domain *d) -> decltype(std::declval<C>().vmult_add(*r, *d),
-                                          std::declval<C>().Tvmult_add(*d, *r),
-                                          std::true_type());
-
-  public:
-    // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
-    // otherwise it is std::false_type
-
-    typedef decltype(test<T>(nullptr, nullptr)) type;
-  };
-
-
-  // A helper function to apply a given vmult, or Tvmult to a vector with
-  // intermediate storage
-  template <typename Function, typename Range, typename Domain>
-  void
-  apply_with_intermediate_storage(Function      function,
-                                  Range &       v,
-                                  const Domain &u,
-                                  bool          add)
-  {
-    GrowingVectorMemory<Range> vector_memory;
-
-    typename VectorMemory<Range>::Pointer i(vector_memory);
-    i->reinit(v, /*bool omit_zeroing_entries =*/true);
-
-    function(*i, u);
-
-    if (add)
-      v += *i;
-    else
-      v = *i;
-  }
-
-
-  // A helper class to add a reduced matrix interface to a LinearOperator
-  // (typically provided by Preconditioner classes)
-  template <typename Range, typename Domain, typename Payload>
-  class MatrixInterfaceWithoutVmultAdd
-  {
-  public:
-    template <typename Matrix>
-    void
-    operator()(LinearOperator<Range, Domain, Payload> &op, const Matrix &matrix)
-    {
-      op.vmult = [&matrix](Range &v, const Domain &u) {
-        if (PointerComparison::equal(&v, &u))
-          {
-            // If v and u are the same memory location use intermediate storage
-            apply_with_intermediate_storage(
-              [&matrix](Range &b, const Domain &a) { matrix.vmult(b, a); },
-              v,
-              u,
-              /*bool add =*/false);
-          }
-        else
-          {
-            matrix.vmult(v, u);
-          }
-      };
-
-      op.vmult_add = [&matrix](Range &v, const Domain &u) {
-        // use intermediate storage to implement vmult_add with vmult
-        apply_with_intermediate_storage(
-          [&matrix](Range &b, const Domain &a) { matrix.vmult(b, a); },
-          v,
-          u,
-          /*bool add =*/true);
-      };
-
-      op.Tvmult = [&matrix](Domain &v, const Range &u) {
-        if (PointerComparison::equal(&v, &u))
-          {
-            // If v and u are the same memory location use intermediate storage
-            apply_with_intermediate_storage(
-              [&matrix](Domain &b, const Range &a) { matrix.Tvmult(b, a); },
-              v,
-              u,
-              /*bool add =*/false);
-          }
-        else
-          {
-            matrix.Tvmult(v, u);
-          }
-      };
-
-      op.Tvmult_add = [&matrix](Domain &v, const Range &u) {
-        // use intermediate storage to implement Tvmult_add with Tvmult
-        apply_with_intermediate_storage(
-          [&matrix](Domain &b, const Range &a) { matrix.Tvmult(b, a); },
-          v,
-          u,
-          /*bool add =*/true);
-      };
-    }
-  };
-
-
-  // A helper class to add the full matrix interface to a LinearOperator
-  template <typename Range, typename Domain, typename Payload>
-  class MatrixInterfaceWithVmultAdd
-  {
-  public:
-    template <typename Matrix>
-    void
-    operator()(LinearOperator<Range, Domain, Payload> &op, const Matrix &matrix)
-    {
-      // As above ...
-
-      MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>().operator()(
-        op, matrix);
-
-      // ... but add native vmult_add and Tvmult_add variants:
-
-      op.vmult_add = [&matrix](Range &v, const Domain &u) {
-        if (PointerComparison::equal(&v, &u))
-          {
-            apply_with_intermediate_storage(
-              [&matrix](Range &b, const Domain &a) { matrix.vmult(b, a); },
-              v,
-              u,
-              /*bool add =*/true);
-          }
-        else
-          {
-            matrix.vmult_add(v, u);
-          }
-      };
-
-      op.Tvmult_add = [&matrix](Domain &v, const Range &u) {
-        if (PointerComparison::equal(&v, &u))
-          {
-            apply_with_intermediate_storage(
-              [&matrix](Domain &b, const Range &a) { matrix.Tvmult(b, a); },
-              v,
-              u,
-              /*bool add =*/true);
-          }
-        else
-          {
-            matrix.Tvmult_add(v, u);
-          }
-      };
-    }
-  };
-
-} /* namespace */
+} // namespace internal
 
 
 /**
@@ -1290,6 +1291,7 @@ template <typename Range,
 LinearOperator<Range, Domain, Payload>
 linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 {
+  using namespace internal::LinearOperatorImplementation;
   // Initialize the payload based on the input exemplar matrix
   LinearOperator<Range, Domain, Payload> return_op(
     Payload(operator_exemplar, matrix));
@@ -1345,6 +1347,7 @@ LinearOperator<Range, Domain, Payload>
 linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
                 const Matrix &                                matrix)
 {
+  using namespace internal::LinearOperatorImplementation;
   // Initialize the payload based on the LinearOperator exemplar
   auto return_op = operator_exemplar;
 

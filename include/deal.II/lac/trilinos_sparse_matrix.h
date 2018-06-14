@@ -2150,66 +2150,61 @@ namespace TrilinosWrappers
 
   namespace internal
   {
-    namespace
+    inline void
+    check_vector_map_equality(const Epetra_CrsMatrix &  mtrx,
+                              const Epetra_MultiVector &src,
+                              const Epetra_MultiVector &dst,
+                              const bool                transpose)
     {
-      inline void
-      check_vector_map_equality(const Epetra_CrsMatrix &  mtrx,
-                                const Epetra_MultiVector &src,
-                                const Epetra_MultiVector &dst,
-                                const bool                transpose)
-      {
-        if (transpose == false)
-          {
-            Assert(src.Map().SameAs(mtrx.DomainMap()) == true,
-                   ExcMessage(
-                     "Column map of matrix does not fit with vector map!"));
-            Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
-                   ExcMessage(
-                     "Row map of matrix does not fit with vector map!"));
-          }
-        else
-          {
-            Assert(src.Map().SameAs(mtrx.RangeMap()) == true,
-                   ExcMessage(
-                     "Column map of matrix does not fit with vector map!"));
-            Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
-                   ExcMessage(
-                     "Row map of matrix does not fit with vector map!"));
-          }
-        (void)mtrx; // removes -Wunused-variable in optimized mode
-        (void)src;
-        (void)dst;
-      }
+      if (transpose == false)
+        {
+          Assert(src.Map().SameAs(mtrx.DomainMap()) == true,
+                 ExcMessage(
+                   "Column map of matrix does not fit with vector map!"));
+          Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
+                 ExcMessage("Row map of matrix does not fit with vector map!"));
+        }
+      else
+        {
+          Assert(src.Map().SameAs(mtrx.RangeMap()) == true,
+                 ExcMessage(
+                   "Column map of matrix does not fit with vector map!"));
+          Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
+                 ExcMessage("Row map of matrix does not fit with vector map!"));
+        }
+      (void)mtrx; // removes -Wunused-variable in optimized mode
+      (void)src;
+      (void)dst;
+    }
 
-      inline void
-      check_vector_map_equality(const Epetra_Operator &   op,
-                                const Epetra_MultiVector &src,
-                                const Epetra_MultiVector &dst,
-                                const bool                transpose)
-      {
-        if (transpose == false)
-          {
-            Assert(src.Map().SameAs(op.OperatorDomainMap()) == true,
-                   ExcMessage(
-                     "Column map of operator does not fit with vector map!"));
-            Assert(dst.Map().SameAs(op.OperatorRangeMap()) == true,
-                   ExcMessage(
-                     "Row map of operator does not fit with vector map!"));
-          }
-        else
-          {
-            Assert(src.Map().SameAs(op.OperatorRangeMap()) == true,
-                   ExcMessage(
-                     "Column map of operator does not fit with vector map!"));
-            Assert(dst.Map().SameAs(op.OperatorDomainMap()) == true,
-                   ExcMessage(
-                     "Row map of operator does not fit with vector map!"));
-          }
-        (void)op; // removes -Wunused-variable in optimized mode
-        (void)src;
-        (void)dst;
-      }
-    } // namespace
+    inline void
+    check_vector_map_equality(const Epetra_Operator &   op,
+                              const Epetra_MultiVector &src,
+                              const Epetra_MultiVector &dst,
+                              const bool                transpose)
+    {
+      if (transpose == false)
+        {
+          Assert(src.Map().SameAs(op.OperatorDomainMap()) == true,
+                 ExcMessage(
+                   "Column map of operator does not fit with vector map!"));
+          Assert(dst.Map().SameAs(op.OperatorRangeMap()) == true,
+                 ExcMessage(
+                   "Row map of operator does not fit with vector map!"));
+        }
+      else
+        {
+          Assert(src.Map().SameAs(op.OperatorRangeMap()) == true,
+                 ExcMessage(
+                   "Column map of operator does not fit with vector map!"));
+          Assert(dst.Map().SameAs(op.OperatorDomainMap()) == true,
+                 ExcMessage(
+                   "Row map of operator does not fit with vector map!"));
+        }
+      (void)op; // removes -Wunused-variable in optimized mode
+      (void)src;
+      (void)dst;
+    }
 
     namespace LinearOperatorImplementation
     {

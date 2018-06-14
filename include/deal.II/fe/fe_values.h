@@ -4363,7 +4363,7 @@ namespace FEValuesViews
 
 
 
-  namespace
+  namespace internal
   {
     /**
      * Return the symmetrized version of a tensor whose n'th row equals the
@@ -4433,7 +4433,7 @@ namespace FEValuesViews
             }
         }
     }
-  } // namespace
+  } // namespace internal
 
 
 
@@ -4454,7 +4454,7 @@ namespace FEValuesViews
     if (snc == -2)
       return symmetric_gradient_type();
     else if (snc != -1)
-      return symmetrize_single_row(
+      return internal::symmetrize_single_row(
         shape_function_data[shape_function].single_nonzero_component_index,
         fe_values->finite_element_output.shape_gradients[snc][q_point]);
     else

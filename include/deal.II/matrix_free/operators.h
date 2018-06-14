@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MatrixFreeOperators
 {
-  namespace
+  namespace BlockHelper
   {
     // workaroud for unifying non-block vector and block vector implementations
     // a non-block vector has one block and the only subblock is the vector
@@ -101,7 +101,7 @@ namespace MatrixFreeOperators
     typename std::enable_if<!IsBlockVector<VectorType>::value, void>::type
     collect_sizes(const VectorType &)
     {}
-  } // namespace
+  } // namespace BlockHelper
 
   /**
    * Abstract base class for matrix-free operators which can be used both at
@@ -1052,21 +1052,21 @@ namespace MatrixFreeOperators
   Base<dim, VectorType>::initialize_dof_vector(VectorType &vec) const
   {
     Assert(data.get() != nullptr, ExcNotInitialized());
-    AssertDimension(n_blocks(vec), selected_rows.size());
-    for (unsigned int i = 0; i < n_blocks(vec); ++i)
+    AssertDimension(BlockHelper::n_blocks(vec), selected_rows.size());
+    for (unsigned int i = 0; i < BlockHelper::n_blocks(vec); ++i)
       {
         const unsigned int index = selected_rows[i];
-        if (!subblock(vec, index)
+        if (!BlockHelper::subblock(vec, index)
                .partitioners_are_compatible(
                  *data->get_dof_info(index).vector_partitioner))
-          data->initialize_dof_vector(subblock(vec, index), index);
+          data->initialize_dof_vector(BlockHelper::subblock(vec, index), index);
 
-        Assert(subblock(vec, index)
+        Assert(BlockHelper::subblock(vec, index)
                  .partitioners_are_globally_compatible(
                    *data->get_dof_info(index).vector_partitioner),
                ExcInternalError());
       }
-    collect_sizes(vec);
+    BlockHelper::collect_sizes(vec);
   }
 
 
@@ -1214,14 +1214,15 @@ namespace MatrixFreeOperators
   void
   Base<dim, VectorType>::set_constrained_entries_to_one(VectorType &dst) const
   {
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
         const std::vector<unsigned int> &constrained_dofs =
           data->get_constrained_dofs(selected_rows[j]);
         for (unsigned int i = 0; i < constrained_dofs.size(); ++i)
-          subblock(dst, j).local_element(constrained_dofs[i]) = 1.;
+          BlockHelper::subblock(dst, j).local_element(constrained_dofs[i]) = 1.;
         for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
-          subblock(dst, j).local_element(edge_constrained_indices[j][i]) = 1.;
+          BlockHelper::subblock(dst, j).local_element(
+            edge_constrained_indices[j][i]) = 1.;
       }
   }
 
@@ -1264,29 +1265,30 @@ namespace MatrixFreeOperators
     const bool        is_row) const
   {
     typedef typename Base<dim, VectorType>::value_type Number;
-    for (unsigned int i = 0; i < n_blocks(src); ++i)
+    for (unsigned int i = 0; i < BlockHelper::n_blocks(src); ++i)
       {
         const unsigned int mf_component =
           is_row ? selected_rows[i] : selected_columns[i];
         // If both vectors use the same partitioner -> done
-        if (subblock(src, i).get_partitioner().get() ==
+        if (BlockHelper::subblock(src, i).get_partitioner().get() ==
             data->get_dof_info(mf_component).vector_partitioner.get())
           continue;
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
         Assert(
-          subblock(src, i).get_partitioner()->local_size() ==
+          BlockHelper::subblock(src, i).get_partitioner()->local_size() ==
             data->get_dof_info(mf_component).vector_partitioner->local_size(),
           ExcMessage("The vector passed to the vmult() function does not have "
                      "the correct size for compatibility with MatrixFree."));
 
         // copy the vector content to a temporary vector so that it does not get
         // lost
-        LinearAlgebra::distributed::Vector<Number> copy_vec(subblock(src, i));
-        subblock(const_cast<VectorType &>(src), i)
+        LinearAlgebra::distributed::Vector<Number> copy_vec(
+          BlockHelper::subblock(src, i));
+        BlockHelper::subblock(const_cast<VectorType &>(src), i)
           .reinit(data->get_dof_info(mf_component).vector_partitioner);
-        subblock(const_cast<VectorType &>(src), i)
+        BlockHelper::subblock(const_cast<VectorType &>(src), i)
           .copy_locally_owned_data_from(copy_vec);
       }
   }
@@ -1304,14 +1306,16 @@ namespace MatrixFreeOperators
 
     // set zero Dirichlet values on the input vector (and remember the src and
     // dst values because we need to reset them at the end)
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
         for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
           {
             edge_constrained_values[j][i] = std::pair<Number, Number>(
-              subblock(src, j).local_element(edge_constrained_indices[j][i]),
-              subblock(dst, j).local_element(edge_constrained_indices[j][i]));
-            subblock(const_cast<VectorType &>(src), j)
+              BlockHelper::subblock(src, j).local_element(
+                edge_constrained_indices[j][i]),
+              BlockHelper::subblock(dst, j).local_element(
+                edge_constrained_indices[j][i]));
+            BlockHelper::subblock(const_cast<VectorType &>(src), j)
               .local_element(edge_constrained_indices[j][i]) = 0.;
           }
       }
@@ -1326,8 +1330,8 @@ namespace MatrixFreeOperators
                                   const bool        transpose) const
   {
     AssertDimension(dst.size(), src.size());
-    AssertDimension(n_blocks(dst), n_blocks(src));
-    AssertDimension(n_blocks(dst), selected_rows.size());
+    AssertDimension(BlockHelper::n_blocks(dst), BlockHelper::n_blocks(src));
+    AssertDimension(BlockHelper::n_blocks(dst), selected_rows.size());
     preprocess_constraints(dst, src);
     if (transpose)
       Tapply_add(dst, src);
@@ -1343,25 +1347,26 @@ namespace MatrixFreeOperators
   Base<dim, VectorType>::postprocess_constraints(VectorType &      dst,
                                                  const VectorType &src) const
   {
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
         const std::vector<unsigned int> &constrained_dofs =
           data->get_constrained_dofs(selected_rows[j]);
         for (unsigned int i = 0; i < constrained_dofs.size(); ++i)
-          subblock(dst, j).local_element(constrained_dofs[i]) +=
-            subblock(src, j).local_element(constrained_dofs[i]);
+          BlockHelper::subblock(dst, j).local_element(constrained_dofs[i]) +=
+            BlockHelper::subblock(src, j).local_element(constrained_dofs[i]);
       }
 
     // reset edge constrained values, multiply by unit matrix and add into
     // destination
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
         for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
           {
-            subblock(const_cast<VectorType &>(src), j)
+            BlockHelper::subblock(const_cast<VectorType &>(src), j)
               .local_element(edge_constrained_indices[j][i]) =
               edge_constrained_values[j][i].first;
-            subblock(dst, j).local_element(edge_constrained_indices[j][i]) =
+            BlockHelper::subblock(dst, j).local_element(
+              edge_constrained_indices[j][i]) =
               edge_constrained_values[j][i].second +
               edge_constrained_values[j][i].first;
           }
@@ -1387,34 +1392,36 @@ namespace MatrixFreeOperators
 
     // set zero Dirichlet values on the input vector (and remember the src and
     // dst values because we need to reset them at the end)
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
         {
           edge_constrained_values[j][i] = std::pair<Number, Number>(
-            subblock(src, j).local_element(edge_constrained_indices[j][i]),
-            subblock(dst, j).local_element(edge_constrained_indices[j][i]));
-          subblock(const_cast<VectorType &>(src), j)
+            BlockHelper::subblock(src, j).local_element(
+              edge_constrained_indices[j][i]),
+            BlockHelper::subblock(dst, j).local_element(
+              edge_constrained_indices[j][i]));
+          BlockHelper::subblock(const_cast<VectorType &>(src), j)
             .local_element(edge_constrained_indices[j][i]) = 0.;
         }
 
     apply_add(dst, src);
 
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
         unsigned int c = 0;
         for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
           {
             for (; c < edge_constrained_indices[j][i]; ++c)
-              subblock(dst, j).local_element(c) = 0.;
+              BlockHelper::subblock(dst, j).local_element(c) = 0.;
             ++c;
 
             // reset the src values
-            subblock(const_cast<VectorType &>(src), j)
+            BlockHelper::subblock(const_cast<VectorType &>(src), j)
               .local_element(edge_constrained_indices[j][i]) =
               edge_constrained_values[j][i].first;
           }
-        for (; c < subblock(dst, j).local_size(); ++c)
-          subblock(dst, j).local_element(c) = 0.;
+        for (; c < BlockHelper::subblock(dst, j).local_size(); ++c)
+          BlockHelper::subblock(dst, j).local_element(c) = 0.;
       }
   }
 
@@ -1436,24 +1443,25 @@ namespace MatrixFreeOperators
       return;
 
     VectorType src_cpy(src);
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
         unsigned int c = 0;
         for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
           {
             for (; c < edge_constrained_indices[j][i]; ++c)
-              subblock(src_cpy, j).local_element(c) = 0.;
+              BlockHelper::subblock(src_cpy, j).local_element(c) = 0.;
             ++c;
           }
-        for (; c < subblock(src_cpy, j).local_size(); ++c)
-          subblock(src_cpy, j).local_element(c) = 0.;
+        for (; c < BlockHelper::subblock(src_cpy, j).local_size(); ++c)
+          BlockHelper::subblock(src_cpy, j).local_element(c) = 0.;
       }
 
     apply_add(dst, src_cpy);
 
-    for (unsigned int j = 0; j < n_blocks(dst); ++j)
+    for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
-        subblock(dst, j).local_element(edge_constrained_indices[j][i]) = 0.;
+        BlockHelper::subblock(dst, j).local_element(
+          edge_constrained_indices[j][i]) = 0.;
   }
 
 
@@ -1840,7 +1848,7 @@ namespace MatrixFreeOperators
                                            src);
   }
 
-  namespace
+  namespace Implementation
   {
     template <typename Number>
     bool
@@ -1853,7 +1861,7 @@ namespace MatrixFreeOperators
 
       return true;
     }
-  } // namespace
+  } // namespace Implementation
 
 
 
@@ -1877,7 +1885,7 @@ namespace MatrixFreeOperators
       {
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
-            Assert(non_negative((*scalar_coefficient)(cell, q)),
+            Assert(Implementation::non_negative((*scalar_coefficient)(cell, q)),
                    ExcMessage("Coefficient must be non-negative"));
             phi.submit_gradient((*scalar_coefficient)(cell, q) *
                                   phi.get_gradient(q),

@@ -2338,87 +2338,84 @@ namespace internal
 {
   namespace SymmetricTensorImplementation
   {
-    namespace
+    // a function to do the unrolling from a set of indices to a
+    // scalar index into the array in which we store the elements of
+    // a symmetric tensor
+    //
+    // this function is for rank-2 tensors
+    template <int dim>
+    inline unsigned int
+    component_to_unrolled_index(const TableIndices<2> &indices)
     {
-      // a function to do the unrolling from a set of indices to a
-      // scalar index into the array in which we store the elements of
-      // a symmetric tensor
-      //
-      // this function is for rank-2 tensors
-      template <int dim>
-      inline unsigned int
-      component_to_unrolled_index(const TableIndices<2> &indices)
-      {
-        Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
-        Assert(indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+      Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
+      Assert(indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
 
-        switch (dim)
-          {
-            case 1:
-              {
-                return 0;
-              }
+      switch (dim)
+        {
+          case 1:
+            {
+              return 0;
+            }
 
-            case 2:
-              {
-                static const unsigned int table[2][2] = {{0, 2}, {2, 1}};
-                return table[indices[0]][indices[1]];
-              }
+          case 2:
+            {
+              static const unsigned int table[2][2] = {{0, 2}, {2, 1}};
+              return table[indices[0]][indices[1]];
+            }
 
-            case 3:
-              {
-                static const unsigned int table[3][3] = {{0, 3, 4},
-                                                         {3, 1, 5},
-                                                         {4, 5, 2}};
-                return table[indices[0]][indices[1]];
-              }
+          case 3:
+            {
+              static const unsigned int table[3][3] = {{0, 3, 4},
+                                                       {3, 1, 5},
+                                                       {4, 5, 2}};
+              return table[indices[0]][indices[1]];
+            }
 
-            case 4:
-              {
-                static const unsigned int table[4][4] = {{0, 4, 5, 6},
-                                                         {4, 1, 7, 8},
-                                                         {5, 7, 2, 9},
-                                                         {6, 8, 9, 3}};
-                return table[indices[0]][indices[1]];
-              }
+          case 4:
+            {
+              static const unsigned int table[4][4] = {{0, 4, 5, 6},
+                                                       {4, 1, 7, 8},
+                                                       {5, 7, 2, 9},
+                                                       {6, 8, 9, 3}};
+              return table[indices[0]][indices[1]];
+            }
 
-            default:
-              // for the remainder, manually figure out the numbering
-              {
-                if (indices[0] == indices[1])
-                  return indices[0];
+          default:
+            // for the remainder, manually figure out the numbering
+            {
+              if (indices[0] == indices[1])
+                return indices[0];
 
-                TableIndices<2> sorted_indices(indices);
-                sorted_indices.sort();
+              TableIndices<2> sorted_indices(indices);
+              sorted_indices.sort();
 
-                for (unsigned int d = 0, c = 0; d < dim; ++d)
-                  for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                    if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
-                      return dim + c;
+              for (unsigned int d = 0, c = 0; d < dim; ++d)
+                for (unsigned int e = d + 1; e < dim; ++e, ++c)
+                  if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
+                    return dim + c;
 
-                // should never get here:
-                Assert(false, ExcInternalError());
-                return 0;
-              }
-          }
-      }
+              // should never get here:
+              Assert(false, ExcInternalError());
+              return 0;
+            }
+        }
+    }
 
-      // a function to do the unrolling from a set of indices to a
-      // scalar index into the array in which we store the elements of
-      // a symmetric tensor
-      //
-      // this function is for tensors of ranks not already handled
-      // above
-      template <int dim, int rank_>
-      inline unsigned int
-      component_to_unrolled_index(const TableIndices<rank_> &indices)
-      {
-        (void)indices;
-        Assert(false, ExcNotImplemented());
-        return numbers::invalid_unsigned_int;
-      }
-    } // namespace
-  }   // namespace SymmetricTensorImplementation
+    // a function to do the unrolling from a set of indices to a
+    // scalar index into the array in which we store the elements of
+    // a symmetric tensor
+    //
+    // this function is for tensors of ranks not already handled
+    // above
+    template <int dim, int rank_>
+    inline unsigned int
+    component_to_unrolled_index(const TableIndices<rank_> &indices)
+    {
+      (void)indices;
+      Assert(false, ExcNotImplemented());
+      return numbers::invalid_unsigned_int;
+    }
+  } // namespace SymmetricTensorImplementation
 } // namespace internal
 
 
@@ -2437,94 +2434,91 @@ namespace internal
 {
   namespace SymmetricTensorImplementation
   {
-    namespace
+    // a function to do the inverse of the unrolling from a set of
+    // indices to a scalar index into the array in which we store
+    // the elements of a symmetric tensor. in other words, it goes
+    // from the scalar index into the array to a set of indices of
+    // the tensor
+    //
+    // this function is for rank-2 tensors
+    template <int dim>
+    inline TableIndices<2>
+    unrolled_to_component_indices(const unsigned int i,
+                                  const std::integral_constant<int, 2> &)
     {
-      // a function to do the inverse of the unrolling from a set of
-      // indices to a scalar index into the array in which we store
-      // the elements of a symmetric tensor. in other words, it goes
-      // from the scalar index into the array to a set of indices of
-      // the tensor
-      //
-      // this function is for rank-2 tensors
-      template <int dim>
-      inline TableIndices<2>
-      unrolled_to_component_indices(const unsigned int i,
-                                    const std::integral_constant<int, 2> &)
-      {
-        Assert(
-          (i <
-           dealii::SymmetricTensor<2, dim, double>::n_independent_components),
-          ExcIndexRange(
-            i,
-            0,
-            dealii::SymmetricTensor<2, dim, double>::n_independent_components));
-        switch (dim)
-          {
-            case 1:
-              {
-                return TableIndices<2>(0, 0);
-              }
-
-            case 2:
-              {
-                const TableIndices<2> table[3] = {TableIndices<2>(0, 0),
-                                                  TableIndices<2>(1, 1),
-                                                  TableIndices<2>(0, 1)};
-                return table[i];
-              }
-
-            case 3:
-              {
-                const TableIndices<2> table[6] = {TableIndices<2>(0, 0),
-                                                  TableIndices<2>(1, 1),
-                                                  TableIndices<2>(2, 2),
-                                                  TableIndices<2>(0, 1),
-                                                  TableIndices<2>(0, 2),
-                                                  TableIndices<2>(1, 2)};
-                return table[i];
-              }
-
-            default:
-              if (i < dim)
-                return TableIndices<2>(i, i);
-
-              for (unsigned int d = 0, c = 0; d < dim; ++d)
-                for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                  if (c == i)
-                    return TableIndices<2>(d, e);
-
-              // should never get here:
-              Assert(false, ExcInternalError());
+      Assert(
+        (i < dealii::SymmetricTensor<2, dim, double>::n_independent_components),
+        ExcIndexRange(
+          i,
+          0,
+          dealii::SymmetricTensor<2, dim, double>::n_independent_components));
+      switch (dim)
+        {
+          case 1:
+            {
               return TableIndices<2>(0, 0);
-          }
-      }
+            }
 
-      // a function to do the inverse of the unrolling from a set of
-      // indices to a scalar index into the array in which we store
-      // the elements of a symmetric tensor. in other words, it goes
-      // from the scalar index into the array to a set of indices of
-      // the tensor
-      //
-      // this function is for tensors of a rank not already handled
-      // above
-      template <int dim, int rank_>
-      inline TableIndices<rank_>
-      unrolled_to_component_indices(const unsigned int i,
-                                    const std::integral_constant<int, rank_> &)
-      {
-        (void)i;
-        Assert((i < dealii::SymmetricTensor<rank_, dim, double>::
-                      n_independent_components),
-               ExcIndexRange(i,
-                             0,
-                             dealii::SymmetricTensor<rank_, dim, double>::
-                               n_independent_components));
-        Assert(false, ExcNotImplemented());
-        return TableIndices<rank_>();
-      }
+          case 2:
+            {
+              const TableIndices<2> table[3] = {TableIndices<2>(0, 0),
+                                                TableIndices<2>(1, 1),
+                                                TableIndices<2>(0, 1)};
+              return table[i];
+            }
 
-    } // namespace
-  }   // namespace SymmetricTensorImplementation
+          case 3:
+            {
+              const TableIndices<2> table[6] = {TableIndices<2>(0, 0),
+                                                TableIndices<2>(1, 1),
+                                                TableIndices<2>(2, 2),
+                                                TableIndices<2>(0, 1),
+                                                TableIndices<2>(0, 2),
+                                                TableIndices<2>(1, 2)};
+              return table[i];
+            }
+
+          default:
+            if (i < dim)
+              return TableIndices<2>(i, i);
+
+            for (unsigned int d = 0, c = 0; d < dim; ++d)
+              for (unsigned int e = d + 1; e < dim; ++e, ++c)
+                if (c == i)
+                  return TableIndices<2>(d, e);
+
+            // should never get here:
+            Assert(false, ExcInternalError());
+            return TableIndices<2>(0, 0);
+        }
+    }
+
+    // a function to do the inverse of the unrolling from a set of
+    // indices to a scalar index into the array in which we store
+    // the elements of a symmetric tensor. in other words, it goes
+    // from the scalar index into the array to a set of indices of
+    // the tensor
+    //
+    // this function is for tensors of a rank not already handled
+    // above
+    template <int dim, int rank_>
+    inline TableIndices<rank_>
+    unrolled_to_component_indices(const unsigned int i,
+                                  const std::integral_constant<int, rank_> &)
+    {
+      (void)i;
+      Assert(
+        (i <
+         dealii::SymmetricTensor<rank_, dim, double>::n_independent_components),
+        ExcIndexRange(i,
+                      0,
+                      dealii::SymmetricTensor<rank_, dim, double>::
+                        n_independent_components));
+      Assert(false, ExcNotImplemented());
+      return TableIndices<rank_>();
+    }
+
+  } // namespace SymmetricTensorImplementation
 } // namespace internal
 
 template <int rank_, int dim, typename Number>
@@ -3090,24 +3084,20 @@ namespace internal
     std::array<std::pair<Number, Tensor<1, 3, Number>>, 3>
     hybrid(const dealii::SymmetricTensor<2, 3, Number> &A);
 
-    namespace
+    /**
+     * A struct that is used to sort arrays of pairs of eign=envalues and
+     * eigenvectors. Sorting is performed in descending order of eigenvalue.
+     */
+    template <int dim, typename Number>
+    struct SortEigenValuesVectors
     {
-      /**
-       * A struct that is used to sort arrays of pairs of eign=envalues and
-       * eigenvectors. Sorting is performed in descending order of eigenvalue.
-       */
-      template <int dim, typename Number>
-      struct SortEigenValuesVectors
+      typedef std::pair<Number, Tensor<1, dim, Number>> EigValsVecs;
+      bool
+      operator()(const EigValsVecs &lhs, const EigValsVecs &rhs)
       {
-        typedef std::pair<Number, Tensor<1, dim, Number>> EigValsVecs;
-        bool
-        operator()(const EigValsVecs &lhs, const EigValsVecs &rhs)
-        {
-          return lhs.first > rhs.first;
-        }
-      };
-
-    } // namespace
+        return lhs.first > rhs.first;
+      }
+    };
 
   } // namespace SymmetricTensorImplementation
 

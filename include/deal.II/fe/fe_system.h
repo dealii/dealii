@@ -1223,49 +1223,52 @@ private:
 //------------------------variadic template constructor------------------------
 
 #  ifndef DOXYGEN
-namespace
+namespace internal
 {
-  template <int dim, int spacedim>
-  unsigned int
-  count_nonzeros(
-    const std::initializer_list<
-      std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
-      &fe_systems)
+  namespace FESystemImplementation
   {
-    return std::count_if(
-      fe_systems.begin(),
-      fe_systems.end(),
-      [](const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                         unsigned int> &fe_system) {
-        return fe_system.second > 0;
-      });
-  }
+    template <int dim, int spacedim>
+    unsigned int
+    count_nonzeros(
+      const std::initializer_list<
+        std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
+        &fe_systems)
+    {
+      return std::count_if(
+        fe_systems.begin(),
+        fe_systems.end(),
+        [](const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                           unsigned int> &fe_system) {
+          return fe_system.second > 0;
+        });
+    }
 
 
 
-  template <int dim, int spacedim>
-  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>
-  promote_to_fe_pair(const FiniteElement<dim, spacedim> &fe)
-  {
-    return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                          unsigned int>(std::move(fe.clone()), 1u);
-  }
+    template <int dim, int spacedim>
+    std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>
+    promote_to_fe_pair(const FiniteElement<dim, spacedim> &fe)
+    {
+      return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                            unsigned int>(std::move(fe.clone()), 1u);
+    }
 
 
 
-  template <int dim, int spacedim>
-  auto
-  promote_to_fe_pair(
-    std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int> &&p)
-    -> decltype(
-      std::forward<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                             unsigned int>>(p))
-  {
-    return std::forward<
-      std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>(
-      p);
-  }
-} // namespace
+    template <int dim, int spacedim>
+    auto
+    promote_to_fe_pair(std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                                 unsigned int> &&p)
+      -> decltype(
+        std::forward<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                               unsigned int>>(p))
+    {
+      return std::forward<
+        std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>(
+        p);
+    }
+  } // namespace FESystemImplementation
+} // namespace internal
 
 
 
@@ -1277,7 +1280,8 @@ template <int dim, int spacedim>
 template <class... FEPairs, typename>
 FESystem<dim, spacedim>::FESystem(FEPairs &&... fe_pairs)
   : FESystem<dim, spacedim>(
-      {promote_to_fe_pair<dim, spacedim>(std::forward<FEPairs>(fe_pairs))...})
+      {internal::FESystemImplementation::promote_to_fe_pair<dim, spacedim>(
+        std::forward<FEPairs>(fe_pairs))...})
 {}
 
 
@@ -1294,7 +1298,7 @@ FESystem<dim, spacedim>::FESystem(
         fe_systems),
       FETools::Compositing::compute_nonzero_components<dim, spacedim>(
         fe_systems))
-  , base_elements(count_nonzeros(fe_systems))
+  , base_elements(internal::FESystemImplementation::count_nonzeros(fe_systems))
 {
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   std::vector<unsigned int>                         multiplicities;
