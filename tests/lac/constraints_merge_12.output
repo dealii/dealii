@@ -1,5 +1,5 @@
 
-DEAL::Checking ConstraintMatrix::merge with localized lines
+DEAL::Checking AffineConstraints<double>::merge with localized lines
     99999800 = 0
     99999801 = 0
     99999802 = 0
