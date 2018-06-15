@@ -177,3 +177,21 @@ process()
   esac
 }
 
+#
+# Variant of above function that only processes files that have changed
+# since the last merge commit to master. For this, we collect all files
+# that
+#  - are new
+#  - have changed since the last merge commit to master
+#
+
+process_changed()
+{
+  LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 master)"
+
+  ( git ls-files --others --exclude-standard -- ${1};
+    git diff --name-only $LAST_MERGE_COMMIT -- ${1} )|
+      sort -u |
+      grep -E "^${2}$" |
+      xargs --no-run-if-empty -d '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
+}
