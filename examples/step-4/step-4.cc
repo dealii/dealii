@@ -257,9 +257,11 @@ void Step4<dim>::make_grid()
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(4);
 
-  std::cout << "   Number of active cells: " << triangulation.n_active_cells()
-            << std::endl
-            << "   Total number of cells: " << triangulation.n_cells()
+  std::cout << "   Number of active cells: "  //
+            << triangulation.n_active_cells() //
+            << std::endl                      //
+            << "   Total number of cells: "   //
+            << triangulation.n_cells()        //
             << std::endl;
 }
 
@@ -275,7 +277,8 @@ void Step4<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+  std::cout << "   Number of degrees of freedom: " //
+            << dof_handler.n_dofs()                //
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -366,9 +369,9 @@ void Step4<dim>::assemble_system()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_grad(i, q_index) *
-                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+              cell_matrix(i, j) += (fe_values.shape_grad(i, q_index) * //
+                                    fe_values.shape_grad(j, q_index) * //
+                                    fe_values.JxW(q_index));
 
             cell_rhs(i) +=
               (fe_values.shape_value(i, q_index) *
@@ -488,7 +491,9 @@ void Step4<dim>::output_results() const
 template <int dim>
 void Step4<dim>::run()
 {
-  std::cout << "Solving problem in " << dim << " space dimensions."
+  std::cout << "Solving problem in " //
+            << dim                   //
+            << " space dimensions."  //
             << std::endl;
 
   make_grid();
