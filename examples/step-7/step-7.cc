@@ -64,6 +64,7 @@
 // the same file as the FEValues class:
 #include <deal.II/fe/fe_values.h>
 
+#include <array>
 #include <fstream>
 #include <iostream>
 
@@ -98,9 +99,9 @@ namespace Step7
   class SolutionBase
   {
   protected:
-    static const unsigned int n_source_centers = 3;
-    static const Point<dim>   source_centers[n_source_centers];
-    static const double       width;
+    static const unsigned int                             n_source_centers = 3;
+    static const std::array<Point<dim>, n_source_centers> source_centers;
+    static const double                                   width;
   };
 
 
@@ -123,16 +124,18 @@ namespace Step7
   // it doesn't have to generate the variable from a template by substituting
   // <code>dim</code>, but can immediately use the following definition:
   template <>
-  const Point<1>
-    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] =
-      {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
+  const std::array<Point<1>, SolutionBase<1>::n_source_centers>
+    SolutionBase<1>::source_centers = {Point<1>(-1.0 / 3.0),
+                                       Point<1>(0.0),
+                                       Point<1>(+1.0 / 3.0)};
 
   // Likewise, we can provide an explicit specialization for
   // <code>dim=2</code>. We place the centers for the 2d case as follows:
   template <>
-  const Point<2>
-    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] =
-      {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
+  const std::array<Point<2>, SolutionBase<2>::n_source_centers>
+    SolutionBase<2>::source_centers = {Point<2>(-0.5, +0.5),
+                                       Point<2>(-0.5, -0.5),
+                                       Point<2>(+0.5, -0.5)};
 
   // There remains to assign a value to the half-width of the exponentials. We
   // would like to use the same value for all dimensions. In this case, we
