@@ -68,6 +68,29 @@ checks() {
 export TMPDIR="${TMPDIR:-/tmp}"
 
 #
+# Depending on whether REPORT_ONLY is set to true, or false, either report
+# an issue or print a status
+#
+
+export REPORT_ONLY="${REPORT_ONLY:-false}"
+
+fix_or_report()
+{
+  file="${1}"
+  tmpfile="${2}"
+  message="${3}"
+
+  if ! diff -q "${file}" "${tmpfile}" >/dev/null; then
+    if ${REPORT_ONLY}; then
+      echo "    ${file}  -  ${message}"
+    else
+      mv "${tmpfile}" "${file}"
+    fi
+  fi
+}
+export -f fix_or_report
+
+#
 # In order to format .cc and .h files we have to make sure that we override
 # the source/header file only if the actual contents changed.
 # Unfortunately, clang-format isn't exactly helpful there. Thus, use a
@@ -80,7 +103,7 @@ format_file()
   tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
 
   clang-format "${file}" > "${tmpfile}"
-  diff -q "${file}" "${tmpfile}" >/dev/null || mv "${tmpfile}" "${file}"
+  fix_or_report "${file}" "${tmpfile}" "file indented incorrectly"
   rm -f "${tmpfile}"
 }
 export -f format_file
@@ -112,7 +135,7 @@ format_inst()
   sed -i -e 's#{ // namespace#\\{#g' "${tmpfile}new"
   sed -i -e 's#}[ ]*// namespace.*#\\}#g' "${tmpfile}new"
 
-  diff -q "${file}" "${tmpfile}new" >/dev/null || mv "${tmpfile}new" "${file}"
+  fix_or_report "${file}" "${tmpfile}new" "file indented incorrectly"
   rm -f "${tmpfile}" "${tmpfile}new"
 }
 export -f format_inst
@@ -128,8 +151,9 @@ dos_to_unix()
   tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
 
   tr -d '\015' <"${file}" >"${tmpfile}"
-  diff -q "${file}" "${tmpfile}" >/dev/null || mv "${tmpfile}" "${file}"
-  rm -f "${tmpfile}"
+
+  fix_or_report "${file}" "${tmpfile}" "file has non-unix line-ending '\\r\\n'"
+  rm -f "${tmpfile}" "${tmpfile}"
 }
 export -f dos_to_unix
 
@@ -141,7 +165,13 @@ fix_permissions()
 {
   file="${1}"
 
-  chmod 644 "${file}"
+  if [ "$(stat -c '%a' ${file})" != "644" ]; then
+    if ${REPORT_ONLY}; then
+      echo "    ${file}  -  file has incorrect permissions"
+    else
+      chmod 644 "${file}"
+    fi
+  fi
 }
 export -f fix_permissions
 
