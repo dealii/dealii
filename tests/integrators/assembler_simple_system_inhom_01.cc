@@ -483,13 +483,11 @@ RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
  * Main class
  */
 template <int dim>
-class MeshWorkerAffineConstraints<double> Test
+class MeshWorkerConstraintMatrixTest
 {
 public:
-  MeshWorkerAffineConstraints<double>
-  Test(const FiniteElement<dim> &fe);
-  ~MeshWorkerAffineConstraints<double>
-  Test();
+  MeshWorkerConstraintMatrixTest(const FiniteElement<dim> &fe);
+  ~MeshWorkerConstraintMatrixTest();
 
   void
   run();
@@ -525,9 +523,8 @@ private:
 
 
 template <int dim>
-MeshWorkerAffineConstraints<double>
-  Test<dim>::MeshWorkerAffineConstraints<double>
-  Test(const FiniteElement<dim> &fe)
+MeshWorkerConstraintMatrixTest<dim>::MeshWorkerConstraintMatrixTest(
+  const FiniteElement<dim> &fe)
   : mapping()
   , dof_handler(triangulation)
   , fe(fe)
@@ -543,17 +540,15 @@ MeshWorkerAffineConstraints<double>
 
 
 template <int dim>
-MeshWorkerAffineConstraints<double>
-  Test<dim>::~MeshWorkerAffineConstraints<double>
-  Test()
+MeshWorkerConstraintMatrixTest<dim>::~MeshWorkerConstraintMatrixTest()
 {
   dof_handler.clear();
 }
 
 
 template <int dim>
-void MeshWorkerAffineConstraints<double>
-     Test<dim>::setup_system()
+void
+MeshWorkerConstraintMatrixTest<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
@@ -592,8 +587,8 @@ void MeshWorkerAffineConstraints<double>
  * Assemble with SystemSimple
  */
 template <int dim>
-void MeshWorkerAffineConstraints<double>
-     Test<dim>::assemble_system_MeshWorker()
+void
+MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
 
@@ -628,8 +623,8 @@ void MeshWorkerAffineConstraints<double>
  * Assemble matrix and vector separately
  */
 template <int dim>
-void MeshWorkerAffineConstraints<double>
-     Test<dim>::assemble_MeshWorker()
+void
+MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
 
@@ -672,8 +667,8 @@ void MeshWorkerAffineConstraints<double>
 
 
 template <int dim>
-void MeshWorkerAffineConstraints<double>
-     Test<dim>::createInhomConstraints()
+void
+MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
 {
   this->constraintsInhom.clear();
   // boundary constraints
@@ -706,8 +701,8 @@ void MeshWorkerAffineConstraints<double>
 
 
 template <int dim>
-void MeshWorkerAffineConstraints<double>
-     Test<dim>::run()
+void
+MeshWorkerConstraintMatrixTest<dim>::run()
 {
   setup_system();
   createInhomConstraints();
@@ -748,13 +743,13 @@ main()
 
   FE_Q<2> fe(1);
   deallog.push(fe.get_name());
-  MeshWorkerAffineConstraints<double> Test<2> test(fe);
+  MeshWorkerConstraintMatrixTest<2> test(fe);
   test.run();
   deallog.pop();
 
   FE_DGQ<2> fe2(1);
   deallog.push(fe2.get_name());
-  MeshWorkerAffineConstraints<double> Test<2> test2(fe2);
+  MeshWorkerConstraintMatrixTest<2> test2(fe2);
   test2.run();
   deallog.pop();
 }
