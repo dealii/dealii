@@ -107,6 +107,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 
       template void
       interpolate_boundary_values(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DH<deal_II_dimension, deal_II_space_dimension> &,
+        const types::boundary_id,
+        const Function<deal_II_space_dimension, float> &,
+        AffineConstraints<float> &,
+        const ComponentMask &);
+
+      template void
+      interpolate_boundary_values(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const types::boundary_id,
         const Function<deal_II_space_dimension> &,
@@ -116,10 +125,27 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       template void
       interpolate_boundary_values(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
+        const types::boundary_id,
+        const Function<deal_II_space_dimension, float> &,
+        AffineConstraints<float> &,
+        const ComponentMask &);
+
+      template void
+      interpolate_boundary_values(
+        const DH<deal_II_dimension, deal_II_space_dimension> &,
         const std::map<types::boundary_id,
                        const Function<deal_II_space_dimension, double> *> &,
         AffineConstraints<double> &,
         const ComponentMask &);
+
+      template void
+      interpolate_boundary_values(
+        const DH<deal_II_dimension, deal_II_space_dimension> &,
+        const std::map<types::boundary_id,
+                       const Function<deal_II_space_dimension, float> *> &,
+        AffineConstraints<float> &,
+        const ComponentMask &);
+
     \}
 #endif
   }
