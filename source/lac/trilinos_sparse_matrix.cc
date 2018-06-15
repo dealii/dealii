@@ -413,10 +413,11 @@ namespace TrilinosWrappers
         // Try to copy all the rows of the matrix one by one. In case of error
         // (i.e., the column indices are different), we need to abort and blow
         // away the matrix.
-        for (size_type row = local_range.first; row < local_range.second; ++row)
+        for (const auto &row : locally_owned_range_indices())
           {
             const int row_local = matrix->RowMap().LID(
               static_cast<TrilinosWrappers::types::int_type>(row));
+            Assert((row_local >= 0), ExcAccessToNonlocalRow(row));
 
             int             n_entries, rhs_n_entries;
             TrilinosScalar *value_ptr, *rhs_value_ptr;
@@ -1454,6 +1455,7 @@ namespace TrilinosWrappers
     int ncols = -1;
     int local_row =
       matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(row));
+    Assert((local_row >= 0), ExcAccessToNonlocalRow(row));
 
     // on the processor who owns this
     // row, we'll have a non-negative
@@ -1464,7 +1466,7 @@ namespace TrilinosWrappers
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
-    return ncols;
+    return static_cast<unsigned int>(ncols);
   }
 
 
@@ -1906,10 +1908,11 @@ namespace TrilinosWrappers
     const std::pair<size_type, size_type> local_range = rhs.local_range();
     const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
 
-    for (size_type row = local_range.first; row < local_range.second; ++row)
+    for (const auto &row : locally_owned_range_indices())
       {
         const int row_local = matrix->RowMap().LID(
           static_cast<TrilinosWrappers::types::int_type>(row));
+        Assert((row_local >= 0), ExcAccessToNonlocalRow(row));
 
         // First get a view to the matrix columns of both matrices. Note that
         // the data is in local index spaces so we need to be careful not only
