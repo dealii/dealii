@@ -220,11 +220,11 @@ namespace Step48
     void
     output_norm();
 
-    Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
-    DoFHandler<dim>    dof_handler;
-    ConstraintMatrix   constraints;
-    IndexSet           locally_relevant_dofs;
+    Triangulation<dim>        triangulation;
+    FE_Q<dim>                 fe;
+    DoFHandler<dim>           dof_handler;
+    AffineConstraints<double> constraints;
+    IndexSet                  locally_relevant_dofs;
 
     MatrixFree<dim, double> matrix_free_data;
 

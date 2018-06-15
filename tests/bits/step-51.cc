@@ -313,7 +313,7 @@ namespace Step51
     DoFHandler<dim> dof_handler_u_post;
     Vector<double>  solution_u_post;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

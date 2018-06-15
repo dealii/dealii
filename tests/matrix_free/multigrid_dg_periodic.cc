@@ -82,7 +82,7 @@ public:
       (update_gradients | update_JxW_values);
     addit_data.mapping_update_flags_boundary_faces =
       (update_gradients | update_JxW_values);
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     constraints.close();
 
     data.reinit(mapping, dof_handler, constraints, quad, addit_data);

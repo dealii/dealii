@@ -159,7 +159,7 @@ private:
   // object which holds a list of
   // constraints originating from
   // the hanging nodes:
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -463,14 +463,14 @@ LaplaceProblem<dim>::setup_system()
   // The next step is <code>closing</code>
   // this object. For this note that,
   // in principle, the
-  // <code>ConstraintMatrix</code> class can
+  // <code>AffineConstraints<double></code> class can
   // hold other constraints as well,
   // i.e. constraints that do not
   // stem from hanging
   // nodes. Sometimes, it is useful
   // to use such constraints, in
   // which case they may be added to
-  // the <code>ConstraintMatrix</code> object
+  // the <code>AffineConstraints<double></code> object
   // after the hanging node
   // constraints were computed. After
   // all constraints have been added,

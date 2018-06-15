@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix::condense(Vector) for parallel vectors. this
+// check AffineConstraints<double>::condense(Vector) for parallel vectors. this
 // function used to crash
 //
 // original test case by Daniel Arndt

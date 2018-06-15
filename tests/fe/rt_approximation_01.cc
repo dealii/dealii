@@ -354,7 +354,7 @@ double TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
       TestPoly<2> pol(deg);
 
       // Project solution onto RT FE field
-      ConstraintMatrix hn_constraints;
+      AffineConstraints<double> hn_constraints;
       hn_constraints.clear();
       DoFTools::make_hanging_node_constraints(*dof_handler, hn_constraints);
       hn_constraints.close();
@@ -463,7 +463,7 @@ main()
   solution_q.reinit(dof_handler->n_dofs());
   deformation.reinit(dof_handler_def->n_dofs());
 
-  ConstraintMatrix hn_constraints_def;
+  AffineConstraints<double> hn_constraints_def;
   hn_constraints_def.clear();
   DoFTools::make_hanging_node_constraints(*dof_handler_def, hn_constraints_def);
   hn_constraints_def.close();

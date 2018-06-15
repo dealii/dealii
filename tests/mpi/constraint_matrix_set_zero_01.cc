@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix::set_zero(Vector) for parallel vectors.
+// check AffineConstraints<double>::set_zero(Vector) for parallel vectors.
 // this documents a bug introduced in r29678 for block vectors
 // that was fixed in 29940.
 

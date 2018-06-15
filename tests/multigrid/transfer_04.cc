@@ -128,8 +128,8 @@ check_fe(FiniteElement<dim> &fe)
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(dofh);
 
-  ConstraintMatrix hanging_node_constraints;
-  IndexSet         locally_relevant_set;
+  AffineConstraints<double> hanging_node_constraints;
+  IndexSet                  locally_relevant_set;
   DoFTools::extract_locally_relevant_dofs(dofh, locally_relevant_set);
   hanging_node_constraints.reinit(locally_relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, hanging_node_constraints);

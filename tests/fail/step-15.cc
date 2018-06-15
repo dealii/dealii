@@ -126,7 +126,7 @@ private:
   FE_Q<dim>       fe;
   DoFHandler<dim> dof_handler;
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> matrix;

@@ -199,7 +199,7 @@ test(const FiniteElement<dim> &fe)
 {
   Geometry<dim>                           geometry;
   TranscendentalManufacturedSolution<dim> fe_function;
-  ConstraintMatrix                        constraints;
+  AffineConstraints<double>               constraints;
   constraints.close();
 
   deallog << "FE degree: " << fe.degree << std::endl;

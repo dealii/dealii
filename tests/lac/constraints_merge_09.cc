@@ -33,7 +33,7 @@ std::ofstream logfile("output");
 void
 merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge with localized lines"
+  deallog << "Checking AffineConstraints<double>::merge with localized lines"
           << std::endl;
 
   // set local lines to a very large range that
@@ -63,7 +63,7 @@ merge_check()
 
       // check that the `merge' function
       // works correctly
-      ConstraintMatrix c1(local_lines), c2(local_lines);
+      AffineConstraints<double> c1(local_lines), c2(local_lines);
 
       // enter simple line
       c1.add_line(index_0);
@@ -91,7 +91,7 @@ merge_check()
       // results
       try
         {
-          c1.merge(c2, ConstraintMatrix::right_object_wins);
+          c1.merge(c2, AffineConstraints<double>::right_object_wins);
         }
       catch (...)
         {

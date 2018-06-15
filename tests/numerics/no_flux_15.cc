@@ -47,8 +47,8 @@ check()
   tria.set_all_manifold_ids(0);
   tria.set_manifold(0, spherical);
 
-  ConstraintMatrix cm;
-  MappingQ<dim>    mapping(4);
+  AffineConstraints<double> cm;
+  MappingQ<dim>             mapping(4);
 
   FESystem<dim>   fe(FE_Q<dim>(2), dim);
   DoFHandler<dim> dofh(tria);

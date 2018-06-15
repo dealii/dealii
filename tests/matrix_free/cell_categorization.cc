@@ -68,7 +68,7 @@ test()
   FE_DGQ<dim>     fe(1);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   MatrixFree<dim>                          mf_data;

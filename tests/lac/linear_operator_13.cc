@@ -64,11 +64,11 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   block_component[1] = 1;
 
   // Initialise
-  const FESystem<dim> fe(fe_test, 1, fe_trial, 1);
-  Triangulation<dim>  triangulation;
-  QGauss<dim>         quadrature_formula(fe_trial.degree + 1);
-  DoFHandler<dim>     dof_handler(triangulation);
-  ConstraintMatrix    constraints;
+  const FESystem<dim>       fe(fe_test, 1, fe_trial, 1);
+  Triangulation<dim>        triangulation;
+  QGauss<dim>               quadrature_formula(fe_trial.degree + 1);
+  DoFHandler<dim>           dof_handler(triangulation);
+  AffineConstraints<double> constraints;
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 

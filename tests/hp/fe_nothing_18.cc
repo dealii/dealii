@@ -105,9 +105,10 @@ private:
   hp::FECollection<dim> fe; // used to stack several other elements together to
                             // form one vector-valued finite element.
 
-  ConstraintMatrix hanging_node_constraints; // object to hold hanging node
-                                             // constraints after refinement
-  ConstraintMatrix constraints;
+  AffineConstraints<double>
+    hanging_node_constraints; // object to hold hanging node
+                              // constraints after refinement
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern sparsity_pattern; // store sparsity pattern
 

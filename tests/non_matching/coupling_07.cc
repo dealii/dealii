@@ -69,7 +69,7 @@ test()
   dh.distribute_dofs(fe);
   space_dh.distribute_dofs(space_fe);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(space_dh, constraints);
 
   constraints.close();

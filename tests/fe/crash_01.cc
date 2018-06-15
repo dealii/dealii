@@ -82,7 +82,7 @@ test(FiniteElement<dim> &fe)
   tria.refine_global(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
-  ConstraintMatrix             constraints;
+  AffineConstraints<double>    constraints;
   Functions::ZeroFunction<dim> boundary_values(fe.n_components());
   VectorTools::project_boundary_values_curl_conforming(
     dof_handler, 0, boundary_values, 0, constraints);

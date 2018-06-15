@@ -284,16 +284,16 @@ test()
   for (unsigned int i = 0; i < dof.size(); ++i)
     src[i].reinit(dof[i]->n_dofs());
 
-  std::vector<const ConstraintMatrix *> constraints(3);
-  ConstraintMatrix                      constraint0;
+  std::vector<const AffineConstraints<double> *> constraints(3);
+  AffineConstraints<double>                      constraint0;
   DoFTools::make_hanging_node_constraints(*dof[0], constraint0);
   constraint0.close();
   constraints[0] = &constraint0;
-  ConstraintMatrix constraint1;
+  AffineConstraints<double> constraint1;
   DoFTools::make_hanging_node_constraints(*dof[1], constraint1);
   constraint1.close();
   constraints[1] = &constraint1;
-  ConstraintMatrix constraint2;
+  AffineConstraints<double> constraint2;
   DoFTools::make_hanging_node_constraints(*dof[2], constraint2);
   constraint2.close();
   constraints[2] = &constraint2;

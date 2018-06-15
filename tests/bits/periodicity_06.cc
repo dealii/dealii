@@ -46,11 +46,11 @@
 
 using namespace dealii;
 
-ConstraintMatrix
+AffineConstraints<double>
 make_constraint_matrix(const DoFHandler<2> &dof_handler, int version)
 {
-  constexpr int    dim = 2;
-  ConstraintMatrix constraints;
+  constexpr int             dim = 2;
+  AffineConstraints<double> constraints;
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
@@ -240,7 +240,7 @@ main(int argc, char *argv[])
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  std::vector<ConstraintMatrix> constraints(8);
+  std::vector<AffineConstraints<double>> constraints(8);
 
   PeriodicReference<dim> periodic_function;
 

@@ -109,7 +109,7 @@ private:
   IndexSet locally_owned_dofs;
   IndexSet locally_relevant_dofs;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   LA::MPI::SparseMatrix system_matrix;
   LA::MPI::Vector       locally_relevant_solution;

@@ -24,7 +24,7 @@
 //   make_sparsity_pattern (const DoFHandler<dim> &,
 //                          Table<2,DoFTools::Coupling> &,
 //                      SparsityPattern       &,
-//                          ConstraintMatrix,
+//                          AffineConstraints<double>,
 //                          true);
 
 
@@ -42,7 +42,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   for (unsigned int i = 0; i < n_components; ++i)
     mask[i][i] = mask[i][n_components - i - 1] = DoFTools::always;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof_handler, cm);
   cm.close();
 

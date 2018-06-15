@@ -66,7 +66,7 @@ test()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof_handler, cm);
   cm.write_dot(deallog.get_file_stream());
 }

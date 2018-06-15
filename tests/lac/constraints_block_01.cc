@@ -229,7 +229,7 @@ main()
    * The interface check is simplified for this 2x2 case
    */
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   const unsigned int dofs_per_fl_msh_face = fluid_fe->dofs_per_face;
   const unsigned int dofs_per_solid_face  = solid_fe->dofs_per_face;

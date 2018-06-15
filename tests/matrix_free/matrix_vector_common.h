@@ -54,9 +54,9 @@ test();
 
 template <int dim, int fe_degree, typename number, int n_q_points_1d>
 void
-do_test(const DoFHandler<dim> & dof,
-        const ConstraintMatrix &constraints,
-        const unsigned int      parallel_option = 0)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints,
+        const unsigned int               parallel_option = 0)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   if (parallel_option > 0)

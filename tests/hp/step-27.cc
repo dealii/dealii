@@ -100,7 +100,7 @@ namespace Step27
     std::vector<double>                     ln_k;
     Table<dim, std::complex<double>>        fourier_coefficients;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

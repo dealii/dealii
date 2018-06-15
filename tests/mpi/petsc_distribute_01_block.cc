@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix.distribute() for a petsc vector
+// check AffineConstraints<double>.distribute() for a petsc vector
 //
 // like _01, but for a block vector. this has the additional complication that
 // (at a global level) the set of indices owned by this processor is not
@@ -75,7 +75,7 @@ test()
   }
 
 
-  // create a ConstraintMatrix with a range that exceeds the locally
+  // create a AffineConstraints<double> with a range that exceeds the locally
   // owned range by 50 on each side
   IndexSet locally_relevant_range(vec.size());
   locally_relevant_range.add_range(

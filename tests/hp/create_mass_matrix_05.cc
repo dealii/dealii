@@ -107,7 +107,7 @@ check()
       mask[dim + i][dim + j] = DoFTools::always;
   DoFTools::make_sparsity_pattern(dof, mask, sparsity);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
   constraints.condense(sparsity);

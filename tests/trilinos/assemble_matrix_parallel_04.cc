@@ -148,7 +148,7 @@ private:
   FESystem<dim>   fe;
   QGauss<dim>     quadrature;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   TrilinosWrappers::BlockSparseMatrix reference_matrix;
   TrilinosWrappers::BlockSparseMatrix test_matrix;

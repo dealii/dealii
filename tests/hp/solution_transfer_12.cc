@@ -118,7 +118,7 @@ transfer(std::ostream &out)
   q_dof_handler.distribute_dofs(fe_q);
   q_solution.reinit(q_dof_handler.n_dofs());
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   // interpolation is not straight forward for FE_Q_Hierarchical.

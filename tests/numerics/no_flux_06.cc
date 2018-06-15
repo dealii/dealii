@@ -58,8 +58,8 @@ test_hyper_cube()
   boundary_ids.insert(1);
   boundary_ids.insert(3);
 
-  ConstraintMatrix    cm;
-  const MappingQ<dim> mapping(4);
+  AffineConstraints<double> cm;
+  const MappingQ<dim>       mapping(4);
   VectorTools::compute_no_normal_flux_constraints(
     dof, 0, boundary_ids, cm, mapping);
   cm.close();

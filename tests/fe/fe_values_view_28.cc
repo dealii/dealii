@@ -85,7 +85,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   Vector<double> fe_function(dof.n_dofs());
   // set the elements of the vector in such a way that the function
   // equals the vector function (0,x^2)
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
   VectorTools::project(dof, cm, QGauss<2>(4), F(), fe_function);
 

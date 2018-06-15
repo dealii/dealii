@@ -112,7 +112,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 
   dof_handler.distribute_dofs(fe_collection);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   dealii::DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

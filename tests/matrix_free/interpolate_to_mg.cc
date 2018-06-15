@@ -136,7 +136,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   // constraints:
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

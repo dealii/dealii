@@ -47,7 +47,7 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix             constraints;
+  AffineConstraints<double>    constraints;
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(1);
   deal_II_exceptions::disable_abort_on_exception();

@@ -70,7 +70,7 @@ private:
   FE_Q_iso_Q1<dim> fe_precondition;
   DoFHandler<dim>  dof_handler_precondition;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   TrilinosWrappers::SparseMatrix system_matrix;
   TrilinosWrappers::SparseMatrix preconditioner_matrix;

@@ -61,7 +61,7 @@ test()
   // DoFRenumbering::component_wise(dof_handler);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
-  ConstraintMatrix           constraints;
+  AffineConstraints<double>  constraints;
   FEValuesExtractors::Vector velocities(1);
   ComponentMask              mask = fe.component_mask(velocities);
 

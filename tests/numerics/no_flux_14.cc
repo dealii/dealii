@@ -44,8 +44,8 @@ check()
   GridGenerator::quarter_hyper_shell(tr, Point<dim>(), 0.5, 1.0, 3, true);
   tr.reset_manifold(0);
 
-  ConstraintMatrix cm;
-  MappingQ<dim>    mapping(1);
+  AffineConstraints<double> cm;
+  MappingQ<dim>             mapping(1);
 
   FESystem<dim>   fe(FE_Q<dim>(3), dim);
   DoFHandler<dim> dofh(tr);

@@ -91,7 +91,7 @@ test()
                                            0,
                                            Functions::ConstantFunction<dim>(1.),
                                            boundary_values);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
   constraints.close();

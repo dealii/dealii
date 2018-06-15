@@ -30,7 +30,7 @@
 void
 test()
 {
-  ConstraintMatrix cm1, cm2;
+  AffineConstraints<double> cm1, cm2;
 
   // a "regular" and a singular
   // constraint to each of the

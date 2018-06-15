@@ -54,7 +54,7 @@ test()
 
   dofh.distribute_dofs(fe);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   DoFTools::make_hanging_node_constraints(dofh, cm);
   cm.close();

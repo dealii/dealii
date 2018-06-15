@@ -16,7 +16,7 @@
 
 
 // document bug in assembling a LA::MPI::SparseMatrix
-// this was due to handing a wrong IndexSet to the ConstraintMatrix
+// this was due to handing a wrong IndexSet to the AffineConstraints<double>
 
 #include <deal.II/base/index_set.h>
 
@@ -51,7 +51,7 @@ test()
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   parallel::distributed::Triangulation<dim> triangulation(

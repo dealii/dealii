@@ -77,10 +77,10 @@ private:
   void
   refine_grid();
 
-  Triangulation<dim> triangulation;
-  FE_Q<dim>          fe;
-  DoFHandler<dim>    dof_handler;
-  ConstraintMatrix   constraints;
+  Triangulation<dim>        triangulation;
+  FE_Q<dim>                 fe;
+  DoFHandler<dim>           dof_handler;
+  AffineConstraints<double> constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

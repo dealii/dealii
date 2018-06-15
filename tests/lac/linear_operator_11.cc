@@ -66,7 +66,7 @@ private:
   FE_Q<dim>          fe;
   DoFHandler<dim>    dof_handler;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   TrilinosWrappers::SparseMatrix system_matrix;
   TrilinosWrappers::MPI::Vector  solution;

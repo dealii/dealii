@@ -54,8 +54,8 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const DoFHandler<dim> & dof_handler,
-                 const ConstraintMatrix &constraints)
+  MatrixFreeTest(const DoFHandler<dim> &          dof_handler,
+                 const AffineConstraints<double> &constraints)
     : dof_handler(dof_handler)
     , constraints(constraints)
   {}
@@ -92,17 +92,17 @@ public:
   };
 
 private:
-  const DoFHandler<dim> & dof_handler;
-  const ConstraintMatrix &constraints;
+  const DoFHandler<dim> &          dof_handler;
+  const AffineConstraints<double> &constraints;
 };
 
 
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> & dof,
-        const ConstraintMatrix &constraints,
-        const unsigned int      parallel_option = 0)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints,
+        const unsigned int               parallel_option = 0)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   if (parallel_option > 0)
@@ -219,7 +219,7 @@ test()
   FESystem<dim>      fe(FE_Q<dim>(degree), dim);
   DoFHandler<dim>    dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

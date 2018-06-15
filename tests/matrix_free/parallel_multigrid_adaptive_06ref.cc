@@ -146,7 +146,7 @@ do_test(const DoFHandler<dim> &dof)
   dirichlet_boundary[0] = &zero_function;
 
   // fine-level constraints
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
@@ -190,7 +190,7 @@ do_test(const DoFHandler<dim> &dof)
   // set constant rhs vector
   {
     // this is to make it consistent with parallel_multigrid_adaptive.cc
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
     hanging_node_constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
     hanging_node_constraints.close();
@@ -223,8 +223,8 @@ do_test(const DoFHandler<dim> &dof)
       mg_additional_data.tasks_block_size = 3;
       mg_additional_data.level_mg_handler = level;
 
-      ConstraintMatrix level_constraints;
-      IndexSet         relevant_dofs;
+      AffineConstraints<double> level_constraints;
+      IndexSet                  relevant_dofs;
       DoFTools::extract_locally_relevant_level_dofs(dof, level, relevant_dofs);
       level_constraints.reinit(relevant_dofs);
       level_constraints.add_lines(

@@ -65,7 +65,7 @@ using namespace dealii;
 void
 test(bool use_inhomogeneity_for_rhs)
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   cm.add_line(1);
   cm.set_inhomogeneity(1, -5.0);

@@ -105,7 +105,7 @@ test()
 
   const types::global_dof_index n_local_dofs = locally_owned_dofs.n_elements();
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

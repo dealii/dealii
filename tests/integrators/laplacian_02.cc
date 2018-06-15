@@ -42,7 +42,7 @@ test_boundary(const FiniteElement<dim> &fe, bool diff = false)
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_zero_boundary_constraints(dof, constraints);
 
   QGauss<dim - 1>   quadrature(fe.tensor_degree() + 1);
@@ -81,7 +81,7 @@ test_face(const FiniteElement<dim> &fe, bool diff = false)
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_zero_boundary_constraints(dof, constraints);
 
   QGauss<dim - 1>   quadrature(fe.tensor_degree() + 1);

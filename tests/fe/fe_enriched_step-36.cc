@@ -182,7 +182,7 @@ namespace Step36
     std::vector<PetscScalar>                eigenvalues;
     PETScWrappers::MPI::SparseMatrix        stiffness_matrix, mass_matrix;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     MPI_Comm           mpi_communicator;
     const unsigned int n_mpi_processes;

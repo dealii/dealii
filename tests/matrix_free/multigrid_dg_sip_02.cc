@@ -84,7 +84,7 @@ public:
       update_JxW_values | update_normal_vectors | update_jacobians;
     addit_data.mapping_update_flags_faces_by_cells =
       update_JxW_values | update_normal_vectors | update_jacobians;
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     constraints.close();
 
     data.reinit(mapping, dof_handler, constraints, quad, addit_data);

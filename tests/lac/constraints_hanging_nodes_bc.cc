@@ -74,7 +74,7 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
 
-  ConstraintMatrix correct_constraints, library_constraints;
+  AffineConstraints<double> correct_constraints, library_constraints;
 
   DoFTools::make_hanging_node_constraints(dof, correct_constraints);
   library_constraints.merge(correct_constraints);

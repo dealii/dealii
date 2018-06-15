@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix.distribute() for a petsc vector
+// check AffineConstraints<double>.distribute() for a petsc vector
 //
 // we do this by creating a vector where each processor has 100
 // elements but no ghost elements. then we add constraints on each
@@ -62,7 +62,7 @@ test()
   }
 
 
-  // create a ConstraintMatrix with a range that exceeds the locally
+  // create a AffineConstraints<double> with a range that exceeds the locally
   // owned range by 50 on each side
   IndexSet locally_relevant_range(vec.size());
   locally_relevant_range.add_range(

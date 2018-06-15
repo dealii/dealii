@@ -73,7 +73,7 @@ sub_test()
       tria.execute_coarsening_and_refinement();
 
       dof.distribute_dofs(fe);
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       constraints.close();
 
       // std::cout << "Number of cells: " <<

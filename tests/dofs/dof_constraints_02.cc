@@ -66,7 +66,7 @@ test()
   dof_handler.distribute_dofs(fe);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
   deallog << "Number of constraints: " << constraints.n_constraints()

@@ -68,7 +68,7 @@ test(FiniteElement<dim> &fe)
 
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

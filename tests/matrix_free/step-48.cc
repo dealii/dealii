@@ -224,10 +224,10 @@ namespace Step48
 #else
     Triangulation<dim> triangulation;
 #endif
-    FE_Q<dim>        fe;
-    DoFHandler<dim>  dof_handler;
-    ConstraintMatrix constraints;
-    IndexSet         locally_relevant_dofs;
+    FE_Q<dim>                 fe;
+    DoFHandler<dim>           dof_handler;
+    AffineConstraints<double> constraints;
+    IndexSet                  locally_relevant_dofs;
 
     MatrixFree<dim, double> matrix_free_data;
 

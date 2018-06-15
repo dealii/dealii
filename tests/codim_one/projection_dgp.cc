@@ -72,7 +72,7 @@ test(std::string filename, unsigned int n)
 
   Functions::CosineFunction<spacedim> cosine;
   QGauss<dim>                         quad(5);
-  ConstraintMatrix                    constraints;
+  AffineConstraints<double>           constraints;
   constraints.close();
   VectorTools::project(
     dof_handler, constraints, quad, cosine, interpolated_one);

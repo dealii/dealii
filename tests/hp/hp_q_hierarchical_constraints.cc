@@ -52,9 +52,9 @@ test(const bool apply_constrains, const unsigned int hp)
                                         triangulation);
   }
 
-  hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler(triangulation);
-  ConstraintMatrix      constraints; // for boundary conditions
+  hp::FECollection<dim>     fe;
+  hp::DoFHandler<dim>       dof_handler(triangulation);
+  AffineConstraints<double> constraints; // for boundary conditions
 
 
   // populate fe system:

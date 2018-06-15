@@ -75,7 +75,7 @@ test()
   // consequently subtracting the vector from
   // itself should yield zero
   {
-    ConstraintMatrix cm;
+    AffineConstraints<double> cm;
     cm.close();
     VectorTools::project(dh, cm, QGauss<dim>(3), fef, v2);
   }

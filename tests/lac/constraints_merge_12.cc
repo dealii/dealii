@@ -15,9 +15,9 @@
 
 
 
-// Merge two ConstraintMatrix objects initialized with IndexSets where entries
-// have been added in a way that local_lines extends beyond the end of the
-// IndexSet
+// Merge two AffineConstraints<double> objects initialized with IndexSets where
+// entries have been added in a way that local_lines extends beyond the end of
+// the IndexSet
 
 #include <deal.II/lac/affine_constraints.h>
 
@@ -28,7 +28,7 @@
 void
 merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge with localized lines"
+  deallog << "Checking AffineConstraints<double>::merge with localized lines"
           << std::endl;
 
   // set local lines to a very large range that surely triggers an error if
@@ -38,7 +38,7 @@ merge_check()
   local_lines.compress();
 
   // works correctly
-  ConstraintMatrix c1(local_lines), c2(local_lines);
+  AffineConstraints<double> c1(local_lines), c2(local_lines);
   for (types::global_dof_index i = 99999800; i < local_lines.size(); ++i)
     if (i % 2 == 1)
       c1.add_line(i);
@@ -48,7 +48,7 @@ merge_check()
   c2.add_line(99999802);
 
   // now merge the two and print the results
-  c2.merge(c1, ConstraintMatrix::right_object_wins);
+  c2.merge(c1, AffineConstraints<double>::right_object_wins);
   c2.print(deallog.get_file_stream());
 
   deallog << "OK" << std::endl;

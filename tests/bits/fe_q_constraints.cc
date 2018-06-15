@@ -113,10 +113,10 @@ private:
   void
   test();
 
-  Triangulation<dim> triangulation;
-  FE_Q<dim>          fe;
-  DoFHandler<dim>    dof_handler;
-  ConstraintMatrix   hanging_node_constraints;
+  Triangulation<dim>        triangulation;
+  FE_Q<dim>                 fe;
+  DoFHandler<dim>           dof_handler;
+  AffineConstraints<double> hanging_node_constraints;
 };
 
 template <int dim>

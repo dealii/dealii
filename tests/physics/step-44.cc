@@ -717,7 +717,7 @@ namespace Step44
     const QGauss<dim - 1>                qf_face;
     const unsigned int                   n_q_points;
     const unsigned int                   n_q_points_f;
-    ConstraintMatrix                     constraints;
+    AffineConstraints<double>            constraints;
     BlockSparsityPattern                 sparsity_pattern;
     BlockSparseMatrix<double>            tangent_matrix;
     BlockVector<double>                  system_rhs;
@@ -811,7 +811,7 @@ namespace Step44
     make_grid();
     system_setup();
     {
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       constraints.close();
       const ComponentSelectFunction<dim> J_mask(J_component, n_components);
       VectorTools::project(dof_handler_ref,

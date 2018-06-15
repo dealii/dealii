@@ -176,7 +176,7 @@ namespace Step18
     parallel::shared::Triangulation<dim> triangulation;
     FESystem<dim>                        fe;
     DoFHandler<dim>                      dof_handler;
-    ConstraintMatrix                     hanging_node_constraints;
+    AffineConstraints<double>            hanging_node_constraints;
     const QGauss<dim>                    quadrature_formula;
     std::vector<PointHistory<dim>>       quadrature_point_history;
     PETScWrappers::MPI::SparseMatrix     system_matrix;

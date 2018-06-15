@@ -480,16 +480,16 @@ create_right_hand_side(const Mapping<dim> &   mapping,
 
 template <int dim>
 void
-project(const Mapping<dim> &    mapping,
-        const DoFHandler<dim> & dof,
-        const ConstraintMatrix &constraints,
-        const Quadrature<dim> & quadrature,
-        const Function<dim> &   function,
-        Vector<double> &        vec,
-        const unsigned int      min_convergence_steps,
-        const bool              enforce_zero_boundary = false,
-        const Quadrature<dim - 1> &                   = QGauss<dim - 1>(2),
-        const bool project_to_boundary_first          = false)
+project(const Mapping<dim> &             mapping,
+        const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints,
+        const Quadrature<dim> &          quadrature,
+        const Function<dim> &            function,
+        Vector<double> &                 vec,
+        const unsigned int               min_convergence_steps,
+        const bool                       enforce_zero_boundary = false,
+        const Quadrature<dim - 1> &          = QGauss<dim - 1>(2),
+        const bool project_to_boundary_first = false)
 {
   Assert(dof.get_fe().n_components() == function.n_components,
          ExcInternalError());
@@ -739,7 +739,7 @@ check(const FiniteElement<2> &           fe,
       Vector<double> solution(dof_handler->n_dofs());
 
       // Project solution onto FE field
-      ConstraintMatrix hn_constraints;
+      AffineConstraints<double> hn_constraints;
       hn_constraints.clear();
       DoFTools::make_hanging_node_constraints(*dof_handler, hn_constraints);
       hn_constraints.close();

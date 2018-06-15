@@ -143,7 +143,7 @@ do_test(const DoFHandler<dim> &dof)
     data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::partition_color;
     data.tasks_block_size = 3;
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     mf_data.reinit(dof, constraints, quad, data);
   }

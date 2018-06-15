@@ -233,7 +233,8 @@ public:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   // use this for info on problem

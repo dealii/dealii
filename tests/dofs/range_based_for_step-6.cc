@@ -84,7 +84,7 @@ private:
   DoFHandler<dim> dof_handler;
   FE_Q<dim>       fe;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

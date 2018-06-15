@@ -15,7 +15,7 @@
 
 
 
-// test: test the ConstraintMatrix::get_lines() range object
+// test: test the AffineConstraints<double>::get_lines() range object
 
 
 #include <deal.II/lac/affine_constraints.h>
@@ -26,7 +26,7 @@
 void
 test()
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   // an inhomogeneous constraint
   cm.add_line(4);

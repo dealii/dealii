@@ -75,7 +75,7 @@ check()
       // constraints. this should trip the
       // new code using the hp constraints,
       // added in late July 2006
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);
 
       for (unsigned int j = 0; j < dof.n_dofs(); ++j)

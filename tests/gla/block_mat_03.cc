@@ -208,7 +208,7 @@ test_alt()
   locally_relevant_dofs.print(deallog);
 
 
-  ConstraintMatrix constraints(locally_relevant_dofs);
+  AffineConstraints<double> constraints(locally_relevant_dofs);
   constraints.close();
 
   TrilinosWrappers::BlockSparsityPattern sp(locally_owned_partitioning,

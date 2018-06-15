@@ -69,7 +69,7 @@ test()
       deallog << std::endl;
     }
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
   DoFTools::make_hanging_node_constraints(dof_handler,
                                           hanging_node_constraints);
   hanging_node_constraints.close();

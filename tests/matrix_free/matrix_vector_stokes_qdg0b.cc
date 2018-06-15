@@ -144,7 +144,7 @@ test(const unsigned int fe_degree)
 
   MatrixFree<dim, double> mf_data;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> system_matrix;
@@ -281,9 +281,9 @@ test(const unsigned int fe_degree)
     std::vector<const DoFHandler<dim> *> dofs;
     dofs.push_back(&dof_handler_u);
     dofs.push_back(&dof_handler_p);
-    ConstraintMatrix dummy_constraints;
+    AffineConstraints<double> dummy_constraints;
     dummy_constraints.close();
-    std::vector<const ConstraintMatrix *> constraints;
+    std::vector<const AffineConstraints<double> *> constraints;
     constraints.push_back(&dummy_constraints);
     constraints.push_back(&dummy_constraints);
     QGauss<1> quad(fe_degree + 2);

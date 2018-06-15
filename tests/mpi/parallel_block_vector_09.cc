@@ -94,7 +94,7 @@ test(const unsigned int n_blocks = 5)
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
 
-  ConstraintMatrix constraints(relevant_set);
+  AffineConstraints<double> constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

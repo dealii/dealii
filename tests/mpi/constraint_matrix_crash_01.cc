@@ -15,8 +15,8 @@
 
 
 
-// ConstraintMatrix::add_line crashes in release mode (missing compress inside
-// ConstraintMatrix)
+// AffineConstraints<double>::add_line crashes in release mode (missing compress
+// inside AffineConstraints<double>)
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -39,7 +39,7 @@ test()
   local_active_together.add_range(0, 3);
   // local_active_together.compress();
 
-  ConstraintMatrix cm(local_active_together);
+  AffineConstraints<double> cm(local_active_together);
   cm.add_line(1);
   cm.close();
   deallog << "OK" << std::endl;

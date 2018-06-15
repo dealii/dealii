@@ -112,7 +112,7 @@ test_constraints(hp::FECollection<dim> &fe_coll)
   deallog << "DoFs: " << dof_handler.n_dofs() << std::endl;
 
   // Create the constraints.
-  ConstraintMatrix constraint_matrix;
+  AffineConstraints<double> constraint_matrix;
 
   DoFTools::make_hanging_node_constraints(dof_handler, constraint_matrix);
 
@@ -146,7 +146,7 @@ test_constraints_old(FiniteElement<dim> &fe)
   deallog << "DoFs: " << dof_handler.n_dofs() << std::endl;
 
   // Create the constraints.
-  ConstraintMatrix constraint_matrix;
+  AffineConstraints<double> constraint_matrix;
 
   DoFTools::make_hanging_node_constraints(dof_handler, constraint_matrix);
 

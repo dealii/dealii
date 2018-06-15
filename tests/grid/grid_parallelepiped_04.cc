@@ -124,8 +124,8 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
       dh.distribute_dofs(fe);
       DataOut<dim> d_o;
       d_o.attach_dof_handler(dh);
-      Vector<double>   vec(dh.n_dofs());
-      ConstraintMatrix constraints;
+      Vector<double>            vec(dh.n_dofs());
+      AffineConstraints<double> constraints;
       for (unsigned int c = 0; c < 6; ++c)
         VectorTools::interpolate_boundary_values(
           dh, c, Functions::ConstantFunction<dim>(c), constraints);

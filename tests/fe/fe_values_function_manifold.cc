@@ -225,11 +225,11 @@ protected:
   QGauss<dim>                    cell_quadrature;
   MappingQGeneric<dim>           cell_mapping;
 
-  ConstraintMatrix     all_constraints;
-  SparsityPattern      sparsity_pattern;
-  SparseMatrix<double> system_matrix;
-  Vector<double>       system_rhs;
-  Vector<double>       solution;
+  AffineConstraints<double> all_constraints;
+  SparsityPattern           sparsity_pattern;
+  SparseMatrix<double>      system_matrix;
+  Vector<double>            system_rhs;
+  Vector<double>            solution;
 
   void
   setup_dofs();

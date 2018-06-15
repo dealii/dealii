@@ -151,7 +151,7 @@ test(const FESystem<dim> &fe)
 
   MatrixFree<dim, double> mf_data;
 
-  ConstraintMatrix constraints, constraints_u, constraints_p;
+  AffineConstraints<double> constraints, constraints_u, constraints_p;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

@@ -79,7 +79,7 @@ public:
         MatrixFree<dim, number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
     addit_data.level_mg_handler = level;
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     if (level == numbers::invalid_unsigned_int)
       {
         IndexSet relevant_dofs;
@@ -511,8 +511,8 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
   deallog << std::endl;
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-  ConstraintMatrix hanging_node_constraints;
-  IndexSet         locally_relevant_dofs;
+  AffineConstraints<double> hanging_node_constraints;
+  IndexSet                  locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
   hanging_node_constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);

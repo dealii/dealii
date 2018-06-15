@@ -27,7 +27,7 @@
 void
 merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge with localized lines"
+  deallog << "Checking AffineConstraints<double>::merge with localized lines"
           << std::endl;
 
   // set local lines to a very large range that
@@ -66,7 +66,7 @@ merge_check()
 
       // check that the `merge' function
       // works correctly
-      ConstraintMatrix c1(local_lines1), c2(local_lines2);
+      AffineConstraints<double> c1(local_lines1), c2(local_lines2);
 
       // enter simple line
       c1.add_line(index_0);
@@ -103,7 +103,7 @@ merge_check()
 
       // now merge the two and print the
       // results
-      c1.merge(c2, ConstraintMatrix::no_conflicts_allowed, true);
+      c1.merge(c2, AffineConstraints<double>::no_conflicts_allowed, true);
       c1.print(deallog.get_file_stream());
     };
 }

@@ -35,7 +35,7 @@ using namespace dealii;
 void
 run()
 {
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   {
     constraints.add_line(7);

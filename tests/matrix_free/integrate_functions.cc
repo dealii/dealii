@@ -197,7 +197,7 @@ test()
   // std::cout << "Number of cells: " << tria.n_active_cells() << std::endl;
   // std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 

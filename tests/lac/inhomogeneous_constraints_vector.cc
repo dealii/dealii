@@ -17,10 +17,11 @@
 
 // this function tests the correctness of the implementation of
 // inhomogeneous constraints with
-// ConstraintMatrix::distribute_local_to_global operating only on a vector,
-// based on a modification of the step-5 tutorial program. It assumes
-// correctness of the function ConstraintMatrix::distribute_local_to_global
-// operating on both the matrix and vector simultaneously.
+// AffineConstraints<double>::distribute_local_to_global operating only on a
+// vector, based on a modification of the step-5 tutorial program. It assumes
+// correctness of the function
+// AffineConstraints<double>::distribute_local_to_global operating on both the
+// matrix and vector simultaneously.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -79,9 +80,9 @@ private:
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  Vector<double>   solution;
-  Vector<double>   system_rhs;
-  ConstraintMatrix constraints;
+  Vector<double>            solution;
+  Vector<double>            system_rhs;
+  AffineConstraints<double> constraints;
 };
 
 template <int dim>

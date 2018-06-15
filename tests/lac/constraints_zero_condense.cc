@@ -33,7 +33,7 @@ test()
 {
   // constrain each dof to zero. this
   // should yield a diagonal matrix
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   for (unsigned int i = 0; i < 5; ++i)
     cm.add_line(i);

@@ -140,7 +140,7 @@ private:
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> reference_matrix;

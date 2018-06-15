@@ -111,12 +111,12 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   // constraints:
-  ConstraintMatrix constraints_euler;
+  AffineConstraints<double> constraints_euler;
   constraints_euler.reinit(locally_relevant_dofs_euler);
   DoFTools::make_hanging_node_constraints(dof_handler_euler, constraints_euler);
   constraints_euler.close();
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints_euler.close();

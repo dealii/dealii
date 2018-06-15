@@ -33,7 +33,7 @@
 void
 test()
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   // a "regular" constraint
   cm.add_line(1);

@@ -15,7 +15,7 @@
 
 
 
-// document bug in the new ConstraintMatrix::distribute() from r29593
+// document bug in the new AffineConstraints<double>::distribute() from r29593
 // if one vector owns all DoFs, then distribute() hangs.
 
 #include <deal.II/lac/affine_constraints.h>
@@ -47,7 +47,7 @@ test()
     vec(i) = i;
   vec.compress(VectorOperation::insert);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   cm.distribute(vec);

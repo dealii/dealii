@@ -99,7 +99,7 @@ private:
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

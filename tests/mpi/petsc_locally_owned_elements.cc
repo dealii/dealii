@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix.distribute() for a petsc vector
+// check AffineConstraints<double>.distribute() for a petsc vector
 //
 // like _01, but for a block vector. this has the additional complication that
 // (at a global level) the set of indices owned by this processor is not

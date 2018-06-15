@@ -15,7 +15,7 @@
 
 
 
-// test ConstraintMatrix::is_consistent_in_parallel
+// test AffineConstraints<double>::is_consistent_in_parallel
 
 #include <deal.II/base/utilities.h>
 
@@ -58,7 +58,7 @@ check(parallel::distributed::Triangulation<dim> &tria)
   IndexSet locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);

@@ -167,15 +167,15 @@ namespace Maxwell
     double
     calcErrorHcurlNorm();
 
-    Triangulation<dim>   triangulation;
-    MappingQ<dim>        mapping;
-    DoFHandler<dim>      dof_handler;
-    FE_Nedelec<dim>      fe;
-    ConstraintMatrix     constraints;
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Triangulation<dim>        triangulation;
+    MappingQ<dim>             mapping;
+    DoFHandler<dim>           dof_handler;
+    FE_Nedelec<dim>           fe;
+    AffineConstraints<double> constraints;
+    SparsityPattern           sparsity_pattern;
+    SparseMatrix<double>      system_matrix;
+    Vector<double>            solution;
+    Vector<double>            system_rhs;
 
     ConvergenceTable convergence_table;
 

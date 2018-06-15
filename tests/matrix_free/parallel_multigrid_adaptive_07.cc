@@ -248,8 +248,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
   dirichlet_boundary[0] = &zero_function;
 
   // fine-level constraints
-  std::vector<ConstraintMatrix>         constraints(dof.size());
-  std::vector<const ConstraintMatrix *> constraints_ptrs(dof.size());
+  std::vector<AffineConstraints<double>>         constraints(dof.size());
+  std::vector<const AffineConstraints<double> *> constraints_ptrs(dof.size());
   for (unsigned int i = 0; i < dof.size(); ++i)
     {
       constraints[i].reinit(locally_relevant_dofs[i]);
@@ -299,7 +299,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
     for (unsigned int b = 0; b < nb; ++b)
       {
         // this is to make it consistent with parallel_multigrid_adaptive.cc
-        ConstraintMatrix hanging_node_constraints;
+        AffineConstraints<double> hanging_node_constraints;
 
         hanging_node_constraints.reinit(locally_relevant_dofs[b]);
         DoFTools::make_hanging_node_constraints(*dof[b],
@@ -340,8 +340,9 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
       mg_additional_data.tasks_block_size = 3;
       mg_additional_data.level_mg_handler = level;
 
-      std::vector<ConstraintMatrix>         level_constraints(dof.size());
-      std::vector<const ConstraintMatrix *> level_constraints_ptrs(dof.size());
+      std::vector<AffineConstraints<double>> level_constraints(dof.size());
+      std::vector<const AffineConstraints<double> *> level_constraints_ptrs(
+        dof.size());
       for (unsigned int i = 0; i < dof.size(); ++i)
         {
           IndexSet relevant_dofs;

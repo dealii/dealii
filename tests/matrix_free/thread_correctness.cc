@@ -70,7 +70,7 @@ sub_test()
       tria.execute_coarsening_and_refinement();
 
       dof.distribute_dofs(fe);
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);
       VectorTools::interpolate_boundary_values(dof,
                                                0,

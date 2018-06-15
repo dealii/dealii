@@ -72,9 +72,9 @@ private:
   DoFHandler<dim>    dof_handler;
   MappingQ<dim>      mapping;
 
-  SparsityPattern      sparsity_pattern;
-  SparseMatrix<double> system_matrix;
-  ConstraintMatrix     mean_value_constraints;
+  SparsityPattern           sparsity_pattern;
+  SparseMatrix<double>      system_matrix;
+  AffineConstraints<double> mean_value_constraints;
 
   Vector<double> solution;
   Vector<double> system_rhs;

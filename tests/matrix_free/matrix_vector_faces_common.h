@@ -658,9 +658,9 @@ MatrixIntegrator<dim>::boundary(
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void
-do_test(const DoFHandler<dim> & dof,
-        const ConstraintMatrix &constraints,
-        const bool              also_test_parallel = false)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints,
+        const bool                       also_test_parallel = false)
 {
   if (types_are_equal<number, float>::value == true)
     deallog.push("float");

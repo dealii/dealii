@@ -85,7 +85,7 @@ check()
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 

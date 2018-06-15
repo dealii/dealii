@@ -16,8 +16,8 @@
 
 
 // this function tests that assembly of matrices in parallel works properly,
-// in particular the cache used in ConstraintMatrix that stores some scratch
-// data and is accessed by several threads at the same time.
+// in particular the cache used in AffineConstraints<double> that stores some
+// scratch data and is accessed by several threads at the same time.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/graph_coloring.h>
@@ -140,7 +140,7 @@ private:
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> reference_matrix;

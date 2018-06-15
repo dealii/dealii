@@ -94,7 +94,7 @@ test()
       hp::DoFHandler<dim>   dof_handler(triangulation);
       dof_handler.distribute_dofs(hp_fe);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

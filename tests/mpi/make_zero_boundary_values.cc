@@ -44,7 +44,7 @@ test()
   dofh.distribute_dofs(fe);
 
   {
-    ConstraintMatrix boundary_values;
+    AffineConstraints<double> boundary_values;
     DoFTools::make_zero_boundary_constraints(dofh, boundary_values);
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       boundary_values.print(deallog.get_file_stream());
@@ -55,7 +55,7 @@ test()
   {
     IndexSet relevant_set(dofh.n_dofs());
     DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
-    ConstraintMatrix boundary_values(relevant_set);
+    AffineConstraints<double> boundary_values(relevant_set);
     DoFTools::make_zero_boundary_constraints(dofh, boundary_values);
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       boundary_values.print(deallog.get_file_stream());

@@ -27,9 +27,9 @@ main()
 
   deallog.attach(logfile);
 
-  ConstraintMatrix constraints;
-  unsigned int     IDs[]  = {1, 2, 3, 5, 8, 13, 21};
-  double           vals[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+  AffineConstraints<double> constraints;
+  unsigned int              IDs[]  = {1, 2, 3, 5, 8, 13, 21};
+  double                    vals[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
   for (unsigned int i = 0; i < sizeof(IDs) / sizeof(IDs[0]); ++i)
     {
       constraints.add_line(IDs[i]);
@@ -39,7 +39,7 @@ main()
   constraints.print(deallog.get_file_stream());
   deallog << std::endl;
 
-  ConstraintMatrix cm(std::move(constraints));
+  AffineConstraints<double> cm(std::move(constraints));
   cm.print(deallog.get_file_stream());
   deallog << constraints.n_constraints() << std::endl << std::endl;
 

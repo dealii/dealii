@@ -19,7 +19,7 @@
 // --------------------------------------------------------
 // An error occurred in line <304> of file <.../constraint_matrix.cc> in
 // function
-//     void dealii::ConstraintMatrix::close()
+//     void dealii::AffineConstraints<double>::close()
 // The violated condition was:
 //     dof_index != line->line
 // The name and call sequence of the exception was:
@@ -196,10 +196,10 @@ template <int dim>
 void
 run()
 {
-  Triangulation<dim> triangulation;
-  FESystem<dim>      fe(FE_Q<dim>(1), dim);
-  DoFHandler<dim>    dof_handler(triangulation);
-  ConstraintMatrix   constraints;
+  Triangulation<dim>        triangulation;
+  FESystem<dim>             fe(FE_Q<dim>(1), dim);
+  DoFHandler<dim>           dof_handler(triangulation);
+  AffineConstraints<double> constraints;
 
   sixty_deg_hyper_shell(triangulation, Point<dim>(), 0.5, 1.0);
   GridTools::copy_boundary_to_manifold_id(triangulation);

@@ -80,7 +80,7 @@ private:
   // Although we do not have h-refinement,
   // hanging nodes will inevitably appear
   // due to different polynomial degrees.
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   Vector<double> solution;
   Vector<double> system_rhs;

@@ -23,7 +23,7 @@
 void
 test()
 {
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   constraints.add_line(1);
   constraints.add_entry(1, 2, 1.);
@@ -39,7 +39,7 @@ test()
   constraints.close();
 
   // copy the object above
-  ConstraintMatrix constraints_2;
+  AffineConstraints<double> constraints_2;
   constraints_2.copy_from(constraints);
 
   // let both objects describe themselves in string form

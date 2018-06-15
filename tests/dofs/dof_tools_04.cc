@@ -31,7 +31,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   std::vector<bool> hanging_node_dofs(n_dofs);
   DoFTools::extract_hanging_node_dofs(dof_handler, hanging_node_dofs);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

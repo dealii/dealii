@@ -73,8 +73,8 @@ private:
   FE_Q<dim>                                 fe;
   DoFHandler<dim>                           dof_handler;
 
-  ConstraintMatrix constraints;
-  SparsityPattern  sparsity_pattern;
+  AffineConstraints<double> constraints;
+  SparsityPattern           sparsity_pattern;
 
   TrilinosWrappers::SparseMatrix system_matrix;
 

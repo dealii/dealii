@@ -15,7 +15,7 @@
 
 
 
-// block vectors: test ConstraintMatrix::distribute (fails currently)
+// block vectors: test AffineConstraints<double>::distribute (fails currently)
 
 #include <deal.II/base/index_set.h>
 

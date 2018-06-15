@@ -195,7 +195,7 @@ test(const FiniteElement<dim> &fe)
     {
       MappingQ<dim> mapping(mapping_p, true);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

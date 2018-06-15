@@ -68,7 +68,7 @@ private:
   FE_Q<dim>                                         fe;
   IndexSet                                          locally_owned_dofs;
   IndexSet                                          locally_relevant_dofs;
-  ConstraintMatrix                                  constraints;
+  AffineConstraints<double>                         constraints;
   TrilinosWrappers::SparseMatrix                    system_matrix;
   TrilinosWrappers::MPI::Vector                     locally_relevant_solution;
   TrilinosWrappers::MPI::Vector interpolated_locally_relevant_solution;

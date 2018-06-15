@@ -104,13 +104,13 @@ namespace Step37
     std::shared_ptr<
       MappingFEField<dim, dim, LinearAlgebra::distributed::Vector<double>>>
                                                mapping;
-    ConstraintMatrix                           constraints_euler;
+    AffineConstraints<double>                  constraints_euler;
     LinearAlgebra::distributed::Vector<double> euler_positions;
 
     IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix constraints;
-    ConstraintMatrix non_homogeneous_constraints;
+    AffineConstraints<double> constraints;
+    AffineConstraints<double> non_homogeneous_constraints;
     typedef MatrixFreeOperators::LaplaceOperator<
       dim,
       degree_finite_element,
@@ -258,7 +258,7 @@ namespace Step37
         DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                       level,
                                                       relevant_dofs);
-        ConstraintMatrix level_constraints;
+        AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
@@ -321,7 +321,7 @@ namespace Step37
 
     non_homogeneous_constraints.clear();
     {
-      ConstraintMatrix hanging_nodes_laplace_constraints;
+      AffineConstraints<double> hanging_nodes_laplace_constraints;
       hanging_nodes_laplace_constraints.reinit(locally_relevant_dofs);
       non_homogeneous_constraints.reinit(locally_relevant_dofs);
       DoFTools::make_hanging_node_constraints(
@@ -340,7 +340,7 @@ namespace Step37
       // make sure hanging nodes override Dirichlet
       non_homogeneous_constraints.merge(
         hanging_nodes_laplace_constraints,
-        ConstraintMatrix::MergeConflictBehavior::right_object_wins);
+        AffineConstraints<double>::MergeConflictBehavior::right_object_wins);
       non_homogeneous_constraints.close();
     }
 

@@ -113,7 +113,7 @@ namespace Step50
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     vector_t solution;
     vector_t system_rhs;
@@ -276,9 +276,9 @@ namespace Step50
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    std::vector<ConstraintMatrix> boundary_constraints(
+    std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_global_levels());
-    ConstraintMatrix empty_constraints;
+    AffineConstraints<double> empty_constraints;
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {

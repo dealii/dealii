@@ -57,7 +57,7 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
       for (unsigned int j = 0; j <= i; ++j)
         boundary_ids.insert(j);
 
-      ConstraintMatrix cm;
+      AffineConstraints<double> cm;
       VectorTools::compute_no_normal_flux_constraints(dof, 0, boundary_ids, cm);
 
       cm.print(deallog.get_file_stream());

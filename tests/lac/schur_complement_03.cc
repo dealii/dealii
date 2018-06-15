@@ -81,7 +81,7 @@ namespace Step22
     Triangulation<dim>        triangulation;
     FESystem<dim>             fe;
     DoFHandler<dim>           dof_handler;
-    ConstraintMatrix          constraints;
+    AffineConstraints<double> constraints;
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
     BlockVector<double>       solution;

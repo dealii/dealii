@@ -96,7 +96,7 @@ namespace Step40
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     PETScWrappers::MPI::SparseMatrix system_matrix;
     PETScWrappers::MPI::Vector       locally_relevant_solution;

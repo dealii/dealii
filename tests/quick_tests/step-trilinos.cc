@@ -69,7 +69,7 @@ private:
 
   TrilinosWrappers::SparseMatrix A;
   TrilinosWrappers::MPI::Vector  b, x;
-  ConstraintMatrix               constraints;
+  AffineConstraints<double>      constraints;
 
   TableHandler output_table;
 };

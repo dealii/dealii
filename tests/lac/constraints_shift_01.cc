@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test ConstraintMatrix::shift for a ConstraintMatrix object
+// test AffineConstraints<double>::shift for a AffineConstraints<double> object
 // initialized with an IndexSet object
 
 #include <deal.II/base/index_set.h>
@@ -40,14 +40,14 @@ test()
   index_set.print(deallog);
 
   deallog
-    << "Create ConstraintMatrix with constraints u(2)=.5*u(5), u(5)=.7*u(8)"
+    << "Create AffineConstraints<double> with constraints u(2)=.5*u(5), u(5)=.7*u(8)"
     << std::endl;
-  dealii::ConstraintMatrix constraints1(index_set);
+  dealii::AffineConstraints<double> constraints1(index_set);
   constraints1.add_line(5);
   constraints1.add_entry(5, 8, .7);
   constraints1.add_line(2);
   constraints1.add_entry(2, 5, .5);
-  dealii::ConstraintMatrix constraints2(constraints1);
+  dealii::AffineConstraints<double> constraints2(constraints1);
   constraints1.print(deallog.get_file_stream());
 
   constraints1.shift(size / 2);
@@ -55,7 +55,7 @@ test()
   constraints1.print(deallog.get_file_stream());
 
   constraints1.merge(constraints2,
-                     ConstraintMatrix::no_conflicts_allowed,
+                     AffineConstraints<double>::no_conflicts_allowed,
                      true);
   deallog << "Shifted and merged constraints" << std::endl;
   constraints1.print(deallog.get_file_stream());

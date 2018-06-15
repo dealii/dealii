@@ -59,7 +59,8 @@ test()
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
 
-  ConstraintMatrix constraints_0(relevant_set), constraints_1(relevant_set);
+  AffineConstraints<double> constraints_0(relevant_set),
+    constraints_1(relevant_set);
   VectorTools::interpolate_boundary_values(dof,
                                            0,
                                            Functions::ZeroFunction<dim>(),
@@ -79,8 +80,8 @@ test()
   mf_data_0->reinit(dof, constraints_0, quad, data);
   mf_data_1->reinit(dof, constraints_1, quad, data);
   {
-    std::vector<const DoFHandler<dim> *>  dof_handlers(2, &dof);
-    std::vector<const ConstraintMatrix *> constraint(2);
+    std::vector<const DoFHandler<dim> *>           dof_handlers(2, &dof);
+    std::vector<const AffineConstraints<double> *> constraint(2);
     constraint[0] = &constraints_0;
     constraint[1] = &constraints_1;
     mf_data_combined->reinit(dof_handlers, constraint, quad, data);

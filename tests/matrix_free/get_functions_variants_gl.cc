@@ -174,8 +174,8 @@ test()
       solution_dist(i)   = entry;
     }
 
-  ConstraintMatrix constraints;
-  MatrixFree<dim>  mf_data;
+  AffineConstraints<double> constraints;
+  MatrixFree<dim>           mf_data;
   {
     const QGaussLobatto<1>                   quad(fe_degree + 1);
     typename MatrixFree<dim>::AdditionalData data;

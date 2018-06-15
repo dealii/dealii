@@ -208,12 +208,12 @@ test_neumann(const NeumanBC<dim> &func)
 {
   deallog << "NeumanBC case:" << std::endl;
   deallog << "--------------" << std::endl;
-  Triangulation<dim>       triangulation;
-  hp::DoFHandler<dim>      dof_handler(triangulation);
-  hp::FECollection<dim>    fe_collection;
-  hp::QCollection<dim>     quadrature_formula;
-  hp::QCollection<dim - 1> face_quadrature_formula;
-  ConstraintMatrix         constraints;
+  Triangulation<dim>        triangulation;
+  hp::DoFHandler<dim>       dof_handler(triangulation);
+  hp::FECollection<dim>     fe_collection;
+  hp::QCollection<dim>      quadrature_formula;
+  hp::QCollection<dim - 1>  face_quadrature_formula;
+  AffineConstraints<double> constraints;
 
   const unsigned int p = 3;
 
@@ -293,12 +293,12 @@ test_regular(const MyFunction<dim> &func)
   deallog << std::endl;
   deallog << "Regular face:" << std::endl;
   deallog << "-------------" << std::endl;
-  Triangulation<dim>       triangulation;
-  hp::DoFHandler<dim>      dof_handler(triangulation);
-  hp::FECollection<dim>    fe_collection;
-  hp::QCollection<dim>     quadrature_formula;
-  hp::QCollection<dim - 1> face_quadrature_formula;
-  ConstraintMatrix         constraints;
+  Triangulation<dim>        triangulation;
+  hp::DoFHandler<dim>       dof_handler(triangulation);
+  hp::FECollection<dim>     fe_collection;
+  hp::QCollection<dim>      quadrature_formula;
+  hp::QCollection<dim - 1>  face_quadrature_formula;
+  AffineConstraints<double> constraints;
 
   const unsigned int        p1 = 1;
   const unsigned int        p2 = 2;
@@ -407,12 +407,12 @@ test_irregular(const MyFunction<dim> &func)
   deallog << std::endl;
   deallog << "Irregular face:" << std::endl;
   deallog << "---------------" << std::endl;
-  Triangulation<dim>       triangulation;
-  hp::DoFHandler<dim>      dof_handler(triangulation);
-  hp::FECollection<dim>    fe_collection;
-  hp::QCollection<dim>     quadrature_formula;
-  hp::QCollection<dim - 1> face_quadrature_formula;
-  ConstraintMatrix         constraints;
+  Triangulation<dim>        triangulation;
+  hp::DoFHandler<dim>       dof_handler(triangulation);
+  hp::FECollection<dim>     fe_collection;
+  hp::QCollection<dim>      quadrature_formula;
+  hp::QCollection<dim - 1>  face_quadrature_formula;
+  AffineConstraints<double> constraints;
 
   const unsigned int        p1 = 1;
   const unsigned int        p2 = 2;
@@ -590,12 +590,12 @@ test(const MySecondFunction<dim> &func)
   deallog << "More complicated mesh:" << std::endl;
   deallog << "----------------------" << std::endl;
 
-  dealii::Triangulation<dim>       triangulation;
-  dealii::hp::DoFHandler<dim>      dof_handler(triangulation);
-  dealii::hp::FECollection<dim>    fe_collection;
-  dealii::hp::QCollection<dim>     quadrature_formula;
-  dealii::hp::QCollection<dim - 1> face_quadrature_formula;
-  dealii::ConstraintMatrix         constraints;
+  dealii::Triangulation<dim>        triangulation;
+  dealii::hp::DoFHandler<dim>       dof_handler(triangulation);
+  dealii::hp::FECollection<dim>     fe_collection;
+  dealii::hp::QCollection<dim>      quadrature_formula;
+  dealii::hp::QCollection<dim - 1>  face_quadrature_formula;
+  dealii::AffineConstraints<double> constraints;
   for (unsigned int p = 1; p <= 3; p++)
     {
       fe_collection.push_back(dealii::FE_Q<dim>(QIterated<1>(QTrapez<1>(), p)));

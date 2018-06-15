@@ -85,7 +85,7 @@ private:
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   LinearAlgebra::distributed::Vector<double> solution;
   LinearAlgebra::distributed::Vector<double> system_rhs;
@@ -296,8 +296,9 @@ LaplaceProblem<dim>::assemble_multigrid()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values(n_q_points);
 
-  std::vector<ConstraintMatrix> boundary_constraints(triangulation.n_levels());
-  ConstraintMatrix              empty_constraints;
+  std::vector<AffineConstraints<double>> boundary_constraints(
+    triangulation.n_levels());
+  AffineConstraints<double> empty_constraints;
   for (unsigned int level = min_level; level < triangulation.n_levels();
        ++level)
     {

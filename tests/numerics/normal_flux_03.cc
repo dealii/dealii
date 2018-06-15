@@ -49,7 +49,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   VectorTools::compute_normal_flux_constraints(dof, 0, boundary_ids, cm);
 
   cm.print(deallog.get_file_stream());

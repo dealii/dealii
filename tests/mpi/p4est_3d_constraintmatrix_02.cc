@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix.distribute() for a distributed mesh
+// check AffineConstraints<double>.distribute() for a distributed mesh
 // with Trilinos
 
 #include <deal.II/base/tensor.h>
@@ -87,7 +87,7 @@ test()
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
 
-  ConstraintMatrix cm(relevant_set);
+  AffineConstraints<double> cm(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   cm.close();
 

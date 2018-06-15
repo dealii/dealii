@@ -16,7 +16,7 @@
 // This test was written by Sam Cox.
 
 // Tests the behaviour of DoFTools::make_flux_sparsity_pattern (DoFHandler,
-//                          SparsityPattern, ConstraintMatrix, bool,
+//                          SparsityPattern, AffineConstraints<double>, bool,
 //                          coupling, flux_coupling, subdomain_id)
 
 #include <deal.II/base/point.h>
@@ -97,7 +97,7 @@ test()
   DoFTools::extract_locally_relevant_dofs(dh, relevant_partitioning);
 
   // Generate hanging node constraints
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dh, constraints);
   constraints.close();

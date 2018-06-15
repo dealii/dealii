@@ -39,7 +39,7 @@
 //   DoFTools::
 //   make_flux_sparsity_pattern (const DoFHandler<dim> &,
 //                           SparsityPattern       &,
-//                           ConstraintMatrix      &);
+//                           AffineConstraints<double>      &);
 // this used to fail at one point because we forgot that in 1d
 // neighboring cells can be more than one level apart. with
 // FE_DGQ(0) elements, we get the following mesh and DoF indices:
@@ -59,7 +59,9 @@ check_this(const DoFHandler<dim> &dof_handler)
   // create sparsity pattern
   SparsityPattern sp(dof_handler.n_dofs(),
                      dof_handler.max_couplings_between_dofs() * 2);
-  DoFTools::make_flux_sparsity_pattern(dof_handler, sp, ConstraintMatrix());
+  DoFTools::make_flux_sparsity_pattern(dof_handler,
+                                       sp,
+                                       AffineConstraints<double>());
   sp.compress();
 
   // write out 20 lines of this

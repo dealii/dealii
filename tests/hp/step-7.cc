@@ -209,7 +209,7 @@ private:
 
   SmartPointer<const hp::FECollection<dim>> fe;
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

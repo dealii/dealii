@@ -15,8 +15,8 @@
 
 
 
-// Try to merge two empty ConstraintMatrix objects initialized with IndexSets
-// that don't match.
+// Try to merge two empty AffineConstraints<double> objects initialized with
+// IndexSets that don't match.
 
 #include <deal.II/lac/affine_constraints.h>
 
@@ -27,7 +27,7 @@
 void
 merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge with localized lines"
+  deallog << "Checking AffineConstraints<double>::merge with localized lines"
           << std::endl;
 
   // set local lines to a very large range that
@@ -46,11 +46,11 @@ merge_check()
   local_lines2.print(deallog.get_file_stream());
 
   // works correctly
-  ConstraintMatrix c1(local_lines1), c2(local_lines2);
+  AffineConstraints<double> c1(local_lines1), c2(local_lines2);
 
   // now merge the two and print the
   // results
-  c1.merge(c2, ConstraintMatrix::no_conflicts_allowed, true);
+  c1.merge(c2, AffineConstraints<double>::no_conflicts_allowed, true);
   c1.print(deallog.get_file_stream());
 
   deallog << "OK" << std::endl;

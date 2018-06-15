@@ -151,14 +151,14 @@ namespace polytest
     unsigned int p_order;
     unsigned int quad_order;
 
-    Triangulation<dim>   tria;
-    DoFHandler<dim>      dof_handler;
-    FE_NedelecSZ<dim>    fe;
-    ConstraintMatrix     constraints;
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Triangulation<dim>        tria;
+    DoFHandler<dim>           dof_handler;
+    FE_NedelecSZ<dim>         fe;
+    AffineConstraints<double> constraints;
+    SparsityPattern           sparsity_pattern;
+    SparseMatrix<double>      system_matrix;
+    Vector<double>            solution;
+    Vector<double>            system_rhs;
   };
 
   template <int dim>

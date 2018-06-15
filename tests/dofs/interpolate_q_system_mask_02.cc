@@ -105,7 +105,7 @@ test()
       mask2.set(1, true);
       mask2.set(2, true);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

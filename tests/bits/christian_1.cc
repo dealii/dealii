@@ -172,7 +172,7 @@ main()
   DoFToolsEx::transfer(dof, sol, both_dof, both_sol);
 
   // handle hanging nodes
-  ConstraintMatrix both_constraints;
+  AffineConstraints<double> both_constraints;
   DoFTools::make_hanging_node_constraints(both_dof, both_constraints);
   both_constraints.close();
   both_constraints.distribute(both_sol);

@@ -62,7 +62,7 @@ private:
 
   FE_Q<2> fe;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   IndexSet locally_owned_dofs;
   IndexSet locally_relevant_dofs;

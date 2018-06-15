@@ -15,8 +15,8 @@
 
 
 // Check that all the functionality needed for calling
-// ConstraintMatrix::distribute_local_to_global on mutiple combinations of
-// PETScWrappers objects is correctly instantiated and works.
+// AffineConstraints<double>::distribute_local_to_global on mutiple combinations
+// of PETScWrappers objects is correctly instantiated and works.
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>

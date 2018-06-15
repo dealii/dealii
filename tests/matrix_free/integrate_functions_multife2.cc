@@ -291,11 +291,11 @@ test()
   dst[4].reinit(dst[0]);
   dst[5].reinit(dst[0]);
 
-  std::vector<const ConstraintMatrix *> constraints(2);
-  ConstraintMatrix                      constraint0;
+  std::vector<const AffineConstraints<double> *> constraints(2);
+  AffineConstraints<double>                      constraint0;
   constraint0.close();
   constraints[0] = &constraint0;
-  ConstraintMatrix constraint1;
+  AffineConstraints<double> constraint1;
   DoFTools::make_hanging_node_constraints(*dof[1], constraint1);
   constraint1.close();
   constraints[1] = &constraint1;

@@ -960,8 +960,8 @@ namespace StokesClass
     std::vector<IndexSet> owned_partitioning;
     std::vector<IndexSet> relevant_partitioning;
 
-    ConstraintMatrix constraints_u;
-    ConstraintMatrix constraints_p;
+    AffineConstraints<double> constraints_u;
+    AffineConstraints<double> constraints_p;
 
     block_vector_t solution;
     block_vector_t system_rhs;
@@ -1071,7 +1071,7 @@ namespace StokesClass
     std::vector<const DoFHandler<dim> *> stokes_dofs;
     stokes_dofs.push_back(&dof_handler_u);
     stokes_dofs.push_back(&dof_handler_p);
-    std::vector<const ConstraintMatrix *> stokes_constraints;
+    std::vector<const AffineConstraints<double> *> stokes_constraints;
     stokes_constraints.push_back(&constraints_u);
     stokes_constraints.push_back(&constraints_p);
 
@@ -1122,7 +1122,7 @@ namespace StokesClass
         DoFTools::extract_locally_relevant_level_dofs(dof_handler_u,
                                                       level,
                                                       relevant_dofs);
-        ConstraintMatrix level_constraints;
+        AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
@@ -1177,8 +1177,8 @@ namespace StokesClass
                                  update_JxW_values | update_quadrature_points);
 
     // Create constraints with no Dirchlet info
-    ConstraintMatrix constraints_u_no_dirchlet;
-    IndexSet         locally_relevant_dofs_u;
+    AffineConstraints<double> constraints_u_no_dirchlet;
+    IndexSet                  locally_relevant_dofs_u;
     DoFTools::extract_locally_relevant_dofs(dof_handler_u,
                                             locally_relevant_dofs_u);
     constraints_u_no_dirchlet.reinit(locally_relevant_dofs_u);
@@ -1186,7 +1186,7 @@ namespace StokesClass
                                             constraints_u_no_dirchlet);
     constraints_u_no_dirchlet.close();
 
-    std::vector<const ConstraintMatrix *> constraints_no_dirchlet;
+    std::vector<const AffineConstraints<double> *> constraints_no_dirchlet;
     constraints_no_dirchlet.push_back(&constraints_u_no_dirchlet);
     constraints_no_dirchlet.push_back(&constraints_p);
     std::vector<const DoFHandler<dim> *> dofs;

@@ -79,7 +79,7 @@ test()
       dof.distribute_dofs(*fes[i]);
       MatrixFree<dim> matrix_free;
       matrix_free.reinit(dof,
-                         ConstraintMatrix(),
+                         AffineConstraints<double>(),
                          QGauss<1>(degree + 3),
                          typename MatrixFree<dim>::AdditionalData());
       if (i < 2)

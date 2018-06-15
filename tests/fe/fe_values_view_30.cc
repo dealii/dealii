@@ -127,7 +127,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                           update_values | update_gradients |
                             update_3rd_derivatives);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

@@ -136,7 +136,7 @@ test()
 
   // .... test constraint handling
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 

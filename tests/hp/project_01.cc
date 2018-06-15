@@ -77,7 +77,7 @@ test()
 
   Vector<double> v(dh.n_dofs());
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
   VectorTools::project(
     dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);

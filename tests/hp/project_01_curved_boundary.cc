@@ -88,7 +88,7 @@ test()
 
   Vector<double> v(dh.n_dofs());
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   // use the implicit Q1 mapping. this will yield a zero solution

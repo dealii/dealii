@@ -67,7 +67,7 @@ test()
 
   std::vector<bool> mask(2, true);
   mask[1] = false;
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_periodicity_constraints(dof_handler.begin(0)->face(0),
                                          (++dof_handler.begin(0))->face(1),
                                          cm,

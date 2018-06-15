@@ -129,7 +129,7 @@ private:
   hp::FECollection<dim> fe;
   hp::DoFHandler<dim>   dof_handler;
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> matrix;

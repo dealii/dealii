@@ -80,7 +80,7 @@ test()
 
   const F<dim> approximated_function;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   VectorTools::interpolate_boundary_values(dh, 0, approximated_function, cm);
   cm.close();
 

@@ -187,7 +187,7 @@ test(const FiniteElement<dim> &fe,
     {
       dof_handler.distribute_dofs(fe);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

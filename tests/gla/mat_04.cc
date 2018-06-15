@@ -52,7 +52,7 @@ test()
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   parallel::distributed::Triangulation<dim> triangulation(
@@ -113,7 +113,7 @@ test_trilinos_alternative()
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   parallel::distributed::Triangulation<dim> triangulation(

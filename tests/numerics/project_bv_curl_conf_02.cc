@@ -61,8 +61,8 @@ BoundaryFunction<dim>::vector_value(const Point<dim> &,
 
 template <int dim>
 void
-test_boundary_values(const FiniteElement<dim> &fe,
-                     ConstraintMatrix &        constraints)
+test_boundary_values(const FiniteElement<dim> & fe,
+                     AffineConstraints<double> &constraints)
 {
   Triangulation<dim> triangulation;
   GridGenerator::subdivided_hyper_cube(triangulation, 2);
@@ -81,7 +81,7 @@ test(unsigned order)
 {
   deallog << "dim:" << dim << " order:" << order << "\t";
 
-  ConstraintMatrix constraints_fe, constraints_fes;
+  AffineConstraints<double> constraints_fe, constraints_fes;
 
   {
     FE_Nedelec<3> fe(order);

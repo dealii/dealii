@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix.distribute() for a trilinos vector
+// check AffineConstraints<double>.distribute() for a trilinos vector
 //
 // we do this by creating a vector where each processor has 100
 // elements but no ghost elements. then we add constraints on each
@@ -67,14 +67,14 @@ test()
   }
 
 
-  // create a ConstraintMatrix with a range that exceeds the locally
+  // create a AffineConstraints<double> with a range that exceeds the locally
   // owned range by 50 on each side
   IndexSet locally_relevant_range(vec.size());
   locally_relevant_range.add_range(
     std::max<int>(100 * myid - 50, 0),
     std::min(static_cast<types::global_dof_index>(100 * myid + 150),
              vec.size()));
-  ConstraintMatrix cm(locally_relevant_range);
+  AffineConstraints<double> cm(locally_relevant_range);
 
   // add constraints that constrain an element in the middle of the
   // local range of each processor against an element outside, both in

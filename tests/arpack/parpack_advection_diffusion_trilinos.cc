@@ -122,12 +122,12 @@ test()
     Utilities::MPI::this_mpi_process(mpi_communicator);
 
 
-  Triangulation<dim> triangulation;
-  DoFHandler<dim>    dof_handler(triangulation);
-  FE_Q<dim>          fe(1);
-  ConstraintMatrix   constraints;
-  IndexSet           locally_owned_dofs;
-  IndexSet           locally_relevant_dofs;
+  Triangulation<dim>        triangulation;
+  DoFHandler<dim>           dof_handler(triangulation);
+  FE_Q<dim>                 fe(1);
+  AffineConstraints<double> constraints;
+  IndexSet                  locally_owned_dofs;
+  IndexSet                  locally_relevant_dofs;
 
   std::vector<TrilinosWrappers::MPI::Vector> eigenfunctions;
   std::vector<TrilinosWrappers::MPI::Vector> arpack_vectors;

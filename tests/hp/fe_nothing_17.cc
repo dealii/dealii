@@ -55,8 +55,8 @@ transfer(std::ostream &out)
   FESystem<dim>   fe(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1);
   DoFHandler<dim> dof_handler(tria);
 
-  Vector<double>   solution;
-  ConstraintMatrix cm;
+  Vector<double>            solution;
+  AffineConstraints<double> cm;
   cm.close();
 
   dof_handler.distribute_dofs(fe);

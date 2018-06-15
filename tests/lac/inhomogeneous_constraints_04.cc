@@ -92,7 +92,7 @@ test(bool use_constraint_matrix)
 
   if (use_constraint_matrix == true)
     {
-      ConstraintMatrix cm;
+      AffineConstraints<double> cm;
 
       cm.add_line(1);
       cm.set_inhomogeneity(1, -5.0);

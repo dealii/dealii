@@ -366,10 +366,10 @@ namespace LaplaceSolver
       void
       solve(Vector<double> &solution) const;
 
-      ConstraintMatrix     hanging_node_constraints;
-      SparsityPattern      sparsity_pattern;
-      SparseMatrix<double> matrix;
-      Vector<double>       rhs;
+      AffineConstraints<double> hanging_node_constraints;
+      SparsityPattern           sparsity_pattern;
+      SparseMatrix<double>      matrix;
+      Vector<double>            rhs;
     };
 
     void
@@ -533,7 +533,7 @@ namespace LaplaceSolver
   {
     hanging_node_constraints.clear();
 
-    void (*mhnc_p)(const hp::DoFHandler<dim> &, ConstraintMatrix &) =
+    void (*mhnc_p)(const hp::DoFHandler<dim> &, AffineConstraints<double> &) =
       &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<> mhnc_thread =
@@ -1597,7 +1597,7 @@ namespace LaplaceSolver
     const PrimalSolver<dim> &primal_solver = *this;
     const DualSolver<dim> &  dual_solver   = *this;
 
-    ConstraintMatrix primal_hanging_node_constraints;
+    AffineConstraints<double> primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints(primal_solver.dof_handler,
                                             primal_hanging_node_constraints);
     primal_hanging_node_constraints.close();
@@ -1631,7 +1631,7 @@ namespace LaplaceSolver
     const PrimalSolver<dim> &primal_solver = *this;
     const DualSolver<dim> &  dual_solver   = *this;
 
-    ConstraintMatrix dual_hanging_node_constraints;
+    AffineConstraints<double> dual_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints(dual_solver.dof_handler,
                                             dual_hanging_node_constraints);
     dual_hanging_node_constraints.close();
@@ -1642,7 +1642,7 @@ namespace LaplaceSolver
                          dual_hanging_node_constraints,
                          primal_solution);
 
-    ConstraintMatrix primal_hanging_node_constraints;
+    AffineConstraints<double> primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints(primal_solver.dof_handler,
                                             primal_hanging_node_constraints);
     primal_hanging_node_constraints.close();

@@ -84,7 +84,7 @@ main()
   print_dofs(dof_handler.begin_active());
   print_dofs(++dof_handler.begin_active());
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   dealii::DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

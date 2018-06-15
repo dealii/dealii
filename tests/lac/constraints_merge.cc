@@ -29,7 +29,7 @@ std::ofstream logfile("output");
 void
 merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge" << std::endl;
+  deallog << "Checking AffineConstraints<double>::merge" << std::endl;
 
   // check twice, once with closed
   // objects, once with open ones
@@ -40,7 +40,7 @@ merge_check()
 
       // check that the `merge' function
       // works correctly
-      ConstraintMatrix c1, c2;
+      AffineConstraints<double> c1, c2;
 
       // enter simple line
       c1.add_line(0);

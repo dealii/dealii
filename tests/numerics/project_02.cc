@@ -78,7 +78,7 @@ test()
   v.block(1).reinit(dh.n_dofs() - dh.n_dofs() / 2);
   v.collect_sizes();
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
   VectorTools::project(dh, cm, QGauss<dim>(3), F<dim>(), v);
 

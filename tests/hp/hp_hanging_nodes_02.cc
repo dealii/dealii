@@ -16,7 +16,7 @@
 
 
 // compute hanging node constraints (before and after the processing
-// we do in ConstraintMatrix::close()) for some grids with and without
+// we do in AffineConstraints<double>::close()) for some grids with and without
 // random distribution of FEs
 
 #include <deal.II/base/function.h>
@@ -57,10 +57,10 @@ template <int dim>
 void
 run(bool random_p, unsigned int *indx)
 {
-  Triangulation<dim>    triangulation;
-  hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler(triangulation);
-  ConstraintMatrix      hanging_node_constraints;
+  Triangulation<dim>        triangulation;
+  hp::FECollection<dim>     fe;
+  hp::DoFHandler<dim>       dof_handler(triangulation);
+  AffineConstraints<double> hanging_node_constraints;
 
   FE_Q<dim> fe_1(QIterated<1>(QTrapez<1>(), indx[0])),
     fe_2(QIterated<1>(QTrapez<1>(), indx[1])),

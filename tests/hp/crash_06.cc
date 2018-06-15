@@ -80,7 +80,7 @@ do_check(const Triangulation<dim> &   triangulation,
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

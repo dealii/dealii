@@ -110,8 +110,8 @@ test(std::string filename)
     exp[2] = 0;
   Functions::Monomial<spacedim> monomial(exp);
 
-  const QGauss<dim> quad(5);
-  ConstraintMatrix  constraints;
+  const QGauss<dim>         quad(5);
+  AffineConstraints<double> constraints;
   constraints.close();
   VectorTools::project(dof_handler, constraints, quad, monomial, projected_one);
 

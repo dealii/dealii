@@ -108,7 +108,7 @@ namespace Step22
     FESystem<dim> &    fe;
     DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;

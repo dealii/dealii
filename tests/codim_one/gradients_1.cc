@@ -91,8 +91,8 @@ test(std::string filename, unsigned int degree = 1)
   //     exp[2]=0;
   // Functions::Monomial<spacedim> the_function(exp);
 
-  const QGauss<dim> quad(2 * fe.degree + 1);
-  ConstraintMatrix  constraints;
+  const QGauss<dim>         quad(2 * fe.degree + 1);
+  AffineConstraints<double> constraints;
   constraints.close();
   VectorTools::project(
     mapping, dof_handler, constraints, quad, the_function, projected_one);

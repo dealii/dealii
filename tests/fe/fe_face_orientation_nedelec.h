@@ -235,7 +235,7 @@ set_solution(Vector<double> &      vector,
              const DoFHandler<3> & dof_handler_ref,
              const Vector<double> &u_ref)
 {
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   constraints.close();
 

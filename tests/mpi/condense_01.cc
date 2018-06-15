@@ -15,7 +15,7 @@
 
 
 
-// test ConstraintMatrix::condense(in, out)
+// test AffineConstraints<double>::condense(in, out)
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>

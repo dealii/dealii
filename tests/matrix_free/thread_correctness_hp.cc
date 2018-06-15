@@ -131,7 +131,7 @@ do_test(const unsigned int parallel_option)
 
   // setup DoFs
   dof.distribute_dofs(fe_collection);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

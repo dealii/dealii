@@ -84,9 +84,9 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
     typename Triangulation<dim>::MeshSmoothing(
       Triangulation<dim>::smoothing_on_refinement |
       Triangulation<dim>::smoothing_on_coarsening));
-  QGauss<dim>      quadrature_formula(fe_trial.degree + 1);
-  DoFHandler<dim>  dof_handler(triangulation);
-  ConstraintMatrix constraints;
+  QGauss<dim>               quadrature_formula(fe_trial.degree + 1);
+  DoFHandler<dim>           dof_handler(triangulation);
+  AffineConstraints<double> constraints;
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 

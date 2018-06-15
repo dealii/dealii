@@ -23,7 +23,7 @@
 // check
 //   DoFTools::
 //   make_hanging_node_constraints (const DoFHandler<dim> &,
-//                              ConstraintMatrix      &);
+//                              AffineConstraints<double>      &);
 
 
 
@@ -47,7 +47,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().constraints_are_implemented() == false)
     return;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof_handler, cm);
   cm.close();
 

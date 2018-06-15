@@ -92,7 +92,7 @@ namespace Step36
     std::vector<Vector<double>>       eigenfunctions;
     std::vector<std::complex<double>> eigenvalues;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
   };
 
 

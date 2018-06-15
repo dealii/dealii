@@ -54,7 +54,7 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
   const unsigned int        degree = fe.degree;
   system_matrix                    = 0;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
   FEValues<dim>      fe_values(fe,
                           quadrature_formula,

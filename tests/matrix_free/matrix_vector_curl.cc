@@ -142,7 +142,7 @@ test()
 
   MatrixFree<dim, double> mf_data;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> system_matrix;

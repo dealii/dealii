@@ -28,7 +28,7 @@
 void
 test()
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   // an inhomogeneous constraint
   cm.add_line(4);

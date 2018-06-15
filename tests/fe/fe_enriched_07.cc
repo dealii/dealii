@@ -131,7 +131,7 @@ test6(const bool         do_href,
 
   deallog << "n_cells: " << triangulation.n_active_cells() << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   dealii::DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

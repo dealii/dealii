@@ -72,7 +72,7 @@ namespace pdd
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     PETScWrappers::MPI::Vector locally_relevant_solution;
   };

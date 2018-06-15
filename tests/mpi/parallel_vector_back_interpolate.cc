@@ -56,7 +56,7 @@ test()
   DoFHandler<dim> dof1(tria), dof2(tria);
   dof1.distribute_dofs(fe1);
   dof2.distribute_dofs(fe2);
-  ConstraintMatrix c1, c2;
+  AffineConstraints<double> c1, c2;
   DoFTools::make_hanging_node_constraints(dof1, c1);
   c1.close();
   DoFTools::make_hanging_node_constraints(dof2, c2);

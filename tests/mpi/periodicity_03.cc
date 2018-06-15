@@ -91,9 +91,9 @@ namespace Step22
     FESystem<dim>                             fe;
     DoFHandler<dim>                           dof_handler;
 
-    ConstraintMatrix      constraints;
-    std::vector<IndexSet> owned_partitioning;
-    std::vector<IndexSet> relevant_partitioning;
+    AffineConstraints<double> constraints;
+    std::vector<IndexSet>     owned_partitioning;
+    std::vector<IndexSet>     relevant_partitioning;
 
     TrilinosWrappers::BlockSparseMatrix system_matrix;
 
