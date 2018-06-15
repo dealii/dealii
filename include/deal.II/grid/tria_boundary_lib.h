@@ -16,6 +16,8 @@
 #ifndef dealii_tria_boundary_lib_h
 #define dealii_tria_boundary_lib_h
 
+#include <deal.II/base/config.h>
+
 #warning This file is deprecated. Use the Manifold classes instead.
 
 #endif
