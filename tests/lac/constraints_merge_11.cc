@@ -18,7 +18,7 @@
 // Try to merge two empty ConstraintMatrix objects initialized with IndexSets
 // that don't match.
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

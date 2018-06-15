@@ -21,7 +21,7 @@
 
 #include <deal.II/base/job_identifier.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <iostream>
 #include <vector>

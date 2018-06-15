@@ -18,7 +18,7 @@
 // test: test the ConstraintMatrix::get_lines() range object
 
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

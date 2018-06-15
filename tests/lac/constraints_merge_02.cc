@@ -18,7 +18,7 @@
 // merge and print a bunch of ConstrainMatrices. test the case that we
 // have inhomogeneities in the constraints
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

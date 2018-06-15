@@ -18,7 +18,7 @@
 // This is the same as constraints_merge_08 but local_lines differs for
 // the objects to be merged.
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

@@ -21,7 +21,7 @@
 
 #include <deal.II/base/function.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 
 #include <complex>

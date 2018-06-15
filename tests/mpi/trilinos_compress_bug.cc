@@ -21,7 +21,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <iostream>

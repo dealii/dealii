@@ -21,7 +21,7 @@
 // (at a global level) the set of indices owned by this processor is not
 // contiguous
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 #include <sstream>

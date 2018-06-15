@@ -34,10 +34,10 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 
 #include <deal.II/numerics/error_estimator.h>

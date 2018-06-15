@@ -49,7 +49,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>

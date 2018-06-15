@@ -19,7 +19,7 @@
 // inhomogeneities in the constraints and the constraint matrix is constructed
 // based on an IndexSet to transform large global indices into local ones
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

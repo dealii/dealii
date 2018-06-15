@@ -18,7 +18,7 @@
 // merge and print a bunch of ConstrainMatrices. test the case where we have
 // conflicting constraints and don't allow any conflicts
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

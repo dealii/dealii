@@ -20,7 +20,7 @@
 //
 // like _05, but the winning constraint introduces another chain
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

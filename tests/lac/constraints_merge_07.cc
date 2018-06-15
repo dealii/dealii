@@ -21,7 +21,7 @@
 // like _06, but the winning constraint introduces now introduces a cycle in
 // the graph of constraints
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

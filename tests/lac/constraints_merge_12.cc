@@ -19,7 +19,7 @@
 // have been added in a way that local_lines extends beyond the end of the
 // IndexSet
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 

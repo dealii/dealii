@@ -21,7 +21,7 @@
 // we condense a matrix with this then the right thing happens
 
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 
 #include "../tests.h"

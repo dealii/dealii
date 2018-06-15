@@ -27,7 +27,7 @@
 // we use constraints of the form x_i = x_j with sequentially growing
 // x_j's so that we can verify the correctness analytically
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <sstream>

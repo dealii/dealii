@@ -17,7 +17,7 @@
 
 // merge and print a bunch of ConstrainMatrices
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
