@@ -23,7 +23,7 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/base/multithread_info.h>
 
-#include <numeric> 
+#include <numeric>
 #include <iostream>
 
 #ifdef DEAL_II_WITH_TRILINOS

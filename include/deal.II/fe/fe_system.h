@@ -459,18 +459,21 @@ public:
    * In other words, if no multiplicity for an element is explicitly specified
    * via the exponentiation operation, then it is assumed to be one (as one
    * would have expected).
+   *
+   * @warning This feature is not available for Intel compilers
+   * prior to version 19.0
    */
-  template <class... FEPairs,
-            typename = typename enable_if_all<
-              (std::is_same<typename std::decay<FEPairs>::type,
-                            std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>::value
-               ||
-               std::is_base_of<FiniteElement<dim, spacedim>,
-                               typename std::decay<FEPairs>::type>::value)
-              ...
-              >::type
-            >
   FESystem (FEPairs &&... fe_pairs);
+#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+  template <
+    class... FEPairs,
+    typename = typename enable_if_all<
+      (std::is_same<typename std::decay<FEPairs>::type,
+                    std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                              unsigned int>>::value ||
+       std::is_base_of<FiniteElement<dim, spacedim>,
+                       typename std::decay<FEPairs>::type>::value)...>::type>
+  FESystem(FEPairs &&... fe_pairs);
 
   /**
    * Same as above allowing the following syntax:
@@ -479,9 +482,14 @@ public:
    *   FiniteElementType1<dim,spacedim> fe_2;
    *   FESystem<dim,spacedim> fe_system = { fe_1^dim, fe_2^1 };
    * @endcode
+   *
+   * @warning This feature is not available for Intel compilers
+   * prior to version 19.0
    */
-  FESystem (const std::initializer_list<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-            unsigned int>> &fe_systems);
+  FESystem(
+    const std::initializer_list<
+    std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
+    &fe_systems);
 
   /**
    * Copy constructor. This constructor is deleted, i.e., copying
@@ -1208,15 +1216,19 @@ namespace
 
 
 
-// We are just forwarding/delegating to the constructor taking a std::initializer_list.
-// If we decide to remove the deprecated constructors, we might just use the variadic
-// constructor with a suitable static_assert instead of the std::enable_if.
-template<int dim, int spacedim>
-template <class... FEPairs,
-          typename>
-FESystem<dim,spacedim>::FESystem (FEPairs &&... fe_pairs)
-  :
-  FESystem<dim, spacedim> ({promote_to_fe_pair<dim,spacedim>(std::forward<FEPairs>(fe_pairs))...})
+#    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+// We are just forwarding/delegating to the constructor taking a
+// std::initializer_list. If we decide to remove the deprecated constructors, we
+// might just use the variadic constructor with a suitable static_assert instead
+// of the std::enable_if.
+template <int dim, int spacedim>
+template <class... FEPairs, typename>
+FESystem<dim, spacedim>::FESystem(FEPairs &&... fe_pairs)
+  : FESystem<dim, spacedim>(
+{
+  promote_to_fe_pair<dim, spacedim>(
+    std::forward<FEPairs>(fe_pairs))...
+})
 {}
 
 
@@ -1248,6 +1260,7 @@ FESystem<dim,spacedim>::FESystem
 
   initialize(fes, multiplicities);
 }
+#    endif
 
 #endif //DOXYGEN
 
