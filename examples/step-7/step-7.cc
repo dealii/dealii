@@ -655,14 +655,16 @@ namespace Step7
                 // The first thing that has changed is the bilinear form. It
                 // now contains the additional term from the Helmholtz
                 // equation:
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
+                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *     //
+                                         fe_values.shape_grad(j, q_point)     //
+                                       +                                      //
+                                       fe_values.shape_value(i, q_point) *    //
+                                         fe_values.shape_value(j, q_point)) * //
                                       fe_values.JxW(q_point));
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+              cell_rhs(i) += (fe_values.shape_value(i, q_point) * //
+                              rhs_values[q_point] *               //
+                              fe_values.JxW(q_point));
             }
 
         // Then there is that second term on the right hand side, the contour
@@ -707,9 +709,9 @@ namespace Step7
                      fe_face_values.normal_vector(q_point));
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                    cell_rhs(i) +=
-                      (neumann_value * fe_face_values.shape_value(i, q_point) *
-                       fe_face_values.JxW(q_point));
+                    cell_rhs(i) += (neumann_value *                          //
+                                    fe_face_values.shape_value(i, q_point) * //
+                                    fe_face_values.JxW(q_point));
                 }
             }
 
