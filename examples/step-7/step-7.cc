@@ -635,13 +635,10 @@ namespace Step7
 
     // Now for the main loop over all cells. This is mostly unchanged from
     // previous examples, so we only comment on the things that have changed.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto cell : dof_handler.active_cell_iterators())
       {
-        cell_matrix = 0;
-        cell_rhs    = 0;
+        cell_matrix = 0.;
+        cell_rhs    = 0.;
 
         fe_values.reinit(cell);
 
@@ -1003,19 +1000,16 @@ namespace Step7
             GridGenerator::hyper_cube(triangulation, -1, 1);
             triangulation.refine_global(3);
 
-            typename Triangulation<dim>::cell_iterator cell =
-                                                         triangulation.begin(),
-                                                       endc =
-                                                         triangulation.end();
-            for (; cell != endc; ++cell)
+            for (const auto cell : triangulation.cell_iterators())
               for (unsigned int face_number = 0;
                    face_number < GeometryInfo<dim>::faces_per_cell;
                    ++face_number)
-                if ((std::fabs(cell->face(face_number)->center()(0) - (-1)) <
-                     1e-12) ||
-                    (std::fabs(cell->face(face_number)->center()(1) - (-1)) <
-                     1e-12))
-                  cell->face(face_number)->set_boundary_id(1);
+                {
+                  const auto &center = cell->face(face_number)->center();
+                  if ((std::fabs(center(0) - (-1)) < 1e-12) ||
+                      (std::fabs(center(1) - (-1)) < 1e-12))
+                    cell->face(face_number)->set_boundary_id(1);
+                }
           }
         else
           refine_grid();
