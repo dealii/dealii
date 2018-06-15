@@ -24,7 +24,8 @@
 #include <adolc/adouble.h>
 #include <adolc/drivers/drivers.h>
 #include <adolc/taping.h>
-#include <math.h>
+
+#include <cmath>
 
 using namespace dealii;
 

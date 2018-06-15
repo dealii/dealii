@@ -78,7 +78,7 @@
 // output files. The first header provides the <code>mkdir</code> function and
 // the second lets us determine what happened if <code>mkdir</code> fails.
 #include <sys/stat.h>
-#include <errno.h>
+#include <cerrno>
 
 namespace Step42
 {
