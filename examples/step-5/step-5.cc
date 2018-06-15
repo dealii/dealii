@@ -158,12 +158,6 @@ void Step5<dim>::setup_system()
 // side can take a comparable time, and you should think about using one or
 // two optimizations at some places.
 //
-// What we will show here is how we can avoid calls to the shape_value,
-// shape_grad, and quadrature_point functions of the FEValues object. The way
-// to do so will be explained in the following, while those parts of this
-// function that are not changed with respect to the previous example are not
-// commented on.
-//
 // The first parts of the function are completely unchanged from before:
 template <int dim>
 void Step5<dim>::assemble_system()
