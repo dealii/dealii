@@ -66,10 +66,9 @@
  * <dd>
  * The numbers of row and column are types::global_dof_index even if it is not
  * expected that someone will create a FullMatrix with so many entries.
- * However, some functions of ConstraintMatrix are templated on the matrix
- * type and thus, the
- * size of a FullMatrix has to be of the same type than the size of
- * SparseMatrix.
+ * However, some methods of the AffineConstraints class are templated on
+ * the matrix type and thus, the size of a FullMatrix has to be of the same
+ * type than the size of SparseMatrix.
  * </dd>
  *
  * <dt class="glossary">@anchor GlobalDoFIndexSparseMatrix

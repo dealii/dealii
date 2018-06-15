@@ -558,7 +558,7 @@
  *
  * 1. At the end of your assembly loop on matrices and vectors. This needs to
  * be done if you write entries directly or if you use
- * ConstraintMatrix::distribute_local_to_global. Use VectorOperation::add.
+ * AffineConstraints::distribute_local_to_global. Use VectorOperation::add.
  *
  * 2. When you are done setting individual elements in a matrix/vector before
  * any other operations are done (adding to elements, other operations like
@@ -568,8 +568,8 @@
  * VectorOperation::add.
  *
  * All other operations like scaling or adding vectors, assignments, calls
- * into deal.II (VectorTools, ConstraintMatrix, ...) or solvers do not require
- * calls to compress().
+ * into deal.II (VectorTools, AffineConstraints, ...) or solvers do not
+ * require calls to compress().
  * </dd>
  *
  * @note Compressing is an operation that only applies to vectors whose

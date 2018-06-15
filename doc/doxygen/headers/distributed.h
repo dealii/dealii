@@ -332,7 +332,7 @@
  * When creating the sparsity pattern as well as when assembling the linear
  * system, we need to know about constraints on degrees of freedom, for
  * example resulting from hanging nodes or boundary conditions. Like the
- * DynamicSparsityPattern class, the ConstraintMatrix can also take
+ * DynamicSparsityPattern class, the AffineConstraints container can also take
  * an IndexSet upon construction that indicates for which of the possibly very
  * large number of degrees of freedom it should actually store
  * constraints. Unlike for the sparsity pattern, these are now only those
@@ -347,8 +347,8 @@
  * this chain of constraints, it may not be sufficient to only store
  * constraints on locally active degrees of freedom but one may also need to
  * have constraints available on locally relevant ones. In that case, the
- * ConstraintMatrix object needs to be initialized with the IndexSet produced
- * by DoFTools::extract_locally_relevant_dofs() .
+ * AffineConstraints object needs to be initialized with the IndexSet
+ * produced by DoFTools::extract_locally_relevant_dofs() .
  *
  * In general, your program will continue to do something if you happen to not
  * store all necessary constraints on each processor: you will just generate

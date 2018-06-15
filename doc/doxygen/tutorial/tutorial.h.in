@@ -235,7 +235,7 @@
  *       <td>step-22</td>
  *       <td> Solving the Stokes equations of slow fluid flow on adaptive
  *       meshes. More on Schur complement solvers. Advanced use of the
- *       ConstraintMatrix class.
+ *       AffineConstraints class.
  *       </td></tr>
  *
  *   <tr valign="top">
