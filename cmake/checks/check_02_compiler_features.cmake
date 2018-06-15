@@ -25,7 +25,6 @@
 #   DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
 #   DEAL_II_VECTOR_ITERATOR_IS_POINTER
 #   DEAL_II_HAVE_BUILTIN_EXPECT
-#   DEAL_II_HAVE_VERBOSE_TERMINATE
 #   DEAL_II_HAVE_GLIBC_STACKTRACE
 #   DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION
@@ -123,41 +122,6 @@ CHECK_CXX_SOURCE_COMPILES(
   int main(){ if (__builtin_expect(f(),false)) ; }
   "
   DEAL_II_HAVE_BUILTIN_EXPECT)
-
-
-#
-# Newer versions of GCC have a very nice feature: you can set
-# a verbose terminate handler, that not only aborts a program
-# when an exception is thrown and not caught somewhere, but
-# before aborting it prints that an exception has been thrown,
-# and possibly what the std::exception::what() function has to
-# say. Since many people run into the trap of not having a
-# catch clause in main(), they wonder where that abort may be
-# coming from.  The terminate handler then at least says what is
-# missing in their program.
-#
-# This test checks whether this feature is available.
-#
-# - Matthias Maier, rewritten 2012
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <exception>
-  namespace __gnu_cxx
-  {
-    extern void __verbose_terminate_handler ();
-  }
-  struct preload_terminate_dummy
-  {
-    preload_terminate_dummy()
-    {
-      std::set_terminate (__gnu_cxx::__verbose_terminate_handler);
-    }
-  };
-  static preload_terminate_dummy dummy;
-  int main() { throw 1; return 0; }
-  "
-  DEAL_II_HAVE_VERBOSE_TERMINATE)
 
 
 #
