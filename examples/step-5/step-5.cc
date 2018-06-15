@@ -134,7 +134,8 @@ void Step5<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+  std::cout << "   Number of degrees of freedom: " //
+            << dof_handler.n_dofs()                //
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -184,8 +185,8 @@ void Step5<dim>::assemble_system()
   // coefficient value at each quadrature point.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      cell_matrix = 0;
-      cell_rhs    = 0;
+      cell_matrix = 0.;
+      cell_rhs    = 0.;
 
       fe_values.reinit(cell);
 
@@ -196,11 +197,13 @@ void Step5<dim>::assemble_system()
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) +=
-                  (current_coefficient * fe_values.shape_grad(i, q_index) *
-                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+                cell_matrix(i, j) += (current_coefficient *              //
+                                      fe_values.shape_grad(i, q_index) * //
+                                      fe_values.shape_grad(j, q_index) * //
+                                      fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * //
+                              1.0 *                               //
                               fe_values.JxW(q_index));
             }
         }
@@ -269,8 +272,10 @@ void Step5<dim>::solve()
 
   solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-  std::cout << "   " << solver_control.last_step()
-            << " CG iterations needed to obtain convergence." << std::endl;
+  std::cout << "   "                                          //
+            << solver_control.last_step()                     //
+            << " CG iterations needed to obtain convergence." //
+            << std::endl;
 }
 
 
@@ -452,9 +457,11 @@ void Step5<dim>::run()
 
       // Now that we have a mesh for sure, we write some output and do all the
       // things that we have already seen in the previous examples.
-      std::cout << "   Number of active cells: "
-                << triangulation.n_active_cells() << std::endl
-                << "   Total number of cells: " << triangulation.n_cells()
+      std::cout << "   Number of active cells: "  //
+                << triangulation.n_active_cells() //
+                << std::endl                      //
+                << "   Total number of cells: "   //
+                << triangulation.n_cells()        //
                 << std::endl;
 
       setup_system();
