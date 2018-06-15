@@ -349,10 +349,13 @@ KellyErrorEstimator<1, spacedim>::estimate(
                     "value map."));
 
   for (const auto boundary_function : neumann_bc)
-    Assert(boundary_function.second->n_components == n_components,
-           ExcInvalidBoundaryFunction(boundary_function.first,
-                                      boundary_function.second->n_components,
-                                      n_components));
+    {
+      (void)boundary_function;
+      Assert(boundary_function.second->n_components == n_components,
+             ExcInvalidBoundaryFunction(boundary_function.first,
+                                        boundary_function.second->n_components,
+                                        n_components));
+    }
 
   Assert(component_mask.represents_n_components(n_components),
          ExcInvalidComponentMask());
@@ -377,10 +380,13 @@ KellyErrorEstimator<1, spacedim>::estimate(
          ExcInvalidCoefficient());
 
   for (const auto &boundary_function : neumann_bc)
-    Assert(boundary_function.second->n_components == n_components,
-           ExcInvalidBoundaryFunction(boundary_function.first,
-                                      boundary_function.second->n_components,
-                                      n_components));
+    {
+      (void)boundary_function;
+      Assert(boundary_function.second->n_components == n_components,
+             ExcInvalidBoundaryFunction(boundary_function.first,
+                                        boundary_function.second->n_components,
+                                        n_components));
+    }
 
   // reserve one slot for each cell and set it to zero
   for (unsigned int n = 0; n < n_solution_vectors; ++n)
