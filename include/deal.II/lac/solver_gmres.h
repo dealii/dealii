@@ -743,8 +743,9 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
   const boost::signals2::signal<void(double)> &cond_signal)
 {
   // Avoid copying the Hessenberg matrix if it isn't needed.
-  if (!eigenvalues_signal.empty() || !hessenberg_signal.empty() ||
-      !cond_signal.empty())
+  if ((!eigenvalues_signal.empty() || !hessenberg_signal.empty() ||
+       !cond_signal.empty()) &&
+      dim > 0)
     {
       LAPACKFullMatrix<double> mat(dim, dim);
       for (unsigned int i = 0; i < dim; ++i)
