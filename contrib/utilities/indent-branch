@@ -15,9 +15,10 @@
 ## ---------------------------------------------------------------------
 
 #
-# This script does the same thing as contrib/utilities/indent but only reformats
-# files which have changed (or been added and not committed) since the last
-# merge commit to the master branch. It should be run as
+# This script does the same thing as contrib/utilities/indent but only
+# reformats files which have changed (or have been added but neither
+# staged/commited) since the last merge commit to the master branch. It
+# should be run as
 #
 #    make indent-branch
 #
