@@ -184,28 +184,25 @@ namespace TrilinosWrappers
    * @endcond
    */
 
-  namespace
-  {
 #  ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the global ID of local ID of
-    // an Epetra_BlockMap object  by calling either the 32- or 64-bit
-    // function necessary.
-    inline int
-    gid(const Epetra_BlockMap &map, int i)
-    {
-      return map.GID(i);
-    }
+  // an Epetra_BlockMap object  by calling either the 32- or 64-bit
+  // function necessary.
+  inline int
+  gid(const Epetra_BlockMap &map, int i)
+  {
+    return map.GID(i);
+  }
 #  else
     // define a helper function that queries the global ID of local ID of
-    // an Epetra_BlockMap object  by calling either the 32- or 64-bit
-    // function necessary.
-    inline long long int
-    gid(const Epetra_BlockMap &map, int i)
-    {
-      return map.GID64(i);
-    }
+  // an Epetra_BlockMap object  by calling either the 32- or 64-bit
+  // function necessary.
+  inline long long int
+  gid(const Epetra_BlockMap &map, int i)
+  {
+    return map.GID64(i);
+  }
 #  endif
-  } // namespace
 
   /**
    * Namespace for Trilinos vector classes that work in parallel over MPI.

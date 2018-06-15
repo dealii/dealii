@@ -40,22 +40,19 @@ namespace internal
   {
     // ----------------- actual ShapeInfo functions --------------------
 
-    namespace
+    template <typename Number>
+    Number
+    get_first_array_element(const Number a)
     {
-      template <typename Number>
-      Number
-      get_first_array_element(const Number a)
-      {
-        return a;
-      }
+      return a;
+    }
 
-      template <typename Number>
-      Number
-      get_first_array_element(const VectorizedArray<Number> a)
-      {
-        return a[0];
-      }
-    } // namespace
+    template <typename Number>
+    Number
+    get_first_array_element(const VectorizedArray<Number> a)
+    {
+      return a[0];
+    }
 
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo()

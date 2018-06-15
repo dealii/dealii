@@ -472,32 +472,35 @@ operator-(const Range &offset, const PackagedOperation<Range> &comp)
  */
 //@{
 
-namespace
+namespace internal
 {
-  // Poor man's trait class that determines whether type T is a vector:
-  // FIXME: Implement this as a proper type trait - similar to
-  // isBlockVector
-
-  template <typename T>
-  class has_vector_interface
+  namespace PackagedOperationImplementation
   {
-    template <typename C>
-    static std::false_type
-    test(...);
+    // Poor man's trait class that determines whether type T is a vector:
+    // FIXME: Implement this as a proper type trait - similar to
+    // isBlockVector
 
-    template <typename C>
-    static std::true_type
-    test(decltype(&C::operator+=),
-         decltype(&C::operator-=),
-         decltype(&C::l2_norm));
+    template <typename T>
+    class has_vector_interface
+    {
+      template <typename C>
+      static std::false_type
+      test(...);
 
-  public:
-    // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
-    // otherwise it is std::false_type
+      template <typename C>
+      static std::true_type
+      test(decltype(&C::operator+=),
+           decltype(&C::operator-=),
+           decltype(&C::l2_norm));
 
-    typedef decltype(test<T>(nullptr, nullptr, nullptr)) type;
-  };
-} // namespace
+    public:
+      // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
+      // otherwise it is std::false_type
+
+      typedef decltype(test<T>(nullptr, nullptr, nullptr)) type;
+    }; // namespace
+  }    // namespace PackagedOperationImplementation
+} // namespace internal
 
 
 /**
@@ -516,7 +519,8 @@ namespace
 
 template <typename Range,
           typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
+            internal::PackagedOperationImplementation::has_vector_interface<
+              Range>::type::value>::type>
 PackagedOperation<Range>
 operator+(const Range &u, const Range &v)
 {
@@ -560,7 +564,8 @@ operator+(const Range &u, const Range &v)
 
 template <typename Range,
           typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
+            internal::PackagedOperationImplementation::has_vector_interface<
+              Range>::type::value>::type>
 PackagedOperation<Range>
 operator-(const Range &u, const Range &v)
 {
@@ -603,7 +608,8 @@ operator-(const Range &u, const Range &v)
  */
 template <typename Range,
           typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
+            internal::PackagedOperationImplementation::has_vector_interface<
+              Range>::type::value>::type>
 PackagedOperation<Range> operator*(const Range &              u,
                                    typename Range::value_type number)
 {
@@ -627,7 +633,8 @@ PackagedOperation<Range> operator*(const Range &              u,
  */
 template <typename Range,
           typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
+            internal::PackagedOperationImplementation::has_vector_interface<
+              Range>::type::value>::type>
 PackagedOperation<Range> operator*(typename Range::value_type number,
                                    const Range &              u)
 {

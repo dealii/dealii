@@ -1209,54 +1209,51 @@ FullMatrix<number>::operator==(const FullMatrix<number> &M) const
 
 namespace internal
 {
-  namespace
+  // LAPACKFullMatrix is not implemented for
+  // complex numbers or long doubles
+  template <typename number, typename = void>
+  struct Determinant
   {
-    // LAPACKFullMatrix is not implemented for
-    // complex numbers or long doubles
-    template <typename number, typename = void>
-    struct Determinant
+    static number
+    value(const FullMatrix<number> &)
     {
-      static number
-      value(const FullMatrix<number> &)
-      {
-        AssertThrow(false, ExcNotImplemented());
-        return 0.0;
-      }
-    };
+      AssertThrow(false, ExcNotImplemented());
+      return 0.0;
+    }
+  };
 
 
-    // LAPACKFullMatrix is only implemented for
-    // floats and doubles
-    template <typename number>
-    struct Determinant<
-      number,
-      typename std::enable_if<std::is_same<number, float>::value ||
-                              std::is_same<number, double>::value>::type>
-    {
+  // LAPACKFullMatrix is only implemented for
+  // floats and doubles
+  template <typename number>
+  struct Determinant<
+    number,
+    typename std::enable_if<std::is_same<number, float>::value ||
+                            std::is_same<number, double>::value>::type>
+  {
 #ifdef DEAL_II_WITH_LAPACK
-      static number
-      value(const FullMatrix<number> &A)
-      {
-        using s_type = typename LAPACKFullMatrix<number>::size_type;
-        AssertIndexRange(A.m() - 1, std::numeric_limits<s_type>::max());
-        AssertIndexRange(A.n() - 1, std::numeric_limits<s_type>::max());
-        LAPACKFullMatrix<number> lp_A(static_cast<s_type>(A.m()),
-                                      static_cast<s_type>(A.n()));
-        lp_A = A;
-        lp_A.compute_lu_factorization();
-        return lp_A.determinant();
-      }
+    static number
+    value(const FullMatrix<number> &A)
+    {
+      using s_type = typename LAPACKFullMatrix<number>::size_type;
+      AssertIndexRange(A.m() - 1, std::numeric_limits<s_type>::max());
+      AssertIndexRange(A.n() - 1, std::numeric_limits<s_type>::max());
+      LAPACKFullMatrix<number> lp_A(static_cast<s_type>(A.m()),
+                                    static_cast<s_type>(A.n()));
+      lp_A = A;
+      lp_A.compute_lu_factorization();
+      return lp_A.determinant();
+    }
 #else
-      static number
-      value(const FullMatrix<number> &)
-      {
-        AssertThrow(false, ExcNeedsLAPACK());
-        return 0.0;
-      }
+    static number
+    value(const FullMatrix<number> &)
+    {
+      AssertThrow(false, ExcNeedsLAPACK());
+      return 0.0;
+    }
 #endif
-    };
+  };
 
-  } // namespace
 } // namespace internal
 
 

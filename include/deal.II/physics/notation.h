@@ -962,18 +962,15 @@ namespace Physics
 
       namespace internal
       {
-        namespace
-        {
-          template <typename TensorType>
-          struct is_rank_2_symmetric_tensor : std::false_type
-          {};
+        template <typename TensorType>
+        struct is_rank_2_symmetric_tensor : std::false_type
+        {};
 
-          template <int dim, typename Number>
-          struct is_rank_2_symmetric_tensor<SymmetricTensor<2, dim, Number>>
-            : std::true_type
-          {};
-        } // namespace
-      }   // namespace internal
+        template <int dim, typename Number>
+        struct is_rank_2_symmetric_tensor<SymmetricTensor<2, dim, Number>>
+          : std::true_type
+        {};
+      } // namespace internal
 
 
       template <int dim,

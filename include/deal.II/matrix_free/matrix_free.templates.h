@@ -1753,104 +1753,99 @@ MatrixFree<dim, Number>::clear()
 
 namespace internal
 {
-  namespace
+  void
+  fill_index_subrange(
+    const unsigned int                                        begin,
+    const unsigned int                                        end,
+    const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
+    tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
+                                  unsigned int> &             map)
   {
-    void
-    fill_index_subrange(
-      const unsigned int begin,
-      const unsigned int end,
-      const std::vector<std::pair<unsigned int, unsigned int>>
-        &                                          cell_level_index,
-      tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                    unsigned int> &map)
-    {
-      if (cell_level_index.empty())
-        return;
-      unsigned int cell = begin;
-      if (cell == 0)
-        map.insert(std::make_pair(cell_level_index[cell++], 0U));
-      for (; cell < end; ++cell)
-        if (cell_level_index[cell] != cell_level_index[cell - 1])
-          map.insert(std::make_pair(cell_level_index[cell], cell));
-    }
+    if (cell_level_index.empty())
+      return;
+    unsigned int cell = begin;
+    if (cell == 0)
+      map.insert(std::make_pair(cell_level_index[cell++], 0U));
+    for (; cell < end; ++cell)
+      if (cell_level_index[cell] != cell_level_index[cell - 1])
+        map.insert(std::make_pair(cell_level_index[cell], cell));
+  }
 
-    template <int dim>
-    void
-    fill_connectivity_subrange(
-      const unsigned int                begin,
-      const unsigned int                end,
-      const dealii::Triangulation<dim> &tria,
-      const std::vector<std::pair<unsigned int, unsigned int>>
-        &                                                cell_level_index,
-      const tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                          unsigned int> &map,
-      DynamicSparsityPattern &                           connectivity_direct)
-    {
-      std::vector<types::global_dof_index> new_indices;
-      for (unsigned int cell = begin; cell < end; ++cell)
-        {
-          new_indices.clear();
-          typename dealii::Triangulation<dim>::cell_iterator dcell(
-            &tria, cell_level_index[cell].first, cell_level_index[cell].second);
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-            {
-              // Only inner faces couple different cells
-              if (dcell->at_boundary(f) == false &&
-                  dcell->neighbor_or_periodic_neighbor(f)
-                      ->level_subdomain_id() == dcell->level_subdomain_id())
-                {
-                  std::pair<unsigned int, unsigned int> level_index(
-                    dcell->neighbor_or_periodic_neighbor(f)->level(),
-                    dcell->neighbor_or_periodic_neighbor(f)->index());
-                  auto it = map.find(level_index);
-                  if (it != map.end())
-                    {
-                      const unsigned int neighbor_cell = it->second;
-                      if (neighbor_cell != cell)
-                        new_indices.push_back(neighbor_cell);
-                    }
-                }
-            }
-          std::sort(new_indices.begin(), new_indices.end());
-          connectivity_direct.add_entries(cell,
-                                          new_indices.begin(),
-                                          std::unique(new_indices.begin(),
-                                                      new_indices.end()));
-        }
-    }
+  template <int dim>
+  void
+  fill_connectivity_subrange(
+    const unsigned int                                        begin,
+    const unsigned int                                        end,
+    const dealii::Triangulation<dim> &                        tria,
+    const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
+    const tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
+                                        unsigned int> &       map,
+    DynamicSparsityPattern &connectivity_direct)
+  {
+    std::vector<types::global_dof_index> new_indices;
+    for (unsigned int cell = begin; cell < end; ++cell)
+      {
+        new_indices.clear();
+        typename dealii::Triangulation<dim>::cell_iterator dcell(
+          &tria, cell_level_index[cell].first, cell_level_index[cell].second);
+        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          {
+            // Only inner faces couple different cells
+            if (dcell->at_boundary(f) == false &&
+                dcell->neighbor_or_periodic_neighbor(f)->level_subdomain_id() ==
+                  dcell->level_subdomain_id())
+              {
+                std::pair<unsigned int, unsigned int> level_index(
+                  dcell->neighbor_or_periodic_neighbor(f)->level(),
+                  dcell->neighbor_or_periodic_neighbor(f)->index());
+                auto it = map.find(level_index);
+                if (it != map.end())
+                  {
+                    const unsigned int neighbor_cell = it->second;
+                    if (neighbor_cell != cell)
+                      new_indices.push_back(neighbor_cell);
+                  }
+              }
+          }
+        std::sort(new_indices.begin(), new_indices.end());
+        connectivity_direct.add_entries(cell,
+                                        new_indices.begin(),
+                                        std::unique(new_indices.begin(),
+                                                    new_indices.end()));
+      }
+  }
 
-    void
-    fill_connectivity_indirect_subrange(
-      const unsigned int            begin,
-      const unsigned int            end,
-      const DynamicSparsityPattern &connectivity_direct,
-      DynamicSparsityPattern &      connectivity)
-    {
-      std::vector<types::global_dof_index> new_indices;
-      for (unsigned int block = begin; block < end; ++block)
-        {
-          new_indices.clear();
-          for (DynamicSparsityPattern::iterator it =
-                 connectivity_direct.begin(block);
-               it != connectivity_direct.end(block);
-               ++it)
-            {
-              new_indices.push_back(it->column());
-              for (DynamicSparsityPattern::iterator it_neigh =
-                     connectivity_direct.begin(it->column());
-                   it_neigh != connectivity_direct.end(it->column());
-                   ++it_neigh)
-                if (it_neigh->column() != block)
-                  new_indices.push_back(it_neigh->column());
-            }
-          std::sort(new_indices.begin(), new_indices.end());
-          connectivity.add_entries(block,
-                                   new_indices.begin(),
-                                   std::unique(new_indices.begin(),
-                                               new_indices.end()));
-        }
-    }
-  } // namespace
+  void
+  fill_connectivity_indirect_subrange(
+    const unsigned int            begin,
+    const unsigned int            end,
+    const DynamicSparsityPattern &connectivity_direct,
+    DynamicSparsityPattern &      connectivity)
+  {
+    std::vector<types::global_dof_index> new_indices;
+    for (unsigned int block = begin; block < end; ++block)
+      {
+        new_indices.clear();
+        for (DynamicSparsityPattern::iterator it =
+               connectivity_direct.begin(block);
+             it != connectivity_direct.end(block);
+             ++it)
+          {
+            new_indices.push_back(it->column());
+            for (DynamicSparsityPattern::iterator it_neigh =
+                   connectivity_direct.begin(it->column());
+                 it_neigh != connectivity_direct.end(it->column());
+                 ++it_neigh)
+              if (it_neigh->column() != block)
+                new_indices.push_back(it_neigh->column());
+          }
+        std::sort(new_indices.begin(), new_indices.end());
+        connectivity.add_entries(block,
+                                 new_indices.begin(),
+                                 std::unique(new_indices.begin(),
+                                             new_indices.end()));
+      }
+  }
 } // namespace internal
 
 #endif

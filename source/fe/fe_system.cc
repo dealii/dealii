@@ -33,22 +33,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace internal
+namespace
 {
-  namespace FESystemImplementation
+  unsigned int
+  count_nonzeros(const std::vector<unsigned int> &vec)
   {
-    namespace
-    {
-      unsigned int
-      count_nonzeros(const std::vector<unsigned int> &vec)
-      {
-        return std::count_if(vec.begin(), vec.end(), [](const unsigned int i) {
-          return i > 0;
-        });
-      }
-    } // namespace
-  }   // namespace FESystemImplementation
-} // namespace internal
+    return std::count_if(vec.begin(), vec.end(), [](const unsigned int i) {
+      return i > 0;
+    });
+  }
+} // namespace
 /* ----------------------- FESystem::InternalData ------------------- */
 
 
@@ -308,8 +302,7 @@ FESystem<dim, spacedim>::FESystem(
         fes,
         multiplicities),
       FETools::Compositing::compute_nonzero_components(fes, multiplicities))
-  , base_elements(
-      internal::FESystemImplementation::count_nonzeros(multiplicities))
+  , base_elements(count_nonzeros(multiplicities))
 {
   initialize(fes, multiplicities);
 }
@@ -1618,7 +1611,7 @@ FESystem<dim, spacedim>::initialize(
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
   Assert(fes.size() > 0,
          ExcMessage("Need to pass at least one finite element."));
-  Assert(internal::FESystemImplementation::count_nonzeros(multiplicities) > 0,
+  Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
   // Note that we need to skip every fe with multiplicity 0 in the following

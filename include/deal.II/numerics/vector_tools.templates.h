@@ -97,10 +97,10 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools
 {
-  // This anonymous namespace contains the actual implementation called
+  // This namespace contains the actual implementation called
   // by VectorTools::interpolate and variants (such as
   // VectorTools::interpolate_by_material_id).
-  namespace
+  namespace internal
   {
     // A small helper function to transform a component range starting
     // at offset from the real to the unit cell according to the
@@ -527,7 +527,7 @@ namespace VectorTools
       vec.compress(VectorOperation::insert);
     }
 
-  } // namespace
+  } // namespace internal
 
 
 
@@ -556,7 +556,8 @@ namespace VectorTools
       return &function;
     };
 
-    interpolate(mapping, dof_handler, function_map, vec, component_mask);
+    internal::interpolate(
+      mapping, dof_handler, function_map, vec, component_mask);
   }
 
 
@@ -670,7 +671,8 @@ namespace VectorTools
         return nullptr;
     };
 
-    interpolate(mapping, dof_handler, function_map, vec, component_mask);
+    internal::interpolate(
+      mapping, dof_handler, function_map, vec, component_mask);
   }
 
 
@@ -885,7 +887,7 @@ namespace VectorTools
   }
 
 
-  namespace
+  namespace internal
   {
     /**
      * Compute the boundary values to be used in the project() functions.
@@ -1666,7 +1668,7 @@ namespace VectorTools
                                                            vec_result);
       vec_result.compress(VectorOperation::insert);
     }
-  } // namespace
+  } // namespace internal
 
 
 
@@ -1684,19 +1686,19 @@ namespace VectorTools
     switch (dof.get_fe().degree)
       {
         case 1:
-          project_parallel<dim, VectorType, spacedim, 1>(
+          internal::project_parallel<dim, VectorType, spacedim, 1>(
             mapping, dof, constraints, quadrature, func, vec_result);
           break;
         case 2:
-          project_parallel<dim, VectorType, spacedim, 2>(
+          internal::project_parallel<dim, VectorType, spacedim, 2>(
             mapping, dof, constraints, quadrature, func, vec_result);
           break;
         case 3:
-          project_parallel<dim, VectorType, spacedim, 3>(
+          internal::project_parallel<dim, VectorType, spacedim, 3>(
             mapping, dof, constraints, quadrature, func, vec_result);
           break;
         default:
-          project_parallel<dim, VectorType, spacedim, -1>(
+          internal::project_parallel<dim, VectorType, spacedim, -1>(
             mapping, dof, constraints, quadrature, func, vec_result);
       }
   }
@@ -1722,23 +1724,23 @@ namespace VectorTools
       switch (fe_degree)
         {
           case 1:
-            project_parallel<dim, VectorType, dim, 1, 2>(
+            internal::project_parallel<dim, VectorType, dim, 1, 2>(
               matrix_free, constraints, func, vec_result, fe_component);
             break;
           case 2:
-            project_parallel<dim, VectorType, dim, 2, 3>(
+            internal::project_parallel<dim, VectorType, dim, 2, 3>(
               matrix_free, constraints, func, vec_result, fe_component);
             break;
           case 3:
-            project_parallel<dim, VectorType, dim, 3, 4>(
+            internal::project_parallel<dim, VectorType, dim, 3, 4>(
               matrix_free, constraints, func, vec_result, fe_component);
             break;
           default:
-            project_parallel<dim, VectorType, dim, -1, 0>(
+            internal::project_parallel<dim, VectorType, dim, -1, 0>(
               matrix_free, constraints, func, vec_result, fe_component);
         }
     else
-      project_parallel<dim, VectorType, dim, -1, 0>(
+      internal::project_parallel<dim, VectorType, dim, -1, 0>(
         matrix_free, constraints, func, vec_result, fe_component);
   }
 
@@ -1789,30 +1791,30 @@ namespace VectorTools
             &function);
         Assert(mapping_ptr != nullptr, ExcInternalError());
         Assert(dof_ptr != nullptr, ExcInternalError());
-        project<VectorType, dim>(*mapping_ptr,
-                                 *dof_ptr,
-                                 constraints,
-                                 quadrature,
-                                 *function_ptr,
-                                 vec_result,
-                                 enforce_zero_boundary,
-                                 q_boundary,
-                                 project_to_boundary_first);
+        internal::project<VectorType, dim>(*mapping_ptr,
+                                           *dof_ptr,
+                                           constraints,
+                                           quadrature,
+                                           *function_ptr,
+                                           vec_result,
+                                           enforce_zero_boundary,
+                                           q_boundary,
+                                           project_to_boundary_first);
       }
     else
       {
         Assert((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
                   &(dof.get_triangulation())) == nullptr),
                ExcNotImplemented());
-        do_project(mapping,
-                   dof,
-                   constraints,
-                   quadrature,
-                   function,
-                   vec_result,
-                   enforce_zero_boundary,
-                   q_boundary,
-                   project_to_boundary_first);
+        internal::do_project(mapping,
+                             dof,
+                             constraints,
+                             quadrature,
+                             function,
+                             vec_result,
+                             enforce_zero_boundary,
+                             q_boundary,
+                             project_to_boundary_first);
       }
   }
 
@@ -1864,15 +1866,15 @@ namespace VectorTools
               &(dof.get_triangulation())) == nullptr),
            ExcNotImplemented());
 
-    do_project(mapping,
-               dof,
-               constraints,
-               quadrature,
-               function,
-               vec_result,
-               enforce_zero_boundary,
-               q_boundary,
-               project_to_boundary_first);
+    internal::do_project(mapping,
+                         dof,
+                         constraints,
+                         quadrature,
+                         function,
+                         vec_result,
+                         enforce_zero_boundary,
+                         q_boundary,
+                         project_to_boundary_first);
   }
 
 
@@ -2737,7 +2739,7 @@ namespace VectorTools
 
   // ----------- interpolate_boundary_values for std::map --------------------
 
-  namespace
+  namespace internal
   {
     template <int dim,
               int spacedim,
@@ -3067,7 +3069,7 @@ namespace VectorTools
                 }
         }
     } // end of interpolate_boundary_values
-  }   // namespace
+  }   // namespace internal
 
 
 
@@ -3084,7 +3086,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     const ComponentMask &                      component_mask_)
   {
-    do_interpolate_boundary_values(
+    internal::do_interpolate_boundary_values(
       mapping, dof, function_map, boundary_values, component_mask_);
   }
 
@@ -3121,7 +3123,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     const ComponentMask &                      component_mask_)
   {
-    do_interpolate_boundary_values(
+    internal::do_interpolate_boundary_values(
       mapping, dof, function_map, boundary_values, component_mask_);
   }
 
@@ -3275,7 +3277,7 @@ namespace VectorTools
   // -------- implementation for project_boundary_values with std::map --------
 
 
-  namespace
+  namespace internal
   {
     // keep the first argument non-reference since we use it
     // with 1e-8 * number
@@ -3606,7 +3608,7 @@ namespace VectorTools
               boundary_projection(dof_to_boundary_mapping[i]);
           }
     }
-  } // namespace
+  } // namespace internal
 
   template <int dim, int spacedim, typename number>
   void
@@ -3619,7 +3621,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     std::vector<unsigned int>                  component_mapping)
   {
-    do_project_boundary_values(
+    internal::do_project_boundary_values(
       mapping, dof, boundary_functions, q, boundary_values, component_mapping);
   }
 
@@ -3656,7 +3658,7 @@ namespace VectorTools
     std::map<types::global_dof_index, number> &boundary_values,
     std::vector<unsigned int>                  component_mapping)
   {
-    do_project_boundary_values(
+    internal::do_project_boundary_values(
       mapping, dof, boundary_functions, q, boundary_values, component_mapping);
   }
 
@@ -7501,7 +7503,7 @@ namespace VectorTools
 
 
 
-  namespace
+  namespace internal
   {
     template <int dim>
     struct PointComparator
@@ -7516,7 +7518,7 @@ namespace VectorTools
         return false;
       }
     };
-  } // namespace
+  } // namespace internal
 
 
 
@@ -7594,7 +7596,8 @@ namespace VectorTools
     // Extract a list that collects all vector components that belong to the
     // same node (scalar basis function). When creating that list, we use an
     // array of dim components that stores the global degree of freedom.
-    std::set<std::array<types::global_dof_index, dim>, PointComparator<dim>>
+    std::set<std::array<types::global_dof_index, dim>,
+             internal::PointComparator<dim>>
                                          vector_dofs;
     std::vector<types::global_dof_index> face_dofs;
 
@@ -7673,7 +7676,7 @@ namespace VectorTools
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
     for (typename std::set<std::array<types::global_dof_index, dim>,
-                           PointComparator<dim>>::const_iterator it =
+                           internal::PointComparator<dim>>::const_iterator it =
            vector_dofs.begin();
          it != vector_dofs.end();
          ++it)
@@ -7836,7 +7839,7 @@ namespace VectorTools
         n_q_points, std::vector<Tensor<1, spacedim>>(n_components));
     }
 
-    namespace
+    namespace internal
     {
       template <typename number>
       double
@@ -7858,7 +7861,7 @@ namespace VectorTools
             "Mean value norm is not implemented for complex-valued vectors"));
         return mean_value.real();
       }
-    } // namespace
+    } // namespace internal
 
 
     // avoid compiling inner function for many vector types when we always
@@ -8143,7 +8146,7 @@ namespace VectorTools
         }
 
       if (norm == mean)
-        diff = mean_to_double(diff_mean);
+        diff = internal::mean_to_double(diff_mean);
 
       // append result of this cell to the end of the vector
       AssertIsFinite(diff);
@@ -8911,13 +8914,12 @@ namespace VectorTools
     return gradient[0];
   }
 
-  namespace
+  namespace internal
   {
     template <typename VectorType>
     typename std::enable_if<dealii::is_serial_vector<VectorType>::value ==
                             true>::type
-    internal_subtract_mean_value(VectorType &             v,
-                                 const std::vector<bool> &p_select)
+    subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
       if (p_select.size() == 0)
         {
@@ -8958,25 +8960,24 @@ namespace VectorTools
     template <typename VectorType>
     typename std::enable_if<dealii::is_serial_vector<VectorType>::value ==
                             false>::type
-    internal_subtract_mean_value(VectorType &             v,
-                                 const std::vector<bool> &p_select)
+    subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
       (void)p_select;
       Assert(p_select.size() == 0, ExcNotImplemented());
       // In case of an empty boolean mask operate on the whole vector:
       v.add(-v.mean_value());
     }
-  } // namespace
+  } // namespace internal
 
 
   template <typename VectorType>
   void
   subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
   {
-    internal_subtract_mean_value(v, p_select);
+    internal::subtract_mean_value(v, p_select);
   }
 
-  namespace
+  namespace internal
   {
     template <typename Number>
     void
@@ -8995,7 +8996,7 @@ namespace VectorTools
     {
       n = std::complex<Type>(r, i);
     }
-  } // namespace
+  } // namespace internal
 
 
   template <int dim, typename VectorType, int spacedim>
@@ -9060,7 +9061,9 @@ namespace VectorTools
                                        p_triangulation->get_communicator());
         AssertThrowMPI(ierr);
 
-        set_possibly_complex_number(global_values[0], global_values[1], mean);
+        internal::set_possibly_complex_number(global_values[0],
+                                              global_values[1],
+                                              mean);
         area = global_values[2];
       }
 #endif

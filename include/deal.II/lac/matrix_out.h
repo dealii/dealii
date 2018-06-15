@@ -197,85 +197,82 @@ namespace internal
 {
   namespace MatrixOutImplementation
   {
-    namespace
+    /**
+     * Return the element with given indices of a sparse matrix.
+     */
+    template <typename number>
+    double
+    get_element(const dealii::SparseMatrix<number> &matrix,
+                const types::global_dof_index       i,
+                const types::global_dof_index       j)
     {
-      /**
-       * Return the element with given indices of a sparse matrix.
-       */
-      template <typename number>
-      double
-      get_element(const dealii::SparseMatrix<number> &matrix,
-                  const types::global_dof_index       i,
-                  const types::global_dof_index       j)
-      {
-        return matrix.el(i, j);
-      }
+      return matrix.el(i, j);
+    }
 
 
 
-      /**
-       * Return the element with given indices of a block sparse matrix.
-       */
-      template <typename number>
-      double
-      get_element(const dealii::BlockSparseMatrix<number> &matrix,
-                  const types::global_dof_index            i,
-                  const types::global_dof_index            j)
-      {
-        return matrix.el(i, j);
-      }
+    /**
+     * Return the element with given indices of a block sparse matrix.
+     */
+    template <typename number>
+    double
+    get_element(const dealii::BlockSparseMatrix<number> &matrix,
+                const types::global_dof_index            i,
+                const types::global_dof_index            j)
+    {
+      return matrix.el(i, j);
+    }
 
 
 #  ifdef DEAL_II_WITH_TRILINOS
-      /**
-       * Return the element with given indices of a Trilinos sparse matrix.
-       */
-      inline double
-      get_element(const TrilinosWrappers::SparseMatrix &matrix,
-                  const types::global_dof_index         i,
-                  const types::global_dof_index         j)
-      {
-        return matrix.el(i, j);
-      }
+    /**
+     * Return the element with given indices of a Trilinos sparse matrix.
+     */
+    inline double
+    get_element(const TrilinosWrappers::SparseMatrix &matrix,
+                const types::global_dof_index         i,
+                const types::global_dof_index         j)
+    {
+      return matrix.el(i, j);
+    }
 
 
 
-      /**
-       * Return the element with given indices of a Trilinos block sparse
-       * matrix.
-       */
-      inline double
-      get_element(const TrilinosWrappers::BlockSparseMatrix &matrix,
-                  const types::global_dof_index              i,
-                  const types::global_dof_index              j)
-      {
-        return matrix.el(i, j);
-      }
+    /**
+     * Return the element with given indices of a Trilinos block sparse
+     * matrix.
+     */
+    inline double
+    get_element(const TrilinosWrappers::BlockSparseMatrix &matrix,
+                const types::global_dof_index              i,
+                const types::global_dof_index              j)
+    {
+      return matrix.el(i, j);
+    }
 #  endif
 
 
 #  ifdef DEAL_II_WITH_PETSC
-      // no need to do anything: PETSc matrix objects do not distinguish
-      // between operator() and el(i,j), so we can safely access elements
-      // through the generic function below
+    // no need to do anything: PETSc matrix objects do not distinguish
+    // between operator() and el(i,j), so we can safely access elements
+    // through the generic function below
 #  endif
 
 
-      /**
-       * Return the element with given indices from any matrix type for which
-       * no specialization of this function was declared above. This will call
-       * <tt>operator()</tt> on the matrix.
-       */
-      template <class Matrix>
-      double
-      get_element(const Matrix &                matrix,
-                  const types::global_dof_index i,
-                  const types::global_dof_index j)
-      {
-        return matrix(i, j);
-      }
-    } // namespace
-  }   // namespace MatrixOutImplementation
+    /**
+     * Return the element with given indices from any matrix type for which
+     * no specialization of this function was declared above. This will call
+     * <tt>operator()</tt> on the matrix.
+     */
+    template <class Matrix>
+    double
+    get_element(const Matrix &                matrix,
+                const types::global_dof_index i,
+                const types::global_dof_index j)
+    {
+      return matrix(i, j);
+    }
+  } // namespace MatrixOutImplementation
 } // namespace internal
 
 

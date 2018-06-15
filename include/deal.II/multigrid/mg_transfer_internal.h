@@ -42,8 +42,8 @@ namespace internal
     template <int dim, int spacedim>
     void
     fill_copy_indices(
-      const dealii::DoFHandler<dim, spacedim> &mg_dof,
-      const MGConstrainedDoFs *                mg_constrained_dofs,
+      const DoFHandler<dim, spacedim> &mg_dof,
+      const MGConstrainedDoFs *        mg_constrained_dofs,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
         &copy_indices,
@@ -120,7 +120,7 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const dealii::DoFHandler<dim> &         mg_dof,
+      const DoFHandler<dim> &                 mg_dof,
       const MGConstrainedDoFs *               mg_constrained_dofs,
       ElementInfo<Number> &                   elem_info,
       std::vector<std::vector<unsigned int>> &level_dof_indices,
