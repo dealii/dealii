@@ -17,6 +17,8 @@
 #ifndef dealii_constraint_matrix_h
 #define dealii_constraint_matrix_h
 
+#warning This file is deprecated. Use <deal.II/lac/affine_constraints.h> instead.
+
 #include <deal.II/lac/affine_constraints.h>
 
 #endif
