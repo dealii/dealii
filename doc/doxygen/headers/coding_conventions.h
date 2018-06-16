@@ -50,14 +50,16 @@ on each of your files. This will make sure indentation is conforming to the
 style guidelines outlined in this page. Alternatively, you can run
 <code>
 <pre>
-  make indent
+  make indent-branch
 </pre>
 </code>
 in whatever directory you set up the library to be compiled in to indent all
-source files. If you want to make sure that the indenting is correct for all
-your commits, you might want to set up a pre-commit hook. One way to do so,
-is to copy ${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format to
-${SOURCE_DIR}/.git/hooks/pre-commit and make sure it is executable.
+source files that have been changed recently. If you want to make sure that
+the indenting is correct for all your commits, you might want to set up a
+pre-commit hook. One way to do so, is to copy
+<code>${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
+<code>${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
+executable.
 </p>
 
 <h3>Style issues</h3>
@@ -67,8 +69,8 @@ ${SOURCE_DIR}/.git/hooks/pre-commit and make sure it is executable.
   degrees of freedom, etc) should start with <code>n_*</code>. Example:
   SparsityPattern::n_nonzero_entries().</li>
 
-<li> %Function which set a bit or flag should start with <code>set_*</code>;
-  functions which clear bits of flags should be named <code>clear_*</code>.
+<li> %Functions which set a bit or flag should start with <code>set_*</code>;
+  functions which clear bits or flags should be named <code>clear_*</code>.
   Example: CellIterator::set_refine_flag().</li>
 
 <li> Traditional logical operators should be used instead of their English

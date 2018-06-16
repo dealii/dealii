@@ -15,19 +15,26 @@
 ## ---------------------------------------------------------------------
 
 #
-# This script indents all source files of deal.II according to our
-# usual code formatting standards. It is used to ensure that our
-# code base looks uniform, as uniformity helps make code easier to
-# read.
+# This script indents all source files of deal.II according to our usual
+# code formatting standards. It is used to ensure that our code base looks
+# uniform, as uniformity helps make code easier to read.
 #
 # While we're already touching every file, this script also makes
-# sure we set permissions correctly
+# sure we set permissions correctly and checks for correct unix-style line
+# endings.
 #
 # The script needs to be executed as
-#   ./contrib/utilities/indent
+#   $ ./contrib/utilities/indent
 # from the top-level directory of the source tree, or via
-#   make indent
+#   $ make indent
 # from a build directory.
+#
+# Note: If the script is invoked with REPORT_ONLY=true set,
+#   $ REPORT_ONLY=true ./contrib/utilities/indent
+# or,
+#   $ make REPORT_ONLY=true indent
+# then indentation errors will only be reported without any actual file
+# changes.
 #
 
 if [ ! -f contrib/utilities/indent_common.sh ]; then
