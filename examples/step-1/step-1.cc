@@ -95,50 +95,48 @@ void second_grid()
   const double   inner_radius = 0.5, outer_radius = 1.0;
   GridGenerator::hyper_shell(
     triangulation, center, inner_radius, outer_radius, 10);
-  // By default, the triangulation assumes that all boundaries are
-  // straight lines, and all cells are bi-linear quads or tri-linear
-  // hexes, and that they are defined by the cells of the coarse grid
-  // (which we just created). Unless we do something special, when new
-  // points need to be introduced the domain is assumed to be
-  // delineated by the straight lines of the coarse mesh, and new
-  // points will simply be in the middle of the surrounding ones.
-  // Here, however, we know that the domain is curved, and we would
-  // like to have the Triangulation place new points according to the
-  // underlying geometry. Fortunately, some good soul implemented an
-  // object which describes a spherical domain, of which the ring is a
-  // section; it only needs the center of the ring and automatically
-  // figures out how to instruct the Triangulation where to place the
-  // new points. The way this works in deal.II is that you tag parts
-  // of the triangulation you want to be curved with a number that is
+  // By default, the triangulation assumes that all boundaries are straight
+  // lines, and all cells are bi-linear quads or tri-linear hexes, and that
+  // they are defined by the cells of the coarse grid (which we just
+  // created). Unless we do something special, when new points need to be
+  // introduced the domain is assumed to be delineated by the straight
+  // lines of the coarse mesh, and new points will simply be in the middle
+  // of the surrounding ones. Here, however, we know that the domain is
+  // curved, and we would like to have the Triangulation place new points
+  // according to the underlying geometry. Fortunately, some good soul
+  // implemented an object which describes a spherical domain, of which the
+  // ring is a section; it only needs the center of the ring and
+  // automatically figures out how to instruct the Triangulation where to
+  // place the new points. The way this works in deal.II is that you tag
+  // parts of the triangulation you want to be curved with a number that is
   // usually referred to as "manifold indicator" and then tell the
-  // triangulation to use a particular "manifold object" for all
-  // places with this manifold indicator. How exactly this works is
-  // not important at this point (you can read up on it in step-53 and
-  // @ref manifold). The functions in GridGenerator handle this for us in most
-  // circumstances: they attach the correct manifold to a domain so that when
-  // the triangulation is refined new cells are placed in the correct
+  // triangulation to use a particular "manifold object" for all places
+  // with this manifold indicator. How exactly this works is not important
+  // at this point (you can read up on it in step-53 and @ref manifold).
+  // The functions in GridGenerator handle this for us in most
+  // circumstances: they attach the correct manifold to a domain so that
+  // when the triangulation is refined new cells are placed in the correct
   // places. In the present case GridGenerator::hyper_shell attaches a
   // SphericalManifold to all cells: this causes cells to be refined with
-  // calculations in spherical coordinates (so new cells have edges that are
-  // either radial or lie along concentric circles around the origin).
+  // calculations in spherical coordinates (so new cells have edges that
+  // are either radial or lie along concentric circles around the origin).
   //
-  // By default (i.e., for a Triangulation created by hand or without a call
-  // to a GridGenerator function like GridGenerator::hyper_shell or
-  // GridGenerator::hyper_ball), all cells and
-  // faces of the Triangulation have their manifold_id set to
-  // numbers::invalid_manifold_id, which is the default if you want a
-  // manifold that produces straight edges, but you can change this
-  // number for individual cells and faces. In that case, the curved
-  // manifold thus associated with number zero will not apply to those
-  // parts with a non-zero manifold indicator, but other manifold
-  // description objects can be associated with those non-zero
-  // indicators. If no manifold description is associated with a
-  // particular manifold indicator, a manifold that produces straight
-  // edges is implied. (Manifold indicators are a slightly complicated
-  // topic; if you're confused about what exactly is happening here,
-  // you may want to look at the @ref GlossManifoldIndicator "glossary
-  // entry on this topic".) Since the default chosen by
-  // GridGenerator::hyper_shell is reasonable we leave things alone.
+  // By default (i.e., for a Triangulation created by hand or without a
+  // call to a GridGenerator function like GridGenerator::hyper_shell or
+  // GridGenerator::hyper_ball), all cells and faces of the Triangulation
+  // have their manifold_id set to numbers::invalid_manifold_id, which is
+  // the default if you want a manifold that produces straight edges, but
+  // you can change this number for individual cells and faces. In that
+  // case, the curved manifold thus associated with number zero will not
+  // apply to those parts with a non-zero manifold indicator, but other
+  // manifold description objects can be associated with those non-zero
+  // indicators. If no manifold description is associated with a particular
+  // manifold indicator, a manifold that produces straight edges is
+  // implied. (Manifold indicators are a slightly complicated topic; if
+  // you're confused about what exactly is happening here, you may want to
+  // look at the @ref GlossManifoldIndicator "glossary entry on this
+  // topic".) Since the default chosen by GridGenerator::hyper_shell is
+  // reasonable we leave things alone.
   //
   // In order to demonstrate how to write a loop over all cells, we will
   // refine the grid in five steps towards the inner circle of the domain:
