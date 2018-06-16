@@ -23,7 +23,8 @@
 
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/constraint_matrix.h> // keep for backward-compatibility
 #include <deal.II/lac/sparse_matrix.h>
 
 #include <deal.II/multigrid/mg_base.h>
