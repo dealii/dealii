@@ -572,34 +572,3 @@ namespace deal_II_exceptions
 
 
 DEAL_II_NAMESPACE_CLOSE
-
-
-
-// Newer versions of gcc have a very nice feature: you can set a verbose
-// terminate handler, that not only aborts a program when an exception is
-// thrown and not caught somewhere, but before aborting it prints that an
-// exception has been thrown, and possibly what the std::exception::what()
-// function has to say. Since many people run into the trap of not having a
-// catch clause in main(), they wonder where that abort may be coming from.
-// The terminate handler then at least says what is missing in their
-// program.
-#ifdef DEAL_II_HAVE_VERBOSE_TERMINATE
-namespace __gnu_cxx
-{
-  extern void
-  __verbose_terminate_handler();
-}
-
-namespace
-{
-  struct preload_terminate_dummy
-  {
-    preload_terminate_dummy()
-    {
-      std::set_terminate(__gnu_cxx::__verbose_terminate_handler);
-    }
-  };
-
-  static preload_terminate_dummy dummy;
-} // namespace
-#endif
