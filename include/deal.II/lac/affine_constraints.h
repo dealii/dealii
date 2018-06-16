@@ -60,9 +60,13 @@ class AffineConstraints;
  * ConstraintMatrix has been renamed to AffineConstraints. Provide a
  * compatibility typedef that defaults to AffineConstraints<double>.
  *
- * @deprecated Use AffineConstraints
+ * @deprecated Use AffineConstraints<double> instead of ConstraintMatrix
  */
 using ConstraintMatrix = AffineConstraints<double>;
+// Note: Unfortunately, we cannot move this compatibility typedef into
+// constraint_matrix.h directly. This would break a lot of user projects
+// that include constraint_matrix.h transitively due to various deal.II
+// headers that include the file.
 
 
 // TODO[WB]: We should have a function of the kind
