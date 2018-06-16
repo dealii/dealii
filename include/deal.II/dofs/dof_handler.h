@@ -30,6 +30,7 @@
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/dof_levels.h>
+#include <deal.II/dofs/function_map.h> // keep for backward-compatibility
 #include <deal.II/dofs/number_cache.h>
 
 #include <deal.II/hp/fe_collection.h>

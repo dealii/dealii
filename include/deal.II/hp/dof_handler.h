@@ -28,6 +28,7 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
+#include <deal.II/dofs/function_map.h> // keep for backward-compatibility
 #include <deal.II/dofs/number_cache.h>
 
 #include <deal.II/hp/dof_faces.h>

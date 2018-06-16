@@ -22,6 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
+#include <deal.II/dofs/function_map.h> // keep for backward-compatibility
+
 #include <deal.II/fe/component_mask.h>
 
 #include <map>
