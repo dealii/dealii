@@ -20,15 +20,15 @@
 # staged/commited) since the last merge commit to the master branch.
 #
 # The script needs to be executed as
-#   $ ./contrib/utilities/indent-branch
+#   ./contrib/utilities/indent-branch
 # from the top-level directory of the source tree, or via
-#   $ make indent-branch
+#   make indent-branch
 # from a build directory.
 #
 # Note: If the script is invoked with REPORT_ONLY=true set,
-#   $ REPORT_ONLY=true ./contrib/utilities/indent-branch
+#   REPORT_ONLY=true ./contrib/utilities/indent-branch
 # or,
-#   $ make REPORT_ONLY=true indent-branch
+#   make REPORT_ONLY=true indent-branch
 # then indentation errors will only be reported without any actual file
 # changes.
 #
