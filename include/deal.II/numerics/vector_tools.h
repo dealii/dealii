@@ -24,6 +24,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/deprecated_function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/hp/dof_handler.h>
