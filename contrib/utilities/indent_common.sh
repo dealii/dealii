@@ -67,12 +67,13 @@ checks() {
 #
 export TMPDIR="${TMPDIR:-/tmp}"
 
-#
-# Depending on whether REPORT_ONLY is set to true, or false, either report
-# an issue or print a status
-#
-
 export REPORT_ONLY="${REPORT_ONLY:-false}"
+
+#
+# If REPORT_ONLY is set to "true", this function reports a formatting issue
+# if file "${1}" and tmpfile "${2}" don't match (using the error message
+# "${3}"), or, if set to "false" silently replaces file "${1}" with "${2}".
+#
 
 fix_or_report()
 {
