@@ -49,7 +49,7 @@
 #endif
 
 #ifndef DEAL_II_MSVC
-#  include <stdlib.h>
+#  include <cstdlib>
 #endif
 
 

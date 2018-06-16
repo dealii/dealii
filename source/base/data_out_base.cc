@@ -49,7 +49,7 @@
 #include <sstream>
 
 // we use uint32_t and uint8_t below, which are declared here:
-#include <stdint.h>
+#include <cstdint>
 
 #ifdef DEAL_II_WITH_ZLIB
 #  include <zlib.h>
