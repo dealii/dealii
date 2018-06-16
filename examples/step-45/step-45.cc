@@ -27,12 +27,10 @@
 
 // In order to implement periodic boundary conditions only two functions
 // have to be modified:
-// - <code>StokesProblem<dim>::setup_dofs()</code>: To populate a
-// ConstraintMatrix
-//   object with periodicity constraints
-// - <code>StokesProblem<dim>::run()</code>: To supply a distributed
-// triangulation with
-//   periodicity information.
+// - <code>StokesProblem<dim>::setup_dofs()</code>:
+//   To populate a AffineConstraints object with periodicity constraints
+// - <code>StokesProblem<dim>::run()</code>:
+//   To supply a distributed triangulation with periodicity information.
 //
 // The rest of the program is identical to step-22, so let us skip this part
 // and only show these two functions in the following. (The full program can be
@@ -45,7 +43,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 
 #include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/lac/trilinos_solver.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -328,7 +326,7 @@ namespace Step45
     // \quad
     // b=\begin{pmatrix}0&0\end{pmatrix}.
     // @f}
-    // The data structure we are saving the reuslitng information into is here
+    // The data structure we are saving the resulting information into is here
     // based on the Triangulation.
     std::vector<GridTools::PeriodicFacePair<
       typename parallel::distributed::Triangulation<dim>::cell_iterator>>
@@ -435,9 +433,8 @@ namespace Step45
       // DoFHandler@<dim@>::cell_iterator@> </code>. The periodic boundaries
       // have the boundary indicators 2 (x=0) and 3 (y=0). All the other
       // parameters we have set up before. In this case the direction does not
-      // matter. Due to
-      // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is exactly what we
-      // want.
+      // matter. Due to $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is
+      // exactly what we want.
       std::vector<
         GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
         periodicity_vector;
@@ -452,10 +449,10 @@ namespace Step45
                                         offset,
                                         rotation_matrix);
 
-      // Next we need to provide information on which vector valued components
+      // Next, we need to provide information on which vector valued components
       // of the solution should be rotated. Since we choose here to just
       // constraint the velocity and this starts at the first component of the
-      // solution vector we simply insert a 0:
+      // solution vector, we simply insert a 0:
       std::vector<unsigned int> first_vector_components;
       first_vector_components.push_back(0);
 
@@ -546,10 +543,7 @@ namespace Step45
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -574,16 +568,18 @@ namespace Step45
                   for (unsigned int j = 0; j <= i; ++j)
                     {
                       local_matrix(i, j) +=
-                        (symgrad_phi_u[i] * symgrad_phi_u[j] -
-                         div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                         phi_p[i] * phi_p[j]) *
-                        fe_values.JxW(q);
+                        (symgrad_phi_u[i] * symgrad_phi_u[j] // diffusion
+                         - div_phi_u[i] * phi_p[j]           // pressure force
+                         - phi_p[i] * div_phi_u[j]           // divergence
+                         + phi_p[i] * phi_p[j])              // pressure mass
+                        * fe_values.JxW(q);
                     }
 
                   const unsigned int component_i =
                     fe.system_to_component_index(i).first;
-                  local_rhs(i) += fe_values.shape_value(i, q) *
-                                  rhs_values[q](component_i) * fe_values.JxW(q);
+                  local_rhs(i) += fe_values.shape_value(i, q)  //
+                                  * rhs_values[q](component_i) //
+                                  * fe_values.JxW(q);
                 }
             }
 
