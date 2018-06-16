@@ -439,6 +439,7 @@ public:
   FESystem(const std::vector<const FiniteElement<dim, spacedim> *> &fes,
            const std::vector<unsigned int> &multiplicities);
 
+#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
   /**
    * Constructor taking an arbitrary number of parameters of type
    * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned
@@ -477,9 +478,10 @@ public:
    * would have expected).
    *
    * @warning This feature is not available for Intel compilers
-   * prior to version 19.0
+   * prior to version 19.0. Defining this
+   * constructor leads to internal compiler errors for Intel compilers prior
+   * to 18.0.
    */
-#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
   template <
     class... FEPairs,
     typename = typename enable_if_all<
@@ -499,7 +501,8 @@ public:
    * @endcode
    *
    * @warning This feature is not available for Intel compilers
-   * prior to version 19.0
+   * prior to version 19.0. The constructor is just not selected for overload
+   * resolution.
    */
   FESystem(
     const std::initializer_list<
