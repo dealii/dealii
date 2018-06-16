@@ -408,8 +408,6 @@ namespace TrilinosWrappers
       n_nonzero_elements() != rhs.n_nonzero_elements();
     if (!needs_deep_copy)
       {
-        const std::pair<size_type, size_type> local_range = rhs.local_range();
-
         // Try to copy all the rows of the matrix one by one. In case of error
         // (i.e., the column indices are different), we need to abort and blow
         // away the matrix.
@@ -1905,7 +1903,6 @@ namespace TrilinosWrappers
            ExcMessage("Addition of matrices only allowed if matrices are "
                       "filled, i.e., compress() has been called"));
 
-    const std::pair<size_type, size_type> local_range = rhs.local_range();
     const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
 
     for (const auto &row : locally_owned_range_indices())
