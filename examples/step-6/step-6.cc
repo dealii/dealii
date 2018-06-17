@@ -66,7 +66,7 @@
 // the global solution is continuous. We are also going to store the boundary
 // conditions in this object. The following file contains a class which is
 // used to handle these constraints:
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 // In order to refine our grids locally, we need a function from the library
 // that decides which cells to flag for refinement or coarsening based on the

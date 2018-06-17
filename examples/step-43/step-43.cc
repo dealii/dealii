@@ -38,7 +38,7 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>

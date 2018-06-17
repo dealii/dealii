@@ -62,7 +62,7 @@ class AffineConstraints;
  *
  * @deprecated Use AffineConstraints<double> instead of ConstraintMatrix
  */
-using ConstraintMatrix = AffineConstraints<double>;
+using ConstraintMatrix DEAL_II_DEPRECATED = AffineConstraints<double>;
 // Note: Unfortunately, we cannot move this compatibility typedef into
 // constraint_matrix.h directly. This would break a lot of user projects
 // that include constraint_matrix.h transitively due to various deal.II

@@ -34,7 +34,7 @@
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/grid/tria.h>

@@ -58,7 +58,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_selector.h>
 #include <deal.II/lac/sparse_direct.h>
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 // Here are the headers necessary to use the LinearOperator class.
 // These are also all conveniently packaged into a single

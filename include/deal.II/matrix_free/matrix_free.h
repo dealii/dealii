@@ -35,8 +35,8 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector_base.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_operation.h>
 
