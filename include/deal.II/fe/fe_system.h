@@ -439,6 +439,7 @@ public:
   FESystem(const std::vector<const FiniteElement<dim, spacedim> *> &fes,
            const std::vector<unsigned int> &multiplicities);
 
+#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
   /**
    * Constructor taking an arbitrary number of parameters of type
    * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned
@@ -475,6 +476,11 @@ public:
    * In other words, if no multiplicity for an element is explicitly specified
    * via the exponentiation operation, then it is assumed to be one (as one
    * would have expected).
+   *
+   * @warning This feature is not available for Intel compilers
+   * prior to version 19.0. Defining this
+   * constructor leads to internal compiler errors for Intel compilers prior
+   * to 18.0.
    */
   template <
     class... FEPairs,
@@ -493,11 +499,16 @@ public:
    *   FiniteElementType1<dim,spacedim> fe_2;
    *   FESystem<dim,spacedim> fe_system = { fe_1^dim, fe_2^1 };
    * @endcode
+   *
+   * @warning This feature is not available for Intel compilers
+   * prior to version 19.0. The constructor is just not selected for overload
+   * resolution.
    */
   FESystem(
     const std::initializer_list<
       std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
       &fe_systems);
+#  endif
 
   /**
    * Copy constructor. This constructor is deleted, i.e., copying
@@ -1272,6 +1283,7 @@ namespace internal
 
 
 
+#    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
 // We are just forwarding/delegating to the constructor taking a
 // std::initializer_list. If we decide to remove the deprecated constructors, we
 // might just use the variadic constructor with a suitable static_assert instead
@@ -1316,6 +1328,7 @@ FESystem<dim, spacedim>::FESystem(
 
   initialize(fes, multiplicities);
 }
+#    endif
 
 #  endif // DOXYGEN
 
