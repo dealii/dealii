@@ -36,7 +36,7 @@
 
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -83,7 +83,7 @@ private:
   // Although we do not have h-refinement,
   // hanging nodes will inevitably appear
   // due to different polynomial degrees.
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   Vector<double> solution;
   Vector<double> system_rhs;

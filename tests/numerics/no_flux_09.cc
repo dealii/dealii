@@ -40,7 +40,7 @@
 
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -55,8 +55,8 @@ check()
   GridGenerator::quarter_hyper_shell(tr, Point<dim>(), 0.5, 1.0, 3, true);
   tr.reset_manifold(0);
 
-  ConstraintMatrix cm;
-  MappingQ<dim>    mapping(1);
+  AffineConstraints<double> cm;
+  MappingQ<dim>             mapping(1);
 
   FESystem<dim>   fe(FE_Q<dim>(1), dim);
   DoFHandler<dim> dofh(tr);

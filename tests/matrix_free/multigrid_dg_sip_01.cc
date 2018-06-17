@@ -34,7 +34,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -81,7 +81,7 @@ public:
       (update_gradients | update_JxW_values);
     addit_data.mapping_update_flags_boundary_faces =
       (update_gradients | update_JxW_values);
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     constraints.close();
 
     data.reinit(mapping, dof_handler, constraints, quad, addit_data);

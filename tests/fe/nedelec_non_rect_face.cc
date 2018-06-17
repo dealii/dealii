@@ -61,7 +61,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
@@ -167,15 +167,15 @@ namespace Maxwell
     double
     calcErrorHcurlNorm();
 
-    Triangulation<dim>   triangulation;
-    MappingQ<dim>        mapping;
-    DoFHandler<dim>      dof_handler;
-    FE_Nedelec<dim>      fe;
-    ConstraintMatrix     constraints;
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Triangulation<dim>        triangulation;
+    MappingQ<dim>             mapping;
+    DoFHandler<dim>           dof_handler;
+    FE_Nedelec<dim>           fe;
+    AffineConstraints<double> constraints;
+    SparsityPattern           sparsity_pattern;
+    SparseMatrix<double>      system_matrix;
+    Vector<double>            solution;
+    Vector<double>            system_rhs;
 
     ConvergenceTable convergence_table;
 

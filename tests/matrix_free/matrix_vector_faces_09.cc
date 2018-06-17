@@ -70,7 +70,7 @@ test()
   FE_DGQ<dim>     fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name();

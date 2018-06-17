@@ -15,8 +15,8 @@
 
 
 
-// ConstraintMatrix.distribute() produces a different result when using a
-// Trilinos::Vector with ghost elements (e.g. owned vs. active), which is a
+// AffineConstraints<double>.distribute() produces a different result when using
+// a Trilinos::Vector with ghost elements (e.g. owned vs. active), which is a
 // bug. Now distribute() throws an Exception when called with a Vector with
 // ghost elements. check that this happens.
 
@@ -92,7 +92,7 @@ test()
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
 
-  ConstraintMatrix cm(relevant_set);
+  AffineConstraints<double> cm(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   std::vector<bool> velocity_mask(dim + 1, true);
 

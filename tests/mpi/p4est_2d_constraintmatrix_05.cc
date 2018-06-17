@@ -15,7 +15,7 @@
 
 
 
-// check that ConstraintMatrix.distribute() is not doing anything in a
+// check that AffineConstraints<double>.distribute() is not doing anything in a
 // distributed computation for a vector that already has the entries set
 // correctly
 
@@ -68,10 +68,10 @@ test()
   TrilinosWrappers::MPI::Vector x1(x_ref);
 
   // we have interpolated values, so
-  // ConstraintMatrix::distribute should not do
+  // AffineConstraints<double>::distribute should not do
   // anything
   x1 = x_ref;
-  ConstraintMatrix cm(relevant_set);
+  AffineConstraints<double> cm(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
   cm.close();
   cm.distribute(x1);

@@ -15,12 +15,12 @@
 
 
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
 
-// bug in ConstraintMatrix
+// bug in AffineConstraints<double>
 
 // index=18466 line_index=652 lines_cache[line_index]=919940456 lines.size()=21
 
@@ -31,7 +31,7 @@ test()
   std::ifstream f(SOURCE_DIR "/constraints_01/is.23");
   rel.read(f);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.clear();
   cm.reinit(rel);
 

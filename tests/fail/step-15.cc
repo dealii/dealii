@@ -38,7 +38,7 @@ std::ofstream logfile("output");
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -126,7 +126,7 @@ private:
   FE_Q<dim>       fe;
   DoFHandler<dim> dof_handler;
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> matrix;

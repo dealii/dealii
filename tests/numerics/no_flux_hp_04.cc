@@ -27,7 +27,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -82,7 +82,7 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   VectorTools::compute_no_normal_flux_constraints(dof, 0, boundary_ids, cm);
   cm.close();
 

@@ -79,10 +79,10 @@ private:
   void
   setup_system();
 
-  Triangulation<2> triangulation;
-  FE_Q<2>          fe;
-  DoFHandler<2>    dof_handler;
-  ConstraintMatrix constraints;
+  Triangulation<2>          triangulation;
+  FE_Q<2>                   fe;
+  DoFHandler<2>             dof_handler;
+  AffineConstraints<double> constraints;
 };
 
 Deal2PeriodicBug::Deal2PeriodicBug()

@@ -43,7 +43,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -97,7 +97,7 @@ namespace Step40
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     PETScWrappers::MPI::SparseMatrix system_matrix;
     PETScWrappers::MPI::Vector       locally_relevant_solution;

@@ -18,7 +18,7 @@
 //   DoFTools::
 //   make_periodicity_constraints (const FaceIterator       &,
 //                                 const FaceIterator       &,
-//                                 dealii::ConstraintMatrix &,
+//                                 dealii::AffineConstraints<double> &,
 //                                 const std::vector<bool>  &,
 //                                 bool, bool, bool)
 // for correct behaviour on non standard oriented meshes.
@@ -38,7 +38,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <iostream>
 #include <utility>
@@ -121,8 +121,8 @@ print_matching(DoFHandler<dim> &dof_handler)
   const FiniteElement<dim> &fe = dof_handler.get_fe();
   MappingQ<dim>             mapping(1);
 
-  ConstraintMatrix        constraint_matrix;
-  std::vector<Point<dim>> support_points(dof_handler.n_dofs());
+  AffineConstraints<double> constraint_matrix;
+  std::vector<Point<dim>>   support_points(dof_handler.n_dofs());
   DoFTools::map_dofs_to_support_points<dim>(mapping,
                                             dof_handler,
                                             support_points);

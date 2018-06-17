@@ -39,7 +39,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -107,7 +107,7 @@ check()
       mask[dim + i][dim + j] = DoFTools::always;
   DoFTools::make_sparsity_pattern(dof, mask, sparsity);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
   constraints.condense(sparsity);

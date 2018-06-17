@@ -32,7 +32,7 @@
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -195,7 +195,7 @@ test(const FiniteElement<dim> &fe)
     {
       MappingQ<dim> mapping(mapping_p, true);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

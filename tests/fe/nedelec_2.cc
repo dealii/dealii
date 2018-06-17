@@ -28,7 +28,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -90,7 +90,7 @@ plot(const Triangulation<dim> &tr, const unsigned int p)
   FE_Nedelec<dim> fe_ned(p);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe_ned);
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof, cm);
   cm.close();
 

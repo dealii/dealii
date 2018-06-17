@@ -33,7 +33,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -112,7 +112,7 @@ test_constraints(hp::FECollection<dim> &fe_coll)
   deallog << "DoFs: " << dof_handler.n_dofs() << std::endl;
 
   // Create the constraints.
-  ConstraintMatrix constraint_matrix;
+  AffineConstraints<double> constraint_matrix;
 
   DoFTools::make_hanging_node_constraints(dof_handler, constraint_matrix);
 
@@ -146,7 +146,7 @@ test_constraints_old(FiniteElement<dim> &fe)
   deallog << "DoFs: " << dof_handler.n_dofs() << std::endl;
 
   // Create the constraints.
-  ConstraintMatrix constraint_matrix;
+  AffineConstraints<double> constraint_matrix;
 
   DoFTools::make_hanging_node_constraints(dof_handler, constraint_matrix);
 

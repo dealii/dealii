@@ -37,7 +37,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -71,7 +71,7 @@ test(std::string filename, unsigned int n)
 
   Functions::CosineFunction<spacedim> cosine;
   QGauss<dim>                         quad(5);
-  ConstraintMatrix                    constraints;
+  AffineConstraints<double>           constraints;
   constraints.close();
   VectorTools::project(dof_handler, constraints, quad, cosine, projected_one);
 

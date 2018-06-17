@@ -35,7 +35,7 @@ std::ofstream logfile("output");
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include "matrix_vector_mf.h"
@@ -52,7 +52,7 @@ test()
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;

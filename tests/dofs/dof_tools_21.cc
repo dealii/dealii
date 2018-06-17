@@ -19,7 +19,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -34,7 +34,7 @@
 //   DoFTools::
 //   make_periodicity_constraints (const FaceIterator       &,
 //                                 const FaceIterator       &,
-//                                 dealii::ConstraintMatrix &,
+//                                 dealii::AffineConstraints<double> &,
 //                                 const std::vector<bool>  &)
 //
 // We project an already periodic function onto the FE space of
@@ -50,7 +50,7 @@ check_this(const DoFHandler<dim> &dof_handler)
 {
   Functions::CosineFunction<dim> test_func(dof_handler.get_fe().n_components());
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   // Apply periodic boundary conditions only in the one direction where
   // we can match the (locally refined) faces:

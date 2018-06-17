@@ -26,7 +26,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/fe_field_function.h>
@@ -152,7 +152,7 @@ set_solution(Vector<double> &      vector,
              const DoFHandler<3> & dof_handler_ref,
              const Vector<double> &u_ref)
 {
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   constraints.close();
 

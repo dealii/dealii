@@ -16,7 +16,7 @@
 
 
 // document bug in assembling a LA::MPI::SparseMatrix
-// this was due to handing a wrong IndexSet to the ConstraintMatrix
+// this was due to handing a wrong IndexSet to the AffineConstraints<double>
 
 #include <deal.II/base/index_set.h>
 
@@ -30,7 +30,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/sparsity_tools.h>
@@ -51,7 +51,7 @@ test()
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   parallel::distributed::Triangulation<dim> triangulation(

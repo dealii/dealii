@@ -19,7 +19,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -30,7 +30,7 @@
 // check
 //   DoFTools::
 //   make_hanging_node_constraints (const DoFHandler<dim> &,
-//                              ConstraintMatrix      &);
+//                              AffineConstraints<double>      &);
 //
 // As the results of dof_tools_03 seem unclear, this test aims
 // at verifying the constraints by projecting a constant function
@@ -65,7 +65,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().constraints_are_implemented() == false)
     return;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof_handler, cm);
   cm.close();
 

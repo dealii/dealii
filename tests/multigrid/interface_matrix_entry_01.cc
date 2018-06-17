@@ -81,11 +81,11 @@ test()
       }
   tria.execute_coarsening_and_refinement();
 
-  FE_Q<dim>         fe(2);
-  DoFHandler<dim>   mg_dof_handler(tria);
-  IndexSet          locally_relevant_set;
-  ConstraintMatrix  constraints;
-  MGConstrainedDoFs mg_constrained_dofs;
+  FE_Q<dim>                 fe(2);
+  DoFHandler<dim>           mg_dof_handler(tria);
+  IndexSet                  locally_relevant_set;
+  AffineConstraints<double> constraints;
+  MGConstrainedDoFs         mg_constrained_dofs;
 
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs();

@@ -48,7 +48,7 @@ std::ofstream logfile("output");
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -343,7 +343,7 @@ main(int /*argc*/, char ** /*argv*/)
   deformation.reinit(dof_handler_def->n_dofs());
 
   // Project solution onto RT FE field
-  ConstraintMatrix hn_constraints;
+  AffineConstraints<double> hn_constraints;
   hn_constraints.clear();
   DoFTools::make_hanging_node_constraints(*dof_handler, hn_constraints);
   hn_constraints.close();
@@ -351,7 +351,7 @@ main(int /*argc*/, char ** /*argv*/)
     *dof_handler, hn_constraints, QGauss<2>(6), TestMap1<2>(2), solution);
 
   // Project reference solution onto RT FE field
-  ConstraintMatrix hn_constraints_def;
+  AffineConstraints<double> hn_constraints_def;
   hn_constraints_def.clear();
   DoFTools::make_hanging_node_constraints(*dof_handler_def, hn_constraints_def);
   hn_constraints_def.close();

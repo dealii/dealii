@@ -37,9 +37,9 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -140,7 +140,7 @@ private:
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> reference_matrix;

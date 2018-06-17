@@ -31,7 +31,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -62,7 +62,7 @@ private:
 
   FE_Q<2> fe;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   IndexSet locally_owned_dofs;
   IndexSet locally_relevant_dofs;

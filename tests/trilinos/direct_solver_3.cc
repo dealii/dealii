@@ -32,7 +32,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/solver_cg.h>
@@ -72,8 +72,8 @@ private:
   FE_Q<dim>                                 fe;
   DoFHandler<dim>                           dof_handler;
 
-  ConstraintMatrix constraints;
-  SparsityPattern  sparsity_pattern;
+  AffineConstraints<double> constraints;
+  SparsityPattern           sparsity_pattern;
 
   TrilinosWrappers::SparseMatrix system_matrix;
 

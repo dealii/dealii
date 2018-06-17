@@ -41,7 +41,7 @@ std::ofstream logfile("output");
 
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -280,10 +280,10 @@ namespace LaplaceSolver
       void
       solve(Vector<double> &solution) const;
 
-      ConstraintMatrix     hanging_node_constraints;
-      SparsityPattern      sparsity_pattern;
-      SparseMatrix<double> matrix;
-      Vector<double>       rhs;
+      AffineConstraints<double> hanging_node_constraints;
+      SparsityPattern           sparsity_pattern;
+      SparseMatrix<double>      matrix;
+      Vector<double>            rhs;
     };
 
     void
@@ -447,7 +447,7 @@ namespace LaplaceSolver
   {
     hanging_node_constraints.clear();
 
-    void (*mhnc_p)(const hp::DoFHandler<dim> &, ConstraintMatrix &) =
+    void (*mhnc_p)(const hp::DoFHandler<dim> &, AffineConstraints<double> &) =
       &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<> mhnc_thread =

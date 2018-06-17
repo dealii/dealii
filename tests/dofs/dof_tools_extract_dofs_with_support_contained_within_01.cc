@@ -74,7 +74,7 @@ test(const unsigned int flag)
   FE_Q<dim> fe(2);
   dh.distribute_dofs(fe);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dh, cm);
 
   IndexSet support = DoFTools::extract_dofs_with_support_contained_within(

@@ -18,7 +18,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/petsc_solver.h>
@@ -225,11 +225,11 @@ protected:
   QGauss<dim>                    cell_quadrature;
   MappingQGeneric<dim>           cell_mapping;
 
-  ConstraintMatrix     all_constraints;
-  SparsityPattern      sparsity_pattern;
-  SparseMatrix<double> system_matrix;
-  Vector<double>       system_rhs;
-  Vector<double>       solution;
+  AffineConstraints<double> all_constraints;
+  SparsityPattern           sparsity_pattern;
+  SparseMatrix<double>      system_matrix;
+  Vector<double>            system_rhs;
+  Vector<double>            solution;
 
   void
   setup_dofs();

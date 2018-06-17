@@ -33,7 +33,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -46,12 +46,12 @@
 
 using namespace dealii;
 
-ConstraintMatrix
+AffineConstraints<double>
 make_constraint_matrix(const DoFHandler<3> &dof_handler, int version)
 {
   constexpr int dim = 3;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
@@ -269,7 +269,7 @@ main(int argc, char *argv[])
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  std::vector<ConstraintMatrix> constraints(4);
+  std::vector<AffineConstraints<double>> constraints(4);
 
   PeriodicReference<dim> periodic_function;
 

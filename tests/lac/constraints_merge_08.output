@@ -1,5 +1,5 @@
 
-DEAL::Checking ConstraintMatrix::merge with localized lines
+DEAL::Checking AffineConstraints<double>::merge with localized lines
 DEAL::Number of local lines: 20
 DEAL::Checking with open objects
     99999890 99999991:  1.0

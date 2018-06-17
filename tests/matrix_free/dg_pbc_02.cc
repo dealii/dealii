@@ -83,7 +83,7 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   const QGauss<1>                          quad(1);

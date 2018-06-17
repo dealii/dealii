@@ -22,7 +22,7 @@
 // in function
 //     static void dealii::VectorTools::compute_no_normal_flux_constraints(const
 //     DoFHandlerType<dim, spacedim>&, unsigned int, const
-//     std::set<types::boundary_id>&, dealii::ConstraintMatrix&, const
+//     std::set<types::boundary_id>&, dealii::AffineConstraints<double>&, const
 //     dealii::Mapping<dim, spacedim>&) [with int dim = 3, DoFHandlerType =
 //     dealii::DoFHandler, int spacedim = 3]
 // The violated condition was:
@@ -43,7 +43,7 @@
 
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -58,8 +58,8 @@ check()
   GridGenerator::half_hyper_shell(tr, Point<dim>(), 0.5, 1, 0);
   tr.reset_manifold(0);
 
-  ConstraintMatrix cm;
-  MappingQ<dim>    mapping(1);
+  AffineConstraints<double> cm;
+  MappingQ<dim>             mapping(1);
 
   FESystem<dim>   fe(FE_Q<dim>(1), dim);
   DoFHandler<dim> dofh(tr);

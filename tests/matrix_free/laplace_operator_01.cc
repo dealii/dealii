@@ -31,7 +31,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
@@ -91,7 +91,7 @@ test()
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
 
-  ConstraintMatrix constraints(relevant_set);
+  AffineConstraints<double> constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

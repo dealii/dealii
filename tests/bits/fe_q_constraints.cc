@@ -41,7 +41,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -113,10 +113,10 @@ private:
   void
   test();
 
-  Triangulation<dim> triangulation;
-  FE_Q<dim>          fe;
-  DoFHandler<dim>    dof_handler;
-  ConstraintMatrix   hanging_node_constraints;
+  Triangulation<dim>        triangulation;
+  FE_Q<dim>                 fe;
+  DoFHandler<dim>           dof_handler;
+  AffineConstraints<double> hanging_node_constraints;
 };
 
 template <int dim>

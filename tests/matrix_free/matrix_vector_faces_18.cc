@@ -154,7 +154,7 @@ test()
   DoFHandler<dim> dof(triangulation);
   dof_orig.distribute_dofs(fe);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name();

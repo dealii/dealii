@@ -44,7 +44,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -176,7 +176,7 @@ namespace Step18
     parallel::shared::Triangulation<dim> triangulation;
     FESystem<dim>                        fe;
     DoFHandler<dim>                      dof_handler;
-    ConstraintMatrix                     hanging_node_constraints;
+    AffineConstraints<double>            hanging_node_constraints;
     const QGauss<dim>                    quadrature_formula;
     std::vector<PointHistory<dim>>       quadrature_point_history;
     PETScWrappers::MPI::SparseMatrix     system_matrix;

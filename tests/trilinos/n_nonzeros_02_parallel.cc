@@ -61,7 +61,7 @@ test()
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,
                                   sparsity,
-                                  ConstraintMatrix(),
+                                  AffineConstraints<double>(),
                                   false,
                                   Utilities::MPI::this_mpi_process(
                                     MPI_COMM_WORLD));

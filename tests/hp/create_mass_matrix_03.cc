@@ -47,7 +47,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -100,7 +100,7 @@ check()
   // not couple, so use pattern
   SparsityPattern sparsity(dof.n_dofs(), dof.n_dofs());
   DoFTools::make_sparsity_pattern(dof, sparsity);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
   constraints.condense(sparsity);

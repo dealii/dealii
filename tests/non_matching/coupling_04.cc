@@ -83,7 +83,7 @@ test()
   }
   SparseMatrix<double> coupling(sparsity);
   NonMatching::create_coupling_mass_matrix(
-    space_dh, dh, quad, coupling, ConstraintMatrix());
+    space_dh, dh, quad, coupling, AffineConstraints<double>());
 
   SparsityPattern mass_sparsity;
   {

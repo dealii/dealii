@@ -41,7 +41,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
@@ -136,7 +136,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   // constraints:
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

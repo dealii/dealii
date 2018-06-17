@@ -29,7 +29,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -309,7 +309,8 @@ protected:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   // use this for info on problem

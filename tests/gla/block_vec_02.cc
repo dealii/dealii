@@ -15,11 +15,11 @@
 
 
 
-// block vectors: test ConstraintMatrix::distribute (fails currently)
+// block vectors: test AffineConstraints<double>::distribute (fails currently)
 
 #include <deal.II/base/index_set.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 
 #include <iostream>

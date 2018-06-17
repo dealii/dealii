@@ -36,8 +36,8 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -91,9 +91,9 @@ namespace Step22
     FESystem<dim>                             fe;
     DoFHandler<dim>                           dof_handler;
 
-    ConstraintMatrix      constraints;
-    std::vector<IndexSet> owned_partitioning;
-    std::vector<IndexSet> relevant_partitioning;
+    AffineConstraints<double> constraints;
+    std::vector<IndexSet>     owned_partitioning;
+    std::vector<IndexSet>     relevant_partitioning;
 
     TrilinosWrappers::BlockSparseMatrix system_matrix;
 

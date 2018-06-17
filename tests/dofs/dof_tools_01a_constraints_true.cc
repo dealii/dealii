@@ -23,7 +23,7 @@
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
 //                      SparsityPattern       &,
-//                          ConstraintMatrix,
+//                          AffineConstraints<double>,
 //                          true);
 
 
@@ -32,7 +32,7 @@ template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler)
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof_handler, cm);
   cm.close();
 

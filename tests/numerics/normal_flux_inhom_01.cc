@@ -31,7 +31,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -60,7 +60,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       for (unsigned int j = 0; j <= i; ++j)
         boundary_ids.insert(j);
 
-      ConstraintMatrix cm;
+      AffineConstraints<double> cm;
       VectorTools::compute_nonzero_normal_flux_constraints(
         dof, 0, boundary_ids, function_map, cm);
 

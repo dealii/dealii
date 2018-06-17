@@ -52,7 +52,7 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   std::unique_ptr<Triangulation<dim>> tria(make_tria<dim>());
   std::unique_ptr<DoFHandler<dim>>    dof1(make_dof_handler(*tria, fe1));
   std::unique_ptr<DoFHandler<dim>>    dof2(make_dof_handler(*tria, fe2));
-  ConstraintMatrix                    cm;
+  AffineConstraints<double>           cm;
   DoFTools::make_hanging_node_constraints(*dof2, cm);
   cm.close();
 

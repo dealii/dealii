@@ -73,7 +73,7 @@ test()
     DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     constraints.close();
     do_test<dim, fe_degree, double>(dof, constraints);
   }
@@ -82,7 +82,7 @@ test()
     DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     constraints.close();
     do_test<dim, fe_degree, double>(dof, constraints);
   }
@@ -92,7 +92,7 @@ test()
     DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     constraints.close();
     do_test<dim, -1, double>(dof, constraints);
   }

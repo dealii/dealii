@@ -24,7 +24,7 @@
 // node).
 
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
@@ -33,7 +33,7 @@
 void
 test()
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   // a "regular" constraint
   cm.add_line(1);

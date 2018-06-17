@@ -38,10 +38,10 @@ std::ofstream logfile("output");
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
@@ -145,7 +145,7 @@ test()
 
   MatrixFree<dim, double> mf_data;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> system_matrix;
@@ -282,9 +282,9 @@ test()
     std::vector<const DoFHandler<dim> *> dofs;
     dofs.push_back(&dof_handler_u);
     dofs.push_back(&dof_handler_p);
-    ConstraintMatrix dummy_constraints;
+    AffineConstraints<double> dummy_constraints;
     dummy_constraints.close();
-    std::vector<const ConstraintMatrix *> constraints;
+    std::vector<const AffineConstraints<double> *> constraints;
     constraints.push_back(&dummy_constraints);
     constraints.push_back(&dummy_constraints);
     QGauss<1> quad(fe_degree + 2);

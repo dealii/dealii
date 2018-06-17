@@ -101,7 +101,7 @@ test()
   IndexSet        locally_relevant_set;
   DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_set);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.reinit(locally_relevant_set);
   DoFTools::make_hanging_node_constraints(dh, cm);
   cm.close();

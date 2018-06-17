@@ -68,7 +68,7 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
@@ -144,7 +144,7 @@ test()
 
   // .... test constraint handling
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 

@@ -56,7 +56,7 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   VectorTools::interpolate_boundary_values(dof,
                                            0,
                                            Functions::ZeroFunction<dim>(),
@@ -85,12 +85,12 @@ test()
   system_matrix.reinit(sparsity);
 
   // setup MG levels
-  const unsigned int                  nlevels = tria.n_levels();
-  typedef MatrixFree<dim>             MatrixFreeTestType;
-  MGLevelObject<MatrixFreeTestType>   mg_matrices;
-  MGLevelObject<ConstraintMatrix>     mg_constraints;
-  MGLevelObject<SparsityPattern>      mg_sparsities;
-  MGLevelObject<SparseMatrix<double>> mg_ref_matrices;
+  const unsigned int                       nlevels = tria.n_levels();
+  typedef MatrixFree<dim>                  MatrixFreeTestType;
+  MGLevelObject<MatrixFreeTestType>        mg_matrices;
+  MGLevelObject<AffineConstraints<double>> mg_constraints;
+  MGLevelObject<SparsityPattern>           mg_sparsities;
+  MGLevelObject<SparseMatrix<double>>      mg_ref_matrices;
   mg_matrices.resize(0, nlevels - 1);
   mg_constraints.resize(0, nlevels - 1);
   mg_sparsities.resize(0, nlevels - 1);

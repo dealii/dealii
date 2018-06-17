@@ -31,8 +31,8 @@
 
 #include <deal.II/grid/grid_generator.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
@@ -84,9 +84,9 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
     typename Triangulation<dim>::MeshSmoothing(
       Triangulation<dim>::smoothing_on_refinement |
       Triangulation<dim>::smoothing_on_coarsening));
-  QGauss<dim>      quadrature_formula(fe_trial.degree + 1);
-  DoFHandler<dim>  dof_handler(triangulation);
-  ConstraintMatrix constraints;
+  QGauss<dim>               quadrature_formula(fe_trial.degree + 1);
+  DoFHandler<dim>           dof_handler(triangulation);
+  AffineConstraints<double> constraints;
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 

@@ -35,9 +35,9 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
@@ -81,7 +81,7 @@ namespace Step22
     Triangulation<dim>        triangulation;
     FESystem<dim>             fe;
     DoFHandler<dim>           dof_handler;
-    ConstraintMatrix          constraints;
+    AffineConstraints<double> constraints;
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
     BlockVector<double>       solution;

@@ -32,8 +32,8 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -80,7 +80,7 @@ test()
   v.block(1).reinit(dh.n_dofs() - dh.n_dofs() / 2);
   v.collect_sizes();
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
   VectorTools::project(
     dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);

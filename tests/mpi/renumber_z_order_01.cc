@@ -83,7 +83,7 @@ test()
   TrilinosWrappers::MPI::Vector vector;
   vector.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   {
-    ConstraintMatrix cm;
+    AffineConstraints<double> cm;
     cm.close();
     QGauss<dim>                          quadrature_formula(2);
     FEValues<dim>                        fe_values(fe,

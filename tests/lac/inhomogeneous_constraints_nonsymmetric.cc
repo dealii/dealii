@@ -33,7 +33,7 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -79,8 +79,8 @@ private:
   DoFHandler<dim> dof_handler;
   FE_Q<dim>       fe;
 
-  ConstraintMatrix hanging_nodes_only;
-  ConstraintMatrix test_all_constraints;
+  AffineConstraints<double> hanging_nodes_only;
+  AffineConstraints<double> test_all_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> reference_matrix;

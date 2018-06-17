@@ -36,8 +36,8 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/sparsity_tools.h>
@@ -100,7 +100,7 @@ test()
 
   stokes_relevant_set.print(deallog.get_file_stream());
 
-  ConstraintMatrix cm(stokes_relevant_set);
+  AffineConstraints<double> cm(stokes_relevant_set);
 
   DoFTools::make_hanging_node_constraints(stokes_dof_handler, cm);
 
@@ -196,7 +196,7 @@ test_LA_Trilinos()
     stokes_relevant_set.get_view(n_u, n_u + n_p));
   stokes_relevant_set.print(deallog.get_file_stream());
 
-  ConstraintMatrix cm(stokes_relevant_set);
+  AffineConstraints<double> cm(stokes_relevant_set);
 
   DoFTools::make_hanging_node_constraints(stokes_dof_handler, cm);
 

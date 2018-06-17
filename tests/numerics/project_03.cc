@@ -32,7 +32,7 @@
 
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -80,7 +80,7 @@ test()
 
   const F<dim> approximated_function;
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   VectorTools::interpolate_boundary_values(dh, 0, approximated_function, cm);
   cm.close();
 

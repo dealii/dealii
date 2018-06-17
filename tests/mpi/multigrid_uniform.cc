@@ -36,7 +36,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -99,7 +99,7 @@ namespace Step50
 
     matrix_t system_matrix;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     vector_t solution;
     vector_t system_rhs;
@@ -323,9 +323,9 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values(n_q_points);
 
-    std::vector<ConstraintMatrix> boundary_constraints(
+    std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints(
+    std::vector<AffineConstraints<double>> boundary_interface_constraints(
       triangulation.n_levels());
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       {

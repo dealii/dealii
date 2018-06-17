@@ -43,7 +43,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/precondition.h>
@@ -152,7 +152,7 @@ namespace Step50
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     vector_t solution;
     vector_t system_rhs;
@@ -362,7 +362,7 @@ namespace Step50
   void
   LaplaceProblem<dim>::assemble_system_and_multigrid()
   {
-    std::vector<ConstraintMatrix> boundary_constraints(
+    std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_global_levels());
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)

@@ -1,6 +1,6 @@
 
 DEAL::Create index set with entries: {2, 5, 8}
-DEAL::Create ConstraintMatrix with constraints u(2)=.5*u(5), u(5)=.7*u(8)
+DEAL::Create AffineConstraints<double> with constraints u(2)=.5*u(5), u(5)=.7*u(8)
     5 8:  0.700000
     2 5:  0.500000
 DEAL::Shifted constraints

@@ -33,7 +33,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/error_estimator.h>
@@ -75,7 +75,7 @@ check()
       // constraints. this should trip the
       // new code using the hp constraints,
       // added in late July 2006
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);
 
       for (unsigned int j = 0; j < dof.n_dofs(); ++j)

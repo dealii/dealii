@@ -66,9 +66,9 @@ test()
 
   tria.refine_global(3 - dim);
 
-  FE_DGQHermite<dim> fe(fe_degree);
-  DoFHandler<dim>    dof(tria);
-  ConstraintMatrix   constraints;
+  FE_DGQHermite<dim>        fe(fe_degree);
+  DoFHandler<dim>           dof(tria);
+  AffineConstraints<double> constraints;
   constraints.close();
 
   for (unsigned int test = 0; test < 2; ++test)

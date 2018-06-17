@@ -28,7 +28,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/intergrid_map.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -172,7 +172,7 @@ main()
   DoFToolsEx::transfer(dof, sol, both_dof, both_sol);
 
   // handle hanging nodes
-  ConstraintMatrix both_constraints;
+  AffineConstraints<double> both_constraints;
   DoFTools::make_hanging_node_constraints(both_dof, both_constraints);
   both_constraints.close();
   both_constraints.distribute(both_sol);

@@ -30,7 +30,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -70,7 +70,7 @@ private:
   FE_Q_iso_Q1<dim> fe_precondition;
   DoFHandler<dim>  dof_handler_precondition;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   TrilinosWrappers::SparseMatrix system_matrix;
   TrilinosWrappers::SparseMatrix preconditioner_matrix;

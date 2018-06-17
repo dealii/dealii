@@ -1,5 +1,5 @@
 
-DEAL::Checking ConstraintMatrix::merge with localized lines
+DEAL::Checking AffineConstraints<double>::merge with localized lines
 {[99999890,99999899], [99999990,99999991]}
 {[99999893,99999899], [99999990,99999999]}
 DEAL::OK

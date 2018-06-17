@@ -28,7 +28,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -174,8 +174,8 @@ test()
       solution_dist(i)   = entry;
     }
 
-  ConstraintMatrix constraints;
-  MatrixFree<dim>  mf_data;
+  AffineConstraints<double> constraints;
+  MatrixFree<dim>           mf_data;
   {
     const QGaussLobatto<1>                   quad(fe_degree + 1);
     typename MatrixFree<dim>::AdditionalData data;

@@ -37,8 +37,8 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/sparsity_tools.h>
@@ -208,7 +208,7 @@ test_alt()
   locally_relevant_dofs.print(deallog);
 
 
-  ConstraintMatrix constraints(locally_relevant_dofs);
+  AffineConstraints<double> constraints(locally_relevant_dofs);
   constraints.close();
 
   TrilinosWrappers::BlockSparsityPattern sp(locally_owned_partitioning,

@@ -43,7 +43,7 @@ std::ofstream logfile("output");
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -211,23 +211,23 @@ private:
   void
   process_solution(const unsigned int cycle);
 
-  Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
-  ConstraintMatrix     constraints;
-  SparsityPattern      sparsity_pattern;
-  SparseMatrix<double> system_matrix;
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Triangulation<dim>        triangulation;
+  FE_Q<dim>                 fe;
+  DoFHandler<dim>           dof_handler;
+  AffineConstraints<double> constraints;
+  SparsityPattern           sparsity_pattern;
+  SparseMatrix<double>      system_matrix;
+  Vector<double>            solution;
+  Vector<double>            system_rhs;
 
-  FE_TraceQ<dim>       fe_trace;
-  DoFHandler<dim>      dof_handler_trace;
-  ConstraintMatrix     constraints_trace;
-  SparsityPattern      sparsity_pattern_trace;
-  SparseMatrix<double> system_matrix_trace;
-  Vector<double>       solution_trace_full;
-  Vector<double>       solution_trace;
-  Vector<double>       system_rhs_trace;
+  FE_TraceQ<dim>            fe_trace;
+  DoFHandler<dim>           dof_handler_trace;
+  AffineConstraints<double> constraints_trace;
+  SparsityPattern           sparsity_pattern_trace;
+  SparseMatrix<double>      system_matrix_trace;
+  Vector<double>            solution_trace_full;
+  Vector<double>            solution_trace;
+  Vector<double>            system_rhs_trace;
 
   const RefinementMode refinement_mode;
 

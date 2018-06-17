@@ -28,7 +28,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -257,7 +257,7 @@ test(const FiniteElement<dim> &fe,
     {
       dof_handler.distribute_dofs(fe);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

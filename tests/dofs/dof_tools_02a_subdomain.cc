@@ -50,7 +50,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   // the framework sets the subdomain
   // id to the level of each cell
   DoFTools::make_sparsity_pattern(
-    dof_handler, mask, sp, ConstraintMatrix(), true, 2);
+    dof_handler, mask, sp, AffineConstraints<double>(), true, 2);
   sp.compress();
 
   // write out 10 lines of this

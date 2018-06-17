@@ -50,7 +50,7 @@ test()
   DoFTools::extract_locally_relevant_dofs(dh, relevant_partitioning);
 
   // generate empty constraints
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   // generate sparsity pattern
   TrilinosWrappers::SparsityPattern sp(dh.locally_owned_dofs(),

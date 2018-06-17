@@ -15,10 +15,9 @@
 
 
 
-// check ConstraintMatrix for a distributed mesh on hyper shell with both
-// hanging nodes and no-normal-flux constraints on the outer boundary of the
-// shell.
-// Also see test renumber_z_order_02
+// check AffineConstraints<double> for a distributed mesh on hyper shell with
+// both hanging nodes and no-normal-flux constraints on the outer boundary of
+// the shell. Also see test renumber_z_order_02
 
 #include <deal.II/base/tensor.h>
 
@@ -112,7 +111,7 @@ test()
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, constraints);
   std::set<types::boundary_id> no_normal_flux_boundaries;

@@ -16,9 +16,10 @@
 
 
 // this function tests the correctness of the implementation of
-// ConstraintMatrix::distribute_local_to_global for FullMatrix by comparing
-// the results with a sparse matrix. As a test case, we use a square mesh that
-// is refined once globally and then the first cell is refined adaptively.
+// AffineConstraints<double>::distribute_local_to_global for FullMatrix by
+// comparing the results with a sparse matrix. As a test case, we use a square
+// mesh that is refined once globally and then the first cell is refined
+// adaptively.
 
 #include <deal.II/base/function.h>
 
@@ -32,7 +33,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -61,7 +62,7 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            1,

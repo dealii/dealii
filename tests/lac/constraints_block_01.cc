@@ -47,7 +47,7 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
@@ -229,7 +229,7 @@ main()
    * The interface check is simplified for this 2x2 case
    */
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   const unsigned int dofs_per_fl_msh_face = fluid_fe->dofs_per_face;
   const unsigned int dofs_per_solid_face  = solid_fe->dofs_per_face;

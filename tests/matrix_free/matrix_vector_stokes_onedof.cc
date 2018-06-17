@@ -41,7 +41,7 @@ std::ofstream logfile("output");
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
@@ -151,7 +151,7 @@ test(const FESystem<dim> &fe)
 
   MatrixFree<dim, double> mf_data;
 
-  ConstraintMatrix constraints, constraints_u, constraints_p;
+  AffineConstraints<double> constraints, constraints_u, constraints_p;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

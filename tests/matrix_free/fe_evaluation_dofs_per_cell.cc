@@ -25,7 +25,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
@@ -79,7 +79,7 @@ test()
       dof.distribute_dofs(*fes[i]);
       MatrixFree<dim> matrix_free;
       matrix_free.reinit(dof,
-                         ConstraintMatrix(),
+                         AffineConstraints<double>(),
                          QGauss<1>(degree + 3),
                          typename MatrixFree<dim>::AdditionalData());
       if (i < 2)

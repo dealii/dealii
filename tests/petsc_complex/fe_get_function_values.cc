@@ -39,7 +39,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -105,7 +105,7 @@ test()
 
   const types::global_dof_index n_local_dofs = locally_owned_dofs.n_elements();
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

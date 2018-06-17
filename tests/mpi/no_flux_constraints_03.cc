@@ -15,9 +15,9 @@
 
 
 
-// check that the ConstraintMatrix with hanging nodes and no-normal-flux
-// constraints on an adaptively refined hyper_cube are the same independet
-// of the number of CPUs
+// check that the AffineConstraints<double> with hanging nodes and
+// no-normal-flux constraints on an adaptively refined hyper_cube are the same
+// independet of the number of CPUs
 
 #include <deal.II/base/tensor.h>
 
@@ -87,7 +87,7 @@ test()
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, constraints);
   std::set<types::boundary_id> no_normal_flux_boundaries;

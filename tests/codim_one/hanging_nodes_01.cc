@@ -31,7 +31,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
@@ -67,7 +67,7 @@ main()
   /*****************************************************************/
   FE_Q<dim, spacedim>       fe(1);
   DoFHandler<dim, spacedim> dh(boundary_mesh);
-  ConstraintMatrix          hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   dh.distribute_dofs(fe);
   hanging_node_constraints.clear();

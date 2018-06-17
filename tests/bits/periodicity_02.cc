@@ -58,7 +58,7 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_periodicity_constraints(dof_handler.begin(0)->face(0),
                                          (++dof_handler.begin(0))->face(1),
                                          cm);

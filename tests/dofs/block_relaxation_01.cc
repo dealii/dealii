@@ -34,7 +34,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -54,7 +54,7 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
   const unsigned int        degree = fe.degree;
   system_matrix                    = 0;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
   FEValues<dim>      fe_values(fe,
                           quadrature_formula,

@@ -37,7 +37,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -80,7 +80,7 @@ private:
   DoFHandler<dim> dof_handler;
   FE_Q<dim>       fe;
 
-  ConstraintMatrix hanging_node_constraints;
+  AffineConstraints<double> hanging_node_constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;

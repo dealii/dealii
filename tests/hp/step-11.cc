@@ -41,7 +41,7 @@ std::ofstream logfile("output");
 
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -76,9 +76,9 @@ private:
   hp::DoFHandler<dim>        dof_handler;
   hp::MappingCollection<dim> mapping;
 
-  SparsityPattern      sparsity_pattern;
-  SparseMatrix<double> system_matrix;
-  ConstraintMatrix     mean_value_constraints;
+  SparsityPattern           sparsity_pattern;
+  SparseMatrix<double>      system_matrix;
+  AffineConstraints<double> mean_value_constraints;
 
   Vector<double> solution;
   Vector<double> system_rhs;

@@ -35,7 +35,7 @@
 
 #include <deal.II/integrators/laplace.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
@@ -157,7 +157,7 @@ private:
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   Vector<double> solution;
   Vector<double> system_rhs;
@@ -406,9 +406,9 @@ LaplaceProblem<dim>::assemble_multigrid(const bool &use_mw)
       const Coefficient<dim> coefficient;
       std::vector<double>    coefficient_values(n_q_points);
 
-      std::vector<ConstraintMatrix> boundary_constraints(
+      std::vector<AffineConstraints<double>> boundary_constraints(
         triangulation.n_levels());
-      std::vector<ConstraintMatrix> boundary_interface_constraints(
+      std::vector<AffineConstraints<double>> boundary_interface_constraints(
         triangulation.n_levels());
       for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
         {

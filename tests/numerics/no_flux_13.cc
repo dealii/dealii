@@ -26,7 +26,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -47,7 +47,7 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix             constraints;
+  AffineConstraints<double>    constraints;
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(1);
   deal_II_exceptions::disable_abort_on_exception();

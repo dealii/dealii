@@ -15,13 +15,13 @@
 
 
 
-// check ConstraintMatrix.distribute() for a petsc vector
+// check AffineConstraints<double>.distribute() for a petsc vector
 //
 // like _01, but for a block vector. this has the additional complication that
 // (at a global level) the set of indices owned by this processor is not
 // contiguous
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 
 #include <sstream>

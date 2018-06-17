@@ -12,7 +12,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/data_out.h>
 
@@ -52,9 +52,9 @@ test(const bool apply_constrains, const unsigned int hp)
                                         triangulation);
   }
 
-  hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler(triangulation);
-  ConstraintMatrix      constraints; // for boundary conditions
+  hp::FECollection<dim>     fe;
+  hp::DoFHandler<dim>       dof_handler(triangulation);
+  AffineConstraints<double> constraints; // for boundary conditions
 
 
   // populate fe system:

@@ -91,7 +91,7 @@ test(const bool left = true)
   FE_Q<dim> fe(2);
   dh.distribute_dofs(fe);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dh, cm);
 
   IndexSet support =

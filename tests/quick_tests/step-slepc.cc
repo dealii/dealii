@@ -68,7 +68,7 @@ private:
   PETScWrappers::SparseMatrix             A, B;
   std::vector<PETScWrappers::MPI::Vector> x;
   std::vector<double>                     lambda;
-  ConstraintMatrix                        constraints;
+  AffineConstraints<double>               constraints;
 
   TableHandler output_table;
 };

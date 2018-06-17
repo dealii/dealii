@@ -80,7 +80,7 @@ test()
   FE_DGQ<dim>     fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   // there should not be any hanging nodes or
   // boundary conditions for FE_DGQ as there are
   // only interior DoFs on the elements, but try

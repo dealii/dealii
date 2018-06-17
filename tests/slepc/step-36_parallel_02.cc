@@ -64,12 +64,12 @@ test(std::string solver_name, std::string preconditioner_name)
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
 
 
-  dealii::Triangulation<dim> triangulation;
-  dealii::DoFHandler<dim>    dof_handler(triangulation);
-  dealii::FE_Q<dim>          fe(1);
-  dealii::ConstraintMatrix   constraints;
-  dealii::IndexSet           locally_owned_dofs;
-  dealii::IndexSet           locally_relevant_dofs;
+  dealii::Triangulation<dim>        triangulation;
+  dealii::DoFHandler<dim>           dof_handler(triangulation);
+  dealii::FE_Q<dim>                 fe(1);
+  dealii::AffineConstraints<double> constraints;
+  dealii::IndexSet                  locally_owned_dofs;
+  dealii::IndexSet                  locally_relevant_dofs;
 
   std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
   std::vector<PetscScalar>                        eigenvalues;

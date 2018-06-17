@@ -69,11 +69,11 @@ test()
 
   tria.refine_global(3 - dim);
 
-  FE_DGQ<dim>      fe(fe_degree);
-  FESystem<dim>    fe_system(fe, dim);
-  DoFHandler<dim>  dof(tria);
-  DoFHandler<dim>  dof_system(tria);
-  ConstraintMatrix constraints;
+  FE_DGQ<dim>               fe(fe_degree);
+  FESystem<dim>             fe_system(fe, dim);
+  DoFHandler<dim>           dof(tria);
+  DoFHandler<dim>           dof_system(tria);
+  AffineConstraints<double> constraints;
   constraints.close();
 
   for (unsigned int test = 0; test < 3; ++test)

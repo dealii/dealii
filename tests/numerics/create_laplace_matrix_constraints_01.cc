@@ -35,7 +35,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -75,7 +75,7 @@ check()
   MappingQ<dim> mapping(3);
   QGauss<dim>   quadrature(6);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(
     dof, 0, Functions::ConstantFunction<dim>(1, 1.), constraints);

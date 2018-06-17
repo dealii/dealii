@@ -21,7 +21,7 @@
 // constraint matrices
 
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
@@ -30,7 +30,7 @@
 void
 test()
 {
-  ConstraintMatrix cm1, cm2;
+  AffineConstraints<double> cm1, cm2;
 
   // a "regular" and a singular
   // constraint to each of the

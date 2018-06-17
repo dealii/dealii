@@ -31,7 +31,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/read_write_vector.h>
@@ -55,7 +55,8 @@ test();
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 void
-do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 

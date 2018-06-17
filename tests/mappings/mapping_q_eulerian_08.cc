@@ -43,7 +43,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
@@ -173,12 +173,12 @@ test(const unsigned int n_ref = 0)
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   // constraints:
-  ConstraintMatrix constraints_euler;
+  AffineConstraints<double> constraints_euler;
   constraints_euler.reinit(locally_relevant_dofs_euler);
   DoFTools::make_hanging_node_constraints(dof_handler_euler, constraints_euler);
   constraints_euler.close();
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints_euler.close();
@@ -285,8 +285,8 @@ test(const unsigned int n_ref = 0)
         update_values | update_gradients | update_JxW_values |
         update_quadrature_points;
 
-      ConstraintMatrix level_constraints;
-      IndexSet         relevant_dofs;
+      AffineConstraints<double> level_constraints;
+      IndexSet                  relevant_dofs;
       DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                     level,
                                                     relevant_dofs);

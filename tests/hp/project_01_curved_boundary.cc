@@ -34,7 +34,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -88,7 +88,7 @@ test()
 
   Vector<double> v(dh.n_dofs());
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
 
   // use the implicit Q1 mapping. this will yield a zero solution

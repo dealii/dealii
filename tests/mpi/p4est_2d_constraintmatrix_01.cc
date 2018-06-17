@@ -15,7 +15,7 @@
 
 
 
-// check ConstraintMatrix for a distributed mesh,
+// check AffineConstraints<double> for a distributed mesh,
 // also compare with/without sparse line_cache via IndexSet.
 // Simple mesh.
 
@@ -64,9 +64,9 @@ test()
   IndexSet dof_set;
   DoFTools::extract_locally_relevant_dofs(dofh, dof_set);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dofh, cm);
-  ConstraintMatrix cm2(dof_set);
+  AffineConstraints<double> cm2(dof_set);
   DoFTools::make_hanging_node_constraints(dofh, cm2);
 
   {

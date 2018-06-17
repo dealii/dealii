@@ -107,7 +107,7 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   dof.initialize_local_block_info();
 
   // Initialize hanging node constraints
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   //  DoFTools::make_zero_boundary_constraints(dof, constraints);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();

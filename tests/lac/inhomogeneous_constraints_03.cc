@@ -41,7 +41,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -65,7 +65,7 @@ using namespace dealii;
 void
 test(bool use_inhomogeneity_for_rhs)
 {
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   cm.add_line(1);
   cm.set_inhomogeneity(1, -5.0);

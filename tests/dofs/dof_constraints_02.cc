@@ -29,7 +29,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
@@ -66,7 +66,7 @@ test()
   dof_handler.distribute_dofs(fe);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
   deallog << "Number of constraints: " << constraints.n_constraints()

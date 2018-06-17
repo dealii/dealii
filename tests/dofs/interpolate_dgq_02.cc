@@ -34,7 +34,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -85,7 +85,7 @@ test()
       DoFHandler<dim> dof_handler(triangulation);
       dof_handler.distribute_dofs(fe);
 
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
 

@@ -112,7 +112,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
 
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;

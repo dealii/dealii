@@ -33,7 +33,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -72,7 +72,7 @@ namespace pdd
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     PETScWrappers::MPI::Vector locally_relevant_solution;
   };

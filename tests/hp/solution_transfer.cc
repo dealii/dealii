@@ -124,7 +124,7 @@ transfer(std::ostream &out)
   dgq_dof_handler.distribute_dofs(fe_dgq);
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   cm.close();
   VectorTools::interpolate(mapping, q_dof_handler, function, q_solution);
   VectorTools::interpolate(mapping, dgq_dof_handler, function, dgq_solution);

@@ -20,12 +20,12 @@
 /*
 905: --------------------------------------------------------
 905: An error occurred in line <1898> of file
-</scratch/deal-trunk/deal.II/include/deal.II/lac/constraint_matrix.h> in
+</scratch/deal-trunk/deal.II/include/deal.II/lac/affine_constraints.h> in
 function 905:     void
-dealii::ConstraintMatrix::add_line(dealii::ConstraintMatrix::size_type) 905: The
-violated condition was: 905:     line != numbers::invalid_size_type 905: The
-name and call sequence of the exception was: 905:     ExcInternalError() 905:
-Additional Information: 905: (none) 905:
+dealii::AffineConstraints<double>::add_line(dealii::AffineConstraints<double>::size_type)
+905: The violated condition was: 905:     line != numbers::invalid_size_type
+905: The name and call sequence of the exception was: 905: ExcInternalError()
+905: Additional Information: 905: (none) 905:
 --------------------------------------------------------
 */
 
@@ -74,7 +74,7 @@ test()
 
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   IndexSet relevant_set;

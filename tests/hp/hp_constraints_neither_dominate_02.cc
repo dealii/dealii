@@ -159,7 +159,7 @@ test2cells(const FiniteElement<dim> &fe_0,
     }
   dof_handler.distribute_dofs(fe_collection);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   dealii::DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();

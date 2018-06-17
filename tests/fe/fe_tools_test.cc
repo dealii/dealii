@@ -35,7 +35,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -115,11 +115,11 @@ test(const Triangulation<dim> &tria,
   Vector<double> function1_back(dof_handler1.n_dofs());
   Vector<double> function2(dof_handler2.n_dofs());
 
-  ConstraintMatrix constraints1;
+  AffineConstraints<double> constraints1;
   DoFTools::make_hanging_node_constraints(dof_handler1, constraints1);
   constraints1.close();
 
-  ConstraintMatrix constraints2;
+  AffineConstraints<double> constraints2;
   DoFTools::make_hanging_node_constraints(dof_handler2, constraints2);
   constraints2.close();
 

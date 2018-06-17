@@ -31,7 +31,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -124,8 +124,8 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
       dh.distribute_dofs(fe);
       DataOut<dim> d_o;
       d_o.attach_dof_handler(dh);
-      Vector<double>   vec(dh.n_dofs());
-      ConstraintMatrix constraints;
+      Vector<double>            vec(dh.n_dofs());
+      AffineConstraints<double> constraints;
       for (unsigned int c = 0; c < 6; ++c)
         VectorTools::interpolate_boundary_values(
           dh, c, Functions::ConstantFunction<dim>(c), constraints);

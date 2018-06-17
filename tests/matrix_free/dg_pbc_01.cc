@@ -68,7 +68,7 @@ test()
   FE_DGQ<dim>     fe(0);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   MappingQ<dim> mapping(fe_degree + 1);

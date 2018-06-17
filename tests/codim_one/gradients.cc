@@ -44,7 +44,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -110,8 +110,8 @@ test(std::string filename)
     exp[2] = 0;
   Functions::Monomial<spacedim> monomial(exp);
 
-  const QGauss<dim> quad(5);
-  ConstraintMatrix  constraints;
+  const QGauss<dim>         quad(5);
+  AffineConstraints<double> constraints;
   constraints.close();
   VectorTools::project(dof_handler, constraints, quad, monomial, projected_one);
 

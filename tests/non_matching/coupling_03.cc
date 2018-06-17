@@ -79,7 +79,7 @@ test()
 
   QGauss<dim> quad(3); // Quadrature for coupling
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   SparsityPattern sparsity;
   {

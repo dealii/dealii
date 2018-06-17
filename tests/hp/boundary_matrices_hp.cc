@@ -42,7 +42,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 

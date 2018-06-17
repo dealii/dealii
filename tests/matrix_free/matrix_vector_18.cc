@@ -30,7 +30,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -106,9 +106,9 @@ private:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> & dof,
-        const ConstraintMatrix &constraints,
-        const unsigned int      parallel_option = 0)
+do_test(const DoFHandler<dim> &          dof,
+        const AffineConstraints<double> &constraints,
+        const unsigned int               parallel_option = 0)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   if (parallel_option > 0)
@@ -237,7 +237,7 @@ test()
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

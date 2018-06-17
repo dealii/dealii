@@ -43,9 +43,9 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/affine_constraints.h> //conform hanging nodes DoF to certain constrains to make the solution continuous
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h> //conform hanging nodes DoF to certain constrains to make the solution continuous
 #include <deal.II/lac/dynamic_sparsity_pattern.h> //for the intermediate sparsity pattern structure
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>  //and a preconditioner
@@ -105,9 +105,10 @@ private:
   hp::FECollection<dim> fe; // used to stack several other elements together to
                             // form one vector-valued finite element.
 
-  ConstraintMatrix hanging_node_constraints; // object to hold hanging node
-                                             // constraints after refinement
-  ConstraintMatrix constraints;
+  AffineConstraints<double>
+    hanging_node_constraints; // object to hold hanging node
+                              // constraints after refinement
+  AffineConstraints<double> constraints;
 
   BlockSparsityPattern sparsity_pattern; // store sparsity pattern
 

@@ -38,7 +38,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -146,7 +146,7 @@ private:
   FE_Q<dim>       fe;
   QGauss<dim>     quadrature;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   TrilinosWrappers::SparseMatrix reference_matrix;
   TrilinosWrappers::SparseMatrix test_matrix;

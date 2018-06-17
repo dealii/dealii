@@ -21,7 +21,7 @@
 
 #include <deal.II/base/job_identifier.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <iostream>
 #include <vector>
@@ -35,7 +35,7 @@ using namespace dealii;
 void
 run()
 {
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   {
     constraints.add_line(7);

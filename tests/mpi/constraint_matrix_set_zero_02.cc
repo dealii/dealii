@@ -15,7 +15,8 @@
 
 
 
-// check ConstraintMatrix::set_zero(Vector) for parallel distributed vectors
+// check AffineConstraints<double>::set_zero(Vector) for parallel distributed
+// vectors
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -61,7 +62,7 @@ test()
   local_active_together.add_range(myid, myid + 1);
   local_active_together.add_range(numproc + myid * 2, numproc + myid * 2 + 2);
 
-  ConstraintMatrix cm(local_active_together);
+  AffineConstraints<double> cm(local_active_together);
   cm.add_line(numproc + myid * 2);
   cm.close();
 

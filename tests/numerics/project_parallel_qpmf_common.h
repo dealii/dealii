@@ -39,7 +39,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -113,11 +113,11 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
   deallog << "n_cells=" << triangulation.n_global_active_cells() << std::endl;
 
   std::vector<std::shared_ptr<DoFHandler<dim>>> dof_handlers(fes.size());
-  std::vector<IndexSet>         locally_relevant_dofs(fes.size());
-  std::vector<ConstraintMatrix> constraints(fes.size());
+  std::vector<IndexSet>                  locally_relevant_dofs(fes.size());
+  std::vector<AffineConstraints<double>> constraints(fes.size());
 
-  std::vector<const DoFHandler<dim> *>  dof_handlers_mf(fes.size());
-  std::vector<const ConstraintMatrix *> constraints_mf(fes.size());
+  std::vector<const DoFHandler<dim> *>           dof_handlers_mf(fes.size());
+  std::vector<const AffineConstraints<double> *> constraints_mf(fes.size());
   for (unsigned int i = 0; i < fes.size(); ++i)
     {
       dof_handlers[i] = std::make_shared<DoFHandler<dim>>(triangulation);

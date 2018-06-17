@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <vector>
 
@@ -23,7 +23,7 @@
 void
 test()
 {
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   constraints.add_line(1);
   constraints.add_entry(1, 2, 1.);

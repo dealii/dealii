@@ -31,7 +31,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 
 #include "../tests.h"
@@ -279,7 +279,7 @@ main()
           DoFHandler<3> dof(tria);
           dof.distribute_dofs(*fe);
 
-          ConstraintMatrix constraints;
+          AffineConstraints<double> constraints;
           DoFTools::make_hanging_node_constraints(dof, constraints);
           constraints.close();
 

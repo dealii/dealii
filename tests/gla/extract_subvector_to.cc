@@ -19,7 +19,7 @@
 
 #include <deal.II/base/index_set.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>

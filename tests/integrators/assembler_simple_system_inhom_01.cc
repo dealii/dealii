@@ -49,7 +49,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -516,9 +516,9 @@ private:
   Vector<double> rhs;
   Vector<double> error_rhs;
 
-  ConstraintMatrix constraintsInhom;
-  ConstraintMatrix constraints;
-  ConstraintMatrix constraintsAll;
+  AffineConstraints<double> constraintsInhom;
+  AffineConstraints<double> constraints;
+  AffineConstraints<double> constraintsAll;
 };
 
 

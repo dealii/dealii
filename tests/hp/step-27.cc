@@ -40,7 +40,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -100,7 +100,7 @@ namespace Step27
     std::vector<double>                     ln_k;
     Table<dim, std::complex<double>>        fourier_coefficients;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

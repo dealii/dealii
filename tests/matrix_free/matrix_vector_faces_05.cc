@@ -42,7 +42,7 @@ test()
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   // test with threads enabled as well

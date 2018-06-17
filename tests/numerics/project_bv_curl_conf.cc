@@ -22,7 +22,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -65,8 +65,8 @@ test_boundary_values(const FiniteElement<dim> &fe)
 
   dof_handler.distribute_dofs(fe);
 
-  BoundaryFunction<dim> boundary_function;
-  ConstraintMatrix      constraints;
+  BoundaryFunction<dim>     boundary_function;
+  AffineConstraints<double> constraints;
 
   constraints.clear();
   VectorTools::project_boundary_values_curl_conforming(

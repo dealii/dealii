@@ -37,7 +37,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -86,7 +86,7 @@ namespace Step8
 
     FESystem<dim> fe;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

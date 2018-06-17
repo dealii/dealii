@@ -46,7 +46,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -80,7 +80,7 @@ do_check(const Triangulation<dim> &   triangulation,
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 
@@ -377,7 +377,7 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
 
         dof_handler.distribute_dofs(fe);
 
-        ConstraintMatrix constraints;
+        AffineConstraints<double> constraints;
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
         constraints.close();
 

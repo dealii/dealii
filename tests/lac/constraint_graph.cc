@@ -33,7 +33,7 @@
 
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include "../tests.h"
 
@@ -66,7 +66,7 @@ test()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dof_handler, cm);
   cm.write_dot(deallog.get_file_stream());
 }

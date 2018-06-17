@@ -30,7 +30,7 @@
 
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -182,7 +182,7 @@ check(const unsigned int orientation, bool reverse)
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
   IndexSet locally_relevant_dofs;
