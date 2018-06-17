@@ -17,8 +17,18 @@
 #ifndef dealii_constraint_matrix_h
 #define dealii_constraint_matrix_h
 
-#warning This file is deprecated. Use <deal.II/lac/affine_constraints.h> instead.
-
 #include <deal.II/lac/affine_constraints.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+/**
+ * ConstraintMatrix has been renamed to AffineConstraints. Provide a
+ * compatibility typedef that defaults to AffineConstraints<double>.
+ *
+ * @deprecated Use AffineConstraints<double> instead of ConstraintMatrix
+ */
+using ConstraintMatrix DEAL_II_DEPRECATED = AffineConstraints<double>;
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

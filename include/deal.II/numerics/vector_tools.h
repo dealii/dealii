@@ -25,6 +25,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/function_map.h> // keep for backward-compatibility
 
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>

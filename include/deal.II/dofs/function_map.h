@@ -15,7 +15,6 @@
 
 #ifndef dealii_function_map_h
 #define dealii_function_map_h
-#warning This file is deprecated.
 
 #include <deal.II/base/config.h>
 
