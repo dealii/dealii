@@ -50,7 +50,15 @@ struct VectorOperation
     /**
      * The current operation is an addition.
      */
-    add
+    add,
+    /**
+     * The current operation is a minimization.
+     */
+    min,
+    /**
+     * The current operation is a maximization.
+     */
+    max
   };
 };
 

@@ -250,7 +250,46 @@ namespace LinearAlgebra
     return *this;
   }
 
+  namespace internal
+  {
+    // In the import_from_ghosted_array_finish we need to calculate maximal
+    // and minimal value on number types, which is not straight forward for
+    // complex numbers. Therfore, comparison of complex numbers is
+    // prohibited and throw an assert.
+    template <typename Number>
+    Number
+    get_min(const Number a, const Number b)
+    {
+      return std::min(a, b);
+    }
 
+    template <typename Number>
+    std::complex<Number>
+    get_min(const std::complex<Number> a, const std::complex<Number>)
+    {
+      AssertThrow(false,
+                  ExcMessage("VectorOperation::min max not"
+                             "implemented for complex numbers"));
+      return a;
+    }
+
+    template <typename Number>
+    Number
+    get_max(const Number a, const Number b)
+    {
+      return std::max(a, b);
+    }
+
+    template <typename Number>
+    std::complex<Number>
+    get_max(const std::complex<Number> a, const std::complex<Number>)
+    {
+      AssertThrow(false,
+                  ExcMessage("VectorOperation::min max not "
+                             "implemented for complex numbers"));
+      return a;
+    }
+  } // namespace internal
 
   template <typename Number>
   void
@@ -288,6 +327,16 @@ namespace LinearAlgebra
     if (operation == VectorOperation::add)
       for (size_type i = 0; i < stored.n_elements(); ++i)
         local_element(i) += tmp_vector(stored.nth_index_in_set(i));
+    else if (operation == VectorOperation::min)
+      for (size_type i = 0; i < stored.n_elements(); ++i)
+        local_element(i) =
+          internal::get_min(tmp_vector(stored.nth_index_in_set(i)),
+                            local_element(i));
+    else if (operation == VectorOperation::max)
+      for (size_type i = 0; i < stored.n_elements(); ++i)
+        local_element(i) =
+          internal::get_max(tmp_vector(stored.nth_index_in_set(i)),
+                            local_element(i));
     else
       for (size_type i = 0; i < stored.n_elements(); ++i)
         local_element(i) = tmp_vector(stored.nth_index_in_set(i));
@@ -438,6 +487,42 @@ namespace LinearAlgebra
         for (int i = 0; i < size; ++i)
           values[i] += new_values[i];
       }
+    else if (operation == VectorOperation::min)
+      {
+        const int err = target_vector.Import(multivector, import, Add);
+        AssertThrow(err == 0,
+                    ExcMessage("Epetra Import() failed with error code: " +
+                               Utilities::to_string(err)));
+
+        const double *new_values = target_vector.Values();
+        const int     size       = target_vector.MyLength();
+        Assert(size == 0 || values != nullptr,
+               ExcInternalError("Import failed."));
+
+        // To ensure that this code also compiles with complex
+        // numbers, we only compare the real part of the
+        // variable. Note that min/max do not make sense with complex
+        // numbers.
+        for (int i = 0; i < size; ++i)
+          if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+            values[i] = new_values[i];
+      }
+    else if (operation == VectorOperation::max)
+      {
+        const int err = target_vector.Import(multivector, import, Add);
+        AssertThrow(err == 0,
+                    ExcMessage("Epetra Import() failed with error code: " +
+                               Utilities::to_string(err)));
+
+        const double *new_values = target_vector.Values();
+        const int     size       = target_vector.MyLength();
+        Assert(size == 0 || values != nullptr,
+               ExcInternalError("Import failed."));
+
+        for (int i = 0; i < size; ++i)
+          if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+            values[i] = new_values[i];
+      }
     else
       AssertThrow(false, ExcNotImplemented());
   }
@@ -500,7 +585,7 @@ namespace LinearAlgebra
                                             cudaMemcpyDeviceToHost);
         AssertCuda(error_code);
       }
-    else
+    else if (operation == VectorOperation::add)
       {
         // Copy the vector from the device to a temporary vector on the host
         std::vector<Number> tmp(n_elements);
@@ -514,6 +599,40 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < n_elements; ++i)
           values[i] += tmp[i];
       }
+    else if (operation == VectorOperation::min)
+      {
+        // Copy the vector from the device to a temporary vector on the host
+        std::vector<Number> tmp(n_elements);
+        cudaError_t         error_code = cudaMemcpy(tmp.data(),
+                                            cuda_vec.get_values(),
+                                            n_elements * sizeof(Number),
+                                            cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+
+        // To ensure that this code also compiles with complex
+        // numbers, we only compare the real part of the
+        // variable. Note that min/max do not make sense with complex
+        // numbers.
+        for (unsigned int i = 0; i < n_elements; ++i)
+          if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
+            values[i] = tmp[i];
+      }
+    else if (operation == VectorOperation::max)
+      {
+        // Copy the vector from the device to a temporary vector on the host
+        std::vector<Number> tmp(n_elements);
+        cudaError_t         error_code = cudaMemcpy(tmp.data(),
+                                            cuda_vec.get_values(),
+                                            n_elements * sizeof(Number),
+                                            cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+
+        for (unsigned int i = 0; i < n_elements; ++i)
+          if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
+            values[i] = tmp[i];
+      }
+    else
+      AssertThrow(false, ExcNotImplemented());
   }
 #endif
 
