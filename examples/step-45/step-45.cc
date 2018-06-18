@@ -92,12 +92,15 @@ namespace Step45
     FESystem<dim>                             fe;
     DoFHandler<dim>                           dof_handler;
 
-    ConstraintMatrix      constraints;
-    std::vector<IndexSet> owned_partitioning;
-    std::vector<IndexSet> relevant_partitioning;
+    AffineConstraints<double> constraints;
+    std::vector<IndexSet>     owned_partitioning;
+    std::vector<IndexSet>     relevant_partitioning;
 
     TrilinosWrappers::BlockSparsityPattern sparsity_pattern;
     TrilinosWrappers::BlockSparseMatrix    system_matrix;
+
+    TrilinosWrappers::BlockSparsityPattern preconditioner_sparsity_pattern;
+    TrilinosWrappers::BlockSparseMatrix    preconditioner_matrix;
 
     TrilinosWrappers::MPI::BlockVector solution;
     TrilinosWrappers::MPI::BlockVector system_rhs;
@@ -487,7 +490,16 @@ namespace Step45
                                                  relevant_partitioning,
                                                  mpi_communicator);
 
+      Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
+      for (unsigned int c = 0; c < dim + 1; ++c)
+        for (unsigned int d = 0; d < dim + 1; ++d)
+          if (!((c == dim) && (d == dim)))
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
+
       DoFTools::make_sparsity_pattern(dof_handler,
+                                      coupling,
                                       bsp,
                                       constraints,
                                       false,
@@ -497,6 +509,34 @@ namespace Step45
       bsp.compress();
 
       system_matrix.reinit(bsp);
+    }
+
+    {
+      TrilinosWrappers::BlockSparsityPattern preconditioner_bsp(
+        owned_partitioning,
+        owned_partitioning,
+        relevant_partitioning,
+        mpi_communicator);
+
+      Table<2, DoFTools::Coupling> preconditioner_coupling(dim + 1, dim + 1);
+      for (unsigned int c = 0; c < dim + 1; ++c)
+        for (unsigned int d = 0; d < dim + 1; ++d)
+          if ((c == dim) && (d == dim))
+            preconditioner_coupling[c][d] = DoFTools::always;
+          else
+            preconditioner_coupling[c][d] = DoFTools::none;
+
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      preconditioner_coupling,
+                                      preconditioner_bsp,
+                                      constraints,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(
+                                        mpi_communicator));
+
+      preconditioner_bsp.compress();
+
+      preconditioner_matrix.reinit(preconditioner_bsp);
     }
 
     system_rhs.reinit(owned_partitioning, mpi_communicator);
@@ -513,8 +553,9 @@ namespace Step45
   template <int dim>
   void StokesProblem<dim>::assemble_system()
   {
-    system_matrix = 0.;
-    system_rhs    = 0.;
+    system_matrix         = 0.;
+    system_rhs            = 0.;
+    preconditioner_matrix = 0.;
 
     QGauss<dim> quadrature_formula(degree + 2);
 
@@ -529,6 +570,8 @@ namespace Step45
     const unsigned int n_q_points = quadrature_formula.size();
 
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> local_preconditioner_matrix(dofs_per_cell,
+                                                   dofs_per_cell);
     Vector<double>     local_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -547,8 +590,9 @@ namespace Step45
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
-          local_matrix = 0;
-          local_rhs    = 0;
+          local_matrix                = 0;
+          local_preconditioner_matrix = 0;
+          local_rhs                   = 0;
 
           right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                             rhs_values);
@@ -570,9 +614,11 @@ namespace Step45
                       local_matrix(i, j) +=
                         (symgrad_phi_u[i] * symgrad_phi_u[j] // diffusion
                          - div_phi_u[i] * phi_p[j]           // pressure force
-                         - phi_p[i] * div_phi_u[j]           // divergence
-                         + phi_p[i] * phi_p[j])              // pressure mass
+                         - phi_p[i] * div_phi_u[j])          // divergence
                         * fe_values.JxW(q);
+
+                      local_preconditioner_matrix(i, j) +=
+                        (phi_p[i] * phi_p[j]) * fe_values.JxW(q);
                     }
 
                   const unsigned int component_i =
@@ -585,7 +631,11 @@ namespace Step45
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
-              local_matrix(i, j) = local_matrix(j, i);
+              {
+                local_matrix(i, j) = local_matrix(j, i);
+                local_preconditioner_matrix(i, j) =
+                  local_preconditioner_matrix(j, i);
+              }
 
           cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(local_matrix,
@@ -593,6 +643,9 @@ namespace Step45
                                                  local_dof_indices,
                                                  system_matrix,
                                                  system_rhs);
+          constraints.distribute_local_to_global(local_preconditioner_matrix,
+                                                 local_dof_indices,
+                                                 preconditioner_matrix);
         }
 
     system_matrix.compress(VectorOperation::add);
@@ -634,11 +687,11 @@ namespace Step45
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
       TrilinosWrappers::PreconditionAMG preconditioner;
-      preconditioner.initialize(system_matrix.block(1, 1));
+      preconditioner.initialize(preconditioner_matrix.block(1, 1));
 
       InverseMatrix<TrilinosWrappers::SparseMatrix,
                     TrilinosWrappers::PreconditionAMG>
-        m_inverse(system_matrix.block(1, 1),
+        m_inverse(preconditioner_matrix.block(1, 1),
                   preconditioner,
                   owned_partitioning[1],
                   mpi_communicator);
