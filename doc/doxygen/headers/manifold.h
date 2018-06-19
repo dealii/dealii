@@ -21,7 +21,7 @@
  *
  * The classes in this module are concerned with the description of the
  * manifold in which the domain that a Triangulation describes lives. This
- * manifold description is necessary in two contexts:
+ * manifold description is necessary in several contexts:
  *
  * <ul>
  *
@@ -61,6 +61,17 @@
  *   its information about the boundary of the domain from the classes
  *   described here. The same is, of course, true when integrating boundary
  *   terms (e.g., inhomogenous Neumann boundary conditions).
+ *
+ *   <li> Domains with nonzero codimension: In cases where a Triangulation is
+ *   embedded into a higher dimensional space, i.e., whenever the second
+ *   template argument of the Triangulation class is explicitly specified and
+ *   larger than the first (for an example, see step-34), the manifold
+ *   description objects serve as a tool to describe the geometry not only of
+ *   the boundary of the domain but of the domain itself, in case the domain
+ *   is a manifold that is in fact curved. In these cases, one can use the
+ *   Triangulation::set_manifold() function to indicate what manifold
+ *   description to use when refining the curve, or when computing integrals
+ *   using high order mappings.
  *
  * </ul>
  *
