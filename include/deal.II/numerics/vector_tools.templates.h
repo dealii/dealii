@@ -913,7 +913,7 @@ namespace VectorTools
         // values, but enforce
         // homogeneous boundary values
         // anyway
-        internal::interpolate_zero_boundary_values(dof, boundary_values);
+        interpolate_zero_boundary_values(dof, boundary_values);
 
       else
         // no homogeneous boundary values
