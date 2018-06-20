@@ -20,8 +20,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Constructor:
-template <int dim>
-FE_NedelecSZ<dim>::FE_NedelecSZ(const unsigned int degree)
+template <int dim, int spacedim>
+FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
   : FiniteElement<dim, dim>(
       FiniteElementData<dim>(get_dpo_vector(degree),
                              dim,
@@ -47,10 +47,10 @@ FE_NedelecSZ<dim>::FE_NedelecSZ(const unsigned int degree)
 }
 
 // Shape functions:
-template <int dim>
+template <int dim, int spacedim>
 double
-FE_NedelecSZ<dim>::shape_value(const unsigned int /*i*/,
-                               const Point<dim> & /*p*/) const
+FE_NedelecSZ<dim, spacedim>::shape_value(const unsigned int /*i*/,
+                                         const Point<dim> & /*p*/) const
 {
   typedef FiniteElement<dim, dim> FEE;
   Assert(false, typename FEE::ExcFENotPrimitive());
@@ -59,11 +59,12 @@ FE_NedelecSZ<dim>::shape_value(const unsigned int /*i*/,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 double
-FE_NedelecSZ<dim>::shape_value_component(const unsigned int /*i*/,
-                                         const Point<dim> & /*p*/,
-                                         const unsigned int /*component*/) const
+FE_NedelecSZ<dim, spacedim>::shape_value_component(
+  const unsigned int /*i*/,
+  const Point<dim> & /*p*/,
+  const unsigned int /*component*/) const
 {
   // Not implemented yet:
   Assert(false, ExcNotImplemented());
@@ -72,10 +73,10 @@ FE_NedelecSZ<dim>::shape_value_component(const unsigned int /*i*/,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<1, dim>
-FE_NedelecSZ<dim>::shape_grad(const unsigned int /*i*/,
-                              const Point<dim> & /*p*/) const
+FE_NedelecSZ<dim, spacedim>::shape_grad(const unsigned int /*i*/,
+                                        const Point<dim> & /*p*/) const
 {
   typedef FiniteElement<dim, dim> FEE;
   Assert(false, typename FEE::ExcFENotPrimitive());
@@ -84,11 +85,12 @@ FE_NedelecSZ<dim>::shape_grad(const unsigned int /*i*/,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<1, dim>
-FE_NedelecSZ<dim>::shape_grad_component(const unsigned int /*i*/,
-                                        const Point<dim> & /*p*/,
-                                        const unsigned int /*component*/) const
+FE_NedelecSZ<dim, spacedim>::shape_grad_component(
+  const unsigned int /*i*/,
+  const Point<dim> & /*p*/,
+  const unsigned int /*component*/) const
 {
   Assert(false, ExcNotImplemented());
   return Tensor<1, dim>();
@@ -96,10 +98,10 @@ FE_NedelecSZ<dim>::shape_grad_component(const unsigned int /*i*/,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<2, dim>
-FE_NedelecSZ<dim>::shape_grad_grad(const unsigned int /*i*/,
-                                   const Point<dim> & /*p*/) const
+FE_NedelecSZ<dim, spacedim>::shape_grad_grad(const unsigned int /*i*/,
+                                             const Point<dim> & /*p*/) const
 {
   typedef FiniteElement<dim, dim> FEE;
   Assert(false, typename FEE::ExcFENotPrimitive());
@@ -108,9 +110,9 @@ FE_NedelecSZ<dim>::shape_grad_grad(const unsigned int /*i*/,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<2, dim>
-FE_NedelecSZ<dim>::shape_grad_grad_component(
+FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
   const unsigned int /*i*/,
   const Point<dim> & /*p*/,
   const unsigned int /*component*/) const
@@ -120,17 +122,17 @@ FE_NedelecSZ<dim>::shape_grad_grad_component(
 }
 
 
-
-template <int dim>
-std::unique_ptr<typename FiniteElement<dim, dim>::InternalDataBase>
-FE_NedelecSZ<dim>::get_data(
+template <int dim, int spacedim>
+std::unique_ptr<typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+FE_NedelecSZ<dim, spacedim>::get_data(
   const UpdateFlags update_flags,
-  const Mapping<dim, dim> & /*mapping*/,
+  const Mapping<dim, spacedim> & /*mapping*/,
   const Quadrature<dim> &quadrature,
-  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                     spacedim>
     & /*output_data*/) const
 {
-  std::unique_ptr<InternalData> data(new InternalData);
+  auto data         = std_cxx14::make_unique<InternalData>();
   data->update_each = update_each(update_flags) | update_once(update_flags);
 
   // Useful quantities:
@@ -1095,9 +1097,9 @@ FE_NedelecSZ<dim>::get_data(
   return std::move(data);
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_NedelecSZ<dim>::fill_edge_values(
+FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const Quadrature<dim> &                                quadrature,
   const InternalData &                                   fe_data) const
@@ -1520,9 +1522,9 @@ FE_NedelecSZ<dim>::fill_edge_values(
     }
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_NedelecSZ<dim>::fill_face_values(
+FE_NedelecSZ<dim, spacedim>::fill_face_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const Quadrature<dim> &                                quadrature,
   const InternalData &                                   fe_data) const
@@ -1894,9 +1896,9 @@ FE_NedelecSZ<dim>::fill_face_values(
     }
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_NedelecSZ<dim>::fill_fe_values(
+FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const CellSimilarity::Similarity /*cell_similarity*/,
   const Quadrature<dim> &                             quadrature,
@@ -2006,9 +2008,9 @@ FE_NedelecSZ<dim>::fill_fe_values(
     }
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_NedelecSZ<dim>::fill_fe_face_values(
+FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const unsigned int                                     face_no,
   const Quadrature<dim - 1> &                            quadrature,
@@ -2132,9 +2134,9 @@ FE_NedelecSZ<dim>::fill_fe_face_values(
     }
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_NedelecSZ<dim>::fill_fe_subface_values(
+FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, dim>::cell_iterator & /*cell*/,
   const unsigned int /*face_no*/,
   const unsigned int /*sub_no*/,
@@ -2150,16 +2152,17 @@ FE_NedelecSZ<dim>::fill_fe_subface_values(
   Assert(false, ExcNotImplemented());
 }
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_NedelecSZ<dim>::requires_update_flags(const UpdateFlags flags) const
+FE_NedelecSZ<dim, spacedim>::requires_update_flags(
+  const UpdateFlags flags) const
 {
   return update_once(flags) | update_each(flags);
 }
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_NedelecSZ<dim>::update_once(const UpdateFlags flags) const
+FE_NedelecSZ<dim, spacedim>::update_once(const UpdateFlags flags) const
 {
   const bool values_once = (mapping_type == mapping_none);
 
@@ -2170,9 +2173,9 @@ FE_NedelecSZ<dim>::update_once(const UpdateFlags flags) const
   return out;
 }
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_NedelecSZ<dim>::update_each(const UpdateFlags flags) const
+FE_NedelecSZ<dim, spacedim>::update_each(const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
@@ -2194,9 +2197,9 @@ FE_NedelecSZ<dim>::update_each(const UpdateFlags flags) const
   return out;
 }
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FE_NedelecSZ<dim>::get_name() const
+FE_NedelecSZ<dim, spacedim>::get_name() const
 {
   // note that the
   // FETools::get_fe_from_name
@@ -2211,16 +2214,16 @@ FE_NedelecSZ<dim>::get_name() const
   return namebuf.str();
 }
 
-template <int dim>
+template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, dim>>
-FE_NedelecSZ<dim>::clone() const
+FE_NedelecSZ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_NedelecSZ<dim>>(*this);
+  return std_cxx14::make_unique<FE_NedelecSZ<dim, spacedim>>(*this);
 }
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<unsigned int>
-FE_NedelecSZ<dim>::get_dpo_vector(const unsigned int degree)
+FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
 {
   // internal function to return a vector of "dofs per object"
   // where the objects inside the vector refer to:
@@ -2239,9 +2242,9 @@ FE_NedelecSZ<dim>::get_dpo_vector(const unsigned int degree)
   return dpo;
 }
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_NedelecSZ<dim>::compute_num_dofs(const unsigned int degree) const
+FE_NedelecSZ<dim, spacedim>::compute_num_dofs(const unsigned int degree) const
 {
   // Internal function to compute the number of DoFs
   // for a given dimension & polynomial order.
@@ -2261,9 +2264,9 @@ FE_NedelecSZ<dim>::compute_num_dofs(const unsigned int degree) const
     }
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_NedelecSZ<dim>::create_polynomials(const unsigned int degree)
+FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
 {
   // fill the 1d polynomials vector:
   IntegratedLegendrePolynomials =

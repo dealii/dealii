@@ -67,10 +67,13 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ross Kynch
  * @date 2016, 2017, 2018
  */
-template <int dim>
+template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
 {
 public:
+  static_assert(dim == spacedim,
+                "FE_NedelecSZ is only implemented for dim==spacedim!");
+
   /**
    * Constructor for an element of given @p degree.
    */
@@ -153,12 +156,14 @@ protected:
    */
   MappingType mapping_type;
 
-  virtual std::unique_ptr<typename FiniteElement<dim, dim>::InternalDataBase>
+  virtual std::unique_ptr<
+    typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
   get_data(
-    const UpdateFlags        update_flags,
-    const Mapping<dim, dim> &mapping,
-    const Quadrature<dim> &  quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim> &       quadrature,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
       &output_data) const override;
 
   /**
