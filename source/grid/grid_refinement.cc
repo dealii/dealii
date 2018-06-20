@@ -105,6 +105,8 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
         cell->set_coarsen_flag();
 }
 
+
+
 template <int dim>
 std::pair<double, double>
 GridRefinement::adjust_refine_and_coarsen_number_fraction(
@@ -117,7 +119,9 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
   Assert(top_fraction <= 1, ExcInvalidParameterValue());
   Assert(bottom_fraction >= 0, ExcInvalidParameterValue());
   Assert(bottom_fraction <= 1, ExcInvalidParameterValue());
-  Assert(top_fraction + bottom_fraction <= 1, ExcInvalidParameterValue());
+  Assert(top_fraction + bottom_fraction <=
+           1 + 10 * std::numeric_limits<double>::epsilon(),
+         ExcInvalidParameterValue());
 
   double refine_cells  = current_n_cells * top_fraction;
   double coarsen_cells = current_n_cells * bottom_fraction;
@@ -184,6 +188,8 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
   return (adjusted_fractions);
 }
 
+
+
 template <int dim, typename Number, int spacedim>
 void
 GridRefinement::refine_and_coarsen_fixed_number(
@@ -199,7 +205,9 @@ GridRefinement::refine_and_coarsen_fixed_number(
          ExcInvalidParameterValue());
   Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
          ExcInvalidParameterValue());
-  Assert(top_fraction + bottom_fraction <= 1, ExcInvalidParameterValue());
+  Assert(top_fraction + bottom_fraction <=
+           1 + 10 * std::numeric_limits<double>::epsilon(),
+         ExcInvalidParameterValue());
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   const std::pair<double, double> adjusted_fractions =
@@ -265,7 +273,9 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
          ExcInvalidParameterValue());
   Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
          ExcInvalidParameterValue());
-  Assert(top_fraction + bottom_fraction <= 1, ExcInvalidParameterValue());
+  Assert(top_fraction + bottom_fraction <=
+           1 + 10 * std::numeric_limits<double>::epsilon(),
+         ExcInvalidParameterValue());
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   // let tmp be the cellwise square of the
