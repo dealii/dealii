@@ -166,7 +166,16 @@ fix_permissions()
 {
   file="${1}"
 
-  if [ "$(stat -c '%a' ${file})" != "644" ]; then
+  case "${OSTYPE}" in
+    darwin*)
+      PERMISSIONS="$(stat -f '%a' ${file})"
+      ;;
+    *)
+      PERMISSIONS="$(stat -c '%a' ${file})"
+      ;;
+  esac
+
+  if [ "${PERMISSIONS}" != "644" ]; then
     if ${REPORT_ONLY}; then
       echo "    ${file}  -  file has incorrect permissions"
     else
@@ -220,9 +229,18 @@ process_changed()
 {
   LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 master)"
 
+  case "${OSTYPE}" in
+    darwin*)
+      XARGS="xargs -E"
+      ;;
+    *)
+      XARGS="xargs --no-run-if-empty -d"
+      ;;
+  esac
+
   ( git ls-files --others --exclude-standard -- ${1};
     git diff --name-only $LAST_MERGE_COMMIT -- ${1} )|
       sort -u |
       grep -E "^${2}$" |
-      xargs --no-run-if-empty -d '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
+      ${XARGS} '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
 }
