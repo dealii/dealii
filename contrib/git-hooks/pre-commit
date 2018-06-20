@@ -20,18 +20,18 @@
 
 BASEDIR="$(git rev-parse --show-toplevel 2>/dev/null)"
 
-if [ ! -f "${BASEDIR}"/contrib/utilities/indent-branch ]; then
+if [ ! -f "${BASEDIR}"/contrib/utilities/indent ]; then
   echo "*** This script must be run from within the deal.II git repository."
   exit 1
 fi
 
 cd "${BASEDIR}"
-OUTPUT="$(REPORT_ONLY=true "${BASEDIR}"/contrib/utilities/indent-branch)"
+OUTPUT="$(REPORT_ONLY=true "${BASEDIR}"/contrib/utilities/indent)"
 
 if [ ! -z "${OUTPUT}" ]; then
   echo "git commit aborted due to formatting issues:"
   echo "${OUTPUT}"
   echo ""
-  echo "Please run ./contrib/utilities/indent-branch to fix these issues and try again."
+  echo "Please run ./contrib/utilities/indent to fix these issues and try again."
   exit 1
 fi
