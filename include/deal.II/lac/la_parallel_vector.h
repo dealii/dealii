@@ -417,12 +417,18 @@ namespace LinearAlgebra
        * ghost element is found, it is compared to the value on the owning
        * processor and an exception is thrown if these elements do not agree.
        * If called with VectorOperation::min or VectorOperation::max the
-       * minimum or maximum on all elements across the processors is set. If
-       * a processor does not set values for the ghosts, the value 0.0 is
-       * assumed, which can be the minimal or maximal value across all
-       * processors. The operations min and max are reasonable if all
-       * processors set relevant values or set values that do not alter the
-       * results, e.g. small values for the max operation.
+       * minimum or maximum on all elements across the processors is set.
+       * @note This vector class has a fixed set of ghost entries attached to
+       * the local representation. As a consequence, all ghost entries are
+       * assumed to be valid and will be unconditionally exchanged according
+       * to the given VectorOperation. Make sure to initialize all ghost
+       * entries with the neutral element of the given VectorOperation. The
+       * neutral element is zero for VectorOperation::add and
+       * VectorOperation::insert, `+inf` for VectorOperation::min, and `-inf`
+       * for VectorOperation::max or touch all ghost entries. If all values
+       * are initialized with values below zero and compress is called with
+       * VectorOperation::max two times subsequently, the maximal value
+       * after the second calculation will be zero.
        */
       virtual void
       compress(::dealii::VectorOperation::values operation) override;

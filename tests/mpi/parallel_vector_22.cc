@@ -62,7 +62,7 @@ test()
   deallog << myid << ":"
           << "second owned entry: " << v(myid * 2 + 1) << std::endl;
 
-  // set ghost dof on not owning processor and maximize
+  // set ghost dof on owning processor and maximize
   if (myid)
     v(1) = 7. * myid;
   v.compress(VectorOperation::max);
@@ -72,7 +72,7 @@ test()
 
   // check
   deallog << myid << ":"
-          << "ghost entry: " << v(1) << std::endl;
+          << "ghost entry after max from owner: " << v(1) << std::endl;
 
   // ghosts are set to zero
   v.zero_out_ghosts();
@@ -83,9 +83,9 @@ test()
 
   // check
   deallog << myid << ":"
-          << "ghost entry: " << v(1) << std::endl;
+          << "ghost entry after min from zero: " << v(1) << std::endl;
 
-  // update of ghost value from owner and minimize
+  // set ghost dof on non-owning processors and minimize
   v.zero_out_ghosts();
   if (!myid)
     v(1) = -1.;
@@ -94,7 +94,44 @@ test()
 
   // check
   deallog << myid << ":"
-          << "ghost entry: " << v(1) << std::endl;
+          << "ghost entry after min from : " << v(1) << std::endl;
+
+  // set vector to 1, zeros in ghosts except on owner where -1. is set
+  v.zero_out_ghosts();
+  v = 1.0;
+  if (!myid)
+    v(1) = -1.0;
+
+  // maximize
+  v.compress(VectorOperation::max);
+  v.update_ghost_values();
+
+  // even if only one value is set (-1. on owner), the other values
+  // contribute a "0" and maximization receives zero and returns it
+  deallog << myid << ":"
+          << "ghost entry after max and partly init: " << v(1) << std::endl;
+
+  // however, if the ghost value is set on all processors, the
+  // maximum is -1:
+  v.zero_out_ghosts();
+  v    = 1.0;
+  v(1) = -1.0;
+  v.compress(VectorOperation::max);
+  v.update_ghost_values();
+  deallog << myid << ":"
+          << "ghost entry after max and full init: " << v(1) << std::endl;
+
+  // what happens in case max is called two times and all values were smaller
+  // than zero
+  v.zero_out_ghosts();
+  v    = -1.0;
+  v(1) = -1.0;
+  v.compress(VectorOperation::max);
+  deallog << myid << ":"
+          << "ghost entry after first max: " << v(1) << std::endl;
+  v.compress(VectorOperation::max);
+  deallog << myid << ":"
+          << "ghost entry after second max: " << v(1) << std::endl;
 
   if (myid == 0)
     deallog << "OK" << std::endl;
