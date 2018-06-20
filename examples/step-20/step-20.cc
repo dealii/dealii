@@ -473,16 +473,13 @@ namespace Step20
     // refer to the velocities (a set of <code>dim</code> components starting
     // at component zero) or the pressure (a scalar component located at
     // position <code>dim</code>):
-    const FEValuesExtractors::Vector velocities(0);
-    const FEValuesExtractors::Scalar pressure(dim);
+    const FEValuesExtractors::Vector u(0);
+    const FEValuesExtractors::Scalar p(dim);
 
     // With all this in place, we can go on with the loop over all cells. The
     // body of this loop has been discussed in the introduction, and will not
     // be commented any further here:
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         local_matrix = 0;
@@ -496,22 +493,21 @@ namespace Step20
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const Tensor<1, dim> phi_i_u = fe_values[velocities].value(i, q);
-              const double div_phi_i_u = fe_values[velocities].divergence(i, q);
-              const double phi_i_p     = fe_values[pressure].value(i, q);
+              const Tensor<1, dim> phi_i_u     = fe_values[u].value(i, q);
+              const double         div_phi_i_u = fe_values[u].divergence(i, q);
+              const double         phi_i_p     = fe_values[p].value(i, q);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const Tensor<1, dim> phi_j_u =
-                    fe_values[velocities].value(j, q);
-                  const double div_phi_j_u =
-                    fe_values[velocities].divergence(j, q);
-                  const double phi_j_p = fe_values[pressure].value(j, q);
+                  const Tensor<1, dim> phi_j_u = fe_values[u].value(j, q);
+                  const double div_phi_j_u     = fe_values[u].divergence(j, q);
+                  const double phi_j_p         = fe_values[p].value(j, q);
 
                   local_matrix(i, j) +=
-                    (phi_i_u * k_inverse_values[q] * phi_j_u -
-                     div_phi_i_u * phi_j_p - phi_i_p * div_phi_j_u) *
-                    fe_values.JxW(q);
+                    (phi_i_u * k_inverse_values[q] * phi_j_u //
+                     - phi_i_p * div_phi_j_u                 //
+                     - div_phi_i_u * phi_j_p)                //
+                    * fe_values.JxW(q);
                 }
 
               local_rhs(i) += -phi_i_p * rhs_values[q] * fe_values.JxW(q);
@@ -529,9 +525,10 @@ namespace Step20
 
               for (unsigned int q = 0; q < n_face_q_points; ++q)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  local_rhs(i) += -(fe_face_values[velocities].value(i, q) *
-                                    fe_face_values.normal_vector(q) *
-                                    boundary_values[q] * fe_face_values.JxW(q));
+                  local_rhs(i) += -(fe_face_values[u].value(i, q) *   //
+                                    fe_face_values.normal_vector(q) * //
+                                    boundary_values[q] *              //
+                                    fe_face_values.JxW(q));
             }
 
         // The final step in the loop over all cells is to transfer local
