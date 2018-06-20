@@ -5211,44 +5211,33 @@ namespace DataOutBase
     // when writing, first write out all vector data, then handle the scalar
     // data sets that have been left over
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (unsigned int n_th_vector = 0; n_th_vector < vector_data_ranges.size();
-         ++n_th_vector)
+    for (auto range : vector_data_ranges)
       {
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) >=
-                      std::get<0>(vector_data_ranges[n_th_vector]),
-                    ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                                  std::get<0>(
-                                    vector_data_ranges[n_th_vector])));
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                    ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                                  0,
-                                  n_data_sets));
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(vector_data_ranges[n_th_vector]) <=
-                      3,
+        AssertThrow(std::get<1>(range) >= std::get<0>(range),
+                    ExcLowerRange(std::get<1>(range), std::get<0>(range)));
+        AssertThrow(std::get<1>(range) < n_data_sets,
+                    ExcIndexRange(std::get<1>(range), 0, n_data_sets));
+        AssertThrow(std::get<1>(range) + 1 - std::get<0>(range) <= 3,
                     ExcMessage(
                       "Can't declare a vector with more than 3 components "
                       "in VTK"));
 
         // mark these components as already written:
-        for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-             i <= std::get<1>(vector_data_ranges[n_th_vector]);
-             ++i)
+        for (unsigned int i = std::get<0>(range); i <= std::get<1>(range); ++i)
           data_set_written[i] = true;
 
         // write the header. concatenate all the component names with double
         // underscores unless a vector name has been specified
         out << "    <DataArray type=\"Float32\" Name=\"";
 
-        if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
-          out << std::get<2>(vector_data_ranges[n_th_vector]);
+        if (std::get<2>(range) != "")
+          out << std::get<2>(range);
         else
           {
-            for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-                 i < std::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i = std::get<0>(range); i < std::get<1>(range);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(range)];
           }
 
         out << "\" NumberOfComponents=\"3\" format=\"" << ascii_or_binary
@@ -5260,33 +5249,23 @@ namespace DataOutBase
 
         for (unsigned int n = 0; n < n_nodes; ++n)
           {
-            switch (std::get<1>(vector_data_ranges[n_th_vector]) -
-                    std::get<0>(vector_data_ranges[n_th_vector]))
+            switch (std::get<1>(range) - std::get<0>(range))
               {
                 case 0:
-                  data.push_back(
-                    data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),
-                                 n));
+                  data.push_back(data_vectors(std::get<0>(range), n));
                   data.push_back(0);
                   data.push_back(0);
                   break;
 
                 case 1:
-                  data.push_back(
-                    data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),
-                                 n));
-                  data.push_back(data_vectors(
-                    std::get<0>(vector_data_ranges[n_th_vector]) + 1, n));
+                  data.push_back(data_vectors(std::get<0>(range), n));
+                  data.push_back(data_vectors(std::get<0>(range) + 1, n));
                   data.push_back(0);
                   break;
                 case 2:
-                  data.push_back(
-                    data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),
-                                 n));
-                  data.push_back(data_vectors(
-                    std::get<0>(vector_data_ranges[n_th_vector]) + 1, n));
-                  data.push_back(data_vectors(
-                    std::get<0>(vector_data_ranges[n_th_vector]) + 2, n));
+                  data.push_back(data_vectors(std::get<0>(range), n));
+                  data.push_back(data_vectors(std::get<0>(range) + 1, n));
+                  data.push_back(data_vectors(std::get<0>(range) + 2, n));
                   break;
 
                 default:
