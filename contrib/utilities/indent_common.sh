@@ -20,7 +20,7 @@
 
 #
 # This function checks that we are in the root directory and that
-# clang-format is available. It is called by both indent and indent-branch
+# clang-format is available. It is called by both indent and indent-all
 # to ensure that the rest of the indentation pipeline makes sense.
 #
 
