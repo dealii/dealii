@@ -382,6 +382,8 @@ namespace FETools
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 
+
+
     // special version for PETSc
 #ifdef DEAL_II_WITH_PETSC
     template <int dim, int spacedim>
@@ -413,6 +415,8 @@ namespace FETools
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 
+
+
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -426,6 +430,8 @@ namespace FETools
       Assert(false, ExcNotImplemented());
     }
 #endif
+
+
 
     // special version for Trilinos
 #ifdef DEAL_II_WITH_TRILINOS
@@ -458,6 +464,8 @@ namespace FETools
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 
+
+
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -487,6 +495,8 @@ namespace FETools
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 
+
+
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -502,6 +512,8 @@ namespace FETools
       AssertThrow(false, ExcNotImplemented());
     }
 #endif
+
+
 
     // special version for LinearAlgebra::distributed::Vector
     template <int dim, int spacedim, typename Number>
@@ -526,6 +538,8 @@ namespace FETools
       u2.update_ghost_values();
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
+
+
 
     // special version for LinearAlgebra::distributed::BlockVector
     template <int dim, int spacedim, typename Number>
