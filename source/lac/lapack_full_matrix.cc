@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -29,6 +30,214 @@
 DEAL_II_NAMESPACE_OPEN
 
 using namespace LAPACKSupport;
+
+namespace internal
+{
+  namespace LAPACKFullMatrixImplementation
+  {
+    // ZGEEV/CGEEV and DGEEV/SGEEV need different work arrays and different
+    // output arrays for eigenvalues. This makes working with generic scalar
+    // types a bit difficult. To get around this, geev_helper has the same
+    // signature for real and complex arguments, but it ignores some
+    // parameters when called with a real type and ignores different
+    // parameters when called with a complex type.
+    template <typename T>
+    void
+    geev_helper(const char            vl,
+                const char            vr,
+                AlignedVector<T> &    matrix,
+                const types::blas_int n_rows,
+                std::vector<T> &      real_part_eigenvalues,
+                std::vector<T> &      imag_part_eigenvalues,
+                std::vector<T> &      left_eigenvectors,
+                std::vector<T> &      right_eigenvectors,
+                std::vector<T> &      real_work,
+                std::vector<T> & /*complex_work*/,
+                const types::blas_int work_flag,
+                types::blas_int &     info)
+    {
+      static_assert(std::is_same<T, double>::value ||
+                      std::is_same<T, float>::value,
+                    "Only implemented for double and float");
+      Assert(matrix.size() == static_cast<std::size_t>(n_rows * n_rows),
+             ExcInternalError());
+      Assert(static_cast<std::size_t>(n_rows) <= real_part_eigenvalues.size(),
+             ExcInternalError());
+      Assert(static_cast<std::size_t>(n_rows) <= imag_part_eigenvalues.size(),
+             ExcInternalError());
+      if (vl == 'V')
+        Assert(static_cast<std::size_t>(n_rows * n_rows) <=
+                 left_eigenvectors.size(),
+               ExcInternalError());
+      if (vr == 'V')
+        Assert(static_cast<std::size_t>(n_rows * n_rows) <=
+                 right_eigenvectors.size(),
+               ExcInternalError());
+      Assert(work_flag == -1 ||
+               static_cast<std::size_t>(2 * n_rows) <= real_work.size(),
+             ExcInternalError());
+      Assert(work_flag == -1 || std::max<long int>(1, 3 * n_rows) <= work_flag,
+             ExcInternalError());
+      geev(&vl,
+           &vr,
+           &n_rows,
+           &matrix[0],
+           &n_rows,
+           real_part_eigenvalues.data(),
+           imag_part_eigenvalues.data(),
+           left_eigenvectors.data(),
+           &n_rows,
+           right_eigenvectors.data(),
+           &n_rows,
+           real_work.data(),
+           &work_flag,
+           &info);
+    }
+
+    template <typename T>
+    void
+    geev_helper(const char                      vl,
+                const char                      vr,
+                AlignedVector<std::complex<T>> &matrix,
+                const types::blas_int           n_rows,
+                std::vector<T> & /*real_part_eigenvalues*/,
+                std::vector<std::complex<T>> &eigenvalues,
+                std::vector<std::complex<T>> &left_eigenvectors,
+                std::vector<std::complex<T>> &right_eigenvectors,
+                std::vector<std::complex<T>> &complex_work,
+                std::vector<T> &              real_work,
+                const types::blas_int         work_flag,
+                types::blas_int &             info)
+    {
+      static_assert(
+        std::is_same<T, double>::value || std::is_same<T, float>::value,
+        "Only implemented for std::complex<double> and std::complex<float>");
+      Assert(matrix.size() == static_cast<std::size_t>(n_rows * n_rows),
+             ExcInternalError());
+      Assert(static_cast<std::size_t>(n_rows) <= eigenvalues.size(),
+             ExcInternalError());
+      if (vl == 'V')
+        Assert(static_cast<std::size_t>(n_rows * n_rows) <=
+                 left_eigenvectors.size(),
+               ExcInternalError());
+      if (vr == 'V')
+        Assert(static_cast<std::size_t>(n_rows * n_rows) <=
+                 right_eigenvectors.size(),
+               ExcInternalError());
+      Assert(std::max<std::size_t>(1, work_flag) <= real_work.size(),
+             ExcInternalError());
+      Assert(work_flag == -1 ||
+               std::max<long int>(1, 2 * n_rows) <= (work_flag),
+             ExcInternalError());
+
+      geev(&vl,
+           &vr,
+           &n_rows,
+           &matrix[0],
+           &n_rows,
+           eigenvalues.data(),
+           left_eigenvectors.data(),
+           &n_rows,
+           right_eigenvectors.data(),
+           &n_rows,
+           complex_work.data(),
+           &work_flag,
+           real_work.data(),
+           &info);
+    }
+
+
+
+    template <typename T>
+    void
+    gesdd_helper(const char            job,
+                 const types::blas_int n_rows,
+                 const types::blas_int n_cols,
+                 AlignedVector<T> &    matrix,
+                 std::vector<T> &      singular_values,
+                 AlignedVector<T> &    left_vectors,
+                 AlignedVector<T> &    right_vectors,
+                 std::vector<T> &      real_work,
+                 std::vector<T> & /*complex work*/,
+                 std::vector<types::blas_int> &integer_work,
+                 const types::blas_int &       work_flag,
+                 types::blas_int &             info)
+    {
+      Assert(job == 'A' || job == 'S' || job == 'O' || job == 'N',
+             ExcInternalError());
+      Assert(static_cast<std::size_t>(n_rows * n_cols) == matrix.size(),
+             ExcInternalError());
+      Assert(std::min<std::size_t>(n_rows, n_cols) <= singular_values.size(),
+             ExcInternalError());
+      Assert(8 * std::min<std::size_t>(n_rows, n_cols) <= integer_work.size(),
+             ExcInternalError());
+      Assert(work_flag == -1 ||
+               static_cast<std::size_t>(work_flag) <= real_work.size(),
+             ExcInternalError());
+      gesdd(&job,
+            &n_rows,
+            &n_cols,
+            &matrix[0],
+            &n_rows,
+            singular_values.data(),
+            &left_vectors[0],
+            &n_rows,
+            &right_vectors[0],
+            &n_cols,
+            real_work.data(),
+            &work_flag,
+            integer_work.data(),
+            &info);
+    }
+
+
+
+    template <typename T>
+    void
+    gesdd_helper(const char                      job,
+                 const types::blas_int           n_rows,
+                 const types::blas_int           n_cols,
+                 AlignedVector<std::complex<T>> &matrix,
+                 std::vector<T> &                singular_values,
+                 AlignedVector<std::complex<T>> &left_vectors,
+                 AlignedVector<std::complex<T>> &right_vectors,
+                 std::vector<std::complex<T>> &  work,
+                 std::vector<T> &                real_work,
+                 std::vector<types::blas_int> &  integer_work,
+                 const types::blas_int &         work_flag,
+                 types::blas_int &               info)
+    {
+      Assert(job == 'A' || job == 'S' || job == 'O' || job == 'N',
+             ExcInternalError());
+      Assert(static_cast<std::size_t>(n_rows * n_cols) == matrix.size(),
+             ExcInternalError());
+      Assert(static_cast<std::size_t>(std::min(n_rows, n_cols)) <=
+               singular_values.size(),
+             ExcInternalError());
+      Assert(8 * std::min<std::size_t>(n_rows, n_cols) <= integer_work.size(),
+             ExcInternalError());
+      Assert(work_flag == -1 ||
+               static_cast<std::size_t>(work_flag) <= real_work.size(),
+             ExcInternalError());
+
+      gesdd(&job,
+            &n_rows,
+            &n_cols,
+            &matrix[0],
+            &n_rows,
+            singular_values.data(),
+            &left_vectors[0],
+            &n_rows,
+            &right_vectors[0],
+            &n_cols,
+            work.data(),
+            &work_flag,
+            real_work.data(),
+            integer_work.data(),
+            &info);
+    }
+  } // namespace LAPACKFullMatrixImplementation
+} // namespace internal
 
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n)
@@ -1312,36 +1521,47 @@ LAPACKFullMatrix<number>::compute_svd()
   Assert(state == matrix, ExcState(state));
   state = LAPACKSupport::unusable;
 
-  const types::blas_int mm     = this->m();
-  const types::blas_int nn     = this->n();
-  number *const         values = &this->values[0];
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
   wr.resize(std::max(mm, nn));
   std::fill(wr.begin(), wr.end(), 0.);
   ipiv.resize(8 * mm);
 
-  svd_u              = std_cxx14::make_unique<LAPACKFullMatrix<number>>(mm, mm);
-  svd_vt             = std_cxx14::make_unique<LAPACKFullMatrix<number>>(nn, nn);
-  number *const   mu = &svd_u->values[0];
-  number *const   mvt  = &svd_vt->values[0];
+  svd_u  = std_cxx14::make_unique<LAPACKFullMatrix<number>>(mm, mm);
+  svd_vt = std_cxx14::make_unique<LAPACKFullMatrix<number>>(nn, nn);
   types::blas_int info = 0;
 
   // First determine optimal workspace size
   work.resize(1);
   types::blas_int lwork = -1;
-  gesdd(&LAPACKSupport::A,
-        &mm,
-        &nn,
-        values,
-        &mm,
-        wr.data(),
-        mu,
-        &mm,
-        mvt,
-        &nn,
-        work.data(),
-        &lwork,
-        ipiv.data(),
-        &info);
+
+  // TODO double check size
+  std::vector<typename numbers::NumberTraits<number>::real_type> real_work;
+  if (numbers::NumberTraits<number>::is_complex)
+    {
+      // This array is only used by the complex versions.
+      std::size_t min = std::min(this->m(), this->n());
+      std::size_t max = std::max(this->m(), this->n());
+      real_work.resize(
+        std::max(5 * min * min + 5 * min, 2 * max * min + 2 * min * min + min));
+    }
+
+  // make sure that the first entry in the work array is clear, in case the
+  // routine does not completely overwrite the memory:
+  work[0] = number();
+  internal::LAPACKFullMatrixImplementation::gesdd_helper(LAPACKSupport::A,
+                                                         mm,
+                                                         nn,
+                                                         this->values,
+                                                         wr,
+                                                         svd_u->values,
+                                                         svd_vt->values,
+                                                         work,
+                                                         real_work,
+                                                         ipiv,
+                                                         lwork,
+                                                         info);
+
   AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("gesdd", info));
   // Resize the work array. Add one to the size computed by LAPACK to be on
   // the safe side.
@@ -1349,20 +1569,18 @@ LAPACKFullMatrix<number>::compute_svd()
 
   work.resize(lwork);
   // Do the actual SVD.
-  gesdd(&LAPACKSupport::A,
-        &mm,
-        &nn,
-        values,
-        &mm,
-        wr.data(),
-        mu,
-        &mm,
-        mvt,
-        &nn,
-        work.data(),
-        &lwork,
-        ipiv.data(),
-        &info);
+  internal::LAPACKFullMatrixImplementation::gesdd_helper(LAPACKSupport::A,
+                                                         mm,
+                                                         nn,
+                                                         this->values,
+                                                         wr,
+                                                         svd_u->values,
+                                                         svd_vt->values,
+                                                         work,
+                                                         real_work,
+                                                         ipiv,
+                                                         lwork,
+                                                         info);
   AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("gesdd", info));
 
   work.resize(0);
@@ -1381,11 +1599,12 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
 
   Assert(state == LAPACKSupport::svd, ExcState(state));
 
+  const typename numbers::NumberTraits<number>::real_type one(1.0);
   const double lim = std::abs(wr[0]) * threshold;
   for (size_type i = 0; i < wr.size(); ++i)
     {
       if (std::abs(wr[i]) > lim)
-        wr[i] = number(1.) / wr[i];
+        wr[i] = one / wr[i];
       else
         wr[i] = 0.;
     }
@@ -1404,9 +1623,10 @@ LAPACKFullMatrix<number>::compute_inverse_svd_with_kernel(
 
   Assert(state == LAPACKSupport::svd, ExcState(state));
 
-  const unsigned int n_wr = wr.size();
+  const typename numbers::NumberTraits<number>::real_type one(1.0);
+  const unsigned int                                      n_wr = wr.size();
   for (size_type i = 0; i < n_wr - kernel_size; ++i)
-    wr[i] = number(1.) / wr[i];
+    wr[i] = one / wr[i];
   for (size_type i = n_wr - kernel_size; i < n_wr; ++i)
     wr[i] = 0.;
   state = LAPACKSupport::inverse_svd;
@@ -1619,12 +1839,10 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
   if (left)
     vl.resize(nn * nn);
 
-  number *const values = &this->values[0];
-
-  types::blas_int   info  = 0;
-  types::blas_int   lwork = 1;
-  const char *const jobvr = (right) ? (&V) : (&N);
-  const char *const jobvl = (left) ? (&V) : (&N);
+  types::blas_int info  = 0;
+  types::blas_int lwork = 1;
+  const char      jobvr = (right) ? V : N;
+  const char      jobvl = (left) ? V : N;
 
   /*
    * The LAPACK routine xGEEV requires a sufficiently large work array; the
@@ -1638,20 +1856,23 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
   lwork = -1;
   work.resize(1);
 
-  geev(jobvl,
-       jobvr,
-       &nn,
-       values,
-       &nn,
-       wr.data(),
-       wi.data(),
-       vl.data(),
-       &nn,
-       vr.data(),
-       &nn,
-       work.data(),
-       &lwork,
-       &info);
+  std::vector<typename numbers::NumberTraits<number>::real_type> real_work;
+  if (numbers::NumberTraits<number>::is_complex)
+    // This array is only used by the complex versions.
+    real_work.resize(2 * this->m());
+  internal::LAPACKFullMatrixImplementation::geev_helper(jobvl,
+                                                        jobvr,
+                                                        this->values,
+                                                        this->m(),
+                                                        wr,
+                                                        wi,
+                                                        vl,
+                                                        vr,
+                                                        work,
+                                                        real_work,
+                                                        lwork,
+                                                        info);
+
   // geev returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert(info == 0, ExcInternalError());
@@ -1663,21 +1884,18 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
   work.resize((size_type)lwork);
 
   // Finally compute the eigenvalues.
-  geev(jobvl,
-       jobvr,
-       &nn,
-       values,
-       &nn,
-       wr.data(),
-       wi.data(),
-       vl.data(),
-       &nn,
-       vr.data(),
-       &nn,
-       work.data(),
-       &lwork,
-       &info);
-  // Negative return value implies a wrong argument. This should be internal.
+  internal::LAPACKFullMatrixImplementation::geev_helper(jobvl,
+                                                        jobvr,
+                                                        this->values,
+                                                        this->m(),
+                                                        wr,
+                                                        wi,
+                                                        vl,
+                                                        vr,
+                                                        work,
+                                                        real_work,
+                                                        lwork,
+                                                        info);
 
   Assert(info >= 0, ExcInternalError());
   // TODO:[GK] What if the QR method fails?

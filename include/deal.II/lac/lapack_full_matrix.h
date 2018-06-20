@@ -910,10 +910,11 @@ private:
    * Real parts of eigenvalues or the singular values. Filled by
    * compute_eigenvalues() or compute_svd().
    */
-  std::vector<number> wr;
+  std::vector<typename numbers::NumberTraits<number>::real_type> wr;
 
   /**
-   * Imaginary parts of eigenvalues. Filled by compute_eigenvalues.
+   * Imaginary parts of eigenvalues, or, in the complex scalar case, the
+   * eigenvalues themselves. Filled by compute_eigenvalues.
    */
   std::vector<number> wi;
 
@@ -1119,7 +1120,10 @@ LAPACKFullMatrix<number>::eigenvalue(const size_type i) const
   Assert(wi.size() == this->n_rows(), ExcInternalError());
   AssertIndexRange(i, this->n_rows());
 
-  return std::complex<number>(wr[i], wi[i]);
+  if (numbers::NumberTraits<number>::is_complex)
+    return std::complex<number>(wi[i]);
+  else
+    return std::complex<number>(wr[i], wi[i]);
 }
 
 

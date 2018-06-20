@@ -1,0 +1,6 @@
+axpy
+gemm
+gemv
+trmv
+syr
+syrk
