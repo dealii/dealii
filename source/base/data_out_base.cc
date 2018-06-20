@@ -2762,7 +2762,11 @@ namespace DataOutBase
   write_ucd(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const UcdFlags &flags,
     std::ostream &  out)
   {
@@ -2849,7 +2853,11 @@ namespace DataOutBase
   write_dx(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const DXFlags &flags,
     std::ostream & out)
   {
@@ -3131,7 +3139,11 @@ namespace DataOutBase
   write_gnuplot(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const GnuplotFlags &flags,
     std::ostream &      out)
   {
@@ -3341,7 +3353,11 @@ namespace DataOutBase
   write_povray(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const PovrayFlags &flags,
     std::ostream &     out)
   {
@@ -3670,7 +3686,11 @@ namespace DataOutBase
   write_eps(
     const std::vector<Patch<dim, spacedim>> & /*patches*/,
     const std::vector<std::string> & /*data_names*/,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const EpsFlags & /*flags*/,
     std::ostream & /*out*/)
   {
@@ -3684,7 +3704,11 @@ namespace DataOutBase
   write_eps(
     const std::vector<Patch<2, spacedim>> &patches,
     const std::vector<std::string> & /*data_names*/,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const EpsFlags &flags,
     std::ostream &  out)
   {
@@ -4011,7 +4035,11 @@ namespace DataOutBase
   write_gmv(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const GmvFlags &flags,
     std::ostream &  out)
   {
@@ -4144,7 +4172,11 @@ namespace DataOutBase
   write_tecplot(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const TecplotFlags &flags,
     std::ostream &      out)
   {
@@ -4371,8 +4403,12 @@ namespace DataOutBase
   write_tecplot_binary(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                 nonscalar_data_ranges,
     const TecplotFlags &flags,
     std::ostream &      out)
   {
@@ -4384,7 +4420,7 @@ namespace DataOutBase
 #ifndef DEAL_II_HAVE_TECPLOT
 
     // simply call the ASCII output function if the Tecplot API isn't present
-    write_tecplot(patches, data_names, vector_data_ranges, flags, out);
+    write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
     return;
 
 #else
@@ -4392,7 +4428,7 @@ namespace DataOutBase
     // Tecplot binary output only good for 2D & 3D
     if (dim == 1)
       {
-        write_tecplot(patches, data_names, vector_data_ranges, flags, out);
+        write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
         return;
       }
 
@@ -4408,7 +4444,7 @@ namespace DataOutBase
         Assert(false,
                ExcMessage("Specify the name of the tecplot_binary"
                           " file through the TecplotFlags interface."));
-        write_tecplot(patches, data_names, vector_data_ranges, flags, out);
+        write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
         return;
       }
 
@@ -4697,8 +4733,12 @@ namespace DataOutBase
   write_vtk(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out)
   {
@@ -4825,28 +4865,30 @@ namespace DataOutBase
     // when writing, first write out all vector data, then handle the scalar
     // data sets that have been left over
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (unsigned int n_th_vector = 0; n_th_vector < vector_data_ranges.size();
+    for (unsigned int n_th_vector = 0;
+         n_th_vector < nonscalar_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) >=
-                      std::get<0>(vector_data_ranges[n_th_vector]),
-                    ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                                  std::get<0>(
-                                    vector_data_ranges[n_th_vector])));
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                    ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                                  0,
-                                  n_data_sets));
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(vector_data_ranges[n_th_vector]) <=
+        AssertThrow(
+          std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
+            std::get<0>(nonscalar_data_ranges[n_th_vector]),
+          ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
+                        std::get<0>(nonscalar_data_ranges[n_th_vector])));
+        AssertThrow(
+          std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
+          ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
+                        0,
+                        n_data_sets));
+        AssertThrow(std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
+                        std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
                       3,
                     ExcMessage(
                       "Can't declare a vector with more than 3 components "
                       "in VTK"));
 
         // mark these components as already written:
-        for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-             i <= std::get<1>(vector_data_ranges[n_th_vector]);
+        for (unsigned int i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
+             i <= std::get<1>(nonscalar_data_ranges[n_th_vector]);
              ++i)
           data_set_written[i] = true;
 
@@ -4854,15 +4896,16 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "VECTORS ";
 
-        if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
-          out << std::get<2>(vector_data_ranges[n_th_vector]);
+        if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
+          out << std::get<2>(nonscalar_data_ranges[n_th_vector]);
         else
           {
-            for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-                 i < std::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i =
+                   std::get<0>(nonscalar_data_ranges[n_th_vector]);
+                 i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(nonscalar_data_ranges[n_th_vector])];
           }
 
         out << " double" << '\n';
@@ -4870,32 +4913,35 @@ namespace DataOutBase
         // now write data. pad all vectors to have three components
         for (unsigned int n = 0; n < n_nodes; ++n)
           {
-            switch (std::get<1>(vector_data_ranges[n_th_vector]) -
-                    std::get<0>(vector_data_ranges[n_th_vector]))
+            switch (std::get<1>(nonscalar_data_ranges[n_th_vector]) -
+                    std::get<0>(nonscalar_data_ranges[n_th_vector]))
               {
                 case 0:
                   out << data_vectors(
-                           std::get<0>(vector_data_ranges[n_th_vector]), n)
+                           std::get<0>(nonscalar_data_ranges[n_th_vector]), n)
                       << " 0 0" << '\n';
                   break;
 
                 case 1:
                   out << data_vectors(
-                           std::get<0>(vector_data_ranges[n_th_vector]), n)
+                           std::get<0>(nonscalar_data_ranges[n_th_vector]), n)
                       << ' '
                       << data_vectors(
-                           std::get<0>(vector_data_ranges[n_th_vector]) + 1, n)
+                           std::get<0>(nonscalar_data_ranges[n_th_vector]) + 1,
+                           n)
                       << " 0" << '\n';
                   break;
                 case 2:
                   out << data_vectors(
-                           std::get<0>(vector_data_ranges[n_th_vector]), n)
+                           std::get<0>(nonscalar_data_ranges[n_th_vector]), n)
                       << ' '
                       << data_vectors(
-                           std::get<0>(vector_data_ranges[n_th_vector]) + 1, n)
+                           std::get<0>(nonscalar_data_ranges[n_th_vector]) + 1,
+                           n)
                       << ' '
                       << data_vectors(
-                           std::get<0>(vector_data_ranges[n_th_vector]) + 2, n)
+                           std::get<0>(nonscalar_data_ranges[n_th_vector]) + 2,
+                           n)
                       << '\n';
                   break;
 
@@ -4975,13 +5021,17 @@ namespace DataOutBase
   write_vtu(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out)
   {
     write_vtu_header(out, flags);
-    write_vtu_main(patches, data_names, vector_data_ranges, flags, out);
+    write_vtu_main(patches, data_names, nonscalar_data_ranges, flags, out);
     write_vtu_footer(out);
 
     out << std::flush;
@@ -4993,8 +5043,12 @@ namespace DataOutBase
   write_vtu_main(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out)
   {
@@ -5021,12 +5075,13 @@ namespace DataOutBase
             << "  <PointData Scalars=\"scalars\">\n";
         std::vector<bool> data_set_written(data_names.size(), false);
         for (unsigned int n_th_vector = 0;
-             n_th_vector < vector_data_ranges.size();
+             n_th_vector < nonscalar_data_ranges.size();
              ++n_th_vector)
           {
             // mark these components as already written:
-            for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-                 i <= std::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i =
+                   std::get<0>(nonscalar_data_ranges[n_th_vector]);
+                 i <= std::get<1>(nonscalar_data_ranges[n_th_vector]);
                  ++i)
               data_set_written[i] = true;
 
@@ -5034,16 +5089,17 @@ namespace DataOutBase
             // underscores unless a vector name has been specified
             out << "    <DataArray type=\"Float32\" Name=\"";
 
-            if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
-              out << std::get<2>(vector_data_ranges[n_th_vector]);
+            if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
+              out << std::get<2>(nonscalar_data_ranges[n_th_vector]);
             else
               {
                 for (unsigned int i =
-                       std::get<0>(vector_data_ranges[n_th_vector]);
-                     i < std::get<1>(vector_data_ranges[n_th_vector]);
+                       std::get<0>(nonscalar_data_ranges[n_th_vector]);
+                     i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
                      ++i)
                   out << data_names[i] << "__";
-                out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
+                out << data_names[std::get<1>(
+                  nonscalar_data_ranges[n_th_vector])];
               }
 
             out << "\" NumberOfComponents=\"3\"></DataArray>\n";
@@ -5211,7 +5267,7 @@ namespace DataOutBase
     // when writing, first write out all vector data, then handle the scalar
     // data sets that have been left over
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (auto range : vector_data_ranges)
+    for (auto range : nonscalar_data_ranges)
       {
         const auto first_component = std::get<0>(range);
         const auto last_component  = std::get<1>(range);
@@ -5313,8 +5369,12 @@ namespace DataOutBase
     std::ostream &                  out,
     const std::vector<std::string> &piece_names,
     const std::vector<std::string> &data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &vector_data_ranges)
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &nonscalar_data_ranges)
   {
     AssertThrow(out, ExcIO());
 
@@ -5334,28 +5394,30 @@ namespace DataOutBase
 
     // We need to output in the same order as the write_vtu function does:
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (unsigned int n_th_vector = 0; n_th_vector < vector_data_ranges.size();
+    for (unsigned int n_th_vector = 0;
+         n_th_vector < nonscalar_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) >=
-                      std::get<0>(vector_data_ranges[n_th_vector]),
-                    ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                                  std::get<0>(
-                                    vector_data_ranges[n_th_vector])));
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                    ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                                  0,
-                                  n_data_sets));
-        AssertThrow(std::get<1>(vector_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(vector_data_ranges[n_th_vector]) <=
+        AssertThrow(
+          std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
+            std::get<0>(nonscalar_data_ranges[n_th_vector]),
+          ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
+                        std::get<0>(nonscalar_data_ranges[n_th_vector])));
+        AssertThrow(
+          std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
+          ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
+                        0,
+                        n_data_sets));
+        AssertThrow(std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
+                        std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
                       3,
                     ExcMessage(
                       "Can't declare a vector with more than 3 components "
                       "in VTK"));
 
         // mark these components as already written:
-        for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-             i <= std::get<1>(vector_data_ranges[n_th_vector]);
+        for (unsigned int i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
+             i <= std::get<1>(nonscalar_data_ranges[n_th_vector]);
              ++i)
           data_set_written[i] = true;
 
@@ -5363,15 +5425,16 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "    <PDataArray type=\"Float32\" Name=\"";
 
-        if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
-          out << std::get<2>(vector_data_ranges[n_th_vector]);
+        if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
+          out << std::get<2>(nonscalar_data_ranges[n_th_vector]);
         else
           {
-            for (unsigned int i = std::get<0>(vector_data_ranges[n_th_vector]);
-                 i < std::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i =
+                   std::get<0>(nonscalar_data_ranges[n_th_vector]);
+                 i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(nonscalar_data_ranges[n_th_vector])];
           }
 
         out << "\" NumberOfComponents=\"3\" format=\"ascii\"/>\n";
@@ -5534,7 +5597,11 @@ namespace DataOutBase
   write_svg(
     const std::vector<Patch<dim, spacedim>> &,
     const std::vector<std::string> &,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>> &,
     const SvgFlags &,
     std::ostream &)
   {
@@ -5546,8 +5613,12 @@ namespace DataOutBase
   write_svg(
     const std::vector<Patch<2, spacedim>> &patches,
     const std::vector<std::string> & /*data_names*/,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      & /*vector_data_ranges*/,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      & /*nonscalar_data_ranges*/,
     const SvgFlags &flags,
     std::ostream &  out)
   {
@@ -6532,8 +6603,12 @@ namespace DataOutBase
   write_deal_II_intermediate(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &nonscalar_data_ranges,
     const Deal_II_IntermediateFlags & /*flags*/,
     std::ostream &out)
   {
@@ -6559,11 +6634,11 @@ namespace DataOutBase
     for (unsigned int i = 0; i < patches.size(); ++i)
       out << patches[i] << '\n';
 
-    out << vector_data_ranges.size() << '\n';
-    for (unsigned int i = 0; i < vector_data_ranges.size(); ++i)
-      out << std::get<0>(vector_data_ranges[i]) << ' '
-          << std::get<1>(vector_data_ranges[i]) << '\n'
-          << std::get<2>(vector_data_ranges[i]) << '\n';
+    out << nonscalar_data_ranges.size() << '\n';
+    for (unsigned int i = 0; i < nonscalar_data_ranges.size(); ++i)
+      out << std::get<0>(nonscalar_data_ranges[i]) << ' '
+          << std::get<1>(nonscalar_data_ranges[i]) << '\n'
+          << std::get<2>(nonscalar_data_ranges[i]) << '\n';
 
     out << '\n';
     // make sure everything now gets to disk
@@ -6603,7 +6678,7 @@ DataOutInterface<dim, spacedim>::write_dx(std::ostream &out) const
 {
   DataOutBase::write_dx(get_patches(),
                         get_dataset_names(),
-                        get_vector_data_ranges(),
+                        get_nonscalar_data_ranges(),
                         dx_flags,
                         out);
 }
@@ -6616,7 +6691,7 @@ DataOutInterface<dim, spacedim>::write_ucd(std::ostream &out) const
 {
   DataOutBase::write_ucd(get_patches(),
                          get_dataset_names(),
-                         get_vector_data_ranges(),
+                         get_nonscalar_data_ranges(),
                          ucd_flags,
                          out);
 }
@@ -6629,7 +6704,7 @@ DataOutInterface<dim, spacedim>::write_gnuplot(std::ostream &out) const
 {
   DataOutBase::write_gnuplot(get_patches(),
                              get_dataset_names(),
-                             get_vector_data_ranges(),
+                             get_nonscalar_data_ranges(),
                              gnuplot_flags,
                              out);
 }
@@ -6642,7 +6717,7 @@ DataOutInterface<dim, spacedim>::write_povray(std::ostream &out) const
 {
   DataOutBase::write_povray(get_patches(),
                             get_dataset_names(),
-                            get_vector_data_ranges(),
+                            get_nonscalar_data_ranges(),
                             povray_flags,
                             out);
 }
@@ -6655,7 +6730,7 @@ DataOutInterface<dim, spacedim>::write_eps(std::ostream &out) const
 {
   DataOutBase::write_eps(get_patches(),
                          get_dataset_names(),
-                         get_vector_data_ranges(),
+                         get_nonscalar_data_ranges(),
                          eps_flags,
                          out);
 }
@@ -6668,7 +6743,7 @@ DataOutInterface<dim, spacedim>::write_gmv(std::ostream &out) const
 {
   DataOutBase::write_gmv(get_patches(),
                          get_dataset_names(),
-                         get_vector_data_ranges(),
+                         get_nonscalar_data_ranges(),
                          gmv_flags,
                          out);
 }
@@ -6681,7 +6756,7 @@ DataOutInterface<dim, spacedim>::write_tecplot(std::ostream &out) const
 {
   DataOutBase::write_tecplot(get_patches(),
                              get_dataset_names(),
-                             get_vector_data_ranges(),
+                             get_nonscalar_data_ranges(),
                              tecplot_flags,
                              out);
 }
@@ -6694,7 +6769,7 @@ DataOutInterface<dim, spacedim>::write_tecplot_binary(std::ostream &out) const
 {
   DataOutBase::write_tecplot_binary(get_patches(),
                                     get_dataset_names(),
-                                    get_vector_data_ranges(),
+                                    get_nonscalar_data_ranges(),
                                     tecplot_flags,
                                     out);
 }
@@ -6707,7 +6782,7 @@ DataOutInterface<dim, spacedim>::write_vtk(std::ostream &out) const
 {
   DataOutBase::write_vtk(get_patches(),
                          get_dataset_names(),
-                         get_vector_data_ranges(),
+                         get_nonscalar_data_ranges(),
                          vtk_flags,
                          out);
 }
@@ -6718,7 +6793,7 @@ DataOutInterface<dim, spacedim>::write_vtu(std::ostream &out) const
 {
   DataOutBase::write_vtu(get_patches(),
                          get_dataset_names(),
-                         get_vector_data_ranges(),
+                         get_nonscalar_data_ranges(),
                          vtk_flags,
                          out);
 }
@@ -6729,7 +6804,7 @@ DataOutInterface<dim, spacedim>::write_svg(std::ostream &out) const
 {
   DataOutBase::write_svg(get_patches(),
                          get_dataset_names(),
-                         get_vector_data_ranges(),
+                         get_nonscalar_data_ranges(),
                          svg_flags,
                          out);
 }
@@ -6798,7 +6873,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
     std::stringstream ss;
     DataOutBase::write_vtu_main(get_patches(),
                                 get_dataset_names(),
-                                get_vector_data_ranges(),
+                                get_nonscalar_data_ranges(),
                                 vtk_flags,
                                 ss);
     ierr = MPI_File_write_ordered(fh,
@@ -6837,7 +6912,7 @@ DataOutInterface<dim, spacedim>::write_pvtu_record(
   DataOutBase::write_pvtu_record(out,
                                  piece_names,
                                  get_dataset_names(),
-                                 get_vector_data_ranges());
+                                 get_nonscalar_data_ranges());
 }
 
 
@@ -6849,7 +6924,7 @@ DataOutInterface<dim, spacedim>::write_deal_II_intermediate(
 {
   DataOutBase::write_deal_II_intermediate(get_patches(),
                                           get_dataset_names(),
-                                          get_vector_data_ranges(),
+                                          get_nonscalar_data_ranges(),
                                           deal_II_intermediate_flags,
                                           out);
 }
@@ -6999,7 +7074,7 @@ DataOutInterface<dim, spacedim>::write_filtered_data(
 {
   DataOutBase::write_filtered_data(get_patches(),
                                    get_dataset_names(),
-                                   get_vector_data_ranges(),
+                                   get_nonscalar_data_ranges(),
                                    filtered_data);
 }
 
@@ -7008,8 +7083,12 @@ void
 DataOutBase::write_filtered_data(
   const std::vector<Patch<dim, spacedim>> &patches,
   const std::vector<std::string> &         data_names,
-  const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-    &                         vector_data_ranges,
+  const std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    &                         nonscalar_data_ranges,
   DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
@@ -7049,45 +7128,46 @@ DataOutBase::write_filtered_data(
   for (n_th_vector = 0, data_set = 0; data_set < n_data_sets;)
     {
       // Advance n_th_vector to at least the current data set we are on
-      while (n_th_vector < vector_data_ranges.size() &&
-             std::get<0>(vector_data_ranges[n_th_vector]) < data_set)
+      while (n_th_vector < nonscalar_data_ranges.size() &&
+             std::get<0>(nonscalar_data_ranges[n_th_vector]) < data_set)
         n_th_vector++;
 
       // Determine the dimension of this data
-      if (n_th_vector < vector_data_ranges.size() &&
-          std::get<0>(vector_data_ranges[n_th_vector]) == data_set)
+      if (n_th_vector < nonscalar_data_ranges.size() &&
+          std::get<0>(nonscalar_data_ranges[n_th_vector]) == data_set)
         {
           // Multiple dimensions
-          pt_data_vector_dim = std::get<1>(vector_data_ranges[n_th_vector]) -
-                               std::get<0>(vector_data_ranges[n_th_vector]) + 1;
+          pt_data_vector_dim = std::get<1>(nonscalar_data_ranges[n_th_vector]) -
+                               std::get<0>(nonscalar_data_ranges[n_th_vector]) +
+                               1;
 
           // Ensure the dimensionality of the data is correct
           AssertThrow(
-            std::get<1>(vector_data_ranges[n_th_vector]) >=
-              std::get<0>(vector_data_ranges[n_th_vector]),
-            ExcLowerRange(std::get<1>(vector_data_ranges[n_th_vector]),
-                          std::get<0>(vector_data_ranges[n_th_vector])));
+            std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
+              std::get<0>(nonscalar_data_ranges[n_th_vector]),
+            ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
+                          std::get<0>(nonscalar_data_ranges[n_th_vector])));
           AssertThrow(
-            std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-            ExcIndexRange(std::get<1>(vector_data_ranges[n_th_vector]),
+            std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
+            ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                           0,
                           n_data_sets));
 
           // Determine the vector name. Concatenate all the component names with
           // double underscores unless a vector name has been specified
-          if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
+          if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
             {
-              vector_name = std::get<2>(vector_data_ranges[n_th_vector]);
+              vector_name = std::get<2>(nonscalar_data_ranges[n_th_vector]);
             }
           else
             {
               vector_name = "";
-              for (i = std::get<0>(vector_data_ranges[n_th_vector]);
-                   i < std::get<1>(vector_data_ranges[n_th_vector]);
+              for (i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
+                   i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
                    ++i)
                 vector_name += data_names[i] + "__";
               vector_name +=
-                data_names[std::get<1>(vector_data_ranges[n_th_vector])];
+                data_names[std::get<1>(nonscalar_data_ranges[n_th_vector])];
             }
         }
       else
@@ -7761,10 +7841,18 @@ DataOutInterface<dim, spacedim>::memory_consumption() const
 
 
 template <int dim, int spacedim>
-std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-DataOutInterface<dim, spacedim>::get_vector_data_ranges() const
+std::vector<
+  std::tuple<unsigned int,
+             unsigned int,
+             std::string,
+             DataComponentInterpretation::DataComponentInterpretation>>
+DataOutInterface<dim, spacedim>::get_nonscalar_data_ranges() const
 {
-  return std::vector<std::tuple<unsigned int, unsigned int, std::string>>();
+  return std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>();
 }
 
 
@@ -7778,8 +7866,12 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
     // complicated, because vector ranges might have a name or not.
     std::set<std::string> all_names;
 
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-                                   ranges      = this->get_vector_data_ranges();
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+                                   ranges = this->get_nonscalar_data_ranges();
     const std::vector<std::string> data_names  = this->get_dataset_names();
     const unsigned int             n_data_sets = data_names.size();
     std::vector<bool>              data_set_written(n_data_sets, false);
@@ -7838,8 +7930,13 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
     tmp.swap(dataset_names);
   }
   {
-    std::vector<std::tuple<unsigned int, unsigned int, std::string>> tmp;
-    tmp.swap(vector_data_ranges);
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      tmp;
+    tmp.swap(nonscalar_data_ranges);
   }
 
   // then check that we have the correct header of this file. both the first and
@@ -7905,13 +8002,13 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
   for (unsigned int i = 0; i < n_patches; ++i)
     in >> patches[i];
 
-  unsigned int n_vector_data_ranges;
-  in >> n_vector_data_ranges;
-  vector_data_ranges.resize(n_vector_data_ranges);
-  for (unsigned int i = 0; i < n_vector_data_ranges; ++i)
+  unsigned int n_nonscalar_data_ranges;
+  in >> n_nonscalar_data_ranges;
+  nonscalar_data_ranges.resize(n_nonscalar_data_ranges);
+  for (unsigned int i = 0; i < n_nonscalar_data_ranges; ++i)
     {
-      in >> std::get<0>(vector_data_ranges[i]) >>
-        std::get<1>(vector_data_ranges[i]);
+      in >> std::get<0>(nonscalar_data_ranges[i]) >>
+        std::get<1>(nonscalar_data_ranges[i]);
 
       // read in the name of that vector range. because it is on a separate
       // line, we first need to read to the end of the previous line (nothing
@@ -7920,7 +8017,7 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
       std::string name;
       getline(in, name);
       getline(in, name);
-      std::get<2>(vector_data_ranges[i]) = name;
+      std::get<2>(nonscalar_data_ranges[i]) = name;
     }
 
   AssertThrow(in, ExcIO());
@@ -7943,22 +8040,22 @@ DataOutReader<dim, spacedim>::merge(const DataOutReader<dim, spacedim> &source)
          ExcIncompatibleDatasetNames());
 
   // check equality of the vector data specifications
-  Assert(get_vector_data_ranges().size() ==
-           source.get_vector_data_ranges().size(),
+  Assert(get_nonscalar_data_ranges().size() ==
+           source.get_nonscalar_data_ranges().size(),
          ExcMessage("Both sources need to declare the same components "
                     "as vectors."));
-  for (unsigned int i = 0; i < get_vector_data_ranges().size(); ++i)
+  for (unsigned int i = 0; i < get_nonscalar_data_ranges().size(); ++i)
     {
-      Assert(std::get<0>(get_vector_data_ranges()[i]) ==
-               std::get<0>(source.get_vector_data_ranges()[i]),
+      Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
+               std::get<0>(source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
-      Assert(std::get<1>(get_vector_data_ranges()[i]) ==
-               std::get<1>(source.get_vector_data_ranges()[i]),
+      Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
+               std::get<1>(source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
-      Assert(std::get<2>(get_vector_data_ranges()[i]) ==
-               std::get<2>(source.get_vector_data_ranges()[i]),
+      Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
+               std::get<2>(source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
     }
@@ -8009,10 +8106,14 @@ DataOutReader<dim, spacedim>::get_dataset_names() const
 
 
 template <int dim, int spacedim>
-std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-DataOutReader<dim, spacedim>::get_vector_data_ranges() const
+std::vector<
+  std::tuple<unsigned int,
+             unsigned int,
+             std::string,
+             DataComponentInterpretation::DataComponentInterpretation>>
+DataOutReader<dim, spacedim>::get_nonscalar_data_ranges() const
 {
-  return vector_data_ranges;
+  return nonscalar_data_ranges;
 }
 
 

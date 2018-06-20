@@ -973,11 +973,15 @@ protected:
   get_fes() const;
 
   /**
-   * Overload of the respective DataOutInterface::get_vector_data_ranges()
+   * Overload of the respective DataOutInterface::get_nonscalar_data_ranges()
    * function. See there for a more extensive documentation.
    */
-  virtual std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const override;
+  virtual std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+  get_nonscalar_data_ranges() const override;
 
   /**
    * Make all template siblings friends. Needed for the merge_patches()
@@ -1129,22 +1133,22 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
 
   // check equality of the vector data
   // specifications
-  Assert(get_vector_data_ranges().size() ==
-           source.get_vector_data_ranges().size(),
+  Assert(get_nonscalar_data_ranges().size() ==
+           source.get_nonscalar_data_ranges().size(),
          ExcMessage("Both sources need to declare the same components "
                     "as vectors."));
-  for (unsigned int i = 0; i < get_vector_data_ranges().size(); ++i)
+  for (unsigned int i = 0; i < get_nonscalar_data_ranges().size(); ++i)
     {
-      Assert(std::get<0>(get_vector_data_ranges()[i]) ==
-               std::get<0>(source.get_vector_data_ranges()[i]),
+      Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
+               std::get<0>(source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
-      Assert(std::get<1>(get_vector_data_ranges()[i]) ==
-               std::get<1>(source.get_vector_data_ranges()[i]),
+      Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
+               std::get<1>(source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
-      Assert(std::get<2>(get_vector_data_ranges()[i]) ==
-               std::get<2>(source.get_vector_data_ranges()[i]),
+      Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
+               std::get<2>(source.get_nonscalar_data_ranges()[i]),
              ExcMessage("Both sources need to declare the same components "
                         "as vectors."));
     }

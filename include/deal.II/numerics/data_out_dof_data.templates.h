@@ -1323,11 +1323,20 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
 
 
 template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+std::vector<
+  std::tuple<unsigned int,
+             unsigned int,
+             std::string,
+             DataComponentInterpretation::DataComponentInterpretation>>
 DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
-  get_vector_data_ranges() const
+  get_nonscalar_data_ranges() const
 {
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>> ranges;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    ranges;
 
   // collect the ranges of dof and cell data
   typedef typename std::vector<std::shared_ptr<
@@ -1366,8 +1375,14 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               }
 
           // finally add a corresponding range
-          std::tuple<unsigned int, unsigned int, std::string> range(
-            output_component, output_component + patch_space_dim - 1, name);
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>
+            range(output_component,
+                  output_component + patch_space_dim - 1,
+                  name,
+                  DataComponentInterpretation::component_is_part_of_vector);
 
           ranges.push_back(range);
 

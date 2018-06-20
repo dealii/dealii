@@ -2954,7 +2954,11 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   DataOutBase::write_vtk(
     patches,
     triangulation_patch_data_names(),
-    std::vector<std::tuple<unsigned int, unsigned int, std::string>>(),
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>(),
     vtk_flags,
     out);
 
@@ -2980,7 +2984,11 @@ GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
   DataOutBase::write_vtu(
     patches,
     triangulation_patch_data_names(),
-    std::vector<std::tuple<unsigned int, unsigned int, std::string>>(),
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>(),
     vtu_flags,
     out);
 
@@ -3106,7 +3114,11 @@ GridOut::write_mesh_per_processor_as_vtu(
     }
 
   std::ofstream out(new_file.c_str());
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
                         vector_data_ranges;
   DataOutBase::VtkFlags flags;
   DataOutBase::write_vtu(patches, data_names, vector_data_ranges, flags, out);
