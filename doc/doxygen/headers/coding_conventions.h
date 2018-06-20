@@ -50,7 +50,7 @@ on each of your files. This will make sure indentation is conforming to the
 style guidelines outlined in this page. Alternatively, you can run
 <code>
 <pre>
-  make indent-branch
+  make indent
 </pre>
 </code>
 in whatever directory you set up the library to be compiled in to indent all
