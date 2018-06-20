@@ -1106,8 +1106,9 @@ namespace ColorEnriched
        */
       for (unsigned int i = 0; i < num_indices; ++i)
         for (unsigned int j = i + 1; j < num_indices; ++j)
-          if (internal::find_connection_between_subdomains(
-                mesh, predicates[i], predicates[j]))
+          if (internal::find_connection_between_subdomains(mesh,
+                                                           predicates[i],
+                                                           predicates[j]))
             dsp.add(i, j);
 
       dsp.symmetrize();
@@ -1200,9 +1201,9 @@ namespace ColorEnriched
                     std::pair<unsigned int, unsigned int>(predicate_colors[i],
                                                           i));
 
-                  AssertThrow(
-                    ret.second == 1,
-                    ExcMessage("Only one enrichment function per color"));
+                  AssertThrow(ret.second == 1,
+                              ExcMessage(
+                                "Only one enrichment function per color"));
 
                   color_list.insert(predicate_colors[i]);
                 }
@@ -1430,8 +1431,9 @@ namespace ColorEnriched
 
           AssertDimension(vec_fe_enriched.size(), functions.size());
 
-          FE_Enriched<dim, spacedim> fe_component(
-            &fe_base, vec_fe_enriched, functions);
+          FE_Enriched<dim, spacedim> fe_component(&fe_base,
+                                                  vec_fe_enriched,
+                                                  functions);
           fe_collection.push_back(fe_component);
         }
     }
@@ -1444,12 +1446,12 @@ namespace ColorEnriched
     const FE_Q<dim, spacedim> &                             fe_base,
     const FE_Q<dim, spacedim> &                             fe_enriched,
     const std::vector<predicate_function<dim, spacedim>> &  predicates,
-    const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments) :
-    fe_base(fe_base),
-    fe_enriched(fe_enriched),
-    fe_nothing(1, true),
-    predicates(predicates),
-    enrichments(enrichments)
+    const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments)
+    : fe_base(fe_base)
+    , fe_enriched(fe_enriched)
+    , fe_nothing(1, true)
+    , predicates(predicates)
+    , enrichments(enrichments)
   {}
 
 

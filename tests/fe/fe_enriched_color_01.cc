@@ -39,9 +39,9 @@ using namespace dealii;
 template <int dim>
 struct predicate_template
 {
-  predicate_template(const Point<dim> p, const int radius) :
-    p(p),
-    radius(radius)
+  predicate_template(const Point<dim> p, const int radius)
+    : p(p)
+    , radius(radius)
   {}
 
   template <class Iterator>

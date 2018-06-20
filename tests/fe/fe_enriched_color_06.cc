@@ -48,9 +48,9 @@
 template <int dim>
 struct EnrichmentPredicate
 {
-  EnrichmentPredicate(const Point<dim> origin, const double radius) :
-    origin(origin),
-    radius(radius)
+  EnrichmentPredicate(const Point<dim> origin, const double radius)
+    : origin(origin)
+    , radius(radius)
   {}
 
   template <class Iterator>
@@ -121,9 +121,11 @@ main(int argc, char **argv)
   // Construct helper class to construct fe collection
   FE_Q<dim>                         fe_base(2);
   FE_Q<dim>                         fe_enriched(1);
-  static ColorEnriched::Helper<dim> fe_space(
-    fe_base, fe_enriched, vec_predicates, vec_enrichments);
-  const hp::FECollection<dim> &fe_collection(
+  static ColorEnriched::Helper<dim> fe_space(fe_base,
+                                             fe_enriched,
+                                             vec_predicates,
+                                             vec_enrichments);
+  const hp::FECollection<dim> &     fe_collection(
     fe_space.build_fe_collection(dof_handler));
 
   // check if fe_collection is correctly constructed by function

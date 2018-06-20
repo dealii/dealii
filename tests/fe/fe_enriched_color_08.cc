@@ -105,8 +105,9 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
       hp::MappingCollection<dim>                    hp_mapping;
       for (unsigned int i = 0; i < dof_handler.get_fe_collection().size(); ++i)
         hp_mapping.push_back(mapping);
-      DoFTools::map_dofs_to_support_points(
-        hp_mapping, dof_handler, support_points);
+      DoFTools::map_dofs_to_support_points(hp_mapping,
+                                           dof_handler,
+                                           support_points);
 
       const std::string base_filename =
         "DOFs" + dealii::Utilities::int_to_string(dim) + "_p" +
@@ -172,9 +173,9 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 template <int dim>
 struct EnrichmentPredicate
 {
-  EnrichmentPredicate(const Point<dim> origin, const double radius) :
-    origin(origin),
-    radius(radius)
+  EnrichmentPredicate(const Point<dim> origin, const double radius)
+    : origin(origin)
+    , radius(radius)
   {}
 
   template <class Iterator>
@@ -249,9 +250,11 @@ main(int argc, char **argv)
   FE_Q<dim> fe_base(2);
   FE_Q<dim> fe_enriched(1);
 
-  static ColorEnriched::Helper<dim> fe_space(
-    fe_base, fe_enriched, vec_predicates, vec_enrichments);
-  hp::FECollection<dim> fe_collection(
+  static ColorEnriched::Helper<dim> fe_space(fe_base,
+                                             fe_enriched,
+                                             vec_predicates,
+                                             vec_enrichments);
+  hp::FECollection<dim>             fe_collection(
     fe_space.build_fe_collection(dof_handler));
 
   // check if fe_collection is correctly constructed by function

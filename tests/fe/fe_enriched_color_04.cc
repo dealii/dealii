@@ -41,9 +41,9 @@
 template <int dim>
 struct EnrichmentPredicate
 {
-  EnrichmentPredicate(const Point<dim> origin, const double radius) :
-    origin(origin),
-    radius(radius)
+  EnrichmentPredicate(const Point<dim> origin, const double radius)
+    : origin(origin)
+    , radius(radius)
   {}
 
   template <class Iterator>
@@ -107,8 +107,10 @@ main(int argc, char **argv)
   // Do manual coloring since we are not testing coloring function here!
   std::vector<unsigned int> predicate_colors;
   predicate_colors.resize(vec_predicates.size());
-  unsigned int num_colors = ColorEnriched::internal::color_predicates(
-    dof_handler, vec_predicates, predicate_colors);
+  unsigned int num_colors =
+    ColorEnriched::internal::color_predicates(dof_handler,
+                                              vec_predicates,
+                                              predicate_colors);
 
 
   // Make required objects to call function set_cellwise_color_set_and_fe_index

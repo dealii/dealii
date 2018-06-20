@@ -39,9 +39,9 @@
 template <int dim>
 struct EnrichmentPredicate
 {
-  EnrichmentPredicate(const Point<dim> origin, const double radius) :
-    origin(origin),
-    radius(radius)
+  EnrichmentPredicate(const Point<dim> origin, const double radius)
+    : origin(origin)
+    , radius(radius)
   {}
 
   template <class Iterator>
@@ -105,8 +105,9 @@ main(int argc, char **argv)
 
     predicate_colors.resize(vec_predicates.size());
 
-    ColorEnriched::internal::color_predicates<dim>(
-      dof_handler, vec_predicates, predicate_colors);
+    ColorEnriched::internal::color_predicates<dim>(dof_handler,
+                                                   vec_predicates,
+                                                   predicate_colors);
 
     deallog << "Case 1" << std::endl;
     for (auto i : predicate_colors)
@@ -124,8 +125,9 @@ main(int argc, char **argv)
 
     predicate_colors.resize(vec_predicates.size());
 
-    ColorEnriched::internal::color_predicates(
-      dof_handler, vec_predicates, predicate_colors);
+    ColorEnriched::internal::color_predicates(dof_handler,
+                                              vec_predicates,
+                                              predicate_colors);
 
     deallog << "Case 2" << std::endl;
     for (auto i : predicate_colors)
@@ -150,8 +152,9 @@ main(int argc, char **argv)
 
     predicate_colors.resize(vec_predicates.size());
 
-    ColorEnriched::internal::color_predicates(
-      dof_handler, vec_predicates, predicate_colors);
+    ColorEnriched::internal::color_predicates(dof_handler,
+                                              vec_predicates,
+                                              predicate_colors);
 
     deallog << "Case 3" << std::endl;
     for (auto i : predicate_colors)
