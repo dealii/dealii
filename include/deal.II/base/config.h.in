@@ -165,20 +165,6 @@
 #cmakedefine DEAL_II_TRILINOS_WITH_ROL
 #cmakedefine DEAL_II_TRILINOS_WITH_ZOLTAN
 
-/*
- * Depending on the use of threads, we will have to make some variables
- * volatile. We do this here in a very old-fashioned C-style, but still
- * convenient way.
- *
- * @deprecated This macro is deprecated in favor of using the
- * <code>std::atomic</code> template class.
- */
-#ifdef DEAL_II_WITH_THREADS
-#  define DEAL_VOLATILE volatile
-#else
-#  define DEAL_VOLATILE
-#endif
-
 
 /***********************************************************************
  * Various macros for version number query and comparison:
