@@ -47,7 +47,12 @@ check(DataOutBase::DXFlags flags, std::ostream &out)
   names[3] = "x4";
   names[4] = "i";
 
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vectors;
 
   DataOutBase::write_dx(patches, names, vectors, flags, out);
 }
@@ -66,7 +71,12 @@ check_cont(unsigned int         ncells,
 
   std::vector<std::string> names(1);
   names[0] = "CutOff";
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vectors;
   DataOutBase::write_dx(patches, names, vectors, flags, out);
 }
 
