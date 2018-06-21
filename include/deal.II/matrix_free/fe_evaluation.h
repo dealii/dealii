@@ -1658,8 +1658,9 @@ protected:
  *           phi.quadrature_point(q_index);
  *         // Need to evaluate function for each component in VectorizedArray
  *         VectorizedArray<double> f_value;
- *         for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements;
- * ++v)
+ *         for (unsigned int v=0;
+ *              v<VectorizedArray<double>::n_array_elements;
+ *              ++v)
  *           {
  *             Point<dim> p;
  *             for (unsigned int d=0; d<dim; ++d)
@@ -1754,7 +1755,8 @@ protected:
  *       {
  *         const unsigned int n_items =
  *           i+VectorizedArray<double>::n_array_elements > dofs_per_cell ?
- *           (dofs_per_cell - i) : VectorizedArray<double>::n_array_elements;
+ *           (dofs_per_cell - i) :
+ *           VectorizedArray<double>::n_array_elements;
  *
  *         // Set n_items unit vectors
  *         for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -1984,9 +1986,8 @@ protected:
  * VectorizedArray@<double@> a tensor is returned,
  *
  * @code
- * get_value -> Tensor<1,n_components,VectorizedArray<double> >
- * get_gradient -> Tensor<1,n_components,Tensor<1,dim,VectorizedArray<double> >
- * >
+ * get_value -> Tensor<1,n_components,VectorizedArray<double>>
+ * get_gradient -> Tensor<1,n_components,Tensor<1,dim,VectorizedArray<double>>
  * @endcode
  *
  * In a similar vein, the submit_value() and submit_gradient() calls take

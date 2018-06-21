@@ -171,7 +171,8 @@ namespace MatrixFreeOperators
    * matrix_free_inhomogeneous.reinit(dof_handler, constraints_no_dirichlet,
    *                                  quadrature, additional_data);
    * operator_inhomogeneous.initialize(matrix_free_inhomogeneous,
-   * selected_blocks); LinearAlgebra::distributed::Vector<double> inhomogeneity;
+   *                                   selected_blocks);
+   * LinearAlgebra::distributed::Vector<double> inhomogeneity;
    * matrix_free_inhomogeneous.initialize_dof_vector(inhomogeneity);
    * constraints_with_dirichlet.distribute(inhomogeneity);
    * operator_inhomogeneous.vmult(system_rhs, inhomogeneity);
@@ -789,7 +790,7 @@ namespace MatrixFreeOperators
      *       fe_eval.reinit(cell);
      *       for (unsigned int q=0; q<n_q_points; ++q)
      *         (*coefficient)(cell,q) =
-     * function.value(fe_eval.quadrature_point(q));
+     *           function.value(fe_eval.quadrature_point(q));
      *     }
      * }
      * @endcode
