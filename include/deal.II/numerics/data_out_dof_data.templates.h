@@ -84,8 +84,8 @@ namespace internal
           x_fe_values.resize(this->finite_elements.size());
           for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
             {
-              // check if there is a finite element that is equal to the
-              // present one, then we can re-use the FEValues object
+              // check if there is a finite element that is equal to the present
+              // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
                 if (this->finite_elements[i].get() ==
                     this->finite_elements[j].get())
@@ -110,8 +110,8 @@ namespace internal
           x_fe_face_values.resize(this->finite_elements.size());
           for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
             {
-              // check if there is a finite element that is equal to the
-              // present one, then we can re-use the FEValues object
+              // check if there is a finite element that is equal to the present
+              // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
                 if (this->finite_elements[i].get() ==
                     this->finite_elements[j].get())
@@ -168,8 +168,8 @@ namespace internal
           x_fe_values.resize(this->finite_elements.size());
           for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
             {
-              // check if there is a finite element that is equal to the
-              // present one, then we can re-use the FEValues object
+              // check if there is a finite element that is equal to the present
+              // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
                 if (this->finite_elements[i].get() ==
                     this->finite_elements[j].get())
@@ -193,8 +193,8 @@ namespace internal
           x_fe_face_values.resize(this->finite_elements.size());
           for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
             {
-              // check if there is a finite element that is equal to the
-              // present one, then we can re-use the FEValues object
+              // check if there is a finite element that is equal to the present
+              // one, then we can re-use the FEValues object
               for (unsigned int j = 0; j < i; ++j)
                 if (this->finite_elements[i].get() ==
                     this->finite_elements[j].get())
@@ -318,9 +318,9 @@ namespace internal
   namespace DataOutImplementation
   {
     /**
-     * Extract the specified component of a number. This template is used
-     * when the given value is assumed to be a real scalar, so asking
-     * for the real part is the only valid choice for the second argument.
+     * Extract the specified component of a number. This template is used when
+     * the given value is assumed to be a real scalar, so asking for the real
+     * part is the only valid choice for the second argument.
      */
     template <typename NumberType>
     double
@@ -340,8 +340,8 @@ namespace internal
 
 
     /**
-     * Extract the specified component of a number. This template is used
-     * when the given value is a complex number
+     * Extract the specified component of a number. This template is used when
+     * the given value is a complex number
      */
     template <typename NumberType>
     double
@@ -673,11 +673,10 @@ namespace internal
 
           fe_patch_values.get_function_values(
             *vector,
-            // reinterpret output argument type; because of
-            // the 'if' statement above, this is the
-            // identity cast whenever the code is
-            // executed, but the cast is necessary
-            // to allow compilation even if we don't get here
+            // reinterpret output argument type; because of the 'if' statement
+            // above, this is the identity cast whenever the code is executed,
+            // but the cast is necessary to allow compilation even if we don't
+            // get here
             reinterpret_cast<
               std::vector<dealii::Vector<typename VectorType::value_type>> &>(
               patch_values_system));
@@ -685,10 +684,10 @@ namespace internal
       else
         {
           // OK, so we know that the data type stored by the user-provided
-          // vector is not simply a double. In that case, we need to
-          // ask the FEValuesBase object to extract function values for
-          // us from the evaluation points in the provided data
-          // type, and then copy them by hand into the output location.
+          // vector is not simply a double. In that case, we need to ask the
+          // FEValuesBase object to extract function values for us from the
+          // evaluation points in the provided data type, and then copy them by
+          // hand into the output location.
           const unsigned int n_components =
             fe_patch_values.get_fe().n_components();
           const unsigned int n_eval_points =
@@ -731,11 +730,10 @@ namespace internal
 
           fe_patch_values.get_function_values(
             *vector,
-            // reinterpret output argument type; because of
-            // the 'if' statement above, this is the
-            // identity cast whenever the code is
-            // executed, but the cast is necessary
-            // to allow compilation even if we don't get here
+            // reinterpret output argument type; because of the 'if' statement
+            // above, this is the identity cast whenever the code is executed,
+            // but the cast is necessary to allow compilation even if we don't
+            // get here
             reinterpret_cast<std::vector<typename VectorType::value_type> &>(
               patch_values));
         }
@@ -769,11 +767,10 @@ namespace internal
 
           fe_patch_values.get_function_gradients(
             *vector,
-            // reinterpret output argument type; because of
-            // the 'if' statement above, this is the
-            // identity cast whenever the code is
-            // executed, but the cast is necessary
-            // to allow compilation even if we don't get here
+            // reinterpret output argument type; because of the 'if' statement
+            // above, this is the identity cast whenever the code is executed,
+            // but the cast is necessary to allow compilation even if we don't
+            // get here
             reinterpret_cast<std::vector<
               std::vector<Tensor<1,
                                  DoFHandlerType::space_dimension,
@@ -783,10 +780,10 @@ namespace internal
       else
         {
           // OK, so we know that the data type stored by the user-provided
-          // vector is not simply a double. In that case, we need to
-          // ask the FEValuesBase object to extract function values for
-          // us from the evaluation points in the provided data
-          // type, and then copy them by hand into the output location.
+          // vector is not simply a double. In that case, we need to ask the
+          // FEValuesBase object to extract function values for us from the
+          // evaluation points in the provided data type, and then copy them by
+          // hand into the output location.
           const unsigned int n_components =
             fe_patch_values.get_fe().n_components();
           const unsigned int n_eval_points =
@@ -832,11 +829,10 @@ namespace internal
 
           fe_patch_values.get_function_gradients(
             *vector,
-            // reinterpret output argument type; because of
-            // the 'if' statement above, this is the
-            // identity cast whenever the code is
-            // executed, but the cast is necessary
-            // to allow compilation even if we don't get here
+            // reinterpret output argument type; because of the 'if' statement
+            // above, this is the identity cast whenever the code is executed,
+            // but the cast is necessary to allow compilation even if we don't
+            // get here
             reinterpret_cast<
               std::vector<Tensor<1,
                                  DoFHandlerType::space_dimension,
@@ -877,11 +873,10 @@ namespace internal
 
           fe_patch_values.get_function_hessians(
             *vector,
-            // reinterpret output argument type; because of
-            // the 'if' statement above, this is the
-            // identity cast whenever the code is
-            // executed, but the cast is necessary
-            // to allow compilation even if we don't get here
+            // reinterpret output argument type; because of the 'if' statement
+            // above, this is the identity cast whenever the code is executed,
+            // but the cast is necessary to allow compilation even if we don't
+            // get here
             reinterpret_cast<std::vector<
               std::vector<Tensor<2,
                                  DoFHandlerType::space_dimension,
@@ -891,10 +886,10 @@ namespace internal
       else
         {
           // OK, so we know that the data type stored by the user-provided
-          // vector is not simply a double. In that case, we need to
-          // ask the FEValuesBase object to extract function values for
-          // us from the evaluation points in the provided data
-          // type, and then copy them by hand into the output location.
+          // vector is not simply a double. In that case, we need to ask the
+          // FEValuesBase object to extract function values for us from the
+          // evaluation points in the provided data type, and then copy them by
+          // hand into the output location.
           const unsigned int n_components =
             fe_patch_values.get_fe().n_components();
           const unsigned int n_eval_points =
@@ -940,11 +935,10 @@ namespace internal
 
           fe_patch_values.get_function_hessians(
             *vector,
-            // reinterpret output argument type; because of
-            // the 'if' statement above, this is the
-            // identity cast whenever the code is
-            // executed, but the cast is necessary
-            // to allow compilation even if we don't get here
+            // reinterpret output argument type; because of the 'if' statement
+            // above, this is the identity cast whenever the code is executed,
+            // but the cast is necessary to allow compilation even if we don't
+            // get here
             reinterpret_cast<
               std::vector<Tensor<2,
                                  DoFHandlerType ::space_dimension,
@@ -1010,8 +1004,8 @@ template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::~DataOut_DoFData()
 {
   // virtual functions called in constructors and destructors never use the
-  // override in a derived class
-  // for clarity be explicit on which function is called
+  // override in a derived class for clarity be explicit on which function is
+  // called
   DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear();
 }
 
@@ -1297,8 +1291,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   const
 {
   std::vector<std::string> names;
-  // collect the names of dof
-  // and cell data
+  // collect the names of dof and cell data
   typedef typename std::vector<std::shared_ptr<
     internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>::
     const_iterator data_iterator;
@@ -1344,17 +1337,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
   unsigned int output_component = 0;
   for (data_iterator d = dof_data.begin(); d != dof_data.end(); ++d)
     for (unsigned int i = 0; i < (*d)->n_output_variables;)
-      // see what kind of data we have
-      // here. note that for the purpose of
-      // the current function all we care
-      // about is vector data
+      // see what kind of data we have here. note that for the purpose of the
+      // current function all we care about is vector data
       if ((*d)->data_component_interpretation[i] ==
           DataComponentInterpretation::component_is_part_of_vector)
         {
-          // ensure that there is a
-          // continuous number of next
-          // space_dim components that all
-          // deal with vectors
+          // ensure that there is a continuous number of next space_dim
+          // components that all deal with vectors
           Assert(i + patch_space_dim <= (*d)->n_output_variables,
                  Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
                    i, (*d)->names[i]));
@@ -1365,12 +1354,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
                 i, (*d)->names[i]));
 
-          // all seems alright, so figure out
-          // whether there is a common name
-          // to these components. if not,
-          // leave the name empty and let the
-          // output format writer decide what
-          // to do here
+          // all seems alright, so figure out whether there is a common name to
+          // these components. if not, leave the name empty and let the output
+          // format writer decide what to do here
           std::string name = (*d)->names[i];
           for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
             if (name != (*d)->names[i + dd])
@@ -1379,17 +1365,14 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                 break;
               }
 
-          // finally add a corresponding
-          // range
+          // finally add a corresponding range
           std::tuple<unsigned int, unsigned int, std::string> range(
             output_component, output_component + patch_space_dim - 1, name);
 
           ranges.push_back(range);
 
-          // increase the 'component' counter
-          // by the appropriate amount, same
-          // for 'i', since we have already
-          // dealt with all these components
+          // increase the 'component' counter by the appropriate amount, same
+          // for 'i', since we have already dealt with all these components
           output_component += patch_space_dim;
           i += patch_space_dim;
         }
