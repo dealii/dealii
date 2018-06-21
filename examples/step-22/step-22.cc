@@ -79,7 +79,7 @@ namespace Step22
   // distinguish between them by the use of the spatial dimension as a
   // template parameter. See step-4 for details on templates. We are not going
   // to create any preconditioner object here, all we do is to create class
-  // that holds a local typedef determining the preconditioner class so we can
+  // that holds a local alias determining the preconditioner class so we can
   // write our program in a dimension-independent way.
   template <int dim>
   struct InnerPreconditioner;
@@ -88,14 +88,14 @@ namespace Step22
   template <>
   struct InnerPreconditioner<2>
   {
-    typedef SparseDirectUMFPACK type;
+    using type = SparseDirectUMFPACK;
   };
 
   // And the ILU preconditioning in 3D, called by SparseILU:
   template <>
   struct InnerPreconditioner<3>
   {
-    typedef SparseILU<double> type;
+    using type = SparseILU<double>;
   };
 
 
@@ -108,8 +108,8 @@ namespace Step22
   // <code>preconditioner_sparsity_pattern</code>.
   // In this example we also use adaptive grid refinement, which is handled
   // in analogy to step-6. According to the discussion in the introduction,
-  // we are also going to use the ConstraintMatrix for implementing Dirichlet
-  // boundary conditions. Hence, we change the name
+  // we are also going to use the AffineConstraints object for implementing
+  // Dirichlet boundary conditions. Hence, we change the name
   // <code>hanging_node_constraints</code> into <code>constraints</code>.
   template <int dim>
   class StokesProblem
@@ -131,7 +131,7 @@ namespace Step22
     FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
@@ -498,12 +498,16 @@ namespace Step22
     DoFTools::count_dofs_per_block(dof_handler,
                                    dofs_per_block,
                                    block_component);
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const unsigned int n_u = dofs_per_block[0];
+    const unsigned int n_p = dofs_per_block[1];
 
-    std::cout << "   Number of active cells: " << triangulation.n_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-              << " (" << n_u << '+' << n_p << ')' << std::endl;
+    std::cout << "   Number of active cells: "       //
+              << triangulation.n_active_cells()      //
+              << std::endl                           //
+              << "   Number of degrees of freedom: " //
+              << dof_handler.n_dofs()                //
+              << " (" << n_u << '+' << n_p << ')'    //
+              << std::endl;
 
     // The next task is to allocate a sparsity pattern for the system matrix we
     // will create and one for the preconditioner matrix. We could do this in
@@ -615,10 +619,12 @@ namespace Step22
 
     QGauss<dim> quadrature_formula(degree + 2);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_quadrature_points |
-                              update_JxW_values | update_gradients);
+    FEValues<dim> fe_values(fe,                          //
+                            quadrature_formula,          //
+                            update_values |              //
+                              update_quadrature_points | //
+                              update_JxW_values |        //
+                              update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -666,10 +672,7 @@ namespace Step22
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         local_matrix                = 0;
@@ -694,9 +697,10 @@ namespace Step22
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) -
-                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
-                      fe_values.JxW(q);
+                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) //
+                       - div_phi_u[i] * phi_p[j]                 //
+                       - phi_p[i] * div_phi_u[j])                //
+                      * fe_values.JxW(q);
 
                     local_preconditioner_matrix(i, j) +=
                       (phi_p[i] * phi_p[j]) * fe_values.JxW(q);
@@ -716,8 +720,9 @@ namespace Step22
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
-                local_rhs(i) += fe_values.shape_value(i, q) *
-                                rhs_values[q](component_i) * fe_values.JxW(q);
+                local_rhs(i) += fe_values.shape_value(i, q) * //
+                                rhs_values[q](component_i) *  //
+                                fe_values.JxW(q);
               }
           }
 
@@ -726,9 +731,9 @@ namespace Step22
         // line of the local matrix contribution.
 
         // Before we can write the local data into the global matrix (and
-        // simultaneously use the ConstraintMatrix object to apply Dirichlet
-        // boundary conditions and eliminate hanging node constraints, as we
-        // discussed in the introduction), we have to be careful about one
+        // simultaneously use the AffineConstraints object to apply
+        // Dirichlet boundary conditions and eliminate hanging node constraints,
+        // as we discussed in the introduction), we have to be careful about one
         // thing, though. We have only built half of the local matrices
         // because of symmetry, but we're going to save the full matrices
         // in order to use the standard functions for solving. This is done
@@ -757,7 +762,7 @@ namespace Step22
     // preconditioner for the velocity-velocity matrix, i.e.,
     // <code>block(0,0)</code> in the system matrix. As mentioned above, this
     // depends on the spatial dimension. Since the two classes described by
-    // the <code>InnerPreconditioner::type</code> typedef have the same
+    // the <code>InnerPreconditioner::type</code> alias have the same
     // interface, we do not have to do anything different whether we want to
     // use a sparse direct solver or an ILU:
     std::cout << "   Computing preconditioner..." << std::endl << std::flush;
@@ -847,8 +852,9 @@ namespace Step22
       // pressure field.
       constraints.distribute(solution);
 
-      std::cout << "  " << solver_control.last_step()
-                << " outer CG Schur complement iterations for pressure"
+      std::cout << "  "                                                 //
+                << solver_control.last_step()                           //
+                << " outer CG Schur complement iterations for pressure" //
                 << std::endl;
     }
 
@@ -976,10 +982,12 @@ namespace Step22
       std::vector<unsigned int> subdivisions(dim, 1);
       subdivisions[0] = 4;
 
-      const Point<dim> bottom_left =
-        (dim == 2 ? Point<dim>(-2, -1) : Point<dim>(-2, 0, -1));
-      const Point<dim> top_right =
-        (dim == 2 ? Point<dim>(2, 0) : Point<dim>(2, 1, 0));
+      const Point<dim> bottom_left = (dim == 2 ?             //
+                                        Point<dim>(-2, -1) : //
+                                        Point<dim>(-2, 0, -1));
+      const Point<dim> top_right   = (dim == 2 ?           //
+                                      Point<dim>(2, 0) : //
+                                      Point<dim>(2, 1, 0));
 
       GridGenerator::subdivided_hyper_rectangle(triangulation,
                                                 subdivisions,
@@ -991,10 +999,7 @@ namespace Step22
     // Dirichlet boundary conditions, i.e.  to faces that are located at 0 in
     // the last coordinate direction. See the example description above for
     // details.
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->center()[dim - 1] == 0)
           cell->face(f)->set_all_boundary_ids(1);
@@ -1008,7 +1013,8 @@ namespace Step22
     // As first seen in step-6, we cycle over the different refinement levels
     // and refine (except for the first cycle), setup the degrees of freedom
     // and matrices, assemble, solve and create output:
-    for (unsigned int refinement_cycle = 0; refinement_cycle < 6;
+    for (unsigned int refinement_cycle = 0; //
+         refinement_cycle < 6;              //
          ++refinement_cycle)
       {
         std::cout << "Refinement cycle " << refinement_cycle << std::endl;
