@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -9,26 +9,30 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
 #
-# This script does the same thing as contrib/utilities/indent but only
-# reformats files which have changed (or have been added but neither
-# staged/commited) since the last merge commit to the master branch.
+# This script indents all source files of deal.II according to our usual
+# code formatting standards. It is used to ensure that our code base looks
+# uniform, as uniformity helps make code easier to read.
+#
+# While we're already touching every file, this script also makes
+# sure we set permissions correctly and checks for correct unix-style line
+# endings.
 #
 # The script needs to be executed as
-#   ./contrib/utilities/indent-branch
+#   ./contrib/utilities/indent-all
 # from the top-level directory of the source tree, or via
-#   make indent-branch
+#   make indent-all
 # from a build directory.
 #
 # Note: If the script is invoked with REPORT_ONLY=true set,
-#   REPORT_ONLY=true ./contrib/utilities/indent-branch
+#   REPORT_ONLY=true ./contrib/utilities/indent-all
 # or,
-#   make REPORT_ONLY=true indent-branch
+#   make REPORT_ONLY=true indent-all
 # then indentation errors will only be reported without any actual file
 # changes.
 #
@@ -50,15 +54,15 @@ checks
 # Process all source and header files:
 #
 
-process_changed "tests include source examples" ".*\.(cc|h|cu|cuh)" format_file
-process_changed "source" ".*\.inst.in" format_inst
+process "tests include source examples" ".*\.(cc|h|cu|cuh)" format_file
+process "source" ".*\.inst.in" format_inst
 
 #
 # Fix permissions and convert to unix line ending if necessary:
 #
 
-process_changed "tests include source examples" \
+process "tests include source examples" \
   ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-process_changed "tests include source examples" \
+process "tests include source examples" \
   ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix

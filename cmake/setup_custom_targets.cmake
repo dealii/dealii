@@ -103,18 +103,18 @@ ENDIF()
 # Provide an indentation target for indenting uncommitted changes and changes on
 # the current feature branch
 #
-ADD_CUSTOM_TARGET(indent-branch
+ADD_CUSTOM_TARGET(indent
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMAND ./contrib/utilities/indent-branch
+  COMMAND ./contrib/utilities/indent
   COMMENT "Indenting recently changed files in the deal.II directories"
   )
 
 #
 # Provide "indent" target for indenting all headers and source files
 #
-ADD_CUSTOM_TARGET(indent
+ADD_CUSTOM_TARGET(indent-all
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMAND ./contrib/utilities/indent
+  COMMAND ./contrib/utilities/indent-all
   COMMENT "Indenting all files in the deal.II directories"
   )
 
@@ -155,9 +155,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    setup_tests    - set up testsuite subprojects
 #    prune_tests    - remove all testsuite subprojects
 #
-#    indent         - indent all headers and source files
-#    indent-branch  - indent all headers and source files that changed since the
+#    indent         - indent all headers and source files that changed since the
 #                     last commit to master, including untracked ones
+#    indent-all     - indent all headers and source files
 ")
 
 #
