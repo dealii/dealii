@@ -233,13 +233,9 @@ class Triangulation;
  *   {
  *     sweep_no = s;
  *
- *                                 // reset the number each
- *                                 // time step has, since some time
- *                                 // steps might have been added since
- *                                 // the last time we visited them
- *                                 //
- *                                 // also set the sweep we will
- *                                 // process in the sequel
+ *    // reset the number each time step has, since some time steps might have
+ *    // been added since the last time we visited them.
+ *    // also set the sweep we will process in the sequel
  *     for (unsigned int step=0; step<timesteps.size(); ++step)
  *       {
  *         timesteps[step]->set_timestep_no (step);
@@ -255,8 +251,11 @@ class Triangulation;
  *   TimeDependent::solve_primal_problem ()
  *   {
  *     do_loop (std::bind(&TimeStepBase::init_for_primal_problem,
- * std::placeholders::_1), std::bind(&TimeStepBase::solve_primal_problem,
- * std::placeholders::_1), timestepping_data_primal, forward);
+ *                        std::placeholders::_1),
+ *              std::bind(&TimeStepBase::solve_primal_problem,
+ *                        std::placeholders::_1),
+ *              timestepping_data_primal,
+ *              forward);
  *   };
  * @endcode
  * The latter function shows rather clear how most of the loops are invoked
@@ -285,10 +284,11 @@ class Triangulation;
  *   ...
  *
  *   do_loop (std::bind(&TimeStepBase_Tria<dim>::init_for_refinement,
- * std::placeholders::_1), std::bind(&TimeStepBase_Wave<dim>::refine_grid,
+ *                      std::placeholders::_1),
+ *            std::bind(&TimeStepBase_Wave<dim>::refine_grid,
  *                      std::placeholders::_1,
- *                      TimeStepBase_Tria<dim>::RefinementData (top_threshold,
- *                                                              bottom_threshold)),
+ *                      TimeStepBase_Tria<dim>::RefinementData (
+ *                        top_threshold, bottom_threshold)),
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * @endcode
@@ -311,41 +311,48 @@ class Triangulation;
  *                           const TimeSteppingData &timestepping_data,
  *                           const Direction         direction)
  *   {
- *                                 // initialize the time steps for
- *                                 // a round of this loop
+ *     // initialize the time steps for a round of this loop
  *     for (unsigned int step=0; step<n_timesteps; ++step)
  *       init_function (static_cast<typename InitFunctionObject::argument_type>
- *                 (timesteps[step]));
+ *                        (timesteps[step]));
  *
- *                                 // wake up the first few time levels
+ *     // wake up the first few time levels
  *     for (int step=-timestepping_data.look_ahead; step<0; ++step)
- *       for (int look_ahead=0; look_ahead<=timestepping_data.look_ahead;
- * ++look_ahead) timesteps[step+look_ahead]->wake_up(look_ahead);
+ *       for (int look_ahead=0;
+ *            look_ahead<=timestepping_data.look_ahead;
+ *            ++look_ahead)
+ *         timesteps[step+look_ahead]->wake_up(look_ahead);
  *
  *
  *     for (unsigned int step=0; step<n_timesteps; ++step)
  *       {
- *                                     // first thing: wake up the
- *                                     // timesteps ahead as necessary
+ *         // first thing: wake up the timesteps ahead as necessary
  *         for (unsigned int look_ahead=0;
- *         look_ahead<=timestepping_data.look_ahead; ++look_ahead)
- *      timesteps[step+look_ahead]->wake_up(look_ahead);
+ *              look_ahead<=timestepping_data.look_ahead;
+ *              ++look_ahead)
+ *           timesteps[step+look_ahead]->wake_up(look_ahead);
  *
  *
- *                                     // actually do the work
- *         loop_function (static_cast<typename
- * LoopFunctionObject::argument_type> (timesteps[step]));
+ *         // actually do the work
+ *         loop_function(
+ *           static_cast<typename LoopFunctionObject::argument_type> (
+ *             timesteps[step]));
  *
- *                                     // let the timesteps behind sleep
+ *         // let the timesteps behind sleep
  *         for (unsigned int look_back=0;
- * look_back<=timestepping_data.look_back; ++look_back)
- *      timesteps[step-look_back]->sleep(look_back);
+ *              look_back<=timestepping_data.look_back;
+ *              ++look_back)
+ *           timesteps[step-look_back]->sleep(look_back);
  *       };
  *
- *                                 // make the last few timesteps sleep
- *     for (int step=n_timesteps; n_timesteps+timestepping_data.look_back;
- * ++step) for (int look_back=0; look_back<=timestepping_data.look_back;
- * ++look_back) timesteps[step-look_back]->sleep(look_back);
+ *     // make the last few timesteps sleep
+ *     for (int step=n_timesteps;
+ *          step<=n_timesteps+timestepping_data.look_back;
+ *          ++step)
+ *       for (int look_back=0;
+ *            look_back<=timestepping_data.look_back;
+ *            ++look_back)
+ *         timesteps[step-look_back]->sleep(look_back);
  *   };
  * @endcode
  *

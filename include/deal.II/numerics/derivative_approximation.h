@@ -76,9 +76,10 @@ DEAL_II_NAMESPACE_OPEN
  * DoFHandlerType<dim,spacedim>&, const InputVector&, unsigned int, const
  *  std::pair<unsigned int, unsigned int>&, Vector<float>&) [with
  * DerivativeDescription = DerivativeApproximation::Gradient<3>, int dim = 3,
- * DoFHandlerType = DoFHandler, InputVector = Vector<double>] The violated
- * condition was: determinant(Y) != 0 The name and call sequence of the
- * exception was: ExcInsufficientDirections() Additional Information: (none)
+ * DoFHandlerType = DoFHandler, InputVector = Vector<double>]
+ * The violated condition was: determinant(Y) != 0
+ * The name and call sequence of the exception was: ExcInsufficientDirections()
+ * Additional Information: (none)
  * --------------------------------------------------------
  * @endcode
  * As can easily be verified, this can only happen on very coarse grids, when

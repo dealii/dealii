@@ -50,41 +50,45 @@ DEAL_II_NAMESPACE_OPEN
  * use @p SolutionTransfer as follows:
  * @code
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
- *                                     // flag some cells for refinement, e.g.
- * GridRefinement::refine_and_coarsen_fixed_fraction(
- *   *tria, error_indicators, 0.3, 0);
- *                                     // prepare the triangulation
- *                                     // for refinement,
+ *
+ * // flag some cells for refinement, e.g.
+ * GridRefinement::refine_and_coarsen_fixed_fraction(*tria,
+ *                                                   error_indicators,
+ *                                                   0.3,
+ *                                                   0);
+ * // prepare the triangulation for refinement,
  * tria->prepare_coarsening_and_refinement();
- *                                     // tell the SolutionTransfer object
- *                                     // that we intend to do pure refinement,
+ *
+ * // tell the SolutionTransfer object that we intend to do pure refinement,
  * soltrans.prepare_for_pure_refinement();
- *                                     // actually execute the refinement,
+ *
+ * // actually execute the refinement,
  * tria->execute_coarsening_and_refinement();
- *                                     // and redistribute dofs.
+ *
+ * // and redistribute dofs.
  * dof_handler->distribute_dofs (fe);
  * @endcode
  *
  * Then to proceed do
  * @code
- *                                     // take a copy of the solution vector
+ * // take a copy of the solution vector
  * Vector<double> solution_old(solution);
- *                                     // resize solution vector to the correct
- *                                     // size, as the @p refine_interpolate
- *                                     // function requires the vectors to be
- *                                     // of right sizes
+ *
+ * // resize solution vector to the correct size, as the @p refine_interpolate
+ * // function requires the vectors to be of right sizes
  * solution.reinit(dof_handler->n_dofs());
- *                                     // and finally interpolate
+ *
+ * // and finally interpolate
  * soltrans.refine_interpolate(solution_old, solution);
  * @endcode
  *
  * Although the @p refine_interpolate functions are allowed to be called
  * multiple times, e.g. for interpolating several solution vectors, there is
- * following possibility of interpolating several functions simultaneously.
+ * the following possibility of interpolating several functions simultaneously.
  * @code
- * vector<Vector<double> > solutions_old(n_vectors, Vector<double> (n));
+ * std::vector<Vector<double> > solutions_old(n_vectors, Vector<double> (n));
  * ...
- * vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
+ * std::vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
  * soltrans.refine_interpolate(solutions_old, solutions);
  * @endcode
  * This is used in several of the tutorial programs, for example step-31.
@@ -93,22 +97,27 @@ DEAL_II_NAMESPACE_OPEN
  * SolutionTransfer as follows:
  * @code
  * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
- *                                     // flag some cells for refinement
- *                                     // and coarsening, e.g.
- * GridRefinement::refine_and_coarsen_fixed_fraction(
- *   *tria, error_indicators, 0.3, 0.05);
- *                                     // prepare the triangulation,
+ *
+ * // flag some cells for refinement and coarsening, e.g.
+ * GridRefinement::refine_and_coarsen_fixed_fraction(*tria,
+ *                                                   error_indicators,
+ *                                                   0.3,
+ *                                                   0.05);
+ *
+ * // prepare the triangulation,
  * tria->prepare_coarsening_and_refinement();
- *                                     // prepare the SolutionTransfer object
- *                                     // for coarsening and refinement and give
- *                                     // the solution vector that we intend to
- *                                     // interpolate later,
+ *
+ * // prepare the SolutionTransfer object for coarsening and refinement and give
+ * // the solution vector that we intend to interpolate later,
  * soltrans.prepare_for_coarsening_and_refinement(solution);
- *                                     // actually execute the refinement,
+ *
+ * // actually execute the refinement,
  * tria->execute_coarsening_and_refinement ();
- *                                     // redistribute dofs,
+ *
+ * // redistribute dofs,
  * dof_handler->distribute_dofs (fe);
- *                                     // and interpolate the solution
+ *
+ * // and interpolate the solution
  * Vector<double> interpolate_solution(dof_handler->n_dofs());
  * soltrans.interpolate(solution, interpolated_solution);
  * @endcode

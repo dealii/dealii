@@ -92,8 +92,8 @@ namespace Functions
    *
    * // Now project it to the second domain
    * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
-   * VectorTools::project (dh_2, constraints_2, quad, fe_function_1,
-   * solution_2);
+   * VectorTools::project (dh_2, constraints_2, quad,
+   *                       fe_function_1, solution_2);
    *
    * // Or interpolate it...
    * Vector<double> solution_3;
