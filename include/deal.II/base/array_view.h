@@ -48,15 +48,12 @@ DEAL_II_NAMESPACE_OPEN
  * template argument type of this class needs to be @p const as well. The
  * following code snippet gives an example:
  * @code
- *   std::vector<int>       array       = get_data();  // a writable array
- *
- *   ArrayView<int> view (&array[5], 5);               // a view of
- * elements 5..9 (inclusive) view[2] = 42; // array[7] is set to 42
- *
- *   ArrayView<const int> const_view (&array[5], 5);   // same view, but
- * read-only int element_7 = const_view[2];                    // returns 42
- *   const_view[2] = 42;                               // error, can't write
- * into this view
+ * std::vector<int> array = get_data(); // a writable array
+ * ArrayView<int> view (&array[5], 5); // a view of elements 5..9 (inclusive)
+ * view[2] = 42; // array[7] is set to 42
+ * ArrayView<const int> const_view (&array[5], 5); // same view, but read-only
+ * int element_7 = const_view[2]; // set element_7 to 42
+ * const_view[2] = 42; // this line won't compile; can't write into this view
  * @endcode
  * In either case, accessing an element of a view does not change the
  * ArrayView object itself, and consequently ArrayView::operator[] is a @p

@@ -2036,26 +2036,25 @@ namespace DataOutBase
    * <code>std::vector@<std::pair@<double,std::string@> @></code>):
    *
    * @code
-   *  template <int dim>
-   *  void MyEquation<dim>::output_results () const
-   *  {
-   *    DataOut<dim> data_out;
+   * template <int dim>
+   * void MyEquation<dim>::output_results () const
+   * {
+   *   DataOut<dim> data_out;
    *
-   *    data_out.attach_dof_handler (dof_handler);
-   *    data_out.add_data_vector (solution, "U");
-   *    data_out.build_patches ();
+   *   data_out.attach_dof_handler(dof_handler);
+   *   data_out.add_data_vector(solution, "U");
+   *   data_out.build_patches();
    *
-   *    const std::string filename = "solution-" +
-   *                                 Utilities::int_to_string (timestep_number,
-   * 3) +
-   *                                 ".vtu";
-   *    std::ofstream output (filename.c_str());
-   *    data_out.write_vtu (output);
+   *   const std::string filename = "solution-" +
+   *                                Utilities::int_to_string (timestep_n, 3) +
+   *                                ".vtu";
+   *   std::ofstream output(filename);
+   *   data_out.write_vtu(output);
    *
-   *    times_and_names.emplace_back (time, filename);
-   *    std::ofstream pvd_output ("solution.pvd");
-   *    DataOutBase::write_pvd_record (pvd_output, times_and_names);
-   *  }
+   *   times_and_names.emplace_back (time, filename);
+   *   std::ofstream pvd_output ("solution.pvd");
+   *   DataOutBase::write_pvd_record (pvd_output, times_and_names);
+   * }
    * @endcode
    *
    * @note See DataOutInterface::write_vtu, DataOutInterface::write_pvtu_record,
@@ -2095,21 +2094,21 @@ namespace DataOutBase
    * multiple time steps. Here is an example of how the function would be
    * used:
    * @code
-   *  const unsigned int number_of_time_steps = 3;
-   *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
+   * const unsigned int number_of_time_steps = 3;
+   * std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
    *
-   *  piece_names[0].emplace_back("subdomain_01.time_step_0.vtk");
-   *  piece_names[0].emplace_back("subdomain_02.time_step_0.vtk");
+   * piece_names[0].emplace_back("subdomain_01.time_step_0.vtk");
+   * piece_names[0].emplace_back("subdomain_02.time_step_0.vtk");
    *
-   *  piece_names[1].emplace_back("subdomain_01.time_step_1.vtk");
-   *  piece_names[1].emplace_back("subdomain_02.time_step_1.vtk");
+   * piece_names[1].emplace_back("subdomain_01.time_step_1.vtk");
+   * piece_names[1].emplace_back("subdomain_02.time_step_1.vtk");
    *
-   *  piece_names[2].emplace_back("subdomain_01.time_step_2.vtk");
-   *  piece_names[2].emplace_back("subdomain_02.time_step_2.vtk");
+   * piece_names[2].emplace_back("subdomain_01.time_step_2.vtk");
+   * piece_names[2].emplace_back("subdomain_02.time_step_2.vtk");
    *
-   *  std::ofstream visit_output ("master_file.visit");
+   * std::ofstream visit_output ("master_file.visit");
    *
-   *  DataOutBase::write_visit_record(visit_output, piece_names);
+   * DataOutBase::write_visit_record(visit_output, piece_names);
    * @endcode
    *
    * This function is documented in the "Creating a master file for parallel"
@@ -2127,25 +2126,25 @@ namespace DataOutBase
    * each timestep. Here is an example of how the function would be
    * used:
    * @code
-   *  const unsigned int number_of_time_steps = 3;
-   *  std::vector<std::pair<double,std::vector<std::string > > >
+   * const unsigned int number_of_time_steps = 3;
+   * std::vector<std::pair<double,std::vector<std::string > > >
    * times_and_piece_names(number_of_time_steps);
    *
-   *  times_and_piece_names[0].first = 0.0;
-   *  times_and_piece_names[0].second.emplace_back("subdomain_01.time_step_0.vtk");
-   *  times_and_piece_names[0].second.emplace_back("subdomain_02.time_step_0.vtk");
+   * times_and_piece_names[0].first = 0.0;
+   * times_and_piece_names[0].second.emplace_back("subdomain_01.time_step_0.vtk");
+   * times_and_piece_names[0].second.emplace_back("subdomain_02.time_step_0.vtk");
    *
-   *  times_and_piece_names[1].first = 0.5;
-   *  times_and_piece_names[1].second.emplace_back("subdomain_01.time_step_1.vtk");
-   *  times_and_piece_names[1].second.emplace_back("subdomain_02.time_step_1.vtk");
+   * times_and_piece_names[1].first = 0.5;
+   * times_and_piece_names[1].second.emplace_back("subdomain_01.time_step_1.vtk");
+   * times_and_piece_names[1].second.emplace_back("subdomain_02.time_step_1.vtk");
    *
-   *  times_and_piece_names[2].first = 1.0;
-   *  times_and_piece_names[2].second.emplace_back("subdomain_01.time_step_2.vtk");
-   *  times_and_piece_names[2].second.emplace_back("subdomain_02.time_step_2.vtk");
+   * times_and_piece_names[2].first = 1.0;
+   * times_and_piece_names[2].second.emplace_back("subdomain_01.time_step_2.vtk");
+   * times_and_piece_names[2].second.emplace_back("subdomain_02.time_step_2.vtk");
    *
-   *  std::ofstream visit_output ("master_file.visit");
+   * std::ofstream visit_output ("master_file.visit");
    *
-   *  DataOutBase::write_visit_record(visit_output, times_and_piece_names);
+   * DataOutBase::write_visit_record(visit_output, times_and_piece_names);
    * @endcode
    *
    * This function is documented in the "Creating a master file for parallel"
@@ -2438,21 +2437,17 @@ namespace DataOutBase
  *
  * Usage is as follows:
  * @code
- *                               // within function declaring parameters:
- *   ...
- *   prm.enter_subsection ("Output format options");
- *     DataOutInterface<dim>::declare_parameters (prm);
- *   prm.leave_subsection ();
- *   ...
+ *   // within function declaring parameters:
+ *   prm.enter_subsection("Output format options");
+ *   DataOutInterface<dim>::declare_parameters(prm);
+ *   prm.leave_subsection();
  *
- *
- *                               // within function doing the output:
  *   ...
+ *   // within function doing the output:
  *   DataOut<dim> out;
- *   prm.enter_subsection ("Output format options");
- *   out.parse_parameters (prm);
- *   prm.leave_subsection ();
- *   ...
+ *   prm.enter_subsection("Output format options");
+ *   out.parse_parameters(prm);
+ *   prm.leave_subsection();
  * @endcode
  * Note that in the present example, the class <tt>DataOut</tt> was used.
  * However, any other class derived from <tt>DataOutInterface</tt> would work
@@ -2687,16 +2682,18 @@ public:
    * DataOutFilter:
    *
    * @code
-   * DataOutBase::DataOutFilter
-   * data_filter(DataOutBase::DataOutFilterFlags(true, true));
-   * std::vector<XDMFEntry>       xdmf_entries;
+   * DataOutBase::DataOutFilterFlags flags(true, true)
+   * DataOutBase::DataOutFilter data_filter(flags);
+   * std::vector<XDMFEntry> xdmf_entries;
    * // Filter the data and store it in data_filter
    * data_out.write_filtered_data(data_filter);
    * // Write the filtered data to HDF5
    * data_out.write_hdf5_parallel(data_filter, "solution.h5", MPI_COMM_WORLD);
    * // Create an XDMF entry detailing the HDF5 file
-   * new_xdmf_entry = data_out.create_xdmf_entry(data_filter, "solution.h5",
-   * simulation_time, MPI_COMM_WORLD);
+   * auto new_xdmf_entry = data_out.create_xdmf_entry(data_filter,
+   *                                                  "solution.h5",
+   *                                                  simulation_time,
+   *                                                  MPI_COMM_WORLD);
    * // Add the XDMF entry to the list
    * xdmf_entries.push_back(new_xdmf_entry);
    * // Create an XDMF file from all stored entries
@@ -2714,8 +2711,8 @@ public:
    * with the DataOutFilter:
    *
    * @code
-   * DataOutBase::DataOutFilter
-   * data_filter(DataOutBase::DataOutFilterFlags(true, true));
+   * DataOutBase::DataOutFilterFlags flags(true, true)
+   * DataOutBase::DataOutFilter data_filter(flags);
    * // Filter the data and store it in data_filter
    * data_out.write_filtered_data(data_filter);
    * // Write the filtered data to HDF5
