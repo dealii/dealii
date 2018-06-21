@@ -1357,6 +1357,46 @@ Tensor<rank_, dim, Number>::component_to_unrolled_index(
 }
 
 
+
+namespace internal
+{
+  // unrolled_to_component_indices is instantiated from DataOut for dim==0
+  // and rank=2. Make sure we don't have compiler warnings.
+
+  template <int dim>
+  inline unsigned int
+  mod(const unsigned int x)
+  {
+    return x % dim;
+  }
+
+  template <>
+  inline unsigned int
+  mod<0>(const unsigned int x)
+  {
+    Assert(false, ExcInternalError());
+    return x;
+  }
+
+  template <int dim>
+  inline unsigned int
+  div(const unsigned int x)
+  {
+    return x / dim;
+  }
+
+  template <>
+  inline unsigned int
+  div<0>(const unsigned int x)
+  {
+    Assert(false, ExcInternalError());
+    return x;
+  }
+
+} // namespace internal
+
+
+
 template <int rank_, int dim, typename Number>
 inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
@@ -1369,8 +1409,8 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
   unsigned int remainder = i;
   for (int r = rank_ - 1; r >= 0; --r)
     {
-      indices[r] = (remainder % dim);
-      remainder /= dim;
+      indices[r] = internal::mod<dim>(remainder);
+      remainder  = internal::div<dim>(remainder);
     }
   Assert(remainder == 0, ExcInternalError());
 

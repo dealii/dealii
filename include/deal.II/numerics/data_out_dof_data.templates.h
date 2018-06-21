@@ -1212,8 +1212,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
   if (actual_type == type_dof_data)
     {
       // output vectors for which at least part of the data is to be interpreted
-      // as vector fields cannot be complex-valued, because we cannot visualize
-      // complex-valued vector fields
+      // as vector or tensor fields cannot be complex-valued, because we cannot
+      // visualize complex-valued vector fields
       Assert(!((std::find(
                   data_component_interpretation.begin(),
                   data_component_interpretation.end(),
@@ -1225,6 +1225,20 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                "cannot contain components that shall be interpreted as "
                "vector fields because one can not visualize complex-valued "
                "vector fields. However, you may want to try to output "
+               "this vector as a collection of scalar fields that can then "
+               "be visualized by their real and imaginary parts separately."));
+
+      Assert(!((std::find(
+                  data_component_interpretation.begin(),
+                  data_component_interpretation.end(),
+                  DataComponentInterpretation::component_is_part_of_tensor) !=
+                data_component_interpretation.end()) &&
+               new_entry->is_complex_valued()),
+             ExcMessage(
+               "Complex-valued vectors added to a DataOut-like object "
+               "cannot contain components that shall be interpreted as "
+               "tensor fields because one can not visualize complex-valued "
+               "tensor fields. However, you may want to try to output "
                "this vector as a collection of scalar fields that can then "
                "be visualized by their real and imaginary parts separately."));
 
@@ -1390,6 +1404,45 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
           // for 'i', since we have already dealt with all these components
           output_component += patch_space_dim;
           i += patch_space_dim;
+        }
+      else if ((*d)->data_component_interpretation[i] ==
+               DataComponentInterpretation::component_is_part_of_tensor)
+        {
+          const unsigned int size = patch_space_dim * patch_space_dim;
+          // ensure that there is a continuous number of next
+          // space_dim*space_dim components that all deal with tensors
+          Assert(i + size <= (*d)->n_output_variables,
+                 Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
+                   i, (*d)->names[i]));
+          for (unsigned int dd = 1; dd < size; ++dd)
+            Assert(
+              (*d)->data_component_interpretation[i + dd] ==
+                DataComponentInterpretation::component_is_part_of_tensor,
+              Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
+                i, (*d)->names[i]));
+
+          // all seems alright, so figure out whether there is a common name to
+          // these components. if not, leave the name empty and let the output
+          // format writer decide what to do here
+          std::string name = (*d)->names[i];
+          for (unsigned int dd = 1; dd < size; ++dd)
+            if (name != (*d)->names[i + dd])
+              {
+                name = "";
+                break;
+              }
+
+          // finally add a corresponding range
+          ranges.push_back(std::make_tuple(
+            output_component,
+            output_component + size - 1,
+            name,
+            DataComponentInterpretation::component_is_part_of_tensor));
+
+          // increase the 'component' counter by the appropriate amount, same
+          // for 'i', since we have already dealt with all these components
+          output_component += size;
+          i += size;
         }
       else
         {

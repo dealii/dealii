@@ -58,7 +58,13 @@ namespace DataComponentInterpretation
      * Indicates that a component of a data set is part of a vector-valued
      * quantity.
      */
-    component_is_part_of_vector
+    component_is_part_of_vector,
+
+    /**
+     * Indicates that a component of a data set is part of a tensor-valued
+     * (2nd order) quantity.
+     */
+    component_is_part_of_tensor
   };
 } // namespace DataComponentInterpretation
 
