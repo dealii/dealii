@@ -5465,20 +5465,16 @@ namespace DataOutBase
 
     const double nblocks = piece_names[0].size();
     Assert(nblocks > 0,
-           ExcMessage("piece_names should be a vector of nonempty vectors."))
+           ExcMessage("piece_names should be a vector of nonempty vectors."));
 
-        out
-      << "!NBLOCKS " << nblocks << '\n';
-    for (std::vector<std::vector<std::string>>::const_iterator domain =
-           piece_names.begin();
-         domain != piece_names.end();
-         ++domain)
+    out << "!NBLOCKS " << nblocks << '\n';
+    for (const auto &domain : piece_names)
       {
-        Assert(domain->size() == nblocks, ExcMessage("piece_names should be a vector of equal sized vectors.")) for (
-          std::vector<std::string>::const_iterator subdomain = domain->begin();
-          subdomain != domain->end();
-          ++subdomain) out
-          << *subdomain << '\n';
+        Assert(domain.size() == nblocks,
+               ExcMessage(
+                 "piece_names should be a vector of equal sized vectors."));
+        for (const auto &subdomain : domain)
+          out << subdomain << '\n';
       }
 
     out << std::flush;
@@ -5501,27 +5497,19 @@ namespace DataOutBase
     Assert(
       nblocks > 0,
       ExcMessage(
-        "time_and_piece_names should contain nonempty vectors of filenames for every timestep."))
+        "time_and_piece_names should contain nonempty vectors of filenames for every timestep."));
 
-        for (std::vector<std::pair<double, std::vector<std::string>>>::
-               const_iterator domain = times_and_piece_names.begin();
-             domain != times_and_piece_names.end();
-             ++domain) out
-      << "!TIME " << domain->first << '\n';
+    for (const auto &domain : times_and_piece_names)
+      out << "!TIME " << domain.first << '\n';
 
     out << "!NBLOCKS " << nblocks << '\n';
-    for (std::vector<
-           std::pair<double, std::vector<std::string>>>::const_iterator domain =
-           times_and_piece_names.begin();
-         domain != times_and_piece_names.end();
-         ++domain)
+    for (const auto &domain : times_and_piece_names)
       {
-        Assert(domain->second.size() == nblocks, ExcMessage("piece_names should be a vector of equal sized vectors.")) for (
-          std::vector<std::string>::const_iterator subdomain =
-            domain->second.begin();
-          subdomain != domain->second.end();
-          ++subdomain) out
-          << *subdomain << '\n';
+        Assert(domain.second.size() == nblocks,
+               ExcMessage(
+                 "piece_names should be a vector of equal sized vectors."));
+        for (const auto &subdomain : domain.second)
+          out << subdomain << '\n';
       }
 
     out << std::flush;
