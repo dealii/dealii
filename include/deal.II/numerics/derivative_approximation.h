@@ -70,16 +70,17 @@ DEAL_II_NAMESPACE_OPEN
  * error similar to this one:
  * @code
  * --------------------------------------------------------
- * An error occurred in line <749> of file
- * <source/numerics/derivative_approximation.cc> in function void
- * DerivativeApproximation::approximate(const Mapping<dim,spacedim>&, const
- * DoFHandlerType<dim,spacedim>&, const InputVector&, unsigned int, const
- *  std::pair<unsigned int, unsigned int>&, Vector<float>&) [with
- * DerivativeDescription = DerivativeApproximation::Gradient<3>, int dim = 3,
- * DoFHandlerType = DoFHandler, InputVector = Vector<double>]
- * The violated condition was: determinant(Y) != 0
- * The name and call sequence of the exception was: ExcInsufficientDirections()
- * Additional Information: (none)
+ * An error occurred in line <749>
+ * of file <source/numerics/derivative_approximation.cc> in function
+ *     void DerivativeApproximation::approximate(...)
+ * [with DerivativeDescription = DerivativeApproximation::Gradient<3>, int
+ * dim = 3, DoFHandlerType = DoFHandler, InputVector = Vector<double>]
+ * The violated condition was:
+ *     determinant(Y) != 0
+ * The name and call sequence of the exception was:
+ *     ExcInsufficientDirections()
+ * Additional Information:
+ * (none)
  * --------------------------------------------------------
  * @endcode
  * As can easily be verified, this can only happen on very coarse grids, when
