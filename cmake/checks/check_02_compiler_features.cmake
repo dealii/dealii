@@ -312,6 +312,10 @@ CHECK_CXX_SOURCE_COMPILES(
             [[deprecated]] void test();
           };
 
+          template <int dim>
+          struct foo {};
+          using bar [[deprecated]] = foo<2>;
+
           int main () {}
   "
   DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
@@ -328,6 +332,10 @@ CHECK_CXX_SOURCE_COMPILES(
             __attribute__((deprecated)) bob(int i);
             __attribute__((deprecated)) void test();
           };
+
+          template <int dim>
+          struct foo {};
+          using bar __attribute__((deprecated)) = foo<2>;
 
           int main () {}
   "
