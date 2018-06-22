@@ -1138,18 +1138,19 @@ namespace DoFTools
                   for (unsigned int c = 0;
                        c < cell->face(face)->number_of_children();
                        ++c)
-                    if (!cell->neighbor_child_on_subface(face, c)
-                           ->is_artificial())
-                      {
-                        mother_face_dominates =
-                          mother_face_dominates &
-                          (cell->get_fe().compare_for_face_domination(
-                            cell->neighbor_child_on_subface(face, c)
-                              ->get_fe()));
-                        fe_ind_face_subface.insert(
-                          cell->neighbor_child_on_subface(face, c)
-                            ->active_fe_index());
-                      }
+                    {
+                      const auto subcell =
+                        cell->neighbor_child_on_subface(face, c);
+                      if (!subcell->is_artificial())
+                        {
+                          mother_face_dominates =
+                            mother_face_dominates &
+                            (cell->get_fe().compare_for_face_domination(
+                              subcell->get_fe()));
+                          fe_ind_face_subface.insert(
+                            subcell->active_fe_index());
+                        }
+                    }
 
                 switch (mother_face_dominates)
                   {
@@ -1251,10 +1252,10 @@ namespace DoFTools
                                                    [cell->active_fe_index()]
                                                    [subface_fe_index][c]),
                                                constraints);
-                          }
+                          } // loop over subfaces
 
                         break;
-                      }
+                      } // Case 1
 
                     case FiniteElementDomination::other_element_dominates:
                     case FiniteElementDomination::neither_element_dominates:
@@ -1445,10 +1446,10 @@ namespace DoFTools
                                                slave_dofs,
                                                constraint_matrix,
                                                constraints);
-                          }
+                          } // loop over subfaces
 
                         break;
-                      }
+                      } // Case 2
 
                     case FiniteElementDomination::no_requirements:
                       // there are no continuity requirements between the two
