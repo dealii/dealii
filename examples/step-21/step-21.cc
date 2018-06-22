@@ -228,8 +228,8 @@ namespace Step21
   //
   // We therefore simply create a function that returns zero in all
   // components. We do that by simply forward every function to the
-  // Functions::ZeroFunction class. Why not use that right away in the places of
-  // this program where we presently use the <code>InitialValues</code> class?
+  // Functions::ZeroFunction class. Why not use that right away in the places of this
+  // program where we presently use the <code>InitialValues</code> class?
   // Because this way it is simpler to later go back and choose a different
   // function for initial values.
   template <int dim>
@@ -444,16 +444,15 @@ namespace Step21
   // The linear solvers we use are also completely analogous to the ones used
   // in step-20. The following classes are therefore copied verbatim from
   // there. Note that the classes here are not only copied from
-  // step-20, but also duplicate classes in deal.II. In a future version of this
-  // example, they should be replaced by an efficient method, though. There is a
-  // single change: if the size of a linear system is small, i.e. when the mesh
-  // is very coarse, then it is sometimes not sufficient to set a maximum of
-  // <code>src.size()</code> CG iterations before the solver in the
-  // <code>vmult()</code> function converges. (This is, of course, a result of
-  // numerical round-off, since we know that on paper, the CG method converges
-  // in at most <code>src.size()</code> steps.) As a consequence, we set the
-  // maximum number of iterations equal to the maximum of the size of the linear
-  // system and 200.
+  // step-20, but also duplicate classes in deal.II. In a future version of this example, they should be
+  // replaced by an efficient method, though. There is a single change: if the size of a linear system is small,
+  // i.e. when the mesh is very coarse, then it is sometimes not sufficient to
+  // set a maximum of <code>src.size()</code> CG iterations before the solver
+  // in the <code>vmult()</code> function converges. (This is, of course, a
+  // result of numerical round-off, since we know that on paper, the CG method
+  // converges in at most <code>src.size()</code> steps.) As a consequence, we
+  // set the maximum number of iterations equal to the maximum of the size of
+  // the linear system and 200.
   template <class MatrixType>
   class InverseMatrix : public Subscriptor
   {

@@ -1877,8 +1877,8 @@ namespace TrilinosWrappers
   {
     Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
     compress(
-      ::dealii::VectorOperation::unknown); // TODO: why do we do this? Should we
-                                           // not check for is_compressed?
+      ::dealii::VectorOperation::
+        unknown); // TODO: why do we do this? Should we not check for is_compressed?
 
     const int ierr = matrix->PutScalar(d);
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -2304,8 +2304,7 @@ namespace TrilinosWrappers
 #  ifdef ML_MPI
       const Epetra_MpiComm *epcomm = dynamic_cast<const Epetra_MpiComm *>(
         &(inputleft.trilinos_matrix().Comm()));
-      // Get the MPI communicator, as it may not be MPI_COMM_W0RLD, and update
-      // the ML comm object
+      // Get the MPI communicator, as it may not be MPI_COMM_W0RLD, and update the ML comm object
       if (epcomm)
         ML_Comm_Set_UsrComm(comm, epcomm->Comm());
 #  endif
@@ -3001,7 +3000,7 @@ namespace TrilinosWrappers
                                        const TrilinosPayload &second_op)
         : use_transpose(false)
         , // The combination of operators provides the exact
-          // definition of the operation
+        // definition of the operation
         communicator(first_op.communicator)
         , domain_map(second_op.domain_map)
         , range_map(first_op.range_map)

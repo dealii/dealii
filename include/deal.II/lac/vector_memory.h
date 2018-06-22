@@ -45,10 +45,9 @@ DEAL_II_NAMESPACE_OPEN
  * for auxiliary vectors. One could allocate and release them anew every time,
  * but this may be expensive in some situations if it has to happen very
  * frequently. A common case for this is when an iterative method is used to
- * invert a matrix in each iteration of an outer solver, such as when inverting
- * a matrix block for a Schur complement solver. (step-20 does this, for
- * example, but instead just keeps a vector around permanently for temporary
- * storage.)
+ * invert a matrix in each iteration of an outer solver, such as when inverting a
+ * matrix block for a Schur complement solver. (step-20 does this, for example,
+ * but instead just keeps a vector around permanently for temporary storage.)
  *
  * In such situations, allocating and deallocating vectors anew in each call
  * to the inner solver is expensive and leads to memory fragmentation. The
@@ -174,11 +173,11 @@ public:
    * to the constructor of this class. The destructor then automatically
    * returns the vector's ownership to the same VectorMemory object.
    *
-   * Pointers of this type are therefore safe in the sense that they
-   * automatically call VectorMemory::free() when they are destroyed, whether
-   * that happens at the end of a code block or because local variables are
-   * destroyed during exception unwinding. These kinds of object thus relieve
-   * the user from using vector management functions explicitly.
+   * Pointers of this type are therefore safe in the sense that they automatically
+   * call VectorMemory::free() when they are destroyed, whether that happens
+   * at the end of a code block or because local variables are destroyed during
+   * exception unwinding. These kinds of object thus relieve the user from
+   * using vector management functions explicitly.
    *
    * In many senses, this class acts like <code>std::unique_ptr</code> in that
    * it is the unique owner of a chunk of memory that it frees upon destruction.

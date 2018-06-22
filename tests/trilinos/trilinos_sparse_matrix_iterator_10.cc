@@ -15,10 +15,10 @@
 
 
 
-// this test, extracted from dof_constraints_09 and
-// trilinos_sparse_matrix_iterator_10, used to fail with aborts. this test is
-// equivalent to trilinos_sparse_matrix_iterator_09, except that we use the
-// postfix operator++ instead of the prefix form
+// this test, extracted from dof_constraints_09 and trilinos_sparse_matrix_iterator_10,
+// used to fail with aborts. this test is equivalent to
+// trilinos_sparse_matrix_iterator_09, except that we use the postfix operator++
+// instead of the prefix form
 
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>

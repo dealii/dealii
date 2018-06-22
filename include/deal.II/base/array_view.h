@@ -50,13 +50,12 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  *   std::vector<int>       array       = get_data();  // a writable array
  *
- *   ArrayView<int> view (&array[5], 5);               // a view of
- * elements 5..9 (inclusive) view[2] = 42; // array[7] is set to 42
+ *   ArrayView<int> view (&array[5], 5);               // a view of elements 5..9 (inclusive)
+ *   view[2] = 42;                                     // array[7] is set to 42
  *
- *   ArrayView<const int> const_view (&array[5], 5);   // same view, but
- * read-only int element_7 = const_view[2];                    // returns 42
- *   const_view[2] = 42;                               // error, can't write
- * into this view
+ *   ArrayView<const int> const_view (&array[5], 5);   // same view, but read-only
+ *   int element_7 = const_view[2];                    // returns 42
+ *   const_view[2] = 42;                               // error, can't write into this view
  * @endcode
  * In either case, accessing an element of a view does not change the
  * ArrayView object itself, and consequently ArrayView::operator[] is a @p

@@ -221,7 +221,7 @@ LaplaceProblem<dim>::setup_system()
 
   DoFHandler<dim> &dof = mg_dof_handler_renumbered;
   DoFRenumbering::component_wise(dof, block_component);
-  // DoFRenumbering::Cuthill_McKee (dof);
+  //DoFRenumbering::Cuthill_McKee (dof);
   for (unsigned int level = 0; level < nlevels; ++level)
     {
       DoFRenumbering::component_wise(mg_dof_handler_renumbered,
@@ -460,7 +460,7 @@ LaplaceProblem<dim>::refine_local()
             }
         }
     }
-  // Wenn nichts verfeinert wurde bisher, global verfeinern!
+  //Wenn nichts verfeinert wurde bisher, global verfeinern!
   if (!cell_refined)
     for (typename Triangulation<dim>::active_cell_iterator cell =
            triangulation.begin_active();
@@ -485,7 +485,7 @@ LaplaceProblem<dim>::run()
           GridGenerator::hyper_cube(triangulation, -1, 1);
           triangulation.refine_global(1);
         }
-      // triangulation.refine_global (1);
+      //triangulation.refine_global (1);
       refine_local();
       setup_system();
       test();

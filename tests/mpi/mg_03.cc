@@ -18,26 +18,12 @@
 // distribute_dofs on one cpu crashes with a segmentation fault.
 /* valgrind says:
 ==7944== Invalid read of size 8
-==7944==    at 0x7A60612: dealii::DoFCellAccessor<dealii::DoFHandler<2, 2>
->::DoFCellAccessor(dealii::Triangulation<2, 2> const*, int, int,
-dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> >::AccessorData const*)
-(dof_accessor.templates.h:3515)
-==7944==    by 0x7AC3618:
-dealii::TriaRawIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> >
->::TriaRawIterator() (tria_iterator.templates.h:36)
-==7944==    by 0x7AC074D:
-dealii::TriaIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> >
->::TriaIterator() (tria_iterator.templates.h:160)
-==7944==    by 0x7B70D2D:
-dealii::TriaActiveIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> >
->::TriaActiveIterator() (tria_iterator.templates.h:330)
-==7944==    by 0x9A434DA:
-dealii::internal::DoFHandler::Policy::ParallelDistributed<2,
-2>::distribute_dofs(unsigned int, dealii::DoFHandler<2, 2>&) const
-(dof_handler_policy.cc:2054)
-==7944==    by 0x99FE383: dealii::DoFHandler<2,
-2>::distribute_dofs(dealii::FiniteElement<2, 2> const&, unsigned int)
-(dof_handler.cc:984)
+==7944==    at 0x7A60612: dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> >::DoFCellAccessor(dealii::Triangulation<2, 2> const*, int, int, dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> >::AccessorData const*) (dof_accessor.templates.h:3515)
+==7944==    by 0x7AC3618: dealii::TriaRawIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> > >::TriaRawIterator() (tria_iterator.templates.h:36)
+==7944==    by 0x7AC074D: dealii::TriaIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> > >::TriaIterator() (tria_iterator.templates.h:160)
+==7944==    by 0x7B70D2D: dealii::TriaActiveIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2, 2> > >::TriaActiveIterator() (tria_iterator.templates.h:330)
+==7944==    by 0x9A434DA: dealii::internal::DoFHandler::Policy::ParallelDistributed<2, 2>::distribute_dofs(unsigned int, dealii::DoFHandler<2, 2>&) const (dof_handler_policy.cc:2054)
+==7944==    by 0x99FE383: dealii::DoFHandler<2, 2>::distribute_dofs(dealii::FiniteElement<2, 2> const&, unsigned int) (dof_handler.cc:984)
 ==7944==    by 0x41C8E7: void test<2>() (mg_03.cc:73)
 ==7944==    by 0x417949: main (mg_03.cc:134)
 ==7944==  Address 0x0 is not stack'd, malloc'd or (recently) free'd

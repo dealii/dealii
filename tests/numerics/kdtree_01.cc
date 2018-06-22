@@ -13,8 +13,8 @@
 //
 //---------------------------------------------------------------------
 
-// Create a list of points, and compute the minimum distance from some other
-// points to this set, using a kdtree library
+// Create a list of points, and compute the minimum distance from some other points
+// to this set, using a kdtree library
 
 #include <deal.II/numerics/kdtree.h>
 

@@ -15,8 +15,7 @@
 
 
 
-// Test
-// LinearAlgebra::distributed::Vector::operator=(TrilinosWrappers::MPI::BlockVector&)
+// Test LinearAlgebra::distributed::Vector::operator=(TrilinosWrappers::MPI::BlockVector&)
 
 #include <deal.II/base/index_set.h>
 

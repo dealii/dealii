@@ -25,8 +25,7 @@
 void
 test()
 {
-  // make sure that is_serial_vector< dealii::PETScWrappers::MPI::Vector > is
-  // working
+  // make sure that is_serial_vector< dealii::PETScWrappers::MPI::Vector > is working
   Assert(is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value == false,
          ExcInternalError());
 
@@ -35,8 +34,7 @@ test()
 
   deallog << "OK" << std::endl << std::endl;
 
-  // make sure that is_serial_vector< dealii::PETScWrappers::MPI::BlockVector >
-  // is working
+  // make sure that is_serial_vector< dealii::PETScWrappers::MPI::BlockVector > is working
   Assert(is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value ==
            false,
          ExcInternalError());

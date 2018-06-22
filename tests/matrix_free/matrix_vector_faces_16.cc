@@ -71,10 +71,9 @@ test()
 
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells() << std::endl; std::cout << "Number
-  // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
-  // of constraints: " << constraints.n_constraints() << std::endl;
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   LinearAlgebra::distributed::Vector<double> in, out, in2, out2;
 

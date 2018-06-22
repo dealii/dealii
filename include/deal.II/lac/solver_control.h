@@ -561,9 +561,8 @@ public:
  * using inexact Hessian.
  *
  * For example: The requested number of consecutively converged iterations is 2,
- * the tolerance is 0.2. The ConsecutiveControl will return
- * SolverControl::State::success only at the last step in the sequence 0.5,
- * 0.0005, 1.0, 0.05, 0.01.
+ * the tolerance is 0.2. The ConsecutiveControl will return SolverControl::State::success
+ * only at the last step in the sequence 0.5, 0.0005, 1.0, 0.05, 0.01.
  *
  * @author Denis Davydov, 2017
  */

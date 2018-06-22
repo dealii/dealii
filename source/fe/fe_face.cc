@@ -208,8 +208,8 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
               double matrix_entry = this->poly_space.compute_value(j, p);
 
               // Correct the interpolated value. I.e. if it is close to 1 or 0,
-              // make it exactly 1 or 0. Unfortunately, this is required to
-              // avoid problems with higher order elements.
+              // make it exactly 1 or 0. Unfortunately, this is required to avoid
+              // problems with higher order elements.
               if (std::fabs(matrix_entry - 1.0) < eps)
                 matrix_entry = 1.0;
               if (std::fabs(matrix_entry) < eps)
@@ -307,9 +307,9 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
           // dofs are located along lines, so two dofs are identical if they are
           // located at identical positions.
           // Therefore, read the points in unit_support_points for the
-          // first coordinate direction. We take the lexicographic ordering of
-          // the points in the second direction (i.e., y-direction) since we
-          // know that the first p+1 dofs are located at the left (x=0) face.
+          // first coordinate direction. We take the lexicographic ordering of the
+          // points in the second direction (i.e., y-direction) since we know
+          // that the first p+1 dofs are located at the left (x=0) face.
           const unsigned int p = this->degree;
           const unsigned int q = fe_q_other->degree;
 
@@ -373,11 +373,11 @@ FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
       if (const FE_FaceQ<dim, spacedim> *fe_q_other =
             dynamic_cast<const FE_FaceQ<dim, spacedim> *>(&fe_other))
         {
-          // this works exactly like the line case above, except that now we
-          // have to have two indices i1, i2 and j1, j2 to characterize the dofs
-          // on the face of each of the finite elements. since they are ordered
-          // lexicographically along the first line and we have a tensor
-          // product, the rest is rather straightforward
+          // this works exactly like the line case above, except that now we have
+          // to have two indices i1, i2 and j1, j2 to characterize the dofs on the
+          // face of each of the finite elements. since they are ordered
+          // lexicographically along the first line and we have a tensor product,
+          // the rest is rather straightforward
           const unsigned int p = this->degree;
           const unsigned int q = fe_q_other->degree;
 
@@ -458,9 +458,8 @@ FE_FaceQ<dim, spacedim>::compare_for_face_domination(
         }
       else
         {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
           return FiniteElementDomination::no_requirements;
         }
     }
@@ -852,9 +851,8 @@ FE_FaceP<dim, spacedim>::compare_for_face_domination(
         }
       else
         {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
           return FiniteElementDomination::no_requirements;
         }
     }
@@ -958,8 +956,8 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
               double matrix_entry = v_out(j);
 
               // Correct the interpolated value. I.e. if it is close to 1 or 0,
-              // make it exactly 1 or 0. Unfortunately, this is required to
-              // avoid problems with higher order elements.
+              // make it exactly 1 or 0. Unfortunately, this is required to avoid
+              // problems with higher order elements.
               if (std::fabs(matrix_entry - 1.0) < eps)
                 matrix_entry = 1.0;
               if (std::fabs(matrix_entry) < eps)

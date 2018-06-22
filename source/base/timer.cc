@@ -48,8 +48,7 @@ namespace internal
     namespace
     {
       /**
-       * Type trait for checking whether or not a type is a
-       * std::chrono::duration.
+       * Type trait for checking whether or not a type is a std::chrono::duration.
        */
       template <typename T>
       struct is_duration : std::false_type

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check method TmTmult of FullMatrix
+//check method TmTmult of FullMatrix
 
 #include <deal.II/lac/eigen.h>
 #include <deal.II/lac/full_matrix.h>
@@ -43,7 +43,7 @@ main()
   FullMatrix<double> C(3, 3);
   FullMatrix<double> D(3, 3);
 
-  // compute C= A^T*B^T in two different ways and compare for equality
+  //compute C= A^T*B^T in two different ways and compare for equality
   Za.Tadd(1., A);
   Zb.Tadd(1., B);
   Za.mmult(D, Zb);

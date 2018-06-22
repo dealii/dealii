@@ -33,8 +33,7 @@
 #include "../tests.h"
 
 // test VectorTools::interpolate_to_different_mesh in parallel
-// this is a slightly modified version from the example by Sam Cox from the
-// mailing
+// this is a slightly modified version from the example by Sam Cox from the mailing
 
 using namespace dealii;
 

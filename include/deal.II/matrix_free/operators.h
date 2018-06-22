@@ -39,8 +39,7 @@ namespace MatrixFreeOperators
   namespace BlockHelper
   {
     // workaroud for unifying non-block vector and block vector implementations
-    // a non-block vector has one block and the only subblock is the vector
-    // itself
+    // a non-block vector has one block and the only subblock is the vector itself
     template <typename VectorType>
     typename std::enable_if<IsBlockVector<VectorType>::value,
                             unsigned int>::type
@@ -108,13 +107,13 @@ namespace MatrixFreeOperators
    * the finest mesh or at a certain level in geometric multigrid.
    *
    * A derived class has to implement apply_add() method as well as
-   * compute_diagonal() to initialize the protected member
-   * inverse_diagonal_entries and/or diagonal_entries. In case of a
-   * non-symmetric operator, Tapply_add() should be additionally implemented.
+   * compute_diagonal() to initialize the protected member inverse_diagonal_entries
+   * and/or diagonal_entries.
+   * In case of a non-symmetric operator, Tapply_add() should be additionally
+   * implemented.
    *
-   * Currently, the only supported vectors are
-   * LinearAlgebra::distributed::Vector and
-   * LinearAlgebra::distributed::BlockVector.
+   * Currently, the only supported vectors are LinearAlgebra::distributed::Vector
+   * and LinearAlgebra::distributed::BlockVector.
    *
    * <h4>Selective use of blocks in MatrixFree</h4>
    *
@@ -141,9 +140,9 @@ namespace MatrixFreeOperators
    * MatrixFree, whereas in the latter, a non-block vector selecting the block
    * {2} would be used.
    *
-   * A second application of selection is in problems with a Newton-type
-   * iteration or problems with inhomogeneous boundary conditions. In such a
-   * case, one has to deal with two different sets of constraints: One set of
+   * A second application of selection is in problems with a Newton-type iteration
+   * or problems with inhomogeneous boundary conditions. In such a case, one
+   * has to deal with two different sets of constraints: One set of
    * constraints applies to the solution vector which might include hanging
    * node constraints or periodicity constraints but no constraints on
    * inhomogeneous Dirichlet boundaries. Before the nonlinear iteration, the
@@ -334,8 +333,7 @@ namespace MatrixFreeOperators
     el(const unsigned int row, const unsigned int col) const;
 
     /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
+     * Determine an estimate for the memory consumption (in bytes) of this object.
      */
     virtual std::size_t
     memory_consumption() const;
@@ -350,8 +348,7 @@ namespace MatrixFreeOperators
      * Compute diagonal of this operator.
      *
      * A derived class needs to implement this function and resize and fill
-     * the protected member inverse_diagonal_entries and/or diagonal_entries
-     * accordingly.
+     * the protected member inverse_diagonal_entries and/or diagonal_entries accordingly.
      */
     virtual void
     compute_diagonal() = 0;
@@ -692,8 +689,7 @@ namespace MatrixFreeOperators
     MassOperator();
 
     /**
-     * For preconditioning, we store a lumped mass matrix at the diagonal
-     * entries.
+     * For preconditioning, we store a lumped mass matrix at the diagonal entries.
      */
     virtual void
     compute_diagonal() override;
@@ -722,9 +718,8 @@ namespace MatrixFreeOperators
 
   /**
    * This class implements the operation of the action of a Laplace matrix,
-   * namely $ L_{ij} = \int_\Omega c(\mathbf x) \mathbf \nabla N_i(\mathbf x)
-   * \cdot \mathbf \nabla N_j(\mathbf x)\,d \mathbf x$, where $c(\mathbf x)$ is
-   * the scalar heterogeneity coefficient.
+   * namely $ L_{ij} = \int_\Omega c(\mathbf x) \mathbf \nabla N_i(\mathbf x) \cdot \mathbf \nabla N_j(\mathbf x)\,d \mathbf x$,
+   * where $c(\mathbf x)$ is the scalar heterogeneity coefficient.
    *
    * Note that this class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
@@ -756,10 +751,10 @@ namespace MatrixFreeOperators
     LaplaceOperator();
 
     /**
-     * The diagonal is approximated by computing a local diagonal matrix per
-     * element and distributing it to the global diagonal. This will lead to
-     * wrong results on element with hanging nodes but is still an acceptable
-     * approximation to be used in preconditioners.
+     * The diagonal is approximated by computing a local diagonal matrix per element
+     * and distributing it to the global diagonal. This will lead to wrong results
+     * on element with hanging nodes but is still an acceptable approximation
+     * to be used in preconditioners.
      */
     virtual void
     compute_diagonal();
@@ -767,11 +762,10 @@ namespace MatrixFreeOperators
     /**
      * Set the heterogeneous scalar coefficient @p scalar_coefficient to be used at
      * the quadrature points. The Table should be of correct size, consistent
-     * with the total number of quadrature points in
-     * <code>dim</code>-dimensions,
+     * with the total number of quadrature points in <code>dim</code>-dimensions,
      * controlled by the @p n_q_points_1d template parameter. Here,
-     * <code>(*scalar_coefficient)(cell,q)</code> corresponds to the value of
-     * the coefficient, where <code>cell</code> is an index into a set of cell
+     * <code>(*scalar_coefficient)(cell,q)</code> corresponds to the value of the
+     * coefficient, where <code>cell</code> is an index into a set of cell
      * batches as administered by the MatrixFree framework (which does not work
      * on individual cells, but instead of batches of cells at once), and
      * <code>q</code> is the number of the quadrature point within this batch.
@@ -794,10 +788,9 @@ namespace MatrixFreeOperators
      *     }
      * }
      * @endcode
-     * where <code>mf_data</code> is a MatrixFree object and
-     * <code>function</code> is a function which provides the following method
-     * <code>VectorizedArray<double> value(const Point<dim,
-     * VectorizedArray<double> > &p_vec)</code>.
+     * where <code>mf_data</code> is a MatrixFree object and <code>function</code>
+     * is a function which provides the following method
+     * <code>VectorizedArray<double> value(const Point<dim, VectorizedArray<double> > &p_vec)</code>.
      *
      * If this function is not called, the coefficient is assumed to be unity.
      *

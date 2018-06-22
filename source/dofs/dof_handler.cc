@@ -248,8 +248,7 @@ namespace internal
       static unsigned int
       max_couplings_between_dofs(const DoFHandler<3, spacedim> &dof_handler)
       {
-        // TODO:[?] Invent significantly better estimates than the ones in this
-        // function
+        //TODO:[?] Invent significantly better estimates than the ones in this function
 
         // doing the same thing here is a
         // rather complicated thing, compared

@@ -14,9 +14,9 @@
  * ---------------------------------------------------------------------
  */
 
-// Same as step-16-50, but use Jacobi smoother at the coarsest grid via
-// MGCoarseGridApplySmoother. In this particular case, the number of iterations
-// until convergence is exactly the same as for MGCoarseGridLACIteration.
+// Same as step-16-50, but use Jacobi smoother at the coarsest grid via MGCoarseGridApplySmoother.
+// In this particular case, the number of iterations until convergence is
+// exactly the same as for MGCoarseGridLACIteration.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -408,8 +408,8 @@ namespace Step50
                    || (mg_constrained_dofs.is_boundary_index(
                          lvl, local_dof_indices[i]) &&
                        local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
+                         local_dof_indices
+                           [j]) // ( boundary(i) && boundary(j) && i==j )
                    ))
                 {
                 }

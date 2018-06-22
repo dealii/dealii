@@ -81,15 +81,15 @@ template <int dim>
 void
 check()
 {
-  // All primitive
+  //All primitive
   {
     FE_Q<dim>     q1(2);
     FE_Q<dim>     q2(1);
     FESystem<dim> s1(q1, dim, q2, 1);
 
-    // All selected
+    //All selected
     ComponentMask component_mask1(dim + 1, true);
-    // Partially selected
+    //Partially selected
     ComponentMask component_mask2(dim + 1, true);
     component_mask2.set(dim, false);
 
@@ -97,15 +97,15 @@ check()
     check_fe(s1, component_mask2);
   }
 
-  // Non-primitive
+  //Non-primitive
   {
     FE_RaviartThomas<dim> q1(1);
     FE_DGQ<dim>           q2(1);
     FESystem<dim>         s1(q1, 1, q2, 1);
 
-    // All selected
+    //All selected
     ComponentMask component_mask1(dim + 1, true);
-    // Partially selected
+    //Partially selected
     ComponentMask component_mask2(dim + 1, true);
     component_mask2.set(dim, false);
 

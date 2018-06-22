@@ -77,20 +77,16 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  *   PETScWrappers::PreconditionBoomerAMG::AdditionalData data;
  *   data.symmetric_operator = true;
- *   PETScWrappers::PreconditionBoomerAMG preconditioner(mpi_communicator,
- * data); SolverControl linear_solver_control (dof_handler.n_dofs(),
- * 1e-12,false,false); PETScWrappers::SolverCG
- * linear_solver(linear_solver_control,mpi_communicator);
+ *   PETScWrappers::PreconditionBoomerAMG preconditioner(mpi_communicator, data);
+ *   SolverControl linear_solver_control (dof_handler.n_dofs(), 1e-12,false,false);
+ *   PETScWrappers::SolverCG  linear_solver(linear_solver_control,mpi_communicator);
  *   linear_solver.initialize(preconditioner);
  *   SolverControl solver_control (100, 1e-9,false,false);
- *   SLEPcWrappers::SolverKrylovSchur
- * eigensolver(solver_control,mpi_communicator);
- *   SLEPcWrappers::TransformationShift
- * spectral_transformation(mpi_communicator);
+ *   SLEPcWrappers::SolverKrylovSchur eigensolver(solver_control,mpi_communicator);
+ *   SLEPcWrappers::TransformationShift spectral_transformation(mpi_communicator);
  *   spectral_transformation.set_solver(linear_solver);
  *   eigensolver.set_transformation(spectral_transformation);
- *   eigensolver.solve
- * (stiffness_matrix,mass_matrix,eigenvalues,eigenfunctions,eigenfunctions.size());
+ *   eigensolver.solve (stiffness_matrix,mass_matrix,eigenvalues,eigenfunctions,eigenfunctions.size());
  * @endcode
  *
  * In order to support this usage case, different from PETSc wrappers, the
@@ -658,8 +654,7 @@ namespace SLEPcWrappers
    * This is declared here to make it possible to take a std::vector of
    * different PETScWrappers vector types
    */
-  // todo: The logic of these functions can be simplified without breaking
-  // backward compatibility...
+  // todo: The logic of these functions can be simplified without breaking backward compatibility...
 
   template <typename OutputVector>
   void
@@ -802,9 +797,8 @@ namespace SLEPcWrappers
 
     // if the eigensolver supports only a single initial vector, but several
     // guesses are provided, then all except the first one will be discarded.
-    // One could still build a vector that is rich in the directions of all
-    // guesses, by taking a linear combination of them. (TODO: make function
-    // virtual?)
+    // One could still build a vector that is rich in the directions of all guesses,
+    // by taking a linear combination of them. (TODO: make function virtual?)
 
     const PetscErrorCode ierr =
       EPSSetInitialSpace(eps, vecs.size(), vecs.data());

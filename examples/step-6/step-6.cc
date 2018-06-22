@@ -164,9 +164,9 @@ Step6<dim>::Step6()
 // Here comes the added destructor of the class. Some objects in deal.II store
 // pointers to other objects: in particular a SparseMatrix stores a SmartPointer
 // pointing to the SparsityPattern with which it was initialized. This example
-// deliberately declares the SparseMatrix before the SparsityPattern to make
-// this dependency clearer. Of course we could have left this order unchanged,
-// but we would like to show what happens if the order is reversed since this
+// deliberately declares the SparseMatrix before the SparsityPattern to make this
+// dependency clearer. Of course we could have left this order unchanged, but
+// we would like to show what happens if the order is reversed since this
 // produces a rather nasty side-effect and results in an error which is
 // difficult to track down if one does not know what happens.
 //
@@ -251,8 +251,7 @@ void Step6<dim>::setup_system()
 
   // We may now populate the ConstraintMatrix with the hanging node
   // constraints. Since we will call this function in a loop we first clear
-  // the current set of constraints from the last system and then compute new
-  // ones:
+  // the current set of constraints from the last system and then compute new ones:
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
@@ -478,10 +477,10 @@ void Step6<dim>::solve()
 //
 // The output is a vector of values for all active cells. While it may
 // make sense to compute the <b>value</b> of a solution degree of freedom
-// very accurately, it is usually not necessary to compute the <b>error
-// indicator</b> corresponding to the solution on a cell particularly
-// accurately. We therefore typically use a vector of floats instead of a vector
-// of doubles to represent error indicators.
+// very accurately, it is usually not necessary to compute the <b>error indicator</b>
+// corresponding to the solution on a cell particularly accurately. We therefore
+// typically use a vector of floats instead of a vector of doubles to represent
+// error indicators.
 template <int dim>
 void Step6<dim>::refine_grid()
 {

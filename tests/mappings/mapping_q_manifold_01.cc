@@ -243,8 +243,8 @@ main()
     {
       test<dim>(FE_Q<dim>(QGaussLobatto<1>(p + 1)));
 
-      // test<dim>(FE_RaviartThomas<dim> (p));
-      // test<dim>(FE_Nedelec<dim> (p));
-      // test<dim>(FESystem<dim> (FE_Q<dim>(p), dim));
+      //test<dim>(FE_RaviartThomas<dim> (p));
+      //test<dim>(FE_Nedelec<dim> (p));
+      //test<dim>(FESystem<dim> (FE_Q<dim>(p), dim));
     }
 }

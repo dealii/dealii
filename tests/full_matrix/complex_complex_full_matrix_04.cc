@@ -15,9 +15,9 @@
 
 
 
-// check creation and output of a matrix using an array. like the full_matrix_*
-// tests, but use complex-valued matrices and vectors; this time we actually
-// store complex values in them
+// check creation and output of a matrix using an array. like the full_matrix_* tests, but use
+// complex-valued matrices and vectors; this time we actually store complex values
+// in them
 
 
 #include "../tests.h"

@@ -130,10 +130,10 @@ DEAL_II_NAMESPACE_OPEN
  * independently of other concurrent uses of copies of these data structures.
  * Therefore, it is perfectly fine to resize auxiliary data structures
  * associated with ScratchData and CopyData to different lengths on each cell.
- * For example, a vector holding densities at each quadrature point which is
- * used with LocalIntegrators::L2::weighted_mass_matrix() to assemble the local
- * matrix could be resized to the corresponding number of quadrature points of
- * the current cell in hp::DoFHandler. Similarly, local stiffness matrix in
+ * For example, a vector holding densities at each quadrature point which is used with
+ * LocalIntegrators::L2::weighted_mass_matrix() to assemble the local matrix
+ * could be resized to the corresponding number of quadrature points of the
+ * current cell in hp::DoFHandler. Similarly, local stiffness matrix in
  * CopyData can be resized in accordance with the number of local DoFs on the
  * current cell.
  *
@@ -150,7 +150,7 @@ namespace WorkStream
 
   namespace internal
   {
-    // TODO: The following classes all use std::shared_ptr, but the
+    //TODO: The following classes all use std::shared_ptr, but the
     //  correct pointer class would actually be std::unique_ptr. make this
     //  replacement whenever we have a class that provides these semantics
     //  and that is available also as a fall-back whenever via boost or similar
@@ -206,8 +206,7 @@ namespace WorkStream
               , currently_in_use(in_use)
             {}
 
-            // TODO: when we push back an object to the list of scratch objects,
-            // in
+            //TODO: when we push back an object to the list of scratch objects, in
             //  Worker::operator(), we first create an object and then copy
             //  it to the end of this list. this involves having two objects
             //      of the current type having pointers to it, each with their
@@ -718,7 +717,7 @@ namespace WorkStream
           , currently_in_use(in_use)
         {}
 
-        // TODO: when we push back an object to the list of scratch objects, in
+        //TODO: when we push back an object to the list of scratch objects, in
         //      Worker::operator(), we first create an object and then copy
         //      it to the end of this list. this involves having two objects
         //      of the current type having pointers to it, each with their own
@@ -798,8 +797,7 @@ namespace WorkStream
                   break;
                 }
 
-            // if no element in the list was found, create one and mark it as
-            // used
+            // if no element in the list was found, create one and mark it as used
             if (scratch_data == nullptr)
               {
                 Assert(copy_data == nullptr, ExcInternalError());

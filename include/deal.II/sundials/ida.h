@@ -116,8 +116,8 @@ namespace SUNDIALS
    * and $\dot y(t_n)$, respectively, and the step size is
    * $h_n=t_n-t_{n-1}$. The coefficients $\alpha_{n,i}$ are uniquely
    * determined by the order $q$, and the history of the step sizes. The
-   * application of the BDF method to the DAE system results in a nonlinear
-   *algebraic system to be solved at each time step:
+   * application of the BDF method to the DAE system results in a nonlinear algebraic
+   * system to be solved at each time step:
    *
    * \f[
    *   G(y_n)\equiv F\left(t_n,y_n,\dfrac{1}{h_n}\sum_{i=0}^q
@@ -140,8 +140,9 @@ namespace SUNDIALS
    * scalar $\alpha$ changes whenever the step size or method order
    * changes.
    *
-   * To provide a simple example, consider the following harmonic oscillator
-   *problem: \f[ \begin{split}
+   * To provide a simple example, consider the following harmonic oscillator problem:
+   * \f[
+   * \begin{split}
    *   u'' & = -k^2 u \\
    *   u (0) & = 0 \\
    *   u'(0) & = k
@@ -166,8 +167,8 @@ namespace SUNDIALS
    * \f]
    * and $y(0)=(0, k)$, $y'(0) = (k, 0)$.
    *
-   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k
-   *t)$, $y_1'(t) = -k^2 \sin(k t)$.
+   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k t)$,
+   * $y_1'(t) = -k^2 \sin(k t)$.
    *
    * The Jacobian to assemble is the following:  $J = \alpha I + A$.
    *
@@ -286,22 +287,19 @@ namespace SUNDIALS
        *
        * @param minimum_step_size Minimum step size
        * @param maximum_order Maximum BDF order
-       * @param maximum_non_linear_iterations Maximum number of nonlinear
-       * iterations
+       * @param maximum_non_linear_iterations Maximum number of nonlinear iterations
        *
        * Error parameters:
        *
        * @param absolute_tolerance Absolute error tolerance
        * @param relative_tolerance Relative error tolerance
-       * @param ignore_algebraic_terms_for_errors Ignore algebraic terms for
-       * error computations
+       * @param ignore_algebraic_terms_for_errors Ignore algebraic terms for error computations
        *
        * Initial condition correction parameters:
        *
        * @param ic_type Initial condition correction type
        * @param reset_type Initial condition correction type after restart
-       * @param maximum_non_linear_iterations_ic Initial condition Newton max
-       * iterations
+       * @param maximum_non_linear_iterations_ic Initial condition Newton max iterations
        */
       AdditionalData( // Initial parameters
         const double &initial_time      = 0.0,
@@ -365,13 +363,12 @@ namespace SUNDIALS
        * end
        * @endcode
        *
-       * These are one-to-one with the options you can pass at construction
-       * time.
+       * These are one-to-one with the options you can pass at construction time.
        *
        * The options you pass at construction time are set as default values in
        * the ParameterHandler object `prm`. You can later modify them by parsing
-       * a parameter file using `prm`. The values of the parameter will be
-       * updated whenever the content of `prm` is updated.
+       * a parameter file using `prm`. The values of the parameter will be updated
+       * whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
        * will occur if you destroy this class, and then parse a parameter file
@@ -522,11 +519,10 @@ namespace SUNDIALS
        * Type of correction for initial conditions to be used after a solver
        * restart.
        *
-       * If you do not have consistent initial conditions after a restart,
-       * (i.e., conditions for which F(y_dot(t_restart), y(t_restart),
-       * t_restart) = 0), you can ask SUNDIALS to compute the new initial
-       * conditions for you by using the `reset_type` parameter at construction
-       * time.
+       * If you do not have consistent initial conditions after a restart, (i.e.,
+       * conditions for which F(y_dot(t_restart), y(t_restart), t_restart) = 0),
+       * you can ask SUNDIALS to compute the new initial conditions for you by
+       * using the `reset_type` parameter at construction time.
        */
       InitialConditionCorrection reset_type;
 
@@ -542,15 +538,13 @@ namespace SUNDIALS
     };
 
     /**
-     * Constructor. It is possible to fine tune the SUNDIALS IDA solver by
-     * passing an AdditionalData() object that sets all of the solver
-     * parameters.
+     * Constructor. It is possible to fine tune the SUNDIALS IDA solver by passing an
+     * AdditionalData() object that sets all of the solver parameters.
      *
-     * IDA is a Differential Algebraic solver. As such, it requires initial
-     * conditions also for the first order derivatives. If you do not provide
-     * consistent initial conditions, (i.e., conditions for which F(y_dot(0),
-     * y(0), 0) = 0), you can ask SUNDIALS to compute initial conditions for you
-     * by using the `ic_type` parameter at construction time.
+     * IDA is a Differential Algebraic solver. As such, it requires initial conditions also for
+     * the first order derivatives. If you do not provide consistent initial conditions, (i.e.,
+     * conditions for which F(y_dot(0), y(0), 0) = 0), you can ask SUNDIALS to compute initial
+     * conditions for you by using the `ic_type` parameter at construction time.
      *
      * You have three options
      * -  none: do not try to make initial conditions consistent.
@@ -560,22 +554,19 @@ namespace SUNDIALS
      *    algebraic components in the function get_differential_components.
      * -  use_y_dot: compute all components of y, given y_dot.
      *
-     * By default, this class assumes that all components are differential, and
-     * that you want to solve a standard ode. In this case, the initial
-     * component type is set to `use_y_diff`, so that the `y_dot` at time
-     * t=`initial_time` is computed by solving the nonlinear problem $F(y_dot,
-     * y(t0), t0) = 0$ in the variable `y_dot`.
+     * By default, this class assumes that all components are differential, and that you want
+     * to solve a standard ode. In this case, the initial component type is set to `use_y_diff`,
+     * so that the `y_dot` at time t=`initial_time` is computed by solving the nonlinear problem
+     * $F(y_dot, y(t0), t0) = 0$ in the variable `y_dot`.
      *
-     * Notice that a Newton solver is used for this computation. The Newton
-     * solver parameters can be tweaked by acting on `ic_alpha` and
-     * `ic_max_iter`.
+     * Notice that a Newton solver is used for this computation. The Newton solver parameters
+     * can be tweaked by acting on `ic_alpha` and `ic_max_iter`.
      *
-     * If you reset the solver at some point, you may want to select a different
-     * computation for the initial conditions after reset. Say, for example,
-     * that you have refined a grid, and after transferring the solution to the
-     * new grid, the initial conditions are no longer consistent. Then you can
-     * choose how these are made consistent, using the same three options that
-     * you used for the initial conditions in `reset_type`.
+     * If you reset the solver at some point, you may want to select a different computation
+     * for the initial conditions after reset. Say, for example, that you have refined a grid,
+     * and after transferring the solution to the new grid, the initial conditions are no longer
+     * consistent. Then you can choose how these are made consistent, using the same three
+     * options that you used for the initial conditions in `reset_type`.
      *
      * The MPI communicator is simply ignored in the serial case.
      *
@@ -608,8 +599,8 @@ namespace SUNDIALS
      * changes, transfers the solution and the solution dot to the new mesh,
      * and returns true.
      *
-     * During reset(), both y and yp are checked for consistency, and according
-     * to what was specified as ic_type (if t==initial_time) or reset_type (if
+     * During reset(), both y and yp are checked for consistency, and according to
+     * what was specified as ic_type (if t==initial_time) or reset_type (if
      * t>initial_time), yp, y, or both are modified to obtain a consistent set
      * of initial data.
      *
@@ -633,8 +624,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (IDAReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double      t,
                       const VectorType &y,
@@ -669,8 +660,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (IDAReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double      t,
                       const VectorType &y,
@@ -703,8 +694,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (IDAReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &rhs, VectorType &dst)>
       solve_jacobian_system;
@@ -761,8 +752,8 @@ namespace SUNDIALS
     /**
      * Return a vector whose components are the weights used by IDA to compute
      * the vector norm. The implementation of this function is optional. If the
-     * user does not provide an implementation, the weights are assumed to be
-     * all ones.
+     * user does not provide an implementation, the weights are assumed to be all
+     * ones.
      */
     std::function<VectorType &()> get_local_tolerances;
 
@@ -778,8 +769,7 @@ namespace SUNDIALS
 
   private:
     /**
-     * Throw an exception when a function with the given name is not
-     * implemented.
+     * Throw an exception when a function with the given name is not implemented.
      */
     DeclException1(ExcFunctionNotProvided,
                    std::string,

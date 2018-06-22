@@ -15,20 +15,15 @@
 
 
 
-// Currently fails. We get this crash in 3d with the quarter shell and no normal
-// flux conditions:
+// Currently fails. We get this crash in 3d with the quarter shell and no normal flux conditions:
 //
-// An error occurred in line <2571> of file
-// </w/heister/deal-trunk/deal.II/include/deal.II/numerics/vectors.templates.h>
-// in function
-//    void dealii::VectorTools::internal::compute_orthonormal_vectors(const
-//    dealii::Tensor<1, dim>&, dealii::Tensor<1, dim> (&)[(dim - 1)]) [with int
-//    dim = 3]
-// The violated condition was:
+//An error occurred in line <2571> of file </w/heister/deal-trunk/deal.II/include/deal.II/numerics/vectors.templates.h> in function
+//    void dealii::VectorTools::internal::compute_orthonormal_vectors(const dealii::Tensor<1, dim>&, dealii::Tensor<1, dim> (&)[(dim - 1)]) [with int dim = 3]
+//The violated condition was:
 //    std::fabs(vector * tmp) < 1e-12
-// The name and call sequence of the exception was:
+//The name and call sequence of the exception was:
 //    ExcInternalError()
-// Additional Information:
+//Additional Information:
 //(none)
 
 
@@ -65,8 +60,7 @@ check()
 
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(1);
-  //  no_normal_flux_boundaries.insert (2); // not required for the crash for
-  //  now, please test with it later!
+  //  no_normal_flux_boundaries.insert (2); // not required for the crash for now, please test with it later!
   no_normal_flux_boundaries.insert(3);
   no_normal_flux_boundaries.insert(4);
   VectorTools::compute_no_normal_flux_constraints(

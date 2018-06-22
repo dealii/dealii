@@ -16,8 +16,7 @@
 
 // Test integrate_difference and compute_global_error
 
-// see
-// http://www.wolframalpha.com/input/?i=integrate+(x%2By%2Bz)%5E3%2B(x%5E2%2By%5E2)%5E3%2B(z%2Bxy)%5E3+from+x%3D0..1,y%3D0..1,z%3D0..1
+// see http://www.wolframalpha.com/input/?i=integrate+(x%2By%2Bz)%5E3%2B(x%5E2%2By%5E2)%5E3%2B(z%2Bxy)%5E3+from+x%3D0..1,y%3D0..1,z%3D0..1
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

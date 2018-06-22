@@ -18,19 +18,14 @@
 // document bug in the new AffineConstraints<double>::distribute():
 /*
 --------------------------------------------------------
-An error occurred in line <1028> of file
-</scratch/deal-trunk/deal.II/include/deal.II/lac/constraint_matrix.templates.h>
-in function void dealii::AffineConstraints<double>::distribute(VectorType&)
-const [with VectorType = dealii::TrilinosWrappers::MPI::Vector] The violated
-condition was: vec(it->line) == it->entries.size() The name and call sequence of
-the exception was: ExcIncorrectConstraint(it->line, it->entries.size())
+An error occurred in line <1028> of file </scratch/deal-trunk/deal.II/include/deal.II/lac/affine_constraints.templates.h> in function
+    void dealii::AffineConstraints<double>::distribute(VectorType&) const [with VectorType = dealii::TrilinosWrappers::MPI::Vector]
+The violated condition was:
+    vec(it->line) == it->entries.size()
+The name and call sequence of the exception was:
+    ExcIncorrectConstraint(it->line, it->entries.size())
 Additional Information:
-While distributing the constraint for DoF 41, it turns out that one of the
-processors who own the 2 degrees of freedom that x_41 is constrained against
-does not know about the constraint on x_41. Did you not initialize the
-AffineConstraints<double> with the appropriate locally_relevant set so that
-every processor who owns a DoF that constrains another DoF also knows about this
-constraint?
+While distributing the constraint for DoF 41, it turns out that one of the processors who own the 2 degrees of freedom that x_41 is constrained against does not know about the constraint on x_41. Did you not initialize the AffineConstraints<double> with the appropriate locally_relevant set so that every processor who owns a DoF that constrains another DoF also knows about this constraint?
 --------------------------------------------------------
 
  */

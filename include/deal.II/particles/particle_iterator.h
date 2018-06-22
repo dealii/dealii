@@ -69,8 +69,8 @@ namespace Particles
     operator=(const ParticleIterator &);
 
     /**
-     * Dereferencing operator, returns a pointer of the particle pointed to.
-     * Usage is thus like <tt>i->get_id ();</tt>
+     * Dereferencing operator, returns a pointer of the particle pointed to. Usage
+     * is thus like <tt>i->get_id ();</tt>
      *
      * There is a @p const and a non-@p const version.
      */
@@ -119,8 +119,8 @@ namespace Particles
 
     /**
      * Postfix <tt>--</tt> operator: <tt>iterator--</tt>. This operator moves
-     * the iterator to the previous element, but returns an iterator to the
-     * element previously pointed to.
+     * the iterator to the previous element, but returns an iterator to the element
+     * previously pointed to.
      */
     ParticleIterator
     operator--(int);

@@ -222,12 +222,12 @@ namespace TriaAccessorExceptions
                    "Iterators can only be compared if they point to the same "
                    "triangulation, or if neither of them are associated "
                    "with a triangulation.");
-  // TODO: Write documentation!
+  //TODO: Write documentation!
   /**
    * @ingroup Exceptions
    */
   DeclException0(ExcNeighborIsCoarser);
-  // TODO: Write documentation!
+  //TODO: Write documentation!
   /**
    * @ingroup Exceptions
    */
@@ -247,7 +247,7 @@ namespace TriaAccessorExceptions
    * @ingroup Exceptions
    */
   DeclException0(ExcNoPeriodicNeighbor);
-  // TODO: Write documentation!
+  //TODO: Write documentation!
   /**
    * @ingroup Exceptions
    */
@@ -332,9 +332,8 @@ protected:
   TriaAccessorBase(const TriaAccessorBase &);
 
   /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
    * by @p b to the object pointed to by @p a. However, the result of
    * dereferencing an iterator is not an object but an accessor; consequently,
    * this operation is not useful for iterators on triangulations.
@@ -635,16 +634,14 @@ public:
   vertex(const unsigned int i) const;
 
   /**
-   * Dummy function to extract lines. Returns a default-constructed line
-   * iterator.
+   * Dummy function to extract lines. Returns a default-constructed line iterator.
    */
   typename dealii::internal::TriangulationImplementation::
     Iterators<dim, spacedim>::line_iterator
     line(const unsigned int i) const;
 
   /**
-   * Dummy function to extract quads. Returns a default-constructed quad
-   * iterator.
+   * Dummy function to extract quads. Returns a default-constructed quad iterator.
    */
   typename dealii::internal::TriangulationImplementation::
     Iterators<dim, spacedim>::quad_iterator
@@ -712,9 +709,8 @@ public:
   TriaAccessor(const TriaAccessor<structdim2, dim2, spacedim2> &);
 
   /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
    * by @p b to the object pointed to by @p a. However, the result of
    * dereferencing an iterator is not an object but an accessor; consequently,
    * this operation is not useful for iterators on triangulations.
@@ -1582,8 +1578,7 @@ public:
 
 private:
   /**
-   * Like set_boundary_id but without checking for internal faces or invalid
-   * ids.
+   * Like set_boundary_id but without checking for internal faces or invalid ids.
    */
   void
   set_boundary_id_internal(const types::boundary_id id) const;
@@ -1697,8 +1692,7 @@ private:
 
 
 /**
- * This class is a specialization of <code>TriaAccessor<structdim, dim,
- * spacedim></code>
+ * This class is a specialization of <code>TriaAccessor<structdim, dim, spacedim></code>
  * for the case that @p structdim is zero. This
  * class represents vertices in a triangulation of dimensionality
  * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a
@@ -2080,8 +2074,7 @@ private:
 
 
 /**
- * This class is a specialization of <code>TriaAccessor<structdim, dim,
- * spacedim></code>
+ * This class is a specialization of <code>TriaAccessor<structdim, dim, spacedim></code>
  * for the case that @p structdim is zero and @p dim is one. This
  * class represents vertices in a one-dimensional triangulation that is
  * embedded in a space of dimensionality <code>spacedim</code> (for
@@ -2635,9 +2628,8 @@ public:
   CellAccessor(const TriaAccessor<structdim2, dim2, spacedim2> &);
 
   /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
    * by @p b to the object pointed to by @p a. However, the result of
    * dereferencing an iterator is not an object but an accessor; consequently,
    * this operation is not useful for iterators on triangulations.
@@ -2900,8 +2892,7 @@ public:
    * pair of numbers can be used in periodic_neighbor_child_on_subface()
    * to get back to the current cell. In other words, the following
    * assertion should be true, for a cell with coarser periodic neighbor:
-   * cell->periodic_neighbor(i)->periodic_neighbor_child_on_subface(face_no,
-   * subface_no)==cell
+   * cell->periodic_neighbor(i)->periodic_neighbor_child_on_subface(face_no, subface_no)==cell
    */
   std::pair<unsigned int, unsigned int>
   periodic_neighbor_of_coarser_periodic_neighbor(const unsigned face_no) const;

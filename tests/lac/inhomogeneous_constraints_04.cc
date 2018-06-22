@@ -19,9 +19,9 @@
 // and the right-hand-side-vector for this system.  But we have the following
 // two inhomogeneous constraints:
 //       x_1 = -5, x_3 = 2.0  and  x_4 = 0.0
-// And we want to test if the distribute_local_to_global function supplies the
-// same system_matrix, right-hand-side-vector and solution as we obtain by using
-// the MatrixTools::apply_boundary_values function.
+// And we want to test if the distribute_local_to_global function supplies the same
+// system_matrix, right-hand-side-vector and solution as we obtain by using the
+// MatrixTools::apply_boundary_values function.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

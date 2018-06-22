@@ -114,8 +114,7 @@ test()
     write_vtk(dof_handler, filename.c_str());
   }
 
-  // Compute a halo layer around active fe index 2 and set it to active fe index
-  // 3
+  // Compute a halo layer around active fe index 2 and set it to active fe index 3
   std::function<bool(const cell_iterator &)> predicate =
     IteratorFilters::ActiveFEIndexEqualTo(2, true);
   std::vector<cell_iterator> active_halo_layer =

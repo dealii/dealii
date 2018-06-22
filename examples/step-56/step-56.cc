@@ -574,8 +574,8 @@ namespace Step56
                                                fe.component_mask(velocities));
 
       // As discussed in the introduction, we need to fix one degree of freedom
-      // of the pressure variable to ensure solvability of the problem. We do
-      // this here by marking the first pressure dof, which has index n_u as a
+      // of the pressure variable to ensure solvability of the problem. We do this
+      // here by marking the first pressure dof, which has index n_u as a
       // constrained dof.
       if (solver_type == SolverType::UMFPACK)
         constraints.add_line(n_u);
@@ -834,8 +834,7 @@ namespace Step56
         return;
       }
 
-    // Here we must make sure to solve for the residual with "good enough"
-    // accuracy
+    // Here we must make sure to solve for the residual with "good enough" accuracy
     SolverControl solver_control(system_matrix.m(),
                                  1e-10 * system_rhs.l2_norm());
     unsigned int  n_iterations_A;
@@ -909,8 +908,7 @@ namespace Step56
         mg::Matrix<Vector<double>> mg_interface_up(mg_interface_matrices);
         mg::Matrix<Vector<double>> mg_interface_down(mg_interface_matrices);
 
-        // Now, we are ready to set up the V-cycle operator and the multilevel
-        // preconditioner.
+        // Now, we are ready to set up the V-cycle operator and the multilevel preconditioner.
         Multigrid<Vector<double>> mg(
           mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
         mg.set_edge_matrices(mg_interface_down, mg_interface_up);

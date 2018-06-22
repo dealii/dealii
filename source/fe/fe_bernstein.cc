@@ -146,7 +146,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
 
       // compute the interpolation matrix by simply taking the value at the
       // support points.
-      // TODO: Verify that all faces are the same with respect to
+      //TODO: Verify that all faces are the same with respect to
       // these support points. Furthermore, check if something has to
       // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature =
@@ -212,10 +212,10 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_Bernstein<dim, spacedim>::hp_vertex_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // we can presently only compute these identities if both FEs are
-  // FE_Bernsteins or if the other one is an FE_Nothing. in the first case,
-  // there should be exactly one single DoF of each FE at a vertex, and they
-  // should have identical value
+  // we can presently only compute these identities if both FEs are FE_Bernsteins
+  // or if the other one is an FE_Nothing. in the first case, there should be
+  // exactly one single DoF of each FE at a vertex, and they should have
+  // identical value
   if (dynamic_cast<const FE_Bernstein<dim, spacedim> *>(&fe_other) != nullptr)
     {
       return std::vector<std::pair<unsigned int, unsigned int>>(
@@ -300,9 +300,8 @@ FE_Bernstein<dim, spacedim>::compare_for_face_domination(
         }
       else
         {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
           return FiniteElementDomination::no_requirements;
         }
     }

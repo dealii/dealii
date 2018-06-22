@@ -171,7 +171,7 @@ test(const FESystem<dim> &fe)
       dof_handler, 0, no_normal_flux_boundaries, constraints, mapping);
   constraints.close();
 
-  // std::cout << "Number of active cells: "
+  //std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
   //          << std::endl
   //          << "Number of degrees of freedom: "

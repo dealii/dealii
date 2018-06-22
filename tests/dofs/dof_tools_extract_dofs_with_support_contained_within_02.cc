@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 //
 
-// test DoFTools::extract_dofs_with_support_contained_within() for the
-// p::d::Tria. As an MPI test, make sure that the total number of shape
-// functions that are non-zero within the domain is the same.
+// test DoFTools::extract_dofs_with_support_contained_within() for the p::d::Tria.
+// As an MPI test, make sure that the total number of shape functions that are
+// non-zero within the domain is the same.
 
 #include <deal.II/base/point.h>
 

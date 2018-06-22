@@ -22,9 +22,10 @@
 /**************************************
 hj : 1/2;
 mj : 1/2;
-define(f(x), (1.81735e-05*(1.0-x)*(0.5-x)*2 + 0.000901649*x*(x-0.5)*2
-+ 1.35059e-05*x*(1.0-x)*4.0)); load("orthopoly"); orthopoly_returns_intervals :
-false; plot2d([legendre_p(0,x), legendre_p(1,x),legendre_p(2,x)], [x,-1,1])$
+define(f(x), (1.81735e-05*(1.0-x)*(0.5-x)*2 + 0.000901649*x*(x-0.5)*2 + 1.35059e-05*x*(1.0-x)*4.0));
+load("orthopoly");
+orthopoly_returns_intervals : false;
+plot2d([legendre_p(0,x), legendre_p(1,x),legendre_p(2,x)], [x,-1,1])$
 define(Lh(n,h,m,x), sqrt(1/h)*legendre_p(n,(x-m)/h));
 define(C(n),integrate(f(x)*Lh(n,hj,mj,x),x,0,1)*(n+1/2));
 bfloat(C(0)), nouns;

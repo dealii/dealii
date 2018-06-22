@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// Test that the flat manifold does what it should. This time on faces, where
-// the flat manifold is implemented as a ChartManifold with identity pull-back
-// and push-forward
+// Test that the flat manifold does what it should. This time on faces, where the
+// flat manifold is implemented as a ChartManifold with identity
+// pull-back and push-forward
 //
 // make the chart higher dimensional
 

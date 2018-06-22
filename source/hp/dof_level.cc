@@ -59,8 +59,8 @@ namespace internal
                        .template n_dofs_per_object<dim>(),
                    ExcInternalError());
 
-            // see if the range of dofs for this cell can be compressed and if
-            // so how many slots we have to store for them
+            // see if the range of dofs for this cell can be compressed and if so
+            // how many slots we have to store for them
             if (next_offset > dof_offsets[cell])
               {
                 bool compressible = true;
@@ -109,8 +109,8 @@ namespace internal
 
             new_dof_offsets[cell] = new_dof_indices.size();
 
-            // see if the range of dofs for this cell can be compressed and if
-            // so how many slots we have to store for them
+            // see if the range of dofs for this cell can be compressed and if so
+            // how many slots we have to store for them
             if (next_offset > dof_offsets[cell])
               {
                 bool compressible = true;
@@ -122,8 +122,8 @@ namespace internal
                       break;
                     }
 
-                // if this cell is compressible, then copy the first index and
-                // mark this in the dof_offsets array
+                // if this cell is compressible, then copy the first index and mark this
+                // in the dof_offsets array
                 if (compressible == true)
                   {
                     new_dof_indices.push_back(dof_indices[dof_offsets[cell]]);

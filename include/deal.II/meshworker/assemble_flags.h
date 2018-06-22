@@ -30,8 +30,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   /**
-   * The enum type given to the mesh_loop() function, telling that function
-   * which elements need to be assembled.
+   * The enum type given to the mesh_loop() function, telling that function which
+   * elements need to be assembled.
    *
    * You can select more than one flag by concatenation using the bitwise or
    * <code>operator|(AssembleFlags,AssembleFlags)</code>.

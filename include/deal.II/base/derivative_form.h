@@ -332,7 +332,7 @@ DerivativeForm<order, dim, spacedim, Number>::determinant() const
     {
       Assert(spacedim > dim, ExcMessage("Only for spacedim>dim."));
       const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
-      Tensor<2, dim, Number> G; // First fundamental form
+      Tensor<2, dim, Number>                         G; //First fundamental form
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
@@ -356,7 +356,7 @@ DerivativeForm<order, dim, spacedim, Number>::covariant_form() const
   else
     {
       const DerivativeForm<1, spacedim, dim> DF_t = this->transpose();
-      Tensor<2, dim, Number>                 G; // First fundamental form
+      Tensor<2, dim, Number>                 G; //First fundamental form
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
@@ -404,7 +404,7 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &DF,
  * @relatesalso DerivativeForm
  * @author Sebastian Pauletti, 2011
  */
-// rank=2
+//rank=2
 template <int spacedim, int dim, typename Number>
 inline DerivativeForm<1, spacedim, dim>
 apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &DF,

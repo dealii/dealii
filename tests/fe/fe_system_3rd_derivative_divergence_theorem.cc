@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// check the correctness of fe_values.shape_3rd_derivative for FE_System by
-// comparing the integral of all shape third derivative components with the flux
-// of the hessian over the boundary by the divergence theorem
+// check the correctness of fe_values.shape_3rd_derivative for FE_System by comparing
+// the integral of all shape third derivative components with the flux of the
+// hessian over the boundary by the divergence theorem
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

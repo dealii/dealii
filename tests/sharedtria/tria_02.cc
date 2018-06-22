@@ -83,16 +83,15 @@ test()
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
-  deallog << " locally_owned_subdomain(): " << tr.locally_owned_subdomain()
-          << "\n"
-          << " n_active_cells: " << tr.n_active_cells() << "\n"
-          << " n_levels: " << tr.n_levels() << "\n"
-          << " n_global_levels: " << tr.n_global_levels()
-          << "\n"
-          //<< " n_locally_owned_active_cells: " <<
-          // tr.n_locally_owned_active_cells() << "\n"
-          //<< " n_global_active_cells: " << tr.n_global_active_cells() << "\n"
-          << std::endl;
+  deallog
+    << " locally_owned_subdomain(): " << tr.locally_owned_subdomain() << "\n"
+    << " n_active_cells: " << tr.n_active_cells() << "\n"
+    << " n_levels: " << tr.n_levels() << "\n"
+    << " n_global_levels: " << tr.n_global_levels()
+    << "\n"
+    //<< " n_locally_owned_active_cells: " << tr.n_locally_owned_active_cells() << "\n"
+    //<< " n_global_active_cells: " << tr.n_global_active_cells() << "\n"
+    << std::endl;
 
   /*deallog << "n_locally_owned_active_cells_per_processor: ";
   std::vector<unsigned int> v = tr.n_locally_owned_active_cells_per_processor();
@@ -101,17 +100,16 @@ test()
     deallog << std::endl;*/
 
   // until parmetis is stable, do not output partitioning
-  // deallog << "subdomains: ";
+  //deallog << "subdomains: ";
   typename parallel::shared::Triangulation<dim>::active_cell_iterator it =
     tr.begin_active();
   for (unsigned int index = 0; it != tr.end(); ++it, ++index)
     {
-      // check that true subdomain_ids are the same as those, stored in
-      // cell->subdomain_id()
+      // check that true subdomain_ids are the same as those, stored in cell->subdomain_id()
       AssertThrow((it->is_artificial() == true) ||
                     (true_subdomain_ids_of_cells[index] == it->subdomain_id()),
                   ExcInternalError());
-      // deallog << (int) it->subdomain_id() << " ";
+      //deallog << (int) it->subdomain_id() << " ";
     }
   deallog << std::endl;
 

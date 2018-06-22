@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 template <>
 QGauss<0>::QGauss(const unsigned int)
   : // there are n_q^dim == 1
-    // points
+  // points
   Quadrature<0>(1)
 {
   // the single quadrature point gets unit
@@ -48,7 +48,7 @@ QGauss<0>::QGauss(const unsigned int)
 template <>
 QGaussLobatto<0>::QGaussLobatto(const unsigned int)
   : // there are n_q^dim == 1
-    // points
+  // points
   Quadrature<0>(1)
 {
   // the single quadrature point gets unit
@@ -857,8 +857,8 @@ template <int dim>
 QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
                       const Point<dim> &   singularity)
   : // We need the explicit implementation if dim == 1. If dim > 1 we use the
-    // former implementation and apply a tensorial product to obtain the higher
-    // dimensions.
+  // former implementation and apply a tensorial product to obtain the higher
+  // dimensions.
   Quadrature<dim>(
     dim == 2 ?
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
@@ -873,7 +873,7 @@ QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
 template <int dim>
 QTelles<dim>::QTelles(const unsigned int n, const Point<dim> &singularity)
   : // In this case we map the standard Gauss Legendre formula using the given
-    // singularity point coordinates.
+  // singularity point coordinates.
   Quadrature<dim>(QTelles<dim>(QGauss<1>(n), singularity))
 {}
 
@@ -980,8 +980,8 @@ namespace internal
 
 
     /**
-     * Computes the weights of the quadrature formula.
-     */
+    * Computes the weights of the quadrature formula.
+    */
     std::vector<double>
     get_quadrature_weights(const unsigned int n)
     {

@@ -531,7 +531,7 @@ MeshWorkerConstraintMatrixTest<dim>::MeshWorkerConstraintMatrixTest(
 {
   GridGenerator::hyper_cube(this->triangulation, -1, 1);
 
-  // refine with hanging node
+  //refine with hanging node
   this->triangulation.refine_global(1);
   this->triangulation.begin_active()->set_refine_flag();
   this->triangulation.execute_coarsening_and_refinement();

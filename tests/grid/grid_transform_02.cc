@@ -51,7 +51,7 @@ main()
     GridTools::find_active_cell_around_point(tria, Point<dim>());
 
   unsigned int best_vertex =
-    cell->vertex_index(0); // vertex number on local triangulation
+    cell->vertex_index(0); //vertex number on local triangulation
   Point<dim> best_pos  = cell->vertex(0);
   double     best_dist = Point<dim>().distance(best_pos);
 

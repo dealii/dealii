@@ -107,10 +107,9 @@ do_test(const DoFHandler<dim> &          dof,
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   if (parallel_option > 0)
     deallog << "Parallel option: " << parallel_option << std::endl;
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells() << std::endl; std::cout << "Number
-  // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
-  // of constraints: " << constraints.n_constraints() << std::endl;
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   MatrixFreeTest<dim, fe_degree, number> mf(dof, constraints);
   Vector<number>                         in(dof.n_dofs()), out(dof.n_dofs());

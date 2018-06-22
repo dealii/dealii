@@ -98,12 +98,12 @@ test()
 
   if (my_id == 0)
     {
-      // A.add (0, 0, 1.33);
-      // A.add (0, 2, 1.0);
+      //A.add (0, 0, 1.33);
+      //A.add (0, 2, 1.0);
     }
   if ((n_procs == 1) || (my_id == 1))
     A.add(0, 0, 1.67);
-  // A.begin()->value() += 1.67; // crashes
+  //A.begin()->value() += 1.67; // crashes
 
   A.compress(VectorOperation::add);
 

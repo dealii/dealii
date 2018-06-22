@@ -15,9 +15,9 @@
 
 
 /* checks that make_flux_sparsity_pattern() with masks runs without
- * calling inactive cells
- * on an adapted mesh with periodic boundary conditions
- */
+* calling inactive cells
+* on an adapted mesh with periodic boundary conditions
+*/
 
 #include <deal.II/base/function.h>
 
@@ -101,10 +101,10 @@ MakeFlux<dim>::run()
         make_grid();
       else
         {
-          /* refine the top-left cell to ensure we test this cell being looped
-           * over in make_flux_sparsity_pattern after the bottom-left cell and
-           * before the top-right cell, both of which will be less refined.
-           */
+          /* refine the top-left cell to ensure we test this cell being looped over
+          * in make_flux_sparsity_pattern after the bottom-left cell and before the
+          * top-right cell, both of which will be less refined.
+          */
 
           Point<dim> refn_point;
           refn_point = Point<dim>(0.005, 0.995);

@@ -426,9 +426,8 @@ void Step5<dim>::run()
   // not to do, after all.
 
   // So if we got past the assertion, we know that dim==2, and we can now
-  // actually read the grid. It is in UCD (unstructured cell data) format
-  // (though the convention is to use the suffix <code>inp</code> for UCD
-  // files):
+  // actually read the grid. It is in UCD (unstructured cell data) format (though
+  // the convention is to use the suffix <code>inp</code> for UCD files):
   grid_in.read_ucd(input_file);
   // If you like to use another input format, you have to use one of the other
   // <code>grid_in.read_xxx</code> function. (See the documentation of the

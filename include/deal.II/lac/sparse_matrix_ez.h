@@ -51,10 +51,10 @@ class FullMatrix;
  * constructor, as well as an increment size for rows.
  *
  * This class uses a storage structure that, similar to the usual sparse matrix
- * format, only stores non-zero elements. These are stored in a single data
- * array for the entire matrix, and are ordered by row and, within each row, by
- * column number. A separate array describes where in the long data array each
- * row starts and how long it is.
+ * format, only stores non-zero elements. These are stored in a single data array
+ * for the entire matrix, and are ordered by row and, within each row, by column
+ * number. A separate array describes where in the long data array each row
+ * starts and how long it is.
  *
  * Due to this structure, gaps may occur between rows. Whenever a new entry
  * must be created, an attempt is made to use the gap in its row. If no gap
@@ -1169,7 +1169,7 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
   // If no more space is available
   // for this row, insert new
   // elements into the vector.
-  // TODO:[GK] We should not extend this row if i<end
+  //TODO:[GK] We should not extend this row if i<end
   if (row != row_info.size() - 1)
     {
       if (end >= row_info[row + 1].start)
@@ -1223,8 +1223,7 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
       // entry below end
       Assert(data[j].column != Entry::invalid, ExcInternalError());
 
-      // TODO[GK]: This could be done more efficiently by moving starting at the
-      // top rather than swapping starting at the bottom
+      //TODO[GK]: This could be done more efficiently by moving starting at the top rather than swapping starting at the bottom
       std::swap(data[j], temp);
     }
   Assert(data[end].column == Entry::invalid, ExcInternalError());
@@ -1290,7 +1289,7 @@ SparseMatrixEZ<number>::add(const std::vector<size_type> &indices,
                             const FullMatrix<number2> &   full_matrix,
                             const bool                    elide_zero_values)
 {
-  // TODO: This function can surely be made more efficient
+  //TODO: This function can surely be made more efficient
   for (size_type i = 0; i < indices.size(); ++i)
     for (size_type j = 0; j < indices.size(); ++j)
       if ((full_matrix(i, j) != 0) || (elide_zero_values == false))
@@ -1307,7 +1306,7 @@ SparseMatrixEZ<number>::add(const std::vector<size_type> &row_indices,
                             const FullMatrix<number2> &   full_matrix,
                             const bool                    elide_zero_values)
 {
-  // TODO: This function can surely be made more efficient
+  //TODO: This function can surely be made more efficient
   for (size_type i = 0; i < row_indices.size(); ++i)
     for (size_type j = 0; j < col_indices.size(); ++j)
       if ((full_matrix(i, j) != 0) || (elide_zero_values == false))
@@ -1324,7 +1323,7 @@ SparseMatrixEZ<number>::add(const size_type               row,
                             const std::vector<number2> &  values,
                             const bool                    elide_zero_values)
 {
-  // TODO: This function can surely be made more efficient
+  //TODO: This function can surely be made more efficient
   for (size_type j = 0; j < col_indices.size(); ++j)
     if ((values[j] != 0) || (elide_zero_values == false))
       add(row, col_indices[j], values[j]);
@@ -1342,7 +1341,7 @@ SparseMatrixEZ<number>::add(const size_type  row,
                             const bool       elide_zero_values,
                             const bool /*col_indices_are_sorted*/)
 {
-  // TODO: This function can surely be made more efficient
+  //TODO: This function can surely be made more efficient
   for (size_type j = 0; j < n_cols; ++j)
     if ((std::abs(values[j]) != 0) || (elide_zero_values == false))
       add(row, col_indices[j], values[j]);
@@ -1600,4 +1599,4 @@ SparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*----------------------------   sparse_matrix.h ---------------------------*/
+/*----------------------------   sparse_matrix.h     ---------------------------*/

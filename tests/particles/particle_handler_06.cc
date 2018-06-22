@@ -39,8 +39,7 @@ test()
     tr.refine_global(2);
     MappingQ<dim, spacedim> mapping(1);
 
-    // both processes create a particle handler, but only the first creates
-    // particles
+    // both processes create a particle handler, but only the first creates particles
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
     Point<spacedim> position;

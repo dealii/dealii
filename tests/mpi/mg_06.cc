@@ -17,12 +17,8 @@
 
 // test to show bug when using hyper_cube_slit:
 /*
-An error occurred in line <1858> of file
-</ssd/deal-trunk/deal.II/source/dofs/dof_handler_policy.cc> in function void
-dealii::internal::DoFHandler::Policy::{anonymous}::communicate_mg_dof_indices_on_marked_cells(const
-dealii::DoFHandler<dim, spacedim>&, const std::map<unsigned int,
-std::set<unsigned int> >&, const std::vector<unsigned int>&, const
-std::vector<unsigned int>&, unsigned int) [with int dim = 2, int spacedim = 2]
+An error occurred in line <1858> of file </ssd/deal-trunk/deal.II/source/dofs/dof_handler_policy.cc> in function
+    void dealii::internal::DoFHandler::Policy::{anonymous}::communicate_mg_dof_indices_on_marked_cells(const dealii::DoFHandler<dim, spacedim>&, const std::map<unsigned int, std::set<unsigned int> >&, const std::vector<unsigned int>&, const std::vector<unsigned int>&, unsigned int) [with int dim = 2, int spacedim = 2]
 The violated condition was:
     senders.find(status.MPI_SOURCE)!=senders.end()
 The name and call sequence of the exception was:
@@ -115,7 +111,7 @@ test()
 
       DoFHandler<dim> dofh(tr);
 
-      // output(tr);
+      //output(tr);
 
       static const FE_Q<dim> fe(1);
       dofh.distribute_dofs(fe);
@@ -137,8 +133,7 @@ test()
                     if (cell->at_boundary(f))
                       continue;
 
-                    // deallog << cell->neighbor(f)->level_subdomain_id() <<
-                    // std::endl;
+                    //deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
                     // is cell level-artificial?
                     Assert(cell->neighbor(f)->level_subdomain_id() < 100,
                            ExcInternalError());

@@ -220,11 +220,11 @@ namespace Step18
   // The second function does something very similar (and therefore is given
   // the same name): compute the symmetric strain tensor from the gradient of
   // a vector-valued field. If you already have a solution field, the
-  // <code>fe_values.get_function_gradients</code> function allows you to
-  // extract the gradients of each component of your solution field at a
-  // quadrature point. It returns this as a vector of rank-1 tensors: one rank-1
-  // tensor (gradient) per vector component of the solution. From this we have
-  // to reconstruct the (symmetric) strain tensor by transforming the data
+  // <code>fe_values.get_function_gradients</code> function allows you to extract
+  // the gradients of each component of your solution field at a quadrature
+  // point. It returns this as a vector of rank-1 tensors: one rank-1 tensor
+  // (gradient) per vector component of the solution. From this we have to
+  // reconstruct the (symmetric) strain tensor by transforming the data
   // storage format and symmetrization. We do this in the same way as above,
   // i.e. we avoid a few computations by filling first the diagonal and then
   // only one half of the symmetric tensor (the <code>SymmetricTensor</code>
@@ -626,11 +626,11 @@ namespace Step18
   // For the purposes of this program, we choose a simple form of boundary
   // displacement: we displace the top boundary with constant velocity
   // downwards. The rest of the boundary is either going to be fixed (and is
-  // then described using an object of type
-  // <code>Functions::ZeroFunction</code>) or free (Neumann-type, in which case
-  // nothing special has to be done).  The implementation of the class
-  // describing the constant downward motion should then be obvious using the
-  // knowledge we gained through all the previous example programs:
+  // then described using an object of type <code>Functions::ZeroFunction</code>) or free
+  // (Neumann-type, in which case nothing special has to be done).  The
+  // implementation of the class describing the constant downward motion
+  // should then be obvious using the knowledge we gained through all the
+  // previous example programs:
   template <int dim>
   class IncrementalBoundaryValues : public Function<dim>
   {
@@ -887,8 +887,8 @@ namespace Step18
     // row. It therefore only ever allocates as much memory as it needs at any
     // given time, and we can build it even for large 3d problems.
     //
-    // It is also worth noting that due to the specifics of
-    // parallel::shared::Triangulation, the sparsity pattern we construct is
+    // It is also worth noting that due to the specifics of parallel::shared::Triangulation,
+    // the sparsity pattern we construct is
     // global, i.e. comprises all degrees of freedom whether they will be
     // owned by the processor we are on or another one (in case this program
     // is run in %parallel via MPI). This of course is not optimal -- it
@@ -1302,16 +1302,15 @@ namespace Step18
     // so we do this on processor 0:
     if (this_mpi_process == 0)
       {
-        // Here we collect all filenames of the current timestep (same format as
-        // above)
+        // Here we collect all filenames of the current timestep (same format as above)
         std::vector<std::string> filenames;
         for (unsigned int i = 0; i < n_mpi_processes; ++i)
           filenames.push_back("solution-" +
                               Utilities::int_to_string(timestep_no, 4) + "." +
                               Utilities::int_to_string(i, 3) + ".vtu");
 
-        // Now we write the .visit file. The naming is similar to the .vtu
-        // files, only that the file obviously doesn't contain a processor id.
+        // Now we write the .visit file. The naming is similar to the .vtu files, only
+        // that the file obviously doesn't contain a processor id.
         const std::string visit_master_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".visit");
         std::ofstream visit_master(visit_master_filename);
@@ -1323,10 +1322,9 @@ namespace Step18
         std::ofstream pvtu_master(pvtu_master_filename);
         data_out.write_pvtu_record(pvtu_master, filenames);
 
-        // Finally, we write the paraview record, that references all .pvtu
-        // files and their respective time. Note that the variable
-        // times_and_names is declared static, so it will retain the entries
-        // from the previous timesteps.
+        // Finally, we write the paraview record, that references all .pvtu files and
+        // their respective time. Note that the variable times_and_names is declared
+        // static, so it will retain the entries from the previous timesteps.
         static std::vector<std::pair<double, std::string>> times_and_names;
         times_and_names.push_back(
           std::pair<double, std::string>(present_time, pvtu_master_filename));

@@ -137,7 +137,7 @@ check_fe(FiniteElement<dim> &fe)
 
   MGTransferPrebuilt<vector_t> transfer(mg_constrained_dofs);
   transfer.build_matrices(dofh);
-  // transfer.print_indices(deallog.get_file_stream());
+  //transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels() - 1);
   for (unsigned int level = u.min_level(); level <= u.max_level(); ++level)
@@ -149,7 +149,7 @@ check_fe(FiniteElement<dim> &fe)
         {
           unsigned int index =
             dofh.locally_owned_mg_dofs(level).nth_index_in_set(i);
-          u[level][index] = 1.0; // 1000+level*100+index;
+          u[level][index] = 1.0; //1000+level*100+index;
         }
       u[level].compress(VectorOperation::insert);
     }
@@ -185,7 +185,7 @@ check()
 
   check_fe(q1);
   //  check_fe(q2);
-  // check_fe(s1);
+  //check_fe(s1);
 }
 
 int
@@ -195,5 +195,5 @@ main(int argc, char *argv[])
   MPILogInitAll                    log;
 
   check<2>();
-  // check<3> ();
+  //check<3> ();
 }

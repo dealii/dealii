@@ -69,8 +69,7 @@ check()
   // 5x5
   {
     // https://math.stackexchange.com/questions/1955784/how-to-find-the-determinant-of-a-5x5-matrix
-    // Wolfram Alpha: determinant
-    // {{0,6,-2,-1,5},{0,0,0,-9,-7},{0,15,35,0,0},{0,-1,-11,-2,1},{-2,-2,3,0,2}}
+    // Wolfram Alpha: determinant {{0,6,-2,-1,5},{0,0,0,-9,-7},{0,15,35,0,0},{0,-1,-11,-2,1},{-2,-2,3,0,2}}
     FullMatrix<number> A(5, 5);
 
     // det(A) = 2480

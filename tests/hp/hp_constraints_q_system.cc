@@ -15,8 +15,8 @@
 
 
 
-// check that computation of hp constraints works for FESystem(FE_Q) elements
-// correctly on a uniformly refined mesh for functions of degree q
+// check that computation of hp constraints works for FESystem(FE_Q) elements correctly
+// on a uniformly refined mesh for functions of degree q
 
 char logname[] = "output";
 

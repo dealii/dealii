@@ -27,8 +27,7 @@ namespace Functions
   // https://github.com/apache/commons-math/blob/master/src/main/java/org/apache/commons/math4/geometry/euclidean/threed/SphericalCoordinates.java
   // http://mathworld.wolfram.com/SphericalCoordinates.html
 
-  /*derivation of Hessian in Maxima as function of tensor products of unit
-  vectors:
+  /*derivation of Hessian in Maxima as function of tensor products of unit vectors:
 
   depends(ur,[theta,phi]);
   depends(utheta,theta);

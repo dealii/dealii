@@ -74,9 +74,8 @@ MixedFECollection<dim>::run()
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(2);
 
-  // looping over all cells and assigning the FE_DG object to the first cell
-  // that comes up -- works. looping over all cells and assigning the FE_DG
-  // object to the interior cells -- doesn't work.
+  // looping over all cells and assigning the FE_DG object to the first cell that comes up -- works.
+  // looping over all cells and assigning the FE_DG object to the interior cells -- doesn't work.
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
                                                               .begin_active(),
                                                      endc = dof_handler.end();

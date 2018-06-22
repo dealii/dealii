@@ -15,8 +15,8 @@
 
 
 
-// check copy constructor Vector<std::complex<double> >::Vector(Vector) for same
-// template argument
+// check copy constructor Vector<std::complex<double> >::Vector(Vector) for same template
+// argument
 
 #include <deal.II/lac/vector.h>
 

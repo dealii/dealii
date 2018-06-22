@@ -749,8 +749,8 @@ namespace Threads
      *
      * Given an arbitrary type RT, store an element of it and grant access to
      * it through functions get() and set(). This is the specialization for
-     * reference types: since references cannot be set after construction time,
-     * we store a pointer instead, which holds the address of the object being
+     * reference types: since references cannot be set after construction time, we
+     * store a pointer instead, which holds the address of the object being
      * referenced.
      */
     template <typename RT>
@@ -1086,9 +1086,9 @@ namespace Threads
      * the returned object, instead of the returned object. This
      * allows writing code such as
      * @code
-     *   Threads::Thread<int> t = Threads::new_thread (...function returning an
-     * int...); t.return_value() = 42;      // overwrite returned value int i =
-     * t.return_value();   // i is now 42
+     *   Threads::Thread<int> t = Threads::new_thread (...function returning an int...);
+     *   t.return_value() = 42;      // overwrite returned value
+     *   int i = t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
      * the function needs to return a writable (non-@p const) reference to
@@ -1261,8 +1261,7 @@ namespace Threads
    *   new_thread() will of course typically be more complicated.
    *   In particular, they will likely <i>capture</i> variables
    *   from the surrounding context and use them within the lambda.
-   *   See
-   * https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
+   *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
    *   for more on how lambda functions work.
    *
    * @note If you pass a lambda function as an argument to the
@@ -1794,9 +1793,9 @@ namespace Threads
      * the returned object, instead of the returned object. This
      * allows writing code such as
      * @code
-     *   Threads::Task<int> t = Threads::new_task (...function returning an
-     * int...); t.return_value() = 42;      // overwrite returned value int i =
-     * t.return_value();   // i is now 42
+     *   Threads::Task<int> t = Threads::new_task (...function returning an int...);
+     *   t.return_value() = 42;      // overwrite returned value
+     *   int i = t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
      * the function needs to return a writable (non-@p const) reference to
@@ -1934,8 +1933,7 @@ namespace Threads
    *   new_task() will of course typically be more complicated.
    *   In particular, they will likely <i>capture</i> variables
    *   from the surrounding context and use them within the lambda.
-   *   See
-   * https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
+   *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
    *   for more on how lambda functions work.
    *
    * @note If you pass a lambda function as an argument to the

@@ -54,7 +54,7 @@ main()
 
   hp::FECollection<2> fe_collection;
   fe_collection.push_back(FE_Q<2>(1));
-  // fe_collection.push_back(FE_Q<2>(2));
+  //fe_collection.push_back(FE_Q<2>(2));
   fe_collection.push_back(FE_Nothing<2>());
 
   hp::DoFHandler<2> dof_handler(triangulation);

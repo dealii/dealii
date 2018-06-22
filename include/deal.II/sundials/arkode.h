@@ -272,8 +272,8 @@ namespace SUNDIALS
    * \f]
    * and $y(0)=(0, k)$.
    *
-   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k
-   *t)$, $y_1'(t) = -k^2 \sin(k t)$.
+   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k t)$,
+   * $y_1'(t) = -k^2 \sin(k t)$.
    *
    * A minimal implementation, using only explicit RK methods, is given by the
    * following code snippet:
@@ -331,12 +331,10 @@ namespace SUNDIALS
        *
        * @param minimum_step_size Minimum step size
        * @param maximum_order Maximum ARK order
-       * @param maximum_non_linear_iterations Maximum number of nonlinear
-       * iterations
-       * @param implicit_function_is_linear Specifies that the implicit portion
-       * of the problem is linear
-       * @param implicit_function_is_time_independent Specifies that the
-       * implicit portion of the problem is linear and time independent
+       * @param maximum_non_linear_iterations Maximum number of nonlinear iterations
+       * @param implicit_function_is_linear Specifies that the implicit portion of the problem is linear
+       * @param implicit_function_is_time_independent Specifies that the implicit portion of the problem
+       *        is linear and time independent
        *
        * Error parameters:
        *
@@ -402,13 +400,12 @@ namespace SUNDIALS
        * end
        * @endcode
        *
-       * These are one-to-one with the options you can pass at construction
-       * time.
+       * These are one-to-one with the options you can pass at construction time.
        *
        * The options you pass at construction time are set as default values in
        * the ParameterHandler object `prm`. You can later modify them by parsing
-       * a parameter file using `prm`. The values of the parameter will be
-       * updated whenever the content of `prm` is updated.
+       * a parameter file using `prm`. The values of the parameter will be updated
+       * whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
        * will occur if you destroy this class, and then parse a parameter file
@@ -559,8 +556,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<
       int(const double t, const VectorType &y, VectorType &explicit_f)>
@@ -579,8 +576,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double t, const VectorType &y, VectorType &res)>
       implicit_function;
@@ -627,47 +624,44 @@ namespace SUNDIALS
      *
      * @param[in] t  the current time
      * @param[in] gamma  the current factor to use in the jacobian computation
-     * @param[in] ypred  is the predicted $y$ vector for the current ARKode
-     * internal step
+     * @param[in] ypred  is the predicted $y$ vector for the current ARKode internal step
      * @param[in] fpred  is the value of the implicit right-hand side at ypred,
      *        $f_I (t_n, ypred)$.
      *
-     * @param[in] convfail – an input flag used to indicate any problem that
-     * occurred during the solution of the nonlinear equation on the current
-     * time step for which the linear solver is being used. This flag can be
-     * used to help decide whether the Jacobian data kept by a linear solver
-     * needs to be updated or not. Its possible values are:
+     * @param[in] convfail – an input flag used to indicate any problem that occurred
+     *   during the solution of the nonlinear equation on the current time step
+     *   for which the linear solver is being used. This flag can be used to help
+     *   decide whether the Jacobian data kept by a linear solver needs to be
+     *   updated or not. Its possible values are:
      *
-     *   - ARK_NO_FAILURES: this value is passed if either this is the first
-     * call for this step, or the local error test failed on the previous
-     * attempt at this step (but the Newton iteration converged).
+     *   - ARK_NO_FAILURES: this value is passed if either this is the first call
+     *     for this step, or the local error test failed on the previous attempt at
+     *     this step (but the Newton iteration converged).
      *
      *   - ARK_FAIL_BAD_J: this value is passed if (a) the previous Newton
      *     corrector iteration did not converge and the linear solver's setup
-     *     function indicated that its Jacobian-related data is not current, or
-     * (b) during the previous Newton corrector iteration, the linear solver's
+     *     function indicated that its Jacobian-related data is not current, or (b)
+     *     during the previous Newton corrector iteration, the linear solver's
      *     solve function failed in a recoverable manner and the linear solver's
-     *     setup function indicated that its Jacobian-related data is not
-     * current.
+     *     setup function indicated that its Jacobian-related data is not current.
      *
      *   - ARK_FAIL_OTHER: this value is passed if during the current internal
-     *     step try, the previous Newton iteration failed to converge even
-     * though the linear solver was using current Jacobian-related data.
+     *     step try, the previous Newton iteration failed to converge even though
+     *     the linear solver was using current Jacobian-related data.
      *
-     * @param[out] j_is_current: a boolean to be filled in by setup_jacobian().
-     * The value should be set to `true` if the Jacobian data is current after
-     * the call, and should be set to `false` if its Jacobian data is not
-     * current. If setup_jacobian() calls for re-evaluation of Jacobian data
-     * (based on convfail and ARKode state data), then it should set
-     * `j_is_current` to `true` unconditionally, otherwise an infinite loop can
-     * result.
+     * @param[out] j_is_current: a boolean to be filled in by setup_jacobian(). The value
+     * should be set to `true` if the Jacobian data is current after the call,
+     * and should be set to `false` if its Jacobian data is not current. If
+     * setup_jacobian() calls for re-evaluation of Jacobian data (based on
+     * convfail and ARKode state data), then it should set `j_is_current` to
+     * `true` unconditionally, otherwise an infinite loop can result.
      *
      * This function should return:
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const int         convfail,
                       const double      t,
@@ -708,18 +702,17 @@ namespace SUNDIALS
      *
      * @param[in] t  the current time
      * @param[in] gamma  the current factor to use in the jacobian computation
-     * @param[in] ycur  is the current $y$ vector for the current ARKode
-     * internal step
-     * @param[in] fcur  is the current value of the implicit right-hand side at
-     * ycur, $f_I (t_n, ypred)$.
+     * @param[in] ycur  is the current $y$ vector for the current ARKode internal step
+     * @param[in] fcur  is the current value of the implicit right-hand side at ycur,
+     *        $f_I (t_n, ypred)$.
      *
      *
      * This function should return:
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double      t,
                       const double      gamma,
@@ -760,8 +753,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double t)> setup_mass;
 
@@ -780,8 +773,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &rhs, VectorType &dst)>
       solve_mass_system;
@@ -793,9 +786,9 @@ namespace SUNDIALS
      * polynomial interpolation of the solution, computed using the current ARK
      * order and the (internally stored) previously computed solution steps.
      *
-     * Notice that it is well possible that internally ARKode computes a time
-     * step which is much larger than the `output_period` step, and therefore
-     * calls this function consecutively several times by simply performing all
+     * Notice that it is well possible that internally ARKode computes a time step
+     * which is much larger than the `output_period` step, and therefore calls
+     * this function consecutively several times by simply performing all
      * intermediate interpolations. There is no relationship between how many
      * times this function is called and how many time steps have actually been
      * computed.
@@ -844,8 +837,7 @@ namespace SUNDIALS
 
   private:
     /**
-     * Throw an exception when a function with the given name is not
-     * implemented.
+     * Throw an exception when a function with the given name is not implemented.
      */
     DeclException1(ExcFunctionNotProvided,
                    std::string,

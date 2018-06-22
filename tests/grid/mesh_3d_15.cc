@@ -99,7 +99,7 @@ void check(Triangulation<3> &tria)
 
   deallog << "Initial check" << std::endl;
   check_this(tria);
-  // TODO:[WB] Is there a reason to do this three times?
+  //TODO:[WB] Is there a reason to do this three times?
   // Changed to two. Guido
   for (unsigned int r = 0; r < 2; ++r)
     {

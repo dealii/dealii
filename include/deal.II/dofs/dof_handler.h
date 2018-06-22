@@ -95,8 +95,7 @@ namespace internal
  * matrices also refer to all degrees of freedom and some kind of condensation
  * is needed to restrict the systems of equations to the unconstrained degrees
  * of freedom only. The actual layout of storage of the indices is described
- * in the dealii::internal::DoFHandlerImplementation::DoFLevel class
- * documentation.
+ * in the dealii::internal::DoFHandlerImplementation::DoFLevel class documentation.
  *
  * The class offers iterators to traverse all cells, in much the same way as
  * the Triangulation class does. Using the begin() and end() functions (and
@@ -615,8 +614,7 @@ public:
    * further refined, then this function returns
    * <code>end_active(level)</code> so that loops of the kind
    *  @code
-   *    for (cell=dof_handler.begin_active(level);
-   * cell!=dof_handler.end_active(level); ++cell)
+   *    for (cell=dof_handler.begin_active(level); cell!=dof_handler.end_active(level); ++cell)
    *      ...
    *  @endcode
    * have zero iterations, as may be expected if there are no active cells on
@@ -932,12 +930,13 @@ public:
    * you are only interested in the number of elements each processor owns
    * then n_locally_owned_dofs_per_processor() is a better choice.
    *
-   * If this is a sequential DoFHandler, then the vector has a single element
-   * that equals the IndexSet representing the entire range [0,n_dofs()]. (Here,
-   * "sequential" means that either the whole program does not use MPI, or that
-   * it uses MPI but only uses a single MPI process, or that there are multiple
-   * MPI processes but the Triangulation on which this DoFHandler builds works
-   * only on one MPI process.)
+   * If this is a sequential DoFHandler, then the vector has a single element that
+   * equals the IndexSet representing the entire range [0,n_dofs()].
+   * (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
    */
   const std::vector<IndexSet> &
   locally_owned_dofs_per_processor() const;
@@ -951,11 +950,12 @@ public:
    * Each element of the vector returned by this function equals the number of
    * elements of the corresponding sets returned by global_dof_indices().
    *
-   * If this is a sequential DoFHandler, then the vector has a single element
-   * equal to n_dofs(). (Here, "sequential" means that either the whole program
-   * does not use MPI, or that it uses MPI but only uses a single MPI process,
-   * or that there are multiple MPI processes but the Triangulation on which
-   * this DoFHandler builds works only on one MPI process.)
+   * If this is a sequential DoFHandler, then the vector has a single element equal
+   * to n_dofs(). (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
    */
   const std::vector<types::global_dof_index> &
   n_locally_owned_dofs_per_processor() const;
@@ -964,12 +964,13 @@ public:
    * Return a vector that stores the locally owned DoFs of each processor on
    * the given level @p level.
    *
-   * If this is a sequential DoFHandler, then the vector has a single element
-   * that equals the IndexSet representing the entire range [0,n_dofs()]. (Here,
-   * "sequential" means that either the whole program does not use MPI, or that
-   * it uses MPI but only uses a single MPI process, or that there are multiple
-   * MPI processes but the Triangulation on which this DoFHandler builds works
-   * only on one MPI process.)
+   * If this is a sequential DoFHandler, then the vector has a single element that
+   * equals the IndexSet representing the entire range [0,n_dofs()].
+   * (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
    */
   const std::vector<IndexSet> &
   locally_owned_mg_dofs_per_processor(const unsigned int level) const;
@@ -983,11 +984,11 @@ public:
   get_fe(const unsigned int index = 0) const;
 
   /**
-   * Return a constant reference to the set of finite element objects that
-   * are used by this @p DoFHandler. Since this object only contains one
-   * FiniteElement, only this one object is returned wrapped in a
-   * hp::FECollection.
-   */
+    * Return a constant reference to the set of finite element objects that
+    * are used by this @p DoFHandler. Since this object only contains one
+    * FiniteElement, only this one object is returned wrapped in a
+    * hp::FECollection.
+    */
   const hp::FECollection<dim, spacedim> &
   get_fe_collection() const;
 
@@ -1275,8 +1276,7 @@ private:
 
 #ifndef DOXYGEN
 
-/* ----------------------- Inline functions ----------------------------------
- */
+/* ----------------------- Inline functions ---------------------------------- */
 
 
 template <int dim, int spacedim>
@@ -1440,8 +1440,7 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::map<types::boundary_id, const Function<spacedim, number> *>
     &boundary_ids) const
 {
-  // extract the set of boundary ids and forget about the function object
-  // pointers
+  // extract the set of boundary ids and forget about the function object pointers
   std::set<types::boundary_id> boundary_ids_only;
   for (typename std::map<types::boundary_id,
                          const Function<spacedim, number> *>::const_iterator p =
@@ -1539,7 +1538,7 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
       levels[i] = std::move(level);
     }
 
-  // Workaround for nullptr, see in save().
+  //Workaround for nullptr, see in save().
   bool faces_is_nullptr = true;
   ar & faces_is_nullptr;
   if (!faces_is_nullptr)

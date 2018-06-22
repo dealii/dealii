@@ -31,8 +31,7 @@ namespace Physics
   {
     /**
      * A collection of tensor definitions for deformation and strain measures,
-     * as well as a few special transformations, that conform to notation used
-     in
+     * as well as a few special transformations, that conform to notation used in
      * standard scientific literature, in particular the books of
      * Holzapfel (2007) and Wriggers (2008). The citation for these references,
      * as well as other notation used here, can be found in the description for
@@ -146,8 +145,7 @@ namespace Physics
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
-       *  \mathbf{E} := \frac{1}{2}[\mathbf{F}^{T}\cdot\mathbf{F} - \mathbf{I}]
-       * \, .
+       *  \mathbf{E} := \frac{1}{2}[\mathbf{F}^{T}\cdot\mathbf{F} - \mathbf{I}] \, .
        * @f]
        *
        * @dealiiWriggersA{23,3.15}
@@ -165,8 +163,7 @@ namespace Physics
        *  \boldsymbol{\varepsilon} := \frac{1}{2} \left[ \nabla_{0}\mathbf{u}
        *   + [\nabla_{0}\mathbf{u}]^{T} \right] \, .
        * @f]
-       * where $\mathbf{u} = \mathbf{u}(\mathbf{X})$ is the displacement at
-       * position
+       * where $\mathbf{u} = \mathbf{u}(\mathbf{X})$ is the displacement at position
        * $\mathbf{X}$ in the referential configuration.
        * The differential operator $\nabla_{0}$ is defined as
        * $\frac{\partial}{\partial \mathbf{X}}$.

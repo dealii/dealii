@@ -278,7 +278,7 @@ test()
 
   deallog << "Testing " << fe0.get_name() << ", " << fe1.get_name() << ", and "
           << fe1.get_name() << std::endl;
-  // std::cout << "Number of cells: " << tria.n_active_cells() << std::endl;
+  //std::cout << "Number of cells: " << tria.n_active_cells() << std::endl;
 
   std::vector<Vector<double>> src(dof.size());
   for (unsigned int i = 0; i < dof.size(); ++i)
@@ -298,14 +298,12 @@ test()
   constraint2.close();
   constraints[2] = &constraint2;
 
-  // std::cout << "Number of degrees of freedom FE 0: " << dof[0]->n_dofs() <<
-  // std::endl; std::cout << "Number of constraints FE 0: " <<
-  // constraints[0]->n_constraints() << std::endl; std::cout << "Number of
-  // degrees of freedom FE 1: " << dof[1]->n_dofs() << std::endl; std::cout <<
-  // "Number of constraints FE 1: " << constraints[1]->n_constraints() <<
-  // std::endl; std::cout << "Number of degrees of freedom FE 2: " <<
-  // dof[2]->n_dofs() << std::endl; std::cout << "Number of constraints FE 2: "
-  // << constraints[2]->n_constraints() << std::endl;
+  //std::cout << "Number of degrees of freedom FE 0: " << dof[0]->n_dofs() << std::endl;
+  //std::cout << "Number of constraints FE 0: " << constraints[0]->n_constraints() << std::endl;
+  //std::cout << "Number of degrees of freedom FE 1: " << dof[1]->n_dofs() << std::endl;
+  //std::cout << "Number of constraints FE 1: " << constraints[1]->n_constraints() << std::endl;
+  //std::cout << "Number of degrees of freedom FE 2: " << dof[2]->n_dofs() << std::endl;
+  //std::cout << "Number of constraints FE 2: " << constraints[2]->n_constraints() << std::endl;
 
   // create vector with random entries
   for (unsigned int no = 0; no < 3; ++no)

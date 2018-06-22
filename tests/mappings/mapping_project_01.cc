@@ -33,11 +33,11 @@ dim2_grid()
 {
   Triangulation<2> triangulation;
 
-  const Point<2> p_ll(-1, -1); // lower left point
-  const Point<2> p_ur(1, 1);   // upper right point
+  const Point<2> p_ll(-1, -1); //lower left point
+  const Point<2> p_ur(1, 1);   //upper right point
   GridGenerator::hyper_rectangle(triangulation, p_ll, p_ur, false);
 
-  const Point<2> testp(.5, -.5); // test point
+  const Point<2> testp(.5, -.5); //test point
 
   MappingQGeneric<2> mapping(1);
 
@@ -63,11 +63,11 @@ dim3_grid()
 {
   Triangulation<3> triangulation;
 
-  const Point<3> p_ll(-1, -1, -1); // lower left point
-  const Point<3> p_ur(1, 1, 1);    // upper right point
+  const Point<3> p_ll(-1, -1, -1); //lower left point
+  const Point<3> p_ur(1, 1, 1);    //upper right point
   GridGenerator::hyper_rectangle(triangulation, p_ll, p_ur, false);
 
-  const Point<3> testp(.5, -.5, 0); // test point
+  const Point<3> testp(.5, -.5, 0); //test point
 
   MappingQGeneric<3> mapping(1);
 
@@ -101,7 +101,7 @@ dim3_parallelepiped_grid()
 
   GridGenerator::parallelepiped(triangulation, corners);
 
-  const Point<3> testp(1, 1, 1); // test point
+  const Point<3> testp(1, 1, 1); //test point
 
   MappingQGeneric<3> mapping(1);
 

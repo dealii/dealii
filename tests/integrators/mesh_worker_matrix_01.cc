@@ -188,7 +188,7 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
     assembler,
     lctrl);
 
-  // matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
+  //matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
   matrix.print(deallog.get_file_stream(), false, false);
 }
 

@@ -408,8 +408,8 @@ namespace Step50
                    || (mg_constrained_dofs.is_boundary_index(
                          lvl, local_dof_indices[i]) &&
                        local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
+                         local_dof_indices
+                           [j]) // ( boundary(i) && boundary(j) && i==j )
                    ))
                 {
                 }
@@ -471,8 +471,7 @@ namespace Step50
 
     const auto op_prec = linear_operator<vector_t>(preconditioner);
     const auto op_I    = identity_operator(op_prec.reinit_range_vector);
-    // just do some nonsense operator to make sure we use LinearOperator in
-    // full:
+    // just do some nonsense operator to make sure we use LinearOperator in full:
     const auto op = op_I + 2.0 * op_prec;
 
     vector_t output_1(system_rhs), output_2(system_rhs), residual(system_rhs);

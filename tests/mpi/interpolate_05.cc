@@ -18,8 +18,7 @@
 // VectorTools::interpolate used to accidentally read from non-owned
 // dofs when called with a component mask that excluded some components.
 // This triggered an assertion. Test that the solution,
-// namely skipping all non-local dofs that are not selected to be interpolated,
-// works.
+// namely skipping all non-local dofs that are not selected to be interpolated, works.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
@@ -108,10 +107,10 @@ test()
     deallog << dofh.n_locally_owned_dofs() << ' ' << dofh.n_dofs() << std::endl
             << "Error of interpolated component: " << norm << std::endl;
 
-  // Integrate the difference in the second component. Since we did not
-  // interpolate the function into the finite element space, this should be
-  // equal to the integral of the ConstantFunction (=1) over the domain (unit
-  // square/cube). Thus the integral should be one.
+  // Integrate the difference in the second component. Since we did not interpolate
+  // the function into the finite element space, this should be equal to the
+  // integral of the ConstantFunction (=1) over the domain (unit square/cube).
+  // Thus the integral should be one.
   VectorTools::integrate_difference(dofh,
                                     x_rel,
                                     Functions::ConstantFunction<dim>(1, 2),

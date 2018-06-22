@@ -57,14 +57,14 @@ test()
 
   Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double>> fef(dh, v1);
 
-  // create the origin
+  //create the origin
   Point<dim> p;
-  // compute the error of the laplacian in this point
+  //compute the error of the laplacian in this point
   deallog << "Value of the laplacian in 0:" << std::endl;
   deallog << "correct value: " << ff.laplacian(p)
           << ", approximation: " << fef.laplacian(p) << std::endl;
 
-  // now we want to test the list version
+  //now we want to test the list version
   Point<dim> p1              = Point<dim>::unit_vector(0);
   p1                         = p1 * 0.5;
   Point<dim>              p2 = p1 * 0.5;
@@ -74,7 +74,7 @@ test()
   std::vector<double> values_c(2);
   std::vector<double> values_a(2);
 
-  // get the laplacians at these two points
+  //get the laplacians at these two points
   ff.laplacian_list(vec, values_c);
   fef.laplacian_list(vec, values_a);
   deallog << "Value of the laplacian in 0.5*e1 and 0.25 * e1:" << std::endl;

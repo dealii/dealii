@@ -424,9 +424,7 @@ namespace Step36
                     if (fe_collection[pou_fe_index]
                           .face_system_to_base_index(i)
                           .first.first == pou_group)
-                      // if
-                      // (fe_collection[1].face_system_to_component_index(i).first
-                      // /*component*/ > 0)
+                      //if (fe_collection[1].face_system_to_component_index(i).first /*component*/ > 0)
                       constraints.add_line(local_face_dof_indices[i]);
                 }
             }
@@ -789,8 +787,8 @@ namespace Step36
           (solution_values[q](0) +
            solution_values[q](1) *
              enrichment.value(
-               evaluation_points[q])); // for FE_Nothing solution_values[q](1)
-                                       // will be zero
+               evaluation_points
+                 [q])); // for FE_Nothing solution_values[q](1) will be zero
       }
   }
 
@@ -816,8 +814,7 @@ namespace Step36
         std::ofstream output(filename.c_str());
 
         Postprocessor<dim> postprocessor(
-          enrichment); // has to live until the DataOut object is destroyed;
-                       // objects are destroyed in reverse order of declaration
+          enrichment); // has to live until the DataOut object is destroyed; objects are destroyed in reverse order of declaration
         DataOut<dim, hp::DoFHandler<dim>> data_out;
         data_out.attach_dof_handler(dof_handler);
         data_out.add_data_vector(eigenfunctions_locally_relevant[0],
@@ -845,7 +842,7 @@ namespace Step36
       }
 
     // scalar data for plotting
-    // output scalar data (eigenvalues, energies, ndofs, etc)
+    //output scalar data (eigenvalues, energies, ndofs, etc)
     if (this_mpi_process == 0)
       {
         const std::string scalar_fname = "scalar-data.txt";
@@ -866,7 +863,7 @@ namespace Step36
 
         output << std::endl;
         output.close();
-      } // end scope
+      } //end scope
   }
 
 

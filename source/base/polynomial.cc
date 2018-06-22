@@ -1072,7 +1072,7 @@ namespace Polynomials
 
             std::vector<double> c2(3);
 
-            const double a = 1.; // 1./8.;
+            const double a = 1.; //1./8.;
 
             c2[0] = 0. * a;
             c2[1] = -4. * a;
@@ -1097,7 +1097,7 @@ namespace Polynomials
 
             std::vector<double> ck(k + 1);
 
-            const double a = 1.; // 1./(2.*k);
+            const double a = 1.; //1./(2.*k);
 
             ck[0] = -a * (*recursive_coefficients[k - 1])[0];
 
@@ -1111,8 +1111,8 @@ namespace Polynomials
             // basis fcn phi_2
             if ((k % 2) == 0)
               {
-                double b = 1.; // 8.;
-                // for (unsigned int i=1; i<=k; i++)
+                double b = 1.; //8.;
+                //for (unsigned int i=1; i<=k; i++)
                 //  b /= 2.*i;
 
                 ck[1] += b * (*recursive_coefficients[2])[1];
@@ -1261,10 +1261,8 @@ namespace Polynomials
       const unsigned int degree      = jacobi_roots.size() + 3;
 
       // Compute two integrals of the product of l_0(x) * l_1(x)
-      // l_0(x) =
-      // (x-y)*(x-jacobi_roots(0))*...*(x-jacobi_roos(degree-4))*(x-1)*(x-1)
-      // l_1(x) =
-      // (x-0)*(x-jacobi_roots(0))*...*(x-jacobi_roots(degree-4))*(x-1)*(x-1)
+      // l_0(x) = (x-y)*(x-jacobi_roots(0))*...*(x-jacobi_roos(degree-4))*(x-1)*(x-1)
+      // l_1(x) = (x-0)*(x-jacobi_roots(0))*...*(x-jacobi_roots(degree-4))*(x-1)*(x-1)
       // where y is either guess_left or guess_right for the two integrals.
       // Note that the polynomials are not yet normalized here, which is not
       // necessary because we are only looking for the x_star where the matrix

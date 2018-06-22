@@ -1901,8 +1901,7 @@ namespace internal
                                                               update_default);
 
           // since we already know the cell type, we can pre-allocate the right
-          // amount of data straight away and we just need to do some basic
-          // counting
+          // amount of data straight away and we just need to do some basic counting
           AssertDimension(cell_type.size(), cells.size() / vectorization_width);
           face_data_by_cells[my_q].data_index_offsets.resize(
             cell_type.size() * GeometryInfo<dim>::faces_per_cell);

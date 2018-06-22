@@ -125,9 +125,9 @@ test()
   cm.distribute(x);
   x_rel = x;
 
-  // l2_norm() not possible for ghosted vectors...
-  // double a=0;//x_test.l2_norm();
-  // double b=0;//x_rel.l2_norm();
+  //l2_norm() not possible for ghosted vectors...
+  //double a=0;//x_test.l2_norm();
+  //double b=0;//x_rel.l2_norm();
 
   /*    if (myid==0)
         deallog << a << " vs " << b << std::endl;

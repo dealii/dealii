@@ -84,8 +84,7 @@ namespace internal
  * BlockMatrixArray matrix (n_blocks, n_blocks);
  *
  * for (size_type i=0;i<blocks.size;++i)
- *   matrix.enter(blocks.block(i).row, blocks.block(i).column,
- * blocks.matrix(i));
+ *   matrix.enter(blocks.block(i).row, blocks.block(i).column, blocks.matrix(i));
  * @endcode
  *
  * Here, we have not gained very much, except that we do not need to set up

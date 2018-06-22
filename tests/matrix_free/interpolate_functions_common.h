@@ -148,7 +148,7 @@ public:
                   std::abs(fe_evalm.get_value(q)[j] - function.value(p, 0));
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    // std::cout << fe_evalm.get_gradient(q)[d][j] << " ";
+                    //std::cout << fe_evalm.get_gradient(q)[d][j] << " ";
                     facem_errors[1] += std::abs(fe_evalm.get_gradient(q)[d][j] -
                                                 function.gradient(p, 0)[d]);
                   }
@@ -166,13 +166,12 @@ public:
                 facep_errors[3] += std::abs(
                   fe_evalp.get_normal_derivative(q)[j] - normal_derivative);
                 // hessians not currently implemented in FEFaceEvaluation
-                // for (unsigned int d=0; d<dim; ++d)
+                //for (unsigned int d=0; d<dim; ++d)
                 //  for (unsigned int e=0; e<dim; ++e)
-                //    facem_errors[2] +=
-                //    std::abs(fe_evalm.get_hessian(q)[d][e][j]-
+                //    facem_errors[2] += std::abs(fe_evalm.get_hessian(q)[d][e][j]-
                 //                                function.hessian(q)[d][e]);
               }
-            // std::cout << std::endl;
+            //std::cout << std::endl;
           }
       }
   }
@@ -220,10 +219,9 @@ public:
                 boundary_errors[3] += std::abs(
                   fe_evalm.get_normal_derivative(q)[j] - normal_derivative);
                 // hessians not currently implemented in FEFaceEvaluation
-                // for (unsigned int d=0; d<dim; ++d)
+                //for (unsigned int d=0; d<dim; ++d)
                 //  for (unsigned int e=0; e<dim; ++e)
-                //    boundary_errors[2] +=
-                //    std::abs(fe_evalm.get_hessian(q)[d][e][j]-
+                //    boundary_errors[2] += std::abs(fe_evalm.get_hessian(q)[d][e][j]-
                 //                                   function.hessian(q)[d][e]);
               }
           }
@@ -274,24 +272,21 @@ public:
             << std::endl;
     deallog << "Error face- gradients:  " << facem_errors[1] / facem_times
             << std::endl;
-    // deallog << "Error face- Hessians:   " << facem_errors[2]/facem_times <<
-    // std::endl;
+    //deallog << "Error face- Hessians:   " << facem_errors[2]/facem_times << std::endl;
     deallog << "Error face- grad*normal:" << facem_errors[3] / facem_times
             << std::endl;
     deallog << "Error face+ values:     " << facep_errors[0] / facep_times
             << std::endl;
     deallog << "Error face+ gradients:  " << facep_errors[1] / facep_times
             << std::endl;
-    // deallog << "Error face+ Hessians:   " << facep_errors[2]/facep_times <<
-    // std::endl;
+    //deallog << "Error face+ Hessians:   " << facep_errors[2]/facep_times << std::endl;
     deallog << "Error face+ grad*normal:" << facem_errors[3] / facep_times
             << std::endl;
     deallog << "Error face b values:    " << boundary_errors[0] / boundary_times
             << std::endl;
     deallog << "Error face b gradients: " << boundary_errors[1] / boundary_times
             << std::endl;
-    // deallog << "Error face b Hessians:  " <<
-    // boundary_errors[2]/boundary_times << std::endl;
+    //deallog << "Error face b Hessians:  " << boundary_errors[2]/boundary_times << std::endl;
     deallog << "Error face b grad*norm: " << boundary_errors[3] / boundary_times
             << std::endl;
     deallog << std::endl;
@@ -314,12 +309,10 @@ do_test(const DoFHandler<dim> &          dof,
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   // use this for info on problem
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells()
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells()
   //          << std::endl;
-  // std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
-  // std::cout << "Number of constraints: " << constraints.n_constraints() <<
-  // std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   Vector<number> interpolated(dof.n_dofs());
   VectorTools::interpolate(dof, CompareFunction<dim>(), interpolated);

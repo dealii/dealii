@@ -149,7 +149,7 @@ namespace Advection
     GridGenerator::subdivided_hyper_rectangle(
       triangulation, subdivisions, LowerLeft, UpperRight, true);
 
-  } // create_grid()
+  } //create_grid()
 
   template <>
   void
@@ -172,7 +172,7 @@ namespace Advection
     GridGenerator::subdivided_hyper_rectangle(
       triangulation, subdivisions, LowerLeft, UpperRight, true);
 
-  } // create_grid()
+  } //create_grid()
 
   template <>
   void
@@ -196,7 +196,7 @@ namespace Advection
     GridGenerator::subdivided_hyper_rectangle(
       triangulation, subdivisions, LowerLeft, UpperRight, true);
 
-  } // create_grid()
+  } //create_grid()
 
   template <int dim>
   void
@@ -208,7 +208,7 @@ namespace Advection
 
     solution = 0.0;
     stage    = 0.0;
-  } // setup_system
+  } //setup_system
 
 
   template <int dim>
@@ -239,10 +239,9 @@ namespace Advection
 
     info_box.initialize(fe, mapping, solution_data, solution);
 
-    // deallog<<"\nWe are now going to attend construction of
-    // MeshWorker::DoFInfo..."<<std::endl;
+    //deallog<<"\nWe are now going to attend construction of  MeshWorker::DoFInfo..."<<std::endl;
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
-    // deallog<<"\nApparently it DoFInfo was constructed fine!"<<std::endl;
+    //deallog<<"\nApparently it DoFInfo was constructed fine!"<<std::endl;
 
     MeshWorker::Assembler::ResidualSimple<Vector<double>> assembler;
     AnyData                                               data;
@@ -278,7 +277,7 @@ namespace Advection
       assembler,
       lctrl);
 
-  } // assemble_system
+  } //assemble_system
 
   template <int dim>
   void
@@ -314,10 +313,10 @@ namespace Advection
                                      fe_v[upos].value(j, q_point) *
                                      fe_v.JxW(q_point);
               }
-          } // i
-      }     // q_point
+          } //i
+      }     //q_point
 
-  } // integrate_cell_term
+  } //integrate_cell_term
 
   template <int dim>
   void
@@ -348,10 +347,10 @@ namespace Advection
             cell_rhs(i) += wavespeed * boundary_flux *
                            fe_v[upos].value(i, q_point) * fe_v.JxW(q_point);
 
-          } // i
-      }     // q_point
+          } //i
+      }     //q_point
 
-  } // integrate_boundary_term
+  } //integrate_boundary_term
 
   template <int dim>
   void
@@ -392,10 +391,10 @@ namespace Advection
                                 fe_v_2[upos].value(i, q_point) *
                                 fe_v_1.JxW(q_point);
 
-          } // i
-      }     // q_point
+          } //i
+      }     //q_point
 
-  } // integrate_face_term
+  } //integrate_face_term
 
 
   template <int dim>
@@ -418,7 +417,7 @@ namespace Advection
     data_out.build_patches(fe.degree);
     data_out.write_gnuplot(deallog.get_file_stream());
 
-  } // output_results
+  } //output_results
 
 
   template <int dim>
@@ -454,7 +453,7 @@ namespace Advection
 
     output_results(n_dt);
 
-  } // AdvectionProblem::run()
+  } //AdvectionProblem::run()
 
 } // namespace Advection
 

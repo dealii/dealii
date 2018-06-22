@@ -14,32 +14,18 @@
 // ---------------------------------------------------------------------
 
 
-// this test documents two unrelated bugs in DataOut when used with a Filter (by
-// deriving from DataOut):
-// 1. The patch index computation in data_out.cc is wrong and causes an SIGV (or
-// an Assert after adding that):
+// this test documents two unrelated bugs in DataOut when used with a Filter (by deriving from DataOut):
+// 1. The patch index computation in data_out.cc is wrong and causes an SIGV (or an Assert after adding that):
 /*
 466: --------------------------------------------------------
-466: An error occurred in line <306> of file
-</ssd/branch_port_the_testsuite/deal.II/source/numerics/data_out.cc> in function
-466:     void dealii::DataOut<dim, DoFHandlerType>::build_one_patch(const
-std::pair<typename dealii::DataOut_DoFData<DoFHandlerType, DoFHandlerType::
-dimension, DoFHandlerType:: space_dimension>::cell_iterator, unsigned int>*,
-dealii::internal::DataOut::ParallelData<DoFHandlerType:: dimension,
-DoFHandlerType:: space_dimension>&, dealii::DataOutBase::Patch<DoFHandlerType::
-dimension, DoFHandlerType:: space_dimension>&, dealii::DataOut<dim,
-DoFHandlerType>::CurvedCellRegion,
-std::vector<dealii::DataOutBase::Patch<DoFHandlerType:: dimension,
-DoFHandlerType:: space_dimension> >&) [with int dim = 2, DoFHandlerType =
-dealii::DoFHandler<2>, typename dealii::DataOut_DoFData<DoFHandlerType,
-DoFHandlerType:: dimension, DoFHandlerType:: space_dimension>::cell_iterator =
-dealii::TriaIterator<dealii::CellAccessor<2, 2> >] 466: The violated condition
-was: 466:     cell_and_index->second < patches.size() 466: The name and call
-sequence of the exception was: 466:     ExcInternalError()
+466: An error occurred in line <306> of file </ssd/branch_port_the_testsuite/deal.II/source/numerics/data_out.cc> in function
+466:     void dealii::DataOut<dim, DoFHandlerType>::build_one_patch(const std::pair<typename dealii::DataOut_DoFData<DoFHandlerType, DoFHandlerType:: dimension, DoFHandlerType:: space_dimension>::cell_iterator, unsigned int>*, dealii::internal::DataOut::ParallelData<DoFHandlerType:: dimension, DoFHandlerType:: space_dimension>&, dealii::DataOutBase::Patch<DoFHandlerType:: dimension, DoFHandlerType:: space_dimension>&, dealii::DataOut<dim, DoFHandlerType>::CurvedCellRegion, std::vector<dealii::DataOutBase::Patch<DoFHandlerType:: dimension, DoFHandlerType:: space_dimension> >&) [with int dim = 2, DoFHandlerType = dealii::DoFHandler<2>, typename dealii::DataOut_DoFData<DoFHandlerType, DoFHandlerType:: dimension, DoFHandlerType:: space_dimension>::cell_iterator = dealii::TriaIterator<dealii::CellAccessor<2, 2> >]
+466: The violated condition was:
+466:     cell_and_index->second < patches.size()
+466: The name and call sequence of the exception was:
+466:     ExcInternalError()
 */
-// 2. DataOut used begi_active() instead of first_cell() in two places which
-// caused a wrong patch to be generated when the first active cell is not picked
-// by the filter.
+// 2. DataOut used begi_active() instead of first_cell() in two places which caused a wrong patch to be generated when the first active cell is not picked by the filter.
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>

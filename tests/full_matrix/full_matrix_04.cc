@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check method FullMatrix::triple_product
+//check method FullMatrix::triple_product
 
 #include <deal.II/lac/eigen.h>
 #include <deal.II/lac/full_matrix.h>

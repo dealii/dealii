@@ -979,14 +979,14 @@ namespace Step14
                                          estimated_error_per_cell);
 
       // Next weigh each entry in the vector of indicators by the value of the
-      // function given to the constructor, evaluated at the cell center. We
-      // need to write the result into the vector entry that corresponds to the
-      // current cell, which we can obtain by asking the cell what its index
-      // among all active cells is using CellAccessor::active_cell_index(). (In
-      // reality, this index is zero for the first cell we handle in the loop,
-      // one for the second cell, etc., and we could as well just keep track of
-      // this index using an integer counter; but using
-      // CellAccessor::active_cell_index() makes this more explicit.)
+      // function given to the constructor, evaluated at the cell center. We need
+      // to write the result into the vector entry that corresponds to the current
+      // cell, which we can obtain by asking the cell what its index among all
+      // active cells is using CellAccessor::active_cell_index(). (In reality,
+      // this index is zero for the first cell we handle in the loop, one for the
+      // second cell, etc., and we could as well just keep track of this index
+      // using an integer counter; but using CellAccessor::active_cell_index()
+      // makes this more explicit.)
       typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
                                                               .begin_active(),
                                                      endc =
@@ -1861,20 +1861,20 @@ namespace Step14
       };
 
 
-      // WorkStream::run generally wants both a scratch object and a copy
-      // object. Here, for reasons similar to what we had in step-9 when
-      // discussing the computation of an approximation of the gradient, we
-      // don't actually need a "copy data" structure. Since WorkStream insists
-      // on having one of these, we just declare an empty structure that does
-      // nothing other than being there.
+      // WorkStream::run generally wants both a scratch object and a copy object.
+      // Here, for reasons similar to what we had in step-9 when discussing the
+      // computation of an approximation of the gradient, we don't actually
+      // need a "copy data" structure. Since WorkStream insists on having one of
+      // these, we just declare an empty structure that does nothing other than
+      // being there.
       struct WeightedResidualCopyData
       {};
 
 
 
       // Regarding the evaluation of the error estimator, we have one driver
-      // function that uses WorkStream::run() to call the second function on
-      // every cell:
+      // function that uses WorkStream::run() to call the second function on every
+      // cell:
       void estimate_error(Vector<float> &error_indicators) const;
 
       void estimate_on_one_cell(const active_cell_iterator & cell,
@@ -2240,8 +2240,8 @@ namespace Step14
       // since we will write into this structure from parallel threads,
       // and doing so would not be thread-safe if the map needed to allocate
       // memory and thereby reshape its data structures. In other words, the
-      // initial initialization relieves us from the necessity to synchronize
-      // the threads through a mutex each time they write to (and modify the
+      // initial initialization relieves us from the necessity to synchronize the
+      // threads through a mutex each time they write to (and modify the
       // structure of) this map.
       FaceIntegrals face_integrals;
       for (active_cell_iterator cell =
@@ -2317,8 +2317,8 @@ namespace Step14
       FaceIntegrals &              face_integrals) const
     {
       // Because of WorkStream, estimate_on_one_cell requires a CopyData object
-      // even if it is no used. The next line silences a warning about this
-      // unused variable.
+      // even if it is no used. The next line silences a warning about this unused
+      // variable.
       (void)copy_data;
 
       // First task on each cell is to compute the cell residual

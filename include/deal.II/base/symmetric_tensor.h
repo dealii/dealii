@@ -652,8 +652,7 @@ public:
   end_raw() const;
 
   /**
-   * Assignment operator from symmetric tensors with different underlying scalar
-   * type.
+   * Assignment operator from symmetric tensors with different underlying scalar type.
    * This obviously requires that the @p OtherNumber type is convertible to
    * @p Number.
    */
@@ -1226,22 +1225,15 @@ namespace internal
         dealii::SymmetricTensor<2, 3, Number> tmp;
 
         // Sympy result: ([
-        // [  (t11*t22 - t12**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 +
-        // 2*t01*t02*t12 - t02**2*t11),
-        //    (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 +
-        //    2*t01*t02*t12 - t02**2*t11), (t01*t12 - t02*t11)/(t00*t11*t22 -
-        //    t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11)],
-        // [  (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 +
-        // 2*t01*t02*t12 - t02**2*t11),
-        //    (t00*t22 - t02**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 +
-        //    2*t01*t02*t12 - t02**2*t11), (t00*t12 - t01*t02)/(-t00*t11*t22 +
-        //    t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)],
-        // [  (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 +
-        // 2*t01*t02*t12 - t02**2*t11),
-        //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 -
-        //    2*t01*t02*t12 + t02**2*t11),
-        //    (-t00*t11 + t01**2)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 -
-        //    2*t01*t02*t12 + t02**2*t11)]  ])
+        // [  (t11*t22 - t12**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11)],
+        // [  (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t00*t22 - t02**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)],
+        // [  (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11),
+        //    (-t00*t11 + t01**2)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)]  ])
         const TableIndices<2> idx_00(0, 0);
         const TableIndices<2> idx_01(0, 1);
         const TableIndices<2> idx_02(0, 2);
@@ -2783,12 +2775,13 @@ second_invariant(const SymmetricTensor<2, 1, Number> &)
  * For the kind of arguments to this function, i.e., a rank-2 tensor of
  * size 2, the result is (counting indices starting at one)
  * $II(\sigma) = \frac 12 \left[ (\sigma_{11} + \sigma_{22})^2
- *                               -(\sigma_{11}^2+2\sigma_{12}^2+\sigma_{22}^2)
- * \right] = \sigma_{11}\sigma_{22} - \sigma_{12}^2$. As expected, for the
- * $2\times 2$ symmetric tensors this function handles, this equals the
- * determinant of the tensor. (This is so because for $2\times 2$ symmetric
- * tensors, there really are only two invariants, so the second and third
- * invariant are the same; the determinant is the third invariant.)
+ *                               -(\sigma_{11}^2+2\sigma_{12}^2+\sigma_{22}^2) \right]
+ *             = \sigma_{11}\sigma_{22} - \sigma_{12}^2$.
+ * As expected, for the $2\times 2$ symmetric tensors this function handles,
+ * this equals the determinant of the tensor. (This is so because for
+ * $2\times 2$ symmetric tensors, there really are only two invariants, so
+ * the second and third invariant are the same; the determinant is the third
+ * invariant.)
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
@@ -2840,20 +2833,18 @@ eigenvalues(const SymmetricTensor<2, 1, Number> &T);
  * The array of eigenvalues is sorted in descending order.
  *
  * For 2x2 tensors, the eigenvalues of tensor $T$ are the roots of
- * <a
- * href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#2.C3.972_matrices">the
- * characteristic polynomial</a> $0 = \lambda^{2} - \lambda\textrm{tr}(T) +
- * \textrm{det}(T)$ as given by
- * $\lambda = \frac{\textrm{tr}(T) \pm \sqrt{[\textrm{tr}(T)]^{2} -
- * 4\textrm{det}(T)}}{2}$.
+ * <a href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#2.C3.972_matrices">the characteristic polynomial</a>
+ * $0 = \lambda^{2} - \lambda\textrm{tr}(T) + \textrm{det}(T)$
+ * as given by
+ * $\lambda = \frac{\textrm{tr}(T) \pm \sqrt{[\textrm{tr}(T)]^{2} - 4\textrm{det}(T)}}{2}$.
  *
  * @warning The algorithm employed here determines the eigenvalues by
  * computing the roots of the characteristic polynomial. In the case that there
  * exists a common root (the eigenvalues are equal), the computation is
- * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off
- * errors</a> of order $\sqrt{\epsilon}$. As an alternative, the eigenvectors()
- * function provides a more robust, but costly, method to compute the
- * eigenvalues of a symmetric tensor.
+ * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off errors</a>
+ * of order $\sqrt{\epsilon}$.
+ * As an alternative, the eigenvectors() function provides a more robust, but costly,
+ * method to compute the eigenvalues of a symmetric tensor.
  *
  * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2017
@@ -2869,19 +2860,16 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T);
  * The array of eigenvalues is sorted in descending order.
  *
  * For 3x3 tensors, the eigenvalues of tensor $T$ are the roots of
- * <a
- * href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#3.C3.973_matrices">the
- * characteristic polynomial</a> $0 = \lambda^{3} - \lambda^{2}\textrm{tr}(T) -
- * \frac{1}{2} \lambda (\textrm{tr}(T^{2}) - [\textrm{tr}(T)]^{2}) -
- * \textrm{det}(T)$.
+ * <a href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#3.C3.973_matrices">the characteristic polynomial</a>
+ * $0 = \lambda^{3} - \lambda^{2}\textrm{tr}(T) - \frac{1}{2} \lambda (\textrm{tr}(T^{2}) - [\textrm{tr}(T)]^{2}) - \textrm{det}(T)$.
  *
  * @warning The algorithm employed here determines the eigenvalues by
  * computing the roots of the characteristic polynomial. In the case that there
  * exists a common root (the eigenvalues are equal), the computation is
- * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off
- * errors</a> of order $\sqrt{\epsilon}$. As an alternative, the eigenvectors()
- * function provides a more robust, but costly, method to compute the
- * eigenvalues of a symmetric tensor.
+ * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off errors</a>
+ * of order $\sqrt{\epsilon}$.
+ * As an alternative, the eigenvectors() function provides a more robust, but costly,
+ * method to compute the eigenvalues of a symmetric tensor.
  *
  * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2017
@@ -3040,10 +3028,10 @@ namespace internal
 
     /**
      * Compute the eigenvalues and eigenvectors of a real-valued rank-2
-     * symmetric 2x2 tensor using the characteristic equation to compute
-     * eigenvalues and an analytical approach based on the cross-product for the
-     * eigenvectors. If the computations are deemed too inaccurate then the
-     * method falls back to ql_implicit_shifts.
+     * symmetric 2x2 tensor using the characteristic equation to compute eigenvalues
+     * and an analytical approach based on the cross-product for the eigenvectors.
+     * If the computations are deemed too inaccurate then the method falls
+     * back to ql_implicit_shifts.
      *
      * @param[in] A The tensor of which the eigenvectors and eigenvalues are
      * to be computed.
@@ -3061,11 +3049,11 @@ namespace internal
 
     /**
      * Compute the eigenvalues and eigenvectors of a real-valued rank-2
-     * symmetric 3x3 tensor using the characteristic equation to compute
-     * eigenvalues and an analytical approach based on the cross-product for the
-     * eigenvectors. If the computations are deemed too inaccurate then the
-     * method falls back to ql_implicit_shifts. The specialized algorithm
-     * implemented here is given in
+     * symmetric 3x3 tensor using the characteristic equation to compute eigenvalues
+     * and an analytical approach based on the cross-product for the eigenvectors.
+     * If the computations are deemed too inaccurate then the method falls
+     * back to ql_implicit_shifts.
+     * The specialized algorithm implemented here is given in
      * @code{.bib}
      * @article{Kopp2008,
      *   title       = {Efficient numerical diagonalization of hermitian 3x3
@@ -4109,9 +4097,9 @@ template <int dim, typename Number>
 inline std::ostream &
 operator<<(std::ostream &out, const SymmetricTensor<2, dim, Number> &t)
 {
-  // make our lives a bit simpler by outputting
-  // the tensor through the operator for the
-  // general Tensor class
+  //make our lives a bit simpler by outputting
+  //the tensor through the operator for the
+  //general Tensor class
   Tensor<2, dim, Number> tt;
 
   for (unsigned int i = 0; i < dim; ++i)
@@ -4136,9 +4124,9 @@ template <int dim, typename Number>
 inline std::ostream &
 operator<<(std::ostream &out, const SymmetricTensor<4, dim, Number> &t)
 {
-  // make our lives a bit simpler by outputting
-  // the tensor through the operator for the
-  // general Tensor class
+  //make our lives a bit simpler by outputting
+  //the tensor through the operator for the
+  //general Tensor class
   Tensor<4, dim, Number> tt;
 
   for (unsigned int i = 0; i < dim; ++i)

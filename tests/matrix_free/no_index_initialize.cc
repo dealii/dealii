@@ -122,12 +122,10 @@ do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints)
 {
   // use this for info on problem
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells()
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells()
   //          << std::endl;
-  // std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
-  // std::cout << "Number of constraints: " << constraints.n_constraints() <<
-  // std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   Vector<number> solution(dof.n_dofs());
 

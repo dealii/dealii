@@ -59,7 +59,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
   // require to call dof_handler.distribute_dofs(fe) *before* the mapping
   // object is constructed, which is not necessarily what we want.
 
-  // TODO: Only one of these two assertions should be relevant
+  //TODO: Only one of these two assertions should be relevant
   AssertDimension(spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
   AssertDimension(shiftmap_dof_handler->get_fe(0).n_components(), spacedim);
 

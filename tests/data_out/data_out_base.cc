@@ -21,7 +21,7 @@
 
 #include "../tests.h"
 
-// TODO: Several functions are commented out since implementations are missing
+//TODO: Several functions are commented out since implementations are missing
 
 #define WRITE(type)                                                       \
   {                                                                       \

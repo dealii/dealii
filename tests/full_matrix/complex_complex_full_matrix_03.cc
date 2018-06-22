@@ -15,9 +15,9 @@
 
 
 
-// check running over const iterators starting at the second line. like the
-// full_matrix_* tests, but use complex-valued matrices and vectors; this time
-// we actually store complex values in them
+// check running over const iterators starting at the second line. like the full_matrix_* tests, but use
+// complex-valued matrices and vectors; this time we actually store complex values
+// in them
 
 
 #include "../tests.h"

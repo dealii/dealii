@@ -202,19 +202,19 @@ namespace Step27
 
     // As described in the introduction, we define the Fourier vectors ${\bf
     // k}$ for which we want to compute Fourier coefficients of the solution
-    // on each cell as follows. In 2d, we will need coefficients corresponding
-    // to vectors ${\bf k}=(2 \pi i, 2\pi j)^T$ for which $\sqrt{i^2+j^2}\le N$,
-    // with $i,j$ integers and $N$ being the maximal polynomial degree we use
-    // for the finite elements in this program. The FESeries::Fourier class'
-    // constructor first parameter $N$ defines the number of coefficients in 1D
-    // with the total number of coefficients being $N^{dim}$. Although we will
-    // not use coefficients corresponding to
-    // $\sqrt{i^2+j^2}> N$ and $i+j==0$, the overhead of their calculation is
-    // minimal. The transformation matrices for each FiniteElement will be
-    // calculated only once the first time they are required in the course of
-    // hp-adaptive refinement. Because we work on the unit cell, we can do all
-    // this work without a mapping from reference to real cell and consequently
-    // can precalculate these matrices. The calculation of expansion
+    // on each cell as follows. In 2d, we will need coefficients corresponding to
+    // vectors ${\bf k}=(2 \pi i, 2\pi j)^T$
+    // for which $\sqrt{i^2+j^2}\le N$, with $i,j$ integers and $N$ being the
+    // maximal polynomial degree we use for the finite elements in this
+    // program. The FESeries::Fourier class' constructor first parameter $N$ defines
+    // the number of coefficients in 1D with the total number of coefficients
+    // being $N^{dim}$. Although we will not use coefficients corresponding to
+    // $\sqrt{i^2+j^2}> N$ and $i+j==0$, the overhead of their calculation is minimal.
+    // The transformation matrices for each FiniteElement will be calculated only
+    // once the first time they are required in the course of hp-adaptive
+    // refinement. Because we work on the unit cell, we can do all this work without a
+    // mapping from reference to real cell and consequently can precalculate
+    // these matrices. The calculation of expansion
     // coefficients for a particular set of local degrees of freedom on a given
     // cell then follows as a simple matrix-vector product.
     // The 3d case is handled analogously.
@@ -691,9 +691,9 @@ namespace Step27
     // perform linear regression to fit their decay slope.
 
 
-    // First thing to do is to loop over all cells and do our work there, i.e.
-    // to locally do the Fourier transform and estimate the decay coefficient.
-    // We will use the following array as a scratch array in the loop to store
+    // First thing to do is to loop over all cells and do our work there, i.e. to
+    // locally do the Fourier transform and estimate the decay coefficient. We
+    // will use the following array as a scratch array in the loop to store
     // local DoF values:
     Vector<double> local_dof_values;
 
@@ -710,8 +710,7 @@ namespace Step27
         // this vector with the matrix ${\cal F}$ corresponding to this finite
         // element. This is done by calling FESeries::Fourier::calculate(),
         // that has to be provided with the <code>local_dof_values</code>,
-        // <code>cell->active_fe_index()</code> and a Table to store
-        // coefficients.
+        // <code>cell->active_fe_index()</code> and a Table to store coefficients.
         local_dof_values.reinit(cell->get_fe().dofs_per_cell);
         cell->get_dof_values(solution, local_dof_values);
 
@@ -722,8 +721,9 @@ namespace Step27
         // The next thing, as explained in the introduction, is that we wanted
         // to only fit our exponential decay of Fourier coefficients to the
         // largest coefficients for each possible value of $|{\bf k}|$. To
-        // this end, we use FESeries::process_coefficients() to rework
-        // coefficients into the desired format. We'll only take those Fourier
+        // this end, we use FESeries::process_coefficients() to rework coefficients
+        // into the desired format.
+        // We'll only take those Fourier
         // coefficients with the largest magnitude for a given value of $|{\bf
         // k}|$ and thereby need to use VectorTools::Linfty_norm:
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
@@ -736,11 +736,12 @@ namespace Step27
 
         Assert(res.first.size() == res.second.size(), ExcInternalError());
 
-        // The first vector in the <code>std::pair</code> will store values of
-        // the predicate, that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$ in
-        // 2D or 3D respectively. This vector will be the same for all the cells
-        // so we can calculate logarithms of the corresponding Fourier vectors
-        // $|{\bf k}|$ only once in the whole hp-refinement cycle:
+        // The first vector in the <code>std::pair</code> will store values of the predicate,
+        // that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$
+        // in 2D or 3D respectively. This
+        // vector will be the same for all the cells so we can calculate
+        // logarithms of the corresponding Fourier vectors $|{\bf k}|$ only once
+        // in the whole hp-refinement cycle:
         if (ln_k.size() == 0)
           {
             ln_k.resize(res.first.size(), 0);

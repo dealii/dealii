@@ -134,7 +134,7 @@ test()
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-        // std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
+        //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
         Assert(idx == get_real_assert_zero_imag(solution(idx)),
                ExcInternalError());
       }

@@ -46,7 +46,7 @@ void make_grid(Triangulation<2> &triangulation)
   const double   inner_radius = 0.5, outer_radius = 1.0;
   GridGenerator::hyper_shell(
     triangulation, center, inner_radius, outer_radius, 10);
-  // triangulation.reset_all_manifolds();
+  //triangulation.reset_all_manifolds();
   GridTools::copy_boundary_to_manifold_id(triangulation);
 
   static const SphericalManifold<2> boundary_description(center);

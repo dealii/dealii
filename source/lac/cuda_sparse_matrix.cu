@@ -267,8 +267,8 @@ namespace CUDAWrappers
     column_index.reserve(nnz);
     std::vector<int> row_ptr(row_ptr_size, 0);
 
-    // dealii::SparseMatrix stores the diagonal first in each row so we need to
-    // do some reordering
+    // dealii::SparseMatrix stores the diagonal first in each row so we need to do some
+    // reordering
     for (int row = 0; row < n_rows; ++row)
       {
         auto         p_end   = sparse_matrix_host.end(row);

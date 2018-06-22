@@ -667,10 +667,9 @@ do_test(const DoFHandler<dim> &          dof,
 
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells() << std::endl; std::cout << "Number
-  // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
-  // of constraints: " << constraints.n_constraints() << std::endl;
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   MappingQGeneric<dim> mapping(dof.get_fe().degree + 1);
 

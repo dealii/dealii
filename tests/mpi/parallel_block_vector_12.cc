@@ -15,10 +15,9 @@
 
 
 
-// this BlockVector<Number>::mmult(const BlockVector<Number> &V,const
-// FullMatrixType &matrix, s,b) also for vectors of different number of blocks.
-// Triangulation and Mass operator are the same as in
-// matrix_free/mass_operator_01.cc
+// this BlockVector<Number>::mmult(const BlockVector<Number> &V,const FullMatrixType &matrix, s,b)
+// also for vectors of different number of blocks.
+// Triangulation and Mass operator are the same as in matrix_free/mass_operator_01.cc
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>

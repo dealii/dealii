@@ -52,10 +52,10 @@ using namespace dealii;
 void create_coarse_grid(Triangulation<2> &coarse_grid)
 {
   static const Point<2> vertices_1[] = {
-    Point<2>(9.6982181981258408e-02, 1.1255621492491609e+03), // 0
-    Point<2>(6.1219285295807092e-02, 1.1256062663438720e+03), // 1
-    Point<2>(0.00000, 1.1255179557007179e+03),                // 2
-    Point<2>(0.00000, 1.1255994426210491e+03),                // 3
+    Point<2>(9.6982181981258408e-02, 1.1255621492491609e+03), //0
+    Point<2>(6.1219285295807092e-02, 1.1256062663438720e+03), //1
+    Point<2>(0.00000, 1.1255179557007179e+03),                //2
+    Point<2>(0.00000, 1.1255994426210491e+03),                //3
   };
   const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
 

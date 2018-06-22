@@ -79,7 +79,7 @@ namespace parallel
     {
       Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
 
-      // TODO: casting away constness is bad
+      //TODO: casting away constness is bad
       parallel::distributed::Triangulation<dim, DoFHandlerType::space_dimension>
         *tria = (dynamic_cast<parallel::distributed::Triangulation<
                    dim,
@@ -165,7 +165,7 @@ namespace parallel
       Assert(input_vectors.size() == all_out.size(),
              ExcDimensionMismatch(input_vectors.size(), all_out.size()));
 
-      // TODO: casting away constness is bad
+      //TODO: casting away constness is bad
       parallel::distributed::Triangulation<dim, DoFHandlerType::space_dimension>
         *tria = (dynamic_cast<parallel::distributed::Triangulation<
                    dim,

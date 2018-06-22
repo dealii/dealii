@@ -235,7 +235,7 @@ RightHandSide<dim>::vector_value(const Point<dim> &p,
   Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
   Assert(dim >= 2, ExcNotImplemented());
 
-  // 2D solution
+  //2D solution
   values(0) = (2 * numbers::PI * numbers::PI + 1) * cos(numbers::PI * p(0)) *
                 sin(numbers::PI * p(1)) +
               bc_constant;

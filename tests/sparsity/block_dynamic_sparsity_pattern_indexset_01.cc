@@ -49,7 +49,7 @@ main()
           << csp.block(1, 0).n_cols() << std::endl;
 
   part.pop_back();
-  csp.reinit(part); // also check the reinit variant.
+  csp.reinit(part); //also check the reinit variant.
 
   deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
           << std::endl;

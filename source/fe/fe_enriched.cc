@@ -29,8 +29,7 @@ namespace internal
     namespace
     {
       /**
-       * Auxiliary function to create multiplicity vector from input enrichment
-       * functions.
+       * Auxiliary function to create multiplicity vector from input enrichment functions.
        */
       template <typename T>
       std::vector<unsigned int>
@@ -110,8 +109,7 @@ namespace internal
 
 
       /**
-       * Auxiliary function which determines whether the FiniteElement will be
-       * enriched.
+       * Auxiliary function which determines whether the FiniteElement will be enriched.
        */
       template <int dim, int spacedim>
       bool
@@ -238,8 +236,8 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
       base_no_mult_local_enriched_dofs[base_no][base_m].push_back(system_index);
     }
 
-  // make sure that local_enriched_dofs.size() is correct, that is equals to
-  // DoFs per cell of the corresponding FE.
+  // make sure that local_enriched_dofs.size() is correct, that is equals to DoFs
+  // per cell of the corresponding FE.
   for (unsigned int base_no = 1;
        base_no < base_no_mult_local_enriched_dofs.size();
        base_no++)
@@ -426,8 +424,7 @@ FE_Enriched<dim, spacedim>::initialize(
   Assert(fes.size() == multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
-  // block of code
+  // Note that we need to skip every fe with multiplicity 0 in the following block of code
   this->base_to_block_indices.reinit(0, 0);
 
   for (unsigned int i = 0; i < fes.size(); i++)
@@ -638,11 +635,11 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
   const unsigned int n_q_points = quadrature.size();
 
-  // First, populate output_data object (that shall hold everything requested
-  // such as shape value, gradients, hessians, etc) from each base element. That
-  // is almost identical to FESystem::compute_fill_one_base(), the difference
-  // being that we do it irrespectively of cell_similarity and use
-  // base_fe_data.update_flags
+  // First, populate output_data object (that shall hold everything requested such
+  // as shape value, gradients, hessians, etc) from each base element.
+  // That is almost identical to FESystem::compute_fill_one_base(),
+  // the difference being that we do it irrespectively of cell_similarity
+  // and use base_fe_data.update_flags
 
   // TODO: do we need it only for dim_1 == dim (i.e. fill_fe_values)?
   if (dim_1 == dim)
@@ -719,9 +716,8 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
            m < base_no_mult_local_enriched_dofs[base_no].size();
            m++)
         {
-          // Avoid evaluating quadrature points if no dofs are assigned. This
-          // happens when FE_Nothing is used together with other FE (i.e. FE_Q)
-          // as enrichments.
+          //Avoid evaluating quadrature points if no dofs are assigned. This
+          //happens when FE_Nothing is used together with other FE (i.e. FE_Q) as enrichments.
           if (base_no_mult_local_enriched_dofs[base_no][m].size() == 0)
             continue;
 
@@ -776,8 +772,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
   // by expanding the product rule for enrichment function.
   // note that the order if important, namely
   // output_data.shape_XYZ contains values of standard FEM and we overwrite
-  // it with the updated one in the following order: hessians -> gradients ->
-  // values
+  // it with the updated one in the following order: hessians -> gradients -> values
   if (flags & update_hessians)
     {
       for (unsigned int base_no = 1; base_no < this->n_base_elements();
@@ -978,13 +973,13 @@ FE_Enriched<dim, spacedim>::compare_for_face_domination(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
   // need to decide which element constrain another.
-  // for example Q(2) dominate Q(4) and thus some DoFs of Q(4) will be
-  // constrained. If we have Q(2) and Q(4)+POU, then it's clear that Q(2)
-  // dominates, namely our DoFs will be constrained to make field continuous.
+  // for example Q(2) dominate Q(4) and thus some DoFs of Q(4) will be constrained.
+  // If we have Q(2) and Q(4)+POU, then it's clear that Q(2) dominates,
+  // namely our DoFs will be constrained to make field continuous.
   // However, we need to check for situations like Q(4) vs Q(2)+POU.
   // In that case the domination for the underlying FEs should be the other way,
-  // but this implies that we can't constrain POU dofs to make the field
-  // continuous. In that case, through an error
+  // but this implies that we can't constrain POU dofs to make the field continuous.
+  // In that case, through an error
 
   // if it's also enriched, do domination based on each one's FESystem
   if (const FE_Enriched<dim, spacedim> *fe_enr_other =

@@ -17,8 +17,7 @@
 
 // test by Jennifer Worthen -- we get an error of the following kind:
 // --------------------------------------------------------
-// An error occurred in line <304> of file <.../constraint_matrix.cc> in
-// function
+// An error occurred in line <304> of file <.../constraint_matrix.cc> in function
 //     void dealii::AffineConstraints<double>::close()
 // The violated condition was:
 //     dof_index != line->line
@@ -148,28 +147,28 @@ void sixty_deg_hyper_shell(Triangulation<3> &tria,
 
   vertices.push_back(center + Point<3>(1.0 / sqrt(5.) * r0,
                                        1.0 / sqrt(5.) * r0,
-                                       sqrt(3. / 5.) * r0)); // 8 -> 0
+                                       sqrt(3. / 5.) * r0)); //8 -> 0
   vertices.push_back(center + Point<3>(1.0 / sqrt(5.) * r1,
                                        1.0 / sqrt(5.) * r1,
-                                       sqrt(3. / 5.) * r1)); // 9 -> 1
+                                       sqrt(3. / 5.) * r1)); //9 -> 1
   vertices.push_back(center + Point<3>(1.0 / sqrt(5.) * r0,
                                        -1.0 / sqrt(5.) * r0,
-                                       sqrt(3. / 5.) * r0)); // 10 -> 2
+                                       sqrt(3. / 5.) * r0)); //10 -> 2
   vertices.push_back(center + Point<3>(1.0 / sqrt(5.) * r1,
                                        -1.0 / sqrt(5.) * r1,
-                                       sqrt(3. / 5.) * r1)); // 11 -> 3
+                                       sqrt(3. / 5.) * r1)); //11 -> 3
   vertices.push_back(center + Point<3>(-1.0 / sqrt(5.) * r0,
                                        1.0 / sqrt(5.) * r0,
-                                       sqrt(3. / 5.) * r0)); // 14 -> 4
+                                       sqrt(3. / 5.) * r0)); //14 -> 4
   vertices.push_back(center + Point<3>(-1.0 / sqrt(5.) * r1,
                                        1.0 / sqrt(5.) * r1,
-                                       sqrt(3. / 5.) * r1)); // 15 -> 5
+                                       sqrt(3. / 5.) * r1)); //15 -> 5
   vertices.push_back(center + Point<3>(-1.0 / sqrt(5.) * r0,
                                        -1.0 / sqrt(5.) * r0,
-                                       sqrt(3. / 5.) * r0)); // 16 -> 6
+                                       sqrt(3. / 5.) * r0)); //16 -> 6
   vertices.push_back(center + Point<3>(-1.0 / sqrt(5.) * r1,
                                        -1.0 / sqrt(5.) * r1,
-                                       sqrt(3. / 5.) * r1)); // 17 -> 7
+                                       sqrt(3. / 5.) * r1)); //17 -> 7
 
   const int cell_vertices[1][8] = {
     {6, 2, 4, 0, 7, 3, 5, 1},

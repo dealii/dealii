@@ -43,31 +43,31 @@ void create_reference_triangulation(Triangulation<3> &triangulation)
 void create_triangulation(Triangulation<3> &triangulation)
 {
   static const Point<3> vertices_parallelograms[] = {
-    Point<3>(-1., -1., -1.), // 0
+    Point<3>(-1., -1., -1.), //0
     Point<3>(0., -1., -1.),  Point<3>(1., -1., -1.),
 
-    Point<3>(-1., -1., 0.), // 3
+    Point<3>(-1., -1., 0.), //3
     Point<3>(0., -1., 0.),   Point<3>(1., -1., 0.),
 
-    Point<3>(-1., -1., 1.), // 6
+    Point<3>(-1., -1., 1.), //6
     Point<3>(0., -1., 1.),   Point<3>(1., -1., 1.),
 
-    Point<3>(-1., 0., -1.), // 9
+    Point<3>(-1., 0., -1.), //9
     Point<3>(0., 0., -1.),   Point<3>(1., 0., -1.),
 
-    Point<3>(-1., 0., 0.), // 12
+    Point<3>(-1., 0., 0.), //12
     Point<3>(0., 0., 0.),    Point<3>(1., 0., 0.),
 
-    Point<3>(-1., 0., 1.), // 15
+    Point<3>(-1., 0., 1.), //15
     Point<3>(0., 0., 1.),    Point<3>(1., 0., 1.),
 
-    Point<3>(-1., 1., -1.), // 18
+    Point<3>(-1., 1., -1.), //18
     Point<3>(0., 1., -1.),   Point<3>(1., 1., -1.),
 
-    Point<3>(-1., 1., 0.), // 21
+    Point<3>(-1., 1., 0.), //21
     Point<3>(0., 1., 0.),    Point<3>(1., 1., 0.),
 
-    Point<3>(-1., 1., 1.), // 24
+    Point<3>(-1., 1., 1.), //24
     Point<3>(0., 1., 1.),    Point<3>(1., 1., 1.)};
   const unsigned n_vertices =
     sizeof(vertices_parallelograms) / sizeof(vertices_parallelograms[0]);
@@ -77,8 +77,7 @@ void create_triangulation(Triangulation<3> &triangulation)
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
-  // create grid with all possible combintations of face_flip, face_orientation
-  // and face_rotation flags
+  // create grid with all possible combintations of face_flip, face_orientation and face_rotation flags
   static const int cell_vertices[][GeometryInfo<3>::vertices_per_cell] = {
     {0, 1, 9, 10, 3, 4, 12, 13},      // cell 1 standard
     {10, 11, 13, 14, 1, 2, 4, 5},     // cell 2 rotated by 270 deg

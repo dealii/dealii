@@ -16,8 +16,7 @@
 
 
 // test the FEValues views and extractor classes. this test is for
-// get_function_symmetric_gradients for vector components and a non-primitive
-// element
+// get_function_symmetric_gradients for vector components and a non-primitive element
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

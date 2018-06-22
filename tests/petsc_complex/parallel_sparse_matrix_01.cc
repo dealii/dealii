@@ -103,7 +103,7 @@ test(const unsigned int poly_degree = 1)
                      dsp,
                      mpi_communicator);
 
-  // assemble mass matrix:
+  //assemble mass matrix:
   mass_matrix = PetscScalar();
   {
     QGauss<dim>   quadrature_formula(poly_degree + 1);
@@ -173,7 +173,7 @@ test(const unsigned int poly_degree = 1)
 
   PETScWrappers::MPI::Vector tmp(vector);
   mass_matrix.vmult(tmp, vector);
-  // mass_matrix.Tvmult (tmp, vector);
+  //mass_matrix.Tvmult (tmp, vector);
 
   const std::complex<double> norm1 = vector * tmp;
   deallog << "(conj(vector),M vector): " << std::endl;

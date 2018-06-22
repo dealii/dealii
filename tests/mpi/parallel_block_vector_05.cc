@@ -16,8 +16,7 @@
 
 
 // this BlockVector<Number>::scalar_product().
-// Triangulation and Mass operator are the same as in
-// matrix_free/mass_operator_01.cc
+// Triangulation and Mass operator are the same as in matrix_free/mass_operator_01.cc
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>

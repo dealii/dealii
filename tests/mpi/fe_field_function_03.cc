@@ -15,18 +15,15 @@
 
 
 
-// Test regression in FEFieldFunction that doesn't throw
-// VectorTools::ExcPointNotAvailableHere()
+// Test regression in FEFieldFunction that doesn't throw VectorTools::ExcPointNotAvailableHere()
 
 /*
-An error occurred in line <3405> of file
-</ssd/deal-git/include/deal.II/dofs/dof_accessor.templates.h> in function void
-dealii::DoFCellAccessor<dealii::DoFHandler<2, 2>, false>::get_dof_values(const
-InputVector &, ForwardIterator, ForwardIterator) const [DoFHandlerType =
-dealii::DoFHandler<2, 2>, lda = false, InputVector =
-dealii::TrilinosWrappers::MPI::Vector, ForwardIterator = double *] The violated
-condition was: this->is_artificial() == false Additional information: Can't ask
-for DoF indices on artificial cells.
+An error occurred in line <3405> of file </ssd/deal-git/include/deal.II/dofs/dof_accessor.templates.h> in function
+    void dealii::DoFCellAccessor<dealii::DoFHandler<2, 2>, false>::get_dof_values(const InputVector &, ForwardIterator, ForwardIterator) const [DoFHandlerType = dealii::DoFHandler<2, 2>, lda = false, InputVector = dealii::TrilinosWrappers::MPI::Vector, ForwardIterator = double *]
+The violated condition was:
+    this->is_artificial() == false
+Additional information:
+    Can't ask for DoF indices on artificial cells.
  */
 
 #include <deal.II/base/function.h>

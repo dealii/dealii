@@ -317,15 +317,14 @@ private:
 
   /**
    * Return a point on the spherical manifold which is intermediate
-   * with respect to the surrounding points. This function uses a candidate
-   * point as guess, and performs a Newton-style iteration to compute the
-   * correct point.
+   * with respect to the surrounding points. This function uses a candidate point
+   * as guess, and performs a Newton-style iteration to compute the correct point.
    *
    * The main part of the implementation uses the ideas in the publication
    *
    * Buss, Samuel R., and Jay P. Fillmore.
-   * "Spherical averages and applications to spherical splines and
-   * interpolation." ACM Transactions on Graphics (TOG) 20.2 (2001): 95-126.
+   * "Spherical averages and applications to spherical splines and interpolation."
+   * ACM Transactions on Graphics (TOG) 20.2 (2001): 95-126.
    *
    * and in particular the implementation provided at
    * http://math.ucsd.edu/~sbuss/ResearchWeb/spheremean/
@@ -710,10 +709,8 @@ private:
  * Wikipedia</a>.  Given a point $(u,v)$ on the chart, the image of this point
  * in real space is given by
  * @f{align*}{
- * \mathbf S(u,v) &= (1-v)\mathbf c_0(u)+v \mathbf c_1(u) + (1-u)\mathbf c_2(v)
- * + u \mathbf c_3(v) \\
- * &\quad - \left[(1-u)(1-v) \mathbf x_0 + u(1-v) \mathbf x_1 + (1-u)v \mathbf
- * x_2 + uv \mathbf x_3 \right]
+ * \mathbf S(u,v) &= (1-v)\mathbf c_0(u)+v \mathbf c_1(u) + (1-u)\mathbf c_2(v) + u \mathbf c_3(v) \\
+ * &\quad - \left[(1-u)(1-v) \mathbf x_0 + u(1-v) \mathbf x_1 + (1-u)v \mathbf x_2 + uv \mathbf x_3 \right]
  * @f}
  * where $\bf x_0, \bf x_1, \bf x_2, \bf x_3$ denote the four bounding vertices
  * bounding the image space and $\bf c_0, \bf c_1, \bf c_2, \bf c_3$ are the

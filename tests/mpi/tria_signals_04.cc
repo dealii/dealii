@@ -28,12 +28,11 @@
 // could catch all cell changes.
 // The test is designed to count cell number increase and decrease in signal
 // calls and then compare the result against n_active_cells reported by Tria
-// object. Absolute value change in n_active_cells is not concerned in this
-// test.
+// object. Absolute value change in n_active_cells is not concerned in this test.
 
 // This test is based on tria_signals_03. The difference is here we have all
-// smoothing flags enabled. Also increase refine fraction to one third to
-// prevent refine flags getting smoothed out.
+// smoothing flags enabled. Also increase refine fraction to one third to prevent
+// refine flags getting smoothed out.
 
 template <int dim, int spacedim>
 class SignalListener
@@ -113,8 +112,7 @@ test()
   tria.refine_global(1);
 
 
-  // The following loop is borrowed from p4est_3d_refine_01 with some
-  // modifications.
+  // The following loop is borrowed from p4est_3d_refine_01 with some modifications.
   for (int n_loop = 0;
        // Terminate loop on global information to prevent premature termination
        // on only part of processors. (n_loop < 20) is just a passive safety to

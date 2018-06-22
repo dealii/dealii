@@ -15,8 +15,8 @@
 
 
 
-// check Vector<std::complex<double> >::operator!=(Vector<std::complex<double>
-// >) for vectors that are equal
+// check Vector<std::complex<double> >::operator!=(Vector<std::complex<double> >) for vectors that are
+// equal
 
 #include <deal.II/lac/vector.h>
 

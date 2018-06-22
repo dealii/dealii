@@ -195,8 +195,7 @@ namespace LocalIntegrators
      * tangential component only, namely on
      * the face <i>F</i> the matrix
      * @f[
-     * \int_F \Bigl(\gamma u_\tau v_\tau - \partial_n u_\tau v_\tau - u_\tau
-     * \partial_n v_\tau\Bigr)\;ds.
+     * \int_F \Bigl(\gamma u_\tau v_\tau - \partial_n u_\tau v_\tau - u_\tau \partial_n v_\tau\Bigr)\;ds.
      * @f]
      *
      * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
@@ -259,8 +258,7 @@ namespace LocalIntegrators
      * Weak boundary condition for the Laplace operator by Nitsche, scalar
      * version, namely on the face <i>F</i> the vector
      * @f[
-     * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n
-     * v\Bigr)\;ds.
+     * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
      * @f]
      *
      * Here, <i>u</i> is the finite element function whose values and gradient
@@ -443,8 +441,8 @@ namespace LocalIntegrators
      * tangential components of a vector field, namely on the face <i>F</i>
      * the matrices associated with the bilinear form
      * @f[
-     * \int_F \Bigl( \gamma [u_\tau][v_\tau] - \{\nabla u_\tau\}[v_\tau\mathbf
-     * n] - [u_\tau\mathbf n]\{\nabla v_\tau\} \Bigr) \; ds.
+     * \int_F \Bigl( \gamma [u_\tau][v_\tau] - \{\nabla u_\tau\}[v_\tau\mathbf n] - [u_\tau\mathbf
+     * n]\{\nabla v_\tau\} \Bigr) \; ds.
      * @f]
      *
      * @warning This function is still under development!

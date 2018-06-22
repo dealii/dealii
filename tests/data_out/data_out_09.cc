@@ -67,7 +67,7 @@ test()
       v_cell[i] = 10 + i;
     }
 
-  // correct one is done if both are possible but specified
+  //correct one is done if both are possible but specified
   deallog << "*** Check cell and node data:" << std::endl;
   {
     DataOut<2> data_out;
@@ -79,7 +79,7 @@ test()
     data_out.write_vtk(deallog.get_file_stream());
   }
 
-  // only tria, output correctly
+  //only tria, output correctly
   deallog << "*** Check cell data only:" << std::endl;
   {
     DataOut<2> data_out;
@@ -91,7 +91,7 @@ test()
   }
 
 
-  // error if both
+  //error if both
   deallog << "*** should fail:" << std::endl;
   try
     {

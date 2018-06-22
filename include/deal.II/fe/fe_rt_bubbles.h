@@ -57,9 +57,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For this enhanced Raviart-Thomas element, the node values are not cell
  * and face moments with respect to certain polynomials, but the values in
- * Gauss-Lobatto quadrature points. The nodal values on edges (faces in
- * <i>3D</i>) are evaluated first, according to the natural ordering of the
- * edges (faces) of a cell. The interior degrees of freedom are evaluated last.
+ * Gauss-Lobatto quadrature points. The nodal values on edges (faces in <i>3D</i>)
+ * are evaluated first, according to the natural ordering of the edges (faces) of
+ * a cell. The interior degrees of freedom are evaluated last.
  *
  * For an RT-Bubbles element of degree <i>k</i>, we choose
  * <i>(k+1)<sup>dim-1</sup></i> Gauss-Lobatto points on each face. These points
@@ -68,12 +68,11 @@ DEAL_II_NAMESPACE_OPEN
  * Gauss-Lobatto formula for integration. The mass matrix assembled with the
  * use of this same quadrature rule, is block diagonal with blocks
  * corresponding to quadrature points. See
- * <i><a href="https://arxiv.org/abs/1710.06742">"Higher order multipoint flux
- * mixed finite element methods on quadrilaterals and hexahedra"</a></i> for
- * more details.
+ * <i><a href="https://arxiv.org/abs/1710.06742">"Higher order multipoint flux mixed
+ * finite element methods on quadrilaterals and hexahedra"</a></i> for more details.
  *
- * The elements of degree $k=3$ in <i>2D</i> and $k=2$ in <i>3D</i> are shown in
- * the figures below (filled arrows indicate DoFs for which continuity across
+ * The elements of degree $k=3$ in <i>2D</i> and $k=2$ in <i>3D</i> are shown in the
+ * figures below (filled arrows indicate DoFs for which continuity across
  * the edges (faces in <i>3D</i>) is required).
  *
  * <table> <tr> <td align="center">

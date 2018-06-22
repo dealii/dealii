@@ -98,7 +98,7 @@ test_real_to_unit_cell()
   typename Triangulation<dim, spacedim>::active_cell_iterator cell =
     triangulation.begin_active();
 
-  // Move a vertex a little bit
+  //Move a vertex a little bit
   const unsigned int n_dx = 5;
   const double       dx   = 0.4 / n_dx;
   Point<spacedim>    direction;

@@ -398,8 +398,7 @@ namespace Step42
         }
 
       Assert(false, ExcNotImplemented());
-      return 1e9; // an unreasonable value; ignored in debug mode because of the
-                  // preceding Assert
+      return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
     }
 
 
@@ -411,30 +410,27 @@ namespace Step42
         values(c) = SphereObstacle<dim>::value(p, c);
     }
 
-    // @sect4{The <code>BitmapFile</code> and <code>ChineseObstacle</code>
-    // classes}
+    // @sect4{The <code>BitmapFile</code> and <code>ChineseObstacle</code> classes}
 
-    // The following two classes describe the obstacle outlined in the
-    // introduction, i.e., the Chinese character. The first of the two,
-    // <code>BitmapFile</code> is responsible for reading in data from a picture
-    // file stored in pbm ascii format. This data will be bilinearly
-    // interpolated and thereby provides a function that describes the obstacle.
-    // (The code below shows how one can construct a function by interpolating
-    // between given data points. One could use the
-    // Functions::InterpolatedUniformGridData, introduced after this tutorial
-    // program was written, which does exactly what we want here, but it is
-    // instructive to see how to do it by hand.)
+    // The following two classes describe the obstacle outlined in the introduction,
+    // i.e., the Chinese character. The first of the two, <code>BitmapFile</code>
+    // is responsible for reading in data from a picture file
+    // stored in pbm ascii format. This data will be bilinearly interpolated and
+    // thereby provides a function that describes the obstacle. (The code below
+    // shows how one can construct a function by interpolating between given
+    // data points. One could use the Functions::InterpolatedUniformGridData,
+    // introduced after this tutorial program was written, which does exactly
+    // what we want here, but it is instructive to see how to do it by hand.)
     //
-    // The data which we read from the file will be stored in a double
-    // std::vector named obstacle_data.  This vector composes the base to
-    // calculate a piecewise bilinear function as a polynomial interpolation.
-    // The data we will read from a file consists of zeros (white) and ones
-    // (black).
+    // The data which we read from the file will be stored in a double std::vector
+    // named obstacle_data.  This vector composes the base to calculate a
+    // piecewise bilinear function as a polynomial interpolation. The data we will
+    // read from a file consists of zeros (white) and ones (black).
     //
     // The <code>hx,hy</code> variables denote the spacing between pixels in $x$
-    // and $y$ directions. <code>nx,ny</code> are the numbers of pixels in each
-    // of these directions.  <code>get_value()</code> returns the value of the
-    // image at a given location, interpolated from the adjacent pixel values.
+    // and $y$ directions. <code>nx,ny</code> are the numbers of pixels in each of
+    // these directions.  <code>get_value()</code> returns the value of the image
+    // at a given location, interpolated from the adjacent pixel values.
     template <int dim>
     class BitmapFile
     {
@@ -573,8 +569,7 @@ namespace Step42
         }
 
       Assert(false, ExcNotImplemented());
-      return 1e9; // an unreasonable value; ignored in debug mode because of the
-                  // preceding Assert
+      return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
     }
 
     template <int dim>
@@ -603,18 +598,16 @@ namespace Step42
   // situation and to handle the nonlinear
   // operator for the constitutive law.
   //
-  // The general layout of this class is very much like for most other tutorial
-  // programs. To make our life a bit easier, this class reads a set of input
-  // parameters from an input file. These parameters, using the ParameterHandler
-  // class, are declared in the <code>declare_parameters</code> function (which
-  // is static so that it can be called before we even create an object of the
-  // current type), and a ParameterHandler object that has been used to read an
-  // input file will then be passed to the constructor of this class.
+  // The general layout of this class is very much like for most other tutorial programs.
+  // To make our life a bit easier, this class reads a set of input parameters from an input file. These
+  // parameters, using the ParameterHandler class, are declared in the <code>declare_parameters</code>
+  // function (which is static so that it can be called before we even create an object of the current
+  // type), and a ParameterHandler object that has been used to read an input file will then be passed
+  // to the constructor of this class.
   //
-  // The remaining member functions are by and large as we have seen in several
-  // of the other tutorial programs, though with additions for the current
-  // nonlinear system. We will comment on their purpose as we get to them
-  // further below.
+  // The remaining member functions are by and large as we have seen in several of the other tutorial
+  // programs, though with additions for the current nonlinear system. We will comment on their purpose
+  // as we get to them further below.
   template <int dim>
   class PlasticityContactProblem
   {
@@ -643,8 +636,8 @@ namespace Step42
     void output_results(const std::string &filename_base);
     void output_contact_force() const;
 
-    // As far as member variables are concerned, we start with ones that we use
-    // to indicate the MPI universe this program runs on, a stream we use to let
+    // As far as member variables are concerned, we start with ones that we use to
+    // indicate the MPI universe this program runs on, a stream we use to let
     // exactly one processor produce output to the console (see step-17) and
     // a variable that is used to time the various sections of the program:
     MPI_Comm           mpi_communicator;
@@ -1279,19 +1272,17 @@ namespace Step42
               for (unsigned int q_point = 0; q_point < n_face_q_points;
                    ++q_point)
                 {
-                  // At each quadrature point (i.e., at each support point of a
-                  // degree of freedom located on the contact boundary), we then
-                  // ask whether it is part of the z-displacement degrees of
-                  // freedom and if we haven't encountered this degree of
-                  // freedom yet (which can happen for those on the edges
-                  // between faces), we need to evaluate the gap between the
-                  // deformed object and the obstacle. If the active set
-                  // condition is true, then we add a constraint to the
-                  // ConstraintMatrix object that the next Newton update needs
-                  // to satisfy, set the solution vector's corresponding element
-                  // to the correct value, and add the index to the IndexSet
-                  // object that stores which degree of freedom is part of the
-                  // contact:
+                  // At each quadrature point (i.e., at each support point of a degree
+                  // of freedom located on the contact boundary), we then ask whether
+                  // it is part of the z-displacement degrees of freedom and if we
+                  // haven't encountered this degree of freedom yet (which can happen
+                  // for those on the edges between faces), we need to evaluate the gap
+                  // between the deformed object and the obstacle. If the active set
+                  // condition is true, then we add a constraint to the ConstraintMatrix
+                  // object that the next Newton update needs to satisfy, set the solution
+                  // vector's corresponding element to the correct value, and add the
+                  // index to the IndexSet object that stores which degree of freedom is
+                  // part of the contact:
                   const unsigned int component =
                     fe.face_system_to_component_index(q_point).first;
 
@@ -1356,9 +1347,9 @@ namespace Step42
 
   // Given the complexity of the problem, it may come as a bit of a surprise
   // that assembling the linear system we have to solve in each Newton iteration
-  // is actually fairly straightforward. The following function builds the
-  // Newton right hand side and Newton matrix. It looks fairly innocent because
-  // the heavy lifting happens in the call to
+  // is actually fairly straightforward. The following function builds the Newton
+  // right hand side and Newton matrix. It looks fairly innocent because the
+  // heavy lifting happens in the call to
   // <code>ConstitutiveLaw::get_linearized_stress_strain_tensors()</code> and in
   // particular in ConstraintMatrix::distribute_local_to_global(), using the
   // constraints we have previously computed.
@@ -1422,26 +1413,23 @@ namespace Step42
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  // Having computed the stress-strain tensor and its
-                  // linearization, we can now put together the parts of the
-                  // matrix and right hand side. In both, we need the linearized
-                  // stress-strain tensor times the symmetric gradient of
-                  // $\varphi_i$, i.e. the term $I_\Pi\varepsilon(\varphi_i)$,
-                  // so we introduce an abbreviation of this term. Recall that
-                  // the matrix corresponds to the bilinear form
-                  // $A_{ij}=(I_\Pi\varepsilon(\varphi_i),\varepsilon(\varphi_j))$
-                  // in the notation of the accompanying publication, whereas
-                  // the right hand side is $F_i=([I_\Pi-P_\Pi
-                  // C]\varepsilon(\varphi_i),\varepsilon(\mathbf u))$ where $u$
-                  // is the current linearization points (typically the last
-                  // solution). This might suggest that the right hand side will
-                  // be zero if the material is completely elastic (where
-                  // $I_\Pi=P_\Pi$) but this ignores the fact that the right
-                  // hand side will also contain contributions from
+                  // Having computed the stress-strain tensor and its linearization,
+                  // we can now put together the parts of the matrix and right hand side.
+                  // In both, we need the linearized stress-strain tensor times the
+                  // symmetric gradient of $\varphi_i$, i.e. the term $I_\Pi\varepsilon(\varphi_i)$,
+                  // so we introduce an abbreviation of this term. Recall that the
+                  // matrix corresponds to the bilinear form
+                  // $A_{ij}=(I_\Pi\varepsilon(\varphi_i),\varepsilon(\varphi_j))$ in the
+                  // notation of the accompanying publication, whereas the right
+                  // hand side is $F_i=([I_\Pi-P_\Pi C]\varepsilon(\varphi_i),\varepsilon(\mathbf u))$
+                  // where $u$ is the current linearization points (typically the last solution).
+                  // This might suggest that the right hand side will be zero if the material
+                  // is completely elastic (where $I_\Pi=P_\Pi$) but this ignores the fact
+                  // that the right hand side will also contain contributions from
                   // non-homogeneous constraints due to the contact.
                   //
-                  // The code block that follows this adds contributions that
-                  // are due to boundary forces, should there be any.
+                  // The code block that follows this adds contributions that are due to
+                  // boundary forces, should there be any.
                   const SymmetricTensor<2, dim> stress_phi_i =
                     stress_strain_tensor_linearized *
                     fe_values[displacement].symmetric_gradient(i, q_point);
@@ -1647,9 +1635,10 @@ namespace Step42
   //   has one neighbor with value $x_1$ which is in contact with the
   //   obstacle and one neighbor $x_2$ which is not in contact. Because
   //   the update for the former will be prescribed, the hanging node constraint
-  //   will have an inhomogeneity and will look like $x_0 = x_1/2 +
-  //   \text{gap}/2$. So the corresponding entries in the ride-hang-side are
-  //   non-zero with a meaningless value. These values we have to set to zero.
+  //   will have an inhomogeneity and will look like $x_0 = x_1/2 + \text{gap}/2$.
+  //   So the corresponding entries in the
+  //   ride-hang-side are non-zero with a
+  //   meaningless value. These values we have to set to zero.
   // - Like in step-40, we need to shuffle between vectors that do and do
   //   not have ghost elements when solving or using the solution.
   //
@@ -1724,13 +1713,14 @@ namespace Step42
   // @sect4{PlasticityContactProblem::solve_newton}
 
   // This is, finally, the function that implements the damped Newton method
-  // on the current mesh. There are two nested loops: the outer loop for the
-  // Newton iteration and the inner loop for the line search which will be used
-  // only if necessary. To obtain a good and reasonable starting value we solve
-  // an elastic problem in the very first Newton step on each mesh (or only on
-  // the first mesh if we transfer solutions between meshes). We do so by
-  // setting the yield stress to an unreasonably large value in these iterations
-  // and then setting it back to the correct value in subsequent iterations.
+  // on the current mesh. There are two nested loops: the outer loop for the Newton
+  // iteration and the inner loop for the line search which
+  // will be used only if necessary. To obtain a good and reasonable
+  // starting value we solve an elastic problem in the very first Newton step on each
+  // mesh (or only on the first mesh if we transfer solutions between meshes). We
+  // do so by setting the yield stress to an unreasonably large value in these
+  // iterations and then setting it back to the correct value in subsequent
+  // iterations.
   //
   // Other than this, the top part of this function should be
   // reasonably obvious. We initialize the variable
@@ -1801,11 +1791,11 @@ namespace Step42
         // There are exceptions to when we use a line search. First,
         // if this is the first Newton step on any mesh, then we don't have
         // any point to compare the residual to, so we always accept a full
-        // step. Likewise, if this is the second Newton step on the first mesh
-        // (or the second on any mesh if we don't transfer solutions from mesh
-        // to mesh), then we have computed the first of these steps using just
-        // an elastic model (see how we set the yield stress sigma to an
-        // unreasonably large value above). In this case, the first Newton
+        // step. Likewise, if this is the second Newton step on the first mesh (or
+        // the second on any mesh if we don't transfer solutions from
+        // mesh to mesh), then we have computed the first of these steps using
+        // just an elastic model (see how we set the yield stress sigma to
+        // an unreasonably large value above). In this case, the first Newton
         // solution was a purely elastic one, the second one a plastic one,
         // and any linear combination would not necessarily be expected to
         // lie in the feasible set -- so we just accept the solution we just

@@ -154,9 +154,8 @@ namespace NonMatching
     //    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
     //      for (unsigned int j=0; j<immersed_fe.dofs_per_cell; ++j)
     //        {
-    //          const auto comp_j =
-    //          immersed_fe.system_to_component_index(j).first; if
-    //          (immersed_gtl[comp_j] == space_gtl[comp_i])
+    //          const auto comp_j = immersed_fe.system_to_component_index(j).first;
+    //          if (immersed_gtl[comp_j] == space_gtl[comp_i])
     //            dof_mask(i,j) = true;
     //        }
     //  }

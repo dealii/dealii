@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Add edge matrices and MGConstraints to make sure they are empty and do not
-// mess things up
+// Add edge matrices and MGConstraints to make sure they are empty and do not mess things up
 
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -795,7 +794,7 @@ namespace Step39
         solve();
         error();
         deallog << "Estimate " << estimate() << std::endl;
-        // output_results(s);
+        //output_results(s);
       }
   }
 } // namespace Step39

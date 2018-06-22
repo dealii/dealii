@@ -90,8 +90,8 @@ test_polar()
     Triangulation<dim, spacedim> tria;
     GridGenerator::hyper_ball(tria);
 
-    // set all entities to the transfinite manifold except for the boundary
-    // where we put the polar manifold
+    // set all entities to the transfinite manifold except for the boundary where
+    // we put the polar manifold
     tria.set_all_manifold_ids(1);
     tria.set_all_manifold_ids_on_boundary(0);
     tria.set_manifold(0, polar_manifold);
@@ -116,8 +116,8 @@ test_polar()
     Triangulation<dim, spacedim> tria;
     GridGenerator::hyper_ball(tria);
 
-    // set all entities to the transfinite manifold except for the boundary
-    // where we put the polar manifold
+    // set all entities to the transfinite manifold except for the boundary where
+    // we put the polar manifold
     tria.set_all_manifold_ids(1);
     tria.set_all_manifold_ids_on_boundary(0);
     tria.set_manifold(0, polar_manifold);

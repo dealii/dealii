@@ -72,7 +72,7 @@ namespace internal
    * dimensions using the tensor product form. Depending on the particular
    * layout in the matrix entries, this corresponds to a usual matrix-matrix
    * product or a matrix-matrix product including some symmetries.
-   *
+  *
    * @tparam variant Variant of evaluation used for creating template
    *                 specializations
    * @tparam dim Dimension of the function

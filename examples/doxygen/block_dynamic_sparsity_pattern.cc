@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// See documentation of BlockDynamicSparsityPattern for documentation of this
-// example
+// See documentation of BlockDynamicSparsityPattern for documentation of this example
 
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>

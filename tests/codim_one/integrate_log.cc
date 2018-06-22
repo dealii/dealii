@@ -15,8 +15,8 @@
 
 
 
-// integrates the function ln(x-a)*f(x), where f(x) is a power of x on the
-// interval [a,b]. dim=1 only.
+// integrates the function ln(x-a)*f(x), where f(x) is a power of x on the interval [a,b].
+// dim=1 only.
 
 #include "../tests.h"
 

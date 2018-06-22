@@ -142,7 +142,7 @@ private:
   void
   renumber()
   {
-    // DoFRenumbering::Cuthill_McKee(dof_handler);
+    //DoFRenumbering::Cuthill_McKee(dof_handler);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
 

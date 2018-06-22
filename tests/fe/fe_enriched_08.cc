@@ -114,7 +114,7 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
   // push back to be able to resolve hp constrains:
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feen)));
 
-  dof_handler.begin_active()->set_active_fe_index(1); // POU
+  dof_handler.begin_active()->set_active_fe_index(1); //POU
 
 
   dof_handler.distribute_dofs(fe_collection);

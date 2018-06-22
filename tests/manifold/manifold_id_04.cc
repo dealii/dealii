@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Test Manifold ID. Now we set differently the id of the first cell and its
-// faces, and verify that the ids are correctly inherited from one cell onward.
+// Test Manifold ID. Now we set differently the id of the first cell and its faces, and verify
+// that the ids are correctly inherited from one cell onward.
 
 #include "../tests.h"
 

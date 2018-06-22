@@ -395,8 +395,7 @@ namespace internal
 
 
       /**
-       * Update the co- and contravariant matrices as well as their determinant,
-       * for the cell
+       * Update the co- and contravariant matrices as well as their determinant, for the cell
        * described stored in the data object, but only if the update_flags of the @p data
        * argument indicate so.
        */
@@ -564,14 +563,14 @@ MappingManifold<dim, spacedim>::fill_fe_values(
           // if dim==spacedim, then there is no cell normal to
           // compute. since this is for FEValues (and not FEFaceValues),
           // there are also no face normals to compute
-          else // codim>0 case
+          else //codim>0 case
             {
               Tensor<1, spacedim> DX_t[dim];
               for (unsigned int i = 0; i < spacedim; ++i)
                 for (unsigned int j = 0; j < dim; ++j)
                   DX_t[j][i] = data.contravariant[point][i][j];
 
-              Tensor<2, dim> G; // First fundamental form
+              Tensor<2, dim> G; //First fundamental form
               for (unsigned int i = 0; i < dim; ++i)
                 for (unsigned int j = 0; j < dim; ++j)
                   G[i][j] = DX_t[i] * DX_t[j];
@@ -602,7 +601,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
                       if (dim == 1)
                         output_data.normal_vectors[point] =
                           cross_product_2d(-DX_t[0]);
-                      else // dim == 2
+                      else //dim == 2
                         output_data.normal_vectors[point] =
                           cross_product_3d(DX_t[0], DX_t[1]);
 
@@ -613,7 +612,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
                         output_data.normal_vectors[point] *= -1.;
                     }
                 }
-            } // codim>0 case
+            } //codim>0 case
         }
     }
 
@@ -771,8 +770,8 @@ namespace internal
                               cross_product_3d(DX_t[0], DX_t[1]);
                             cell_normal /= cell_normal.norm();
 
-                            // then compute the face normal from the face
-                            // tangent and the cell normal:
+                            // then compute the face normal from the face tangent
+                            // and the cell normal:
                             output_data.boundary_forms[point] =
                               cross_product_3d(data.aux[0][point], cell_normal);
 
@@ -917,9 +916,9 @@ namespace internal
                   }
                 return;
               }
-            // We still allow this operation as in the
-            // reference cell Derivatives are Tensor
-            // rather than DerivativeForm
+            //We still allow this operation as in the
+            //reference cell Derivatives are Tensor
+            //rather than DerivativeForm
             case mapping_covariant:
               {
                 Assert(

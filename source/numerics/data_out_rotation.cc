@@ -38,13 +38,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// TODO: Update documentation
-// TODO: Unify code for dimensions
+//TODO: Update documentation
+//TODO: Unify code for dimensions
 
 
-// TODO: build_some_patches isn't going to work if first_cell/next_cell
-// don't iterate over all cells and if cell data is requested. in that
-// case, we need to calculate cell_number as in the DataOut class
+//TODO: build_some_patches isn't going to work if first_cell/next_cell
+//don't iterate over all cells and if cell data is requested. in that
+//case, we need to calculate cell_number as in the DataOut class
 
 // Not implemented for 3D
 

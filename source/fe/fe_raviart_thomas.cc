@@ -35,9 +35,9 @@
 #include <iostream>
 #include <sstream>
 
-// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
-// adjust_line_dof_index_for_line_orientation_table fields, and write tests
-// similar to bits/face_orientation_and_fe_q_*
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -87,8 +87,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
   FETools::compute_embedding_matrices(*this, this->prolongation);
   initialize_restriction();
 
-  // TODO[TL]: for anisotropic refinement we will probably need a table of
-  // submatrices with an array for each refine case
+  // TODO[TL]: for anisotropic refinement we will probably need a table of submatrices with an array for each refine case
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);

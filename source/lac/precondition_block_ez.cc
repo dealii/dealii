@@ -22,8 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 // explicit instantiations for "float" PreconditionBlock
 template class PreconditionBlock<SparseMatrixEZ<float>, float>;
 
-// the instantiation for class PreconditionBlock<SparseMatrixEZ<float>, double>
-// is skipped because it does not make sense to have inverse block matrices with
+// the instantiation for class PreconditionBlock<SparseMatrixEZ<float>, double> is skipped
+// because it does not make sense to have inverse block matrices with
 // higher precision than the matrix itself
 
 
@@ -166,9 +166,9 @@ PreconditionBlockSOR<SparseMatrixEZ<float>, float>::Tvmult<double>(
   const Vector<double> &) const;
 
 
-// the instantiation for class PreconditionBlockSOR<SparseMatrixEZ<float>,
-// double> is skipped because it does not make sense to have inverse block
-// matrices with higher precision than the matrix itself
+// the instantiation for class PreconditionBlockSOR<SparseMatrixEZ<float>, double> is skipped
+// because it does not make sense to have inverse block matrices with
+// higher precision than the matrix itself
 
 
 // explicit instantiations for "double" PreconditionBlockSOR
@@ -268,9 +268,9 @@ PreconditionBlockSSOR<SparseMatrixEZ<float>, float>::Tvmult<double>(
   const Vector<double> &) const;
 
 
-// the instantiation for class PreconditionBlockSSOR<SparseMatrixEZ<float>,
-// double> is skipped because it does not make sense to have inverse block
-// matrices with higher precision than the matrix itself
+// the instantiation for class PreconditionBlockSSOR<SparseMatrixEZ<float>, double> is skipped
+// because it does not make sense to have inverse block matrices with
+// higher precision than the matrix itself
 
 
 // explicit instantiations for "double" PreconditionBlockSSOR

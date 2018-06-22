@@ -72,8 +72,7 @@ class TensorFunction;
  *
  *   // return all components at several points
  *   void   vector_value_list (const std::vector<Point<dim> >    &point_list,
- *                             std::vector<Vector<double> >      &value_list)
- * const;
+ *                             std::vector<Vector<double> >      &value_list) const;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the function or
@@ -132,8 +131,8 @@ class TensorFunction;
  *   $\Omega$ of the function lies. Consequently, the function will be
  *   evaluated at objects of type @p Point<dim>.
  * @tparam RangeNumberType The scalar type of the vector space that is the range
- *   (or image) of this function. As discussed above, objects of the current
- * type represent functions from ${\mathbb R}^\text{dim}$ to
+ *   (or image) of this function. As discussed above, objects of the current type
+ *   represent functions from ${\mathbb R}^\text{dim}$ to
  *   $S^{n_\text{components}}$ where $S$ is the underlying scalar type of
  *   the vector space. The type of $S$ is given by the @p RangeNumberType template
  *   argument.
@@ -401,16 +400,14 @@ namespace Functions
                      const unsigned int    n_components = 1);
 
     /**
-     * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an
-     * argument. The number of components is determined by
-     * <tt>values.size()</tt>.
+     * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an argument.
+     * The number of components is determined by <tt>values.size()</tt>.
      */
     ConstantFunction(const std::vector<RangeNumberType> &values);
 
     /**
-     * Constructor; takes an <tt>Vector<RangeNumberType></tt> object as an
-     * argument. The number of components is determined by
-     * <tt>values.size()</tt>.
+     * Constructor; takes an <tt>Vector<RangeNumberType></tt> object as an argument. The
+     * number of components is determined by <tt>values.size()</tt>.
      */
     ConstantFunction(const Vector<RangeNumberType> &values);
 
@@ -471,10 +468,10 @@ namespace Functions
 
 
   /**
-   * Provide a function which always returns zero. Obviously, also the
-   * derivatives of this function are zero. Also, it returns zero on all
-   * components in case the function is not a scalar one, which can be obtained
-   * by passing the constructor the appropriate number of components.
+   * Provide a function which always returns zero. Obviously, also the derivatives
+   * of this function are zero. Also, it returns zero on all components in case
+   * the function is not a scalar one, which can be obtained by passing the
+   * constructor the appropriate number of components.
    *
    * This function is of use when you want to implement homogeneous boundary
    * conditions, or zero initial conditions.
@@ -566,8 +563,8 @@ public:
    *
    * This is useful if you want to have different values in different
    * components since the provided constructors of
-   * <tt>ComponentSelectFunction@<dim, RangeNumberType@></tt> class can only
-   * have same value for all components.
+   * <tt>ComponentSelectFunction@<dim, RangeNumberType@></tt> class can only have same
+   * value for all components.
    *
    * @note: we copy the underlying component value data from @p f from its
    * beginning. So the number of components of @p f cannot be less than the
@@ -657,8 +654,7 @@ protected:
  * and then pass the <code>my_norm_object</code> around, or you could write it
  * like so:
  * @code
- *   ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_norm_object
- * (&Point<dim>::norm);
+ *   ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_norm_object (&Point<dim>::norm);
  * @endcode
  *
  * Similarly, to generate an object that computes the distance to a point
@@ -697,9 +693,9 @@ class ScalarFunctionFromFunctionObject : public Function<dim, RangeNumberType>
 {
 public:
   /**
-   * Given a function object that takes a Point and returns a RangeNumberType
-   * value, convert this into an object that matches the Function<dim,
-   * RangeNumberType> interface.
+   * Given a function object that takes a Point and returns a RangeNumberType value,
+   * convert this into an object that matches the Function<dim, RangeNumberType>
+   * interface.
    */
   ScalarFunctionFromFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
@@ -760,9 +756,8 @@ class VectorFunctionFromScalarFunctionObject
 {
 public:
   /**
-   * Given a function object that takes a Point and returns a RangeNumberType
-   * value, convert this into an object that matches the Function@<dim@>
-   * interface.
+   * Given a function object that takes a Point and returns a RangeNumberType value,
+   * convert this into an object that matches the Function@<dim@> interface.
    *
    * @param function_object The scalar function that will form one component
    * of the resulting Function object.
@@ -809,8 +804,8 @@ private:
 
 /**
  * This class is built as a means of translating the <code>Tensor<1,dim,
- * RangeNumberType> </code> values produced by objects of type TensorFunction
- * and returning them as a multiple component version of the same thing as a
+ * RangeNumberType> </code> values produced by objects of type TensorFunction and
+ * returning them as a multiple component version of the same thing as a
  * Vector for use in, for example, the VectorTools::interpolate or the many
  * other functions taking Function objects. It allows the user to place the
  * desired components into an <tt>n_components</tt> long vector starting at
@@ -834,8 +829,7 @@ private:
  * object is done using this piece of code:
  *  @code
  *      RighHandSide<1,dim, RangeNumberType> rhs;
- *      VectorFunctionFromTensorFunction<dim, RangeNumberType>
- * rhs_vector_function (rhs, 0, 3*dim);
+ *      VectorFunctionFromTensorFunction<dim, RangeNumberType> rhs_vector_function (rhs, 0, 3*dim);
  *  @endcode
  * where the <code>dim</code> components of the tensor function are placed
  * into the first <code>dim</code> components of the function object.
@@ -848,8 +842,8 @@ class VectorFunctionFromTensorFunction : public Function<dim, RangeNumberType>
 public:
   /**
    * Given a TensorFunction object that takes a <tt>Point</tt> and returns a
-   * <tt>Tensor<1,dim, RangeNumberType></tt> value, convert this into an object
-   * that matches the Function@<dim@> interface.
+   * <tt>Tensor<1,dim, RangeNumberType></tt> value, convert this into an object that
+   * matches the Function@<dim@> interface.
    *
    * By default, create a Vector object of the same size as
    * <tt>tensor_function</tt> returns, i.e., with <tt>dim</tt> components.

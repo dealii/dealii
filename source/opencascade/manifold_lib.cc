@@ -75,8 +75,7 @@ namespace OpenCASCADE
     }
   } // namespace
 
-  /*============================== NormalProjectionManifold
-   * ==============================*/
+  /*============================== NormalProjectionManifold ==============================*/
   template <int dim, int spacedim>
   NormalProjectionManifold<dim, spacedim>::NormalProjectionManifold(
     const TopoDS_Shape &sh,
@@ -117,8 +116,7 @@ namespace OpenCASCADE
   }
 
 
-  /*============================== DirectionalProjectionManifold
-   * ==============================*/
+  /*============================== DirectionalProjectionManifold ==============================*/
   template <int dim, int spacedim>
   DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold(
     const TopoDS_Shape &       sh,
@@ -162,8 +160,7 @@ namespace OpenCASCADE
 
 
 
-  /*============================== NormalToMeshProjectionManifold
-   * ==============================*/
+  /*============================== NormalToMeshProjectionManifold ==============================*/
   template <int dim, int spacedim>
   NormalToMeshProjectionManifold<dim, spacedim>::NormalToMeshProjectionManifold(
     const TopoDS_Shape &sh,
@@ -311,8 +308,7 @@ namespace OpenCASCADE
   }
 
 
-  /*============================== ArclengthProjectionLineManifold
-   * ==============================*/
+  /*============================== ArclengthProjectionLineManifold ==============================*/
   template <int dim, int spacedim>
   ArclengthProjectionLineManifold<dim, spacedim>::
     ArclengthProjectionLineManifold(const TopoDS_Shape &sh,

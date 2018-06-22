@@ -632,9 +632,8 @@ namespace internal
                              ->index()] =
                             FaceCategory::locally_active_done_here;
 
-                      // If neighbor is a ghost element (i.e.
-                      // dcell->subdomain_id !
-                      // dcell->neighbor(f)->subdomain_id()), we need to add its
+                      // If neighbor is a ghost element (i.e. dcell->subdomain_id
+                      // ! dcell->neighbor(f)->subdomain_id()), we need to add its
                       // index into cell level list.
                       if (use_active_cells)
                         add_to_ghost =
@@ -1080,8 +1079,8 @@ namespace internal
           // set the partitioner to the new vectorized lengths
           face_partition_data[partition + 1] = face_partition_data[partition];
 
-          // loop over the faces in the current partition and reorder according
-          // to the face type
+          // loop over the faces in the current partition and reorder according to
+          // the face type
           for (unsigned int face = face_start; face < face_end; ++face)
             {
               for (unsigned int type = 0; type < faces_type.size(); ++type)
@@ -1116,10 +1115,9 @@ namespace internal
               unsigned int               no_faces = faces_type[type].size();
               std::vector<unsigned char> touched(no_faces, 0);
 
-              // do two passes through the data. The first is to identify
-              // similar faces within the same index range as the cells which
-              // will allow for vectorized read operations, the second picks up
-              // all the rest
+              // do two passes through the data. The first is to identify similar
+              // faces within the same index range as the cells which will allow
+              // for vectorized read operations, the second picks up all the rest
               unsigned int n_vectorized = 0;
               for (unsigned int f = 0; f < no_faces; ++f)
                 if (faces_in[faces_type[type][f]].cells_interior[0] %

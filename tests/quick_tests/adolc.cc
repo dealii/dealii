@@ -16,8 +16,7 @@
 // Test of basic functionality for Adol-C:
 //  - Taped doubles
 //  - Gradient and hessian computations
-// Adapted from
-// https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
+// Adapted from https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
 
 #include <deal.II/base/logstream.h>
 

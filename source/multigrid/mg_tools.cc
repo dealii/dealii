@@ -165,8 +165,7 @@ namespace MGTools
         // dofs_per_vertex is
         // arbitrary, not the other way
         // round.
-        // TODO: This assumes that even in hp context, the dofs per face
-        // coincide!
+        //TODO: This assumes that even in hp context, the dofs per face coincide!
         unsigned int increment = fe.dofs_per_cell - dim * fe.dofs_per_face;
         while (i < fe.first_line_index)
           row_lengths[cell_indices[i++]] += increment;
@@ -1320,8 +1319,7 @@ namespace MGTools
     local_dofs.reserve(DoFTools::max_dofs_per_face(dof));
     std::fill(local_dofs.begin(), local_dofs.end(), numbers::invalid_dof_index);
 
-    // First, deal with the simpler case when we have to identify all boundary
-    // dofs
+    // First, deal with the simpler case when we have to identify all boundary dofs
     if (component_mask.n_selected_components(n_components) == n_components)
       {
         typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(),
@@ -1388,8 +1386,8 @@ namespace MGTools
                       {
                         const ComponentMask &nonzero_component_array =
                           cell->get_fe().get_nonzero_components(i);
-                        // if we want to constrain one of the nonzero
-                        // components, we have to constrain all of them
+                        // if we want to constrain one of the nonzero components,
+                        // we have to constrain all of them
 
                         bool selected = false;
                         for (unsigned int c = 0; c < n_components; ++c)
@@ -1409,8 +1407,7 @@ namespace MGTools
                                 "and try to constrain just some of its components!"));
                       }
 
-                    // get indices, physical location and boundary values of
-                    // dofs on this face
+                    // get indices, physical location and boundary values of dofs on this face
                     local_dofs.resize(fe.dofs_per_face);
                     face->get_mg_dof_indices(level, local_dofs);
                     if (fe_is_system)
@@ -1497,7 +1494,7 @@ namespace MGTools
               cell->face(face_nr);
             if (!face->at_boundary())
               {
-                // interior face
+                //interior face
                 const typename DoFHandler<dim>::cell_iterator neighbor =
                   cell->neighbor(face_nr);
 
@@ -1515,7 +1512,7 @@ namespace MGTools
               }
             else
               {
-                // boundary face
+                //boundary face
                 for (unsigned int j = 0; j < dofs_per_face; ++j)
                   cell_dofs[fe.face_to_cell_index(j, face_nr)] = true;
               }
@@ -1578,12 +1575,11 @@ namespace MGTools
               cell->face(face_nr);
             if (!face->at_boundary())
               {
-                // interior face
+                //interior face
                 const typename DoFHandler<dim>::cell_iterator neighbor =
                   cell->neighbor(face_nr);
 
-                // only process cell pairs if one or both of them are owned by
-                // me (ignore if running in serial)
+                // only process cell pairs if one or both of them are owned by me (ignore if running in serial)
                 if (mg_dof_handler.get_triangulation()
                         .locally_owned_subdomain() !=
                       numbers::invalid_subdomain_id &&

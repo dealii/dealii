@@ -75,7 +75,7 @@ main()
   Implicit                          op_implicit(matrix);
   ThetaTimestepping<Vector<double>> solver(op_explicit, op_implicit);
   solver.timestep_control().start_step(0.1);
-  // solver.set_output(out);
+  //solver.set_output(out);
 
   Vector<double> value(2);
   value(0) = 1.;

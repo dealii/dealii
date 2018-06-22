@@ -519,8 +519,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
       const unsigned int source_q_dofs_per_cell =
         Utilities::fixed_power<dim>(source_fe->degree + 1);
 
-      // evaluation is simply done by evaluating the other FE's basis functions
-      // on the unit support points (FE_Q has the property that the cell
+      // evaluation is simply done by evaluating the other FE's basis functions on
+      // the unit support points (FE_Q has the property that the cell
       // interpolation matrix is a unit matrix, so no need to evaluate it and
       // invert it)
       for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
@@ -528,8 +528,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
           // read in a point on this cell and evaluate the shape functions there
           const Point<dim> p = this->unit_support_points[j];
 
-          // FE_Q element evaluates to 1 in unit support point and to zero in
-          // all other points by construction
+          // FE_Q element evaluates to 1 in unit support point and to zero in all
+          // other points by construction
           Assert(std::abs(this->poly_space.compute_value(j, p) - 1.) < 1e-13,
                  ExcInternalError());
 
@@ -649,7 +649,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
 
       // compute the interpolation matrix by simply taking the value at the
       // support points.
-      // TODO: Verify that all faces are the same with respect to
+      //TODO: Verify that all faces are the same with respect to
       // these support points. Furthermore, check if something has to
       // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature =
@@ -912,9 +912,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::compare_for_face_domination(
         }
       else
         {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
           return FiniteElementDomination::no_requirements;
         }
     }
@@ -1084,7 +1083,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
   Assert(face < GeometryInfo<dim>::faces_per_cell,
          ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
 
-  // TODO: we could presumably solve the 3d case below using the
+  //TODO: we could presumably solve the 3d case below using the
   // adjust_quad_dof_index_for_face_orientation_table field. for the
   // 2d case, we can't use adjust_line_dof_index_for_line_orientation_table
   // since that array is empty (presumably because we thought that
@@ -1146,8 +1145,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
             // of pictures of how all the faces can look like with the various
             // flips and rotations.
             //
-            // that said, the Q2 case is easy enough to implement, as is the
-            // case where everything is in standard orientation
+            // that said, the Q2 case is easy enough to implement, as is the case
+            // where everything is in standard orientation
             Assert((this->dofs_per_line <= 1) ||
                      ((face_orientation == true) && (face_flip == false) &&
                       (face_rotation == false)),

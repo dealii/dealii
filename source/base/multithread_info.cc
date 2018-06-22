@@ -94,8 +94,7 @@ MultithreadInfo::get_n_cpus()
 // the deal.II mailing list, such that it can be included into the
 // next deal.II release.
 
-//#error Detection of Processors not supported on this OS. Setting n_cpus=1 by
-// default.
+//#error Detection of Processors not supported on this OS. Setting n_cpus=1 by default.
 
 unsigned int
 MultithreadInfo::get_n_cpus()

@@ -16,8 +16,7 @@
 
 // Test integrate_difference for complex-valued vectors. This test is
 // like integrate_difference_01, but multiplies the real-valued
-// function by (1/sqrt(2)+1/sqrt(2)i) and stores everything using complex data
-// types
+// function by (1/sqrt(2)+1/sqrt(2)i) and stores everything using complex data types
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

@@ -3505,15 +3505,14 @@ namespace Step32
           cell->clear_refine_flag();
 
       // With all flags marked as necessary, we can then tell the
-      // parallel::distributed::SolutionTransfer objects to get ready to
-      // transfer data from one mesh to the next, which they will do when
-      // notified by
+      // parallel::distributed::SolutionTransfer objects to get ready to transfer
+      // data from one mesh to the next, which they will do when notified by
       // Triangulation as part of the @p execute_coarsening_and_refinement() call.
-      // The syntax is similar to the non-%parallel solution transfer (with the
-      // exception that here a pointer to the vector entries is enough). The
-      // remainder of the function further down below is then concerned with
-      // setting up the data structures again after mesh refinement and
-      // restoring the solution vectors on the new mesh.
+      // The syntax is similar to the non-%parallel solution transfer (with the exception
+      // that here a pointer to the vector entries is enough). The remainder of
+      // the function further down below is then concerned with setting up the data
+      // structures again after mesh refinement and restoring the solution
+      // vectors on the new mesh.
       std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature(2);
       x_temperature[0] = &temperature_solution;
       x_temperature[1] = &old_temperature_solution;
@@ -3663,8 +3662,8 @@ namespace Step32
         old_temperature_solution     = temperature_solution;
         if (old_time_step > 0)
           {
-            // Trilinos sadd does not like ghost vectors even as input. Copy
-            // into distributed vectors for now:
+            //Trilinos sadd does not like ghost vectors even as input. Copy
+            //into distributed vectors for now:
             {
               TrilinosWrappers::MPI::BlockVector distr_solution(stokes_rhs);
               distr_solution = stokes_solution;

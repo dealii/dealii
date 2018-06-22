@@ -99,11 +99,11 @@ main()
       if (real_cell_center(0) < 0.5 && real_cell_center(1) < 0.5)
         cell->set_material_id(0); // solid
       else
-        cell->set_material_id(1); // fluid
-    }                             // cell
+        cell->set_material_id(1); //fluid
+    }                             //cell
 
-  // create the FE spaces for the solid and the fluid/mesh
-  // each are padded with FE_Nothing to be equal length
+  //create the FE spaces for the solid and the fluid/mesh
+  //each are padded with FE_Nothing to be equal length
 
   std::string solid_fe_name =
     "FESystem[FE_Q(2)^2-FE_Q(2)^2-FE_Nothing()^2-FE_Nothing()-FE_Nothing()^2]";
@@ -132,7 +132,7 @@ main()
         cell->set_active_fe_index(0);
       else
         cell->set_active_fe_index(1);
-    } // cell
+    } //cell
   dh.distribute_dofs(fe_collection);
 
   std::vector<unsigned int> block_component(total_dim, 0);
@@ -145,7 +145,7 @@ main()
         block_component[comp] = 1;
       else
         block_component[comp] = 2;
-    } // comp
+    } //comp
 
   std::vector<types::global_dof_index> dofs_per_block(
     3, 0); // 3 blocks, count dofs:
@@ -156,26 +156,26 @@ main()
 
   DoFRenumbering::component_wise(dh, block_component);
 
-  // build the sparsitypattern
+  //build the sparsitypattern
 
   BlockSparsityPattern block_sparsity_pattern;
   {
     BlockDynamicSparsityPattern csp(3, 3);
-    csp.block(0, 0).reinit(dofs_per_block[0], dofs_per_block[0]); // solid-solid
-    csp.block(0, 1).reinit(dofs_per_block[0], dofs_per_block[1]); // solid-fluid
-    csp.block(0, 2).reinit(dofs_per_block[0], dofs_per_block[2]); // solid-mesh
+    csp.block(0, 0).reinit(dofs_per_block[0], dofs_per_block[0]); //solid-solid
+    csp.block(0, 1).reinit(dofs_per_block[0], dofs_per_block[1]); //solid-fluid
+    csp.block(0, 2).reinit(dofs_per_block[0], dofs_per_block[2]); //solid-mesh
 
-    csp.block(1, 0).reinit(dofs_per_block[1], dofs_per_block[0]); // fluid-solid
-    csp.block(1, 1).reinit(dofs_per_block[1], dofs_per_block[1]); // fluid-fluid
-    csp.block(1, 2).reinit(dofs_per_block[1], dofs_per_block[2]); // fluid-mesh
+    csp.block(1, 0).reinit(dofs_per_block[1], dofs_per_block[0]); //fluid-solid
+    csp.block(1, 1).reinit(dofs_per_block[1], dofs_per_block[1]); //fluid-fluid
+    csp.block(1, 2).reinit(dofs_per_block[1], dofs_per_block[2]); //fluid-mesh
 
-    csp.block(2, 0).reinit(dofs_per_block[2], dofs_per_block[0]); // mesh-solid
-    csp.block(2, 1).reinit(dofs_per_block[2], dofs_per_block[1]); // mesh-fluid
-    csp.block(2, 2).reinit(dofs_per_block[2], dofs_per_block[2]); // mesh-mesh
+    csp.block(2, 0).reinit(dofs_per_block[2], dofs_per_block[0]); //mesh-solid
+    csp.block(2, 1).reinit(dofs_per_block[2], dofs_per_block[1]); //mesh-fluid
+    csp.block(2, 2).reinit(dofs_per_block[2], dofs_per_block[2]); //mesh-mesh
 
     csp.collect_sizes();
 
-    // enforce coupling across cells and interface
+    //enforce coupling across cells and interface
 
     Table<2, DoFTools::Coupling> cell_coupling(fe_collection.n_components(),
                                                fe_collection.n_components());
@@ -187,28 +187,29 @@ main()
         for (unsigned int d = 0; d < fe_collection.n_components(); ++d)
           {
             if (((c < solid_dim) &&
-                 (d < solid_dim)) // couples solid dims with solid dims
+                 (d < solid_dim)) //couples solid dims with solid dims
                 ||
                 (((c >= solid_dim) &&
-                  (d >= solid_dim)) // couples fluid dims and mesh dims
+                  (d >= solid_dim)) //couples fluid dims and mesh dims
                  &&
                  !((c == solid_dim + dim) &&
                    (d == solid_dim +
-                           dim)))) // fluid pressure does not couple with itself
+                           dim)))) //fluid pressure does not couple with itself
               {
                 cell_coupling[c][d] = DoFTools::always;
                 cell_coupling[d][c] = DoFTools::always;
-              } // cell_coupling
+              } //cell_coupling
 
-            if ((c < solid_dim) &&
-                (d >= solid_dim)) // couples solid dims with fluid and mesh dims
-                                  // on the interface
+            if (
+              (c < solid_dim) &&
+              (d >=
+               solid_dim)) //couples solid dims with fluid and mesh dims on the interface
               {
                 face_coupling[c][d] = DoFTools::always;
                 face_coupling[d][c] = DoFTools::always;
-              } // face_coupling
-          }     // d
-      }         // c
+              } //face_coupling
+          }     //d
+      }         //c
     DoFTools::make_flux_sparsity_pattern(dh, csp, cell_coupling, face_coupling);
     block_sparsity_pattern.copy_from(csp);
   }
@@ -243,17 +244,17 @@ main()
 
   for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
-       ++cell) // loops over the cells
+       ++cell) //loops over the cells
     {
       if (int(cell->material_id()) == 1)
         {
-          // Only loop over cells in the fluid region
+          //Only loop over cells in the fluid region
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             {
               if (!cell->at_boundary(f))
                 {
                   bool face_is_on_interface = false;
-                  // checks to see if cell face neighbor is in the solid domain
+                  //checks to see if cell face neighbor is in the solid domain
                   if (int(cell->neighbor(f)->material_id()) == 0)
                     face_is_on_interface = true;
 
@@ -274,7 +275,7 @@ main()
                             solid_disp_dof.push_back(i);
                           if (comp >= dim && comp < solid_dim)
                             solid_vel_dof.push_back(i);
-                        } // i
+                        } //i
                       for (unsigned int i = 0; i < dofs_per_fl_msh_face; ++i)
                         {
                           unsigned int comp =
@@ -283,12 +284,11 @@ main()
                             fluid_vel_dof.push_back(i);
                           if (comp >= solid_dim + fluid_dim)
                             mesh_disp_dof.push_back(i);
-                        } // i
+                        } //i
 
                       for (unsigned int i = 0; i < solid_vel_dof.size(); ++i)
                         {
-                          // in this example
-                          // solid_vel_dof.size()==fluid_vel_dof.size()
+                          //in this example solid_vel_dof.size()==fluid_vel_dof.size()
                           constraints.add_line(
                             fl_msh_face_dof_indices[fluid_vel_dof[i]]);
                           constraints.add_entry(
@@ -300,7 +300,7 @@ main()
                             std::pair<unsigned int, unsigned int>(
                               solid_face_dof_indices[solid_vel_dof[i]],
                               fl_msh_face_dof_indices[fluid_vel_dof[i]]));
-                        } // i
+                        } //i
                       for (unsigned int i = 0; i < solid_disp_dof.size(); ++i)
                         {
                           constraints.add_line(
@@ -315,11 +315,11 @@ main()
                               solid_face_dof_indices[solid_disp_dof[i]],
                               fl_msh_face_dof_indices[mesh_disp_dof[i]]));
                         }
-                    } // at interface check
-                }     // not at boundary check
-            }         // face
-        }             // is this in the fluid material region?
-    }                 // cell
+                    } //at interface check
+                }     //not at boundary check
+            }         //face
+        }             //is this in the fluid material region?
+    }                 //cell
 
   constraints.close();
 
@@ -338,9 +338,9 @@ main()
   deallog << "------------------------------------------" << std::endl;
 
 
-  // code crashes in the fluid assembly, mocked up below
+  //code crashes in the fluid assembly, mocked up below
   {
-    // fluid assembly
+    //fluid assembly
     const unsigned int dofs_per_cell = fluid_fe->dofs_per_cell;
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -350,9 +350,9 @@ main()
 
     for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
          cell != dh.end();
-         ++cell) // loops over the cells
+         ++cell) //loops over the cells
       {
-        if (int(cell->material_id()) == 1) // are we in the fluid region?
+        if (int(cell->material_id()) == 1) //are we in the fluid region?
           {
             cell->get_dof_indices(local_dof_indices);
 
@@ -369,11 +369,11 @@ main()
                                                    system_matrix,
                                                    system_rhs);
 
-          } // is this in the fluid material region?
+          } //is this in the fluid material region?
 
-      } // cell
+      } //cell
 
-  } // assemble fluid system
+  } //assemble fluid system
 
   return 0;
 }

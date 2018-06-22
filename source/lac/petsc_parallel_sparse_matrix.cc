@@ -419,7 +419,7 @@ namespace PETScWrappers
       // for the usefulness of this option
       // read the documentation of this
       // class.
-      // if (preset_nonzero_locations == true)
+      //if (preset_nonzero_locations == true)
       if (local_rows.n_elements() > 0)
         {
           // MatMPIAIJSetPreallocationCSR

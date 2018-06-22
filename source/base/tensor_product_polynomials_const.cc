@@ -145,8 +145,7 @@ TensorProductPolynomialsConst<dim>::compute(
   this->TensorProductPolynomials<dim>::compute(
     p, values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
-  // for dgq node: values =1, grads=0, grads_grads=0, third_derivatives=0,
-  // fourth_derivatives=0
+  //for dgq node: values =1, grads=0, grads_grads=0, third_derivatives=0, fourth_derivatives=0
   if (do_values)
     values.push_back(1.);
   if (do_grads)

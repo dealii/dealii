@@ -15,8 +15,8 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator*(Vector) on two vectors that
-// are orthogonal
+// check TrilinosWrappers::MPI::Vector::operator*(Vector) on two vectors that are
+// orthogonal
 
 #include <deal.II/base/utilities.h>
 

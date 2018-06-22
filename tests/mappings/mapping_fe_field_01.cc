@@ -57,7 +57,7 @@ test(const unsigned int degree)
   tria.refine_global(2);
 
   FE_Bernstein<dim, spacedim> fe(degree);
-  // FE_Q<dim> fe(degree);
+  //FE_Q<dim> fe(degree);
   FESystem<dim, spacedim> fe_sys(fe, spacedim);
 
   // DoFHandler<dim> dof(tria);

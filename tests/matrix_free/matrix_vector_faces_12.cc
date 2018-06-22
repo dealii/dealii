@@ -82,8 +82,9 @@ gamma_x(double x_m)
       xmod  = 8.3 - xmod;
       gamma = (-0.02 * std::cos(xmod * numbers::PI) + 1.02);
     }
-  else if (xmod > 8.3) // move mesh closer to the wall to get a lower y+ value
-                       // at the peak
+  else if (
+    xmod >
+    8.3) //move mesh closer to the wall to get a lower y+ value at the peak
     {
       xmod  = 9. - xmod;
       gamma = (-0.05 * std::cos(xmod * numbers::PI * 2. / 0.7) + 1.05);
@@ -218,7 +219,7 @@ private:
   const double h = 0.028;
 
   // data from initial block
-  const double x_max = 9.0 * h; // 9.0*h;
+  const double x_max = 9.0 * h; //9.0*h;
   const double y_max = 2.036 * h;
 
   const double y_FoR = h;
@@ -233,10 +234,10 @@ test()
   /* --------------- Generate grid ------------------- */
   const double h = 0.028;
   Point<dim>   coordinates;
-  coordinates[0] = 9.0 * h;   // 9.0*h;
-  coordinates[1] = 3.036 * h; // 2.036*h;
+  coordinates[0] = 9.0 * h;   //9.0*h;
+  coordinates[1] = 3.036 * h; //2.036*h;
   if (dim == 3)
-    coordinates[2] = 2.25 * h; // 4.5*h;
+    coordinates[2] = 2.25 * h; //4.5*h;
   std::vector<unsigned int> refinements(dim, 1);
   refinements[0] = 2;
 
@@ -256,12 +257,12 @@ test()
   if (dim == 3)
     triangulation.last()->vertex(4)[1] = 0.;
   // boundary ids for refinements[0] = 2:
-  // periodicity in x-direction
-  // add 10 to avoid conflicts with dirichlet boundary, which is 0
+  //periodicity in x-direction
+  //add 10 to avoid conflicts with dirichlet boundary, which is 0
   triangulation.begin()->face(0)->set_all_boundary_ids(0 + 10);
   triangulation.last()->face(1)->set_all_boundary_ids(1 + 10);
 
-  // periodicity in z-direction, if dim==3
+  //periodicity in z-direction, if dim==3
   if (dim == 3)
     {
       triangulation.begin()->face(4)->set_all_boundary_ids(2 + 10);

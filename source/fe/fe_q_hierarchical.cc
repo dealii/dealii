@@ -22,9 +22,9 @@
 #include <cmath>
 #include <sstream>
 
-// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
-// adjust_line_dof_index_for_line_orientation_table fields, and write tests
-// similar to bits/face_orientation_and_fe_q_*
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -153,8 +153,7 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(
   if (const FE_Q_Hierarchical<dim> *source_fe =
         dynamic_cast<const FE_Q_Hierarchical<dim> *>(&source))
     {
-      // ok, source is a Q_Hierarchical element, so we will be able to do the
-      // work
+      // ok, source is a Q_Hierarchical element, so we will be able to do the work
       Assert(matrix.m() == this->dofs_per_cell,
              ExcDimensionMismatch(matrix.m(), this->dofs_per_cell));
       Assert(matrix.n() == source.dofs_per_cell,
@@ -269,9 +268,10 @@ FE_Q_Hierarchical<dim>::hp_line_dof_identities(
       const unsigned int &this_dpl  = this->dofs_per_line;
       const unsigned int &other_dpl = fe_other.dofs_per_line;
 
-      // we deal with hierarchical 1d polynomials where dofs are enumerated
-      // increasingly. Thus we return a vector of pairs for the first N-1, where
-      // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
+      // we deal with hierarchical 1d polynomials where dofs are enumerated increasingly.
+      // Thus we return a vector of pairs
+      // for the first N-1, where N is minimum number of
+      // dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
       for (unsigned int i = 0; i < std::min(this_dpl, other_dpl); i++)
         res.emplace_back(i, i);
@@ -307,9 +307,10 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
       const unsigned int &this_dpq  = this->dofs_per_quad;
       const unsigned int &other_dpq = fe_other.dofs_per_quad;
 
-      // we deal with hierarchical 1d polynomials where dofs are enumerated
-      // increasingly. Thus we return a vector of pairs for the first N-1, where
-      // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
+      // we deal with hierarchical 1d polynomials where dofs are enumerated increasingly.
+      // Thus we return a vector of pairs
+      // for the first N-1, where N is minimum number of
+      // dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
       for (unsigned int i = 0; i < std::min(this_dpq, other_dpq); i++)
         res.emplace_back(i, i);
@@ -357,9 +358,8 @@ FE_Q_Hierarchical<dim>::compare_for_face_domination(
         }
       else
         {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
           return FiniteElementDomination::no_requirements;
         }
     }
@@ -390,8 +390,8 @@ FE_Q_Hierarchical<dim>::build_dofs_cell(
 
   // TODO: The dofs_subcell shall differ by a factor 2^p due to shape functions
   // defined on [0,1] instead of [-1,1]. However, that does not seem to be
-  // the case. Perhaps this factor is added later on in auxiliary functions
-  // which use these matrices.
+  // the case. Perhaps this factor is added later on in auxiliary functions which
+  // use these matrices.
 
   // dofs_cells[0](j,k):
   //    0  1 |  2  3  4.

@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// check method TmTmult of FullMatrix on larger size than full_matrix_03 where
-// we interface to the external BLAS by comparison to mmult of the transpose
-// matrix
+//check method TmTmult of FullMatrix on larger size than full_matrix_03 where
+//we interface to the external BLAS by comparison to mmult of the transpose
+//matrix
 
 #include <deal.II/lac/full_matrix.h>
 

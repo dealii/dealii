@@ -192,7 +192,7 @@ test()
                                  dofs_per_block,
                                  stokes_sub_blocks);
 
-  // std::cout << "Number of active cells: "
+  //std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
   //          << std::endl
   //          << "Number of degrees of freedom: "

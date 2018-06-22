@@ -140,8 +140,8 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
           //                |
           //                v
           //
-          // moving vertices 1 and 6 such that diagonal 16 is smaller than all
-          // other diagonals but vertex 6 lies outside all the balls constructed
+          // moving vertices 1 and 6 such that diagonal 16 is smaller than all other
+          // diagonals but vertex 6 lies outside all the balls constructed
           // using largest diagonals
           //
           //

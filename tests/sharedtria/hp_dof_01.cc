@@ -103,16 +103,14 @@ test()
       triangulation.execute_coarsening_and_refinement();
       dof_handler.distribute_dofs(fe);
 
-      // avoid outputting any partitioning info until Parmetis gives
-      // reproducible results
+      // avoid outputting any partitioning info until Parmetis gives reproducible results
       deallog << "n_dofs: " << dof_handler.n_dofs() << std::endl;
-      //          << "n_locally_owned_dofs: " <<
-      //          dof_handler.n_locally_owned_dofs() << std::endl;
+      //          << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
 
       //      deallog << "n_locally_owned_dofs_per_processor: ";
-      //      std::vector<types::global_dof_index> v =
-      //      dof_handler.n_locally_owned_dofs_per_processor(); unsigned int sum
-      //      = 0; for (unsigned int i=0; i<v.size(); ++i)
+      //      std::vector<types::global_dof_index> v = dof_handler.n_locally_owned_dofs_per_processor();
+      //      unsigned int sum = 0;
+      //      for (unsigned int i=0; i<v.size(); ++i)
       //        {
       //          deallog << v[i] << " ";
       //          sum += v[i];

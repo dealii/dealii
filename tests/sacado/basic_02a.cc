@@ -15,9 +15,9 @@
 
 // Tests the computation of the second derivatives of a function using
 // nested reverse-forward mode AD. The Sacado::Rad::ADvar class is used to
-// compute the first derivatives while the Sacado::Fad::DFad class, which
-// utilizes dynamic memory allocation for the number of derivative components,
-// is used for the second derivative calculations.
+// compute the first derivatives while the Sacado::Fad::DFad class, which utilizes
+// dynamic memory allocation for the number of derivative components, is
+// used for the second derivative calculations.
 //
 // A related example that is shipped with Trilinos can be found at
 // https://github.com/trilinos/Trilinos/blob/master/packages/sacado/example/trad_dfad_example.cpp

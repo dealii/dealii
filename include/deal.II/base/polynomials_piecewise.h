@@ -140,14 +140,12 @@ namespace Polynomials
     Polynomial<number> polynomial;
 
     /**
-     * A variable storing the number of intervals that the unit interval is
-     * divided into.
+     * A variable storing the number of intervals that the unit interval is divided into.
      */
     unsigned int n_intervals;
 
     /**
-     * A variable storing the index of the current polynomial in the range of
-     * intervals.
+     * A variable storing the index of the current polynomial in the range of intervals.
      */
     unsigned int interval;
 

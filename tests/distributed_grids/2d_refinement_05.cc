@@ -63,7 +63,7 @@ test(std::ostream & /*out*/)
       for (unsigned int i = 0; i < tr.n_active_cells() / 5 + 1; ++i)
         {
           const unsigned int x = Testing::rand() % flags.size();
-          // deallog << "Refining cell " << x << std::endl;
+          //deallog << "Refining cell " << x << std::endl;
           flags[x] = true;
         }
 

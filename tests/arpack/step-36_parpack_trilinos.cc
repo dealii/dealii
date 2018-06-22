@@ -14,8 +14,7 @@
  * ---------------------------------------------------------------------
 
  *
- * This file tests the PARPACK interface for a symmetric operator taken from
- step-36
+ * This file tests the PARPACK interface for a symmetric operator taken from step-36
  * using Trilinos mpi vectors.
  *
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
@@ -56,7 +55,7 @@
 
 // test Parpack on Step-36 with Trilinos algebra
 
-const unsigned int dim = 2; // run in 2d to save time
+const unsigned int dim = 2; //run in 2d to save time
 
 using namespace dealii;
 
@@ -84,7 +83,7 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
   for (types::global_dof_index index = 1; index < subdomain_association.size();
        ++index)
     {
-      // found index different from the current one
+      //found index different from the current one
       if (subdomain_association[index] != this_subdomain)
         {
           index_sets[this_subdomain].add_range(i_min, index);
@@ -109,7 +108,7 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
     index_sets[i].compress();
 
   return index_sets;
-} // locally_owned_dofs_per_subdomain
+} //locally_owned_dofs_per_subdomain
 
 
 void
@@ -140,8 +139,7 @@ test()
   triangulation.refine_global(global_mesh_refinement_steps);
 
   // we do not use metis but rather partition by hand below.
-  // dealii::GridTools::partition_triangulation (n_mpi_processes,
-  // triangulation);
+  //dealii::GridTools::partition_triangulation (n_mpi_processes, triangulation);
   {
     const double x0 = -1.0;
     const double x1 = 1.0;
@@ -207,7 +205,7 @@ test()
   eigenfunctions.resize(5);
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
     eigenfunctions[i].reinit(locally_owned_dofs,
-                             mpi_communicator); // without ghost dofs
+                             mpi_communicator); //without ghost dofs
 
   eigenvalues.resize(eigenfunctions.size());
 

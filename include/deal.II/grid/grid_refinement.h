@@ -367,4 +367,4 @@ namespace GridRefinement
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii_grid_refinement_h
+#endif //dealii_grid_refinement_h

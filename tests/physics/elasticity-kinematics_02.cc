@@ -13,8 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test vectorization capabilities of the
-// dealii::Physics::Elasticity::kinematics quantities.
+// Test vectorization capabilities of the dealii::Physics::Elasticity::kinematics quantities.
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
@@ -54,8 +53,7 @@ main()
   grad_u[2][1] = -1.0;
   grad_u[2][2] = 2.0;
 
-  // Scale the gradients along the vectorization-index so that each grad_u[v] is
-  // unique.
+  // Scale the gradients along the vectorization-index so that each grad_u[v] is unique.
   for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)
@@ -68,8 +66,7 @@ main()
 
   Tensor<2, dim, VectorizedArray<double>> F_test = Kinematics::F(grad_u);
 
-  // You can't use .norm() on some difference-tensor of the two so we compare
-  // element-wise!
+  // You can't use .norm() on some difference-tensor of the two so we compare element-wise!
   for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)

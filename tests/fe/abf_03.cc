@@ -85,8 +85,8 @@ main()
   deallog.push("0");
   test<3>(0);
   deallog.pop();
-  // deallog.push("1");
-  // test<3>(1);
-  // deallog.pop();
+  //deallog.push("1");
+  //test<3>(1);
+  //deallog.pop();
   deallog.pop();
 }

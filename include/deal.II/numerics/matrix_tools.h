@@ -189,10 +189,9 @@ namespace TrilinosWrappers
  *
  * The create_boundary_mass_matrix() creates the matrix with entries $m_{ij} =
  * \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the union of boundary
- * parts with indicators contained in a std::map<types::boundary_id, const
- * Function<spacedim,number>*> passed to the function (i.e. if you want to set
- * up the mass matrix for the parts of the boundary with indicators zero and 2,
- * you pass the function a map of <tt>unsigned
+ * parts with indicators contained in a std::map<types::boundary_id, const Function<spacedim,number>*>
+ *  passed to the function (i.e. if you want to set up the mass matrix for the parts of the boundary
+ * with indicators zero and 2, you pass the function a map of <tt>unsigned
  * char</tt>s as parameter @p boundary_functions containing the keys zero and
  * 2). The size of the matrix is equal to the number of degrees of freedom
  * that have support on the boundary, i.e. it is <em>not</em> a matrix on all
@@ -236,8 +235,8 @@ namespace MatrixCreator
    * pointer to a function object is zero as it is by default), the
    * coefficient is taken as being constant and equal to one.
    * In case you want to specify @p constraints and use the default argument
-   * for the coefficient you have to specify the (unused) coefficient argument
-   * as <code>(const Function<spacedim,number> *const)nullptr</code>.
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function<spacedim,number> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
@@ -278,8 +277,8 @@ namespace MatrixCreator
    * is given (i.e., if the pointer to a function object is zero as it is by
    * default), the coefficient is taken as being constant and equal to one.
    * In case you want to specify @p constraints and use the default argument
-   * for the coefficient you have to specify the (unused) coefficient argument
-   * as <code>(const Function <spacedim,number> *const)nullptr</code>.
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function <spacedim,number> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
@@ -386,8 +385,8 @@ namespace MatrixCreator
    * @arg @p weight: an optional weight for the computation of the mass
    * matrix. If no weight is given, it is set to one.
    * In case you want to specify @p component_mapping and use the default argument
-   * for the coefficient you have to specify the (unused) coefficient argument
-   * as <code>(const Function <spacedim,number> *const)nullptr</code>.
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function <spacedim,number> *const)nullptr</code>.
    *
    * @arg @p component_mapping: if the components in @p boundary_functions and
    * @p dof do not coincide, this vector allows them to be remapped. If the
@@ -469,8 +468,8 @@ namespace MatrixCreator
    * pointer to a function object is zero as it is by default), the
    * coefficient is taken as being constant and equal to one.
    * In case you want to specify @p constraints and use the default argument
-   * for the coefficient you have to specify the (unused) coefficient argument
-   * as <code>(const Function<spacedim> *const)nullptr</code>.
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function<spacedim> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
@@ -510,8 +509,8 @@ namespace MatrixCreator
    * Assemble the Laplace matrix and a right hand side vector. If no
    * coefficient is given, it is assumed to be constant one.
    * In case you want to specify @p constraints and use the default argument
-   * for the coefficient you have to specify the (unused) coefficient argument
-   * as <code>(const Function<spacedim> *const)nullptr</code>.
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function<spacedim> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.

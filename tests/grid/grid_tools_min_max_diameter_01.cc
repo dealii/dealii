@@ -13,8 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// test GridTools::minimal_cell_diameter and GridTools::maximal_cell_diameter
-// with a mapping
+// test GridTools::minimal_cell_diameter and GridTools::maximal_cell_diameter with a mapping
 
 #include <deal.II/base/quadrature_lib.h>
 

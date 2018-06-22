@@ -114,7 +114,7 @@ namespace CUDAWrappers
     /**
      * Helper class to (re)initialize MatrixFree object.
      */
-    // TODO for now does not support hanging_nodes
+    //TODO for now does not support hanging_nodes
     template <int dim, typename Number>
     class ReinitHelper
     {
@@ -358,8 +358,8 @@ namespace CUDAWrappers
       // Inverse jacobians
       if (update_flags & update_gradients)
         {
-          // Reorder so that all J_11 elements are together, all J_12 elements
-          // are together, etc., i.e., reorder indices from
+          // Reorder so that all J_11 elements are together, all J_12 elements are
+          // together, etc., i.e., reorder indices from
           // cell_id*q_points_per_cell*dim*dim + q*dim*dim +i to
           // i*q_points_per_cell*n_cells + cell_id*q_points_per_cell+q
           internal::transpose_in_place(inv_jacobian_host,
@@ -499,21 +499,21 @@ namespace CUDAWrappers
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
 
-    // TODO: only free if we actually need arrays of different length
+    //TODO: only free if we actually need arrays of different length
     free();
 
     const FiniteElement<dim> &fe = dof_handler.get_fe();
 
     fe_degree = fe.degree;
-    // TODO this should be a templated parameter
+    //TODO this should be a templated parameter
     const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
 
     Assert(n_dofs_1d == n_q_points_1d,
            ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
 
-    // Set padding length to the closest power of two larger than or equal to
-    // the number of threads.
+    // Set padding length to the closest power of two larger than or equal to the
+    // number of threads.
     padding_length = 1 << static_cast<unsigned int>(
                        std::ceil(dim * std::log2(fe_degree + 1.)));
 

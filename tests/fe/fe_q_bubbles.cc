@@ -18,7 +18,7 @@
  *          Guido Kanschat, 2011
  */
 
-// Test whether the bubble functions can be approximated exactly
+//Test whether the bubble functions can be approximated exactly
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -98,7 +98,7 @@ BubbleFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
   for (unsigned int d = 0; d < dim; ++d)
     {
       grad[d] = 1.;
-      // compute grad(\prod_{i=1}^d (1-x_i^2))(p)
+      //compute grad(\prod_{i=1}^d (1-x_i^2))(p)
       for (unsigned j = 0; j < dim; ++j)
         grad[d] *= (d == j ? -2 * p(j) : (1 - p(j) * p(j)));
       // and multiply with x_i^{r-1}
@@ -107,11 +107,11 @@ BubbleFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
 
   if (m_degree >= 2)
     {
-      // add \prod_{i=1}^d (1-x_i^2))(p)
+      //add \prod_{i=1}^d (1-x_i^2))(p)
       double value = 1.;
       for (unsigned int j = 0; j < dim; ++j)
         value *= (1 - p(j) * p(j));
-      // and multiply with grad(x_i^{r-1})
+      //and multiply with grad(x_i^{r-1})
       grad[m_direction] +=
         value * (m_degree - 1) * std::pow(p(m_direction), m_degree - 2);
     }
@@ -264,7 +264,7 @@ template <int dim>
 void
 Step3<dim>::output_results(unsigned int i) const
 {
-  // Visualize the results
+  //Visualize the results
 #ifdef DEBUG_Q_BUBBLES
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);

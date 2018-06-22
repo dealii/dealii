@@ -935,8 +935,8 @@ private:
   mutable size_type largest_range;
 
   /**
-   * A mutex that is used to synchronize operations of the do_compress()
-   * function that is called from many 'const' functions via compress().
+   * A mutex that is used to synchronize operations of the do_compress() function
+   * that is called from many 'const' functions via compress().
    */
   mutable Threads::Mutex compress_mutex;
 
@@ -1391,8 +1391,7 @@ operator-(const IndexSet::ElementIterator &other) const
   // only other can be equal to end() because of the checks above.
   Assert(is_valid(), ExcInternalError());
 
-  // Note: we now compute how far advance *this in "*this < other" to get other,
-  // so we need to return -c at the end.
+  // Note: we now compute how far advance *this in "*this < other" to get other, so we need to return -c at the end.
 
   // first finish the current range:
   std::ptrdiff_t c = index_set->ranges[range_idx].end - idx;
@@ -1409,8 +1408,7 @@ operator-(const IndexSet::ElementIterator &other) const
     ExcMessage(
       "Inconsistent iterator state. Did you invalidate iterators by modifying the IndexSet?"));
 
-  // We might have walked too far because we went until the end of
-  // other.range_idx, so walk backwards to other.idx:
+  // We might have walked too far because we went until the end of other.range_idx, so walk backwards to other.idx:
   if (other.range_idx != numbers::invalid_dof_index)
     c -= index_set->ranges[other.range_idx].end - other.idx;
 

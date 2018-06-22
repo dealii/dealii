@@ -60,8 +60,7 @@ test(const unsigned int size,
   FullMatrix<NumberType> full_A(size), singular_A(size);
   create_spd(full_A);
   singular_A = full_A;
-  // Setting last row and column of the matrix to zero to make the matrix
-  // singular.
+  // Setting last row and column of the matrix to zero to make the matrix singular.
   for (unsigned int i = 0; i < size; ++i)
     {
       singular_A(i, size - 1) = 0;

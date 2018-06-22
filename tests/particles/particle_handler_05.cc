@@ -15,12 +15,10 @@
 
 
 
-// Check that particles are correctly transferred during grid
-// refinement/coarsening. Note that this also tests some special cases. Since
-// many particles lie exactly on cell boundaries they are sorted into the first
-// child cell that approximately contains them (i.e the order in which the
-// children are checked plays a role when deciding which child the particles is
-// sorted into.
+// Check that particles are correctly transferred during grid refinement/coarsening.
+// Note that this also tests some special cases. Since many particles lie exactly on cell boundaries
+// they are sorted into the first child cell that approximately contains them (i.e the order in
+// which the children are checked plays a role when deciding which child the particles is sorted into.
 
 #include <deal.II/distributed/tria.h>
 
@@ -98,11 +96,10 @@ test()
 
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
-    // TODO: Move this into the Particle handler class. Unfortunately, there are
-    // some interactions with the SolutionTransfer class that prevent us from
-    // doing this at the moment. When doing this, check that transferring a
-    // solution and particles during the same refinement is possible (in
-    // particular that the order of serialization/deserialization is preserved).
+    // TODO: Move this into the Particle handler class. Unfortunately, there are some
+    // interactions with the SolutionTransfer class that prevent us from doing this at the moment.
+    // When doing this, check that transferring a solution and particles during the same refinement
+    // is possible (in particular that the order of serialization/deserialization is preserved).
     tr.signals.pre_distributed_refinement.connect(std::bind(
       &Particles::ParticleHandler<dim,
                                   spacedim>::register_store_callback_function,

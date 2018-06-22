@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Output transfer matrices on locally refined meshes with hanging node
-// constraints
+// Output transfer matrices on locally refined meshes with hanging node constraints
 
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/mg_level_object.h>

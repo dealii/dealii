@@ -521,6 +521,6 @@ namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_P4EST
+#endif //DEAL_II_WITH_P4EST
 
-#endif // dealii_p4est_wrappers_h
+#endif //dealii_p4est_wrappers_h

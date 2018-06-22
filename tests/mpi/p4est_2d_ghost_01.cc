@@ -58,10 +58,10 @@ test()
           deallog << std::endl;
         }
 
-      // check that all local
-      // neighbors have the
-      // correct level and a valid
-      // subdomainid
+      //check that all local
+      //neighbors have the
+      //correct level and a valid
+      //subdomainid
       typename Triangulation<dim, dim>::active_cell_iterator cell;
 
       for (cell = tr.begin_active(); cell != tr.end(); ++cell)

@@ -119,8 +119,7 @@ namespace LocalIntegrators
     }
 
     /**
-     * The matrix for the weak boundary condition of Nitsche type for linear
-     * elasticity:
+     * The matrix for the weak boundary condition of Nitsche type for linear elasticity:
      * @f[
      * \int_F \Bigl(\gamma (u \cdot n)(v \cdot n)  - \nabla\cdot u
      * v\cdot n - u \cdot n \nabla \cdot v \Bigr)\;ds.

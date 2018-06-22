@@ -78,10 +78,10 @@ namespace DoFTools
     struct ComparisonHelper
     {
       /**
-       * Comparison operator.
-       *
-       * Return true if @p lhs is considered less than @p rhs.
-       */
+        * Comparison operator.
+        *
+        * Return true if @p lhs is considered less than @p rhs.
+        */
       bool
       operator()(const Point<dim, Number> &lhs,
                  const Point<dim, Number> &rhs) const
@@ -1368,16 +1368,15 @@ namespace DoFTools
 
     // Figure out how many subdomain ids there are.
     //
-    // if this is a parallel triangulation, then we can just ask the
-    // triangulation for this. if this is a sequential triangulation, we loop
-    // over all cells and take the largest subdomain_id value we find; the
-    // number of subdomains is then the largest found value plus one. (we here
-    // assume that all subdomain ids up to the largest are actually used; this
-    // may not be true for a sequential triangulation where these values have
-    // been set by hand and not in accordance with some MPI communicator; but
-    // the function returns an array indexed starting at zero, so we need to
-    // collect information for each subdomain index anyway, not just for the
-    // used one.)
+    // if this is a parallel triangulation, then we can just ask the triangulation
+    // for this. if this is a sequential triangulation, we loop over all cells and
+    // take the largest subdomain_id value we find; the number of subdomains is
+    // then the largest found value plus one. (we here assume that all subdomain
+    // ids up to the largest are actually used; this may not be true for a
+    // sequential triangulation where these values have been set by hand and not
+    // in accordance with some MPI communicator; but the function returns an
+    // array indexed starting at zero, so we need to collect information for
+    // each subdomain index anyway, not just for the used one.)
     const unsigned int n_subdomains =
       (dynamic_cast<
            const parallel::Triangulation<DoFHandlerType::dimension,
@@ -1412,7 +1411,7 @@ namespace DoFTools
          index < subdomain_association.size();
          ++index)
       {
-        // found index different from the current one
+        //found index different from the current one
         if (subdomain_association[index] != this_subdomain)
           {
             index_sets[this_subdomain].add_range(i_min, index);
@@ -1457,11 +1456,10 @@ namespace DoFTools
              "not make sense."));
 
     // Collect all the locally owned DoFs
-    // Note: Even though the distribution of DoFs by the
-    // locally_owned_dofs_per_subdomain function is pseudo-random, we will
-    // collect all the DoFs on the subdomain and its layer cell. Therefore, the
-    // random nature of this function does not play a role in the extraction of
-    // the locally relevant DoFs
+    // Note: Even though the distribution of DoFs by the locally_owned_dofs_per_subdomain
+    // function is pseudo-random, we will collect all the DoFs on the subdomain
+    // and its layer cell. Therefore, the random nature of this function does
+    // not play a role in the extraction of the locally relevant DoFs
     std::vector<IndexSet> dof_set =
       locally_owned_dofs_per_subdomain(dof_handler);
     const dealii::types::subdomain_id n_subdomains = dof_set.size();
@@ -1545,9 +1543,9 @@ namespace DoFTools
     Assert(dof_handler.n_dofs() > 0, ExcInternalError());
 
     // In case this function is executed with parallel::shared::Triangulation
-    // with possibly artificial cells, we need to take "true" subdomain IDs
-    // (i.e. without artificial cells). Otherwise we are good to use
-    // subdomain_id as stored in cell->subdomain_id().
+    // with possibly artificial cells, we need to take "true" subdomain IDs (i.e. without
+    // artificial cells). Otherwise we are good to use subdomain_id as stored
+    // in cell->subdomain_id().
     std::vector<types::subdomain_id> cell_owners(
       dof_handler.get_triangulation().n_active_cells());
     if (const parallel::shared::Triangulation<DoFHandlerType::dimension,
@@ -1851,8 +1849,7 @@ namespace DoFTools
 
 
       /**
-       * Return true if each element of the given element collection is
-       * primitive.
+       * Return true if each element of the given element collection is primitive.
        */
       template <int dim, int spacedim>
       bool
@@ -2719,8 +2716,7 @@ namespace DoFTools
                       DoFHandlerType::dimension>::opposite_face[a_face];
                     for (unsigned int i = 0; i < dpf; ++i)
                       {
-                        // For each dof, get the block it is in and decide to
-                        // exclude it or not
+                        // For each dof, get the block it is in and decide to exclude it or not
                         if (exclude_boundary_dofs[fe.system_to_block_index(
                                                       fe.face_to_cell_index(
                                                         i, face))

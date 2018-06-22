@@ -188,7 +188,7 @@ FE_DGPMonomial<dim>::clone() const
 
 
 
-// TODO: Remove this function and use the one in FETools, if needed
+//TODO: Remove this function and use the one in FETools, if needed
 template <int dim>
 void
 FE_DGPMonomial<dim>::get_interpolation_matrix(

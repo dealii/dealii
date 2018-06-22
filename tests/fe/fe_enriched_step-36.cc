@@ -580,7 +580,7 @@ namespace Step36
       }
 
     // scalar data for plotting
-    // output scalar data (eigenvalues, energies, ndofs, etc)
+    //output scalar data (eigenvalues, energies, ndofs, etc)
     if (this_mpi_process == 0)
       {
         const std::string scalar_fname = "scalar-data.txt";
@@ -601,7 +601,7 @@ namespace Step36
 
         output << std::endl;
         output.close();
-      } // end scope
+      } //end scope
   }
 
 

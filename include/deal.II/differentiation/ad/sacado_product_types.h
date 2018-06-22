@@ -34,9 +34,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/* -------------- Sacado::Fad::DFad
- * (Differentiation::AD::NumberTypes::[sacado_fad/sacado_fad_fad])
- * -------------- */
+/* -------------- Sacado::Fad::DFad (Differentiation::AD::NumberTypes::[sacado_fad/sacado_fad_fad]) -------------- */
 
 
 namespace internal
@@ -128,9 +126,7 @@ struct EnableIfScalar<Sacado::Fad::Expr<T>>
 };
 
 
-/* -------------- Sacado::Rad::ADvar
- * (Differentiation::AD::NumberTypes::[sacado_rad/sacado_rad_fad])
- * -------------- */
+/* -------------- Sacado::Rad::ADvar (Differentiation::AD::NumberTypes::[sacado_rad/sacado_rad_fad]) -------------- */
 
 
 namespace internal

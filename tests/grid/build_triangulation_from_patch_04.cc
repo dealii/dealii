@@ -15,12 +15,12 @@
 
 
 
-// Test GridTools::build_triangulation_from_patch () with a distorted
-// triangulation to make sure the vertices are captured properly when the patch
-// triangulation does not come from the standard deal.II refinement strategy.
-// This mesh is not uniform and so the local_triangulations return will have
-// additional cells that are not in the desired patch but that make sure we have
-// a valid triangulation
+// Test GridTools::build_triangulation_from_patch () with a distorted triangulation
+// to make sure the vertices are captured properly when the patch triangulation
+// does not come from the standard deal.II refinement strategy.  This mesh
+// is not uniform and so the local_triangulations return will have additional
+// cells that are not in the desired patch but that make sure we have a valid
+// triangulation
 
 
 #include <deal.II/base/tensor.h>

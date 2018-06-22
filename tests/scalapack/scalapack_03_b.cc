@@ -17,8 +17,7 @@
 #include "../tests.h"
 
 /*
- * test inverse via LU decomposition in ScaLAPACK vs FullMatrix for general
- * matrices
+ * test inverse via LU decomposition in ScaLAPACK vs FullMatrix for general matrices
  *
  * relevant tests:
  * full_matrix/full_matrix_invert_01

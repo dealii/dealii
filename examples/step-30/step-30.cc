@@ -835,7 +835,7 @@ namespace Step30
                               area[face_no / 2] += JxW[x];
                             }
                         }
-                      else // i.e. neighbor is coarser than cell
+                      else //i.e. neighbor is coarser than cell
                         {
                           // Now the neighbor is actually coarser. This case
                           // is new, in that it did not occur in the assembly

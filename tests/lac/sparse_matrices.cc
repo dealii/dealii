@@ -15,7 +15,7 @@
 
 
 
-// TODO: [GK] Produce some useful output!
+//TODO: [GK] Produce some useful output!
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/precondition.h>

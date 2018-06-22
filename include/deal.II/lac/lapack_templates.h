@@ -4864,7 +4864,6 @@ syevx(const char *,
 }
 
 
-
 inline void
 syevx(const char *                   jobz,
       const char *                   range,

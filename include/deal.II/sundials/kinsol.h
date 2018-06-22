@@ -122,8 +122,8 @@ namespace SUNDIALS
    * linesearch algorithm given in *J. E. Dennis and R. B. Schnabel. "Numerical
    * Methods for Unconstrained Optimization and Nonlinear Equations." SIAM,
    * Philadelphia, 1996.*, where $\lambda$ is chosen to guarantee a sufficient
-   * decrease in $F$ relative to the step length as well as a minimum step
-   * length relative to the initial rate of decrease of $F$. One property of the
+   * decrease in $F$ relative to the step length as well as a minimum step length
+   * relative to the initial rate of decrease of $F$. One property of the
    * algorithm is that the full Newton step tends to be taken close to the
    * solution.
    *
@@ -234,8 +234,7 @@ namespace SUNDIALS
        * Global parameters:
        *
        * @param strategy Solution strategy
-       * @param maximum_non_linear_iterations Maximum number of nonlinear
-       * iterations
+       * @param maximum_non_linear_iterations Maximum number of nonlinear iterations
        * @param function_tolerance Function norm stopping tolerance
        * @param step_tolerance Scaled step stopping tolerance
        *
@@ -243,10 +242,8 @@ namespace SUNDIALS
        *
        * @param no_init_setup No initial matrix setup
        * @param maximum_setup_calls Maximum iterations without matrix setup
-       * @param maximum_newton_step Maximum allowable scaled length of the
-       * Newton step
-       * @param dq_relative_error Relative error for different quotient
-       * computation
+       * @param maximum_newton_step Maximum allowable scaled length of the Newton step
+       * @param dq_relative_error Relative error for different quotient computation
        *
        * Linesearch parameters:
        *
@@ -306,13 +303,12 @@ namespace SUNDIALS
        * end
        * @endcode
        *
-       * These are one-to-one with the options you can pass at construction
-       * time.
+       * These are one-to-one with the options you can pass at construction time.
        *
        * The options you pass at construction time are set as default values in
        * the ParameterHandler object `prm`. You can later modify them by parsing
-       * a parameter file using `prm`. The values of the parameter will be
-       * updated whenever the content of `prm` is updated.
+       * a parameter file using `prm`. The values of the parameter will be updated
+       * whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
        * will occur if you destroy this class, and then parse a parameter file
@@ -484,25 +480,25 @@ namespace SUNDIALS
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &src, VectorType &dst)> residual;
 
     /**
-     * A function object that users should supply and that is intended to
-     * compute the iteration function G(u) for the fixed point and Picard
-     * iteration. This function is only used if the
-     * SolutionStrategy::fixed_point or SolutionStrategy::picard are specified.
+     * A function object that users should supply and that is intended to compute
+     * the iteration function G(u) for the fixed point and Picard iteration.
+     * This function is only used if the SolutionStrategy::fixed_point or
+     * SolutionStrategy::picard are specified.
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &src, VectorType &dst)>
       iteration_function;
@@ -543,10 +539,10 @@ namespace SUNDIALS
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &current_u, const VectorType &current_f)>
       setup_jacobian;
@@ -574,19 +570,18 @@ namespace SUNDIALS
      *
      * Arguments to the function are
      *
-     * @param[in] ycur  is the current $y$ vector for the current KINSOL
-     * internal step
-     * @param[in] fcur  is the current value of the implicit right-hand side at
-     * ycur, $f_I (t_n, ypred)$.
+     * @param[in] ycur  is the current $y$ vector for the current KINSOL internal step
+     * @param[in] fcur  is the current value of the implicit right-hand side at ycur,
+     *        $f_I (t_n, ypred)$.
      * @param[in] rhs  the system right hand side to solve for
      * @param[out] dst the solution of $A^{-1} * src$
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &ycur,
                       const VectorType &fcur,
@@ -623,8 +618,7 @@ namespace SUNDIALS
 
   private:
     /**
-     * Throw an exception when a function with the given name is not
-     * implemented.
+     * Throw an exception when a function with the given name is not implemented.
      */
     DeclException1(ExcFunctionNotProvided,
                    std::string,

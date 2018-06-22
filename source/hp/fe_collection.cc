@@ -32,10 +32,10 @@ namespace hp
     // (because each element can dominate itself). There may also be others,
     // say Y1...YN. Next you have to find one or more elements in the dominating
     // set {X,Y1...YN} that is the weakest. Well, you can't find one that is
-    // weaker than X because if it were, it would not dominate X. In other
-    // words, X is guaranteed to be in the subset of {X,Y1...YN} of weakest
-    // dominating elements. Since we only guarantee that the function returns
-    // one of them, we may as well return X right away.
+    // weaker than X because if it were, it would not dominate X. In other words,
+    // X is guaranteed to be in the subset of {X,Y1...YN} of weakest dominating
+    // elements. Since we only guarantee that the function returns one of them,
+    // we may as well return X right away.
     if (fes.size() == 1)
       return *fes.begin();
 
@@ -64,7 +64,9 @@ namespace hp
         // if we found dominating element, keep them in a set.
         if (
           domination == FiniteElementDomination::this_element_dominates ||
-          domination == FiniteElementDomination::either_element_can_dominate /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/)
+          domination ==
+            FiniteElementDomination::
+              either_element_can_dominate /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/)
           candidate_fes.insert(cur_fe);
       }
 
@@ -94,7 +96,9 @@ namespace hp
 
           if (
             domination == FiniteElementDomination::other_element_dominates ||
-            domination == FiniteElementDomination::either_element_can_dominate /*covers cases like candidate_fes={Q1,Q1}*/)
+            domination ==
+              FiniteElementDomination::
+                either_element_can_dominate /*covers cases like candidate_fes={Q1,Q1}*/)
             return *it;
         }
     // We couldn't find the FE, return invalid_unsigned_int :

@@ -1836,9 +1836,9 @@ namespace Step31
     // preconditioner (IC) as we also use for preconditioning the pressure
     // mass matrix solver. As a solver, we choose the conjugate gradient
     // method CG. As before, we tell the solver to use Trilinos vectors via
-    // the template argument <code>TrilinosWrappers::MPI::Vector</code>.
-    // Finally, we solve, distribute the hanging node constraints and write out
-    // the number of iterations.
+    // the template argument <code>TrilinosWrappers::MPI::Vector</code>.  Finally,
+    // we solve, distribute the hanging node constraints and write out the
+    // number of iterations.
     assemble_temperature_system(maximal_velocity);
     {
       SolverControl solver_control(temperature_matrix.m(),

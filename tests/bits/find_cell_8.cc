@@ -33,12 +33,12 @@
 void create_coarse_grid(Triangulation<2> &coarse_grid)
 {
   static const Point<2> vertices_1[] = {
-    Point<2>(0., 0.),       // 0
-    Point<2>(1., 0.),       // 1
-    Point<2>(1., 1.),       // 2
-    Point<2>(0., 1.),       // 3
-    Point<2>(1.3, 0.),      // 4
-    Point<2>(1.3, 1. / 2.), // 5
+    Point<2>(0., 0.),       //0
+    Point<2>(1., 0.),       //1
+    Point<2>(1., 1.),       //2
+    Point<2>(0., 1.),       //3
+    Point<2>(1.3, 0.),      //4
+    Point<2>(1.3, 1. / 2.), //5
   };
   const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
 

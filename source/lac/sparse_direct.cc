@@ -139,7 +139,7 @@ template <typename number>
 void
 SparseDirectUMFPACK::sort_arrays(const SparseMatrixEZ<number> &matrix)
 {
-  // same thing for SparseMatrixEZ
+  //same thing for SparseMatrixEZ
   for (size_type row = 0; row < matrix.m(); ++row)
     {
       long int cursor = Ap[row];

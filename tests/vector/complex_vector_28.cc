@@ -15,8 +15,8 @@
 
 
 
-// check Vector<std::complex<double> >::operator = (Vector), except that we
-// don't resize the vector to be copied to beforehand
+// check Vector<std::complex<double> >::operator = (Vector), except that we don't
+// resize the vector to be copied to beforehand
 
 #include <deal.II/lac/vector.h>
 

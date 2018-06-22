@@ -65,7 +65,7 @@ namespace pdd
 
     MPI_Comm                                  mpi_communicator;
     parallel::distributed::Triangulation<dim> triangulation;
-    // Triangulation<dim>   triangulation;
+    //Triangulation<dim>   triangulation;
     DoFHandler<dim> dof_handler;
     FE_Q<dim>       fe;
 

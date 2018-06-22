@@ -74,8 +74,7 @@ class Vector;
  *    DoFHandler<dim> flowfield_dof_handler(triangulation);
  *    flowfield_dof_handler.distribute_dofs(fe);
  *    Vector<double> displacement_field(flowfield_dof_handler.n_dofs());
- *    MappingQ1Eulerian<dim> mymapping(flowfield_dof_handler,
- * displacement_field);
+ *    MappingQ1Eulerian<dim> mymapping(flowfield_dof_handler, displacement_field);
  * @endcode
  *
  * Note that since the vector of shift values and the dof handler are only
