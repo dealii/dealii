@@ -1080,10 +1080,7 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandlerType::active_cell_iterator cell = dof_handler
-                                                             .begin_active(),
-                                                    endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto cell : dof_handler.active_cell_iterators())
         {
           // artificial cells can at best neighbor ghost cells, but we're not
           // interested in these interfaces
