@@ -48,7 +48,12 @@ write_patches(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
   DataOutBase::VtkFlags                  vtkflags;
   DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
 
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vectors;
 
   WRITE(dx);
   if (dim == 2)

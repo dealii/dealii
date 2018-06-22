@@ -24,6 +24,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/numerics/data_component_interpretation.h>
+
 #include <limits>
 #include <string>
 #include <tuple>
@@ -1590,8 +1592,12 @@ namespace DataOutBase
   write_dx(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &            nonscalar_data_ranges,
     const DXFlags &flags,
     std::ostream & out);
 
@@ -1644,8 +1650,12 @@ namespace DataOutBase
   write_eps(
     const std::vector<Patch<2, spacedim>> &patches,
     const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const EpsFlags &flags,
     std::ostream &  out);
 
@@ -1659,8 +1669,12 @@ namespace DataOutBase
   write_eps(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const EpsFlags &flags,
     std::ostream &  out);
 
@@ -1679,8 +1693,12 @@ namespace DataOutBase
   write_gmv(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const GmvFlags &flags,
     std::ostream &  out);
 
@@ -1745,8 +1763,12 @@ namespace DataOutBase
   write_gnuplot(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                 nonscalar_data_ranges,
     const GnuplotFlags &flags,
     std::ostream &      out);
 
@@ -1800,8 +1822,12 @@ namespace DataOutBase
   write_povray(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                nonscalar_data_ranges,
     const PovrayFlags &flags,
     std::ostream &     out);
 
@@ -1816,8 +1842,12 @@ namespace DataOutBase
   write_tecplot(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                 nonscalar_data_ranges,
     const TecplotFlags &flags,
     std::ostream &      out);
 
@@ -1845,8 +1875,12 @@ namespace DataOutBase
   write_tecplot_binary(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                 nonscalar_data_ranges,
     const TecplotFlags &flags,
     std::ostream &      out);
 
@@ -1869,8 +1903,12 @@ namespace DataOutBase
   write_ucd(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const UcdFlags &flags,
     std::ostream &  out);
 
@@ -1879,7 +1917,7 @@ namespace DataOutBase
    * data is written in the traditional VTK format as opposed to the XML-based
    * format that write_vtu() produces.
    *
-   * The vector_data_ranges argument denotes ranges of components in the
+   * The nonscalar_data_ranges argument denotes ranges of components in the
    * output that are considered a vector, rather than simply a collection of
    * scalar fields. The VTK output format has special provisions that allow
    * these components to be output by a single name rather than having to
@@ -1898,8 +1936,12 @@ namespace DataOutBase
   write_vtk(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out);
 
@@ -1909,7 +1951,7 @@ namespace DataOutBase
    * data is written in the XML-based VTK format as opposed to the traditional
    * format that write_vtk() produces.
    *
-   * The vector_data_ranges argument denotes ranges of components in the
+   * The nonscalar_data_ranges argument denotes ranges of components in the
    * output that are considered a vector, rather than simply a collection of
    * scalar fields. The VTK output format has special provisions that allow
    * these components to be output by a single name rather than having to
@@ -1932,8 +1974,12 @@ namespace DataOutBase
   write_vtu(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out);
 
@@ -1965,8 +2011,12 @@ namespace DataOutBase
   write_vtu_main(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out);
 
@@ -1993,9 +2043,9 @@ namespace DataOutBase
    * is most easily called by calling DataOutInterfaces::write_pvtu_record(),
    * which determines the last two arguments by calling
    * DataOutInterface::get_dataset_names() and
-   * DataOutInterface::get_vector_data_ranges() functions. The second argument
-   * to this function specifies the names of the files that form the parallel
-   * set.
+   * DataOutInterface::get_nonscalar_data_ranges() functions. The second
+   * argument to this function specifies the names of the files that form the
+   * parallel set.
    *
    * @note Use DataOutBase::write_vtu() and DataOutInterface::write_vtu()
    * for writing each piece. Also note that
@@ -2016,8 +2066,12 @@ namespace DataOutBase
     std::ostream &                  out,
     const std::vector<std::string> &piece_names,
     const std::vector<std::string> &data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &vector_data_ranges);
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &nonscalar_data_ranges);
 
   /**
    * In ParaView it is possible to visualize time-dependent data tagged with
@@ -2184,8 +2238,12 @@ namespace DataOutBase
   write_svg(
     const std::vector<Patch<2, spacedim>> &patches,
     const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &             nonscalar_data_ranges,
     const SvgFlags &flags,
     std::ostream &  out);
 
@@ -2231,8 +2289,12 @@ namespace DataOutBase
   write_deal_II_intermediate(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                              vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                              nonscalar_data_ranges,
     const Deal_II_IntermediateFlags &flags,
     std::ostream &                   out);
 
@@ -2274,8 +2336,12 @@ namespace DataOutBase
   write_filtered_data(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            vector_data_ranges,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &            nonscalar_data_ranges,
     DataOutFilter &filtered_data);
 
   /**
@@ -2485,7 +2551,7 @@ namespace DataOutBase
  * name can be obtained by <tt>default_suffix</tt> without arguments.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 1999
+ * @author Wolfgang Bangerth, 1999, Denis Davydov, 2018
  */
 template <int dim, int spacedim = dim>
 class DataOutInterface
@@ -2614,7 +2680,7 @@ public:
    * fields can actually be found in the individual files that comprise the set
    * of parallel VTU files along with the names of these files. This function
    * gets the names and types of fields through the get_dataset_names() and
-   * get_vector_data_ranges() functions of this class. The second argument
+   * get_nonscalar_data_ranges() functions of this class. The second argument
    * to this function specifies the names of the files that form the parallel
    * set.
    *
@@ -2850,25 +2916,29 @@ protected:
    * output files that consist of more than one data set are to be
    * interpreted.
    *
-   * It returns a list of index pairs and corresponding name indicating which
-   * components of the output are to be considered vector-valued rather than
-   * just a collection of scalar data. The index pairs are inclusive; for
-   * example, if we have a Stokes problem in 2d with components (u,v,p), then
-   * the corresponding vector data range should be (0,1), and the returned
-   * list would consist of only a single element with a tuple such as
-   * (0,1,"velocity").
+   * It returns a list of index pairs and corresponding name and type indicating
+   * which components of the output are to be considered vector- or
+   * tensor-valued rather than just a collection of scalar data. The index pairs
+   * are inclusive; for example, if we have a Stokes problem in 2d with
+   * components (u,v,p), then the corresponding vector data range should be
+   * (0,1), and the returned list would consist of only a single element with a
+   * tuple such as (0,1,"velocity",component_is_part_of_vector).
    *
-   * Since some of the derived classes do not know about vector data, this
+   * Since some of the derived classes do not know about non-scalar data, this
    * function has a default implementation that simply returns an empty
    * string, meaning that all data is to be considered a collection of scalar
    * fields.
    */
-  virtual std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const;
+  virtual std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+  get_nonscalar_data_ranges() const;
 
   /**
    * Validate that the names of the datasets returned by get_dataset_names() and
-   * get_vector_data_ranges() are valid. This currently consists of checking
+   * get_nonscalar_data_ranges() are valid. This currently consists of checking
    * that names are not used more than once. If an invalid state is encountered,
    * an Assert() will be triggered in debug mode.
    */
@@ -3104,8 +3174,12 @@ protected:
    * string, meaning that all data is to be considered a collection of scalar
    * fields.
    */
-  virtual std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const override;
+  virtual std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+  get_nonscalar_data_ranges() const override;
 
 private:
   /**
@@ -3119,8 +3193,12 @@ private:
    * Information about whether certain components of the output field are to
    * be considered vectors.
    */
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-    vector_data_ranges;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    nonscalar_data_ranges;
 };
 
 

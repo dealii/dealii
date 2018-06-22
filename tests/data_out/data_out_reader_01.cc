@@ -40,7 +40,12 @@ check()
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vectors;
 
   std::ostringstream old_data;
   DataOutBase::write_deal_II_intermediate(

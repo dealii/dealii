@@ -48,18 +48,32 @@ public:
     return DataOut<dim>::get_dataset_names();
   }
 
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+  get_nonscalar_data_ranges() const
   {
     // if we have enough components for a
     // vector solution, make the last dim
     // components a vector
-    std::vector<std::tuple<unsigned int, unsigned int, std::string>> retval;
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      retval;
     if (get_dataset_names().size() >= dim)
-      retval.push_back(std::tuple<unsigned int, unsigned int, std::string>(
-        get_dataset_names().size() - dim,
-        get_dataset_names().size() - 1,
-        "vector_data"));
+      retval.push_back(
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>(
+          get_dataset_names().size() - dim,
+          get_dataset_names().size() - 1,
+          "vector_data",
+          DataComponentInterpretation::component_is_part_of_vector));
     return retval;
   }
 };
@@ -82,10 +96,14 @@ public:
     return DataOutReader<dim>::get_dataset_names();
   }
 
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+  get_nonscalar_data_ranges() const
   {
-    return DataOutReader<dim>::get_vector_data_ranges();
+    return DataOutReader<dim>::get_nonscalar_data_ranges();
   }
 };
 
@@ -126,23 +144,24 @@ check_this(const DoFHandler<dim> &dof_handler,
     Assert(data_out.get_patches()[i] == reader.get_patches()[i],
            ExcInternalError());
 
-  deallog << data_out.get_vector_data_ranges().size() << std::endl;
-  Assert(data_out.get_vector_data_ranges().size() ==
-           reader.get_vector_data_ranges().size(),
+  deallog << data_out.get_nonscalar_data_ranges().size() << std::endl;
+  Assert(data_out.get_nonscalar_data_ranges().size() ==
+           reader.get_nonscalar_data_ranges().size(),
          ExcInternalError());
-  for (unsigned int i = 0; i < data_out.get_vector_data_ranges().size(); ++i)
+  for (unsigned int i = 0; i < data_out.get_nonscalar_data_ranges().size(); ++i)
     {
-      deallog << std::get<0>(data_out.get_vector_data_ranges()[i]) << ' '
-              << std::get<1>(data_out.get_vector_data_ranges()[i]) << ' '
-              << std::get<2>(data_out.get_vector_data_ranges()[i]) << std::endl;
-      Assert(std::get<0>(data_out.get_vector_data_ranges()[i]) ==
-               std::get<0>(reader.get_vector_data_ranges()[i]),
+      deallog << std::get<0>(data_out.get_nonscalar_data_ranges()[i]) << ' '
+              << std::get<1>(data_out.get_nonscalar_data_ranges()[i]) << ' '
+              << std::get<2>(data_out.get_nonscalar_data_ranges()[i])
+              << std::endl;
+      Assert(std::get<0>(data_out.get_nonscalar_data_ranges()[i]) ==
+               std::get<0>(reader.get_nonscalar_data_ranges()[i]),
              ExcInternalError());
-      Assert(std::get<1>(data_out.get_vector_data_ranges()[i]) ==
-               std::get<1>(reader.get_vector_data_ranges()[i]),
+      Assert(std::get<1>(data_out.get_nonscalar_data_ranges()[i]) ==
+               std::get<1>(reader.get_nonscalar_data_ranges()[i]),
              ExcInternalError());
-      Assert(std::get<2>(data_out.get_vector_data_ranges()[i]) ==
-               std::get<2>(reader.get_vector_data_ranges()[i]),
+      Assert(std::get<2>(data_out.get_nonscalar_data_ranges()[i]) ==
+               std::get<2>(reader.get_nonscalar_data_ranges()[i]),
              ExcInternalError());
     }
 

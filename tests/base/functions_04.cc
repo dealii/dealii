@@ -185,9 +185,15 @@ check_function(const Functions::FlowFunction<dim> &f,
       names[i] = std::string("comp");
     }
 
-  DataOutBase::DXFlags                                             dxflags;
-  DataOutBase::GnuplotFlags                                        gflags;
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
+  DataOutBase::DXFlags      dxflags;
+  DataOutBase::GnuplotFlags gflags;
+
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vectors;
   if (dim == 2)
     DataOutBase::write_gnuplot(patches, names, vectors, gflags, out);
   else
