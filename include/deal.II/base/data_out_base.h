@@ -2917,14 +2917,14 @@ protected:
    * interpreted.
    *
    * It returns a list of index pairs and corresponding name and type indicating
-   * which components of the output are to be considered non vector- or
+   * which components of the output are to be considered vector- or
    * tensor-valued rather than just a collection of scalar data. The index pairs
    * are inclusive; for example, if we have a Stokes problem in 2d with
    * components (u,v,p), then the corresponding vector data range should be
    * (0,1), and the returned list would consist of only a single element with a
-   * tuple such as (0,1,"velocity").
+   * tuple such as (0,1,"velocity",component_is_part_of_vector).
    *
-   * Since some of the derived classes do not know about vector data, this
+   * Since some of the derived classes do not know about non-scalar data, this
    * function has a default implementation that simply returns an empty
    * string, meaning that all data is to be considered a collection of scalar
    * fields.
