@@ -2094,12 +2094,15 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
     {
       // Now have all shape_grads stored on the reference cell.
       // Must now transform to the physical cell.
-      std::vector<Tensor<2, dim>> transformed_shape_grads(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      std::vector<Tensor<2,dim>> input(n_q_points);
+      std::vector<Tensor<2,dim>> transformed_shape_grads(n_q_points);
+      for (unsigned int dof=0; dof<this->dofs_per_cell; ++dof)
         {
-          mapping.transform(make_array_view(fe_data.shape_grads[dof],
-                                            offset,
-                                            n_q_points),
+          for (unsigned int q=0; q<n_q_points; ++q)
+            {
+              input[q] = fe_data.shape_grads[dof][offset+q];
+            }
+          mapping.transform(input,
                             mapping_covariant_gradient,
                             mapping_internal,
                             make_array_view(transformed_shape_grads));
