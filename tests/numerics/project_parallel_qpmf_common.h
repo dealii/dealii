@@ -96,8 +96,7 @@ private:
 
 
 /**
- * A general function to perform projection of polynomial function of degrees
- * [0,p]
+ * A general function to perform projection of polynomial function of degrees [0,p]
  * onto the FE space given by @p fe and @p triangulation .
  */
 template <int fe_degree, int n_q_points_1d, int dim>

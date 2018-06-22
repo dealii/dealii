@@ -116,9 +116,9 @@ test6(const bool         do_href,
   {
     typename hp::DoFHandler<dim>::active_cell_iterator cell =
       dof_handler.begin_active();
-    cell->set_active_fe_index(1); // POU
+    cell->set_active_fe_index(1); //POU
     cell++;
-    cell->set_active_fe_index(1); // POU
+    cell->set_active_fe_index(1); //POU
   }
   dof_handler.distribute_dofs(fe_collection);
 

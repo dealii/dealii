@@ -381,8 +381,7 @@ namespace LocalIntegrators
      * the normal component of the vector valued trial function and the mean
      * value of the test function.
      * @f[
-     * \int_F (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2)
-     * \frac{v_1+v_2}{2} \,ds
+     * \int_F (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2) \frac{v_1+v_2}{2} \,ds
      * @f]
      *
      * @author Guido Kanschat

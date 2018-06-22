@@ -15,9 +15,9 @@
 
 
 
-// like deal.II/vectors_point_source, but for hp objects. here, each hp object
-// has only a single component, so we expect exactly the same output as for the
-// old test. vectors_point_source_hp tests for different finite elements
+// like deal.II/vectors_point_source, but for hp objects. here, each hp object has only a
+// single component, so we expect exactly the same output as for the old test.
+// vectors_point_source_hp tests for different finite elements
 
 
 #include <deal.II/base/function_lib.h>

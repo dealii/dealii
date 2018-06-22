@@ -16,8 +16,7 @@
 #include "../lapack/create_matrix.h"
 #include "../tests.h"
 
-// test saving and loading of distributed ScaLAPACKMatrices with prescribed
-// chunk sizes
+// test saving and loading of distributed ScaLAPACKMatrices with prescribed chunk sizes
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/logstream.h>
@@ -48,7 +47,7 @@ test(const std::pair<unsigned int, unsigned int> &size,
   FullMatrix<NumberType> full(size.first, size.second);
   create_random(full);
 
-  // create 2d process grid
+  //create 2d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size.first, size.second, block_size, block_size);

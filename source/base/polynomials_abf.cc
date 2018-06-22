@@ -168,8 +168,8 @@ PolynomialsABF<dim>::compute_n_pols(const unsigned int k)
         return 2 * (k + 3) * (k + 1);
 
       case 3:
-        // the polynomial space is Q_{k+2,k,k} \times Q_{k,k+2,k} \times
-        // Q_{k,k,k+2}, which has 3(k+3)(k+1)(k+1) DoFs
+        // the polynomial space is Q_{k+2,k,k} \times Q_{k,k+2,k} \times Q_{k,k,k+2},
+        // which has 3(k+3)(k+1)(k+1) DoFs
         return 3 * (k + 3) * (k + 1) * (k + 1);
 
       default:

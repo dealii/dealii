@@ -402,9 +402,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
 
           // store the data of each of the input vectors. get this data
           // as interpolated onto a finite element space that encompasses
-          // that of all the children. note that
-          // cell->get_interpolated_dof_values already does all of the
-          // interpolations between spaces
+          // that of all the children. note that cell->get_interpolated_dof_values
+          // already does all of the interpolations between spaces
           for (unsigned int j = 0; j < in_size; ++j)
             cell->get_interpolated_dof_values(all_in[j],
                                               dof_values_on_cell[n_cf][j],

@@ -422,8 +422,7 @@ namespace DoFTools
             AssertDimension(nth_master_dof, n_master_dofs);
             AssertDimension(nth_slave_dof, n_dofs - n_master_dofs);
 
-            // TODO[WB]: We should make sure very small entries are removed
-            // after inversion
+            //TODO[WB]: We should make sure very small entries are removed after inversion
             split_matrix->first.gauss_jordan();
           }
       }
@@ -578,7 +577,7 @@ namespace DoFTools
       // we may have to compute constraints for vertices. gotta think about that
       // a bit more
 
-      // TODO[WB]: think about what to do here...
+      //TODO[WB]: think about what to do here...
     }
 
 
@@ -592,7 +591,7 @@ namespace DoFTools
       // we may have to compute constraints for vertices. gotta think about that
       // a bit more
 
-      // TODO[WB]: think about what to do here...
+      //TODO[WB]: think about what to do here...
     }
 
 
@@ -888,8 +887,7 @@ namespace DoFTools
                   (5 * fe.dofs_per_vertex + 12 * fe.dofs_per_line +
                    4 * fe.dofs_per_quad);
 
-                // TODO[TL]: think about this and the following in case of
-                // anisotropic refinement
+                //TODO[TL]: think about this and the following in case of anisotropic refinement
 
                 dofs_on_mother.resize(n_dofs_on_mother);
                 // we might not use all of those in case of artificial cells, so
@@ -923,7 +921,7 @@ namespace DoFTools
                     this_face->dof_index(dof, fe_index);
                 AssertDimension(next_index, dofs_on_mother.size());
 
-                // TODO: assert some consistency assumptions
+                //TODO: assert some consistency assumptions
 
                 // TODO[TL]: think about this in case of anisotropic refinement
 
@@ -1557,8 +1555,8 @@ namespace DoFTools
                             // FESystem(FE_Q(1),FE_DGQ(1)). neither of them
                             // dominates the other.
                             //
-                            // a final possibility is that we have something
-                            // like FESystem(FE_Q(1),FE_Q(1)) vs
+                            // a final possibility is that we have something like
+                            // FESystem(FE_Q(1),FE_Q(1)) vs
                             // FESystem(FE_Q(1),FE_Nothing()), see
                             // hp/fe_nothing_18/19.
                             //
@@ -1622,8 +1620,8 @@ namespace DoFTools
                               face_interpolation_matrices
                                 [dominating_fe_index][cell->active_fe_index()]);
 
-                            // split this matrix into master and slave
-                            // components. invert the master component
+                            // split this matrix into master and slave components.
+                            // invert the master component
                             ensure_existence_of_master_dof_mask(
                               cell->get_fe(),
                               dominating_fe,
@@ -1783,10 +1781,10 @@ namespace DoFTools
      * iterators corresponds to an active object without further children
      *
      * @param transformation A matrix that maps degrees of freedom from one face
-     * to another. If the DoFs on the two faces are supposed to match exactly,
-     * then the matrix so provided will be the identity matrix. if face 2 is
-     * once refined from face 1, then the matrix needs to be the interpolation
-     * matrix from a face to this particular child
+     * to another. If the DoFs on the two faces are supposed to match exactly, then
+     * the matrix so provided will be the identity matrix. if face 2 is once refined
+     * from face 1, then the matrix needs to be the interpolation matrix from a face
+     * to this particular child
      *
      * @precondition: face_1 is supposed to be active
      *
@@ -1849,8 +1847,7 @@ namespace DoFTools
             }
         }
       else
-        // both faces are active. we need to match the corresponding DoFs of
-        // both faces
+        // both faces are active. we need to match the corresponding DoFs of both faces
         {
           const unsigned int face_1_index = face_1->nth_active_fe_index(0);
           const unsigned int face_2_index = face_2->nth_active_fe_index(0);
@@ -1884,17 +1881,17 @@ namespace DoFTools
                    * that there is no attempt to match artificial cells of
                    * parallel distributed triangulations.
                    *
-                   * While it seems like we ought to be able to avoid even
-                   * calling set_periodicity_constraints for artificial faces,
-                   * this situation can arise when a face that is being made
-                   * periodic is only partially touched by the local subdomain.
-                   * make_periodicity_constraints will be called recursively
-                   * even for the section of the face that is not touched by the
-                   * local subdomain.
+                   * While it seems like we ought to be able to avoid even calling
+                   * set_periodicity_constraints for artificial faces, this
+                   * situation can arise when a face that is being made periodic
+                   * is only partially touched by the local subdomain.
+                   * make_periodicity_constraints will be called recursively even
+                   * for the section of the face that is not touched by the local
+                   * subdomain.
                    *
                    * Until there is a better way to determine if the cells that
-                   * neighbor a face are artificial, we simply test to see if
-                   * the face does not have a valid dof initialization.
+                   * neighbor a face are artificial, we simply test to see if the
+                   * face does not have a valid dof initialization.
                    */
                   return;
                 }
@@ -1920,20 +1917,19 @@ namespace DoFTools
           // Build up a cell to face index for face_2:
           for (unsigned int i = 0; i < dofs_per_face; ++i)
             {
-              const unsigned int cell_index =
-                fe.face_to_cell_index(i,
-                                      0, /* It doesn't really matter, just
-                                          * assume we're on the first face...
-                                          */
-                                      true,
-                                      false,
-                                      false // default orientation
-                );
+              const unsigned int cell_index = fe.face_to_cell_index(
+                i,
+                0, /* It doesn't really matter, just assume
+                                                                           * we're on the first face...
+                                                                           */
+                true,
+                false,
+                false // default orientation
+              );
               cell_to_rotated_face_index[cell_index] = i;
             }
 
-          // loop over all dofs on face 2 and constrain them against the ones on
-          // face 1
+          // loop over all dofs on face 2 and constrain them against the ones on face 1
           for (unsigned int i = 0; i < dofs_per_face; ++i)
             if ((component_mask.n_selected_components(fe.n_components()) ==
                  fe.n_components()) ||
@@ -1944,9 +1940,9 @@ namespace DoFTools
                 // consequently, find out whether this dof 'i' will be identity
                 // constrained
                 //
-                // to check whether this is the case, first see whether there
-                // are any weights other than 0 and 1, then in a first stage
-                // make sure that if so there is only one weight equal to 1
+                // to check whether this is the case, first see whether there are
+                // any weights other than 0 and 1, then in a first stage make sure
+                // that if so there is only one weight equal to 1
                 //
                 // afterwards do the same for constraints of type dof1=-dof2
                 bool         is_identity_constrained = true;
@@ -2033,32 +2029,29 @@ namespace DoFTools
 
                 if (!constraint_set)
                   {
-                    // now treat constraints, either as an equality constraint
-                    // or as a sequence of constraints
+                    // now treat constraints, either as an equality constraint or
+                    // as a sequence of constraints
                     if (is_identity_constrained || is_inverse_constrained)
                       {
-                        // Query the correct face_index on face_1 respecting the
-                        // given orientation:
+                        // Query the correct face_index on face_1 respecting the given
+                        // orientation:
                         const unsigned int j =
                           cell_to_rotated_face_index[fe.face_to_cell_index(
                             target,
                             0, /* It doesn't really matter, just assume
-                                * we're on the first face...
-                                */
+                                                                                   * we're on the first face...
+                                                                                   */
                             face_orientation,
                             face_flip,
                             face_rotation)];
 
                         if (constraint_matrix.is_constrained(dofs_2[i]))
                           {
-                            // if the two aren't already identity constrained
-                            // (whichever way around) or already identical (in
-                            // case of rotated periodicity constraints), then
-                            // enter the constraint. otherwise there is nothing
-                            // for us still to do
+                            // if the two aren't already identity constrained (whichever way
+                            // around) or already identical (in case of rotated periodicity constraints),
+                            // then enter the constraint. otherwise there is nothing for us still to do
                             bool enter_constraint = false;
-                            // see if this would add an identity constraint
-                            // cycle
+                            // see if this would add an identity constraint cycle
                             if (!constraint_matrix.is_constrained(dofs_1[j]))
                               {
                                 types::global_dof_index new_dof = dofs_2[i];
@@ -2097,19 +2090,16 @@ namespace DoFTools
                           }
                         else
                           {
-                            // if the two aren't already identity constrained
-                            // (whichever way around) or already identical (in
-                            // case of rotated periodicity constraints), then
-                            // enter the constraint. otherwise there is nothing
-                            // for us still to do
+                            // if the two aren't already identity constrained (whichever way
+                            // around) or already identical (in case of rotated periodicity constraints),
+                            // then enter the constraint. otherwise there is nothing for us still to do
                             bool enter_constraint = false;
                             if (!constraint_matrix.is_constrained(dofs_1[j]))
                               {
                                 if (dofs_2[i] != dofs_1[j])
                                   enter_constraint = true;
                               }
-                            else // dofs_1[j] is constrained, is it identity or
-                                 // inverse constrained?
+                            else //dofs_1[j] is constrained, is it identity or inverse constrained?
                               {
                                 const std::vector<
                                   std::pair<types::global_dof_index, double>>
@@ -2128,16 +2118,13 @@ namespace DoFTools
                                            (*constraint_entries)[0].second +
                                            1) > eps))
                                       {
-                                        // this pair of constraints means that
-                                        // both dofs have to be constrained to
-                                        // 0.
+                                        //this pair of constraints means that both dofs have to be constrained to 0.
                                         constraint_matrix.add_line(dofs_2[i]);
                                       }
                                   }
                                 else
                                   {
-                                    // see if this would add an identity
-                                    // constraint cycle
+                                    // see if this would add an identity constraint cycle
                                     types::global_dof_index new_dof = dofs_1[j];
                                     while (new_dof != dofs_2[i])
                                       if (constraint_matrix.is_constrained(
@@ -2177,13 +2164,12 @@ namespace DoFTools
                       }
                     else if (!constraint_matrix.is_constrained(dofs_2[i]))
                       {
-                        // this is just a regular constraint. enter it piece by
-                        // piece
+                        // this is just a regular constraint. enter it piece by piece
                         constraint_matrix.add_line(dofs_2[i]);
                         for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
                           {
-                            // Query the correct face_index on face_1 respecting
-                            // the given orientation:
+                            // Query the correct face_index on face_1 respecting the given
+                            // orientation:
                             const unsigned int j =
                               cell_to_rotated_face_index[fe.face_to_cell_index(
                                 jj,
@@ -2192,8 +2178,7 @@ namespace DoFTools
                                 face_flip,
                                 face_rotation)];
 
-                            // And finally constrain the two DoFs respecting
-                            // component_mask:
+                            // And finally constrain the two DoFs respecting component_mask:
                             if (transformation(i, jj) != 0)
                               constraint_matrix.add_entry(
                                 dofs_2[i], dofs_1[j], transformation(i, jj));

@@ -112,8 +112,7 @@ test()
   tria.refine_global(1);
 
 
-  // The following loop is borrowed from p4est_3d_refine_01 with some
-  // modifications.
+  // The following loop is borrowed from p4est_3d_refine_01 with some modifications.
   for (int n_loop = 0;
        // Terminate loop on global information to prevent premature termination
        // on only part of processors. (n_loop < 20) is just a passive safety to

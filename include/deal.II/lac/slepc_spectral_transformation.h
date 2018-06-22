@@ -51,9 +51,9 @@ namespace SLEPcWrappers
    * the solver object <code>eigensolver</code>:
    * @code
    *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
-   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data
-   * (3.142); SLEPcWrappers::TransformationShift shift
-   * (mpi_communicator,additional_data); eigensolver.set_transformation (shift);
+   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142);
+   *  SLEPcWrappers::TransformationShift shift (mpi_communicator,additional_data);
+   *  eigensolver.set_transformation (shift);
    * @endcode
    * and later calling the <code>solve()</code> function as usual:
    * @code

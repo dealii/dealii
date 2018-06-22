@@ -668,19 +668,20 @@ namespace hp
     /**
      * Return the number of degrees of freedom that belong to this process.
      *
-     * If this is a sequential DoFHandler, then the result equals that produced
-     * by n_dofs(). (Here, "sequential" means that either the whole program does
-     * not use MPI, or that it uses MPI but only uses a single MPI process, or
-     * that there are multiple MPI processes but the Triangulation on which this
-     * DoFHandler builds works only on one MPI process.) On the other hand, if
-     * we are operating on a parallel::distributed::Triangulation or
-     * parallel::shared::Triangulation, then it includes only the degrees of
-     * freedom that the current processor owns. Note that in this case this does
-     * not include all degrees of freedom that have been distributed on the
-     * current processor's image of the mesh: in particular, some of the degrees
-     * of freedom on the interface between the cells owned by this processor and
-     * cells owned by other processors may be theirs, and degrees of freedom on
-     * ghost cells are also not necessarily included.
+     * If this is a sequential DoFHandler, then the result equals that produced by
+     * n_dofs(). (Here, "sequential" means that either
+     * the whole program does not use MPI, or that it uses MPI
+     * but only uses a single MPI process, or that there are multiple MPI
+     * processes but the Triangulation on which this DoFHandler builds
+     * works only on one MPI process.) On the other hand, if we are operating on a
+     * parallel::distributed::Triangulation or parallel::shared::Triangulation,
+     * then it includes only the degrees
+     * of freedom that the current processor owns. Note that in this case this
+     * does not include all degrees of freedom that have been distributed on
+     * the current processor's image of the mesh: in particular, some of the
+     * degrees of freedom on the interface between the cells owned by this
+     * processor and cells owned by other processors may be theirs, and
+     * degrees of freedom on ghost cells are also not necessarily included.
      */
     types::global_dof_index
     n_locally_owned_dofs() const;
@@ -698,8 +699,8 @@ namespace hp
      * If you are only interested in the number of elements each processor
      * owns then n_dofs_per_processor() is a better choice.
      *
-     * If this is a sequential DoFHandler, then the vector has a single element
-     * that equals the IndexSet representing the entire range [0,n_dofs()].
+     * If this is a sequential DoFHandler, then the vector has a single element that
+     * equals the IndexSet representing the entire range [0,n_dofs()].
      * (Here, "sequential" means that either
      * the whole program does not use MPI, or that it uses MPI
      * but only uses a single MPI process, or that there are multiple MPI
@@ -718,11 +719,12 @@ namespace hp
      * Each element of the vector returned by this function equals the number
      * of elements of the corresponding sets returned by global_dof_indices().
      *
-     * If this is a sequential DoFHandler, then the vector has a single element
-     * equal to n_dofs(). (Here, "sequential" means that either the whole
-     * program does not use MPI, or that it uses MPI but only uses a single MPI
-     * process, or that there are multiple MPI processes but the Triangulation
-     * on which this DoFHandler builds works only on one MPI process.)
+     * If this is a sequential DoFHandler, then the vector has a single element equal
+     * to n_dofs(). (Here, "sequential" means that either
+     * the whole program does not use MPI, or that it uses MPI
+     * but only uses a single MPI process, or that there are multiple MPI
+     * processes but the Triangulation on which this DoFHandler builds
+     * works only on one MPI process.)
      */
     const std::vector<types::global_dof_index> &
     n_locally_owned_dofs_per_processor() const;
@@ -1031,8 +1033,7 @@ namespace hp
 #ifndef DOXYGEN
 
 
-  /* ----------------------- Inline functions ----------------------------------
-   */
+  /* ----------------------- Inline functions ---------------------------------- */
 
 
   template <int dim, int spacedim>
@@ -1042,8 +1043,7 @@ namespace hp
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &boundary_ids) const
   {
-    // extract the set of boundary ids and forget about the function object
-    // pointers
+    // extract the set of boundary ids and forget about the function object pointers
     std::set<types::boundary_id> boundary_ids_only;
     for (typename std::map<types::boundary_id,
                            const Function<spacedim, number> *>::const_iterator
@@ -1150,7 +1150,7 @@ namespace hp
         levels[i] = std::move(level);
       }
 
-    // Workaround for nullptr, see in save().
+    //Workaround for nullptr, see in save().
     bool faces_is_nullptr = true;
     ar & faces_is_nullptr;
     if (!faces_is_nullptr)

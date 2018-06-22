@@ -41,8 +41,8 @@ public:
    */
   ScalingMatrix(number scaling_factor = 1.);
   /**
-   * Apply preconditioner.
-   */
+  * Apply preconditioner.
+  */
   template <typename VectorType>
   void
   vmult(VectorType &, const VectorType &) const;

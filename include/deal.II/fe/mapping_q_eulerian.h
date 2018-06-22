@@ -52,8 +52,8 @@ class Vector;
  * mapping from the initial configuration to the current configuration, and a
  * reference to the DoFHandler. The most common case is to use the solution
  * vector for the problem under consideration as the shift vector. The key
- * requirement is that the number of components of the given vector field must
- * be equal to (or possibly greater than) the number of space dimensions. If
+ * requirement is that the number of components of the given vector field must be
+ * equal to (or possibly greater than) the number of space dimensions. If
  * there are more components than space dimensions (for example, if one is
  * working with a coupled problem where there are additional solution
  * variables), the first <tt>dim</tt> components are assumed to represent the

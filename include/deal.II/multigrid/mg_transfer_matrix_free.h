@@ -164,27 +164,27 @@ public:
 
 private:
   /**
-   * A variable storing the degree of the finite element contained in the
-   * DoFHandler passed to build(). The selection of the computational kernel is
-   * based on this number.
+   * A variable storing the degree of the finite element contained in the DoFHandler
+   * passed to build(). The selection of the computational kernel is based on
+   * this number.
    */
   unsigned int fe_degree;
 
   /**
-   * A variable storing whether the element is continuous and there is a joint
-   * degree of freedom in the center of the 1D line.
+   * A variable storing whether the element is continuous and there is a joint degree of
+   * freedom in the center of the 1D line.
    */
   bool element_is_continuous;
 
   /**
-   * A variable storing the number of components in the finite element contained
-   * in the DoFHandler passed to build().
+   * A variable storing the number of components in the finite element contained in the
+   * DoFHandler passed to build().
    */
   unsigned int n_components;
 
   /**
-   * A variable storing the number of degrees of freedom on all child cells. It
-   * is <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
+   * A variable storing the number of degrees of freedom on all child cells. It is
+   * <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
    * less for continuous elements.
    */
   unsigned int n_child_cell_dofs;
@@ -202,15 +202,14 @@ private:
   std::vector<std::vector<unsigned int>> level_dof_indices;
 
   /**
-   * A variable storing the connectivity from parent to child cell numbers for
-   * each level.
+   * A variable storing the connectivity from parent to child cell numbers for each level.
    */
   std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
     parent_child_connect;
 
   /**
-   * A variable storing the number of cells owned on a given process (sets the
-   * bounds for the worker loops) for each level.
+   * A variable storing the number of cells owned on a given process (sets the bounds for
+   * the worker loops) for each level.
    */
   std::vector<unsigned int> n_owned_level_cells;
 
@@ -239,9 +238,9 @@ private:
   std::vector<AlignedVector<VectorizedArray<Number>>> weights_on_refined;
 
   /**
-   * A variable storing the local indices of Dirichlet boundary conditions on
-   * cells for all levels (outer index), the cells within the levels (second
-   * index), and the indices on the cell (inner index).
+   * A variable storing the local indices of Dirichlet boundary conditions on cells for
+   * all levels (outer index), the cells within the levels (second index), and
+   * the indices on the cell (inner index).
    */
   std::vector<std::vector<std::vector<unsigned short>>> dirichlet_indices;
 
@@ -510,8 +509,7 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
   this->copy_to_mg(dof_handler, dst, src, true);
 
   // FIXME: maybe need to store hanging nodes constraints per level?
-  // MGConstrainedDoFs does NOT keep this info right now, only periodicity
-  // constraints...
+  // MGConstrainedDoFs does NOT keep this info right now, only periodicity constraints...
   dst[max_level].update_ghost_values();
   // do the transfer from level to level-1:
   for (unsigned int level = max_level; level > min_level; --level)

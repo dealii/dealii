@@ -59,8 +59,7 @@ test()
   deallog << "OK" << std::endl << std::endl;
 
 
-  // make sure that is_serial_vector< dealii::LinearAlgebra::Vector<Number> > is
-  // working
+  // make sure that is_serial_vector< dealii::LinearAlgebra::Vector<Number> > is working
   Assert(is_serial_vector<dealii::LinearAlgebra::Vector<double>>::value == true,
          ExcInternalError());
 
@@ -78,8 +77,7 @@ test()
 
   deallog << "OK" << std::endl << std::endl;
 
-  // make sure that dealii::LinearAlgebra::distributed::Vector<Number> > is
-  // working
+  // make sure that dealii::LinearAlgebra::distributed::Vector<Number> > is working
   Assert(is_serial_vector<
            dealii::LinearAlgebra::distributed::Vector<double>>::value == false,
          ExcInternalError());
@@ -101,8 +99,7 @@ test()
 
   deallog << "OK" << std::endl << std::endl;
 
-  // make sure that dealii::LinearAlgebra::distributed::BlockVector<Number> > is
-  // working
+  // make sure that dealii::LinearAlgebra::distributed::BlockVector<Number> > is working
   Assert(is_serial_vector<
            dealii::LinearAlgebra::distributed::BlockVector<double>>::value ==
            false,

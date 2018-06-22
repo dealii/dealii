@@ -13,8 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Check DoFTools::write_gnuplot_dof_support_point_info for a particular set of
-// points
+// Check DoFTools::write_gnuplot_dof_support_point_info for a particular set of points
 
 #include <deal.II/dofs/dof_tools.h>
 

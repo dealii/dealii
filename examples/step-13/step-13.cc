@@ -380,9 +380,9 @@ namespace Step13
     {}
 
 
-    // Following the description above, the function generating the actual
-    // output is now relatively straightforward. The only particularly
-    // interesting feature over previous example programs is the use of the
+    // Following the description above, the function generating the actual output
+    // is now relatively straightforward. The only particularly interesting
+    // feature over previous example programs is the use of the
     // DataOutBase::default_suffix function, returning the usual
     // suffix for files of a given format (e.g. ".eps" for encapsulated
     // postscript files, ".gnuplot" for Gnuplot files), and of the generic
@@ -805,12 +805,13 @@ namespace Step13
       // that can then be filled by WorkStream::run().
       //
       // There remains the question of what the
-      // <code>std::placeholders::_1</code>, <code>std::placeholders::_2</code>,
-      // etc., mean. (These arguments are called <i>placeholders</i>.) The idea
-      // of using <code>std::bind</code> in the first of the two cases above is
-      // that it produces an object that can be called with three arguments. But
-      // how are the three arguments the function object is being called with
-      // going to be distributed to the four arguments
+      // <code>std::placeholders::_1</code>, <code>std::placeholders::_2</code>, etc.,
+      // mean. (These arguments are called <i>placeholders</i>.) The
+      // idea of using <code>std::bind</code> in the first of
+      // the two cases above is that it produces an object that can be
+      // called with three arguments. But how are the three arguments
+      // the function object is being called with going to be
+      // distributed to the four arguments
       // <code>local_assemble_matrix()</code> (including the implicit
       // <code>this</code> pointer)? As specified, the first argument
       // given to the function object will become the first argument

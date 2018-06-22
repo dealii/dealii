@@ -15,8 +15,8 @@
 
 
 
-// check Vector<std::complex<double> >::operator() in set/add-mode
-// alternatingly, but writing to the same elements
+// check Vector<std::complex<double> >::operator() in set/add-mode alternatingly, but
+// writing to the same elements
 
 #include <deal.II/lac/vector.h>
 

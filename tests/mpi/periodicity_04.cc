@@ -177,7 +177,7 @@ check(const unsigned int orientation, bool reverse)
   generate_grid(triangulation, orientation);
   set_periodicity(triangulation, reverse);
 
-  // first without refinement
+  //first without refinement
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
@@ -241,7 +241,7 @@ check(const unsigned int orientation, bool reverse)
   AssertThrow(n_constraints == n_expected_constraints,
               ExcDimensionMismatch(n_constraints, n_expected_constraints));
 
-  // now refine and check if the neighboring faces are correctly found
+  //now refine and check if the neighboring faces are correctly found
   typename Triangulation<dim>::active_cell_iterator cell;
   for (cell = triangulation.begin_active(); cell != triangulation.end(); ++cell)
     if (cell->is_locally_owned() && cell->center()(dim - 1) > 0)

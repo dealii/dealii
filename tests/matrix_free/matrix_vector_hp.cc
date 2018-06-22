@@ -179,10 +179,9 @@ test()
   sparsity.copy_from(csp);
   SparseMatrix<double> system_matrix(sparsity);
 
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells() << std::endl; std::cout << "Number
-  // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
-  // of constraints: " << constraints.n_constraints() << std::endl;
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   // set up MatrixFree
   MatrixFree<dim, number>                          mf_data;

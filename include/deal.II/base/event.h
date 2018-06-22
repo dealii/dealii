@@ -133,7 +133,7 @@ namespace Algorithms
     /**
      * The names of registered events
      */
-    // TODO: This static field must be guarded by a mutex to be thread-safe!
+    //TODO: This static field must be guarded by a mutex to be thread-safe!
     static std::vector<std::string> names;
   };
 

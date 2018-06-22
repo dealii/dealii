@@ -28,8 +28,7 @@
 // could catch all cell changes.
 // The test is designed to count cell number increase and decrease in signal
 // calls and then compare the result against n_active_cells reported by Tria
-// object. Absolute value change in n_active_cells is not concerned in this
-// test.
+// object. Absolute value change in n_active_cells is not concerned in this test.
 
 // This test is based on tria_signals_02. The difference is in this case we know
 // that p4est is doing mesh smoothing beyond class Triangulation. The case setup

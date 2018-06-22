@@ -256,13 +256,12 @@ namespace GridTools
       y_real := sum(y[s]*tphi[s], s=0..7):
       z_real := sum(z[s]*tphi[s], s=0..7):
       with (linalg):
-      J := matrix(3,3, [[diff(x_real, xi), diff(x_real, eta), diff(x_real,
-      zeta)], [diff(y_real, xi), diff(y_real, eta), diff(y_real, zeta)],
+      J := matrix(3,3, [[diff(x_real, xi), diff(x_real, eta), diff(x_real, zeta)],
+      [diff(y_real, xi), diff(y_real, eta), diff(y_real, zeta)],
       [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]):
       detJ := det (J):
 
-      measure := simplify ( int ( int ( int (detJ, xi=0..1), eta=0..1),
-      zeta=0..1)):
+      measure := simplify ( int ( int ( int (detJ, xi=0..1), eta=0..1), zeta=0..1)):
 
       readlib(C):
 
@@ -390,8 +389,8 @@ namespace GridTools
       J := CrossProduct(Jxi, Jeta);
       detJ := sqrt(J[1]^2 + J[2]^2 +J[3]^2);
 
-      # measure := evalf (Int (Int (detJ, xi=0..1, method = _NCrule ) ,
-      eta=0..1, method = _NCrule  ) ): # readlib(C):
+      # measure := evalf (Int (Int (detJ, xi=0..1, method = _NCrule ) , eta=0..1, method = _NCrule  ) ):
+      # readlib(C):
 
       # C(measure, optimized);
 
@@ -900,9 +899,9 @@ namespace GridTools
   }
 
   /**
-   * Distort a triangulation in
-   * some random way.
-   */
+    * Distort a triangulation in
+    * some random way.
+    */
   template <int dim, int spacedim>
   void
   distort_random(const double                  factor,
@@ -971,7 +970,7 @@ namespace GridTools
                              minimal_length[line->vertex_index(1)]);
                 }
             }
-          else // dim==1
+          else //dim==1
             {
               if (keep_boundary)
                 for (unsigned int vertex = 0; vertex < 2; ++vertex)
@@ -1510,8 +1509,7 @@ namespace GridTools
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
       cell_and_position;
-    // To handle points at the border we keep track of points which are close to
-    // the unit cell:
+    // To handle points at the border we keep track of points which are close to the unit cell:
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
       cell_and_position_approx;
@@ -1571,8 +1569,8 @@ namespace GridTools
         // to keep also the "best" cell
         double best_distance = 1e-10;
 
-        // Search all of the cells adjacent to the closest vertex of the cell
-        // hint Most likely we will find the point in them.
+        // Search all of the cells adjacent to the closest vertex of the cell hint
+        // Most likely we will find the point in them.
         for (unsigned int i = 0; i < n_neighbor_cells; ++i)
           {
             try
@@ -1589,9 +1587,9 @@ namespace GridTools
                     approx_cell              = false;
                     break;
                   }
-                // The point is not inside this cell: checking how far outside
-                // it is and whether we want to use this cell as a backup if we
-                // can't find a cell within which the point lies.
+                // The point is not inside this cell: checking how far outside it is
+                // and whether we want to use this cell as a backup if we can't find
+                // a cell within which the point lies.
                 const double dist =
                   GeometryInfo<dim>::distance_to_unit_cell(p_unit);
                 if (dist < best_distance)
@@ -1611,10 +1609,10 @@ namespace GridTools
         else if (approx_cell == true)
           return cell_and_position_approx;
 
-        // The first time around, we check for vertices in the hint_cell. If
-        // that does not work, we set the cell iterator to an invalid one, and
-        // look for a global vertex close to the point. If that does not work,
-        // we are in trouble, and just throw an exception.
+        // The first time around, we check for vertices in the hint_cell. If that
+        // does not work, we set the cell iterator to an invalid one, and look
+        // for a global vertex close to the point. If that does not work, we are in
+        // trouble, and just throw an exception.
         //
         // If we got here, then we did not find the point. If the
         // current_cell.state() here is not IteratorState::valid, it means that
@@ -1673,8 +1671,7 @@ namespace GridTools
         if (parent_cell->active())
           active_cells = {parent_cell};
         else
-          // Finding all active cells descendants of the current one (or the
-          // current one if it is active)
+          //Finding all active cells descendants of the current one (or the current one if it is active)
           active_cells = get_active_child_cells<MeshType>(parent_cell);
 
         const unsigned int spacedim = MeshType::space_dimension;
@@ -1725,9 +1722,9 @@ namespace GridTools
     const bool         allow_merge,
     const unsigned int max_boxes)
   {
-    // Algorithm brief description: begin with creating bounding boxes of all
-    // cells at refinement_level (and coarser levels if there are active cells)
-    // which have the predicate property. These are then merged
+    // Algorithm brief description: begin with creating bounding boxes of all cells at
+    // refinement_level (and coarser levels if there are active cells) which have the predicate
+    // property. These are then merged
 
     Assert(
       refinement_level <= mesh.n_levels(),
@@ -1776,9 +1773,8 @@ namespace GridTools
         std::vector<unsigned int> merged_boxes_idx;
         bool                      found_neighbors = true;
 
-        // We merge only neighbors which can be expressed by a single bounding
-        // box e.g. in 1d [0,1] and [1,2] can be described with [0,2] without
-        // losing anything
+        // We merge only neighbors which can be expressed by a single bounding box
+        // e.g. in 1d [0,1] and [1,2] can be described with [0,2] without losing anything
         while (found_neighbors)
           {
             found_neighbors = false;
@@ -1824,14 +1820,13 @@ namespace GridTools
                   std::min_element(volumes.begin(), volumes.end()) -
                   volumes.begin();
                 volumes.erase(volumes.begin() + min_idx);
-                // Finding a neighbor
+                //Finding a neighbor
                 bool not_removed = true;
                 for (unsigned int i = 0;
                      i < merged_b_boxes.size() && not_removed;
                      ++i)
-                  // We merge boxes if we have "attached" or "mergeable"
-                  // neighbors, even though mergeable should be dealt with in
-                  // Part 1
+                  // We merge boxes if we have "attached" or "mergeable" neighbors, even though mergeable should
+                  // be dealt with in Part 1
                   if (i != min_idx && (merged_b_boxes[i].get_neighbor_type(
                                          merged_b_boxes[min_idx]) ==
                                          NeighborType::attached_neighbors ||
@@ -2021,8 +2016,8 @@ namespace GridTools
                 // See if I "own" this vertex
                 if (lowest_subdomain_id == cell->subdomain_id())
                   {
-                    // Check that the vertex we are working on a vertex that has
-                    // not be dealt with yet
+                    // Check that the vertex we are working on a vertex that has not be
+                    // dealt with yet
                     if (used_vertex_index.find(cell->vertex_index(i)) ==
                         used_vertex_index.end())
                       {
@@ -2030,8 +2025,8 @@ namespace GridTools
                         local_to_global_vertex_index[cell->vertex_index(i)] =
                           next_index++;
 
-                        // Store the information that will be sent to the
-                        // adjacent cells on other subdomains
+                        // Store the information that will be sent to the adjacent cells
+                        // on other subdomains
                         adjacent_cell =
                           vertex_to_cell[cell->vertex_index(i)].begin();
                         for (; adjacent_cell != end_adj_cell; ++adjacent_cell)
@@ -2062,8 +2057,7 @@ namespace GridTools
                   }
                 else
                   {
-                    // We don't own the vertex so we will receive its global
-                    // index
+                    // We don't own the vertex so we will receive its global index
                     vertices_to_recv[lowest_subdomain_id].insert(
                       cell->vertex_index(i));
                     missing_vert_cells.insert(cell);
@@ -2330,8 +2324,7 @@ namespace GridTools
     // create a map pair<lvl,idx> -> SparsityPattern index
     // TODO: we are no longer using user_indices for this because we can get
     // pointer/index clashes when saving/restoring them. The following approach
-    // works, but this map can get quite big. Not sure about more efficient
-    // solutions.
+    // works, but this map can get quite big. Not sure about more efficient solutions.
     std::map<std::pair<unsigned int, unsigned int>, unsigned int> indexmap;
     for (typename dealii::internal::
            ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim>>::type
@@ -3152,8 +3145,7 @@ namespace GridTools
 
 
       /**
-       * Try to fix up a single cell by moving around its midpoint. Return
-       * whether we succeeded with this.
+       * Try to fix up a single cell by moving around its midpoint. Return whether we succeeded with this.
        */
       template <typename Iterator>
       bool
@@ -3885,8 +3877,8 @@ namespace GridTools
           }
       }
 
-    // if no cells need to be added, then no regularization is necessary.
-    // Restore things as they were before this function was called.
+    // if no cells need to be added, then no regularization is necessary. Restore things
+    // as they were before this function was called.
     if (cells_to_add.size() == 0)
       {
         while (refinement_cycles > 0)
@@ -4072,8 +4064,7 @@ namespace GridTools
               {
                 unsigned int current_cell =
                   cells_it - std::get<0>(cell_qpoint_map).begin();
-                // Cell found: just adding the point index and qpoint to the
-                // list
+                // Cell found: just adding the point index and qpoint to the list
                 std::get<1>(cell_qpoint_map)[current_cell].emplace_back(
                   my_pair.second);
                 std::get<2>(cell_qpoint_map)[current_cell].emplace_back(p);
@@ -4136,8 +4127,8 @@ namespace GridTools
 
 
 
-      // Compute point locations; internal version which returns an unordered
-      // map The algorithm is the same as GridTools::compute_point_locations
+      // Compute point locations; internal version which returns an unordered map
+      // The algorithm is the same as GridTools::compute_point_locations
       template <int dim, int spacedim>
       std::unordered_map<
         typename Triangulation<dim, spacedim>::active_cell_iterator,
@@ -4237,13 +4228,13 @@ namespace GridTools
 
 
 
-      // Merging the output means to add data to a previous output, here
-      // contained in output unmap: if the cell is already present: add
-      // information about new points if the cell is not present: add the cell
-      // with all information
+      // Merging the output means to add data to a previous output, here contained
+      // in output unmap:
+      // if the cell is already present: add information about new points
+      // if the cell is not present: add the cell with all information
       //
-      // Notice we call "information" the data associated with a point of the
-      // sort: cell containing it, transformed point on reference cell, index,
+      // Notice we call "information" the data associated with a point of the sort:
+      // cell containing it, transformed point on reference cell, index,
       // rank of the owner etc.
       template <int dim, int spacedim>
       void
@@ -4306,11 +4297,9 @@ namespace GridTools
       // This function initializes the output by calling compute point locations
       // on local points; vector containing points which are probably local.
       // Its output is then sorted in the following manner:
-      // - output unmap: points, with relative information, inside locally onwed
-      // cells,
+      // - output unmap: points, with relative information, inside locally onwed cells,
       // - ghost loc pts: points, with relative information, inside ghost cells,
-      // - classified pts: vector of all points returned in output map and ghost
-      // loc pts
+      // - classified pts: vector of all points returned in output map and ghost loc pts
       //   (these are stored as indices)
       template <int dim, int spacedim>
       void
@@ -4352,9 +4341,9 @@ namespace GridTools
                     // Adding the point to the cell points
                     cell_points[i] = local_points[indices_loc[i]];
 
-                    // Storing the index: notice indices loc refer to the local
-                    // points vector, but we need to return the index with
-                    // respect of the points owned by the current process
+                    // Storing the index: notice indices loc refer to the local points
+                    // vector, but we need to return the index with respect of
+                    // the points owned by the current process
                     cell_points_idx[i] = local_points_idx[indices_loc[i]];
                     classified_pts.emplace_back(
                       local_points_idx[indices_loc[i]]);
@@ -4370,8 +4359,8 @@ namespace GridTools
               }
             else if (cell_loc->is_ghost())
               {
-                // Point inside ghost cell: storing all its information and
-                // preparing it to be sent
+                // Point inside ghost cell: storing all its information and preparing
+                // it to be sent
                 std::vector<Point<spacedim>> cell_points(indices_loc.size());
                 std::vector<unsigned int> cell_points_idx(indices_loc.size());
                 for (unsigned int i = 0; i < indices_loc.size(); ++i)
@@ -4382,9 +4371,8 @@ namespace GridTools
                       local_points_idx[indices_loc[i]]);
                   }
                 // Each key of the following map represent a process,
-                // each mapped value is a tuple containing the information to be
-                // sent: preparing the output for the owner, which has rank
-                // subdomain id
+                // each mapped value is a tuple containing the information to be sent:
+                // preparing the output for the owner, which has rank subdomain id
                 auto &map_tuple_owner = ghost_loc_pts[cell_loc->subdomain_id()];
                 // To identify the cell on the other process we use the cell id
                 std::get<0>(map_tuple_owner).emplace_back(cell_loc->id());
@@ -4398,11 +4386,11 @@ namespace GridTools
 
 
 
-      // Given the map obtained from a communication, where the key is rank and
-      // the mapped value is a pair of (points,indices), calls compute point
-      // locations; its output is then merged with output tuple if check_owned
-      // is set to true only points lying inside locally onwed cells shall be
-      // merged, otherwise all points shall be merged.
+      // Given the map obtained from a communication, where the key is rank and the mapped
+      // value is a pair of (points,indices), calls compute point locations; its output
+      // is then merged with output tuple
+      // if check_owned is set to true only points
+      // lying inside locally onwed cells shall be merged, otherwise all points shall be merged.
       template <int dim, int spacedim>
       void
       compute_and_merge_from_map(
@@ -4421,8 +4409,7 @@ namespace GridTools
       {
         bool no_check = !check_owned;
 
-        // rank and points is a pair: first rank, then a pair of vectors
-        // (points, indices)
+        // rank and points is a pair: first rank, then a pair of vectors (points, indices)
         for (auto const &rank_and_points : map_pts)
           {
             // Rewriting the contents of the map in human readable format
@@ -4430,8 +4417,7 @@ namespace GridTools
             const auto &received_points  = rank_and_points.second.first;
             const auto &received_map     = rank_and_points.second.second;
 
-            // Initializing the vectors needed to store the result of compute
-            // point location
+            // Initializing the vectors needed to store the result of compute point location
             std::vector<
               typename Triangulation<dim, spacedim>::active_cell_iterator>
                                                       in_cell;
@@ -4449,8 +4435,8 @@ namespace GridTools
                 const auto &proc_qpoints = map_c_pt_idx.second.first;
                 const auto &proc_maps    = map_c_pt_idx.second.second;
 
-                // This is stored either if we're not checking if the cell is
-                // owned or if the cell is locally owned
+                // This is stored either if we're not checking if the cell is owned or
+                // if the cell is locally owned
                 if (no_check || proc_cell->is_locally_owned())
                   {
                     in_cell.emplace_back(proc_cell);
@@ -4516,8 +4502,7 @@ namespace GridTools
     const auto &tria_mpi =
       dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
         &cache.get_triangulation());
-    // If the dynamic cast failed we can't recover the mpi communicator:
-    // throwing an assertion error
+    // If the dynamic cast failed we can't recover the mpi communicator: throwing an assertion error
     Assert(
       tria_mpi,
       ExcMessage(
@@ -4542,8 +4527,8 @@ namespace GridTools
       internal::distributed_cptloc::cell_hash<dim, spacedim>>
       temporary_unmap;
 
-    // Step 1 (part 1): Using the bounding boxes to guess the owner of each
-    // points in local_points
+    // Step 1 (part 1): Using the bounding boxes to guess the owner of each points
+    // in local_points
     unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
     // Using global bounding boxes to guess/find owner/s of each point
@@ -4618,10 +4603,10 @@ namespace GridTools
     auto cpt_ghost =
       Utilities::MPI::some_to_some(mpi_communicator, ghost_loc_pts);
 
-    // Step 3: construct vectors containing uncertain points i.e. those whose
-    // owner is known among few guesses The maps goes from rank of the probable
-    // owner to a pair of vectors: the first containing the points, the second
-    // containing the ranks in the current process
+    // Step 3: construct vectors containing uncertain points i.e. those whose owner
+    // is known among few guesses
+    // The maps goes from rank of the probable owner to a pair of vectors: the first
+    // containing the points, the second containing the ranks in the current process
     std::map<unsigned int,
              std::pair<std::vector<Point<spacedim>>, std::vector<unsigned int>>>
       other_check_pts;

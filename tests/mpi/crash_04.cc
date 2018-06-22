@@ -69,7 +69,7 @@ test()
     triangulation.prepare_coarsening_and_refinement();
 
     {
-      // data out
+      //data out
       FE_Q<dim>       fe(1);
       DoFHandler<dim> dof_handler(triangulation);
 

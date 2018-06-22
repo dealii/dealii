@@ -222,7 +222,7 @@ namespace DoFTools
     Assert(sparsity.n_cols() == n_dofs_col,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs_col));
 
-    // TODO: Looks like wasteful memory management here
+    //TODO: Looks like wasteful memory management here
 
     const std::list<std::pair<typename DoFHandlerType::cell_iterator,
                               typename DoFHandlerType::cell_iterator>>

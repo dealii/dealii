@@ -259,8 +259,8 @@ namespace Utilities
       Number *ghost_array_ptr = ghost_array.data();
       for (unsigned int i = 0; i < n_ghost_targets; i++)
         {
-          // in case we only sent a subset of indices, we now need to move the
-          // data to the correct positions and delete the old content
+          // in case we only sent a subset of indices, we now need to move the data
+          // to the correct positions and delete the old content
           if (n_ghost_indices_in_larger_set > n_ghost_indices() &&
               ghost_array.size() == n_ghost_indices_in_larger_set)
             {
@@ -467,12 +467,11 @@ namespace Utilities
             for (; my_imports != import_indices_data.end(); ++my_imports)
               for (unsigned int j = my_imports->first; j < my_imports->second;
                    j++, read_position++)
-                // Below we use relatively large precision in units in the last
-                // place (ULP) as this Assert can be easily triggered in
-                // p::d::SolutionTransfer. The rationale is that during
-                // interpolation on two elements sharing the face, values on
-                // this face obtained from each side might be different due to
-                // additions being done in different order.
+                // Below we use relatively large precision in units in the last place (ULP) as
+                // this Assert can be easily triggered in p::d::SolutionTransfer.
+                // The rationale is that during interpolation on two elements sharing
+                // the face, values on this face obtained from each side might
+                // be different due to additions being done in different order.
                 Assert(*read_position == Number() ||
                          internal::get_abs(locally_owned_array[j] -
                                            *read_position) <=

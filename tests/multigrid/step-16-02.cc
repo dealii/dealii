@@ -121,8 +121,7 @@ LaplaceMatrix<dim>::face(MeshWorker::DoFInfo<dim> & /*dinfo1*/,
                          MeshWorker::IntegrationInfo<dim> & /*info2*/) const
 {
   //  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
-  //  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix,
-  //  dinfo1.matrix(0,true).matrix,
+  //  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
   //         dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
   //         info1.fe_values(0), info2.fe_values(0),
   //         Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));

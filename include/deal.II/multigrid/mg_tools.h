@@ -145,10 +145,9 @@ namespace MGTools
 
 
   /**
-   * Create sparsity pattern for interface_in/out matrices used in a multigrid
-   * computation. These matrices contain an entry representing the coupling of
-   * degrees of freedom on a refinement edge to those not on the refinement edge
-   * of a certain level.
+   * Create sparsity pattern for interface_in/out matrices used in a multigrid computation.
+   * These matrices contain an entry representing the coupling of degrees of
+   * freedom on a refinement edge to those not on the refinement edge of a certain level.
    */
   template <typename DoFHandlerType, typename SparsityPatternType>
   void
@@ -262,12 +261,11 @@ namespace MGTools
 
   /**
    * Return the highest possible level that can be used as the coarsest level in
-   * a Multigrid computation, that is, the highest level in the hierarchy whose
-   * mesh covers the entire domain. This corresponds to the minimum level of a
-   * cell on the active mesh. Since each processor only has a local view of the
-   * mesh, each processor must call this function. Note that this is a global
-   * minimum over the entire mesh and therefore each processor will return the
-   * same value.
+   * a Multigrid computation, that is, the highest level in the hierarchy whose mesh
+   * covers the entire domain. This corresponds to the minimum level of a cell on
+   * the active mesh. Since each processor only has a local view of the mesh, each
+   * processor must call this function. Note that this is a global minimum over the
+   * entire mesh and therefore each processor will return the same value.
    */
   template <int dim, int spacedim>
   unsigned int

@@ -669,11 +669,9 @@ namespace GridOutFlags
    */
   struct Svg
   {
-    /// Height of the plot in SVG units, computed from width if zero. Defaults
-    /// to 1000
+    /// Height of the plot in SVG units, computed from width if zero. Defaults to 1000
     unsigned int height;
-    /// The width of the plot. Computed automatically from height if zero
-    /// (default)
+    /// The width of the plot. Computed automatically from height if zero (default)
     unsigned int width;
     /// Thickness of the lines between cells
     unsigned int line_thickness;
@@ -692,15 +690,13 @@ namespace GridOutFlags
       transparent,
       /// Use white background
       white,
-      /// Use a gradient from white (top) to steelblue (bottom), and add date
-      /// and time plus a deal.II logo. Automatically draws a margin.
+      /// Use a gradient from white (top) to steelblue (bottom), and add date and time plus a deal.II logo. Automatically draws a margin.
       dealii
     };
 
     Background background;
 
-    // View angles for the perspective view of the grid; Default is 0, 0 (top
-    // view).
+    // View angles for the perspective view of the grid; Default is 0, 0 (top view).
     /**
      * The azimuth angle measured from ??? in degrees. Default is 0.
      */
@@ -729,12 +725,10 @@ namespace GridOutFlags
 
     Coloring coloring;
 
-    /// Interpret the level number of the cells as altitude over the x-y-plane
-    /// (useful in the perspective view).
+    /// Interpret the level number of the cells as altitude over the x-y-plane (useful in the perspective view).
     bool convert_level_number_to_height;
 
-    /// The factor determining the vertical distance between levels (default =
-    /// 0.3)
+    /// The factor determining the vertical distance between levels (default = 0.3)
     float level_height_factor;
 
     /// Scaling of the font for cell annotations. Defaults to 1.
@@ -750,11 +744,9 @@ namespace GridOutFlags
     /// Write level subdomain id of each cell. Defaults to false
     bool label_level_subdomain_id;
 
-    /// Draw a colorbar next to the plotted grid with respect to the chosen
-    /// coloring of the cells
+    /// Draw a colorbar next to the plotted grid with respect to the chosen coloring of the cells
     bool draw_colorbar;
-    /// Draw a legend next to the plotted grid, explaining the label of the
-    /// cells
+    /// Draw a legend next to the plotted grid, explaining the label of the cells
     bool draw_legend;
 
     /**
@@ -1188,34 +1180,32 @@ public:
   write_vtu(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
 
   /**
-   * Write triangulation in VTU format for each processor, and add a .pvtu file
-   * for visualization in Visit or Paraview that describes the collection of VTU
-   * files as all part of the same simulation. The output is in the form
-   * <tt>filename_without_extension.proc000*.vtu</tt> where * is
-   * 0,1,...,n_proc-1 and <tt>filename_without_extension.pvtu</tt>. The input
-   * <tt>view_levels</tt> can be set as true to view each level of a multilevel
-   * method. The input <tt>include_artificial</tt> can be set as true to view
-   * the artificial cells for each processor. Each .vtu and .pvtu file will have
-   * the attributes subdomain, level_subdomain, level, and proc_writing. The
-   * level value can be used to separate the image into the view of the grid on
-   * each level of a multilevel method and the proc_writing value can be used to
-   * separate the image into each processor's owned and ghost cells. This is
-   * accomplished by applying the "warp by scalar" filter in paraview to each of
-   * the values. After opening the .pvtu file of a mesh where the input
+   * Write triangulation in VTU format for each processor, and add a .pvtu file for
+   * visualization in Visit or Paraview that describes the collection of VTU files
+   * as all part of the same simulation. The output is in the form
+   * <tt>filename_without_extension.proc000*.vtu</tt> where * is 0,1,...,n_proc-1 and
+   * <tt>filename_without_extension.pvtu</tt>. The input <tt>view_levels</tt> can be
+   * set as true to view each level of a multilevel method. The input
+   * <tt>include_artificial</tt> can be set as true to view the artificial cells for
+   * each processor. Each .vtu and .pvtu file will have the attributes subdomain,
+   * level_subdomain, level, and proc_writing. The level value can be used to separate the
+   * image into the view of the grid on each level of a multilevel method and the
+   * proc_writing value can be used to separate the image into each processor's owned and
+   * ghost cells.
+   * This is accomplished by applying the "warp by scalar" filter in paraview
+   * to each of the values. After opening the .pvtu file of a mesh where the input
    * <tt>view_levels</tt> is set to true, select the "warp by scalar"
-   * filter. For the "Scalars" input select <tt>proc_writing</tt> and for the
-   * "Normal" input enter in 1 0 0, then click Apply. Next select the "warp by
-   * scalar" filter again. For the "Scalars" input select <tt>level</tt> and for
-   * the "Normal" input enter in 0 1 0, then click Apply. This will give you the
-   * following image.
+   * filter. For the "Scalars" input select <tt>proc_writing</tt> and for the "Normal" input
+   * enter in 1 0 0, then click Apply. Next select the "warp by scalar" filter again. For the
+   * "Scalars" input select <tt>level</tt> and for the "Normal" input enter in 0 1 0,
+   * then click Apply. This will give you the following image.
    * @image html write_mesh_vtu_levels.png
-   * If the <tt>view_levels</tt> remains at false, thereby only giving the mesh
-   * for the active level, it is enough to separate the image into the views
-   * written by different processors. This is shown in the following image where
-   * the <tt>include_artificial</tt> input is set as true.
+   * If the <tt>view_levels</tt> remains at false, thereby only giving the mesh for the active
+   * level, it is enough to separate the image into the views written by different processors.
+   * This is shown in the following image where the <tt>include_artificial</tt> input is set as true.
    * @image html write_mesh_vtu_active.png
-   * Note: Depending on the size of the mesh you may need to increase the "Scale
-   * Factor" input so that each piece does not overlap.
+   * Note: Depending on the size of the mesh you may need to increase the "Scale Factor" input
+   * so that each piece does not overlap.
    */
   template <int dim, int spacedim>
   void

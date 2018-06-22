@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// like _02, but with a TransferSelect that selects only the first vector
-// component
+// like _02, but with a TransferSelect that selects only the first vector component
 
 #include <deal.II/base/mg_level_object.h>
 
@@ -138,6 +137,6 @@ main()
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  // TODO: do in 1d
+  //TODO: do in 1d
   check(FESystem<2>(FE_Q<2>(1), 2));
 }

@@ -41,8 +41,7 @@ main()
   const double       inner_radius = 1.;
   const double       outer_radius = 5.;
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);
-  // restore compatibility with the pre-9.0 version of GridGenerator by
-  // resetting manifolds
+  // restore compatibility with the pre-9.0 version of GridGenerator by resetting manifolds
   tria.set_all_manifold_ids(numbers::flat_manifold_id);
   tria.set_all_manifold_ids_on_boundary(0);
   tria.refine_global(2);

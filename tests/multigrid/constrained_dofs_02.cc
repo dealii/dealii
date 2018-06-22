@@ -156,7 +156,7 @@ check_fe(FiniteElement<dim> &fe)
     dofhref.distribute_dofs(fe);
     dofhref.distribute_mg_dofs(fe);
 
-    // std::map<std::string,std::vector<types::global_dof_index> > dofmap;
+    //std::map<std::string,std::vector<types::global_dof_index> > dofmap;
     std::map<std::string, std::vector<types::global_dof_index>> mgdofmap;
 
     for (typename DoFHandler<dim>::level_cell_iterator cell = dofhref.begin();
@@ -252,7 +252,7 @@ check()
 
   check_fe(q1);
   //  check_fe(q2);
-  // check_fe(s1);
+  //check_fe(s1);
 }
 
 int
@@ -262,5 +262,5 @@ main(int argc, char *argv[])
   MPILogInitAll                    log(true);
 
   check<2>();
-  // check<3> ();
+  //check<3> ();
 }

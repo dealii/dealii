@@ -15,8 +15,7 @@
 
 
 
-// Test
-// LinearAlgebra::distributed::Vector::operator=(PETScWrappers::MPI::BlockVector&)
+// Test LinearAlgebra::distributed::Vector::operator=(PETScWrappers::MPI::BlockVector&)
 
 #include <deal.II/base/index_set.h>
 

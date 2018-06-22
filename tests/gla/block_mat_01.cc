@@ -60,7 +60,7 @@ test()
   partitioning.push_back(block1);
   partitioning.push_back(block2);
 
-  // LA::MPI::CompressedBlockSparsityPattern sp(partitioning);
+  //LA::MPI::CompressedBlockSparsityPattern sp(partitioning);
   BlockDynamicSparsityPattern sp(partitioning);
   for (unsigned int i = 0; i < 15; ++i)
     {
@@ -107,6 +107,6 @@ main(int argc, char **argv)
   }
 
   // compile, don't run
-  // if (myid==9999)
+  //if (myid==9999)
   //  test<LA_Dummy>();
 }

@@ -497,9 +497,8 @@ public:
 /**
  * Implementation of scalar, discontinuous tensor product elements based on
  * Hermite-like polynomials, described by the polynomial space
- * Polynomials::HermiteLikeInterpolation. As opposed to the basic FE_DGQ
- * element, these elements are not interpolatory and no support points are
- * defined.
+ * Polynomials::HermiteLikeInterpolation. As opposed to the basic FE_DGQ element,
+ * these elements are not interpolatory and no support points are defined.
  *
  * Note that Hermite polynomials are only available for degrees larger or
  * equal to three, and thus the beneficial properties of

@@ -49,7 +49,7 @@ test_compute_pt_loc(unsigned int n_points)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(std::max(6 - dim, 2));
 
-  // Creating the finite elements needed:
+  //Creating the finite elements needed:
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);

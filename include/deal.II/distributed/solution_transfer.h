@@ -81,9 +81,9 @@ namespace parallel
      * soltrans.interpolate(interpolated_solution);
      * @endcode
      *
-     * Different from PETSc and Trilinos vectors,
-     * LinearAlgebra::distributed::Vector allows writing into ghost elements.
-     * For a ghosted vector the interpolation step can be accomplished via
+     * Different from PETSc and Trilinos vectors, LinearAlgebra::distributed::Vector
+     * allows writing into ghost elements. For a ghosted vector the
+     * interpolation step can be accomplished via
      * @code
      * interpolated_solution.zero_out_ghosts();
      * soltrans.interpolate(interpolated_solution);

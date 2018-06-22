@@ -21,8 +21,8 @@
 // produced the correct constraints on rectangular faces.
 //
 // The new function project_boundary_values_curl_conforming_l2 fixes this
-// and should work on any quad face, assuming the underlying mesh conforms to
-// the standard orientation (i.e. spheres may still cause problems).
+// and should work on any quad face, assuming the underlying mesh conforms to the
+// standard orientation (i.e. spheres may still cause problems).
 //
 // This test solves the real valued curl-curl equation in 3D:
 //
@@ -345,7 +345,7 @@ namespace Maxwell
     Vector<double>     cell_rhs(dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    // RHS storage:
+    //RHS storage:
     std::vector<Vector<double>> rhs_value_list(
       n_q_points, Vector<double>(fe.n_components()));
     Tensor<1, dim> rhs_value_vector;
@@ -479,10 +479,10 @@ namespace Maxwell
 
     deallog << "p = " << p_order << std::endl;
 
-    // convergence_table.set_precision("L2 Error",4);
+    //convergence_table.set_precision("L2 Error",4);
     convergence_table.set_scientific("L2 Error", true);
 
-    // convergence_table.set_precision("H(curl) Error",4);
+    //convergence_table.set_precision("H(curl) Error",4);
     convergence_table.set_scientific("H(curl) Error", true);
 
     convergence_table.write_text(deallog.get_file_stream());

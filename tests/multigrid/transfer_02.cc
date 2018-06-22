@@ -16,7 +16,7 @@
 
 // like _01 but on adaptively refined grid
 
-// TODO:[GK] Add checks for RT again!
+//TODO:[GK] Add checks for RT again!
 
 #include <deal.II/base/mg_level_object.h>
 
@@ -77,7 +77,7 @@ refine_mesh(Triangulation<dim> &triangulation)
           cell_refined = true;
         }
     }
-  if (!cell_refined) // if no cell was selected for refinement, refine global
+  if (!cell_refined) //if no cell was selected for refinement, refine global
     for (typename Triangulation<dim>::active_cell_iterator cell =
            triangulation.begin_active();
          cell != triangulation.end();
@@ -189,6 +189,6 @@ main()
   check_simple(FE_RaviartThomasNodal<2>(1));
   //  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
 
-  // check_simple (FE_DGQ<3>(1));
-  // check_simple (FE_Q<3>(2));
+  //check_simple (FE_DGQ<3>(1));
+  //check_simple (FE_Q<3>(2));
 }

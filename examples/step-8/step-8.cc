@@ -429,14 +429,13 @@ namespace Step8
 
     // The interpolation of the boundary values needs a small modification:
     // since the solution function is vector-valued, so need to be the
-    // boundary values. The <code>Functions::ZeroFunction</code> constructor
-    // accepts a parameter that tells it that it shall represent a vector
-    // valued, constant zero function with that many components. By default,
-    // this parameter is equal to one, in which case the
-    // <code>Functions::ZeroFunction</code> object would represent a scalar
-    // function. Since the solution vector has <code>dim</code> components, we
-    // need to pass <code>dim</code> as number of components to the zero
-    // function as well.
+    // boundary values. The <code>Functions::ZeroFunction</code> constructor accepts a
+    // parameter that tells it that it shall represent a vector valued,
+    // constant zero function with that many components. By default, this
+    // parameter is equal to one, in which case the <code>Functions::ZeroFunction</code>
+    // object would represent a scalar function. Since the solution vector has
+    // <code>dim</code> components, we need to pass <code>dim</code> as number
+    // of components to the zero function as well.
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -579,10 +578,10 @@ namespace Step8
   // example. This time, we use the square [-1,1]^d as domain, and we refine
   // it twice globally before starting the first iteration.
   //
-  // The reason for refining twice is a bit accidental: we use the QGauss
-  // quadrature formula with two points in each direction for integration of the
-  // right hand side; that means that there are four quadrature points on each
-  // cell (in 2D). If we only refine the initial grid once globally, then there
+  // The reason for refining twice is a bit accidental: we use the QGauss quadrature
+  // formula with two points in each direction for integration of the right
+  // hand side; that means that there are four quadrature points on each cell
+  // (in 2D). If we only refine the initial grid once globally, then there
   // will be only four quadrature points in each direction on the
   // domain. However, the right hand side function was chosen to be rather
   // localized and in that case, by pure chance, it happens that all quadrature

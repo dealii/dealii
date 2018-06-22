@@ -108,7 +108,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   deallog << "2cells: " << fe_collection[0].get_name() << " vs "
           << fe_collection[1].get_name() << std::endl;
 
-  dof_handler.begin_active()->set_active_fe_index(1); // Q(p2)xQ(1)
+  dof_handler.begin_active()->set_active_fe_index(1); //Q(p2)xQ(1)
 
   dof_handler.distribute_dofs(fe_collection);
 

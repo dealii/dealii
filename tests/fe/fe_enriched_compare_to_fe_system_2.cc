@@ -55,8 +55,7 @@ const double eps = 1e-10;
 // elements and faces.
 // The comparison is straight forward because local dofs are enumerated
 // in the same way for FE_System and FEEnriched.
-// Same as fe_enriched_compare_to_fe_system.cc but now multiple enrichment
-// functions.
+// Same as fe_enriched_compare_to_fe_system.cc but now multiple enrichment functions.
 const unsigned int patches = 10;
 
 using namespace dealii;
@@ -218,7 +217,7 @@ test(const FiniteElement<dim> & fe_base,
   fe_enrichements[0] = &fe_en1;
   fe_enrichements[1] = &fe_en2;
   FE_Nothing<dim> fe_nothing(1, true);
-  fe_enrichements[2] = &fe_nothing; // should be ignored
+  fe_enrichements[2] = &fe_nothing; //should be ignored
   std::vector<std::vector<std::function<const Function<dim> *(
     const typename Triangulation<dim, dim>::cell_iterator &)>>>
     functions(3);

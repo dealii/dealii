@@ -254,9 +254,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     scratch_data.postprocessed_values[dataset][q](component);
             }
           else
-            // use the given data vector directly, without a postprocessor.
-            // again, we treat single component functions separately for
-            // efficiency reasons.
+            // use the given data vector directly, without a postprocessor. again,
+            // we treat single component functions separately for efficiency
+            // reasons.
             if (n_components == 1)
             {
               // first output the real part of the solution vector
@@ -459,13 +459,11 @@ DataOut<dim, DoFHandlerType>::build_patches(
   // Note, there is a confusing mess of different indices here at play:
   // patch_index - the index of a patch in all_cells
   // cell->index - only unique on each level, used in cell_to_patch_index_map
-  // active_index - index for a cell when counting from begin_active() using
-  // ++cell cell_index - unique index of a cell counted using
-  // next_locally_owned_cell()
+  // active_index - index for a cell when counting from begin_active() using ++cell
+  // cell_index - unique index of a cell counted using next_locally_owned_cell()
   //              starting from first_locally_owned_cell()
   //
-  // It turns out that we create one patch for each selected cell, so
-  // patch_index==cell_index.
+  // It turns out that we create one patch for each selected cell, so patch_index==cell_index.
   //
   // will be cell_to_patch_index_map[cell->level][cell->index] = patch_index
   std::vector<std::vector<unsigned int>> cell_to_patch_index_map;
@@ -502,8 +500,8 @@ DataOut<dim, DoFHandlerType>::build_patches(
     for (; cell != this->triangulation->end();
          cell = next_locally_owned_cell(cell))
       {
-        // move forward until active_cell points at the cell (cell) we are
-        // looking at to compute the current active_index
+        // move forward until active_cell points at the cell (cell) we are looking
+        // at to compute the current active_index
         while (active_cell != this->triangulation->end() && cell->active() &&
                active_cell_iterator(cell) != active_cell)
           {
@@ -579,15 +577,16 @@ DataOut<dim, DoFHandlerType>::build_patches(
     WorkStream::run(
       &all_cells[0],
       &all_cells[0] + all_cells.size(),
-      std::bind(&DataOut<dim, DoFHandlerType>::build_one_patch,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                /* no std::placeholders::_3, since this function doesn't
-                   actually need a copy data object -- it just writes everything
-                   right into the output array */
-                n_subdivisions,
-                curved_cell_region),
+      std::bind(
+        &DataOut<dim, DoFHandlerType>::build_one_patch,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        /* no std::placeholders::_3, since this function doesn't actually need a
+                                  copy data object -- it just writes everything right into the
+                                  output array */
+        n_subdivisions,
+        curved_cell_region),
       // no copy-local-to-global function needed here
       std::function<void(const int &)>(),
       thread_data,

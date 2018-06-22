@@ -43,15 +43,15 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A class for storing at each cell represented by iterators of type @p CellIteratorType
  * a vector of data @p DataType .
- * The underlying structure and the initialize() method of this class are
- * designed in such a way that one could use different child classes derived
- * from the base DataType class to store data on a given cell. This implies the
- * usage of pointers, in our case -- std::shared_ptr().
+ * The underlying structure and the initialize() method of this class are designed
+ * in such a way that one could use different child classes derived from the
+ * base DataType class to store data on a given cell. This implies the usage of pointers,
+ * in our case -- std::shared_ptr().
  *
  * @note The data type stored on each cell can be different.
- * However, within the cell this class stores a vector of objects of a single
- * data type. For this reason, this class may not be sufficiently flexible when,
- * for example, adopting a level-set approach to describe material behavior.
+ * However, within the cell this class stores a vector of objects of a single data type.
+ * For this reason, this class may not be sufficiently flexible when, for example,
+ * adopting a level-set approach to describe material behavior.
  *
  * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
@@ -84,8 +84,8 @@ public:
    * use the erase() function.
    *
    * @note It is possible to use different types @p T for different cells which
-   * may reflect, for example, different constitutive models of continuum
-   * mechanics in different parts of the domain.
+   * may reflect, for example, different constitutive models of continuum mechanics
+   * in different parts of the domain.
    *
    * @pre The type @p T needs to either equal @p DataType, or be a class derived
    * from @p DataType. @p T needs to be default constructible.
@@ -128,8 +128,7 @@ public:
    * Get a vector of the data located at @p cell .
    * A possible additional typename @p T is the class to which the base class
    * DataType could be cast. Since @p DataType is stored as shared pointers,
-   * there is minimal overhead in returning a vector by value instead of by
-   * reference.
+   * there is minimal overhead in returning a vector by value instead of by reference.
    * This allows flexibility if class @p T is not the same as @p DataType on a
    * cell-by-cell basis.
    *
@@ -143,8 +142,7 @@ public:
    * Get a vector of constant pointers to data located at @p cell .
    * A possible additional typename @p T is the class to which the base class
    * DataType could be cast. Since @p DataType is stored as shared pointers,
-   * there is minimal overhead in returning a vector by value instead of by
-   * reference.
+   * there is minimal overhead in returning a vector by value instead of by reference.
    * This allows flexibility if class @p T is not the same as @p DataType on a
    * cell-by-cell basis.
    *
@@ -164,8 +162,7 @@ private:
 
 /**
  * An abstract class which specifies requirements for data on
- * a single quadrature point to be transferable during refinement or
- * repartitioning.
+ * a single quadrature point to be transferable during refinement or repartitioning.
  *
  * This class provides a framework by which derived classes representing data at
  * quadrature points can declare how many scalar values they store, and then
@@ -175,8 +172,8 @@ private:
  * upon mesh refinement and repartitioning.
  * The transfer of quadrature point data between parent and child cells requires
  * some kind of projection and/or interpolation.
- * One possible implementation is via the L2 projection and prolongation
- * matrices as implemented in ContinuousQuadratureDataTransfer class.
+ * One possible implementation is via the L2 projection and prolongation matrices
+ * as implemented in ContinuousQuadratureDataTransfer class.
  *
  * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
@@ -208,8 +205,7 @@ public:
    * quadrature point.
    *
    * @note  The function will be called with @p values of size number_of_values().
-   * The implementation may still have an assert to check that it is indeed the
-   * case.
+   * The implementation may still have an assert to check that it is indeed the case.
    */
   virtual void
   pack_values(std::vector<double> &values) const = 0;
@@ -219,8 +215,7 @@ public:
    * unpack a vector @p values into the data stored in this class.
    *
    * @note  The function will be called with @p values of size number_of_values().
-   * The implementation may still have an assert to check that it is indeed the
-   * case.
+   * The implementation may still have an assert to check that it is indeed the case.
    */
   virtual void
   unpack_values(const std::vector<double> &values) = 0;
@@ -233,40 +228,37 @@ namespace parallel
   namespace distributed
   {
     /**
-     * A class for the transfer of continuous data stored at quadrature points
-     * when performing h-adaptive refinement of
-     * parallel::distributed::Triangulation .
+     * A class for the transfer of continuous data stored at quadrature points when
+     * performing h-adaptive refinement of parallel::distributed::Triangulation .
      *
      * <h3>Implementation details</h3>
      *
      * This class implements the transfer of the quadrature point data between
-     * cells in case of adaptive refinement using L2 projection. That also
-     * includes automatic shipping of information between different processors.
+     * cells in case of adaptive refinement using L2 projection. That also includes
+     * automatic shipping of information between different processors.
      *
-     * To that end, the constructor of the class is provided with three main
-     * objects:
+     * To that end, the constructor of the class is provided with three main objects:
      * scalar FiniteElement @p projection_fe, @p mass_quadrature and @p data_quadrature
      * Quadrature rules.
      * First, the data located at @p data_quadrature of each cell is L2-projected
      * to the continuous space defined by a single FiniteElement @p projection_fe .
-     * This is achieved using
-     * FETools::compute_projection_from_quadrature_points_matrix(). In  doing so
-     * the mass matrix of this element is required, which will be calculated
+     * This is achieved using FETools::compute_projection_from_quadrature_points_matrix().
+     * In  doing so the mass matrix of this element is required, which will be calculated
      * with the @p mass_quadrature rule . Should the cell now belong to another processor,
-     * the data is then sent to this processor. The class makes use of a feature
-     * of p4est (and parallel::distributed::Triangulation) that allows one to
-     * attach information to cells during mesh refinement and rebalancing. On
-     * receiving information on the target cell, the data is projected back to
-     * the quadrature points using the matrix calculated by
+     * the data is then sent to this processor. The class makes use of a feature of p4est
+     * (and parallel::distributed::Triangulation) that allows one to attach information
+     * to cells during mesh refinement and rebalancing.
+     * On receiving information on the target cell, the data is projected back to the
+     * quadrature points using the matrix calculated by
      * FETools::compute_interpolation_to_quadrature_points_matrix() .
      * In the case that local refinement is performed, this class first
      * project local DoF values of the parent element to each child.
      *
      *
      * This class is templated by @p DataType type, however the user's @p DataType class
-     * has to be derived from the TransferableQuadraturePointData class. In
-     * practice that amounts to implementing the following three functions shown
-     * below for a quadrature point data with 2 scalars:
+     * has to be derived from the TransferableQuadraturePointData class. In practice
+     * that amounts to implementing the following three functions shown below for a
+     * quadrature point data with 2 scalars:
      * @code
      * class MyQData : public TransferableQuadraturePointData
      * {
@@ -298,16 +290,14 @@ namespace parallel
      *
      * This class can then be use with CellDataStorage in the following way:
      * @code
-     * CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,MyQData>
-     * data_storage;
-     * parallel::distributed::ContinuousQuadratureDataTransfer<dim,MyQData>
-     * data_transfer(FE_Q<dim>(2),QGauss<dim>(3),QGauss<dim>(4));
+     * CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,MyQData> data_storage;
+     * parallel::distributed::ContinuousQuadratureDataTransfer<dim,MyQData> data_transfer(FE_Q<dim>(2),QGauss<dim>(3),QGauss<dim>(4));
      * //...populate data for all active cells in data_storage
      * //...mark cells for refinement...
      * data_transfer.prepare_for_coarsening_and_refinement(triangulation,data_storage);
      * triangulation.execute_coarsening_and_refinement();
-     * //...initialize quadrature point data on new cells by calling
-     * CellDataStorage::reinit() data_transfer.interpolate();
+     * //...initialize quadrature point data on new cells by calling CellDataStorage::reinit()
+     * data_transfer.interpolate();
      * @endcode
      * This approach can be extended to quadrature point data with Tensors of
      * arbitrary order, although with a little bit more work in packing and
@@ -326,19 +316,17 @@ namespace parallel
      * points on the new mesh via FEValues class. The
      * ContinuousQuadratureDataTransfer class aims at simplifying the whole
      * process by only requiring that the quadrature point data class is derived
-     * from the TransferableQuadraturePointData. Everything else will be done
-     * automatically.
+     * from the TransferableQuadraturePointData. Everything else will be done automatically.
      *
      * @note This class is not well suited to situations where the values stored
      * at quadrature points represent samples from a discontinuous field. An
      * example for such a situation would be where the data stored at the
      * quadrature points represents the elastic or plastic state of a material,
-     * i.e., a property that varies discontinuously within a solid. In such
-     * cases, trying to transfer data from the quadrature points to a finite
-     * element field that is continuous (at least within one cell) will likely
-     * yield over and undershoots that, once evaluated at a different set of
-     * quadrature points (on child or parent cells) results in values that will
-     * not make much sense.
+     * i.e., a property that varies discontinuously within a solid. In such cases,
+     * trying to transfer data from the quadrature points to a finite element
+     * field that is continuous (at least within one cell) will likely yield over
+     * and undershoots that, once evaluated at a different set of quadrature points
+     * (on child or parent cells) results in values that will not make much sense.
      *
      * @author Denis Davydov, Jean-Paul Pelteret, 2016
      */
@@ -392,13 +380,13 @@ namespace parallel
 
       /**
        * Interpolate the data previously stored in this object before the mesh
-       * was refined or coarsened onto the quadrature points of the currently
-       * active set of cells.
+       * was refined or coarsened onto the quadrature points of the currently active
+       * set of cells.
        *
        * @note Before calling this function the user is expected to populate the
        * data stored in the @p data_storage object provided to prepare_for_coarsening_and_refinement()
-       * at new cells using CellDataStorage::initialize(). If that is not the
-       * case, an exception will be thrown in debug mode.
+       * at new cells using CellDataStorage::initialize(). If that is not the case,
+       * an exception will be thrown in debug mode.
        */
       void
       interpolate();
@@ -436,8 +424,7 @@ namespace parallel
       const std::unique_ptr<const FiniteElement<dim>> projection_fe;
 
       /**
-       * The size of the data that will be sent, which depends on the DataType
-       * class.
+       * The size of the data that will be sent, which depends on the DataType class.
        */
       std::size_t data_size_in_bytes;
 
@@ -459,8 +446,7 @@ namespace parallel
       FullMatrix<double> project_to_qp_matrix;
 
       /**
-       * Auxiliary matrix which represents projection of each internal value
-       * stored
+       * Auxiliary matrix which represents projection of each internal value stored
        * at the quadrature point (second index) to the local DoFs of the @p projection_fe
        * (first index).
        */
@@ -489,8 +475,7 @@ namespace parallel
       CellDataStorage<CellIteratorType, DataType> *data_storage;
 
       /**
-       * A pointer to the distributed triangulation to which cell data is
-       * attached.
+       * A pointer to the distributed triangulation to which cell data is attached.
        */
       parallel::distributed::Triangulation<dim> *triangulation;
     };
@@ -525,8 +510,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
     {
       map[cell] = std::vector<std::shared_ptr<DataType>>(n_q_points);
       // we need to initialize one-by-one as the std::vector<>(q, T())
-      // will end with a single same T object stored in each element of the
-      // vector:
+      // will end with a single same T object stored in each element of the vector:
       auto it = map.find(cell);
       for (unsigned int q = 0; q < n_q_points; q++)
         it->second[q] = std::make_shared<T>();
@@ -604,11 +588,10 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   auto it = map.find(cell);
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
 
-  // It would be nice to have a specialized version of this function for
-  // T==DataType. However explicit (i.e full) specialization of a member
-  // template is only allowed when the enclosing class is also explicitly (i.e
-  // fully) specialized. Thus, stick with copying of shared pointers even when
-  // the T==DataType:
+  // It would be nice to have a specialized version of this function for T==DataType.
+  // However explicit (i.e full) specialization of a member template is only allowed
+  // when the enclosing class is also explicitly (i.e fully) specialized.
+  // Thus, stick with copying of shared pointers even when the T==DataType:
   std::vector<std::shared_ptr<T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
     res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
@@ -769,9 +752,8 @@ namespace parallel
       data_storage  = &data_storage_;
       // get the number from the first active cell
       unsigned int number_of_values = 0;
-      // if triangulation has some active cells locally owned cells on this
-      // processor we can expect data to be initialized. Do that to get the
-      // number:
+      // if triangulation has some active cells locally owned cells on this processor we can expect
+      // data to be initialized. Do that to get the number:
       for (typename parallel::distributed::Triangulation<
              dim>::active_cell_iterator it = triangulation->begin_active();
            it != triangulation->end();
@@ -783,8 +765,7 @@ namespace parallel
             number_of_values = qpd[0]->number_of_values();
             break;
           }
-      // some processors may have no data stored, thus get the maximum among all
-      // processors:
+      // some processors may have no data stored, thus get the maximum among all processors:
       number_of_values = Utilities::MPI::max(number_of_values,
                                              triangulation->get_communicator());
       Assert(number_of_values > 0, ExcInternalError());
@@ -873,8 +854,7 @@ namespace parallel
                   ->get_prolongation_matrix(child, cell->refinement_case())
                   .mmult(matrix_dofs_child, matrix_dofs);
 
-                // now we do the usual business of evaluating FE on quadrature
-                // points:
+                // now we do the usual business of evaluating FE on quadrature points:
                 project_to_qp_matrix.mmult(matrix_quadrature,
                                            matrix_dofs_child);
 

@@ -15,8 +15,7 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator =
-// (dealii::Vector<TrilinosScalar>)
+// check TrilinosWrappers::MPI::Vector::operator = (dealii::Vector<TrilinosScalar>)
 
 #include <deal.II/base/utilities.h>
 

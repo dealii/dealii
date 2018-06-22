@@ -96,15 +96,15 @@ namespace Step44
   {
     // @sect4{Finite Element system}
 
-    // As mentioned in the introduction, a different order interpolation should
-    // be used for the displacement $\mathbf{u}$ than for the pressure
+    // As mentioned in the introduction, a different order interpolation should be
+    // used for the displacement $\mathbf{u}$ than for the pressure
     // $\widetilde{p}$ and the dilatation $\widetilde{J}$.  Choosing
     // $\widetilde{p}$ and $\widetilde{J}$ as discontinuous (constant) functions
-    // at the element level leads to the mean-dilatation method. The
-    // discontinuous approximation allows $\widetilde{p}$ and $\widetilde{J}$ to
-    // be condensed out and a classical displacement based method is recovered.
-    // Here we specify the polynomial order used to approximate the solution.
-    // The quadrature order should be adjusted accordingly.
+    // at the element level leads to the mean-dilatation method. The discontinuous
+    // approximation allows $\widetilde{p}$ and $\widetilde{J}$ to be condensed
+    // out and a classical displacement based method is recovered.  Here we
+    // specify the polynomial order used to approximate the solution.  The
+    // quadrature order should be adjusted accordingly.
     struct FESystem
     {
       unsigned int poly_degree;
@@ -306,9 +306,9 @@ namespace Step44
 
     // @sect4{Nonlinear solver}
 
-    // A Newton-Raphson scheme is used to solve the nonlinear system of
-    // governing equations.  We now define the tolerances and the maximum number
-    // of iterations for the Newton-Raphson nonlinear solver.
+    // A Newton-Raphson scheme is used to solve the nonlinear system of governing
+    // equations.  We now define the tolerances and the maximum number of
+    // iterations for the Newton-Raphson nonlinear solver.
     struct NonlinearSolver
     {
       unsigned int max_iterations_NR;
@@ -392,8 +392,8 @@ namespace Step44
 
     // @sect4{All parameters}
 
-    // Finally we consolidate all of the above structures into a single
-    // container that holds all of our run-time selections.
+    // Finally we consolidate all of the above structures into a single container
+    // that holds all of our run-time selections.
     struct AllParameters : public FESystem,
                            public Geometry,
                            public Materials,
@@ -512,9 +512,9 @@ namespace Step44
   // and provides a central point that one would need to modify if one were to
   // implement a different material model. For it to work, we will store one
   // object of this type per quadrature point, and in each of these objects
-  // store the current state (characterized by the values or measures  of the
-  // three fields) so that we can compute the elastic coefficients linearized
-  // around the current state.
+  // store the current state (characterized by the values or measures  of the three fields)
+  // so that we can compute the elastic coefficients linearized around the
+  // current state.
   template <int dim>
   class Material_Compressible_Neo_Hook_Three_Field
   {
@@ -1105,21 +1105,20 @@ namespace Step44
   //
   // Care must be taken (or at least some thought given) when imposing the
   // constraint $\widetilde{J}=1$ on the initial solution field. The constraint
-  // corresponds to the determinant of the deformation gradient in the
-  // undeformed configuration, which is the identity tensor. We use
-  // FE_DGPMonomial bases to interpolate the dilatation field, thus we can't
+  // corresponds to the determinant of the deformation gradient in the undeformed
+  // configuration, which is the identity tensor.
+  // We use FE_DGPMonomial bases to interpolate the dilatation field, thus we can't
   // simply set the corresponding dof to unity as they correspond to the
   // monomial coefficients. Thus we use the VectorTools::project function to do
   // the work for us. The VectorTools::project function requires an argument
   // indicating the hanging node constraints. We have none in this program
   // So we have to create a constraint object. In its original state, constraint
-  // objects are unsorted, and have to be sorted (using the
-  // ConstraintMatrix::close function) before they can be used. Have a look at
-  // step-21 for more information. We only need to enforce the initial condition
-  // on the dilatation. In order to do this, we make use of a
-  // ComponentSelectFunction which acts as a mask and sets the J_component of
-  // n_components to 1. This is exactly what we want. Have a look at its usage
-  // in step-20 for more information.
+  // objects are unsorted, and have to be sorted (using the ConstraintMatrix::close function)
+  // before they can be used. Have a look at step-21 for more information.
+  // We only need to enforce the initial condition on the dilatation.
+  // In order to do this, we make use of a ComponentSelectFunction which acts
+  // as a mask and sets the J_component of n_components to 1. This is exactly what
+  // we want. Have a look at its usage in step-20 for more information.
   template <int dim>
   void Solid<dim>::run()
   {
@@ -1566,12 +1565,9 @@ namespace Step44
       // The global system matrix initially has the following structure
       // @f{align*}
       // \underbrace{\begin{bmatrix}
-      //   \mathsf{\mathbf{K}}_{uu}  & \mathsf{\mathbf{K}}_{u\widetilde{p}} &
-      //   \mathbf{0}
-      //   \\ \mathsf{\mathbf{K}}_{\widetilde{p}u} & \mathbf{0} &
-      //   \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}
-      //   \\ \mathbf{0} & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}} &
-      //   \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
+      //   \mathsf{\mathbf{K}}_{uu}  & \mathsf{\mathbf{K}}_{u\widetilde{p}} & \mathbf{0}
+      //   \\ \mathsf{\mathbf{K}}_{\widetilde{p}u} & \mathbf{0} & \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}
+      //   \\ \mathbf{0} & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}} & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
       // \end{bmatrix}}_{\mathsf{\mathbf{K}}(\mathbf{\Xi}_{\textrm{i}})}
       //      \underbrace{\begin{bmatrix}
       //          d \mathsf{u}
@@ -1620,9 +1616,9 @@ namespace Step44
 
 
   // @sect4{Solid::determine_component_extractors}
-  // Next we compute some information from the FE system that describes which
-  // local element DOFs are attached to which block component.  This is used
-  // later to extract sub-blocks from the global matrix.
+  // Next we compute some information from the FE system that describes which local
+  // element DOFs are attached to which block component.  This is used later to
+  // extract sub-blocks from the global matrix.
   //
   // In essence, all we need is for the FESystem object to indicate to which
   // block component a DOF on the reference cell is attached to.  Currently, the
@@ -1689,8 +1685,8 @@ namespace Step44
   // the task across a number of CPU cores.
   //
   // To start this, we first we need to obtain the total solution as it stands
-  // at this Newton increment and then create the initial copy of the scratch
-  // and copy data objects:
+  // at this Newton increment and then create the initial copy of the scratch and
+  // copy data objects:
   template <int dim>
   void
   Solid<dim>::update_qph_incremental(const BlockVector<double> &solution_delta)
@@ -1956,8 +1952,7 @@ namespace Step44
   }
 
   // Calculate how well the dilatation $\widetilde{J}$ agrees with $J :=
-  // \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[ \int_{\Omega_0} {[
-  // J
+  // \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[ \int_{\Omega_0} {[ J
   // - \widetilde{J}]}^{2}\textrm{d}V \bigr]^{1/2}$.
   // We also return the ratio of the current volume of the
   // domain to the reference volume. This is of interest for incompressible
@@ -2001,9 +1996,9 @@ namespace Step44
   // @sect4{Solid::get_error_residual}
 
   // Determine the true residual error for the problem.  That is, determine the
-  // error in the residual for the unconstrained degrees of freedom.  Note that
-  // to do so, we need to ignore constrained DOFs by setting the residual in
-  // these vector components to zero.
+  // error in the residual for the unconstrained degrees of freedom.  Note that to
+  // do so, we need to ignore constrained DOFs by setting the residual in these
+  // vector components to zero.
   template <int dim>
   void Solid<dim>::get_error_residual(Errors &error_residual)
   {
@@ -2042,9 +2037,9 @@ namespace Step44
 
   // @sect4{Solid::get_total_solution}
 
-  // This function provides the total solution, which is valid at any Newton
-  // step. This is required as, to reduce computational error, the total
-  // solution is only updated at the end of the timestep.
+  // This function provides the total solution, which is valid at any Newton step.
+  // This is required as, to reduce computational error, the total solution is
+  // only updated at the end of the timestep.
   template <int dim>
   BlockVector<double> Solid<dim>::get_total_solution(
     const BlockVector<double> &solution_delta) const
@@ -2214,8 +2209,7 @@ namespace Step44
                       data.cell_matrix(i, j) += grad_Nx[i][component_i] * tau *
                                                 grad_Nx[j][component_j] * JxW;
                   }
-                // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
-                // contribution
+                // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$ contribution
                 else if ((i_group == p_dof) && (j_group == u_dof))
                   {
                     data.cell_matrix(i, j) +=
@@ -2224,9 +2218,9 @@ namespace Step44
                        Physics::Elasticity::StandardTensors<dim>::I) *
                       JxW;
                   }
-                // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J}
-                // \widetilde{p}}$ and $\mathsf{\mathbf{k}}_{ \widetilde{J}
-                // \widetilde{J}}$ contributions:
+                // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{p}}$
+                // and $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$
+                // contributions:
                 else if ((i_group == J_dof) && (j_group == p_dof))
                   data.cell_matrix(i, j) -= N[i] * N[j] * JxW;
                 else if ((i_group == j_group) && (i_group == J_dof))
@@ -2627,22 +2621,19 @@ namespace Step44
   // The static condensation process could be performed at a global level but we
   // need the inverse of one of the blocks. However, since the pressure and
   // dilatation variables are discontinuous, the static condensation (SC)
-  // operation can also be done on a per-cell basis and we can produce the
-  // inverse of the block-diagonal
-  // $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}$ block by inverting the
-  // local blocks. We can again use TBB to do this since each operation will be
-  // independent of one another.
+  // operation can also be done on a per-cell basis and we can produce the inverse of
+  // the block-diagonal $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}$
+  // block by inverting the local blocks. We can again use TBB to do this since
+  // each operation will be independent of one another.
   //
-  // Using the TBB via the WorkStream class, we assemble the contributions to
-  // form
+  // Using the TBB via the WorkStream class, we assemble the contributions to form
   //  $
   //  \mathsf{\mathbf{K}}_{\textrm{con}}
-  //  = \bigl[ \mathsf{\mathbf{K}}_{uu} +
-  //  \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
+  //  = \bigl[ \mathsf{\mathbf{K}}_{uu} + \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
   //  $
-  // from each element's contributions. These contributions are then added to
-  // the global stiffness matrix. Given this description, the following two
-  // functions should be clear:
+  // from each element's contributions. These contributions are then added to the
+  // global stiffness matrix. Given this description, the following two functions
+  // should be clear:
   template <int dim>
   void Solid<dim>::assemble_sc()
   {
@@ -2710,35 +2701,29 @@ namespace Step44
     // is of the form:
     // @f{align*}
     //    \begin{bmatrix}
-    //       \mathsf{\mathbf{k}}_{uu}  &  \mathsf{\mathbf{k}}_{u\widetilde{p}}
-    //       & \mathbf{0}
-    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0}  &
-    //    \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}
-    //    \\ \mathbf{0}  &  \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}  &
-    //    \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}} \end{bmatrix}
+    //       \mathsf{\mathbf{k}}_{uu}  &  \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
+    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0}  &  \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}
+    //    \\ \mathbf{0}  &  \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}  & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
+    //    \end{bmatrix}
     // @f}
     //
     // We now need to modify it such that it appear as
     // @f{align*}
     //    \begin{bmatrix}
-    //       \mathsf{\mathbf{k}}_{\textrm{con}}   &
-    //       \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
-    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0} &
-    //    \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
-    //    \\ \mathbf{0} & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}} &
-    //    \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}} \end{bmatrix}
+    //       \mathsf{\mathbf{k}}_{\textrm{con}}   & \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
+    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0} & \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
+    //    \\ \mathbf{0} & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}} & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
+    //    \end{bmatrix}
     // @f}
-    // with $\mathsf{\mathbf{k}}_{\textrm{con}} = \bigl[
-    // \mathsf{\mathbf{k}}_{uu} +\overline{\overline{\mathsf{\mathbf{k}}}}~
-    // \bigr]$ where $               \overline{\overline{\mathsf{\mathbf{k}}}}
-    // := \mathsf{\mathbf{k}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{k}}}
-    // \mathsf{\mathbf{k}}_{\widetilde{p}u}
+    // with $\mathsf{\mathbf{k}}_{\textrm{con}} = \bigl[ \mathsf{\mathbf{k}}_{uu} +\overline{\overline{\mathsf{\mathbf{k}}}}~ \bigr]$
+    // where
+    // $               \overline{\overline{\mathsf{\mathbf{k}}}} :=
+    // \mathsf{\mathbf{k}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{k}}} \mathsf{\mathbf{k}}_{\widetilde{p}u}
     // $
     // and
     // $
     //    \overline{\mathsf{\mathbf{k}}} =
-    //     \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}^{-1}
-    //     \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
+    //     \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
     //    \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
     // $.
     //
@@ -2768,8 +2753,7 @@ namespace Step44
     // static-condensation $\overline{\overline{\mathsf{\mathbf{k}}}}$.
     //
     // - $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$:
-    //                      Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p}
-    //                      \widetilde{J}}$ exists in
+    //                      Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ exists in
     //          the subblock. Since the copy
     //          operation is a += operation, we
     //          need to subtract the existing
@@ -2887,72 +2871,51 @@ namespace Step44
 
     if (parameters.use_static_condensation == true)
       {
-        // Firstly, here is the approach using the (permanent) augmentation of
-        // the tangent matrix. For the following, recall that
+        // Firstly, here is the approach using the (permanent) augmentation of the
+        // tangent matrix.
+        // For the following, recall that
         // @f{align*}
         //  \mathsf{\mathbf{K}}_{\textrm{store}}
         //:=
         //  \begin{bmatrix}
-        //      \mathsf{\mathbf{K}}_{\textrm{con}}      &
-        //      \mathsf{\mathbf{K}}_{u\widetilde{p}}    & \mathbf{0}
-        //  \\  \mathsf{\mathbf{K}}_{\widetilde{p}u}    &       \mathbf{0} &
-        //  \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
-        //  \\  \mathbf{0}      &
-        //  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}                &
-        //  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}} \end{bmatrix} \, .
+        //      \mathsf{\mathbf{K}}_{\textrm{con}}      &       \mathsf{\mathbf{K}}_{u\widetilde{p}}    & \mathbf{0}
+        //  \\  \mathsf{\mathbf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+        //  \\  \mathbf{0}      &       \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}                & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
+        //  \end{bmatrix} \, .
         // @f}
         // and
         //  @f{align*}
         //              d \widetilde{\mathsf{\mathbf{p}}}
-        //              & =
-        //              \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
-        //              \bigl[
+        //              & = \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \bigl[
         //                       \mathsf{\mathbf{F}}_{\widetilde{J}}
-        //                       -
-        //                       \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
-        //                       d \widetilde{\mathsf{\mathbf{J}}} \bigr]
+        //                       - \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathsf{\mathbf{J}}} \bigr]
         //              \\ d \widetilde{\mathsf{\mathbf{J}}}
-        //              & =
-        //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
-        //              \bigl[
+        //              & = \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
         //                      \mathsf{\mathbf{F}}_{\widetilde{p}}
-        //                      - \mathsf{\mathbf{K}}_{\widetilde{p}u} d
-        //                      \mathsf{\mathbf{u}} \bigr]
+        //                      - \mathsf{\mathbf{K}}_{\widetilde{p}u} d \mathsf{\mathbf{u}}
+        //                      \bigr]
         //               \\ \Rightarrow d \widetilde{\mathsf{\mathbf{p}}}
-        //              &= \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
-        //              \mathsf{\mathbf{F}}_{\widetilde{J}}
-        //              -
-        //              \underbrace{\bigl[\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
-        //              \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
-        //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}\bigr]}_{\overline{\mathsf{\mathbf{K}}}}\bigl[
-        //              \mathsf{\mathbf{F}}_{\widetilde{p}}
-        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d
-        //              \mathsf{\mathbf{u}} \bigr]
+        //              &=  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{F}}_{\widetilde{J}}
+        //              - \underbrace{\bigl[\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
+        //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}\bigr]}_{\overline{\mathsf{\mathbf{K}}}}\bigl[ \mathsf{\mathbf{F}}_{\widetilde{p}}
+        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d \mathsf{\mathbf{u}} \bigr]
         //  @f}
         //  and thus
         //  @f[
-        //              \underbrace{\bigl[ \mathsf{\mathbf{K}}_{uu} +
-        //              \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
-        //              }_{\mathsf{\mathbf{K}}_{\textrm{con}}} d
-        //              \mathsf{\mathbf{u}}
+        //              \underbrace{\bigl[ \mathsf{\mathbf{K}}_{uu} + \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
+        //              }_{\mathsf{\mathbf{K}}_{\textrm{con}}} d \mathsf{\mathbf{u}}
         //              =
         //          \underbrace{
         //              \Bigl[
         //              \mathsf{\mathbf{F}}_{u}
-        //                      - \mathsf{\mathbf{K}}_{u\widetilde{p}} \bigl[
-        //                      \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
-        //                      \mathsf{\mathbf{F}}_{\widetilde{J}}
-        //                      -
-        //                      \overline{\mathsf{\mathbf{K}}}\mathsf{\mathbf{F}}_{\widetilde{p}}
-        //                      \bigr]
+        //                      - \mathsf{\mathbf{K}}_{u\widetilde{p}} \bigl[ \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{F}}_{\widetilde{J}}
+        //                      - \overline{\mathsf{\mathbf{K}}}\mathsf{\mathbf{F}}_{\widetilde{p}} \bigr]
         //              \Bigr]}_{\mathsf{\mathbf{F}}_{\textrm{con}}}
         //  @f]
         //  where
         //  @f[
         //              \overline{\overline{\mathsf{\mathbf{K}}}} :=
-        //                      \mathsf{\mathbf{K}}_{u\widetilde{p}}
-        //                      \overline{\mathsf{\mathbf{K}}}
-        //                      \mathsf{\mathbf{K}}_{\widetilde{p}u} \, .
+        //                      \mathsf{\mathbf{K}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{K}}} \mathsf{\mathbf{K}}_{\widetilde{p}u} \, .
         //  @f]
 
         // At the top, we allocate two temporary vectors to help with the
@@ -2966,12 +2929,11 @@ namespace Step44
         // displacement $d\mathbf{u}$.  To this end, we perform static
         // condensation to make
         //    $\mathsf{\mathbf{K}}_{\textrm{con}}
-        //    = \bigl[ \mathsf{\mathbf{K}}_{uu} +
-        //    \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]$
+        //    = \bigl[ \mathsf{\mathbf{K}}_{uu} + \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]$
         // and put
         // $\mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}$
-        // in the original $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$
-        // block. That is, we make $\mathsf{\mathbf{K}}_{\textrm{store}}$.
+        // in the original $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$ block.
+        // That is, we make $\mathsf{\mathbf{K}}_{\textrm{store}}$.
         {
           assemble_sc();
 
@@ -3226,17 +3188,17 @@ namespace Step44
             // Manual condensation of the dilatation and pressure fields on
             // a local level, and subsequent post-processing, took quite a
             // bit of effort to achieve. To recap, we had to produce the
-            // inverse matrix
-            // $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}$, which
-            // was permanently written into the global tangent matrix. We then
-            // permanently modified $\mathsf{\mathbf{K}}_{uu}$ to produce
-            // $\mathsf{\mathbf{K}}_{\textrm{con}}$. This involved the
-            // extraction and manipulation of local sub-blocks of the tangent
-            // matrix. After solving for the displacement, the individual
-            // matrix-vector operations required to solve for dilatation and
-            // pressure were carefully implemented. Contrast these many sequence
-            // of steps to the much simpler and transparent implementation using
-            // functionality provided by the LinearOperator class.
+            // inverse matrix $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}$,
+            // which was permanently written into the global tangent matrix.
+            // We then permanently modified $\mathsf{\mathbf{K}}_{uu}$ to
+            // produce $\mathsf{\mathbf{K}}_{\textrm{con}}$. This involved
+            // the extraction and manipulation of local sub-blocks of the
+            // tangent matrix. After solving for the displacement, the
+            // individual matrix-vector operations required to solve for
+            // dilatation and pressure were carefully implemented.
+            // Contrast these many sequence of steps to the much simpler and
+            // transparent implementation using functionality provided by the
+            // LinearOperator class.
 
             // For ease of later use, we define some aliases for
             // blocks in the RHS vector
@@ -3249,9 +3211,9 @@ namespace Step44
             Vector<double> &d_p = newton_update.block(p_dof);
             Vector<double> &d_J = newton_update.block(J_dof);
 
-            // We next define some linear operators for the tangent matrix
-            // sub-blocks We will exploit the symmetry of the system, so not all
-            // blocks are required.
+            // We next define some linear operators for the tangent matrix sub-blocks
+            // We will exploit the symmetry of the system, so not all blocks
+            // are required.
             const auto K_uu =
               linear_operator(tangent_matrix.block(u_dof, u_dof));
             const auto K_up =
@@ -3263,11 +3225,10 @@ namespace Step44
             const auto K_JJ =
               linear_operator(tangent_matrix.block(J_dof, J_dof));
 
-            // We then construct a LinearOperator that represents the inverse of
-            // (square block)
-            // $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}$. Since it is
-            // diagonal (or, when a higher order ansatz it used, nearly
-            // diagonal), a Jacobi preconditioner is suitable.
+            // We then construct a LinearOperator that represents the inverse of (square block)
+            // $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}$. Since it is diagonal (or,
+            // when a higher order ansatz it used, nearly diagonal), a Jacobi preconditioner
+            // is suitable.
             PreconditionSelector<SparseMatrix<double>, Vector<double>>
               preconditioner_K_Jp_inv("jacobi");
             preconditioner_K_Jp_inv.use_matrix(
@@ -3283,33 +3244,29 @@ namespace Step44
             const auto K_Jp_inv =
               inverse_operator(K_Jp, solver_K_Jp_inv, preconditioner_K_Jp_inv);
 
-            // Now we can construct that transpose of
-            // $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}$ and a
-            // linear operator that represents the condensed operations
+            // Now we can construct that transpose of $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}$
+            // and a linear operator that represents the condensed operations
             // $\overline{\mathsf{\mathbf{K}}}$ and
-            // $\overline{\overline{\mathsf{\mathbf{K}}}}$ and the final
-            // augmented matrix
+            // $\overline{\overline{\mathsf{\mathbf{K}}}}$ and the final augmented matrix
             // $\mathsf{\mathbf{K}}_{\textrm{con}}$.
-            // Note that the schur_complement() operator could also be of use
-            // here, but for clarity and the purpose of demonstrating the
-            // similarities between the formulation and implementation of the
-            // linear solution scheme, we will perform these operations
-            // manually.
+            // Note that the schur_complement() operator could also be of use here, but
+            // for clarity and the purpose of demonstrating the similarities between the
+            // formulation and implementation of the linear solution scheme, we will perform
+            // these operations manually.
             const auto K_pJ_inv     = transpose_operator(K_Jp_inv);
             const auto K_pp_bar     = K_Jp_inv * K_JJ * K_pJ_inv;
             const auto K_uu_bar_bar = K_up * K_pp_bar * K_pu;
             const auto K_uu_con     = K_uu + K_uu_bar_bar;
 
-            // Lastly, we define an operator for inverse of augmented stiffness
-            // matrix, namely $\mathsf{\mathbf{K}}_{\textrm{con}}^{-1}$. Note
-            // that the preconditioner for the augmented stiffness matrix is
-            // different to the case when we use static condensation. In this
-            // instance, the preconditioner is based on a non-modified
-            // $\mathsf{\mathbf{K}}_{uu}$, while with the first approach we
-            // actually modified the entries of this sub-block. However, since
-            // $\mathsf{\mathbf{K}}_{\textrm{con}}$ and
-            // $\mathsf{\mathbf{K}}_{uu}$ operate on the same space, it remains
-            // adequate for this problem.
+            // Lastly, we define an operator for inverse of augmented stiffness matrix,
+            // namely $\mathsf{\mathbf{K}}_{\textrm{con}}^{-1}$.
+            // Note that the preconditioner for the augmented stiffness matrix is
+            // different to the case when we use static condensation. In this instance,
+            // the preconditioner is based on a non-modified $\mathsf{\mathbf{K}}_{uu}$,
+            // while with the first approach we actually modified the entries of this
+            // sub-block. However, since $\mathsf{\mathbf{K}}_{\textrm{con}}$ and
+            // $\mathsf{\mathbf{K}}_{uu}$ operate on the same space, it remains adequate
+            // for this problem.
             PreconditionSelector<SparseMatrix<double>, Vector<double>>
               preconditioner_K_con_inv(parameters.preconditioner_type,
                                        parameters.preconditioner_relaxation);
@@ -3338,8 +3295,8 @@ namespace Step44
 
             timer.leave_subsection();
 
-            // The operations need to post-process for the dilatation and
-            // pressure fields are just as easy to express.
+            // The operations need to post-process for the dilatation and pressure
+            // fields are just as easy to express.
             timer.enter_subsection("Linear solver postprocessing");
             std::cout << " PP " << std::flush;
 

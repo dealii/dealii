@@ -91,8 +91,7 @@ test_distributed_cpt(unsigned int ref_cube)
   const auto &points = std::get<3>(output_tuple);
   const auto &ranks  = std::get<4>(output_tuple);
 
-  // Testing the results: if the map in maps is correct test_points[maps[i][j]]
-  // == points[i][j]
+  // Testing the results: if the map in maps is correct test_points[maps[i][j]] == points[i][j]
   bool test_passed = true;
 
   for (unsigned int i = 0; i < points.size(); ++i)

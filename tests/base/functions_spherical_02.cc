@@ -24,17 +24,17 @@
 spherical:
 f: r*r*cos(theta)*sin(phi);
 [diff(f,r), diff(f,theta), diff(f,phi)];
-[diff(f,r,2), diff(f,theta,2), diff(f,phi,2), diff(f,r,1,theta,1),
-diff(f,r,1,phi,1), diff (f,theta,1,phi,1)];
+[diff(f,r,2), diff(f,theta,2), diff(f,phi,2), diff(f,r,1,theta,1), diff(f,r,1,phi,1), diff (f,theta,1,phi,1)];
 
 Cartesian:
 
 assume(r>0);
 srule: [r= sqrt(x*x+y*y+z*z)];
-srule2: [sqrt(x*x+y*y+z*z) = r, x*x+y*y+z*z = r^2, expand((x*x+y*y+z*z)^2) =
-r^4]; f: subst(srule,r*r*x/r); df: fullratsimp([diff(f,x), diff(f,y),
-diff(f,z)]); df2 :(subst(srule2,expand(df))); ddf : fullratsimp([diff(f,x,2),
-diff(f,y,2), diff(f,z,2), diff(f,x,1,y,1), diff(f,x,1,z,1), diff(f,y,1,z,1)]);
+srule2: [sqrt(x*x+y*y+z*z) = r, x*x+y*y+z*z = r^2, expand((x*x+y*y+z*z)^2) = r^4];
+f: subst(srule,r*r*x/r);
+df: fullratsimp([diff(f,x), diff(f,y), diff(f,z)]);
+df2 :(subst(srule2,expand(df)));
+ddf : fullratsimp([diff(f,x,2), diff(f,y,2), diff(f,z,2), diff(f,x,1,y,1), diff(f,x,1,z,1), diff(f,y,1,z,1)]);
 ddf2: (subst(srule2,expand(ddf)));
 
  */

@@ -561,8 +561,7 @@ FlatManifold<dim, spacedim>::get_new_point(
                      ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
             }
 
-      // compute the weighted average point, possibly taking into account
-      // periodicity
+      // compute the weighted average point, possibly taking into account periodicity
       for (unsigned int i = 0; i < surrounding_points.size(); ++i)
         {
           Point<spacedim> dp;

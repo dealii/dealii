@@ -51,11 +51,11 @@ test()
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
               << " / " << tr.n_global_active_cells() << std::endl;
 
-      // tr.write_mesh_vtk("a");
+      //tr.write_mesh_vtk("a");
 
       tr.repartition();
 
-      // tr.write_mesh_vtk("b");
+      //tr.write_mesh_vtk("b");
 
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
               << " / " << tr.n_global_active_cells() << std::endl;

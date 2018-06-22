@@ -15,8 +15,8 @@
 
 
 
-// Test FEFieldFunction for parallel computations. Specifically, we should be
-// able to evaluate it in owned or ghost cells.
+// Test FEFieldFunction for parallel computations. Specifically, we should be able
+// to evaluate it in owned or ghost cells.
 
 // This used to crash with VectorTools::ExcPointNotAvailableHere() because we
 // didn't expect getting a ghost cell.
@@ -155,8 +155,7 @@ test()
         }
     }
 
-  // also hit the code path for list version (no need to cover gradients/laplace
-  // here):
+  // also hit the code path for list version (no need to cover gradients/laplace here):
   std::vector<double> values(points.size());
   field_function.value_list(points, values, 0);
 

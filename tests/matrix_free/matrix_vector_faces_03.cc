@@ -52,7 +52,7 @@ test()
   tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  // if (fe_degree == 1)
+  //if (fe_degree == 1)
   //  tria.refine_global(1);
   cell = tria.begin_active();
   for (unsigned int i = 0; i < 9 - 3 * dim; ++i)

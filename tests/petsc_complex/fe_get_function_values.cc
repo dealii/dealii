@@ -109,7 +109,7 @@ test()
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
-  // set vector:
+  //set vector:
   unsigned int myid = Utilities::MPI::this_mpi_process(mpi_communicator);
   for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); i++)
     {
@@ -127,10 +127,10 @@ test()
   vector_Re_locally_relevant = vector_Re;
   vector_Im_locally_relevant = vector_Im;
 
-  // test get_function_values:
+  //test get_function_values:
   {
-    // a separate quadrature formula
-    // enough for mass and kinetic matrices assembly
+    //a separate quadrature formula
+    //enough for mass and kinetic matrices assembly
     QGauss<dim>   quadrature_formula(poly_degree + 1);
     FEValues<dim> fe_values(fe,
                             quadrature_formula,

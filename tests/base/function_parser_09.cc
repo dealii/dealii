@@ -46,7 +46,7 @@ main()
 {
   initlog();
 
-  double random = eval("rand()"); // random seed
+  double random = eval("rand()"); //random seed
 
   if (0.0 <= random && random <= 1.0)
     deallog << "OK" << std::endl;

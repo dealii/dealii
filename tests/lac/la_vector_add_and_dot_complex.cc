@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// check that LinearAlgebra::Vector::add_and_dot works correctly for
-// complex-valued vectors
+// check that LinearAlgebra::Vector::add_and_dot works correctly for complex-valued
+// vectors
 
 #include <deal.II/lac/la_vector.h>
 

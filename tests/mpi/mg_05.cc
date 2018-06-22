@@ -109,7 +109,7 @@ test()
 
       DoFHandler<dim> dofh(tr);
 
-      // output(tr);
+      //output(tr);
 
       static const FE_Q<dim> fe(1);
       dofh.distribute_dofs(fe);
@@ -132,8 +132,7 @@ test()
                     if (cell->at_boundary(f))
                       continue;
 
-                    //        deallog << cell->neighbor(f)->level_subdomain_id()
-                    //        << std::endl;
+                    //        deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
                     // is cell level-artificial?
                     Assert(cell->neighbor(f)->level_subdomain_id() < 100,
                            ExcInternalError());

@@ -100,14 +100,14 @@ MGTransferSelect<number>::copy_from_mg(
   do_copy_from_mg(mg_dof_handler, dst, src);
   if (constraints != nullptr)
     {
-      // If we were given constraints
-      // apply them to the dst that goes
-      // back now to the linear solver.
-      // Since constraints are globally
-      // defined create a global vector here
-      // and copy dst to the right component,
-      // apply the constraints then and copy
-      // the block back to dst.
+      //If we were given constraints
+      //apply them to the dst that goes
+      //back now to the linear solver.
+      //Since constraints are globally
+      //defined create a global vector here
+      //and copy dst to the right component,
+      //apply the constraints then and copy
+      //the block back to dst.
       const unsigned int n_blocks =
         *std::max_element(target_component.begin(), target_component.end()) + 1;
       std::vector<types::global_dof_index> dofs_per_block(n_blocks);

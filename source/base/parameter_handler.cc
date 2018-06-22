@@ -1163,8 +1163,8 @@ ParameterHandler::recursively_print_parameters(
                           label.append("/");
                         }
                       label.append(p->first);
-                      // Backwards-compatibility. Output the label with and
-                      // without escaping whitespace:
+                      // Backwards-compatibility. Output the label with and without
+                      // escaping whitespace:
                       if (label.find("_20") != std::string::npos)
                         out << "\\label{"
                             << Utilities::replace_in_string(label, "_20", " ")
@@ -1226,8 +1226,8 @@ ParameterHandler::recursively_print_parameters(
                           label.append("/");
                         }
                       label.append(p->first);
-                      // Backwards-compatibility. Output the label with and
-                      // without escaping whitespace:
+                      // Backwards-compatibility. Output the label with and without
+                      // escaping whitespace:
                       if (label.find("_20") != std::string::npos)
                         out << "\\label{"
                             << Utilities::replace_in_string(label, "_20", " ")
@@ -1475,9 +1475,8 @@ ParameterHandler::print_parameters_section(
               // the current section under it
               boost::property_tree::ptree single_node_tree;
 
-              // if there is no subsection selected, add the whole tree of
-              // entries, otherwise add a root element and the selected
-              // subsection under it
+              // if there is no subsection selected, add the whole tree of entries,
+              // otherwise add a root element and the selected subsection under it
               if (subsection_path.size() == 0)
                 {
                   single_node_tree.add_child("ParameterHandler", *entries);
@@ -1981,7 +1980,7 @@ ParameterHandler::scan_line(std::string        line,
   while (line.find('\t') != std::string::npos)
     line.replace(line.find('\t'), 1, " ");
 
-  // trim start and end:
+  //trim start and end:
   line = Utilities::trim(line);
 
   // if line is now empty: leave
@@ -2165,7 +2164,7 @@ ParameterHandler::scan_line(std::string        line,
 std::size_t
 ParameterHandler::memory_consumption() const
 {
-  // TODO: add to this an estimate of the memory in the property_tree
+  //TODO: add to this an estimate of the memory in the property_tree
   return (MemoryConsumption::memory_consumption(subsection_path));
 }
 

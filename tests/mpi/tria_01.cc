@@ -58,7 +58,7 @@ test()
 
   deallog << "subdomainid = " << tr.begin_active()->subdomain_id() << std::endl;
 
-  // if (myid!=0)
+  //if (myid!=0)
   //   Assert(tr.begin(1)==tr.end(1), ExcInternalError());
 
   const unsigned int checksum = tr.get_checksum();

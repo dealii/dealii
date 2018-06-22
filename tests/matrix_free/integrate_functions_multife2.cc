@@ -281,7 +281,7 @@ test()
 
   deallog << "Testing " << fe0.get_name() << " and " << fe1.get_name()
           << std::endl;
-  // std::cout << "Number of cells: " << tria.n_active_cells() << std::endl;
+  //std::cout << "Number of cells: " << tria.n_active_cells() << std::endl;
 
   std::vector<Vector<number>> dst(6);
   dst[0].reinit(dof[0]->n_dofs());
@@ -300,12 +300,10 @@ test()
   constraint1.close();
   constraints[1] = &constraint1;
 
-  // std::cout << "Number of degrees of freedom FE 0: " << dof[0]->n_dofs() <<
-  // std::endl; std::cout << "Number of constraints FE 0: " <<
-  // constraints[0]->n_constraints() << std::endl; std::cout << "Number of
-  // degrees of freedom FE 1: " << dof[1]->n_dofs() << std::endl; std::cout <<
-  // "Number of constraints FE 1: " << constraints[1]->n_constraints() <<
-  // std::endl;
+  //std::cout << "Number of degrees of freedom FE 0: " << dof[0]->n_dofs() << std::endl;
+  //std::cout << "Number of constraints FE 0: " << constraints[0]->n_constraints() << std::endl;
+  //std::cout << "Number of degrees of freedom FE 1: " << dof[1]->n_dofs() << std::endl;
+  //std::cout << "Number of constraints FE 1: " << constraints[1]->n_constraints() << std::endl;
 
   MatrixFree<dim, number> mf_data;
   {

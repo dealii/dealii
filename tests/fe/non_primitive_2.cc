@@ -225,8 +225,8 @@ test(const unsigned int p)
   // for the stokes equation the
   // pressure does not couple to
   // itself
-  //   std::vector<std::vector<bool> > mask (dim+1, std::vector<bool> (dim+1,
-  //   true)); mask[dim][dim] = false;
+  //   std::vector<std::vector<bool> > mask (dim+1, std::vector<bool> (dim+1, true));
+  //   mask[dim][dim] = false;
 
   DoFTools::make_sparsity_pattern(dof_handler, /*mask,*/ sparsity);
   sparsity.compress();

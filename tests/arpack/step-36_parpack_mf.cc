@@ -14,8 +14,7 @@
  * ---------------------------------------------------------------------
 
  *
- * This file tests the PARPACK interface for a symmetric operator taken from
- step-36
+ * This file tests the PARPACK interface for a symmetric operator taken from step-36
  * using matrix-free operators.
  *
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.

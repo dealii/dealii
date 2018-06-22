@@ -17,19 +17,11 @@
 
 // distributing FE_Q multigrid DoFs fails
 /*
-An error occurred in line <1344> of file
-</scratch/deal-trunk/deal.II/source/dofs/dof_handler_policy.cc> in function void
-dealii::internal::DoFHandler::Policy::{anonymous}::set_mg_dofindices_recursively(const
-dealii::parallel::distributed::Triangulation<dim, spacedim>&, const typename
-dealii::internal::p4est::types<dim>::quadrant&, const typename
-dealii::DoFHandler<dim, spacedim>::level_cell_iterator&, const typename
-dealii::internal::p4est::types<dim>::quadrant&, unsigned int*, unsigned int)
-[with int dim = 2; int spacedim = 2; typename
-dealii::internal::p4est::types<dim>::quadrant = p4est_quadrant; typename
-dealii::DoFHandler<dim, spacedim>::level_cell_iterator =
-dealii::TriaIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2>, true> >] The
-violated condition was: (dof_indices[i] == (numbers::invalid_dof_index)) ||
-(dof_indices[i]==dofs[i]) The name and call sequence of the exception was:
+An error occurred in line <1344> of file </scratch/deal-trunk/deal.II/source/dofs/dof_handler_policy.cc> in function
+    void dealii::internal::DoFHandler::Policy::{anonymous}::set_mg_dofindices_recursively(const dealii::parallel::distributed::Triangulation<dim, spacedim>&, const typename dealii::internal::p4est::types<dim>::quadrant&, const typename dealii::DoFHandler<dim, spacedim>::level_cell_iterator&, const typename dealii::internal::p4est::types<dim>::quadrant&, unsigned int*, unsigned int) [with int dim = 2; int spacedim = 2; typename dealii::internal::p4est::types<dim>::quadrant = p4est_quadrant; typename dealii::DoFHandler<dim, spacedim>::level_cell_iterator = dealii::TriaIterator<dealii::DoFCellAccessor<dealii::DoFHandler<2>, true> >]
+The violated condition was:
+    (dof_indices[i] == (numbers::invalid_dof_index)) || (dof_indices[i]==dofs[i])
+The name and call sequence of the exception was:
     ExcInternalError()
 Additional Information:
 (none)

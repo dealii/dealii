@@ -22,7 +22,7 @@
 #include "../tests.h"
 
 
-// test computing square root of 2 with newton's method
+//test computing square root of 2 with newton's method
 
 using namespace dealii;
 
@@ -73,7 +73,7 @@ void
 SquareRoot::residual(AnyData &out, const AnyData &in)
 {
   Vector<double> &v = *out.entry<Vector<double> *>(0);
-  // residuum = 0
+  //residuum = 0
   v(0)                    = 0.;
   const Vector<double> &x = *in.entry<const Vector<double> *>("Newton iterate");
   v(0)                    = x * x - 2.;

@@ -53,8 +53,7 @@ namespace SLEPcWrappers
     set_problem_type(EPS_GNHEP);
 
     // TODO:
-    // By default, EPS initializes the starting vector or the initial subspace
-    // randomly.
+    // By default, EPS initializes the starting vector or the initial subspace randomly.
   }
 
   SolverBase::~SolverBase()
@@ -96,12 +95,10 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
 #  if DEAL_II_SLEPC_VERSION_GTE(3, 8, 0)
-    // see
-    // https://lists.mcs.anl.gov/mailman/htdig/petsc-users/2017-October/033649.html
-    // From 3.8.0 SLEPc insists that when looking for smallest eigenvalues with
-    // shift-and-invert users should (a) set target (b) use EPS_TARGET_MAGNITUDE
-    // The former, however, needs to be applied to eps object and not spectral
-    // transformation.
+    // see https://lists.mcs.anl.gov/mailman/htdig/petsc-users/2017-October/033649.html
+    // From 3.8.0 SLEPc insists that when looking for smallest eigenvalues with shift-and-invert
+    // users should (a) set target (b) use EPS_TARGET_MAGNITUDE
+    // The former, however, needs to be applied to eps object and not spectral transformation.
     if (SLEPcWrappers::TransformationShiftInvert *sinv =
           dynamic_cast<SLEPcWrappers::TransformationShiftInvert *>(
             &transformation))
@@ -164,16 +161,15 @@ namespace SLEPcWrappers
 
     // TODO breaks step-36
     // force Krylov solver to use true residual instead of an estimate.
-    // EPSSetTrueResidual(solver_data->eps, PETSC_TRUE);
-    // AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+    //EPSSetTrueResidual(solver_data->eps, PETSC_TRUE);
+    //AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // Set convergence test to be absolute
     ierr = EPSSetConvergenceTest(eps, EPS_CONV_ABS);
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
 
     // TODO Set the convergence test function
-    // ierr = EPSSetConvergenceTestFunction (solver_data->eps,
-    // &convergence_test,
+    // ierr = EPSSetConvergenceTestFunction (solver_data->eps, &convergence_test,
     //              reinterpret_cast<void *>(&solver_control));
     // AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
@@ -238,8 +234,7 @@ namespace SLEPcWrappers
       // This can be checked only in conjunction with EPSGetErrorEstimate.
       // and in case of failure: throw exception
       // if (solver_control.last_check () != SolverControl::success)
-      //   AssertThrow(false, SolverControl::NoConvergence
-      //   (solver_control.last_step(),
+      //   AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
       //                                                    solver_control.last_value()));
     }
   }

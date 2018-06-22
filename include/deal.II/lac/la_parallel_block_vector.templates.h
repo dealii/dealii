@@ -28,8 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Forward type declaration to have special treatment of
-// LAPACKFullMatrix<number>
+//Forward type declaration to have special treatment of LAPACKFullMatrix<number>
 // in multivector_inner_product()
 template <typename Number>
 class LAPACKFullMatrix;
@@ -258,8 +257,8 @@ namespace LinearAlgebra
             std::min(start + communication_block_size, this->n_blocks());
 
           // start all requests for all blocks before finishing the transfers as
-          // this saves repeated synchronizations. In order to avoid conflict
-          // with possible other ongoing communication requests (from
+          // this saves repeated synchronizations. In order to avoid conflict with
+          // possible other ongoing communication requests (from
           // LA::distributed::Vector that supports unfinished requests), add an
           // arbitrary number 8273 to the communication tag
           for (unsigned int block = start; block < end; ++block)
@@ -284,10 +283,9 @@ namespace LinearAlgebra
           const unsigned int end =
             std::min(start + communication_block_size, this->n_blocks());
 
-          // In order to avoid conflict with possible other ongoing
-          // communication requests (from LA::distributed::Vector that supports
-          // unfinished requests), add an arbitrary number 9923 to the
-          // communication tag
+          // In order to avoid conflict with possible other ongoing communication
+          // requests (from LA::distributed::Vector that supports unfinished
+          // requests), add an arbitrary number 9923 to the communication tag
           for (unsigned int block = start; block < end; ++block)
             this->block(block).update_ghost_values_start(block - start + 9923);
           for (unsigned int block = start; block < end; ++block)

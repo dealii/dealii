@@ -208,15 +208,13 @@ namespace parallel
          * @endcode
          *
          * @note If you plan to use a custom partition with geometric multigrid,
-         * you must manually partition the level cells in addition to the active
-         * cells.
+         * you must manually partition the level cells in addition to the active cells.
          */
         partition_custom_signal = 0x4,
 
         /**
          * This flag needs to be set to use the geometric multigrid
-         * functionality. This option requires additional computation and
-         * communication.
+         * functionality. This option requires additional computation and communication.
          *
          * Note: This flag should always be set alongside a flag for an
          * active cell partitioning method.
@@ -286,9 +284,9 @@ namespace parallel
        * Read the data of this object from a stream for the purpose of
        * serialization. Throw away the previous content.
        *
-       * This function first does the same work as in
-       * dealii::Triangulation::load, then partitions the triangulation based on
-       * the MPI communicator provided to the constructor.
+       * This function first does the same work as in dealii::Triangulation::load,
+       * then partitions the triangulation based on the MPI communicator
+       * provided to the constructor.
        */
       template <class Archive>
       void
@@ -308,8 +306,8 @@ namespace parallel
       /**
        * Return a vector of length Triangulation::n_cells(level) where each
        * element stores the level subdomain id of the owner of this cell. The
-       * elements of the vector are obviously the same as the level subdomain
-       * ids for locally owned and ghost cells, but are also correct for
+       * elements of the vector are obviously the same as the level subdomain ids
+       * for locally owned and ghost cells, but are also correct for
        * artificial cells that do not store who the owner of the cell is in
        * their level_subdomain_id field.
        */
@@ -364,8 +362,8 @@ namespace parallel
       std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
 
       /**
-       * A vector containing level subdomain IDs of cells obtained by
-       * partitioning each level.
+       * A vector containing level subdomain IDs of cells obtained by partitioning
+       * each level.
        *
        * The original partition information is stored to allow using sequential
        * DoF distribution and partitioning functions with semi-artificial

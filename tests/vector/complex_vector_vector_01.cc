@@ -15,11 +15,10 @@
 
 
 
-// check existence Vector<std::complex<double>
-// >::Vector(Vector<std::complex<float> >). this conversion constructor was
-// disabled previously altogether because of a compiler defect that did not
-// honor the 'explicit' keyword on template constructors. this is now
-// autoconf'ed.
+// check existence Vector<std::complex<double> >::Vector(Vector<std::complex<float> >). this conversion
+// constructor was disabled previously altogether because of a compiler defect
+// that did not honor the 'explicit' keyword on template constructors. this is
+// now autoconf'ed.
 
 #include <deal.II/lac/vector.h>
 

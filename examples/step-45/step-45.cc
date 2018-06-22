@@ -20,10 +20,10 @@
  */
 
 // This example program is a slight modification of step-22 running in parallel
-// using Trilinos to demonstrate the usage of periodic boundary conditions in
-// deal.II. We thus omit to discuss the majority of the source code and only
-// comment on the parts that deal with periodicity constraints. For the rest
-// have a look at step-22 and the full source code at the bottom.
+// using Trilinos to demonstrate the usage of periodic boundary conditions in deal.II.
+// We thus omit to discuss the majority of the source code and only comment on the
+// parts that deal with periodicity constraints. For the rest have a look at step-22
+// and the full source code at the bottom.
 
 // In order to implement periodic boundary conditions only two functions
 // have to be modified:
@@ -311,15 +311,14 @@ namespace Step45
     GridGenerator::quarter_hyper_shell(
       triangulation, center, inner_radius, outer_radius, 0, true);
 
-    // Before we can prescribe periodicity constraints, we need to ensure that
-    // cells on opposite sides of the domain but connected by periodic faces are
-    // part of the ghost layer if one of them is stored on the local processor.
-    // At this point we need to think about how we want to prescribe
-    // periodicity. The vertices $\text{vertices}_2$ of a face on the left
-    // boundary should be matched to the vertices $\text{vertices}_1$ of a face
-    // on the lower boundary given by $\text{vertices}_2=R\cdot
-    // \text{vertices}_1+b$ where the rotation matrix $R$ and the offset $b$ are
-    // given by
+    // Before we can prescribe periodicity constraints, we need to ensure that cells
+    // on opposite sides of the domain but connected by periodic faces are part of
+    // the ghost layer if one of them is stored on the local processor.
+    // At this point we need to think about how we want to prescribe periodicity.
+    // The vertices $\text{vertices}_2$ of a face on the left boundary should be
+    // matched to the vertices $\text{vertices}_1$ of a face on the lower boundary
+    // given by $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
+    // matrix $R$ and the offset $b$ are given by
     // @f{align*}
     // R=\begin{pmatrix}
     // 0&1\\-1&0
@@ -403,14 +402,13 @@ namespace Step45
                                                constraints,
                                                fe.component_mask(velocities));
 
-      // After we provided the mesh with the necessary information for the
-      // periodicity constraints, we are now able to actual create them. For
-      // describing the matching we are using the same approach as before, i.e.,
-      // the $\text{vertices}_2$ of a face on the left boundary should be
-      // matched to the vertices
+      // After we provided the mesh with the necessary information for the periodicity
+      // constraints, we are now able to actual create them. For describing the
+      // matching we are using the same approach as before, i.e., the $\text{vertices}_2$
+      // of a face on the left boundary should be matched to the vertices
       // $\text{vertices}_1$ of a face on the lower boundary given by
-      // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
-      // matrix $R$ and the offset $b$ are given by
+      // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation matrix $R$
+      // and the offset $b$ are given by
       // @f{align*}
       // R=\begin{pmatrix}
       // 0&1\\-1&0
@@ -418,9 +416,8 @@ namespace Step45
       // \quad
       // b=\begin{pmatrix}0&0\end{pmatrix}.
       // @f}
-      // These two objects not only describe how faces should be matched but
-      // also in which sense the solution should be transformed from
-      // $\text{face}_2$ to
+      // These two objects not only describe how faces should be matched but also
+      // in which sense the solution should be transformed from $\text{face}_2$ to
       // $\text{face}_1$.
       FullMatrix<double> rotation_matrix(dim);
       rotation_matrix[0][1] = 1.;

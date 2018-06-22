@@ -122,8 +122,7 @@ LaplaceMatrix<dim>::face(MeshWorker::DoFInfo<dim> & /*dinfo1*/,
                          MeshWorker::IntegrationInfo<dim> & /*info2*/) const
 {
   //  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
-  //  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix,
-  //  dinfo1.matrix(0,true).matrix,
+  //  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
   //         dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
   //         info1.fe_values(0), info2.fe_values(0),
   //         Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
@@ -467,8 +466,8 @@ LaplaceProblem<dim>::assemble_multigrid(bool use_mw)
                    || (mg_constrained_dofs.is_boundary_index(
                          lvl, local_dof_indices[i]) &&
                        local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
+                         local_dof_indices
+                           [j]) // ( boundary(i) && boundary(j) && i==j )
                    ))
                 {
                   // do nothing, so add entries to interface matrix
@@ -508,8 +507,8 @@ LaplaceProblem<dim>::solve(bool use_mw)
   mg::Matrix<> mg_matrix(mg_matrices);
   mg::Matrix<> mg_interface_up(mg_interface_in);
   mg::Matrix<> mg_interface_down(mg_interface_in);
-  // if (use_mw)
-  // mg_interface_down.initialize(mg_interface_out);
+  //if (use_mw)
+  //mg_interface_down.initialize(mg_interface_out);
 
   Multigrid<Vector<double>> mg(mg_dof_handler,
                                mg_matrix,

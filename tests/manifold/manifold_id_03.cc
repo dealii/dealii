@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 // Test Manifold ID. Now we test the function set_manifold_id(), and verify
-// that they are correctly inherited from one cell onward. Notice that only the
-// interior of the cell is given a manifold id. This is inherited by all objects
-// created inside that cells, including all the newly created inner faces.
+// that they are correctly inherited from one cell onward. Notice that only the interior
+// of the cell is given a manifold id.
+// This is inherited by all objects created inside that cells, including all the newly created
+// inner faces.
 
 #include "../tests.h"
 

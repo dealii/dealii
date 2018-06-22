@@ -55,7 +55,7 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
 
   const unsigned int n_cells = criteria.size();
 
-  // TODO: This is undocumented, looks fishy and seems unnecessary
+  //TODO: This is undocumented, looks fishy and seems unnecessary
 
   double new_threshold = threshold;
   // when threshold==0 find the

@@ -165,8 +165,8 @@ class FESystem;
  * If, for example, this system were used to discretize a problem in fluid
  * dynamics then one could think of the first two components representing a
  * vector-valued velocity field whereas the last one corresponds to the scalar
- * pressure field. Without degree-of-freedom (DoF) renumbering this finite
- * element will produce the following distribution of local DoFs:
+ * pressure field. Without degree-of-freedom (DoF) renumbering this finite element will
+ * produce the following distribution of local DoFs:
  *
  * @image html fe_system_example.png DoF indices
  *
@@ -592,9 +592,9 @@ class FESystem;
  * otherwise arbitrary convention). For example, in the example above, the
  * restriction matrices will be
  * @f[
- *   R_0 = \left(\begin{matrix}1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 1 & 0
- * \end{matrix}\right), \qquad\qquad R_1 = \left(\begin{matrix}0 & 0 & 0 \\ 0 &
- * 1 & 0 \\ 1 & 0 & 0 \end{matrix}\right),
+ *   R_0 = \left(\begin{matrix}1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 1 & 0 \end{matrix}\right),
+ *   \qquad\qquad
+ *   R_1 = \left(\begin{matrix}0 & 0 & 0 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{matrix}\right),
  * @f]
  * and the compatibility condition is the $R_{0,21}=R_{1,20}$ because they
  * both indicate that $U^\text{coarse}|_\text{parent,2}$ should be set to one
@@ -1395,8 +1395,7 @@ public:
   operator==(const FiniteElement<dim, spacedim> &fe) const;
 
   /**
-   * Non-equality comparison operator. Defined in terms of the equality
-   * comparison operator.
+   * Non-equality comparison operator. Defined in terms of the equality comparison operator.
    */
   bool
   operator!=(const FiniteElement<dim, spacedim> &) const;
@@ -1427,8 +1426,7 @@ public:
    * than one vector-component). For this information, refer to the
    * #system_to_base_table field and the system_to_base_index() function.
    *
-   * See the class description above for an example of how this function is
-   * typically used.
+   * See the class description above for an example of how this function is typically used.
    *
    * The use of this function is explained extensively in the step-8 and
    * @ref step_20 "step-20"
@@ -1637,8 +1635,7 @@ public:
   element_multiplicity(const unsigned int index) const;
 
   /**
-   * Return a reference to a contained finite element that matches the
-   * components
+   * Return a reference to a contained finite element that matches the components
    * selected by the given ComponentMask @p mask.
    *
    * For an arbitrarily nested FESystem, this function returns the inner-most
@@ -1712,8 +1709,7 @@ public:
   get_sub_fe(const ComponentMask &mask) const;
 
   /**
-   * Return a reference to a contained finite element that matches the
-   * components
+   * Return a reference to a contained finite element that matches the components
    * @p n_selected_components components starting at component with index
    * @p first_component.
    *
@@ -1738,8 +1734,7 @@ public:
    * composed of other elements and at least one of them is vector-valued
    * itself.
    *
-   * See the class documentation above for an example of how this function is
-   * typically used.
+   * See the class documentation above for an example of how this function is typically used.
    *
    * This function returns valid values also in the case of vector-valued
    * (i.e. non-primitive) shape functions, in contrast to the
@@ -2672,13 +2667,13 @@ protected:
    * FEValues object for a given mapping and finite element object. The
    * returned object will later be passed to FiniteElement::fill_fe_values()
    * for a concrete cell, which will itself place its output into an object of
-   * type internal::FEValuesImplementation::FiniteElementRelatedData. Since
-   * there may be data that can already be computed in its <i>final</i> form on
-   * the reference cell, this function also receives a reference to the
-   * internal::FEValuesImplementation::FiniteElementRelatedData object as its
-   * last argument. This output argument is guaranteed to always be the same one
-   * when used with the InternalDataBase object returned by this function. In
-   * other words, the subdivision of scratch data and final data in the returned
+   * type internal::FEValuesImplementation::FiniteElementRelatedData. Since there may be
+   * data that can already be computed in its <i>final</i> form on the
+   * reference cell, this function also receives a reference to the
+   * internal::FEValuesImplementation::FiniteElementRelatedData object as its last argument.
+   * This output argument is guaranteed to always be the same one when used
+   * with the InternalDataBase object returned by this function. In other
+   * words, the subdivision of scratch data and final data in the returned
    * object and the @p output_data object is as follows: If data can be pre-
    * computed on the reference cell in the exact form in which it will later
    * be needed on a concrete cell, then this function should already emplace

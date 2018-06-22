@@ -401,7 +401,7 @@ namespace GridOutFlags
     param.declare_entry("Boundary", "true", Patterns::Bool());
     param.declare_entry("Level color", "false", Patterns::Bool());
     param.declare_entry("Level depth", "true", Patterns::Bool());
-    // TODO: Unify this number with other output formats
+    //TODO: Unify this number with other output formats
     param.declare_entry("Boundary points", "0", Patterns::Integer());
     param.declare_entry("Fill style", "20", Patterns::Integer());
     param.declare_entry("Line style", "0", Patterns::Integer());
@@ -797,7 +797,7 @@ void
 GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
                   std::ostream &                      out) const
 {
-  // TODO:[GK] allow for boundary faces only
+  //TODO:[GK] allow for boundary faces only
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
   AssertThrow(out, ExcIO());
   // Copied and adapted from write_ucd
@@ -1113,19 +1113,21 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
     7
     Pyramid (5 nodes).
     8
-    Second order line (3 nodes: 2 associated with the vertices and 1 with the
-    edge).
+    Second order line (3 nodes: 2 associated with the vertices and 1 with the edge).
     9
-    Second order triangle (6 nodes: 3 associated with the vertices and 3 with
-    the edges). 10 Second order quadrangle (9 nodes: 4 associated with the
-    vertices, 4 with the edges and 1 with the face). 11 Second order tetrahedron
-    (10 nodes: 4 associated with the vertices and 6 with the edges). 12 Second
-    order hexahedron (27 nodes: 8 associated with the vertices, 12 with the
-    edges, 6 with the faces and 1 with the volume). 13 Second order prism (18
-    nodes: 6 associated with the vertices, 9 with the edges and 3 with the
-    quadrangular faces). 14 Second order pyramid (14 nodes: 5 associated with
-    the vertices, 8 with the edges and 1 with the quadrangular face). 15 Point
-    (1 node).
+    Second order triangle (6 nodes: 3 associated with the vertices and 3 with the edges).
+    10
+    Second order quadrangle (9 nodes: 4 associated with the vertices, 4 with the edges and 1 with the face).
+    11
+    Second order tetrahedron (10 nodes: 4 associated with the vertices and 6 with the edges).
+    12
+    Second order hexahedron (27 nodes: 8 associated with the vertices, 12 with the edges, 6 with the faces and 1 with the volume).
+    13
+    Second order prism (18 nodes: 6 associated with the vertices, 9 with the edges and 3 with the quadrangular faces).
+    14
+    Second order pyramid (14 nodes: 5 associated with the vertices, 8 with the edges and 1 with the quadrangular face).
+    15
+    Point (1 node).
   */
   unsigned int elm_type;
   switch (dim)
@@ -1318,7 +1320,7 @@ GridOut::write_xfig(const Triangulation<dim, spacedim> &,
 }
 
 
-// TODO:[GK] Obey parameters
+//TODO:[GK] Obey parameters
 template <>
 void
 GridOut::write_xfig(const Triangulation<2> &tria,
@@ -1343,7 +1345,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
       << "# reduce first number to scale up image" << std::endl
       << "1200 2" << std::endl;
   // Write custom palette
-  // grey
+  //grey
   unsigned int colno = 32;
   out << "0 " << colno++ << " #ff0000" << std::endl;
   out << "0 " << colno++ << " #ff8000" << std::endl;
@@ -1413,7 +1415,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
       // Fill color
       switch (xfig_flags.color_by)
         {
-            // TODO[GK]: Simplify after deprecation period is over
+            //TODO[GK]: Simplify after deprecation period is over
           case GridOutFlags::XFig::material_id:
             out << static_cast<unsigned int>(cell->material_id()) + 32;
             break;
@@ -1784,8 +1786,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                         cos(angle_factor * svg_flags.azimuth_angle);
 
 
-  // determine the bounding box of the given triangulation on the projection
-  // plane of the camera viewing system
+  // determine the bounding box of the given triangulation on the projection plane of the camera viewing system
   point[0] = tria.begin()->vertex(0)[0];
   point[1] = tria.begin()->vertex(0)[1];
   point[2] = 0;
@@ -1932,13 +1933,12 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
         .5 + height * .175); // additional width for colorbar
     }
 
-  // out << "<!-- deal.ii GridOut " << now->tm_mday << '/' << now->tm_mon + 1 <<
-  // '/' << now->tm_year + 1900
+  //out << "<!-- deal.ii GridOut " << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
   //    << ' ' << now->tm_hour << ':';
   //
-  // if (now->tm_min < 10) out << '0';
+  //if (now->tm_min < 10) out << '0';
   //
-  // out << now->tm_min << " -->" << '\n';
+  //out << now->tm_min << " -->" << '\n';
 
   // basic svg header
   out << "<svg width=\"" << width + additional_width << "\" height=\"" << height
@@ -2096,13 +2096,9 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
         << "deal.II"
         << "</text>" << '\n';
 
-      // out << " <text x=\"" << x_offset + static_cast<unsigned int>(.5 +
-      // height * .045 * 4.75) << "\" y=\"" << static_cast<unsigned int>(.5 +
-      // height * .0525) << '\"'
-      //     << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" <<
-      //     font_size << "\">"
-      //     << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year +
-      //     1900
+      // out << " <text x=\"" << x_offset + static_cast<unsigned int>(.5 + height * .045 * 4.75) << "\" y=\"" << static_cast<unsigned int>(.5 + height * .0525) << '\"'
+      //     << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" << font_size << "\">"
+      //     << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
       //     << " - " << now->tm_hour << ':';
       //
       // if(now->tm_min < 10) out << '0';
@@ -2111,8 +2107,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       //     << "</text>"<< '\n' << '\n';
     }
 
-  // draw the cells, starting out from the minimal level (in order to guaranty a
-  // correct perspective view)
+  // draw the cells, starting out from the minimal level (in order to guaranty a correct perspective view)
   out << "  <!-- cells -->" << '\n';
 
   for (unsigned int level_index = min_level; level_index <= max_level;
@@ -2392,8 +2387,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               out << "</text>" << '\n';
             }
 
-          // if the current cell lies at the boundary of the triangulation, draw
-          // the additional boundary line
+          // if the current cell lies at the boundary of the triangulation, draw the additional boundary line
           if (svg_flags.boundary_line_thickness)
             {
               for (unsigned int faceIndex = 0; faceIndex < 4; faceIndex++)
@@ -2612,8 +2606,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
         }
     }
 
-  // show azimuth angle and polar angle as text below the explanation of the
-  // cell labeling
+  // show azimuth angle and polar angle as text below the explanation of the cell labeling
   if (svg_flags.draw_legend)
     {
       out << "  <text x=\"" << width + additional_width << "\" y=\""
@@ -3077,9 +3070,8 @@ GridOut::write_mesh_per_processor_as_vtu(
         {
           std::vector<std::string> filenames;
 
-          // .pvtu needs to reference the files without a relative path because
-          // it will be written in the same directory. For this, remove any
-          // paths from filename.
+          // .pvtu needs to reference the files without a relative path because it will be written
+          // in the same directory. For this, remove any paths from filename.
           std::size_t pos = filename_without_extension.find_last_of('/');
           if (pos == std::string::npos)
             pos = 0;
@@ -3099,8 +3091,8 @@ GridOut::write_mesh_per_processor_as_vtu(
           DataOut<dim, DoFHandler<dim, spacedim>> data_out;
           data_out.attach_triangulation(*tr);
 
-          // We need a dummy vector with the names of the data values in the
-          // .vtu files in order that the .pvtu contains reference these values
+          // We need a dummy vector with the names of the data values in the .vtu files
+          // in order that the .pvtu contains reference these values
           Vector<float> dummy_vector(tr->n_active_cells());
           data_out.add_data_vector(dummy_vector, "level");
           data_out.add_data_vector(dummy_vector, "subdomain");
@@ -4299,8 +4291,7 @@ namespace internal
               // we chose here the viewpoint as in
               // gnuplot as default.
               //
-              // TODO:[WB] Fix a potential problem with viewing angles in 3d Eps
-              // GridOut
+              //TODO:[WB] Fix a potential problem with viewing angles in 3d Eps GridOut
               // note: the following might be wrong
               // if one of the base vectors below
               // is in direction of the viewer, but

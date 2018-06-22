@@ -29,12 +29,13 @@ namespace Functions
 {
   /**
    * An abstract base class for a scalar-valued function $f=f(r,\theta,\phi)$
-   * defined in spherical coordinates. This class wraps transformation of
-   * values, gradients and hessians from spherical coordinates to the Cartesian
-   * coordinate system used by the Function base class. Therefore derived
-   * classes only need to implement those functions in spherical coordinates
-   * (specifically svalue(), sgradient() and shessian() ). The convention for
-   * angles is the same as in GeometricUtilities::Coordinates.
+   * defined in spherical coordinates. This class wraps transformation of values,
+   * gradients and hessians from spherical coordinates to the Cartesian coordinate
+   * system used by the Function base class.
+   * Therefore derived classes only need to implement those functions in
+   * spherical coordinates (specifically svalue(), sgradient() and
+   * shessian() ). The convention for angles is the same as in
+   * GeometricUtilities::Coordinates.
    *
    * @note This function is currently only implemented for dim==3 .
    *
@@ -113,8 +114,7 @@ namespace Functions
      * Return the Hessian in spherical coordinates.
      *
      * The returned object should contain derivatives in the following order:
-     * $\{ f_{,rr},\, f_{,\theta\theta},\, f_{,\phi\phi},\, f_{,r\theta},\,
-     * f_{,r\phi},\, f_{,\theta\phi}\}$.
+     * $\{ f_{,rr},\, f_{,\theta\theta},\, f_{,\phi\phi},\, f_{,r\theta},\, f_{,r\phi},\, f_{,\theta\phi}\}$.
      */
     virtual std::array<double, 6>
     shessian(const std::array<double, dim> &sp,

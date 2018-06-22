@@ -115,13 +115,13 @@ namespace DataPostprocessorInputs
    * Let us consider a complete example of a postprocessor that computes
    * the fluid norm of the stress $\|\sigma\| = \|\eta \nabla u\|$ from the
    * viscosity $\eta$ and the gradient of the fluid velocity, $\nabla u$,
-   * assuming that the viscosity is something that depends on the cell's
-   * material id. This can be done using a class we derive from
-   * DataPostprocessorScalar where we overload the
-   * DataPostprocessor::evaluate_vector_field() function that receives the
-   * values and gradients of the velocity (plus of other solution variables such
-   * as the pressure, but let's ignore those for the moment). Then we could use
-   * code such as this, assuming that we use a hp::DoFHandler:
+   * assuming that the viscosity is something that depends on the cell's material
+   * id. This can be done using a class we derive from DataPostprocessorScalar
+   * where we overload the DataPostprocessor::evaluate_vector_field() function
+   * that receives the values and gradients of the velocity (plus of
+   * other solution variables such as the pressure, but let's ignore those
+   * for the moment). Then we could use code such as this, assuming that we
+   * use a hp::DoFHandler:
    * @code
    *   template <int dim>
    *   class ComputeStress : public DataPostprocessorScalar<dim>
@@ -253,9 +253,9 @@ namespace DataPostprocessorInputs
     std::vector<Tensor<1, spacedim>> solution_gradients;
 
     /**
-     * An array of second derivatives of the (scalar) solution at each of the
-     * evaluation points used to create graphical output from one cell, face, or
-     * other object.
+     * An array of second derivatives of the (scalar) solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
      *
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
@@ -298,9 +298,9 @@ namespace DataPostprocessorInputs
     std::vector<dealii::Vector<double>> solution_values;
 
     /**
-     * An array of gradients of a vector-valued solution at each of the
-     * evaluation points used to create graphical output from one cell, face, or
-     * other object.
+     * An array of gradients of a vector-valued solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
      *
      * The outer vector runs over the evaluation points, whereas the inner
      * vector runs over the components of the finite element field for which
@@ -317,9 +317,9 @@ namespace DataPostprocessorInputs
     std::vector<std::vector<Tensor<1, spacedim>>> solution_gradients;
 
     /**
-     * An array of second derivatives of a vector-valued solution at each of the
-     * evaluation points used to create graphical output from one cell, face, or
-     * other object.
+     * An array of second derivatives of a vector-valued solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
      *
      * The outer vector runs over the evaluation points, whereas the inner
      * vector runs over the components of the finite element field for which
@@ -403,8 +403,8 @@ namespace DataPostprocessorInputs
  * hand, in step-29 we implement a postprocessor that only computes the
  * magnitude of a complex number given by a two-component finite element. It
  * seems silly to have to implement four virtual functions for this
- * (evaluate_scalar_field() or evaluate_vector_field(), get_names(),
- * get_update_flags() and get_data_component_interpretation()).
+ * (evaluate_scalar_field() or evaluate_vector_field(), get_names(), get_update_flags() and
+ * get_data_component_interpretation()).
  *
  * To this end there are three classes DataPostprocessorScalar,
  * DataPostprocessorVector, and DataPostprocessorTensor that are meant to be
@@ -451,9 +451,8 @@ public:
    * Otherwise those vectors will be in an unspecified state.
    *
    * This function is called when the finite element field that is being
-   * converted into graphical data by DataOut or similar classes represents
-   * scalar data, i.e. the finite element in use has only a single vector
-   * component.
+   * converted into graphical data by DataOut or similar classes represents scalar
+   * data, i.e. the finite element in use has only a single vector component.
    */
   virtual void
   evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &input_data,
@@ -688,12 +687,12 @@ private:
  * @image html data_postprocessor_vector_1.png
  *
  * In the second image, the background color corresponds to the magnitude of the
- * gradient vector and the vector glyphs to the gradient itself. It may be
- * surprising at first to see that from each vertex, multiple vectors originate,
- * going in different directions. But that is because the solution is only
- * continuous: in general, the gradient is discontinuous across edges, and so
- * the multiple vectors originating from each vertex simply represent the
- * differing gradients of the solution at each adjacent cell.
+ * gradient vector and the vector glyphs to the gradient itself. It may be surprising
+ * at first to see that from each vertex, multiple vectors originate, going in
+ * different directions. But that is because the solution is only continuous:
+ * in general, the gradient is discontinuous across edges, and so the multiple
+ * vectors originating from each vertex simply represent the differing
+ * gradients of the solution at each adjacent cell.
  *
  * The output above -- namely, the gradient $\nabla u$ of the solution --
  * corresponds to the temperature gradient if one interpreted step-6 as solving
@@ -704,9 +703,8 @@ private:
  * that conducts heat well, and consequently the temperature gradient is small.
  * On the other hand, the "heat flux" corresponds to the quantity
  * $a(\mathbf x) \nabla u(\mathbf x)$. For the
- * solution of that equation, the flux should be continuous across the
- * interface. This is easily verified by the following modification of the
- * postprocessor:
+ * solution of that equation, the flux should be continuous across the interface.
+ * This is easily verified by the following modification of the postprocessor:
  * @code
  * template <int dim>
  * class HeatFluxPostprocessor : public DataPostprocessorVector<dim>
@@ -921,10 +919,10 @@ private:
  *     }
  *   };
  * @endcode
- * The only tricky part in this piece of code is how to sort the
- * <code>dim*dim</code> elements of the strain tensor into the one vector of
- * computed output quantities -- in other words, how to <i>unroll</i> the
- * elements of the tensor into the vector. This is facilitated by the
+ * The only tricky part in this piece of code is how to sort the <code>dim*dim</code>
+ * elements of the strain tensor into the one vector of computed output
+ * quantities -- in other words, how to <i>unroll</i> the elements of
+ * the tensor into the vector. This is facilitated by the
  * Tensor::component_to_unrolled_index() function that takes a
  * pair of indices that specify a particular element of the
  * tensor and returns a vector index that is then used in the code
@@ -960,17 +958,15 @@ private:
  * @image html data_postprocessor_tensor_0.png
  * @image html data_postprocessor_tensor_1.png
  *
- * These pictures show an ellipse representing the gradient tensor at, on
- * average, every tenth mesh point. You may want to read through the
- * documentation of the Visit visualization program (see
- * https://wci.llnl.gov/simulation/computer-codes/visit/) for an interpretation
- * of how exactly tensors are visualizated.
+ * These pictures show an ellipse representing the gradient tensor at, on average,
+ * every tenth mesh point. You may want to read through the documentation of the
+ * Visit visualization program (see https://wci.llnl.gov/simulation/computer-codes/visit/)
+ * for an interpretation of how exactly tensors are visualizated.
  *
- * In elasticity, one is often interested not in the gradient of the
- * displacement, but in the "strain", i.e., the symmetrized version of the
- * gradient
- * $\varepsilon=\frac 12 (\nabla u + \nabla u^T)$. This is easily facilitated
- * with the following minor modification:
+ * In elasticity, one is often interested not in the gradient of the displacement,
+ * but in the "strain", i.e., the symmetrized version of the gradient
+ * $\varepsilon=\frac 12 (\nabla u + \nabla u^T)$. This is easily facilitated with
+ * the following minor modification:
  * @code
  *   template <int dim>
  *   class StrainPostprocessor : public DataPostprocessorTensor<dim>

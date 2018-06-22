@@ -714,15 +714,15 @@ namespace
                         dim>::line_to_cell_vertices(delta_is_edge_in_K, 1)],
                   ExcInternalError());
 
-                // now figure out which direction the each of the "opposite"
-                // edges needs to be oriented into.
+                // now figure out which direction the each of the "opposite" edges
+                // needs to be oriented into.
                 for (unsigned int o_e = 0;
                      o_e < ParallelEdges<dim>::n_other_parallel_edges;
                      ++o_e)
                   {
-                    // get the index of the opposite edge and select which its
-                    // first vertex needs to be based on how the current edge is
-                    // oriented in the current cell
+                    // get the index of the opposite edge and select which its first
+                    // vertex needs to be based on how the current edge is oriented
+                    // in the current cell
                     const unsigned int opposite_edge =
                       cells[K].edge_indices[ParallelEdges<
                         dim>::parallel_edges[delta_is_edge_in_K][o_e]];
@@ -745,28 +745,27 @@ namespace
                            Edge<dim>::forward :
                            Edge<dim>::backward);
 
-                    // see if the opposite edge (there is only one in 2d) has
-                    // already been oriented.
+                    // see if the opposite edge (there is only one in 2d) has already been
+                    // oriented.
                     if (edges[opposite_edge].orientation_status ==
                         Edge<dim>::not_oriented)
                       {
-                        // the opposite edge is not yet oriented. do orient it
-                        // and add it to Delta_k
+                        // the opposite edge is not yet oriented. do orient it and add it to
+                        // Delta_k
                         edges[opposite_edge].orientation_status =
                           opposite_edge_orientation;
                         Delta_k.insert(opposite_edge);
                       }
                     else
                       {
-                        // this opposite edge has already been oriented. it
-                        // should be consistent with the current one in 2d,
-                        // while in 3d it may in fact be mis-oriented, and in
-                        // that case the mesh will not be orientable. indicate
-                        // this by throwing an exception that we can catch
-                        // further up; this has the advantage that we can
-                        // propagate through a couple of functions without
-                        // having to do error checking and without modifying the
-                        // 'cells' array that the user gave us
+                        // this opposite edge has already been oriented. it should be
+                        // consistent with the current one in 2d, while in 3d it may in fact
+                        // be mis-oriented, and in that case the mesh will not be
+                        // orientable. indicate this by throwing an exception that we can
+                        // catch further up; this has the advantage that we can propagate
+                        // through a couple of functions without having to do error
+                        // checking and without modifying the 'cells' array that the
+                        // user gave us
                         if (dim == 2)
                           {
                             Assert(edges[opposite_edge].orientation_status ==

@@ -128,8 +128,7 @@ CellId::to_binary() const
         {
           const unsigned int child_index =
             static_cast<unsigned int>(child_indices[child_level]);
-          // Shift the child index to its position in the unsigned int and store
-          // it
+          // Shift the child index to its position in the unsigned int and store it
           binary_representation[binary_entry] |= (child_index << (j * dim));
           ++child_level;
           if (child_level == n_child_indices)

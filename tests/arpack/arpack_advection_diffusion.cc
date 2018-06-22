@@ -18,16 +18,11 @@
  *          Wolfgang Bangerth, Texas A&M University
  *          Joscha Gedicke, U Heidelberg
  *
- * This file tests the non-symmetric interface to ARPACK for an
- advection-diffussion
- * operator. The advection is chosen in such a way that we compute complex
- eigenvalues.
- * The most critical case when we cut a complex conjugate pair is tested, i.e.
- the
- * last eigenvalue is complex but the conjugate pair is not included in the
- range
- * of eigenvalues we asked for. This is a particular case in the nonsymmetric
- arpack
+ * This file tests the non-symmetric interface to ARPACK for an advection-diffussion
+ * operator. The advection is chosen in such a way that we compute complex eigenvalues.
+ * The most critical case when we cut a complex conjugate pair is tested, i.e. the
+ * last eigenvalue is complex but the conjugate pair is not included in the range
+ * of eigenvalues we asked for. This is a particular case in the nonsymmetric arpack
  * interface that needs to be taken care of.
  *
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.

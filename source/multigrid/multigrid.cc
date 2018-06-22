@@ -162,14 +162,14 @@ MGTransferComponentBase::memory_consumption() const
             sizeof(prolongation_sparsities);
   result += MemoryConsumption::memory_consumption(prolongation_matrices) -
             sizeof(prolongation_matrices);
-  // TODO:[GK] Add this.
+  //TODO:[GK] Add this.
   //   result += MemoryConsumption::memory_consumption(copy_to_and_from_indices)
   //          - sizeof(copy_to_and_from_indices);
   return result;
 }
 
 
-// TODO:[GK] Add all those little vectors.
+//TODO:[GK] Add all those little vectors.
 std::size_t
 MGTransferBlockBase::memory_consumption() const
 {
@@ -185,7 +185,7 @@ MGTransferBlockBase::memory_consumption() const
             sizeof(prolongation_sparsities);
   result += MemoryConsumption::memory_consumption(prolongation_matrices) -
             sizeof(prolongation_matrices);
-  // TODO:[GK] Add this.
+  //TODO:[GK] Add this.
   //   result += MemoryConsumption::memory_consumption(copy_indices)
   //          - sizeof(copy_indices);
   return result;

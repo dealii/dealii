@@ -27,8 +27,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// TODO:[GK] deg+1 is wrong here and should be fixed after FiniteElementData was
-// cleaned up
+//TODO:[GK] deg+1 is wrong here and should be fixed after FiniteElementData was cleaned up
 
 template <class PolynomialType, int dim, int spacedim>
 FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,

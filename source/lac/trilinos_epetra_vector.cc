@@ -154,9 +154,9 @@ namespace LinearAlgebra
       // one given.
       if (communication_pattern == nullptr)
         {
-          // The first time import is called, a communication pattern is
-          // created. Check if the communication pattern already exists and if
-          // it can be reused.
+          // The first time import is called, a communication pattern is created.
+          // Check if the communication pattern already exists and if it can be
+          // reused.
           if ((source_stored_elements.size() !=
                V.get_stored_elements().size()) ||
               (source_stored_elements != V.get_stored_elements()))
@@ -252,8 +252,8 @@ namespace LinearAlgebra
           Assert(ierr == 0, ExcTrilinosError(ierr));
           (void)ierr;
 #    else
-          // In versions older than 11.11 the Import function is broken for
-          // adding Hence, we provide a workaround in this case
+          // In versions older than 11.11 the Import function is broken for adding
+          // Hence, we provide a workaround in this case
 
           Epetra_MultiVector dummy(vector->Map(), 1, false);
           Epetra_Import      data_exchange(dummy.Map(),

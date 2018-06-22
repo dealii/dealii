@@ -60,11 +60,10 @@ DEAL_II_NAMESPACE_OPEN
  * topological location of the node values, and derived classes need to provide
  * this information.
  *
- * Similarly, in many cases, node functionals depend on the shape of the mesh
- * cell, since they evaluate normal or tangential components on the faces. In
- * order to allow for a set of transformations, the variable #mapping_type has
- * been introduced. It should needs be set in the constructor of a derived
- * class.
+ * Similarly, in many cases, node functionals depend on the shape of the mesh cell,
+ * since they evaluate normal or tangential components on the faces. In order
+ * to allow for a set of transformations, the variable #mapping_type has been
+ * introduced. It should needs be set in the constructor of a derived class.
  *
  * Any derived class must decide on the polynomial space to use.  This
  * polynomial space should be implemented simply as a set of vector valued
@@ -212,9 +211,8 @@ protected:
   MappingType mapping_type;
 
 
-  /* NOTE: The following function has its definition inlined into the class
-     declaration because we otherwise run into a compiler error with MS Visual
-     Studio. */
+  /* NOTE: The following function has its definition inlined into the class declaration
+     because we otherwise run into a compiler error with MS Visual Studio. */
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_data(

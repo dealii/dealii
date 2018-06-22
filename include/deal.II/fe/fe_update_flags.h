@@ -290,7 +290,7 @@ operator<<(StreamType &s, const UpdateFlags u)
   if (u & update_jacobian_pushed_forward_3rd_derivatives)
     s << "jacobian_pushed_forward_3rd_derivatives|";
 
-  // TODO: check that 'u' really only has the flags set that are handled above
+  //TODO: check that 'u' really only has the flags set that are handled above
   return s;
 }
 

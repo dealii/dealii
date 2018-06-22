@@ -75,7 +75,7 @@ namespace FETools
   }
 } // namespace FETools
 
-// forward declaration of the data type for periodic face pairs
+//forward declaration of the data type for periodic face pairs
 namespace GridTools
 {
   template <typename CellIterator>
@@ -809,11 +809,10 @@ namespace parallel
       get_coarse_cell_to_p4est_tree_permutation() const;
 
       /**
-       * In addition to the action in the base class Triangulation, this
-       * function joins faces in the p4est forest for periodic boundary
-       * conditions. As a result, each pair of faces will differ by at most one
-       * refinement level and ghost neighbors will be available across these
-       * faces.
+       * In addition to the action in the base class Triangulation, this function
+       * joins faces in the p4est forest for periodic boundary conditions. As a
+       * result, each pair of faces will differ by at most one refinement
+       * level and ghost neighbors will be available across these faces.
        *
        * The vector can be filled by the function
        * GridTools::collect_periodic_faces.
@@ -1270,22 +1269,19 @@ namespace parallel
         const std::vector<bool> &vertex_locally_moved);
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       void
       load(const char *filename, const bool autopartition = true);
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       void
       save(const char *filename) const;
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       unsigned int
       register_data_attach(
@@ -1295,8 +1291,7 @@ namespace parallel
           &pack_callback);
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       void
       notify_ready_to_unpack(
@@ -1317,8 +1312,7 @@ namespace parallel
         p4est_tree_to_coarse_cell_permutation;
 
 
-      // TODO: The following variable should really be private, but it is used
-      // in dof_handler_policy.cc ...
+      //TODO: The following variable should really be private, but it is used in dof_handler_policy.cc ...
       /**
        * dummy settings object
        */

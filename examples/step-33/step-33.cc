@@ -408,8 +408,8 @@ namespace Step33
               {
                 // We prescribe the velocity (we are dealing with a particular
                 // component here so that the average of the velocities is
-                // orthogonal to the surface normal.  This creates sensitivities
-                // of across the velocity components.
+                // orthogonal to the surface normal.  This creates sensitivities of
+                // across the velocity components.
                 typename DataVector::value_type vdotn = 0;
                 for (unsigned int d = 0; d < dim; d++)
                   {
@@ -566,11 +566,11 @@ namespace Step33
     // At the beginning of the function, let us make sure that all variables
     // have the correct sizes, so that we can access individual vector
     // elements without having to wonder whether we might read or write
-    // invalid elements; we also check that the <code>solution_gradients</code>
-    // vector only contains data if we really need it (the system knows about
-    // this because we say so in the <code>get_needed_update_flags()</code>
-    // function below). For the inner vectors, we check that at least the first
-    // element of the outer vector has the correct inner size:
+    // invalid elements; we also check that the <code>solution_gradients</code> vector only
+    // contains data if we really need it (the system knows about this because
+    // we say so in the <code>get_needed_update_flags()</code> function
+    // below). For the inner vectors, we check that at least the first element
+    // of the outer vector has the correct inner size:
     const unsigned int n_quadrature_points = inputs.solution_values.size();
 
     if (do_schlieren_plot == true)
@@ -1722,9 +1722,8 @@ namespace Step33
 
     // After all these declarations, let us actually compute something. First,
     // the values of <code>W</code>, <code>W_old</code>, <code>grad_W</code>
-    // and <code>grad_W_old</code>, which we can compute from the local DoF
-    // values by using the formula $W(x_q)=\sum_i \mathbf W_i \Phi_i(x_q)$,
-    // where
+    // and <code>grad_W_old</code>, which we can compute from the local DoF values
+    // by using the formula $W(x_q)=\sum_i \mathbf W_i \Phi_i(x_q)$, where
     // $\mathbf W_i$ is the $i$th entry of the (local part of the) solution
     // vector, and $\Phi_i(x_q)$ the value of the $i$th vector-valued shape
     // function evaluated at quadrature point $x_q$. The gradient can be
@@ -1772,11 +1771,11 @@ namespace Step33
 
     // Next, in order to compute the cell contributions, we need to evaluate
     // $\mathbf{F}({\mathbf w}^k_{n+1})$, $\mathbf{G}({\mathbf w}^k_{n+1})$ and
-    // $\mathbf{F}({\mathbf w}_n)$, $\mathbf{G}({\mathbf w}_n)$ at all
-    // quadrature points. To store these, we also need to allocate a bit of
-    // memory. Note that we compute the flux matrices and right hand sides in
-    // terms of autodifferentiation variables, so that the Jacobian
-    // contributions can later easily be computed from it:
+    // $\mathbf{F}({\mathbf w}_n)$, $\mathbf{G}({\mathbf w}_n)$ at all quadrature
+    // points. To store these, we also need to allocate a bit of memory. Note
+    // that we compute the flux matrices and right hand sides in terms of
+    // autodifferentiation variables, so that the Jacobian contributions can
+    // later easily be computed from it:
 
     std::vector<std::array<std::array<Sacado::Fad::DFad<double>, dim>,
                            EulerEquations<dim>::n_components>>
@@ -1826,10 +1825,9 @@ namespace Step33
     // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
     // (\mathbf{w}^k_{n+1})_{\text{component\_i}}}{\partial x_d} + (1-\theta)
     // \frac{\partial (\mathbf{w}_n)_{\text{component\_i}}}{\partial x_d} ,
-    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d}
-    // \right)_K
-    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}}
-    // + (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component\_i}} ,
+    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K
+    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
+    // (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component\_i}} ,
     // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
     // @f}
     // where integrals are
@@ -1989,9 +1987,8 @@ namespace Step33
             }
       }
     // On the other hand, if this is an external boundary face, then the
-    // values of $\mathbf{W}^-$ will be either functions of $\mathbf{W}^+$, or
-    // they will be prescribed, depending on the kind of boundary condition
-    // imposed here.
+    // values of $\mathbf{W}^-$ will be either functions of $\mathbf{W}^+$, or they will be
+    // prescribed, depending on the kind of boundary condition imposed here.
     //
     // To start the evaluation, let us ensure that the boundary id specified
     // for this boundary is one for which we actually have data in the
@@ -2024,8 +2021,8 @@ namespace Step33
               Wplus[q],
               boundary_values[q],
               Wminus[q]);
-            // Here we assume that boundary type, boundary normal vector and
-            // boundary data values maintain the same during time advancing.
+            // Here we assume that boundary type, boundary normal vector and boundary data values
+            // maintain the same during time advancing.
             EulerEquations<dim>::compute_Wminus(
               parameters.boundary_conditions[boundary_id].kind,
               fe_v.normal_vector(q),

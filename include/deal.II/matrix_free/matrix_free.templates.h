@@ -1088,8 +1088,8 @@ MatrixFree<dim, Number>::initialize_indices(
           task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::color)
         {
           // set up partitions. if we just use coloring without partitions, do
-          // nothing here, assume all cells to belong to the zero partition
-          // (that we otherwise use for MPI boundary cells)
+          // nothing here, assume all cells to belong to the zero partition (that
+          // we otherwise use for MPI boundary cells)
           if (task_info.scheme ==
               internal::MatrixFreeFunctions::TaskInfo::color)
             {
@@ -1410,8 +1410,7 @@ MatrixFree<dim, Number>::initialize_indices(
                                   face_info.faces[f].cells_interior[v] %
                                     VectorizedArray<Number>::n_array_elements);
 
-            // Assert(cell_and_face_to_plain_faces(index) ==
-            // numbers::invalid_unsigned_int,
+            //Assert(cell_and_face_to_plain_faces(index) == numbers::invalid_unsigned_int,
             //       ExcInternalError("Should only visit each face once"));
             face_info.cell_and_face_to_plain_faces(index) =
               f * VectorizedArray<Number>::n_array_elements + v;
@@ -1424,8 +1423,7 @@ MatrixFree<dim, Number>::initialize_indices(
                   face_info.faces[f].exterior_face_no,
                   face_info.faces[f].cells_exterior[v] %
                     VectorizedArray<Number>::n_array_elements);
-                // Assert(cell_and_face_to_plain_faces(index) ==
-                // numbers::invalid_unsigned_int,
+                //Assert(cell_and_face_to_plain_faces(index) == numbers::invalid_unsigned_int,
                 //       ExcInternalError("Should only visit each face once"));
                 face_info.cell_and_face_to_plain_faces(index) =
                   f * VectorizedArray<Number>::n_array_elements + v;

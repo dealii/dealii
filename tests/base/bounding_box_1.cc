@@ -49,7 +49,7 @@ test_bounding_box()
 
   std::vector<Point<spacedim>> test_points;
 
-  // To guarantee points are inside we take a convex combination
+  //To guarantee points are inside we take a convex combination
   double c;
   for (int t = 0; t < 5; ++t)
     {
@@ -69,13 +69,13 @@ test_bounding_box()
   deallog << std::endl;
   test_points.clear();
 
-  // To create outside points we take a non-convex combination
+  //To create outside points we take a non-convex combination
   for (int t = 0; t < 5; ++t)
     {
       Point<spacedim> test_pt;
       c = (1 + t) * 2.5;
       if (t % 2 == 0)
-        c = -c; // Changing the sign sometimes..
+        c = -c; //Changing the sign sometimes..
       for (unsigned int i = 0; i < spacedim; ++i)
         test_pt[i] = boundaries.first[i] * c + boundaries.second[i] * c;
 

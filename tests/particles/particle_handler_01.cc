@@ -15,8 +15,7 @@
 
 
 
-// check the creation and destruction of particle within the particle handler
-// class.
+// check the creation and destruction of particle within the particle handler class.
 
 #include <deal.II/distributed/tria.h>
 

@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::compute_cholesky_factorization by comparing with
-// FullMatrix
+// test LAPACKFullMatrix::compute_cholesky_factorization by comparing with FullMatrix
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_full_matrix.h>

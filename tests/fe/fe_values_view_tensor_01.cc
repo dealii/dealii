@@ -126,8 +126,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << "Number of degrees of freedom: " << dof_handler.n_dofs() << " = ("
           << n_stress_dof << " + " << n_gamma_dof << ")" << std::endl;
 
-  // following step-22 use of simple compressed block sparsity pattern for
-  // efficiency
+  // following step-22 use of simple compressed block sparsity pattern for efficiency
   {
     BlockDynamicSparsityPattern csp(2, 2);
 
@@ -167,7 +166,7 @@ MixedElastoPlasticity<dim>::assemble_system()
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   deallog << "dofs_per_cell: " << fe.dofs_per_cell << std::endl;
-  // return;
+  //return;
   const unsigned int n_q_points = quadrature_formula.size();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -176,7 +175,7 @@ MixedElastoPlasticity<dim>::assemble_system()
   std::vector<unsigned int> local_dof_indices(dofs_per_cell);
 
 
-  const FEValuesExtractors::Tensor<2> stress_extr(0); // rank2
+  const FEValuesExtractors::Tensor<2> stress_extr(0); //rank2
   const FEValuesExtractors::Scalar    gamma_extr(n_stress_components);
 
   deallog << "fe.dofs_per_cell: " << fe.dofs_per_cell
@@ -192,13 +191,13 @@ MixedElastoPlasticity<dim>::assemble_system()
   std::vector<Tensor<2, dim>> stress_values(n_q_points);
 
   unsigned int cc = 0;
-  for (; cell != endc; ++cell) // loop over all cells
+  for (; cell != endc; ++cell) //loop over all cells
     {
       deallog << ++cc << " ";
       cell_matrix = 0;
       cell_rhs    = 0;
 
-      fe_values.reinit(cell); // compute requested values for a given cell
+      fe_values.reinit(cell); //compute requested values for a given cell
 
       fe_values[stress_extr].get_function_values(solution, stress_values);
       fe_values[stress_extr].get_function_divergences(solution, div_values);

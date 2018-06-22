@@ -13,8 +13,7 @@
  *
  * ---------------------------------------------------------------------
 
- * This file tests the non-symmetric interface to PARPACK for an
- advection-diffussion
+ * This file tests the non-symmetric interface to PARPACK for an advection-diffussion
  * operator with PETSc mpi vectors.
  *
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.
@@ -53,7 +52,7 @@
 
 #include "../tests.h"
 
-const unsigned int dim = 2; // run in 2d to save time
+const unsigned int dim = 2; //run in 2d to save time
 
 const double eps = 1e-10;
 
@@ -82,7 +81,7 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
        index < subdomain_association.size();
        ++index)
     {
-      // found index different from the current one
+      //found index different from the current one
       if (subdomain_association[index] != this_subdomain)
         {
           index_sets[this_subdomain].add_range(i_min, index);
@@ -107,7 +106,7 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
     index_sets[i].compress();
 
   return index_sets;
-} // locally_owned_dofs_per_subdomain
+} //locally_owned_dofs_per_subdomain
 
 class PETScInverse
 {
@@ -164,8 +163,7 @@ test()
   triangulation.refine_global(global_mesh_refinement_steps);
 
   // we do not use metis but rather partition by hand below.
-  // dealii::GridTools::partition_triangulation (n_mpi_processes,
-  // triangulation);
+  //dealii::GridTools::partition_triangulation (n_mpi_processes, triangulation);
   {
     const double x0 = -1.0;
     const double x1 = 1.0;
@@ -232,12 +230,12 @@ test()
   arpack_vectors.resize(number_of_eigenvalues + 1);
   for (unsigned int i = 0; i < arpack_vectors.size(); ++i)
     arpack_vectors[i].reinit(locally_owned_dofs,
-                             mpi_communicator); // without ghost dofs
+                             mpi_communicator); //without ghost dofs
 
   eigenfunctions.resize(2 * number_of_eigenvalues);
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
     eigenfunctions[i].reinit(locally_owned_dofs,
-                             mpi_communicator); // without ghost dofs
+                             mpi_communicator); //without ghost dofs
 
 
   // ready for assembly

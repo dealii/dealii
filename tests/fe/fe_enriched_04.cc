@@ -170,7 +170,7 @@ plot_shape_function()
       if (group == 0)
         shape_functions[s][s] = 1.0;
       else
-        shape_functions[s][s] = 1.0; // can potentially put another value here
+        shape_functions[s][s] = 1.0; //can potentially put another value here
     }
 
   DataOut<dim> data_out;

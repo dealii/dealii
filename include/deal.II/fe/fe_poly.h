@@ -225,9 +225,8 @@ public:
 
 protected:
   /*
-   * NOTE: The following function has its definition inlined into the class
-   * declaration because we otherwise run into a compiler error with MS Visual
-   * Studio.
+   * NOTE: The following function has its definition inlined into the class declaration
+   * because we otherwise run into a compiler error with MS Visual Studio.
    */
 
 
@@ -449,16 +448,13 @@ protected:
    *
    * Before the correction, the third derivatives would be given by
    * @f[
-   * D_{ijkl} = \frac{d^3\phi_i}{d \hat x_J d \hat x_K d \hat x_L} (J_{jJ})^{-1}
-   * (J_{kK})^{-1} (J_{lL})^{-1},
+   * D_{ijkl} = \frac{d^3\phi_i}{d \hat x_J d \hat x_K d \hat x_L} (J_{jJ})^{-1} (J_{kK})^{-1} (J_{lL})^{-1},
    * @f]
    * where $J_{iI}=\frac{d x_i}{d \hat x_I}$. After the correction, the
    * correct third derivative would be given by
    * @f[
-   * \frac{d^3\phi_i}{d x_j d x_k d x_l} = D_{ijkl} - H_{mjl} \frac{d^2
-   * \phi_i}{d x_k d x_m}
-   * - H_{mkl} \frac{d^2 \phi_i}{d x_j d x_m} - H_{mjk} \frac{d^2 \phi_i}{d x_l
-   * d x_m}
+   * \frac{d^3\phi_i}{d x_j d x_k d x_l} = D_{ijkl} - H_{mjl} \frac{d^2 \phi_i}{d x_k d x_m}
+   * - H_{mkl} \frac{d^2 \phi_i}{d x_j d x_m} - H_{mjk} \frac{d^2 \phi_i}{d x_l d x_m}
    * - K_{mjkl} \frac{d \phi_i}{d x_m},
    * @f]
    * where $H_{ijk}$ is the Jacobian pushed-forward derivative and $K_{ijkl}$

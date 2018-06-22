@@ -56,13 +56,11 @@ test()
         GridTools::get_cells_at_coarsest_common_level<Triangulation<dim>>(
           patch_cells);
 
-      // in uniform refinemenet(without any hanging nodes), we expect the size
-      // of vector of patch_cells for each cell be equal to the vector of
-      // coarse_cells around that cell
+      // in uniform refinemenet(without any hanging nodes), we expect the size of vector of patch_cells for each cell be
+      // equal to the vector of coarse_cells around that cell
       Assert(patch_cells.size() == coarse_cells.size(), ExcInternalError());
 
-      // we sort both vectors to ensure that we are comparing the correct cells
-      // to each other
+      // we sort both vectors to ensure that we are comparing the correct cells to each other
       std::sort(patch_cells.begin(), patch_cells.end());
       std::sort(coarse_cells.begin(), coarse_cells.end());
 

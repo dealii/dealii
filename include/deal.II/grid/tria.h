@@ -266,9 +266,8 @@ struct SubCellData
   std::vector<CellData<2>> boundary_quads;
 
   /**
-   * Determine whether the member variables above which may not be used in a
-   * given dimension are really empty. In other words, this function returns
-   * whether
+   * Determine whether the member variables above which may not be used in a given
+   * dimension are really empty. In other words, this function returns whether
    * both @p boundary_lines and @p boundary_quads are empty vectors
    * when @p dim equals one, and whether the @p boundary_quads
    * vector is empty when @p dim equals two.
@@ -508,11 +507,11 @@ namespace internal
  *
  * This class is written to be as independent of the dimension as possible
  * (thus the complex construction of the
- * dealii::internal::TriangulationImplementation::TriaLevel classes) to allow
- * code-sharing, to allow reducing the need to mirror changes in the code for
- * one dimension to the code for other dimensions. Nonetheless, some of the
- * functions are dependent of the dimension and there only exist specialized
- * versions for distinct dimensions.
+ * dealii::internal::TriangulationImplementation::TriaLevel classes) to allow code-sharing,
+ * to allow reducing the need to mirror changes in the code for one dimension
+ * to the code for other dimensions. Nonetheless, some of the functions are
+ * dependent of the dimension and there only exist specialized versions for
+ * distinct dimensions.
  *
  * This class satisfies the
  * @ref ConceptMeshType "MeshType concept"
@@ -1165,10 +1164,10 @@ namespace internal
  * indicators, subdomain ids, material ids, etc. On the other hand, the
  * following information is not stored:
  *   - signals
- *   - pointers to Manifold objects previously set using
- * Triangulation::set_manifold On the other hand, since these are objects that
- * are usually set in user code, they can typically easily be set again in that
- * part of your code in which you re-load triangulations.
+ *   - pointers to Manifold objects previously set using Triangulation::set_manifold
+ * On the other hand, since these are objects that are usually set in user code,
+ * they can typically easily be set again in that part of your code in which you
+ * re-load triangulations.
  *
  * In a sense, this approach to serialization means that re-loading a
  * triangulation is more akin to calling the
@@ -2247,9 +2246,9 @@ public:
      * itself called by other functions such as Triangulation::refine_global()
      * ). At the time this signal is triggered, the triangulation is still
      * unchanged. This signal
-     * is different from the pre_refinement signal, because in the parallel
-     * distributed case the pre_refinement signal is triggered multiple times
-     * without a way to distinguish the last signal call.
+     * is different from the pre_refinement signal, because in the parallel distributed
+     * case the pre_refinement signal is triggered multiple times without a way to
+     * distinguish the last signal call.
      */
     boost::signals2::signal<void()> pre_distributed_refinement;
 
@@ -2257,9 +2256,9 @@ public:
      * This signal is triggered at the end of execution of the
      * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
      * function when the triangulation has reached its final state. This signal
-     * is different from the post_refinement signal, because in the parallel
-     * distributed case the post_refinement signal is triggered multiple times
-     * without a way to distinguish the last signal call.
+     * is different from the post_refinement signal, because in the parallel distributed
+     * case the post_refinement signal is triggered multiple times without a way to
+     * distinguish the last signal call.
      */
     boost::signals2::signal<void()> post_distributed_refinement;
 
@@ -3406,8 +3405,7 @@ protected:
                    std::istream &     in);
 
   /**
-   * Recreate information about periodic neighbors from
-   * periodic_face_pairs_level_0.
+   * Recreate information about periodic neighbors from periodic_face_pairs_level_0.
    */
   void
   update_periodic_face_map();
@@ -3424,8 +3422,7 @@ private:
     periodic_face_pairs_level_0;
 
   /**
-   * If add_periodicity() is called, this variable stores the active periodic
-   * face pairs.
+   * If add_periodicity() is called, this variable stores the active periodic face pairs.
    */
   std::map<std::pair<cell_iterator, unsigned int>,
            std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>>
@@ -3923,7 +3920,7 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
       levels[i] = std::move(level);
     }
 
-  // Workaround for nullptr, see in save().
+  //Workaround for nullptr, see in save().
   bool faces_is_nullptr = true;
   ar & faces_is_nullptr;
   if (!faces_is_nullptr)

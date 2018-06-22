@@ -15,8 +15,7 @@
 
 
 
-// test DynamicSparsityPattern::iterator and document bug with std::vector
-// iterators
+// test DynamicSparsityPattern::iterator and document bug with std::vector iterators
 
 /*
 crash:
@@ -25,32 +24,20 @@ crash:
 
 Objects involved in the operation:
 iterator "lhs" @ 0x0x7fffffffc860 {
-type =
-N11__gnu_debug14_Safe_iteratorIN9__gnu_cxx17__normal_iteratorIPKjSt6vectorIjSaIjEEEENSt7__debug6vectorIjS6_EEEE
-(constant iterator); state = singular;
+type = N11__gnu_debug14_Safe_iteratorIN9__gnu_cxx17__normal_iteratorIPKjSt6vectorIjSaIjEEEENSt7__debug6vectorIjS6_EEEE (constant iterator);
+  state = singular;
 }
 iterator "rhs" @ 0x0x7fffffffd670 {
-type =
-N11__gnu_debug14_Safe_iteratorIN9__gnu_cxx17__normal_iteratorIPKjSt6vectorIjSaIjEEEENSt7__debug6vectorIjS6_EEEE
-(constant iterator); state = singular;
+type = N11__gnu_debug14_Safe_iteratorIN9__gnu_cxx17__normal_iteratorIPKjSt6vectorIjSaIjEEEENSt7__debug6vectorIjS6_EEEE (constant iterator);
+  state = singular;
 }
 
 backtrace:
-#3  0x0000000000416c29 in
-__gnu_debug::operator==<__gnu_cxx::__normal_iterator<unsigned int const*,
-std::vector<unsigned int, std::allocator<unsigned int> > >,
-std::__debug::vector<unsigned int, std::allocator<unsigned int> > >
-(__lhs=<error reading variable: Cannot access memory at address 0x0>,
-__rhs=<error reading variable: Cannot access memory at address 0x0>) at
-/usr/include/c++/4.8/debug/safe_iterator.h:503 #4  0x000000000041075b in
-operator== (other=..., this=0x7fffffffc850) at
-/scratch/deal-git/include/deal.II/lac/dynamic_sparsity_pattern.h:743 #5
-operator== (other=..., this=0x7fffffffc850) at
-/scratch/deal-git/include/deal.II/lac/dynamic_sparsity_pattern.h:868 #6
-operator!= (other=..., this=0x7fffffffc850) at
-/scratch/deal-git/include/deal.II/lac/dynamic_sparsity_pattern.h:877 #7  iterate
-(sp=...) at
-/scratch/deal-git/tests/bits/dynamic_sparsity_pattern_iterator_04.cc:30
+#3  0x0000000000416c29 in __gnu_debug::operator==<__gnu_cxx::__normal_iterator<unsigned int const*, std::vector<unsigned int, std::allocator<unsigned int> > >, std::__debug::vector<unsigned int, std::allocator<unsigned int> > > (__lhs=<error reading variable: Cannot access memory at address 0x0>, __rhs=<error reading variable: Cannot access memory at address 0x0>) at /usr/include/c++/4.8/debug/safe_iterator.h:503
+#4  0x000000000041075b in operator== (other=..., this=0x7fffffffc850) at /scratch/deal-git/include/deal.II/lac/dynamic_sparsity_pattern.h:743
+#5  operator== (other=..., this=0x7fffffffc850) at /scratch/deal-git/include/deal.II/lac/dynamic_sparsity_pattern.h:868
+#6  operator!= (other=..., this=0x7fffffffc850) at /scratch/deal-git/include/deal.II/lac/dynamic_sparsity_pattern.h:877
+#7  iterate (sp=...) at /scratch/deal-git/tests/bits/dynamic_sparsity_pattern_iterator_04.cc:30
 */
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>

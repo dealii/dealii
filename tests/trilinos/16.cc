@@ -15,8 +15,8 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator() in set/add-mode
-// alternatingly, but writing and overwriting the same elements
+// check TrilinosWrappers::MPI::Vector::operator() in set/add-mode alternatingly, but
+// writing and overwriting the same elements
 //
 // this test doesn't really make sense any more -- at least one a
 // single processor. on multiple processors, one has to call

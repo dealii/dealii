@@ -42,14 +42,14 @@ test(const unsigned int size, const unsigned int block_size)
     Utilities::MPI::this_mpi_process(mpi_communicator));
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
-  // create FullMatrix and fill it
+  //create FullMatrix and fill it
   FullMatrix<NumberType> full(size);
   unsigned int           count = 0;
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j, ++count)
       full(i, j) = count;
 
-  // create 2d process grid
+  //create 2d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size, size, block_size, block_size);

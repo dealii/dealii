@@ -78,12 +78,11 @@ namespace Step15
   // are made:
   // - There are two solution vectors, one for the Newton update
   //   $\delta u^n$, and one for the current iterate $u^n$.
-  // - The <code>setup_system</code> function takes an argument that denotes
-  // whether
+  // - The <code>setup_system</code> function takes an argument that denotes whether
   //   this is the first time it is called or not. The difference is that the
-  //   first time around we need to distribute the degrees of freedom and set
-  //   the solution vector for $u^n$ to the correct size. The following times,
-  //   the function is called after we have already done these steps as part of
+  //   first time around we need to distribute the degrees of freedom and set the
+  //   solution vector for $u^n$ to the correct size. The following times, the
+  //   function is called after we have already done these steps as part of
   //   refining the mesh in <code>refine_mesh</code>.
   // - We then also need new functions: <code>set_boundary_values()</code>
   //   takes care of setting the boundary values on the solution vector

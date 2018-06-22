@@ -15,8 +15,8 @@
 
 
 
-// check VectorTools::create_boundary_right_hand_side, but this time for a
-// scalar primitive element
+// check VectorTools::create_boundary_right_hand_side, but this time for a scalar
+// primitive element
 
 
 #include <deal.II/base/function_lib.h>

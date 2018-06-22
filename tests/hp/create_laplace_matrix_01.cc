@@ -15,10 +15,10 @@
 
 
 
-// The MatrixCreator::create_laplace_matrix function overload that also
-// assembles a right hand side vector had a bug in that the statement that
-// assembled the rhs vector was nested in the wrong loop. this was fixed by
-// Moritz' commit 14428
+// The MatrixCreator::create_laplace_matrix function overload that also assembles
+// a right hand side vector had a bug in that the statement that assembled the
+// rhs vector was nested in the wrong loop. this was fixed by Moritz' commit
+// 14428
 //
 // the function internally has four branches, with different code used
 // for the cases with/without coefficient and scalar/vector-valued

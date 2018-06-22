@@ -29,8 +29,8 @@ using namespace dealii;
 
 // Purpose of this test:
 // Demonstrate that mesh smoothing option limit_level_difference_at_vertices
-// is always effective across different initial cells (different trees in p4est
-// context) not matter it is set or not.
+// is always effective across different initial cells (different trees in p4est context)
+// not matter it is set or not.
 //
 // Design of this test:
 // The initial mesh is set to 4 cells in unite square. Then the center most cell
@@ -76,8 +76,7 @@ private:
   const std::string  case_name;
 };
 
-// Equip class Point<dim> with operator < in order to sort the cell center
-// coordinates.
+// Equip class Point<dim> with operator < in order to sort the cell center coordinates.
 template <int dim>
 class Location : public Point<dim>
 {
@@ -108,10 +107,9 @@ main(int argc, char *argv[])
     argc, argv, /* int max_num_threads */ 1);
   const bool I_am_host =
     (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0);
-  // Although most part of this test is designed to run in parallel, there is
-  // still one place that doesn't work perfectly in parallel. Now the sorting of
-  // final cell centers is just a local operation and won't produce any
-  // reasonable result in parallel.
+  // Although most part of this test is designed to run in parallel, there is still
+  // one place that doesn't work perfectly in parallel. Now the sorting of final cell
+  // centers is just a local operation and won't produce any reasonable result in parallel.
   AssertThrow(I_am_host,
               ExcMessage("Current code works properly only with one process."));
 

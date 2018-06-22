@@ -48,8 +48,7 @@ worker(const std::vector<unsigned int>::iterator &i,
 void
 copier(const CopyData &ad)
 {
-  // write into the five elements of 'result' starting at
-  // ad.computed%result.size()
+  // write into the five elements of 'result' starting at ad.computed%result.size()
   for (unsigned int j = 0; j < 5; ++j)
     result((ad.computed + j) % result.size()) += ad.computed;
 }

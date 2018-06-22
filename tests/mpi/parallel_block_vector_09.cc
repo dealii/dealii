@@ -15,12 +15,12 @@
 
 
 
-// use BlockVector<Number>::mmult(const BlockVector<Number> &V, const
-// FullMatrixType &matrix) and multivector_inner_product_with_metric() to test
-// that [ S^{ij}u_i ] * u_j == S^{ij} [u_i * u_j] In order to avoid taking S^T,
-// just use symmetric matrix as a metric, which is actually the way it should be
-// anyway. Triangulation and Mass operator are the same as in
-// matrix_free/mass_operator_01.cc
+// use BlockVector<Number>::mmult(const BlockVector<Number> &V, const FullMatrixType &matrix)
+// and multivector_inner_product_with_metric() to test that
+// [ S^{ij}u_i ] * u_j == S^{ij} [u_i * u_j]
+// In order to avoid taking S^T, just use symmetric matrix as a metric, which is
+// actually the way it should be anyway.
+// Triangulation and Mass operator are the same as in matrix_free/mass_operator_01.cc
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>

@@ -71,8 +71,8 @@ namespace internal
     {
     public:
       /**
-       * Constructor. This constructor is deleted to prevent the use of this
-       * template, as only the specializations should be used
+       * Constructor. This constructor is deleted to prevent the use of this template,
+       * as only the specializations should be used
        */
       DoFFaces() = delete;
     };

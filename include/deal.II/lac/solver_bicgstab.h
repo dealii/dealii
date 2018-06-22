@@ -385,8 +385,7 @@ typename SolverBicgstab<VectorType>::IterationResult
 SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
                                     const PreconditionerType &preconditioner)
 {
-  // TODO:[GK] Implement "use the length of the computed orthogonal residual" in
-  // the BiCGStab method.
+  //TODO:[GK] Implement "use the length of the computed orthogonal residual" in the BiCGStab method.
   SolverControl::State state = SolverControl::iterate;
   alpha = omega = rho = 1.;
 
@@ -425,7 +424,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
       alpha = rho / rhobar;
 
-      // TODO:[?] Find better breakdown criterion
+      //TODO:[?] Find better breakdown criterion
 
       if (std::fabs(alpha) > 1.e10)
         return IterationResult(true, state, step, res);
@@ -435,9 +434,9 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       // check for early success, see the lac/bicgstab_early testcase as to
       // why this is necessary
       //
-      // note: the vector *Vx we pass to the iteration_status signal here is
-      // only the current approximation, not the one we will return with, which
-      // will be x=*Vx + alpha*y
+      // note: the vector *Vx we pass to the iteration_status signal here is only
+      // the current approximation, not the one we will return with,
+      // which will be x=*Vx + alpha*y
       if (this->iteration_status(step, res, *Vx) == SolverControl::success)
         {
           Vx->add(alpha, y);

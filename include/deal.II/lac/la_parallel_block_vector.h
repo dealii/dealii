@@ -90,10 +90,9 @@ namespace LinearAlgebra
        * Most common MPI implementations will get slow when too many
        * messages/requests are outstanding. Even when messages are small,
        * say 1 kB only, we should collect enough data with @p communication_block_size
-       * to cover typical infiniband latencies which are around a few
-       * microseconds. Sending 20 kB at a throughput of 5 GB/s takes 4
-       * microseconds, so we should arrive at the bandwidth dominated regime
-       * then which is good enough.
+       * to cover typical infiniband latencies which are around a few microseconds.
+       * Sending 20 kB at a throughput of 5 GB/s takes 4 microseconds,
+       * so we should arrive at the bandwidth dominated regime then which is good enough.
        */
       static constexpr unsigned int communication_block_size = 20;
 
@@ -472,8 +471,8 @@ namespace LinearAlgebra
        * vector @p V. VectorOperation::values @p operation is used to decide if
        * the elements in @p V should be added to the current vector or replace the
        * current elements. The last parameter can be used if the same
-       * communication pattern is used multiple times. This can be used to
-       * improve performance.
+       * communication pattern is used multiple times. This can be used to improve
+       * performance.
        */
       virtual void
       import(
@@ -495,8 +494,7 @@ namespace LinearAlgebra
        * and $V_j$ indicate the $i$th block (not element!) of $U$ and the
        * $j$th block of $V$, respectively. If @p symmetric is
        * <code>true</code>, it is assumed that inner product results in a
-       * square symmetric matrix and almost half of the scalar products can be
-       * avoided.
+       * square symmetric matrix and almost half of the scalar products can be avoided.
        *
        * Obviously, this function can only be used if all blocks of both vectors
        * are of the same size.
@@ -517,8 +515,7 @@ namespace LinearAlgebra
        * and $V_j$ indicate the $i$th block (not element) of $U$ and the
        * $j$th block of $V$, respectively. If @p symmetric is
        * <code>true</code>, it is assumed that $U_i \cdot V_j$ and $A^{ij}$ are
-       * symmetric matrices and almost half of the scalar products can be
-       * avoided.
+       * symmetric matrices and almost half of the scalar products can be avoided.
        *
        * Obviously, this function can only be used if all blocks of both vectors
        * are of the same size.
@@ -643,8 +640,7 @@ namespace LinearAlgebra
        * most vector operations are memory transfer limited, this reduces the
        * time by 25\% (or 50\% if @p W equals @p this).
        *
-       * For complex-valued vectors, the scalar product in the second step is
-       * implemented as
+       * For complex-valued vectors, the scalar product in the second step is implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       virtual Number

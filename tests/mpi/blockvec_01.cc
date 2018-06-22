@@ -56,7 +56,7 @@ test()
 
   v.compress(VectorOperation::insert);
 
-  // Assert(!v.has_ghost_elements(), ExcInternalError());
+  //Assert(!v.has_ghost_elements(), ExcInternalError());
 
   deallog << "size: " << v.size() << std::endl;
   deallog << "size[0]: " << v.block(0).size() << std::endl;
@@ -117,11 +117,11 @@ main(int argc, char **argv)
       deallog << std::setprecision(4);
 
       test<PETScWrappers::MPI::BlockVector>();
-      // test<TrilinosWrappers::MPI::BlockVector>();
+      //test<TrilinosWrappers::MPI::BlockVector>();
     }
   else
     {
       test<PETScWrappers::MPI::BlockVector>();
-      // test<TrilinosWrappers::MPI::BlockVector>();
+      //test<TrilinosWrappers::MPI::BlockVector>();
     }
 }

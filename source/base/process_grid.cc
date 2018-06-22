@@ -41,13 +41,13 @@ namespace
                                const unsigned int block_size_n)
   {
     // Few notes from the ScaLAPACK user guide:
-    // It is possible to predict the best grid shape given the number of
-    // processes available: Pr x Pc <= P This, however, depends on the task to
-    // be done. LU , QR and QL factorizations perform better for “flat” process
-    // grids (Pr < Pc ) For large N, Pc = 2*Pr is a good choice, whereas for
-    // small N, one should choose small Pr Square or near square grids are more
-    // optimal for Cholesky factorization. LQ and RQ factorizations take
-    // advantage of “tall” grids (Pr > Pc )
+    // It is possible to predict the best grid shape given the number of processes available:
+    // Pr x Pc <= P
+    // This, however, depends on the task to be done.
+    // LU , QR and QL factorizations perform better for “flat” process grids (Pr < Pc )
+    // For large N, Pc = 2*Pr is a good choice, whereas for small N, one should choose small Pr
+    // Square or near square grids are more optimal for Cholesky factorization.
+    // LQ and RQ factorizations take advantage of “tall” grids (Pr > Pc )
 
     // Below we always try to create 2D processor grids:
 
@@ -67,11 +67,10 @@ namespace
     const double ratio = double(n) / m;
     int          Pc    = std::floor(std::sqrt(ratio * Np));
 
-    // one could rounds up Pc to the number which has zero remainder from the
-    // division of Np while ( Np % Pc != 0 )
+    // one could rounds up Pc to the number which has zero remainder from the division of Np
+    // while ( Np % Pc != 0 )
     //  ++Pc;
-    // but this affects the grid shape dramatically, i.e. 10 cores 3x3 becomes
-    // 2x5.
+    // but this affects the grid shape dramatically, i.e. 10 cores 3x3 becomes 2x5.
 
     // limit our estimate to be in [2, Np]
     int n_process_columns = std::min(Np, std::max(2, Pc));
@@ -149,8 +148,7 @@ namespace Utilities
         mpi_process_is_active = true;
 
       // Create an auxiliary communicator which has root and all inactive cores.
-      // Assume that inactive cores start with
-      // id=n_process_rows*n_process_columns
+      // Assume that inactive cores start with id=n_process_rows*n_process_columns
       const unsigned int n_active_mpi_processes =
         n_process_rows * n_process_columns;
       Assert(mpi_process_is_active ||

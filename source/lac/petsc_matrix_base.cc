@@ -300,13 +300,12 @@ namespace PETScWrappers
   MatrixBase::size_type
   MatrixBase::row_length(const size_type row) const
   {
-    // TODO: this function will probably only work if compress() was called on
-    // the matrix previously. however, we can't do this here, since it would
-    // impose global communication and one would have to make sure that this
-    // function is called the same number of times from all processors,
-    // something that is unreasonable. there should simply be a way in PETSc to
-    // query the number of entries in a row bypassing the call to compress(),
-    // but I can't find one
+    //TODO: this function will probably only work if compress() was called on the
+    //matrix previously. however, we can't do this here, since it would impose
+    //global communication and one would have to make sure that this function is
+    //called the same number of times from all processors, something that is
+    //unreasonable. there should simply be a way in PETSc to query the number of
+    //entries in a row bypassing the call to compress(), but I can't find one
     Assert(row < m(), ExcInternalError());
 
     // get a representation of the present
@@ -315,8 +314,8 @@ namespace PETScWrappers
     const PetscInt *   colnums;
     const PetscScalar *values;
 
-    // TODO: this is probably horribly inefficient; we should lobby for a way to
-    // query this information from PETSc
+    //TODO: this is probably horribly inefficient; we should lobby for a way to
+    //query this information from PETSc
     PetscErrorCode ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 

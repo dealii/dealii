@@ -158,7 +158,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       in >> n_vertices;
 
       in.ignore(256,
-                '\n'); // ignoring the number beside the total no. of points.
+                '\n'); //ignoring the number beside the total no. of points.
 
       for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
         {
@@ -178,12 +178,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   "While reading VTK file, failed to find POINTS section"));
 
 
-  //////////////////ignoring space between points and cells
-  /// sections////////////////////
+  //////////////////ignoring space between points and cells sections////////////////////
   std::string checkline;
   int         no;
   in.ignore(256,
-            '\n'); // this move pointer to the next line ignoring unwanted no.
+            '\n'); //this move pointer to the next line ignoring unwanted no.
   no = in.tellg();
   getline(in, checkline);
   if (checkline.compare("") != 0)
@@ -193,8 +192,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  ///////////////////Processing the CELLS section that contains cells(cells) and
-  /// bound_quads(subcelldata)///////////////////////
+  ///////////////////Processing the CELLS section that contains cells(cells) and bound_quads(subcelldata)///////////////////////
 
   if (keyword == "CELLS")
     {
@@ -219,7 +217,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                   cells.emplace_back();
 
-                  for (unsigned int j = 0; j < type; j++) // loop to feed data
+                  for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
@@ -230,7 +228,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   subcelldata.boundary_quads.emplace_back();
 
                   for (unsigned int j = 0; j < type;
-                       j++) // loop to feed the data to the boundary
+                       j++) //loop to feed the data to the boundary
                     in >> subcelldata.boundary_quads.back().vertices[j];
 
                   subcelldata.boundary_quads.back().material_id = 0;
@@ -260,7 +258,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                   cells.emplace_back();
 
-                  for (unsigned int j = 0; j < type; j++) // loop to feed data
+                  for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
@@ -268,12 +266,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
               else if (type == 2)
                 {
-                  // If this is encountered, the pointer comes out of the loop
-                  // and starts processing boundaries.
+                  //If this is encountered, the pointer comes out of the loop
+                  //and starts processing boundaries.
                   subcelldata.boundary_lines.emplace_back();
 
                   for (unsigned int j = 0; j < type;
-                       j++) // loop to feed the data to the boundary
+                       j++) //loop to feed the data to the boundary
                     {
                       in >> subcelldata.boundary_lines.back().vertices[j];
                     }
@@ -293,13 +291,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     ExcMessage(
                       "While reading VTK file, failed to find CELLS section"));
 
-      /////////////////////Processing the CELL_TYPES
-      /// section////////////////////////
+      /////////////////////Processing the CELL_TYPES section////////////////////////
 
       in >> keyword;
 
       if (keyword ==
-          "CELL_TYPES") // Entering the cell_types section and ignoring data.
+          "CELL_TYPES") //Entering the cell_types section and ignoring data.
         {
           in.ignore(256, '\n');
 
@@ -313,8 +310,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
             }
         }
 
-      ////////////////////////Processing the CELL_DATA
-      /// section/////////////////////////////
+      ////////////////////////Processing the CELL_DATA section/////////////////////////////
 
       if (keyword == "CELL_DATA")
         {
@@ -749,8 +745,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                  ExcIndexRange(material_id,
                                0,
                                std::numeric_limits<types::material_id>::max()));
-          // we use only material_ids in the range from 0 to
-          // numbers::invalid_material_id-1
+          // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
           Assert(material_id < numbers::invalid_material_id,
                  ExcIndexRange(material_id, 0, numbers::invalid_material_id));
 
@@ -912,13 +907,11 @@ namespace
 
     // NL: Stored as [ global node-id (int), x-coord, y-coord, z-coord ]
     std::vector<std::vector<double>> node_list;
-    // CL: Stored as [ material-id (int), node1, node2, node3, node4, node5,
-    // node6, node7, node8 ]
+    // CL: Stored as [ material-id (int), node1, node2, node3, node4, node5, node6, node7, node8 ]
     std::vector<std::vector<double>> cell_list;
     // FL: Stored as [ sideset-id (int), node1, node2, node3, node4 ]
     std::vector<std::vector<double>> face_list;
-    // ELSET: Stored as [ (std::string) elset_name = (std::vector) of cells
-    // numbers]
+    // ELSET: Stored as [ (std::string) elset_name = (std::vector) of cells numbers]
     std::map<std::string, std::vector<int>> elsets_list;
   };
 } // namespace
@@ -1504,8 +1497,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                  ExcIndexRange(material_id,
                                0,
                                std::numeric_limits<types::material_id>::max()));
-          // we use only material_ids in the range from 0 to
-          // numbers::invalid_material_id-1
+          // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
           Assert(material_id < numbers::invalid_material_id,
                  ExcIndexRange(material_id, 0, numbers::invalid_material_id));
 
@@ -3114,8 +3106,7 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
       case ucd:
         return ".inp";
       case abaqus:
-        return ".inp"; // Typical suffix for Abaqus mesh files conflicts with
-                       // UCD.
+        return ".inp"; // Typical suffix for Abaqus mesh files conflicts with UCD.
       case xda:
         return ".xda";
       case netcdf:
@@ -3360,8 +3351,7 @@ namespace
             // Read SURFACE definition
             // Note that the orientation of the faces is embedded within the
             // definition of each "set" of faces that comprise the surface
-            // These are either marked by an "S" or "E" in 3d or 2d
-            // respectively.
+            // These are either marked by an "S" or "E" in 3d or 2d respectively.
             std::getline(input_stream, line);
             while (!input_stream.fail() && !input_stream.eof())
               {
@@ -3375,15 +3365,13 @@ namespace
                                ::toupper);
 
                 // Surface can be created from ELSET, or directly from cells
-                // If elsets_list contains a key with specific name - refers to
-                // that ELSET, otherwise refers to cell
+                // If elsets_list contains a key with specific name - refers to that ELSET, otherwise refers to cell
                 std::istringstream iss(line);
                 int                el_idx;
                 int                face_number;
                 char               temp;
 
-                // Get relevant faces, taking into account the element
-                // orientation
+                // Get relevant faces, taking into account the element orientation
                 std::vector<double> quad_node_list;
                 const std::string   elset_name = line.substr(0, line.find(','));
                 if (elsets_list.count(elset_name) != 0)
@@ -3441,11 +3429,9 @@ namespace
             }
 
             // There are two possibilities of storing cells numbers in ELSET:
-            // 1. If the header contains the 'GENERATE' keyword, then the next
-            // line describes range of cells as:
+            // 1. If the header contains the 'GENERATE' keyword, then the next line describes range of cells as:
             //    cell_id_start, cell_id_end, cell_step
-            // 2. If the header does not contain the 'GENERATE' keyword, then
-            // the next lines contain cells numbers
+            // 2. If the header does not contain the 'GENERATE' keyword, then the next lines contain cells numbers
             std::vector<int>  elements;
             const std::size_t generate_idx = line.find("GENERATE");
             if (generate_idx != std::string::npos)
@@ -3459,8 +3445,7 @@ namespace
                 int                elis_step =
                   1; // Default value set in case stride not provided
                 // Some files don't have the stride size
-                // Compare mesh test cases ./grids/abaqus/3d/other_simple.inp to
-                // ./grids/abaqus/2d/2d_test_abaqus.inp
+                // Compare mesh test cases ./grids/abaqus/3d/other_simple.inp to ./grids/abaqus/2d/2d_test_abaqus.inp
                 iss >> elid_start >> comma >> elid_end;
                 // https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null
                 if (iss.rdbuf()->in_avail() != 0)
@@ -3743,7 +3728,7 @@ namespace
 } // namespace
 
 
-// explicit instantiations
+//explicit instantiations
 #include "grid_in.inst"
 
 DEAL_II_NAMESPACE_CLOSE

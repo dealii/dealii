@@ -177,8 +177,7 @@ main(int argc, char **argv)
     }
 
     // set extra settings for JD; Otherwise, at least on OSX,
-    // the number of eigensolver iterations is different between debug and
-    // release modes!
+    // the number of eigensolver iterations is different between debug and release modes!
     PETScWrappers::set_option_value("-st_ksp_type", "cg");
     PETScWrappers::set_option_value("-st_pc_type", "jacobi");
     PETScWrappers::set_option_value("-st_ksp_max_it", "10");

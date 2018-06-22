@@ -278,25 +278,25 @@ IndexSet::subtract_set(const IndexSet &other)
 
   while (own_it != ranges.end() && other_it != other.ranges.end())
     {
-      // advance own iterator until we get an overlap
+      //advance own iterator until we get an overlap
       if (own_it->end <= other_it->begin)
         {
           ++own_it;
           continue;
         }
-      // we are done with other_it, so advance
+      //we are done with other_it, so advance
       if (own_it->begin >= other_it->end)
         {
           ++other_it;
           continue;
         }
 
-      // Now own_it and other_it overlap.  First save the part of own_it that
-      // is before other_it (if not empty).
+      //Now own_it and other_it overlap.  First save the part of own_it that
+      //is before other_it (if not empty).
       if (own_it->begin < other_it->begin)
         {
           Range r(own_it->begin, other_it->begin);
-          r.nth_index_in_set = 0; // fix warning of unused variable
+          r.nth_index_in_set = 0; //fix warning of unused variable
           new_ranges.push_back(r);
         }
       // change own_it to the sub range behind other_it. Do not delete own_it
@@ -647,7 +647,7 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
   return (is_ascending == 1);
 #else
   return true;
-#endif // DEAL_II_WITH_MPI
+#endif //DEAL_II_WITH_MPI
 }
 
 

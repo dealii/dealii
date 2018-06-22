@@ -15,9 +15,8 @@
 
 
 
-// check FESystem(FE_DGPMonomial)::hp_vertex_dof_identities, but with a
-// different arrangement of base elements and multiplicities than in the _01
-// test
+// check FESystem(FE_DGPMonomial)::hp_vertex_dof_identities, but with a different
+// arrangement of base elements and multiplicities than in the _01 test
 
 
 #include <deal.II/fe/fe_dgp_monomial.h>

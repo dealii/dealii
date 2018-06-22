@@ -57,8 +57,8 @@ DataOutStack<dim, spacedim, DoFHandlerType>::new_parameter_value(
   parameter      = p;
   parameter_step = dp;
 
-  // check whether the user called finish_parameter_value() at the end of the
-  // previous parameter step
+  // check whether the user called finish_parameter_value() at the end of the previous
+  // parameter step
   //
   // this is to prevent serious waste of memory
   for (typename std::vector<DataVector>::const_iterator i = dof_data.begin();

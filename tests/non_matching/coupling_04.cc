@@ -97,8 +97,8 @@ test()
   SparseDirectUMFPACK mass_matrix_inv;
   mass_matrix_inv.factorize(mass_matrix);
 
-  // now take the square function in space, project them onto the immersed
-  // space, get back ones, and check for the error.
+  // now take the square function in space, project them onto the immersed space,
+  // get back ones, and check for the error.
   Vector<double> space_square(space_dh.n_dofs());
   Vector<double> squares(dh.n_dofs());
   Vector<double> projected_squares(dh.n_dofs());

@@ -217,18 +217,15 @@ namespace parallel
                                   endc = this->end(lvl);
                   for (unsigned int index = 0; cell != endc; cell++, index++)
                     {
-                      // Store true level subdomain IDs before setting
-                      // artificial
+                      // Store true level subdomain IDs before setting artificial
                       true_level_subdomain_ids_of_cells[lvl][index] =
                         cell->level_subdomain_id();
 
-                      // for active cells, we must have knowledge of level
-                      // subdomain ids of all neighbors to our subdomain, not
-                      // just neighbors on the same level. if the cells
-                      // subdomain id was not set to artitficial above, we will
-                      // also keep its level subdomain id since it is either
-                      // owned by this processor or in the ghost layer of the
-                      // active mesh.
+                      // for active cells, we must have knowledge of level subdomain ids of
+                      // all neighbors to our subdomain, not just neighbors on the same level.
+                      // if the cells subdomain id was not set to artitficial above, we will
+                      // also keep its level subdomain id since it is either owned by this processor
+                      // or in the ghost layer of the active mesh.
                       if (!cell->has_children() &&
                           cell->subdomain_id() !=
                             numbers::artificial_subdomain_id)
@@ -251,8 +248,7 @@ namespace parallel
                             continue;
                         }
 
-                      // we must have knowledge of our neighbors on the same
-                      // level
+                      // we must have knowledge of our neighbors on the same level
                       if (!cell->is_locally_owned_on_level() &&
                           level_halo_layer.find(cell) != level_halo_layer.end())
                         continue;

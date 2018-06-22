@@ -216,11 +216,10 @@ namespace FETools
       // generate the array that will hold the output
       std::vector<bool> retval(n_shape_functions, false);
 
-      // finally go through all the shape functions of the base elements, and
-      // copy their flags. this somehow copies the code in build_cell_table,
-      // which is not nice as it uses too much implicit knowledge about the
-      // layout of the individual bases in the composed FE, but there seems no
-      // way around...
+      // finally go through all the shape functions of the base elements, and copy
+      // their flags. this somehow copies the code in build_cell_table, which is
+      // not nice as it uses too much implicit knowledge about the layout of the
+      // individual bases in the composed FE, but there seems no way around...
       //
       // for each shape function, copy the flags from the base element to this
       // one, taking into account multiplicities, and other complications
@@ -376,20 +375,20 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // needed because fe might be NULL
+        if (multiplicities[i] > 0) //needed because fe might be NULL
           n_shape_functions += fes[i]->dofs_per_cell * multiplicities[i];
 
       unsigned int n_components = 0;
       if (do_tensor_product)
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be NULL
+            if (multiplicities[i] > 0) //needed because fe might be NULL
               n_components += fes[i]->n_components() * multiplicities[i];
         }
       else
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because fe might be NULL
+            if (multiplicities[i] > 0) //needed because fe might be NULL
               {
                 n_components = fes[i]->n_components();
                 break;
@@ -413,9 +412,9 @@ namespace FETools
       // layout of the individual bases in the composed FE, but there seems no
       // way around...
       //
-      // for each shape function, copy the non-zero flags from the base element
-      // to this one, taking into account multiplicities, multiple components in
-      // base elements, and other complications
+      // for each shape function, copy the non-zero flags from the base element to
+      // this one, taking into account multiplicities, multiple components in base
+      // elements, and other complications
       unsigned int total_index = 0;
       for (unsigned int vertex_number = 0;
            vertex_number < GeometryInfo<dim>::vertices_per_cell;
@@ -640,8 +639,8 @@ namespace FETools
         }
       else
         {
-          // The base element establishing a component does not make sense in
-          // this case. Set up to something meaningless:
+          // The base element establishing a component does not make sense in this case.
+          // Set up to something meaningless:
           for (unsigned int i = 0; i < component_to_base_table.size(); i++)
             component_to_base_table[i] =
               std::make_pair(std::make_pair(numbers::invalid_unsigned_int,
@@ -874,11 +873,11 @@ namespace FETools
                   // get (cell) index of this shape function inside the base
                   // element to see whether the shape function is primitive
                   // (assume that all shape functions on vertices share the same
-                  // primitivity property; assume likewise for all shape
-                  // functions located on lines, quads, etc. this way, we can
-                  // ask for primitivity of only _one_ shape function, which is
-                  // taken as representative for all others located on the same
-                  // type of object):
+                  // primitivity property; assume likewise for all shape functions
+                  // located on lines, quads, etc. this way, we can ask for
+                  // primitivity of only _one_ shape function, which is taken as
+                  // representative for all others located on the same type of
+                  // object):
                   const unsigned int index_in_base =
                     (fe.base_element(base).dofs_per_vertex * vertex_number +
                      local_index);
@@ -2541,8 +2540,8 @@ namespace FETools
             for (const auto &base_fe : base_fes)
               raw_base_fes.push_back(base_fe.get());
 
-            // ok, apparently everything went ok. so generate the composed
-            // element. and return it.
+            // ok, apparently everything went ok. so generate the composed element.
+            // and return it.
             return std_cxx14::make_unique<FESystem<dim, spacedim>>(
               raw_base_fes, base_multiplicities);
           }
@@ -2949,8 +2948,7 @@ namespace FETools
         // component_at_node = projection_matrix_u * component_at_qp
         projection_matrix.vmult(component_at_node, component_at_qp);
 
-        // rewrite the projection of the components back into the vector of
-        // tensors
+        // rewrite the projection of the components back into the vector of tensors
         for (unsigned int nn = 0; nn < n_support_points; ++nn)
           {
             (vector_of_tensors_at_nodes[nn])[row][column] =

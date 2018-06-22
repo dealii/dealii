@@ -295,7 +295,7 @@ LaplaceProblem<dim>::setup_system()
     // TODO: currently no Trilinos version is capable of doing this...
     //#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
     // Cannot pre-build sparsity pattern, Trilinos must provide it...
-    // csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD);
+    //csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD);
     //#else
     // OK, Trilinos not new enough - use exactly the same as
     // assemble_matrix_parallel_02.cc

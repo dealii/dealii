@@ -385,7 +385,7 @@ namespace LinearAlgebra
     const std::shared_ptr<const CommunicationPatternBase>
       & /*communication_pattern*/)
   {
-    // TODO: this works only if no communication is needed.
+    //TODO: this works only if no communication is needed.
     Assert(petsc_vec.locally_owned_elements() == stored_elements,
            StandardExceptions::ExcInvalidState());
 
@@ -535,9 +535,9 @@ namespace LinearAlgebra
     VectorOperation::values                         operation,
     std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
-    // While the import does work with Trilinos 12.8.x, it fails with 12.4.x. To
-    // be safe, we disable it here. Note that it would be a useful case, as
-    // ReadWriteVector is supposed to replace ghosted vectors anyways.
+    // While the import does work with Trilinos 12.8.x, it fails with 12.4.x. To be safe,
+    // we disable it here. Note that it would be a useful case, as ReadWriteVector is
+    // supposed to replace ghosted vectors anyways.
     AssertThrow(
       !trilinos_vec.has_ghost_elements(),
       ExcMessage(

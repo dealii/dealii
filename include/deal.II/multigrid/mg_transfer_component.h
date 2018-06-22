@@ -157,9 +157,9 @@ protected:
   std::vector<std::set<types::global_dof_index>> boundary_indices;
 };
 
-// TODO:[GK] Update documentation for copy_* functions
+//TODO:[GK] Update documentation for copy_* functions
 
-// TODO: Use same kind of template argument as MGTransferSelect
+//TODO: Use same kind of template argument as MGTransferSelect
 
 /**
  * Implementation of the MGTransferBase interface for block matrices and
@@ -193,7 +193,7 @@ public:
    */
   virtual ~MGTransferSelect() override = default;
 
-  // TODO: rewrite docs; make sure defaulted args are actually allowed
+  //TODO: rewrite docs; make sure defaulted args are actually allowed
   /**
    * Actually build the prolongation matrices for grouped components.
    *

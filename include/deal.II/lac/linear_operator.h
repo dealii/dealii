@@ -130,8 +130,7 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  * For example: LinearOperator instances representing matrix inverses usually
  * require calling some linear solver. These solvers may not have interfaces
  * to the LinearOperator (which, for example, may represent a composite
- * operation). The
- * TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload
+ * operation). The TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload
  * therefore provides an interface extension to the LinearOperator so that it
  * can be passed to the solver and used by the solver as if it were a Trilinos
  * operator. This implies that all of the necessary functionality of the

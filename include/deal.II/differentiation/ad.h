@@ -38,8 +38,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace Differentiation
 {
   /**
-   * Wrappers for automatic differentiation libraries. Currently there is
-   * support for the following libraries:
+   * Wrappers for automatic differentiation libraries. Currently there is support
+   * for the following libraries:
    *   - Adol-C
    *   - Sacado (a component of Trilinos)
    *

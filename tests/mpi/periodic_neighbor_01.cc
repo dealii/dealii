@@ -269,17 +269,15 @@ periodicity_tests<dim>::check_periodicity()
                            * Now, we want to do the standard test of:
                            *
                            * cell->neighbor(i_face)
-                           *     ->periodic_neighbor_child_on_subface(face_no,
-                           * subface_no)
+                           *     ->periodic_neighbor_child_on_subface(face_no, subface_no)
                            * == cell
                            *
                            * The other important test for coarser neighbors is:
                            * cell->periodic_neighbor(i_face)
                            *     ->face(face_no)->child(subface_no)
                            * == cell->face(i_face)
-                           * But, this is not the case for periodic neighbors.
-                           * Because, we are not talking about the exact same
-                           * faces.
+                           * But, this is not the case for periodic neighbors. Because, we
+                           * are not talking about the exact same faces.
                            */
                           std::pair<unsigned, unsigned> face_subface =
                             cell_it
@@ -332,8 +330,8 @@ main(int argc, char *argv[])
 
       periodicity_tests<2> test_2D;
       /*
-       * Let us first check the periodicity of the simple case of uniformly
-       * refined mesh.
+       * Let us first check the periodicity of the simple case of uniformly refined
+       * mesh.
        */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog
@@ -354,8 +352,8 @@ main(int argc, char *argv[])
 
       periodicity_tests<3> test_3D;
       /*
-       * Let us first check the periodicity of the simple case of uniformly
-       * refined mesh.
+       * Let us first check the periodicity of the simple case of uniformly refined
+       * mesh.
        */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog

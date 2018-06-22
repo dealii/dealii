@@ -63,7 +63,7 @@ template <typename number>
 class AffineConstraints;
 
 
-// TODO: Move documentation of functions to the functions!
+//TODO: Move documentation of functions to the functions!
 
 /**
  * Provide a namespace which offers some operations on vectors. Among these
@@ -125,8 +125,8 @@ class AffineConstraints;
  * of the function to the boundary is done with the
  * VectorTools::project_boundary_values() (see below) function, which is
  * called with a map of boundary functions
- * std::map<types::boundary_id, const Function<spacedim,number>*> in which all
- * boundary indicators from zero to numbers::internal_face_boundary_id-1
+ * std::map<types::boundary_id, const Function<spacedim,number>*> in which all boundary
+ * indicators from zero to numbers::internal_face_boundary_id-1
  * (numbers::internal_face_boundary_id is used for other purposes, see the
  * Triangulation class documentation) point to the function to be projected.
  * The projection to the boundary takes place using a second quadrature
@@ -231,13 +231,14 @@ class AffineConstraints;
  * trace of the function to the boundary.
  *
  * The projection takes place on all boundary parts with boundary indicators
- * listed in the map (std::map<types::boundary_id, const
- * Function<spacedim,number>*>) of boundary functions. These boundary parts may
- * or may not be continuous. For these boundary parts, the mass matrix is
- * assembled using the MatrixTools::create_boundary_mass_matrix() function, as
- * well as the appropriate right hand side. Then the resulting system of
- * equations is solved using a simple CG method (without preconditioning), which
- * is in most cases sufficient for the present purpose.
+ * listed in the map (std::map<types::boundary_id, const Function<spacedim,number>*>)
+ * of boundary functions. These
+ * boundary parts may or may not be continuous. For these boundary parts, the
+ * mass matrix is assembled using the
+ * MatrixTools::create_boundary_mass_matrix() function, as well as the
+ * appropriate right hand side. Then the resulting system of equations is
+ * solved using a simple CG method (without preconditioning), which is in most
+ * cases sufficient for the present purpose.
  *
  * <li> Computing errors: The function integrate_difference() performs the
  * calculation of the error between a given (continuous) reference function
@@ -461,8 +462,7 @@ namespace VectorTools
      * @f]
      * and
      * @f[
-     *   E = \sqrt{\sum_K E_K^2} = \sqrt{ \int_\Omega \sum_c (\nabla e_c)^2 \,
-     * w_c }
+     *   E = \sqrt{\sum_K E_K^2} = \sqrt{ \int_\Omega \sum_c (\nabla e_c)^2 \, w_c }
      * @f]
      * or, for $w \equiv 1$:
      * @f[
@@ -476,14 +476,12 @@ namespace VectorTools
      * expected to have $c \geq \text{dim}$ components and the first @p dim
      * will be used to compute the divergence:
      * @f[
-     *   E_K = \sqrt{ \int_K \left( \sum_c \frac{\partial e_c}{\partial x_c} \,
-     * \sqrt{w_c} \right)^2 }
+     *   E_K = \sqrt{ \int_K \left( \sum_c \frac{\partial e_c}{\partial x_c} \, \sqrt{w_c} \right)^2 }
      * @f]
      * and
      * @f[
      *   E = \sqrt{\sum_K E_K^2}
-     *     = \sqrt{ \int_\Omega \left( \sum_c \frac{\partial e_c}{\partial x_c}
-     * \, \sqrt{w_c} \right)^2  }
+     *     = \sqrt{ \int_\Omega \left( \sum_c \frac{\partial e_c}{\partial x_c}  \, \sqrt{w_c} \right)^2  }
      * @f]
      * or, for $w \equiv 1$:
      * @f[
@@ -500,8 +498,7 @@ namespace VectorTools
      * @f]
      * and
      * @f[
-     *   E = \sqrt{\sum_K E_K^2} = \sqrt{ \int_\Omega \sum_c (e_c^2 + (\nabla
-     * e_c)^2) \, w_c }
+     *   E = \sqrt{\sum_K E_K^2} = \sqrt{ \int_\Omega \sum_c (e_c^2 + (\nabla e_c)^2) \, w_c }
      * @f]
      * or, for $w \equiv 1$:
      * @f[
@@ -530,14 +527,12 @@ namespace VectorTools
     /**
      * The same as the #H1_norm but using <i>L<sup>p</sup></i>:
      * @f[
-     *   E_K = \left( \int_K \sum_c (|e_c|^p + |\nabla e_c|^p) \, w_c
-     * \right)^{1/p}
+     *   E_K = \left( \int_K \sum_c (|e_c|^p + |\nabla e_c|^p) \, w_c \right)^{1/p}
      * @f]
      * and
      * @f[
      *   E = \left( \sum_K E_K^p \right)^{1/p}
-     *     = \left( \int_\Omega \sum_c (|e_c|^p + |\nabla e_c|^p) \, w_c
-     * \right)^{1/p}
+     *     = \left( \int_\Omega \sum_c (|e_c|^p + |\nabla e_c|^p) \, w_c \right)^{1/p}
      * @f]
      * or, for $w \equiv 1$:
      * @f[
@@ -878,8 +873,8 @@ namespace VectorTools
           const bool                 project_to_boundary_first = false);
 
   /**
-   * Same as above, but for arguments of type hp::DoFHandler, hp::QCollection,
-   * and hp::MappingCollection.
+   * Same as above, but for arguments of type hp::DoFHandler, hp::QCollection, and
+   * hp::MappingCollection.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -965,13 +960,12 @@ namespace VectorTools
    *  },
    *  field);
    * @endcode
-   * where <code>qp_data</code> is a an object of type Table<2,
-   * VectorizedArray<double> >, which stores quadrature point data.
+   * where <code>qp_data</code> is a an object of type Table<2, VectorizedArray<double> >,
+   * which stores quadrature point data.
    *
    * @p fe_component allow to additionally specify which component of @p data
-   * to use in case it was constructed with an <code>std::vector<const
-   * DoFHandler<dim>*></code>. It will be used internally in constructor of
-   * FEEvaluation object.
+   * to use in case it was constructed with an <code>std::vector<const DoFHandler<dim>*></code>.
+   * It will be used internally in constructor of FEEvaluation object.
    */
   template <int dim, typename VectorType>
   void
@@ -986,8 +980,7 @@ namespace VectorTools
           const unsigned int      fe_component = 0);
 
   /**
-   * Same as above but for <code>n_q_points_1d =
-   * matrix_free.get_dof_handler().get_fe().degree+1</code>.
+   * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
    */
   template <int dim, typename VectorType>
   void
@@ -1304,8 +1297,8 @@ namespace VectorTools
    * function along the boundary, are then what is computed by this function.
    *
    * In case this function is used with $H_{div}$ conforming finite element
-   * space, the solution of a different problem is computed, namely: Find
-   * $\vec{u}_h \in V_h \subset H(\text{div}; \Omega)$ so that
+   * space, the solution of a different problem is computed, namely: Find $\vec{u}_h
+   * \in V_h \subset H(\text{div}; \Omega)$ so that
    * @f{align*}{
    * \int_{\Gamma} (\vec{\varphi}_i \cdot \vec{n}) (\vec{u}_h \cdot \vec{n})
    * = \sum_{k \in {\cal K}} \int_{\Gamma_k} (\vec{\varphi}_i \cdot \vec{n})
@@ -1988,10 +1981,9 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
 
   /**
-   * This function does the same as the
-   * compute_nonzero_normal_flux_constraints() function (see there for more
-   * information), but for the simpler case of homogeneous normal-flux
-   * constraints, i.e., for imposing the condition
+   * This function does the same as the compute_nonzero_normal_flux_constraints()
+   * function (see there for more information), but for the simpler case of
+   * homogeneous normal-flux constraints, i.e., for imposing the condition
    * $\vec u \cdot \vec n= 0$. This function is used in step-31 and step-32.
    *
    * @ingroup constraints
@@ -2198,9 +2190,9 @@ namespace VectorTools
 
   /**
    * Like the previous set of functions, but for hp objects. The function uses
-   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler
-   * uses any active fe index other than zero, then you need to call the
-   * function above that provides a mapping object for each active fe index.
+   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler uses any
+   * active fe index other than zero, then you need to call the function above
+   * that provides a mapping object for each active fe index.
    */
   template <int dim, int spacedim>
   void
@@ -2259,9 +2251,9 @@ namespace VectorTools
 
   /**
    * Like the previous set of functions, but for hp objects. The function uses
-   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler
-   * uses any active fe index other than zero, then you need to call the
-   * function above that provides a mapping object for each active fe index.
+   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler uses any
+   * active fe index other than zero, then you need to call the function above
+   * that provides a mapping object for each active fe index.
    */
   template <int dim, int spacedim>
   void
@@ -2868,7 +2860,7 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
-   *
+    *
    * @note This function needs to find the cell within which a point lies,
    *   and this can only be done up to a certain numerical tolerance of course.
    *   Consequently, for points that are on, or close to, the boundary of

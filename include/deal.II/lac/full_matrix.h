@@ -892,9 +892,9 @@ public:
   invert(const FullMatrix<number2> &M);
 
   /**
-   * Assign the Cholesky decomposition $A=:L L^T$ of the given matrix $A$ to
-   * <tt>*this</tt>, where $L$ is lower triangular matrix. The given matrix must
-   * be symmetric positive definite.
+   * Assign the Cholesky decomposition $A=:L L^T$ of the given matrix $A$ to <tt>*this</tt>,
+   * where $L$ is lower triangular matrix.
+   * The given matrix must be symmetric positive definite.
    *
    * ExcMatrixNotPositiveDefinite will be thrown in the case that the matrix
    * is not positive definite.

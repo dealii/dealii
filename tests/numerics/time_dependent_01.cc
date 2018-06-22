@@ -70,8 +70,7 @@ test()
   end_sweep_flags = std::vector<bool>(n_time_steps, false);
   td.end_sweep();
 
-  // make sure we have called TimeStep::end_sweep once for every time step
-  // object
+  // make sure we have called TimeStep::end_sweep once for every time step object
   AssertThrow(end_sweep_flags == std::vector<bool>(n_time_steps, true),
               ExcInternalError());
 

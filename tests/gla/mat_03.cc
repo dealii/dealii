@@ -74,7 +74,7 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof_handler, relevant);
 
   // this causes a crash in PETSc, but is ignored in Trilinos:
-  // DynamicSparsityPattern sp (owned);
+  //DynamicSparsityPattern sp (owned);
   DynamicSparsityPattern         sp(relevant);
   typename LA::MPI::SparseMatrix matrix;
   DoFTools::make_sparsity_pattern(dof_handler,
@@ -128,6 +128,6 @@ main(int argc, char **argv)
   }
 
   // compile, don't run
-  // if (myid==9999)
+  //if (myid==9999)
   //  test<LA_Dummy>();
 }

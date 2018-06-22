@@ -15,18 +15,17 @@
 
 
 
-// similar to parallel_multigrid_adaptive_06ref but using
-// MGTransferBlockMatrixFree to solve block-diagonal matrix with Laplace
-// operator on diagonals. As expected, when we use a block vector with a single
-// block, we get the same results as the reference, non-block solution, i.e.
+// similar to parallel_multigrid_adaptive_06ref but using MGTransferBlockMatrixFree
+// to solve block-diagonal matrix with Laplace operator on diagonals.
+// As expected, when we use a block vector with a single block, we get
+// the same results as the reference, non-block solution, i.e.
 //
 // DEAL:2d:cg::Starting value 21.93
 // DEAL:2d:cg::Convergence step 7 value 1.961e-07
 //
 //
 // What this test is really for is block operations. As expected we see
-// exactly the same number of iterations and the ratio of \sqrt(2) in values,
-// i.e.
+// exactly the same number of iterations and the ratio of \sqrt(2) in values, i.e.
 //
 // DEAL:2d:cg::Starting value 31.02
 // DEAL:2d:cg::Convergence step 7 value 2.774e-07

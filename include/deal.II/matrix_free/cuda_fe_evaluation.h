@@ -38,7 +38,7 @@ namespace CUDAWrappers
     __device__ void
     resolve_hanging_nodes_shmem(Number *values, const unsigned int constr)
     {
-      // TODO
+      //TODO
     }
   } // namespace internal
 
@@ -61,8 +61,8 @@ namespace CUDAWrappers
    *
    * @tparam n_components Number of vector components when solving a system of
    * PDEs. If the same operation is applied to several components of a PDE (e.g.
-   * a vector Laplace equation), they can be applied simultaneously with one
-   * call (and often more efficiently). Defaults to 1
+   * a vector Laplace equation), they can be applied simultaneously with one call
+   * (and often more efficiently). Defaults to 1
    *
    * @tparam Number Number format, @p double or @p float. Defaults to @p
    * double.

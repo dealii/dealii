@@ -15,10 +15,9 @@
 
 
 
-// Copy of no_flux_09 for a higher order element. The purpose here is to test
-// the Manifold::normal_vector function inside of
-// VectorTools::compute_no_normal_flux_constraints for points other than the
-// vertices.
+// Copy of no_flux_09 for a higher order element. The purpose here is to test the
+// Manifold::normal_vector function inside of VectorTools::compute_no_normal_flux_constraints
+// for points other than the vertices.
 
 
 #include <deal.II/fe/fe_system.h>
@@ -54,8 +53,7 @@ check()
 
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(1);
-  //  no_normal_flux_boundaries.insert (2); // not required for the crash for
-  //  now, please test with it later!
+  //  no_normal_flux_boundaries.insert (2); // not required for the crash for now, please test with it later!
   no_normal_flux_boundaries.insert(3);
   no_normal_flux_boundaries.insert(4);
   VectorTools::compute_no_normal_flux_constraints(

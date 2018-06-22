@@ -1233,8 +1233,7 @@ namespace Patterns
    *
    * Convert<T> is used by the function Patterns::Tools::add_parameter() in this
    * namespace. Internally it uses the internal::RankInfo<T> class to decide how
-   * many different separators are required to convert the given type to a
-   * string.
+   * many different separators are required to convert the given type to a string.
    *
    * For example, to write vectors of vectors, the default is to use "," for the
    * first (inner) separator, and ";" for the second (outer) separator, i.e.
@@ -1261,9 +1260,8 @@ namespace Patterns
    * @endcode
    *
    * When one needs a mixture of Patterns::List and Patterns::Map types, their
-   * RankInfo is computed by taking the maximum of the vector_rank of the Key
-   * and of the Value type, so that, for example, it is possible to have the
-   * following
+   * RankInfo is computed by taking the maximum of the vector_rank of the Key and
+   * of the Value type, so that, for example, it is possible to have the following
    * @code
    * ... // Build compare class
    * std::map<std::vector<unsigned int>, std::vector<double>, compare> map;
@@ -1283,16 +1281,16 @@ namespace Patterns
   namespace Tools
   {
     /**
-     * Converter class. This class is used to generate strings and Patterns
-     * associated to the given type, and to convert from a string to the given
-     * type and vice versa.
-     *
-     * The second template parameter is used internally to allow for advanced
-     * SFINAE (substitution failure is not an error) tricks used to specialise
-     * this class for arbitrary STL containers and maps.
-     *
-     * @author Luca Heltai, 2017
-     */
+    * Converter class. This class is used to generate strings and Patterns
+    * associated to the given type, and to convert from a string to the given
+    * type and vice versa.
+    *
+    * The second template parameter is used internally to allow for advanced
+    * SFINAE (substitution failure is not an error) tricks used to specialise
+    * this class for arbitrary STL containers and maps.
+    *
+    * @author Luca Heltai, 2017
+    */
     template <class T, class Enable = void>
     struct Convert
     {
@@ -1300,9 +1298,8 @@ namespace Patterns
        * Return a std::unique_ptr to a Pattern that can be used to interpret a
        * string as the type of the template argument, and the other way around.
        *
-       * While the current function (in the general Convert template) is
-       * deleted, it is implemented and available in the specializations of the
-       * Convert
+       * While the current function (in the general Convert template) is deleted,
+       * it is implemented and available in the specializations of the Convert
        * class template for particular kinds of template arguments @p T.
        */
       static std::unique_ptr<Patterns::PatternBase>
@@ -1313,9 +1310,8 @@ namespace Patterns
        * pattern passed to perform the conversion, or create and use a default
        * one.
        *
-       * While the current function (in the general Convert template) is
-       * deleted, it is implemented and available in the specializations of the
-       * Convert
+       * While the current function (in the general Convert template) is deleted,
+       * it is implemented and available in the specializations of the Convert
        * class template for particular kinds of template arguments @p T.
        */
       static std::string
@@ -1327,9 +1323,8 @@ namespace Patterns
        * Convert a string to a value, using the given pattern. Use the pattern
        * passed to perform the conversion, or create and use a default one.
        *
-       * While the current function (in the general Convert template) is
-       * deleted, it is implemented and available in the specializations of the
-       * Convert
+       * While the current function (in the general Convert template) is deleted,
+       * it is implemented and available in the specializations of the Convert
        * class template for particular kinds of template arguments @p T.
        */
       static T
@@ -1339,8 +1334,8 @@ namespace Patterns
     };
 
     /**
-     * A utility function that simplifies the conversion to strings of
-     * arbitrarily complex types.
+     * A utility function that simplifies the conversion to strings of arbitrarily
+     * complex types.
      *
      * This function calls the method Convert<T>::to_string() with the default
      * pattern. An example usage is the following:
@@ -1363,8 +1358,8 @@ namespace Patterns
     to_string(const T &t);
 
     /**
-     * A utility function that simplifies the conversion from strings to
-     * arbitrary types.
+     * A utility function that simplifies the conversion from strings to arbitrary
+     * types.
      *
      * This function calls the method Convert<T>::to_value() with the default
      * pattern. An example usage is the following:
@@ -1471,8 +1466,8 @@ namespace Patterns
        *
        * Elementary types are not compatible with Patterns::List, but non
        * elementary types, like Point(), or std::complex<double>, are compatible
-       * with the List type. Adding more compatible types is a matter of adding
-       * a specialization of this struct for the given type.
+       * with the List type. Adding more compatible types is a matter of adding a
+       * specialization of this struct for the given type.
        *
        * @author Luca Heltai, 2017
        */
@@ -1502,7 +1497,7 @@ namespace Patterns
             -std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
 
         Assert(false, ExcNotImplemented());
-        // the following line should never be invoked
+        //the following line should never be invoked
         return nullptr;
       }
 
@@ -1547,12 +1542,11 @@ namespace Patterns
               is >> value;
 
             // If someone passes "123 abc" to the function, the method yields an
-            // integer 123 alright, but the space terminates the read from the
-            // string although there is more to come. This case, however, is
-            // checked for in the call p->match(s) at the beginning of this
-            // function, and would throw earlier. Here it is safe to assume that
-            // if we didn't fail the conversion with the operator >>, then we
-            // are good to go.
+            // integer 123 alright, but the space terminates the read from the string
+            // although there is more to come. This case, however, is checked for in
+            // the call p->match(s) at the beginning of this function, and would
+            // throw earlier. Here it is safe to assume that if we didn't fail the
+            // conversion with the operator >>, then we are good to go.
             AssertThrow(
               !is.fail(),
               ExcMessage("Failed to convert from \"" + s + "\" to the type \"" +
@@ -1569,7 +1563,7 @@ namespace Patterns
       const std::array<std::string, 4> default_map_separator{
         {":", "=", "@", "#"}};
 
-      // specialize a type for all of the STL containers and maps
+      //specialize a type for all of the STL containers and maps
       template <typename T>
       struct is_list_compatible : std::false_type
       {};
@@ -1621,8 +1615,7 @@ namespace Patterns
       {};
     } // namespace internal
 
-    // type trait to use the implementation type traits as well as decay the
-    // type
+    // type trait to use the implementation type traits as well as decay the type
     template <typename T>
     struct is_list_compatible
     {

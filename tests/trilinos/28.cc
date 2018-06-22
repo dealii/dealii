@@ -15,8 +15,8 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator = (Vector), except that we
-// don't resize the vector to be copied to beforehand
+// check TrilinosWrappers::MPI::Vector::operator = (Vector), except that we don't
+// resize the vector to be copied to beforehand
 
 #include <deal.II/base/utilities.h>
 

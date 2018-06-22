@@ -180,7 +180,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
 
               for (; entry != row_end; ++entry)
                 {
-                  // if (entry->column()<cell_start)
+                  //if (entry->column()<cell_start)
                   if (inverse_permutation[entry->column()] < cell_start)
                     continue;
 
@@ -262,8 +262,7 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
         permuted ? permutation[block_start] : block_start;
 
       //       deallog << std::endl << cell << '-' << block_start
-      //            << '-' << permuted_block_start << (permuted ? 't' : 'f') <<
-      //            '\t';
+      //            << '-' << permuted_block_start << (permuted ? 't' : 'f') << '\t';
 
       for (row = permuted_block_start, row_cell = 0; row_cell < this->blocksize;
            ++row_cell, ++row)
@@ -279,8 +278,7 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
               const size_type inverse_permuted_column =
                 permuted ? inverse_permutation[column] : column;
               b_cell_row -= entry->value() * prev(column);
-              // TODO:[GK] Find out if this is really once column and once
-              // permuted
+              //TODO:[GK] Find out if this is really once column and once permuted
               if (!this->inverses_ready() &&
                   inverse_permuted_column >= block_start &&
                   inverse_permuted_column < block_start + this->blocksize)

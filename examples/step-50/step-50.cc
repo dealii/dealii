@@ -650,8 +650,8 @@ namespace Step50
                    || (mg_constrained_dofs.is_boundary_index(
                          lvl, local_dof_indices[i]) &&
                        local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
+                         local_dof_indices
+                           [j]) // ( boundary(i) && boundary(j) && i==j )
                    ))
                 {
                   // do nothing, so add entries to interface matrix
@@ -754,7 +754,7 @@ namespace Step50
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
-    // mg_smoother.set_symmetric(false);
+    //mg_smoother.set_symmetric(false);
 
     // The next preparatory step is that we
     // must wrap our level and interface
@@ -778,7 +778,7 @@ namespace Step50
     // multilevel preconditioner.
     Multigrid<vector_t> mg(
       mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
-    // mg.set_debug(6);
+    //mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(

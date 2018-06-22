@@ -239,8 +239,8 @@ namespace OpenCASCADE
     reader.PrintCheckLoad(failsonly, mode);
 
     Standard_Integer nRoots = reader.TransferRoots();
-    // selects all IGES entities (including non visible ones) in the
-    // file and puts them into a list called MyList,
+    //selects all IGES entities (including non visible ones) in the
+    //file and puts them into a list called MyList,
 
     AssertThrow(nRoots > 0, ExcMessage("Read nothing from file."));
 
@@ -280,8 +280,8 @@ namespace OpenCASCADE
     reader.PrintCheckLoad(failsonly, mode);
 
     Standard_Integer nRoots = reader.TransferRoots();
-    // selects all IGES entities (including non visible ones) in the
-    // file and puts them into a list called MyList,
+    //selects all IGES entities (including non visible ones) in the
+    //file and puts them into a list called MyList,
 
     AssertThrow(nRoots > 0, ExcMessage("Read nothing from file."));
 
@@ -451,8 +451,7 @@ namespace OpenCASCADE
     for (int i = 0; i < Inters.NbPnt(); ++i)
       {
         const double distance = point(origin).Distance(Inters.Pnt(i + 1));
-        // cout<<"Point "<<i<<": "<<point(Inters.Pnt(i+1))<<"  distance:
-        // "<<distance<<endl;
+        //cout<<"Point "<<i<<": "<<point(Inters.Pnt(i+1))<<"  distance: "<<distance<<endl;
         if (distance < minDistance)
           {
             minDistance = distance;
@@ -654,10 +653,10 @@ namespace OpenCASCADE
         ++face_counter;
       }
 
-    // face counter tells us if the shape contained faces: if it does, there is
-    // no need to loop on edges. Even if the closest point lies on the boundary
-    // of a parametric surface, we need in fact to retain the face and both u
-    // and v, if we want to use this method to retrieve the surface normal
+    // face counter tells us if the shape contained faces: if it does, there is no need
+    // to loop on edges. Even if the closest point lies on the boundary of a parametric surface,
+    // we need in fact to retain the face and both u and v, if we want to use this method to
+    // retrieve the surface normal
     if (face_counter == 0)
       for (exp.Init(in_shape, TopAbs_EDGE); exp.More(); exp.Next())
         {

@@ -37,8 +37,8 @@
 
 #include "../tests.h"
 
-// TODO: Find support_on_face problems for test-no. > 7
-// TODO: Check support_on_face in 3D
+//TODO: Find support_on_face problems for test-no. > 7
+//TODO: Check support_on_face in 3D
 
 
 template <int dim>

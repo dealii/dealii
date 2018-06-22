@@ -15,8 +15,8 @@
 
 
 
-// check that VectorTools::interpolate works for FE_System(FE_Q(p)) elements
-// correctly on a uniformly refined mesh for functions of degree q
+// check that VectorTools::interpolate works for FE_System(FE_Q(p)) elements correctly on
+// a uniformly refined mesh for functions of degree q
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

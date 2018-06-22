@@ -394,8 +394,7 @@ namespace DoFRenumbering
     const bool                                  use_constraints,
     const std::vector<types::global_dof_index> &starting_indices)
   {
-    // see if there is anything to do at all or whether we can skip the work on
-    // this processor
+    // see if there is anything to do at all or whether we can skip the work on this processor
     if (dof_handler.locally_owned_dofs().n_elements() == 0)
       {
         Assert(new_indices.size() == 0, ExcInternalError());
@@ -786,13 +785,13 @@ namespace DoFRenumbering
       {
         if (is_level_operation)
           {
-            // we are dealing with mg dofs, skip foreign level cells:
+            //we are dealing with mg dofs, skip foreign level cells:
             if (!cell->is_locally_owned_on_level())
               continue;
           }
         else
           {
-            // we are dealing with active dofs, skip the loop if not locally
+            //we are dealing with active dofs, skip the loop if not locally
             // owned:
             if (!cell->is_locally_owned())
               continue;
@@ -882,7 +881,7 @@ namespace DoFRenumbering
               local_dof_count[i],
             ExcInternalError());
 
-        // calculate shifts
+        //calculate shifts
         unsigned int cumulated = 0;
         for (unsigned int c = 0; c < n_buckets; ++c)
           {
@@ -1100,13 +1099,13 @@ namespace DoFRenumbering
       {
         if (is_level_operation)
           {
-            // we are dealing with mg dofs, skip foreign level cells:
+            //we are dealing with mg dofs, skip foreign level cells:
             if (!cell->is_locally_owned_on_level())
               continue;
           }
         else
           {
-            // we are dealing with active dofs, skip the loop if not locally
+            //we are dealing with active dofs, skip the loop if not locally
             // owned:
             if (!cell->is_locally_owned())
               continue;
@@ -1185,7 +1184,7 @@ namespace DoFRenumbering
               local_dof_count[i],
             ExcInternalError());
 
-        // calculate shifts
+        //calculate shifts
         types::global_dof_index cumulated = 0;
         for (unsigned int c = 0; c < n_buckets; ++c)
           {
@@ -1246,11 +1245,10 @@ namespace DoFRenumbering
 
   namespace
   {
-    // Helper function for DoFRenumbering::hierarchical(). this function
-    // recurses into the given cell or, if that should be an active (terminal)
-    // cell, renumbers DoF indices on it. The function starts renumbering with
-    // 'next_free_dof_index' and returns the first still unused DoF index at the
-    // end of its operation.
+    // Helper function for DoFRenumbering::hierarchical(). this function recurses into
+    // the given cell or, if that should be an active (terminal) cell, renumbers DoF
+    // indices on it. The function starts renumbering with 'next_free_dof_index' and
+    // returns the first still unused DoF index at the end of its operation.
     template <int dim, class CellIteratorType>
     types::global_dof_index
     compute_hierarchical_recursive(
@@ -1279,15 +1277,13 @@ namespace DoFRenumbering
         {
           // this is a terminal cell. we need to renumber its DoF indices. there
           // are now three cases to decide:
-          // - this is a sequential triangulation: we can just go ahead and
-          // number
+          // - this is a sequential triangulation: we can just go ahead and number
           //   the DoFs in the order in which we encounter cells. in this case,
           //   all cells are actually locally owned
           // - if this is a parallel::distributed::Triangulation, then we only
           //   need to work on the locally owned cells since they contain
           //   all locally owned DoFs.
-          // - if this is a parallel::shared::Triangulation, then the same
-          // applies
+          // - if this is a parallel::shared::Triangulation, then the same applies
           //
           // in all cases, each processor starts new indices so that we get
           // a consecutive numbering on each processor, and disjoint ownership
@@ -1320,8 +1316,7 @@ namespace DoFRenumbering
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 if (locally_owned_dof_indices.is_element(local_dof_indices[i]))
                   {
-                    // this is a locally owned DoF, assign new number if not
-                    // assigned a number yet
+                    // this is a locally owned DoF, assign new number if not assigned a number yet
                     const unsigned int idx =
                       locally_owned_dof_indices.index_within_set(
                         local_dof_indices[i]);

@@ -118,8 +118,7 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               // Globally symmetric contributions, but the off-diagonal
               // blocks are non-square
-              // This is useful for checking implementation of transpose
-              // operator
+              // This is useful for checking implementation of transpose operator
               cell_matrix(i, j) +=
                 (fe_values.shape_value(i, q_point) *
                  fe_values.shape_value(j, q_point) * fe_values.JxW(q_point));
@@ -343,7 +342,7 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
 
       // First test the standard operation to get a reference result
       {
-        VectorType int_lo_pyld(i); // intermediate solution
+        VectorType int_lo_pyld(i); //intermediate solution
         A.vmult(int_lo_pyld, b);
         A.Tvmult(out_ref, int_lo_pyld);
       }
@@ -421,7 +420,7 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
 
       // First test the standard operation to get a reference result
       {
-        VectorType int_lo_pyld(i); // intermediate
+        VectorType int_lo_pyld(i); //intermediate
         A.Tvmult(int_lo_pyld, b);
         A.vmult(out_ref, int_lo_pyld);
       }

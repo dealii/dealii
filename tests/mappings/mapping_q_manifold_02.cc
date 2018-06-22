@@ -201,9 +201,9 @@ create_tria(Triangulation<dim> &triangulation, const Manifold<dim> &manifold)
   refinements[1] = 2;
 
   Point<dim> p1, p2;
-  p2[0] = 4.5 * h; // 9.0*h;
+  p2[0] = 4.5 * h; //9.0*h;
   p1[1] = h;
-  p2[1] = 2.018 * h; // 2.036*h;
+  p2[1] = 2.018 * h; //2.036*h;
   if (dim == 3)
     {
       p1[2] = -2.25 * h;

@@ -422,10 +422,9 @@ DynamicSparsityPattern::compute_mmult_pattern(
     {
       const unsigned int j = it_left->column();
 
-      // We are sitting on entry (i,j) of the left sparsity pattern. We then
-      // need to add all entries (i,k) to the final sparsity pattern where (j,k)
-      // exists in the right sparsity pattern -- i.e., we need to iterate over
-      // row j.
+      // We are sitting on entry (i,j) of the left sparsity pattern. We then need
+      // to add all entries (i,k) to the final sparsity pattern where (j,k) exists
+      // in the right sparsity pattern -- i.e., we need to iterate over row j.
       typename SparsityPatternTypeRight::iterator it_right  = right.begin(j),
                                                   end_right = right.end(j);
       for (; it_right != end_right; ++it_right)

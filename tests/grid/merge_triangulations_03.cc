@@ -134,7 +134,7 @@ test()
     0.5,
     1,
     8,
-    true); // colorize flag set to true so outer bnd is 1 and inner is 0
+    true); //colorize flag set to true so outer bnd is 1 and inner is 0
 
   // set boundaries
   static const SphericalManifold<2> boundary(center);

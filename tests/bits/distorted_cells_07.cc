@@ -15,8 +15,7 @@
 
 
 
-// check that the mapping throws an exception for the test case in
-// distorted_cells_01.cc
+// check that the mapping throws an exception for the test case in distorted_cells_01.cc
 
 #include <deal.II/base/quadrature_lib.h>
 

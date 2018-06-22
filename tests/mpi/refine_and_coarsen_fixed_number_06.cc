@@ -21,13 +21,9 @@
 //#0  0x00007ffff67297e2 in dealii::(anonymous namespace)::min_element<float> (
 //    criteria=...)
 //    at /w/heister/deal-trunk/deal.II/source/distributed/grid_refinement.cc:57
-//#1  0x00007ffff6727672 in dealii::(anonymous
-// namespace)::compute_global_min_and_max_at_root<float> (criteria=...,
-// mpi_communicator=0x6fc860)
+//#1  0x00007ffff6727672 in dealii::(anonymous namespace)::compute_global_min_and_max_at_root<float> (criteria=..., mpi_communicator=0x6fc860)
 //    at /w/heister/deal-trunk/deal.II/source/distributed/grid_refinement.cc:82
-//#2  0x00007ffff672b4ef in
-// dealii::parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number<2,
-// dealii::Vector<float>, 2>
+//#2  0x00007ffff672b4ef in dealii::parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number<2, dealii::Vector<float>, 2>
 
 #include <deal.II/base/utilities.h>
 

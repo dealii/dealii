@@ -49,7 +49,7 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
-  // define DoFhandler and FEs
+  //define DoFhandler and FEs
   FE_Q<dim>     u1(2);
   FE_Q<dim>     p1(1);
   FESystem<dim> fe_system1(u1, 2, p1, 1);
@@ -64,10 +64,10 @@ test()
   hp::DoFHandler<dim> hp_dof_handler(triangulation);
   hp_dof_handler.begin_active()->set_active_fe_index(1);
 
-  // distribute dofs
+  //distribute dofs
   hp_dof_handler.distribute_dofs(fe_collection);
 
-  // count dofs per component and show them on the screen
+  //count dofs per component and show them on the screen
   std::vector<types::global_dof_index> dofs_per_component_hp(3, 0);
   DoFTools::count_dofs_per_component(hp_dof_handler, dofs_per_component_hp);
 

@@ -96,7 +96,7 @@ test()
     Triangulation<2> tmp_rectangle;
     Triangulation<2> tmp_tria_solid;
     //-------Generate and colorize triangulation:-------
-    // Triangulation parameters
+    //Triangulation parameters
     const unsigned int h_cells       = 11;
     const unsigned int outflow_cells = 25;
     const unsigned int inflow_cells  = 5;

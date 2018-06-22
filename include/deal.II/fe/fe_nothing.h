@@ -220,8 +220,8 @@ public:
 
   /**
    * Return the matrix interpolating from the given finite element to the
-   * present one. Since the current finite element has no degrees of freedom,
-   * the interpolation matrix is necessarily empty.
+   * present one. Since the current finite element has no degrees of freedom, the
+   * interpolation matrix is necessarily empty.
    */
   virtual void
   get_interpolation_matrix(

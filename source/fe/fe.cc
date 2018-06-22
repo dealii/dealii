@@ -360,7 +360,7 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
 }
 
 
-// TODO:[GK] This is probably not the most efficient way of doing this.
+//TODO:[GK] This is probably not the most efficient way of doing this.
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::component_to_block_index(
@@ -381,7 +381,7 @@ FiniteElement<dim, spacedim>::component_mask(
 {
   AssertIndexRange(scalar.component, this->n_components());
 
-  // TODO: it would be nice to verify that it is indeed possible
+  //TODO: it would be nice to verify that it is indeed possible
   // to select this scalar component, i.e., that it is not part
   // of a non-primitive element. unfortunately, there is no simple
   // way to write such a condition...
@@ -400,7 +400,7 @@ FiniteElement<dim, spacedim>::component_mask(
   AssertIndexRange(vector.first_vector_component + dim - 1,
                    this->n_components());
 
-  // TODO: it would be nice to verify that it is indeed possible
+  //TODO: it would be nice to verify that it is indeed possible
   // to select these vector components, i.e., that they don't span
   // beyond the beginning or end of anon-primitive element.
   // unfortunately, there is no simple way to write such a condition...
@@ -423,7 +423,7 @@ FiniteElement<dim, spacedim>::component_mask(
                     SymmetricTensor<2, dim>::n_independent_components - 1),
                    this->n_components());
 
-  // TODO: it would be nice to verify that it is indeed possible
+  //TODO: it would be nice to verify that it is indeed possible
   // to select these vector components, i.e., that they don't span
   // beyond the beginning or end of anon-primitive element.
   // unfortunately, there is no simple way to write such a condition...
@@ -559,7 +559,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   Assert(face < GeometryInfo<dim>::faces_per_cell,
          ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
 
-  // TODO: we could presumably solve the 3d case below using the
+  //TODO: we could presumably solve the 3d case below using the
   // adjust_quad_dof_index_for_face_orientation_table field. for the
   // 2d case, we can't use adjust_line_dof_index_for_line_orientation_table
   // since that array is empty (presumably because we thought that

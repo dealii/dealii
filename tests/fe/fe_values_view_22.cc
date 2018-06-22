@@ -179,8 +179,7 @@ MixedElastoPlasticity<dim>::assemble_system()
     cell->get_dof_indices(local_dof_indices);
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       {
-        // 0 = stress (symmetric 2nd order tensor), 1 = Gamma (scalar)
-        // interpolation fields
+        // 0 = stress (symmetric 2nd order tensor), 1 = Gamma (scalar) interpolation fields
         const unsigned int i_group = fe.system_to_base_index(i).first.first;
         // the index of the non-zero shape function
         const unsigned int i_index = fe.system_to_base_index(i).first.second;
@@ -212,8 +211,7 @@ MixedElastoPlasticity<dim>::assemble_system()
 
     // expect the nodal stress value at the quadrature point
     // constant stress field, therefore expect zero divergence
-    // constant gamma field, therefore nodal value should equal value at
-    // quadrature point
+    // constant gamma field, therefore nodal value should equal value at quadrature point
     for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
       {
         deallog << local_values[q] << std::endl

@@ -184,8 +184,7 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
       // face_flip and face_rotation)
       while (err < (dim == 3 ? 8 : 1) * 2e-14);
       // Uncomment here for testing
-      //      deallog << " (Int " << quadrature_int << '-' << exact_int << '='
-      //      << err << ")";
+      //      deallog << " (Int " << quadrature_int << '-' << exact_int << '=' << err << ")";
       deallog << " is exact for polynomials of degree " << i - 1 << std::endl;
     }
   deallog.pop();

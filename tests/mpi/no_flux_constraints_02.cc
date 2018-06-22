@@ -128,7 +128,7 @@ test()
   MPI_Barrier(MPI_COMM_WORLD);
 
   {
-    // write the constraintmatrix to a file on each cpu
+    //write the constraintmatrix to a file on each cpu
     std::string fname = base + "cm_" + Utilities::int_to_string(myid) + ".dot";
     std::ofstream file(fname.c_str());
     constraints.print(file);
@@ -137,8 +137,8 @@ test()
   std::this_thread::sleep_for(std::chrono::seconds(1));
   if (myid == 0)
     {
-      // sort and merge the constraint matrices on proc 0, generate a checksum
-      // and output that into the deallog
+      //sort and merge the constraint matrices on proc 0, generate a checksum
+      //and output that into the deallog
       system(
         (std::string("cat ") + base + "cm_?.dot|sort -n|uniq >" + base + "cm")
           .c_str());

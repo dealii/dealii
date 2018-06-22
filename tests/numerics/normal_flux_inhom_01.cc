@@ -66,7 +66,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
       cm.print(deallog.get_file_stream());
     }
-  // Get the location of all boundary dofs
+  //Get the location of all boundary dofs
   std::vector<types::global_dof_index> face_dofs;
   const std::vector<Point<dim - 1>> &  unit_support_points =
     fe.get_unit_face_support_points();

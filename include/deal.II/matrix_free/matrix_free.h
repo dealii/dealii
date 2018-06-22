@@ -683,12 +683,13 @@ public:
    *
    * @param cell_operation `std::function` with the signature <tt>cell_operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned int> &)</tt> where the first argument
-   * passes the data of the calling class and the last argument defines the
-   * range of cells which should be worked on (typically more than one cell
-   * should be worked on in order to reduce overheads).  One can pass a pointer
-   * to an object in this place if it has an `operator()` with the correct set
-   * of arguments since such a pointer can be converted to the function object.
+   * std::pair<unsigned int,unsigned int> &)</tt> where the first argument passes
+   * the data of the calling class and the last argument defines the range of
+   * cells which should be worked on (typically more than one cell should be
+   * worked on in order to reduce overheads).  One can pass a pointer to an
+   * object in this place if it has an `operator()` with the
+   * correct set of arguments since such a pointer can be converted to the
+   * function object.
    *
    * @param dst Destination vector holding the result. If the vector is of
    * type LinearAlgebra::distributed::Vector (or composite objects thereof
@@ -802,21 +803,21 @@ public:
    *
    * @param cell_operation `std::function` with the signature <tt>cell_operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned int> &)</tt> where the first argument
-   * passes the data of the calling class and the last argument defines the
-   * range of cells which should be worked on (typically more than one cell
-   * should be worked on in order to reduce overheads). One can pass a pointer
-   * to an object in this place if it has an <code>operator()</code> with the
+   * std::pair<unsigned int,unsigned int> &)</tt> where the first argument passes
+   * the data of the calling class and the last argument defines the range of
+   * cells which should be worked on (typically more than one cell should be
+   * worked on in order to reduce overheads). One can pass a pointer to an
+   * object in this place if it has an <code>operator()</code> with the
    * correct set of arguments since such a pointer can be converted to the
    * function object.
    *
    * @param face_operation `std::function` with the signature <tt>face_operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned int> &)</tt> in analogy to
-   * `cell_operation`, but now the part associated to the work on interior
-   * faces. Note that the MatrixFree framework treats periodic faces as interior
-   * ones, so they will be assigned their correct neighbor after applying
-   * periodicity constraints within the face_operation calls.
+   * std::pair<unsigned int,unsigned int> &)</tt> in analogy to `cell_operation`,
+   * but now the part associated to the work on interior faces. Note that the
+   * MatrixFree framework treats periodic faces as interior ones, so they will
+   * be assigned their correct neighbor after applying periodicity constraints
+   * within the face_operation calls.
    *
    * @param boundary_operation `std::function` with the signature
    * <tt>boundary_operation (const MatrixFree<dim,Number> &, OutVector &,
@@ -1066,8 +1067,8 @@ public:
   /**
    * Initialize function for a general vector. The length of the vector is
    * equal to the total number of degrees in the DoFHandler. If the vector is
-   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries
-   * are set accordingly. For vector-valued problems with several DoFHandlers
+   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries are
+   * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
    *
@@ -1076,8 +1077,8 @@ public:
    * @ref GlossLocallyActiveDof "locally active DoFs"
    * and also some of the
    * @ref GlossLocallyRelevantDof "locally relevant DoFs".
-   * The selection of DoFs is such that one can read all degrees of freedom on
-   * all locally relevant elements (locally active) plus the degrees of freedom
+   * The selection of DoFs is such that one can read all degrees of freedom on all
+   * locally relevant elements (locally active) plus the degrees of freedom
    * that constraints expand into from the locally owned cells. However, not
    * all locally relevant DoFs are stored because most of them would never be
    * accessed in matrix-vector products and result in too much data sent
@@ -1091,8 +1092,8 @@ public:
   /**
    * Initialize function for a distributed vector. The length of the vector is
    * equal to the total number of degrees in the DoFHandler. If the vector is
-   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries
-   * are set accordingly. For vector-valued problems with several DoFHandlers
+   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries are
+   * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
    *
@@ -1101,8 +1102,8 @@ public:
    * @ref GlossLocallyActiveDof "locally active DoFs"
    * and also some of the
    * @ref GlossLocallyRelevantDof "locally relevant DoFs".
-   * The selection of DoFs is such that one can read all degrees of freedom on
-   * all locally relevant elements (locally active) plus the degrees of freedom
+   * The selection of DoFs is such that one can read all degrees of freedom on all
+   * locally relevant elements (locally active) plus the degrees of freedom
    * that constraints expand into from the locally owned cells. However, not
    * all locally relevant DoFs are stored because most of them would never be
    * accessed in matrix-vector products and result in too much data sent
@@ -1463,8 +1464,7 @@ public:
   //@}
 
   /**
-   * @name 5: Access of internal data structure (expert mode, interface not
-   * stable between releases)
+   * @name 5: Access of internal data structure (expert mode, interface not stable between releases)
    */
   //@{
   /**

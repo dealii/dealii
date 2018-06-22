@@ -33,8 +33,7 @@ test()
   // create two different FullMatrix objects and add entries randomly to it.
   // Multiply them via FullMatrix::mmult(..), go through each row and column,
   // and check if DynamicSparsityPattern::compute_mmult_pattern(..) predicts
-  // the entries (i,j) where values supposed to be because of the
-  // multiplication.
+  // the entries (i,j) where values supposed to be because of the multiplication.
 
   const unsigned int M = 100;
   const unsigned int N = 50;
@@ -59,8 +58,7 @@ test()
           dyn_left.add(m, n);
           mat_left[m][n] = 1;
         }
-  // add randomly entries to the right matrices/pattern starting at the 2nd
-  // column
+  // add randomly entries to the right matrices/pattern starting at the 2nd column
   for (unsigned int n = 0; n < N; ++n)
     for (unsigned int o = 1; o < O; ++o)
       if (Utilities::generate_normal_random_number(0, 0.2) > 0)

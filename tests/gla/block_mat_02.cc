@@ -104,7 +104,7 @@ test()
 
   DoFTools::make_hanging_node_constraints(stokes_dof_handler, cm);
 
-  // boundary conditions ?
+  //boundary conditions ?
   cm.close();
 
 
@@ -200,10 +200,10 @@ test_LA_Trilinos()
 
   DoFTools::make_hanging_node_constraints(stokes_dof_handler, cm);
 
-  // boundary conditions ?
+  //boundary conditions ?
   cm.close();
   TrilinosWrappers::BlockSparsityPattern
-    // typename LA::MPI::CompressedBlockSparsityPattern
+    //typename LA::MPI::CompressedBlockSparsityPattern
     sp(stokes_partitioning, MPI_COMM_WORLD);
 
 
@@ -223,7 +223,7 @@ test_LA_Trilinos()
 
   sp.compress();
 
-  // sp.print(deallog.get_file_stream());
+  //sp.print(deallog.get_file_stream());
 
   LA::MPI::BlockSparseMatrix stokes_matrix;
   stokes_matrix.reinit(sp);
@@ -256,6 +256,6 @@ main(int argc, char **argv)
   }
 
   // compile, don't run
-  // if (myid==9999)
+  //if (myid==9999)
   //  test<LA_Dummy>();
 }

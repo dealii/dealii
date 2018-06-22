@@ -639,7 +639,7 @@ namespace GridGenerator
     vertices[15] = Point<spacedim>(0, r, -R);
 
     std::vector<CellData<dim>> cells(16);
-    // Right Hand Orientation
+    //Right Hand Orientation
     cells[0].vertices[0] = 0;
     cells[0].vertices[1] = 4;
     cells[0].vertices[2] = 7;
@@ -957,17 +957,17 @@ namespace GridGenerator
               cross_product_3d(edges[0], edges[1]);
 
             /*
-             * Ensure that edges 1, 2, and 3 form a right-handed set of
-             * vectors. This works by applying the definition of the dot product
-             *
-             *     cos(theta) = dot(x, y)/(norm(x)*norm(y))
-             *
-             * and then, since the normal vector and third edge should both
-             * point away from the plane formed by the first two edges, the
-             * angle between them must be between 0 and pi/2; hence we just need
-             *
-             *     0 < dot(x, y).
-             */
+         * Ensure that edges 1, 2, and 3 form a right-handed set of
+         * vectors. This works by applying the definition of the dot product
+         *
+         *     cos(theta) = dot(x, y)/(norm(x)*norm(y))
+         *
+         * and then, since the normal vector and third edge should both point
+         * away from the plane formed by the first two edges, the angle
+         * between them must be between 0 and pi/2; hence we just need
+         *
+         *     0 < dot(x, y).
+         */
             twisted_data = (plane_normal * edges[2] < 0.0);
             break;
           }
@@ -3656,20 +3656,20 @@ namespace GridGenerator
 
         std::vector<Point<3>> vertices;
 
-        vertices.push_back(center + Point<3>(0, inner_radius, 0)); // 0
-        vertices.push_back(center + Point<3>(a, a, 0));            // 1
-        vertices.push_back(center + Point<3>(b, b, 0));            // 2
-        vertices.push_back(center + Point<3>(0, outer_radius, 0)); // 3
-        vertices.push_back(center + Point<3>(0, a, a));            // 4
-        vertices.push_back(center + Point<3>(c, c, h));            // 5
-        vertices.push_back(center + Point<3>(d, d, e));            // 6
-        vertices.push_back(center + Point<3>(0, b, b));            // 7
-        vertices.push_back(center + Point<3>(inner_radius, 0, 0)); // 8
-        vertices.push_back(center + Point<3>(outer_radius, 0, 0)); // 9
-        vertices.push_back(center + Point<3>(a, 0, a));            // 10
-        vertices.push_back(center + Point<3>(b, 0, b));            // 11
-        vertices.push_back(center + Point<3>(0, 0, inner_radius)); // 12
-        vertices.push_back(center + Point<3>(0, 0, outer_radius)); // 13
+        vertices.push_back(center + Point<3>(0, inner_radius, 0)); //0
+        vertices.push_back(center + Point<3>(a, a, 0));            //1
+        vertices.push_back(center + Point<3>(b, b, 0));            //2
+        vertices.push_back(center + Point<3>(0, outer_radius, 0)); //3
+        vertices.push_back(center + Point<3>(0, a, a));            //4
+        vertices.push_back(center + Point<3>(c, c, h));            //5
+        vertices.push_back(center + Point<3>(d, d, e));            //6
+        vertices.push_back(center + Point<3>(0, b, b));            //7
+        vertices.push_back(center + Point<3>(inner_radius, 0, 0)); //8
+        vertices.push_back(center + Point<3>(outer_radius, 0, 0)); //9
+        vertices.push_back(center + Point<3>(a, 0, a));            //10
+        vertices.push_back(center + Point<3>(b, 0, b));            //11
+        vertices.push_back(center + Point<3>(0, 0, inner_radius)); //12
+        vertices.push_back(center + Point<3>(0, 0, outer_radius)); //13
 
         const int cell_vertices[3][8] = {
           {0, 1, 3, 2, 4, 5, 7, 6},
@@ -4474,15 +4474,15 @@ namespace GridGenerator
            ExcNotImplemented());
 
     // This function works using the following assumption:
-    //    Triangulation::create_triangulation(...) will create cells that
-    //    preserve the order of cells passed in using the CellData argument;
-    //    also, that it will not reorder the vertices.
+    //    Triangulation::create_triangulation(...) will create cells that preserve
+    //    the order of cells passed in using the CellData argument; also,
+    //    that it will not reorder the vertices.
 
     std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
              typename MeshType<dim, spacedim>::face_iterator>
       surface_to_volume_mapping;
 
-    const unsigned int boundary_dim = dim - 1; // dimension of the boundary mesh
+    const unsigned int boundary_dim = dim - 1; //dimension of the boundary mesh
 
     // First create surface mesh and mapping
     // from only level(0) cells of volume_mesh
@@ -4497,7 +4497,7 @@ namespace GridGenerator
     std::vector<Point<spacedim>>        vertices;
 
     std::map<unsigned int, unsigned int>
-      map_vert_index; // volume vertex indices to surf ones
+      map_vert_index; //volume vertex indices to surf ones
 
     for (typename MeshType<dim, spacedim>::cell_iterator cell =
            volume_mesh.begin(0);

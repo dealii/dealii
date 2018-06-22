@@ -15,8 +15,8 @@
 
 
 // Check MGTransferBlockMatrixFree by comparison with MGTransferMatrixFree on a
-// series of adaptive meshes for FE_Q. This is similar to
-// transfer_matrix_free_02.cc but using separate DoFHandlers for each block.
+// series of adaptive meshes for FE_Q. This is similar to transfer_matrix_free_02.cc
+// but using separate DoFHandlers for each block.
 
 #include <deal.II/base/logstream.h>
 

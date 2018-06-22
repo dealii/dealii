@@ -99,8 +99,7 @@ test()
             "Some of the vertices on ghost cell were not moved correctly!"));
       }
 
-  /*std::string
-  filename("grid"+Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),2)+".vtu");
+  /*std::string filename("grid"+Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),2)+".vtu");
   std::ofstream out(filename.c_str());
   GridOut grid_out;
   grid_out.write_vtu(triangulation, out);*/

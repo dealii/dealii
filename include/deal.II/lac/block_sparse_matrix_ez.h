@@ -496,4 +496,4 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii_block_sparse_matrix_ez_h
+#endif //dealii_block_sparse_matrix_ez_h

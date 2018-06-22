@@ -50,8 +50,7 @@ namespace DoFToolsEx
 
 /**
  * Detailed desc.
- * Does it make sense to have InVector and OutVector templates? Shouldn't just
- * one Vector be enough?
+ * Does it make sense to have InVector and OutVector templates? Shouldn't just one Vector be enough?
  *
  * @param
  *

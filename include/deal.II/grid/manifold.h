@@ -99,8 +99,8 @@ namespace Manifolds
    *
    * @param[in] iterator A mesh iterator that points to either a line, quad,
    *   or hex.
-   * @param[in] with_interpolation Whether or not to compute the quadrature
-   * weights from transfinite interpolation, as discussed above.
+   * @param[in] with_interpolation Whether or not to compute the quadrature weights
+   *   from transfinite interpolation, as discussed above.
    * @tparam MeshIteratorType An iterator type that corresponds to either
    *   Triangulation::cell_iterator (or variants such as
    *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
@@ -146,8 +146,8 @@ namespace Manifolds
    *
    * @param[in] iterator A mesh iterator that points to either a line, quad,
    *   or hex.
-   * @param[in] with_interpolation Whether or not to compute the quadrature
-   * weights from transfinite interpolation, as discussed above.
+   * @param[in] with_interpolation Whether or not to compute the quadrature weights
+   *   from transfinite interpolation, as discussed above.
    * @tparam MeshIteratorType An iterator type that corresponds to either
    *   Triangulation::cell_iterator (or variants such as
    *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
@@ -190,15 +190,15 @@ namespace Manifolds
  * in this context will then be the vertices of the cell, face, or edge, and
  * the weights are typically one over the number of points when a new midpoint
  * of the cell, face, or edge is needed. Derived classes then will implement the
- * Manifold::get_new_point() function in a way that computes the location of
- * this new point. In the simplest case, for example in the FlatManifold class,
- * the function simply computes the arithmetic average (with given weights) of
- * the given points. However, other classes do something differently; for
- * example, the SphericalManifold class, which is used to describe domains that
- * form (part of) the sphere, will ensure that, given the two vertices of an
- * edge at the boundary, the new returned point will lie on the grand circle
- * that connects the two points, rather than choosing a point that is half-way
- * between the two points in ${\mathbb R}^d$.
+ * Manifold::get_new_point() function in a way that computes the location of this
+ * new point. In the simplest case, for example in the FlatManifold class, the
+ * function simply computes the arithmetic average (with given weights) of
+ * the given points. However, other classes do something differently; for example,
+ * the SphericalManifold class, which is used to describe domains that form (part of) the
+ * sphere, will ensure that, given the two vertices of an edge at
+ * the boundary, the new returned point will lie on the grand circle that connects
+ * the two points, rather than choosing a point that is half-way between the
+ * two points in ${\mathbb R}^d$.
  *
  *
  * @note Unlike almost all other cases in the library, we here interpret the points
@@ -544,17 +544,16 @@ public:
 
   /**
    * Return a vector that, at $\mathbf x_1$, is tangential to
-   * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$. The
-   * geodesic is the shortest line between these two points, where "shortest" is
-   * defined via a metric specific to a particular implementation of this class
-   * in a derived class. For example, in the case of a FlatManifold, the
-   * shortest line between two points is just the straight line, and in this
-   * case the tangent vector is just the difference $\mathbf d=\mathbf
-   * x_2-\mathbf x_1$. On the other hand, for a manifold that describes a
-   * surface embedded in a higher dimensional space (e.g., the surface of a
-   * sphere), then the tangent vector is tangential to the surface, and
-   * consequently may point in a different direction than the straight line that
-   * connects the two points.
+   * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$. The geodesic
+   * is the shortest line between these two points, where "shortest" is defined
+   * via a metric specific to a particular implementation of this class in a
+   * derived class. For example, in the case of a FlatManifold, the shortest
+   * line between two points is just the straight line, and in this case the
+   * tangent vector is just the difference $\mathbf d=\mathbf x_2-\mathbf x_1$.
+   * On the other hand, for a manifold that describes a surface embedded in
+   * a higher dimensional space (e.g., the surface of a sphere), then the
+   * tangent vector is tangential to the surface, and consequently may point in
+   * a different direction than the straight line that connects the two points.
    *
    * While tangent vectors are often normalized to unit length, the vectors
    * returned by this function are normalized as described in the introduction
@@ -568,10 +567,9 @@ public:
    *
    * The default implementation of this function approximates
    * $\mathbf s'(0) \approx \frac{\mathbf s(\epsilon)-\mathbf x_1}{\epsilon}$
-   * for a small value of $\epsilon$, and the evaluation of $\mathbf
-   * s(\epsilon)$ is done by calling get_new_point(). If possible, derived
-   * classes should override this function by an implementation of the exact
-   * derivative.
+   * for a small value of $\epsilon$, and the evaluation of $\mathbf s(\epsilon)$
+   * is done by calling get_new_point(). If possible, derived classes should
+   * override this function by an implementation of the exact derivative.
    *
    * @param x1 The first point that describes the geodesic, and the one
    *   at which the "direction" is to be evaluated.
@@ -1097,10 +1095,10 @@ public:
    * Thus, the computation of tangent vectors also requires the
    * implementation of <i>derivatives</i> $\nabla_\xi F(\xi)$ of
    * the push-forward mapping. Here, $F^{-1}(\mathbf x_2)-F^{-1}(\mathbf x_1)$
-   * is a chartdim-dimensional vector, and $\nabla_\xi F\left(F^{-1}(\mathbf
-   * x_1)\right) = \nabla_\xi F\left(\xi_1\right)$ is a
-   * spacedim-times-chartdim-dimensional matrix. Consequently, and as desired,
-   * the operation results in a spacedim-dimensional vector.
+   * is a chartdim-dimensional vector, and $\nabla_\xi F\left(F^{-1}(\mathbf x_1)\right)
+   * = \nabla_\xi F\left(\xi_1\right)$ is a spacedim-times-chartdim-dimensional
+   * matrix. Consequently, and as desired, the operation results in a
+   * spacedim-dimensional vector.
    *
    * @param x1 The first point that describes the geodesic, and the one
    *   at which the "direction" is to be evaluated.

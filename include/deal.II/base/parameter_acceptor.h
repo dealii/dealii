@@ -235,8 +235,8 @@ DEAL_II_NAMESPACE_OPEN
  * {}
  * @endcode
  *
- * The other way to proceed (recommended) is to use exploit the
- * /section/subsection approach **in the main class**.
+ * The other way to proceed (recommended) is to use exploit the /section/subsection
+ * approach **in the main class**.
  * @code
  * int main()
  * {
@@ -380,13 +380,12 @@ public:
    * decide whether we write the full documentation as well, or only the
    * parameters.
    *
-   * If the input file does not exist, a default one with the same name is
-   * created for you, and an exception is thrown.
+   * If the input file does not exist, a default one with the same name is created
+   * for you, and an exception is thrown.
    *
    * @param filename Input file name
    * @param output_filename Output file name
-   * @param output_style_for_prm_format How to write the output file if format
-   * is `prm`
+   * @param output_style_for_prm_format How to write the output file if format is `prm`
    * @param prm The ParameterHandler to use
    */
   static void

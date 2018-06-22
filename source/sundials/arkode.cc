@@ -513,7 +513,7 @@ namespace SUNDIALS
 #      endif // PETSC_USE_COMPLEX
 #    endif   // DEAL_II_WITH_PETSC
 
-#  endif // DEAL_II_WITH_MPI
+#  endif //DEAL_II_WITH_MPI
 
 } // namespace SUNDIALS
 

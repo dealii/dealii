@@ -69,22 +69,22 @@ namespace internal
                                   const unsigned int fe_degree);
 
     /**
-     * A structure that stores data related to the finite element contained in
-     * the DoFHandler. Used only for the initialization using
+     * A structure that stores data related to the finite element contained in the
+     * DoFHandler. Used only for the initialization using
      * <tt>setup_transfer</tt>.
      */
     template <typename Number>
     struct ElementInfo
     {
       /**
-       * A variable storing the degree of the finite element. The selection of
-       * the computational kernel is based on this number.
+       * A variable storing the degree of the finite element. The selection of the
+       * computational kernel is based on this number.
        */
       unsigned int fe_degree;
 
       /**
-       * A variable storing whether the element is continuous and there is a
-       * joint degree of freedom in the center of the 1D line.
+       * A variable storing whether the element is continuous and there is a joint degree of
+       * freedom in the center of the 1D line.
        */
       bool element_is_continuous;
 
@@ -94,16 +94,16 @@ namespace internal
       unsigned int n_components;
 
       /**
-       * A variable storing the number of degrees of freedom on all child cells.
-       * It is <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and
-       * somewhat less for continuous elements.
+       * A variable storing the number of degrees of freedom on all child cells. It is
+       * <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
+       * less for continuous elements.
        */
       unsigned int n_child_cell_dofs;
 
       /**
-       * An array that holds the numbering between the numbering of degrees of
-       * freedom in the finite element and the lexicographic numbering needed
-       * for the tensor product application.
+       * An array that holds the numbering between the numbering of degrees of freedom in
+       * the finite element and the lexicographic numbering needed for the
+       * tensor product application.
        */
       std::vector<unsigned int> lexicographic_numbering;
 

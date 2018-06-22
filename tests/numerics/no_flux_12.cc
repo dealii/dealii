@@ -20,16 +20,12 @@
 // note that the cylinder boundary is not even the problem here!
 
 /*
-5: An error occurred in line <4586> of file
-</scratch/deal-trunk/deal.II/include/deal.II/numerics/vector_tools.templates.h>
-in function 5:     void
-dealii::VectorTools::compute_no_normal_flux_constraints(const
-DoFHandlerType<dim, spacedim>&, unsigned int, const
-std::set<types::boundary_id>&, dealii::AffineConstraints<double>&, const
-dealii::Mapping<dim, spacedim>&) [with int dim = 3; DoFHandlerType =
-dealii::DoFHandler; int spacedim = 3] 5: The violated condition was: 5:
-contribution->second.size() == dim-1 5: The name and call sequence of the
-exception was: 5:     ExcNotImplemented()
+5: An error occurred in line <4586> of file </scratch/deal-trunk/deal.II/include/deal.II/numerics/vector_tools.templates.h> in function
+5:     void dealii::VectorTools::compute_no_normal_flux_constraints(const DoFHandlerType<dim, spacedim>&, unsigned int, const std::set<types::boundary_id>&, dealii::AffineConstraints<double>&, const dealii::Mapping<dim, spacedim>&) [with int dim = 3; DoFHandlerType = dealii::DoFHandler; int spacedim = 3]
+5: The violated condition was:
+5:     contribution->second.size() == dim-1
+5: The name and call sequence of the exception was:
+5:     ExcNotImplemented()
 
  */
 

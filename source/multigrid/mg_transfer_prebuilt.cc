@@ -270,8 +270,8 @@ MGTransferPrebuilt<VectorType>::build_matrices(
             VectorType>::requires_distributed_sparsity_pattern)
         {
           // Since PETSc matrices do not offer the functionality to fill up in-
-          // complete sparsity patterns on their own, the sparsity pattern must
-          // be manually distributed.
+          // complete sparsity patterns on their own, the sparsity pattern must be
+          // manually distributed.
 
           // Retrieve communicator from triangulation if it is parallel
           const parallel::Triangulation<dim, spacedim> *dist_tria =

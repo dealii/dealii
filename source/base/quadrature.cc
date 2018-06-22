@@ -1175,21 +1175,21 @@ QProjector<dim>::DataSetDescriptor::face(const unsigned int face_no,
           // stick to that (implicit) convention
           static const unsigned int offset[2][2][2] = {
             {{4 * GeometryInfo<dim>::faces_per_cell,
-              5 * GeometryInfo<dim>::
-                    faces_per_cell}, // face_orientation=false; face_flip=false;
-                                     // face_rotation=false and true
+              5 *
+                GeometryInfo<dim>::
+                  faces_per_cell}, // face_orientation=false; face_flip=false; face_rotation=false and true
              {6 * GeometryInfo<dim>::faces_per_cell,
-              7 * GeometryInfo<dim>::
-                    faces_per_cell}}, // face_orientation=false; face_flip=true;
-                                      // face_rotation=false and true
+              7 *
+                GeometryInfo<dim>::
+                  faces_per_cell}}, // face_orientation=false; face_flip=true;  face_rotation=false and true
             {{0 * GeometryInfo<dim>::faces_per_cell,
-              1 * GeometryInfo<dim>::
-                    faces_per_cell}, // face_orientation=true;  face_flip=false;
-                                     // face_rotation=false and true
+              1 *
+                GeometryInfo<dim>::
+                  faces_per_cell}, // face_orientation=true;  face_flip=false; face_rotation=false and true
              {2 * GeometryInfo<dim>::faces_per_cell,
-              3 * GeometryInfo<dim>::
-                    faces_per_cell}}}; // face_orientation=true; face_flip=true;
-                                       // face_rotation=false and true
+              3 *
+                GeometryInfo<dim>::
+                  faces_per_cell}}}; // face_orientation=true;  face_flip=true;  face_rotation=false and true
 
           return (
             (face_no + offset[face_orientation][face_flip][face_rotation]) *
@@ -1333,9 +1333,9 @@ QProjector<3>::DataSetDescriptor::subface(
   // 6,4,0 here to stick to that (implicit)
   // convention
   static const unsigned int ref_case_offset[3] = {
-    6, // cut_x
-    4, // cut_y
-    0  // cut_xy
+    6, //cut_x
+    4, //cut_y
+    0  //cut_xy
   };
 
 

@@ -819,7 +819,7 @@ namespace internal
   } // namespace p4est
 } // namespace internal
 
-#endif // DEAL_II_WITH_P4EST
+#endif //DEAL_II_WITH_P4EST
 
 /*-------------- Explicit Instantiations -------------------------------*/
 #include "p4est_wrappers.inst"

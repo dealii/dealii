@@ -41,7 +41,7 @@ test<2, 2>()
   edges[1] = Point<spacedim>(0.2, 0.8) - Point<spacedim>();
   GridGenerator::subdivided_parallelepiped<dim, spacedim>(tria, origin, edges);
 
-  // GridOut().write_gnuplot (tria, deallog.get_file_stream());
+  //GridOut().write_gnuplot (tria, deallog.get_file_stream());
   GridTools::rotate(numbers::PI / 3.0, tria);
   GridOut().write_gnuplot(tria, deallog.get_file_stream());
 }
@@ -62,11 +62,11 @@ test()
 
   GridGenerator::subdivided_parallelepiped<dim, spacedim>(tria, origin, edges);
 
-  // GridOut().write_gnuplot (tria, deallog.get_file_stream());
+  //GridOut().write_gnuplot (tria, deallog.get_file_stream());
   GridTools::rotate(numbers::PI / 3.0, 0, tria);
-  // GridOut().write_gnuplot (tria, deallog.get_file_stream());
+  //GridOut().write_gnuplot (tria, deallog.get_file_stream());
   GridTools::rotate(numbers::PI / 10.0, 1, tria);
-  // GridOut().write_gnuplot (tria, deallog.get_file_stream());
+  //GridOut().write_gnuplot (tria, deallog.get_file_stream());
   GridTools::rotate(-numbers::PI / 5.0, 2, tria);
   GridOut().write_gnuplot(tria, deallog.get_file_stream());
 }

@@ -266,9 +266,9 @@ namespace internal
                               dof_indices.push_back(n_owned +
                                                     ghost_dofs.size());
 
-                              // collect ghosts so that we can later construct
-                              // an IndexSet for them. also store whether the
-                              // current cell is on the boundary
+                              // collect ghosts so that we can later construct an
+                              // IndexSet for them. also store whether the current
+                              // cell is on the boundary
                               ghost_dofs.push_back(constraint_indices[j]);
                               cell_at_subdomain_boundary = true;
                             }
@@ -283,8 +283,8 @@ namespace internal
               else
                 {
                 no_constraint:
-                  // Not constrained, we simply have to add the local index to
-                  // the indices_local_to_global list and increment constraint
+                  // Not constrained, we simply have to add the local index to the
+                  // indices_local_to_global list and increment constraint
                   // iterator. transform to local index space/mark as ghost
                   if (n_mpi_procs > 1 &&
                       (current_dof < first_owned || current_dof >= last_owned))

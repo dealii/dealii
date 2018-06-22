@@ -111,8 +111,7 @@ void check_faces(Quadrature<1> &q1)
     }
 
   /*
-  Quadrature<dim> subs =
-  QProjector<dim>::project_to_all_subfaces(subquadrature);
+  Quadrature<dim> subs = QProjector<dim>::project_to_all_subfaces(subquadrature);
 
 
   for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)

@@ -88,8 +88,7 @@ void create_triangulation(Triangulation<2> &tria)
   circle_2.set_all_manifold_ids(MANIFOLD_ID);
   circle_2.set_manifold(MANIFOLD_ID, spherical_manifold);
 
-  // then move the vertices to the points where we want them to be to create a
-  // slightly asymmetric cube with a hole
+  // then move the vertices to the points where we want them to be to create a slightly asymmetric cube with a hole
   for (Triangulation<2>::cell_iterator cell = middle.begin();
        cell != middle.end();
        ++cell)
@@ -148,14 +147,13 @@ void create_triangulation(Triangulation<2> &tria)
         }
     }
 
-  // must copy the triangulation because we cannot merge triangulations with
-  // refinement...
+  // must copy the triangulation because we cannot merge triangulations with refinement...
   GridGenerator::flatten_triangulation(middle, middle_tmp);
   GridGenerator::merge_triangulations(circle_1, circle_2, circle_tmp);
   GridGenerator::merge_triangulations(middle_tmp, circle_tmp, tria);
 
   // Set the cylinder boundary  to 2, outflow to 1, the rest to 0.
-  // tria.set_all_manifold_ids(0);
+  //tria.set_all_manifold_ids(0);
   for (Triangulation<2>::active_cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)

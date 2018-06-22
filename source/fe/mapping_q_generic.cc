@@ -231,15 +231,14 @@ namespace internal
       {
         const unsigned int n_points = unit_points.size();
 
-        // Construct the tensor product polynomials used as shape functions for
-        // the Qp mapping of cells at the boundary.
+        // Construct the tensor product polynomials used as shape functions for the
+        // Qp mapping of cells at the boundary.
         const TensorProductPolynomials<dim> tensor_pols(
           Polynomials::generate_complete_Lagrange_basis(
             data.line_support_points.get_points()));
         Assert(n_shape_functions == tensor_pols.n(), ExcInternalError());
 
-        // then also construct the mapping from lexicographic to the Qp shape
-        // function numbering
+        // then also construct the mapping from lexicographic to the Qp shape function numbering
         const std::vector<unsigned int> renumber(
           FETools::lexicographic_to_hierarchic_numbering(FiniteElementData<dim>(
             internal::MappingQGenericImplementation::get_dpo_vector<dim>(
@@ -1008,8 +1007,8 @@ namespace internal
               loqvs(index_table, 4 + j + 3 * M) = p[1];
             }
 
-        // the sum of weights of the points at the outer rim should be one.
-        // check this
+        // the sum of weights of the points at the outer rim should be one. check
+        // this
         for (unsigned int unit_point = 0; unit_point < n_inner_2d; ++unit_point)
           Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
                                            loqvs[unit_point].end(),
@@ -1099,8 +1098,8 @@ namespace internal
                 lohvs(index_table, 8 + 12 * M + 5 * M * M + j * M + k) = p[2];
               }
 
-        // the sum of weights of the points at the outer rim should be one.
-        // check this
+        // the sum of weights of the points at the outer rim should be one. check
+        // this
         for (unsigned int unit_point = 0; unit_point < n_inner; ++unit_point)
           Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
                                            lohvs[unit_point].end(),
@@ -1247,22 +1246,22 @@ namespace internal
         if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
           return p_unit;
 
-        // we need to compare the position of the computed p(x) against the
-        // given point 'p'. We will terminate the iteration and return 'x' if
-        // they are less than eps apart. The question is how to choose eps --
-        // or, put maybe more generally: in which norm we want these 'p' and
-        // 'p(x)' to be eps apart.
+        // we need to compare the position of the computed p(x) against the given
+        // point 'p'. We will terminate the iteration and return 'x' if they are
+        // less than eps apart. The question is how to choose eps -- or, put maybe
+        // more generally: in which norm we want these 'p' and 'p(x)' to be eps
+        // apart.
         //
-        // the question is difficult since we may have to deal with very
-        // elongated cells where we may achieve 1e-12*h for the distance of
-        // these two points in the 'long' direction, but achieving this
-        // tolerance in the 'short' direction of the cell may not be possible
+        // the question is difficult since we may have to deal with very elongated
+        // cells where we may achieve 1e-12*h for the distance of these two points
+        // in the 'long' direction, but achieving this tolerance in the 'short'
+        // direction of the cell may not be possible
         //
         // what we do instead is then to terminate iterations if
         //    \| p(x) - p \|_A < eps
-        // where the A-norm is somehow induced by the transformation of the
-        // cell. in particular, we want to measure distances relative to the
-        // sizes of the cell in its principal directions.
+        // where the A-norm is somehow induced by the transformation of the cell.
+        // in particular, we want to measure distances relative to the sizes of
+        // the cell in its principal directions.
         //
         // to define what exactly A should be, note that to first order we have
         // the following (assuming that x* is the solution of the problem, i.e.,
@@ -1319,10 +1318,10 @@ namespace internal
             double step_length = 1;
             do
               {
-                // update of p_unit. The spacedim-th component of transformed
-                // point is simply ignored in codimension one case. When this
-                // component is not zero, then we are projecting the point to
-                // the surface or curve identified by the cell.
+                // update of p_unit. The spacedim-th component of transformed point
+                // is simply ignored in codimension one case. When this component is
+                // not zero, then we are projecting the point to the surface or
+                // curve identified by the cell.
                 Point<dim> p_unit_trial = p_unit;
                 for (unsigned int i = 0; i < dim; ++i)
                   p_unit_trial[i] -= step_length * delta[i];
@@ -1349,10 +1348,10 @@ namespace internal
                 // see if we are making progress with the current step length
                 // and if not, reduce it by a factor of two and try again
                 //
-                // strictly speaking, we should probably use the same norm as we
-                // use for the outer algorithm. in practice, line search is just
-                // a crutch to find a "reasonable" step length, and so using the
-                // l2 norm is probably just fine
+                // strictly speaking, we should probably use the same norm as we use
+                // for the outer algorithm. in practice, line search is just a
+                // crutch to find a "reasonable" step length, and so using the l2
+                // norm is probably just fine
                 if (f_trial.norm() < f.norm())
                   {
                     p_real = p_real_trial;
@@ -1484,7 +1483,7 @@ namespace internal
                   }
               }
 
-            // TODO: implement a line search here in much the same way as for
+            //TODO: implement a line search here in much the same way as for
             // the corresponding function above that does so for dim==spacedim
             p_minus_F = p;
             p_minus_F -= compute_mapped_location_of_point<dim, spacedim>(mdata);
@@ -1510,8 +1509,8 @@ namespace internal
       }
 
       /**
-       * In case the quadrature formula is a tensor product, this is a
-       * replacement for maybe_compute_q_points(), maybe_update_Jacobians() and
+       * In case the quadrature formula is a tensor product, this is a replacement
+       * for maybe_compute_q_points(), maybe_update_Jacobians() and
        * maybe_update_jacobian_grads()
        */
       template <int dim, int spacedim>
@@ -1707,8 +1706,7 @@ namespace internal
 
 
       /**
-       * Update the co- and contravariant matrices as well as their determinant,
-       * for the cell
+       * Update the co- and contravariant matrices as well as their determinant, for the cell
        * described stored in the data object, but only if the update_flags of the @p data
        * argument indicate so.
        *
@@ -1912,8 +1910,8 @@ namespace internal
       }
 
       /**
-       * Update the third derivatives of the transformation from unit to real
-       * cell, the Jacobian hessians.
+       * Update the third derivatives of the transformation from unit to real cell, the
+       * Jacobian hessians.
        *
        * Skip the computation if possible as indicated by the first argument.
        */
@@ -2070,8 +2068,8 @@ namespace internal
       }
 
       /**
-       * Update the fourth derivatives of the transformation from unit to real
-       * cell, the Jacobian hessian gradients.
+       * Update the fourth derivatives of the transformation from unit to real cell, the
+       * Jacobian hessian gradients.
        *
        * Skip the computation if possible as indicated by the first argument.
        */
@@ -2127,9 +2125,8 @@ namespace internal
       }
 
       /**
-       * Update the Hessian gradient of the transformation from unit to real
-       * cell, the Jacobian Hessians, pushed forward to the real cell
-       * coordinates.
+       * Update the Hessian gradient of the transformation from unit to real cell, the
+       * Jacobian Hessians, pushed forward to the real cell coordinates.
        *
        * Skip the computation if possible as indicated by the first argument.
        */
@@ -2319,8 +2316,7 @@ MappingQGeneric<dim, spacedim>::transform_unit_to_real_cell(
   Assert(tensor_pols.n() == Utilities::fixed_power<dim>(polynomial_degree + 1),
          ExcInternalError());
 
-  // then also construct the mapping from lexicographic to the Qp shape function
-  // numbering
+  // then also construct the mapping from lexicographic to the Qp shape function numbering
   const std::vector<unsigned int> renumber(
     FETools::lexicographic_to_hierarchic_numbering(FiniteElementData<dim>(
       internal::MappingQGenericImplementation::get_dpo_vector<dim>(
@@ -2904,14 +2900,14 @@ MappingQGeneric<dim, spacedim>::fill_fe_values(
             // if dim==spacedim, then there is no cell normal to
             // compute. since this is for FEValues (and not FEFaceValues),
             // there are also no face normals to compute
-            else // codim>0 case
+            else //codim>0 case
               {
                 Tensor<1, spacedim> DX_t[dim];
                 for (unsigned int i = 0; i < spacedim; ++i)
                   for (unsigned int j = 0; j < dim; ++j)
                     DX_t[j][i] = data.contravariant[point][i][j];
 
-                Tensor<2, dim> G; // First fundamental form
+                Tensor<2, dim> G; //First fundamental form
                 for (unsigned int i = 0; i < dim; ++i)
                   for (unsigned int j = 0; j < dim; ++j)
                     G[i][j] = DX_t[i] * DX_t[j];
@@ -2943,7 +2939,7 @@ MappingQGeneric<dim, spacedim>::fill_fe_values(
                         if (dim == 1)
                           output_data.normal_vectors[point] =
                             cross_product_2d(-DX_t[0]);
-                        else // dim == 2
+                        else //dim == 2
                           output_data.normal_vectors[point] =
                             cross_product_3d(DX_t[0], DX_t[1]);
 
@@ -2954,7 +2950,7 @@ MappingQGeneric<dim, spacedim>::fill_fe_values(
                           output_data.normal_vectors[point] *= -1.;
                       }
                   }
-              } // codim>0 case
+              } //codim>0 case
           }
     }
 
@@ -3060,19 +3056,18 @@ namespace internal
 
             if (update_flags & update_boundary_forms)
               {
-                // if dim==spacedim, we can use the unit tangentials to compute
-                // the boundary form by simply taking the cross product
+                // if dim==spacedim, we can use the unit tangentials to compute the
+                // boundary form by simply taking the cross product
                 if (dim == spacedim)
                   {
                     for (unsigned int i = 0; i < n_q_points; ++i)
                       switch (dim)
                         {
                           case 1:
-                            // in 1d, we don't have access to any of the
-                            // data.aux fields (because it has only dim-1
-                            // components), but we can still compute the
-                            // boundary form by simply looking at the number of
-                            // the face
+                            // in 1d, we don't have access to any of the data.aux
+                            // fields (because it has only dim-1 components), but we
+                            // can still compute the boundary form by simply
+                            // looking at the number of the face
                             output_data.boundary_forms[i][0] =
                               (face_no == 0 ? -1 : +1);
                             break;
@@ -3091,8 +3086,8 @@ namespace internal
                 else //(dim < spacedim)
                   {
                     // in the codim-one case, the boundary form results from the
-                    // cross product of all the face tangential vectors and the
-                    // cell normal vector
+                    // cross product of all the face tangential vectors and the cell
+                    // normal vector
                     //
                     // to compute the cell normal, use the same method used in
                     // fill_fe_values for cells above
@@ -3119,8 +3114,8 @@ namespace internal
                               cross_product_3d(DX_t[0], DX_t[1]);
                             cell_normal /= cell_normal.norm();
 
-                            // then compute the face normal from the face
-                            // tangent and the cell normal:
+                            // then compute the face normal from the face tangent
+                            // and the cell normal:
                             output_data.boundary_forms[point] =
                               cross_product_3d(data.aux[0][point], cell_normal);
                           }
@@ -3258,10 +3253,10 @@ MappingQGeneric<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  // if necessary, recompute the support points of the transformation of this
-  // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the triangulations
-  // are not the same)
+  // if necessary, recompute the support points of the transformation of this cell
+  // (note that we need to first check the triangulation pointer, since otherwise
+  // the second test might trigger an exception if the triangulations are not the
+  // same)
   if ((data.mapping_support_points.size() == 0) ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation()) ||
@@ -3304,10 +3299,10 @@ MappingQGeneric<dim, spacedim>::fill_fe_subface_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  // if necessary, recompute the support points of the transformation of this
-  // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the triangulations
-  // are not the same)
+  // if necessary, recompute the support points of the transformation of this cell
+  // (note that we need to first check the triangulation pointer, since otherwise
+  // the second test might trigger an exception if the triangulations are not the
+  // same)
   if ((data.mapping_support_points.size() == 0) ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation()) ||
@@ -3398,9 +3393,9 @@ namespace internal
                   }
                 return;
               }
-            // We still allow this operation as in the
-            // reference cell Derivatives are Tensor
-            // rather than DerivativeForm
+            //We still allow this operation as in the
+            //reference cell Derivatives are Tensor
+            //rather than DerivativeForm
             case mapping_covariant:
               {
                 Assert(
@@ -4092,8 +4087,8 @@ MappingQGeneric<dim, spacedim>::compute_mapping_support_points(
               add_line_support_points(cell, a);
               break;
             case 2:
-              // in 2d, add the points on the four bounding lines to the
-              // exterior (outer) points
+              // in 2d, add the points on the four bounding lines to the exterior
+              // (outer) points
               add_line_support_points(cell, a);
 
               // then get the interior support points

@@ -52,11 +52,11 @@ test()
 int
 main(int argc, char **argv)
 {
-  // Initialize MPI and Zoltan
+  //Initialize MPI and Zoltan
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   MPILogInitAll                    all;
 
-  // tests
+  //tests
   test<1>();
   test<2>();
   test<3>();

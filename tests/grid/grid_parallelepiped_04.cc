@@ -151,8 +151,8 @@ main()
 {
   initlog(true);
 
-  // check_parallelepiped<1> (false, true);
-  // check_parallelepiped<2> (false, true);
+  //check_parallelepiped<1> (false, true);
+  //check_parallelepiped<2> (false, true);
   for (unsigned int subd = 1; subd <= 3; ++subd)
     {
       unsigned int subdivisions[3] = {subd, subd, subd};

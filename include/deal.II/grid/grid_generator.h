@@ -307,9 +307,9 @@ namespace GridGenerator
   /**
    * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
    * responsibility of the user to provide the vertices in the right order (see
-   * the documentation of the GeometryInfo class) because the vertices are
-   * stored in the same order as they are given. It is also important to make
-   * sure that the volume of the cell is positive.
+   * the documentation of the GeometryInfo class) because the vertices are stored
+   * in the same order as they are given. It is also important to make sure that
+   * the volume of the cell is positive.
    *
    * If the argument @p colorize is false, all boundary indicators are set to
    * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
@@ -524,8 +524,8 @@ namespace GridGenerator
    * relative to @p center, which contains three elements in 2d and four in 3d.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
-   * boundary and 1 for the cut plane. The manifold id for the curved boundary
-   * is set to zero, and a SphericalManifold is attached to it.
+   * boundary and 1 for the cut plane. The manifold id for the curved boundary is
+   * set to zero, and a SphericalManifold is attached to it.
    *
    * @note The triangulation passed as argument needs to be empty when calling
    * this function.
@@ -542,8 +542,8 @@ namespace GridGenerator
    * <i>x</i>-axis.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
-   * boundary and 1 for the cut plane. The manifold id for the curved boundary
-   * is set to zero, and a SphericalManifold is attached to it.
+   * boundary and 1 for the cut plane. The manifold id for the curved boundary is
+   * set to zero, and a SphericalManifold is attached to it.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */

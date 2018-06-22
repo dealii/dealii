@@ -103,10 +103,10 @@ namespace Utilities
      * Estimate an upper bound for the largest eigenvalue of @p H by a @p k -step
      * Lanczos process starting from the initial vector @p v0. Typical
      * values of @p k are below 10. This estimator computes a k-step Lanczos
-     * decomposition $H V_k=V_k T_k+f_k e_k^T$ where $V_k$ contains k Lanczos
-     * basis, $V_k^TV_k=I_k$, $T_k$ is the tridiagonal Lanczos matrix, $f_k$ is
-     * a residual vector $f_k^TV_k=0$, and $e_k$ is the k-th canonical basis of
-     * $R^k$. The returned value is $ ||T_k||_2 + ||f_k||_2$.
+     * decomposition $H V_k=V_k T_k+f_k e_k^T$ where $V_k$ contains k Lanczos basis,
+     * $V_k^TV_k=I_k$, $T_k$ is the tridiagonal Lanczos matrix, $f_k$ is a residual
+     * vector $f_k^TV_k=0$, and $e_k$ is the k-th canonical basis of $R^k$.
+     * The returned value is $ ||T_k||_2 + ||f_k||_2$.
      * If @p eigenvalues is not <code>nullptr</code>, the eigenvalues of $T_k$ will be written there.
      *
      * @p vector_memory is used to allocate memory for temporary vectors.
@@ -131,8 +131,7 @@ namespace Utilities
      * eigenvalue of $T_k$.
      *
      * @note This function provides an alternate estimate to that obtained from
-     * several steps of SolverCG with
-     * SolverCG<VectorType>::connect_eigenvalues_slot().
+     * several steps of SolverCG with SolverCG<VectorType>::connect_eigenvalues_slot().
      *
      * @author Denis Davydov, 2017
      */
@@ -147,14 +146,16 @@ namespace Utilities
     /**
      * Apply Chebyshev polynomial of the operator @p H to @p x. For a
      * non-defective operator $H$ with a complete set of eigenpairs
-     * $H \psi_i = \lambda_i \psi_i$, the action of a polynomial filter $p$ is
-     * given by $p(H)x =\sum_i a_i p(\lambda_i) \psi_i$, where $x=: \sum_i a_i
-     * \psi_i$. Thus by appropriately choosing the polynomial filter, one can
-     * alter the eigenmodes contained in $x$.
+     * $H \psi_i = \lambda_i \psi_i$, the action of a polynomial filter $p$ is given by
+     * $p(H)x =\sum_i a_i p(\lambda_i) \psi_i$, where $x=: \sum_i a_i \psi_i$. Thus
+     * by appropriately choosing the polynomial filter, one can alter
+     * the eigenmodes contained in $x$.
      *
      * This function uses Chebyshev polynomials of first kind. Below is an
-     * example of polynomial $T_n(x)$ of degree $n=8$ normalized to unity at
-     * $-1.2$. <table> <tr> <td align="center">
+     * example of polynomial $T_n(x)$ of degree $n=8$ normalized to unity at $-1.2$.
+     * <table>
+     *   <tr>
+     *     <td align="center">
      *       @image html chebyshev8.png
      *     </td>
      *   </tr>
@@ -173,8 +174,7 @@ namespace Utilities
      *
      * @p vector_memory is used to allocate memory for temporary objects.
      *
-     * This function implements the algorithm (with a minor fix of sign of
-     * $\sigma_1$) from
+     * This function implements the algorithm (with a minor fix of sign of $\sigma_1$) from
      * @code{.bib}
      * @article{Zhou2014,
      *   Title   = {Chebyshev-filtered subspace iteration method free of sparse
@@ -399,8 +399,7 @@ namespace Utilities
 
       // note that the largest eigenvalue of T is below the largest
       // eigenvalue of the operator.
-      // return ||T||_2 + ||f||_2, although it is not guaranteed to be an upper
-      // bound.
+      // return ||T||_2 + ||f||_2, although it is not guaranteed to be an upper bound.
       return diagonal[k - 1] + f->l2_norm();
     }
 
@@ -440,9 +439,8 @@ namespace Utilities
       VectorType &yn = *p_yn;
 
       // Below is an implementation of
-      // Algorithm 3.2 in Zhou et al, Journal of Computational Physics 274
-      // (2014) 770-782 with **a bugfix for sigma1**. Here is the original
-      // algorithm verbatim:
+      // Algorithm 3.2 in Zhou et al, Journal of Computational Physics 274 (2014) 770-782
+      // with **a bugfix for sigma1**. Here is the original algorithm verbatim:
       //
       // [Y]=chebyshev_filter_scaled(X, m, a, b, aL).
       // e=(b−a)/2; c=(a+b)/2; σ=e/(c−aL); τ=2/σ;

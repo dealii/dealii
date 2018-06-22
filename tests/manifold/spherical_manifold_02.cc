@@ -13,8 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Check SphericalManifold for get_intermediate_point and get_tangent_vector
-// issues.
+// Check SphericalManifold for get_intermediate_point and get_tangent_vector issues.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

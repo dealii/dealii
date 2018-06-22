@@ -170,7 +170,7 @@ main(int argc, char **argv)
   check_simple(FE_RaviartThomasNodal<2>(1));
   check_simple(FESystem<2>(FE_RaviartThomas<2>(1), 1, FE_DGQ<2>(0), 2));
 
-  // TODO: Reenable after implementing renumber_dofs in 3D
+  //TODO: Reenable after implementing renumber_dofs in 3D
 
   // check_simple (FE_DGQ<3>(1));
   // check_simple (FE_Q<3>(2));

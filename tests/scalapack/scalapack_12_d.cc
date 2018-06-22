@@ -16,8 +16,7 @@
 #include "../lapack/create_matrix.h"
 #include "../tests.h"
 
-// test multiplication of distributed ScaLAPACKMatrices: C = alpha A^T * B^T +
-// beta C
+// test multiplication of distributed ScaLAPACKMatrices: C = alpha A^T * B^T + beta C
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/logstream.h>
@@ -47,7 +46,7 @@ test()
 
   const unsigned int proc_rows    = std::floor(std::sqrt(n_mpi_processes));
   const unsigned int proc_columns = std::floor(n_mpi_processes / proc_rows);
-  // create 2d process grid
+  //create 2d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
     std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,
                                                   proc_rows,

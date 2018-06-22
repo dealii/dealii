@@ -480,8 +480,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
                   fe_face_values.get_present_fe_values()
                     .get_all_normal_vectors()[0];
 
-                // extract the gradient in normal direction of all the
-                // components.
+                // extract the gradient in normal direction of all the components.
                 for (unsigned int s = 0; s < n_solution_vectors; ++s)
                   for (unsigned int c = 0; c < n_components; ++c)
                     grad_dot_n_neighbor[s](c) =

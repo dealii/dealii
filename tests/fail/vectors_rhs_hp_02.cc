@@ -15,9 +15,9 @@
 
 
 
-// like deal.II/vectors_rhs_hp_02, but for hp objects. here, each hp object has
-// only a single component, so we expect exactly the same output as for the old
-// test. vectors_rhs_hp_02_hp tests for different finite elements
+// like deal.II/vectors_rhs_hp_02, but for hp objects. here, each hp object has only a
+// single component, so we expect exactly the same output as for the old test.
+// vectors_rhs_hp_02_hp tests for different finite elements
 
 
 #include <deal.II/base/function_lib.h>

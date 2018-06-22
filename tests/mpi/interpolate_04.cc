@@ -52,7 +52,7 @@ test()
 
   GridGenerator::hyper_cube(tr);
 
-  // tr.refine_global (2);
+  //tr.refine_global (2);
 
   const FE_Q<dim> fe(2);
   DoFHandler<dim> dofh1(tr);

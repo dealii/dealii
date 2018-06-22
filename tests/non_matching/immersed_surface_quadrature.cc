@@ -22,8 +22,8 @@
 
 using namespace dealii;
 
-// Test that an ImmersedSurfaceQuadrature can be constructed for each dimension
-// and that quadrature points can be added to it.
+//Test that an ImmersedSurfaceQuadrature can be constructed for each dimension
+//and that quadrature points can be added to it.
 
 
 
@@ -40,8 +40,8 @@ print_quadrature(const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)
 
 
 
-// Check that get_normals() are callable and are of the same size as
-// points and weights.
+//Check that get_normals() are callable and are of the same size as
+//points and weights.
 template <int dim>
 void
 check_get_normals(const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)

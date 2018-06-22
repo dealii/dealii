@@ -375,8 +375,7 @@ private:
 };
 
 
-/* ----------------------------- Inline functions and templates ----------------
- */
+/* ----------------------------- Inline functions and templates ---------------- */
 
 
 /**

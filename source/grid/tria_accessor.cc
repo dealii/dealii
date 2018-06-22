@@ -108,15 +108,15 @@ namespace
     // first index: subface_no
     // second index: subsubface_no
     // third index: does the first subface have children? -> no and yes
-    static const unsigned int translated_subface_no[2][2][2] = {
-      {{e, 0},   // first  subface, first  subsubface,
-                 // first_child_has_children==no and yes
-       {e, 1}},  // first  subface, second subsubface,
-                 // first_child_has_children==no and yes
-      {{1, 2},   // second subface, first  subsubface,
-                 // first_child_has_children==no and yes
-       {2, 3}}}; // second subface, second subsubface,
-                 // first_child_has_children==no and yes
+    static const unsigned int translated_subface_no[2][2][2] =
+      {{{e, 0},   // first  subface, first  subsubface,
+                  // first_child_has_children==no and yes
+        {e, 1}},  // first  subface, second subsubface,
+                  // first_child_has_children==no and yes
+       {{1, 2},   // second subface, first  subsubface,
+                  // first_child_has_children==no and yes
+        {2, 3}}}; // second subface, second subsubface,
+                  // first_child_has_children==no and yes
 
     Assert(translated_subface_no[subface_no][subsubface_no]
                                 [first_child_has_children] != e,

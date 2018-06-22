@@ -281,8 +281,7 @@ namespace DoFTools
    */
 
   /**
-   * @name Functions to support code that generically uses both DoFHandler and
-   * hp::DoFHandler
+   * @name Functions to support code that generically uses both DoFHandler and hp::DoFHandler
    * @{
    */
   /**
@@ -410,8 +409,8 @@ namespace DoFTools
   fe_is_primitive(const DoFHandler<dim, spacedim> &dh);
 
   /**
-   * Find out whether the first FiniteElement used by this DoFHandler is
-   * primitive or not.
+   * Find out whether the first FiniteElement used by this DoFHandler is primitive
+   * or not.
    *
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
@@ -808,12 +807,11 @@ namespace DoFTools
    * This function could have been written by passing a @p set of boundary_id
    * numbers. However, most of the functions throughout deal.II dealing with
    * boundary indicators take a mapping of boundary indicators and the
-   * corresponding boundary function, i.e., a std::map<types::boundary_id, const
-   * Function<spacedim,number>*> argument. Correspondingly, this function does
-   * the same, though the actual boundary function is ignored here.
-   * (Consequently, if you don't have any such boundary functions, just create a
-   * map with the boundary indicators you want and set the function pointers to
-   * null pointers).
+   * corresponding boundary function, i.e., a std::map<types::boundary_id, const Function<spacedim,number>*> argument.
+   * Correspondingly, this function does the same, though the actual boundary
+   * function is ignored here. (Consequently, if you don't have any such
+   * boundary functions, just create a map with the boundary indicators you
+   * want and set the function pointers to null pointers).
    */
   template <typename DoFHandlerType,
             typename SparsityPatternType,
@@ -1341,8 +1339,8 @@ namespace DoFTools
    *   values for each degree of freedom depending on whether or not it
    *   corresponds to a vector component selected by the mask above. The size
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
-   *   sequential computations of course equals DoFHandler::n_dofs(). The
-   * previous contents of this array are overwritten.
+   *   sequential computations of course equals DoFHandler::n_dofs(). The previous
+   *   contents of this array are overwritten.
    */
   template <int dim, int spacedim>
   void
@@ -1380,8 +1378,8 @@ namespace DoFTools
    *   values for each degree of freedom depending on whether or not it
    *   corresponds to a vector block selected by the mask above. The size
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
-   *   sequential computations of course equals DoFHandler::n_dofs(). The
-   * previous contents of this array are overwritten.
+   *   sequential computations of course equals DoFHandler::n_dofs(). The previous
+   *   contents of this array are overwritten.
    */
   template <int dim, int spacedim>
   void
@@ -1454,11 +1452,10 @@ namespace DoFTools
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
    * live on which cell
-   * @param[in] component_mask A mask denoting the vector components of the
-   * finite element that should be considered (see also
+   * @param[in] component_mask A mask denoting the vector components of the finite
+   * element that should be considered (see also
    * @ref GlossComponentMask).
-   * @param[out] selected_dofs A vector of booleans that is returned and for
-   * which
+   * @param[out] selected_dofs A vector of booleans that is returned and for which
    * an element will be @p true if the corresponding index is a
    * degree of freedom that is located on the
    * boundary (and correspond to the selected vector components and boundary
@@ -1494,11 +1491,11 @@ namespace DoFTools
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
    * live on which cell
-   * @param[in] component_mask A mask denoting the vector components of the
-   * finite element that should be considered (see also
+   * @param[in] component_mask A mask denoting the vector components of the finite
+   * element that should be considered (see also
    * @ref GlossComponentMask).
-   * @param[out] selected_dofs The IndexSet object that is returned and that
-   * will contain the indices of degrees of freedom that are located on the
+   * @param[out] selected_dofs The IndexSet object that is returned and that will
+   * contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
    * indicators, depending on the values of the @p component_mask and @p
    * boundary_ids arguments).
@@ -1553,10 +1550,10 @@ namespace DoFTools
    *
    * @image html extract_dofs_with_support_contained_within.png
    *
-   * This functions will return the union of all DoF indices on those cells
-   * minus DoF 11, 13, 2 and 0; the result will be <code>[9,10], 12,
-   * [14,38]</code>. In the image above the returned DoFs are separated from the
-   * rest by the red line
+   * This functions will return the union of all DoF indices on those cells minus
+   * DoF 11, 13, 2 and 0; the result will be <code>[9,10], 12, [14,38]</code>.
+   * In the image above the returned DoFs are separated from the rest by the
+   * red line
    *
    * Essentially, the question this functions answers is the following:
    * Given a subdomain with associated DoFs, what is the largest subset of
@@ -1969,12 +1966,11 @@ namespace DoFTools
    *
    * This function returns the <tt>vertex_mapping</tt>,
    * that contains the mapping from the vertex indices to the block indices
-   * of the <tt>block_list</tt>. For vertices that do not lead to a vertex
-   * patch, the entry in <tt>vertex_mapping</tt> contains the value
-   * <tt>invalid_unsigned_int</tt>. If <tt>invert_vertex_mapping</tt> is set to
-   * <tt>true</tt>, then the <tt>vertex_mapping</tt> is inverted such that it
-   * contains the mapping from the block indices to the corresponding vertex
-   * indices.
+   * of the <tt>block_list</tt>. For vertices that do not lead to a vertex patch, the
+   * entry in <tt>vertex_mapping</tt> contains the value <tt>invalid_unsigned_int</tt>.
+   * If <tt>invert_vertex_mapping</tt> is set to <tt>true</tt>, then the
+   * <tt>vertex_mapping</tt> is inverted such that it contains the mapping from
+   * the block indices to the corresponding vertex indices.
    *
    * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
    * be stored.
@@ -2013,8 +2009,7 @@ namespace DoFTools
                       const bool            invert_vertex_mapping  = false);
 
   /**
-   * Same as above but allows boundary dofs on blocks to be excluded
-   * individually.
+   * Same as above but allows boundary dofs on blocks to be excluded individually.
    *
    * This is helpful if you want to use, for example, Taylor Hood elements as
    * it allows you to not include the boundary DoFs for the velocity block on
@@ -2250,10 +2245,10 @@ namespace DoFTools
    * <tt>mapping[dof]</tt> gives the index of the degree of freedom with
    * global number @p dof in the list of degrees of freedom on the boundary.
    * If the degree of freedom requested is not on the boundary, the value of
-   * <tt>mapping[dof]</tt> is numbers::invalid_dof_index. This function is
-   * mainly used when setting up matrices and vectors on the boundary from the
-   * trial functions, which have global numbers, while the matrices and vectors
-   * use numbers of the trial functions local to the boundary.
+   * <tt>mapping[dof]</tt> is numbers::invalid_dof_index. This function is mainly
+   * used when setting up matrices and vectors on the boundary from the trial
+   * functions, which have global numbers, while the matrices and vectors use
+   * numbers of the trial functions local to the boundary.
    *
    * Prior content of @p mapping is deleted.
    */

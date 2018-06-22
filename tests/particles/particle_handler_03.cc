@@ -84,8 +84,8 @@ test()
               << std::endl;
 
     // Move all points up by 0.5. This will change cell for particle 1, and will
-    // move particle 2 out of the domain. Note that we need to change the
-    // coordinate dim-1 despite having a spacedim point.
+    // move particle 2 out of the domain. Note that we need to change the coordinate
+    // dim-1 despite having a spacedim point.
     Point<spacedim> shift;
     shift(dim - 1) = 0.5;
     for (auto particle = particle_handler.begin();

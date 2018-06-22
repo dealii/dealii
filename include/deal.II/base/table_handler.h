@@ -709,9 +709,9 @@ protected:
   n_rows() const;
 
   /**
-   * A variable storing the column and supercolumn keys in the order desired by
-   * the user. By default this is the order of adding the columns. This order
-   * may be changed by set_column_order().
+   * A variable storing the column and supercolumn keys in the order desired by the user.
+   * By default this is the order of adding the columns. This order may be
+   * changed by set_column_order().
    */
   std::vector<std::string> column_order;
 
@@ -735,8 +735,8 @@ protected:
   std::map<std::string, std::vector<std::string>> supercolumns;
 
   /**
-   * A map from the supercolumn keys to the captions of the supercolumns that
-   * are used in tex output.
+   * A map from the supercolumn keys to the captions of the supercolumns that are
+   * used in tex output.
    *
    * By default these are just the supercolumn keys but they may be changed by
    * <tt>set_tex_supercaptions(...)</tt>.

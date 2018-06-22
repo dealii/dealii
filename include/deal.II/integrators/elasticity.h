@@ -114,11 +114,9 @@ namespace LocalIntegrators
 
 
     /**
-     * The matrix for the weak boundary condition of Nitsche type for linear
-     * elasticity:
+     * The matrix for the weak boundary condition of Nitsche type for linear elasticity:
      * @f[
-     * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v)
-     * n\Bigr)\;ds.
+     * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v) n\Bigr)\;ds.
      * @f]
      */
     template <int dim>
@@ -169,11 +167,9 @@ namespace LocalIntegrators
     }
 
     /**
-     * The matrix for the weak boundary condition of Nitsche type for the
-     * tangential displacement in linear elasticity:
+     * The matrix for the weak boundary condition of Nitsche type for the tangential displacement in linear elasticity:
      * @f[
-     * \int_F \Bigl(\gamma u_\tau \cdot v_\tau - n^T \epsilon(u_\tau) v_\tau -
-     * u_\tau^T \epsilon(v_\tau) n\Bigr)\;ds.
+     * \int_F \Bigl(\gamma u_\tau \cdot v_\tau - n^T \epsilon(u_\tau) v_\tau - u_\tau^T \epsilon(v_\tau) n\Bigr)\;ds.
      * @f]
      */
     template <int dim>
@@ -245,8 +241,7 @@ namespace LocalIntegrators
      * Weak boundary condition for the elasticity operator by Nitsche, namely
      * on the face <i>F</i> the vector
      * @f[
-     * \int_F \Bigl(\gamma (u-g) \cdot v - n^T \epsilon(u) v - (u-g) \epsilon(v)
-     * n^T\Bigr)\;ds.
+     * \int_F \Bigl(\gamma (u-g) \cdot v - n^T \epsilon(u) v - (u-g) \epsilon(v) n^T\Bigr)\;ds.
      * @f]
      *
      * Here, <i>u</i> is the finite element function whose values and gradient
@@ -304,11 +299,9 @@ namespace LocalIntegrators
     }
 
     /**
-     * The weak boundary condition of Nitsche type for the tangential
-     * displacement in linear elasticity:
+     * The weak boundary condition of Nitsche type for the tangential displacement in linear elasticity:
      * @f[
-     * \int_F \Bigl(\gamma (u_\tau-g_\tau) \cdot v_\tau - n^T \epsilon(u_\tau) v
-     * - (u_\tau-g_\tau) \epsilon(v_\tau) n\Bigr)\;ds.
+     * \int_F \Bigl(\gamma (u_\tau-g_\tau) \cdot v_\tau - n^T \epsilon(u_\tau) v - (u_\tau-g_\tau) \epsilon(v_\tau) n\Bigr)\;ds.
      * @f]
      */
     template <int dim, typename number>
@@ -380,8 +373,7 @@ namespace LocalIntegrators
      * Homogeneous weak boundary condition for the elasticity operator by
      * Nitsche, namely on the face <i>F</i> the vector
      * @f[
-     * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v)
-     * n^T\Bigr)\;ds.
+     * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v) n^T\Bigr)\;ds.
      * @f]
      *
      * Here, <i>u</i> is the finite element function whose values and gradient

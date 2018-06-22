@@ -17,8 +17,7 @@
 // Document bug in determining level subdomain ids in certain cases. This used
 // to cause deadlocks because the list of ghost neighbors was not symmetric.
 //
-// problematic cases: 2d: 6 and 13 procs, 3d 20 procs (original bug report from
-// Martin)
+// problematic cases: 2d: 6 and 13 procs, 3d 20 procs (original bug report from Martin)
 
 #include <deal.II/base/timer.h>
 

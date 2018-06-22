@@ -111,7 +111,7 @@ namespace SUNDIALS
         }
     }
 
-#    endif // DEAL_II_WITH_TRILINOS
+#    endif //DEAL_II_WITH_TRILINOS
 
 #    ifdef DEAL_II_WITH_PETSC
 #      ifndef PETSC_USE_COMPLEX
@@ -166,10 +166,10 @@ namespace SUNDIALS
         }
     }
 
-#      endif // PETSC_USE_COMPLEX
-#    endif   // DEAL_II_WITH_PETSC
+#      endif //PETSC_USE_COMPLEX
+#    endif   //DEAL_II_WITH_PETSC
 
-#  endif // mpi
+#  endif //mpi
 
     void
     copy(BlockVector<double> &dst, const N_Vector &src)

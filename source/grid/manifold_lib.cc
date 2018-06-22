@@ -141,11 +141,10 @@ PolarManifold<dim, spacedim>::get_periodicity()
 {
   Tensor<1, spacedim> periodicity;
   // In two dimensions, theta is periodic.
-  // In three dimensions things are a little more complicated, since the only
-  // variable that is truly periodic is phi, while theta should be bounded
-  // between 0 and pi. There is currently no way to enforce this, so here we
-  // only fix periodicity for the last variable, corresponding to theta in 2d
-  // and phi in 3d.
+  // In three dimensions things are a little more complicated, since the only variable
+  // that is truly periodic is phi, while theta should be bounded between
+  // 0 and pi. There is currently no way to enforce this, so here we only fix
+  // periodicity for the last variable, corresponding to theta in 2d and phi in 3d.
   periodicity[spacedim - 1] = 2 * numbers::PI;
   return periodicity;
 }
@@ -419,9 +418,9 @@ SphericalManifold<dim, spacedim>::normal_vector(
   const Point<spacedim> &                                     p) const
 {
   // if the maximum deviation for the distance from the vertices to the center
-  // is less than 1.e-5 of the minimum distance to the first vertex, assume we
-  // can simply return p-center. otherwise, we compute the normal using
-  // get_normal_vector
+  // is less than 1.e-5 of the minimum distance to the first vertex, assume we can
+  // simply return p-center.
+  // otherwise, we compute the normal using get_normal_vector
   constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
   std::array<double, n_vertices>     distances_to_center;
   std::array<double, n_vertices - 1> distances_to_first_vertex;
@@ -481,9 +480,9 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
   const
 {
   // if the maximum deviation for the distance from the vertices to the center
-  // is less than 1.e-5 of the minimum distance to the first vertex, assume we
-  // can simply return vertex-center. otherwise, we compute the normal using
-  // get_normal_vector
+  // is less than 1.e-5 of the minimum distance to the first vertex, assume we can
+  // simply return vertex-center.
+  // otherwise, we compute the normal using get_normal_vector
   constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
   std::array<double, n_vertices>     distances_to_center;
   std::array<double, n_vertices - 1> distances_to_first_vertex;
@@ -598,8 +597,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
         }
     }
 
-  // Step 1: Check for some special cases, create simple linear guesses
-  // otherwise.
+  // Step 1: Check for some special cases, create simple linear guesses otherwise.
   const double                              tolerance = 1e-10;
   boost::container::small_vector<bool, 100> accurate_point_was_found(
     new_points.size(), false);
@@ -633,8 +631,8 @@ SphericalManifold<dim, spacedim>::get_new_points(
                                   weight_columns));
     }
 
-  // In this case, we treated the case that the candidate is the center and
-  // obtained the new locations from the PolarManifold object otherwise.
+  // In this case, we treated the case that the candidate is the center and obtained
+  // the new locations from the PolarManifold object otherwise.
   if (spacedim < 3)
     return;
 
@@ -667,8 +665,8 @@ SphericalManifold<dim, spacedim>::get_new_points(
     {
       bool found_duplicate = false;
 
-      // This inner loop is of $O(N^2)$ complexity, but
-      // surrounding_points.size() is usually at most 8 points large.
+      // This inner loop is of $O(N^2)$ complexity, but surrounding_points.size()
+      // is usually at most 8 points large.
       for (unsigned int j = 0; j < n_unique_directions; ++j)
         {
           const double squared_distance =
@@ -723,8 +721,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
         }
     }
 
-  // Note that we only use the n_unique_directions first entries in the
-  // ArrayView
+  // Note that we only use the n_unique_directions first entries in the ArrayView
   const ArrayView<const Tensor<1, spacedim>> array_merged_directions =
     make_array_view(merged_directions.begin(),
                     merged_directions.begin() + n_unique_directions);
@@ -1983,8 +1980,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::
                     "active cells on a lower level. Coarsening the mesh is " +
                     "currently not supported"));
 
-  // This computes the distance of the surrounding points transformed to the
-  // unit cell from the unit cell.
+  // This computes the distance of the surrounding points transformed to the unit
+  // cell from the unit cell.
   typename Triangulation<dim, spacedim>::cell_iterator cell =
                                                          triangulation->begin(
                                                            level_coarse),

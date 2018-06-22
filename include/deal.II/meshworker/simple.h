@@ -859,7 +859,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
       Assert(mg_constrained_dofs == 0, ExcInternalError());
-      // TODO: Possibly remove this function all together
+      //TODO: Possibly remove this function all together
 
       for (unsigned int j = 0; j < i1.size(); ++j)
         for (unsigned int k = 0; k < i2.size(); ++k)

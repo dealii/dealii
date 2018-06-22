@@ -69,7 +69,7 @@ main()
   // implementation or instantiation for codimension != 0 is still
   // missing. In these case we just test for spacedim==dim
 
-  // generate_all_dim
+  //generate_all_dim
   gen.generate_all_dim("FE_Q_Hierarchical(1)");
   gen.generate<2, 2>("FE_ABF(0)");
   //  gen.generate<3,3>("FE_ABF(1)");
@@ -114,7 +114,7 @@ main()
   gen.generate_all_dim("FE_FaceQ(2)");
   gen.generate_all_dim("FE_FaceP(2)");
 
-  // generate_all_codim
+  //generate_all_codim
   gen.generate_all_codim("FE_Bernstein(1)");
   gen.generate_all_codim("FE_DGP(1)");
   gen.generate_all_codim("FE_DGQ(1)");
@@ -136,7 +136,7 @@ main()
   gen.generate_all_codim("FE_Bernstein(2)");
   gen.generate_all_codim("FE_DGQHermite(3)");
 
-  // systems
+  //systems
   gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_Q_Hierarchical(1)]");
   gen.generate_all_dim(
     "FESystem[FE_DGPNonparametric(1)^2-FE_Q_Hierarchical(1)]");

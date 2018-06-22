@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check method Tmmult of FullMatrix, symmetric case
+//check method Tmmult of FullMatrix, symmetric case
 
 #include <deal.II/lac/full_matrix.h>
 
@@ -34,7 +34,7 @@ main()
   FullMatrix<double> C(3, 3);
   FullMatrix<double> D(3, 3, compare);
 
-  // compute C= A^T*A
+  //compute C= A^T*A
   A.Tmmult(C, A);
 
   C.add(-1., D);

@@ -483,8 +483,7 @@ namespace
     // 6.5.4 Cholesky Updating and Downdating, Golub 2013 Matrix computations
     // Note that potrf() is called with LAPACKSupport::L , so the
     // factorization is stored in lower triangular part.
-    // Also see discussion here
-    // http://icl.cs.utk.edu/lapack-forum/viewtopic.php?f=2&t=2646
+    // Also see discussion here http://icl.cs.utk.edu/lapack-forum/viewtopic.php?f=2&t=2646
     if (a > 0.)
       {
         // simple update via a sequence of Givens rotations.
@@ -538,8 +537,7 @@ namespace
         // which have real solution only if x2 <= x1.
         // See also Linpack's http://www.netlib.org/linpack/dchdd.f and
         // https://infoscience.epfl.ch/record/161468/files/cholupdate.pdf and
-        // "Analysis of a recursive Least Squares Hyperbolic Rotation Algorithm
-        // for Signal Processing", Alexander, Pan, Plemmons, 1988.
+        // "Analysis of a recursive Least Squares Hyperbolic Rotation Algorithm for Signal Processing", Alexander, Pan, Plemmons, 1988.
         z *= std::sqrt(-a);
         for (typename LAPACKFullMatrix<number>::size_type k = 0; k < N; ++k)
           {
@@ -1662,8 +1660,7 @@ LAPACKFullMatrix<number>::invert()
 
       const types::blas_int lda = std::max<types::blas_int>(1, nn);
       potri(&LAPACKSupport::L, &nn, values, &lda, &info);
-      // inverse is stored in lower diagonal, set the upper diagonal
-      // appropriately:
+      // inverse is stored in lower diagonal, set the upper diagonal appropriately:
       for (types::blas_int i = 0; i < nn; ++i)
         for (types::blas_int j = i + 1; j < nn; ++j)
           this->el(i, j) = this->el(j, i);
@@ -1898,7 +1895,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
                                                         info);
 
   Assert(info >= 0, ExcInternalError());
-  // TODO:[GK] What if the QR method fails?
+  //TODO:[GK] What if the QR method fails?
   if (info != 0)
     std::cerr << "LAPACK error in geev" << std::endl;
 
@@ -1968,8 +1965,8 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
   // syevx returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert(info == 0, ExcInternalError());
-  // Allocate working array according to suggestion (same strategy as was noted
-  // in compute_svd).
+  // Allocate working array according to suggestion (same strategy as was noted in
+  // compute_svd).
   lwork = static_cast<types::blas_int>(std::abs(work[0]) + 1);
   work.resize(static_cast<size_type>(lwork));
 
@@ -2158,8 +2155,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
          ExcMessage("eigenvectors.size() > matrix.n()"));
 
   wr.resize(nn);
-  wi.resize(nn); // This is set purely for consistency reasons with the
-  // eigenvalues() function.
+  wi.resize(nn); //This is set purely for consistency reasons with the
+  //eigenvalues() function.
 
   number *const values_A = &this->values[0];
   number *const values_B = &B.values[0];

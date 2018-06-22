@@ -13,8 +13,7 @@
 //
 //---------------------------------------------------------------------
 
-// Create a list of points, and the ones within a specified radius of the target
-// points
+// Create a list of points, and the ones within a specified radius of the target points
 
 #include <deal.II/numerics/kdtree.h>
 

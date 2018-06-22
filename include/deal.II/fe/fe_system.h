@@ -450,19 +450,19 @@ public:
 #  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
   /**
    * Constructor taking an arbitrary number of parameters of type
-   * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned
-   * int></code>. In combination with FiniteElement::operator^, this allows to
-   * construct FESystem objects as follows:
+   * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int></code>.
+   * In combination with FiniteElement::operator^, this allows to construct FESystem objects
+   * as follows:
    * @code
    *   FiniteElementType1<dim,spacedim> fe_1;
    *   FiniteElementType1<dim,spacedim> fe_2;
    *   FESystem<dim,spacedim> fe_system = ( fe_1^dim, fe_2^1 );
    * @endcode
    *
-   * The FiniteElement objects are not actually used for anything other than
-   * creating a copy that will then be owned by the current object. In other
-   * words, it is completely fine to call this constructor with a temporary
-   * object for the finite element, as in this code snippet:
+   * The FiniteElement objects are not actually used for anything other than creating a
+   * copy that will then be owned by the current object. In other words, it is
+   * completely fine to call this constructor with a temporary object for the
+   * finite element, as in this code snippet:
    * @code
    *   FESystem<dim> fe (FE_Q<dim>(2)^2);
    * @endcode
@@ -1338,7 +1338,7 @@ FESystem<dim, spacedim>::FESystem(
 }
 #    endif
 
-#  endif // DOXYGEN
+#  endif //DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
