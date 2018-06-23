@@ -368,7 +368,7 @@ namespace FETools
   namespace internal
   {
     template <int dim, int spacedim, class InVector>
-    void
+    typename std::enable_if<is_serial_vector<InVector>::value>::type
     back_interpolate(
       const DoFHandler<dim, spacedim> &                       dof1,
       const AffineConstraints<typename InVector::value_type> &constraints1,
@@ -381,6 +381,8 @@ namespace FETools
       interpolate(dof1, u1, dof2, constraints2, u2);
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
+
+
 
     // special version for PETSc
 #ifdef DEAL_II_WITH_PETSC
@@ -412,7 +414,24 @@ namespace FETools
       u2 = u2_out;
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
+
+
+
+    template <int dim, int spacedim>
+    void
+    back_interpolate(
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<PETScWrappers::MPI::BlockVector::value_type> &,
+      const PETScWrappers::MPI::BlockVector &,
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<PETScWrappers::MPI::BlockVector::value_type> &,
+      PETScWrappers::MPI::BlockVector &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
 #endif
+
+
 
     // special version for Trilinos
 #ifdef DEAL_II_WITH_TRILINOS
@@ -444,7 +463,57 @@ namespace FETools
       u2 = u2_out;
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
+
+
+
+    template <int dim, int spacedim>
+    void
+    back_interpolate(
+      const DoFHandler<dim, spacedim> &dof1,
+      const AffineConstraints<
+        typename TrilinosWrappers::MPI::BlockVector::value_type> &constraints1,
+      const TrilinosWrappers::MPI::BlockVector &                  u1,
+      const DoFHandler<dim, spacedim> &                           dof2,
+      const AffineConstraints<
+        typename TrilinosWrappers::MPI::BlockVector::value_type> &constraints2,
+      TrilinosWrappers::MPI::BlockVector &u1_interpolated)
+    {
+      if (u1.n_blocks() == 0)
+        return;
+      const MPI_Comm &mpi_communicator = u1.block(0).get_mpi_communicator();
+      const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+      IndexSet        dof2_locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_dofs(dof2, dof2_locally_relevant_dofs);
+
+      TrilinosWrappers::MPI::Vector u2_out(dof2_locally_owned_dofs,
+                                           mpi_communicator);
+      interpolate(dof1, u1, dof2, constraints2, u2_out);
+      TrilinosWrappers::MPI::Vector u2(dof2_locally_owned_dofs,
+                                       dof2_locally_relevant_dofs,
+                                       mpi_communicator);
+      u2 = u2_out;
+      interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    back_interpolate(
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<
+        typename LinearAlgebra::EpetraWrappers::Vector::value_type> &,
+      const LinearAlgebra::EpetraWrappers::Vector &,
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<
+        typename LinearAlgebra::EpetraWrappers::Vector::value_type> &,
+      LinearAlgebra::EpetraWrappers::Vector &)
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
 #endif
+
+
 
     // special version for LinearAlgebra::distributed::Vector
     template <int dim, int spacedim, typename Number>
@@ -468,6 +537,21 @@ namespace FETools
       interpolate(dof1, u1, dof2, constraints2, u2);
       u2.update_ghost_values();
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+    }
+
+
+
+    // special version for LinearAlgebra::distributed::BlockVector
+    template <int dim, int spacedim, typename Number>
+    void
+    back_interpolate(const DoFHandler<dim, spacedim> &,
+                     const AffineConstraints<Number> &,
+                     const LinearAlgebra::distributed::BlockVector<Number> &,
+                     const DoFHandler<dim, spacedim> &,
+                     const AffineConstraints<Number> &,
+                     LinearAlgebra::distributed::BlockVector<Number> &)
+    {
+      AssertThrow(false, ExcNotImplemented());
     }
   } // namespace internal
 
