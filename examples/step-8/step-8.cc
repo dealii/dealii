@@ -98,7 +98,7 @@ namespace Step8
 
     FESystem<dim> fe;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -304,10 +304,7 @@ namespace Step8
     std::vector<Tensor<1, dim>> rhs_values(n_q_points);
 
     // Now we can begin with the loop over all cells:
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto cell : dof_handler.active_cell_iterators())
       {
         cell_matrix = 0;
         cell_rhs    = 0;
@@ -365,29 +362,33 @@ namespace Step8
                       // component of the i-th shape function with respect to
                       // the comp(i)th coordinate is accessed by the appended
                       // brackets.
-                      ((fe_values.shape_grad(i, q_point)[component_i] *
-                        fe_values.shape_grad(j, q_point)[component_j] *
-                        lambda_values[q_point]) +
-                       (fe_values.shape_grad(i, q_point)[component_j] *
-                        fe_values.shape_grad(j, q_point)[component_i] *
-                        mu_values[q_point]) +
-                       // The second term is (mu nabla u_i, nabla v_j).  We
-                       // need not access a specific component of the
-                       // gradient, since we only have to compute the scalar
-                       // product of the two gradients, of which an
-                       // overloaded version of the operator* takes care, as
-                       // in previous examples.
-                       //
-                       // Note that by using the ?: operator, we only do this
-                       // if comp(i) equals comp(j), otherwise a zero is
-                       // added (which will be optimized away by the
-                       // compiler).
-                       ((component_i == component_j) ?
-                          (fe_values.shape_grad(i, q_point) *
-                           fe_values.shape_grad(j, q_point) *
-                           mu_values[q_point]) :
-                          0)) *
-                      fe_values.JxW(q_point);
+                      (                                                  //
+                        (fe_values.shape_grad(i, q_point)[component_i] * //
+                         fe_values.shape_grad(j, q_point)[component_j] * //
+                         lambda_values[q_point])                         //
+                        +                                                //
+                        (fe_values.shape_grad(i, q_point)[component_j] * //
+                         fe_values.shape_grad(j, q_point)[component_i] * //
+                         mu_values[q_point])                             //
+                        +                                                //
+                        // The second term is (mu nabla u_i, nabla v_j).  We
+                        // need not access a specific component of the
+                        // gradient, since we only have to compute the scalar
+                        // product of the two gradients, of which an
+                        // overloaded version of the operator* takes care, as
+                        // in previous examples.
+                        //
+                        // Note that by using the ?: operator, we only do this
+                        // if comp(i) equals comp(j), otherwise a zero is
+                        // added (which will be optimized away by the
+                        // compiler).
+                        ((component_i == component_j) ?        //
+                           (fe_values.shape_grad(i, q_point) * //
+                            fe_values.shape_grad(j, q_point) * //
+                            mu_values[q_point]) :              //
+                           0)                                  //
+                        ) *                                    //
+                      fe_values.JxW(q_point);                  //
                   }
               }
           }
