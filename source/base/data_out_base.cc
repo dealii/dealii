@@ -2762,6 +2762,29 @@ namespace DataOutBase
   write_ucd(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const UcdFlags &flags,
+    std::ostream &  out)
+  {
+    write_ucd(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_ucd(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -2846,6 +2869,30 @@ namespace DataOutBase
     // assert the stream is still ok
     AssertThrow(out, ExcIO());
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_dx(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const DXFlags &flags,
+    std::ostream & out)
+  {
+    write_dx(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
+  }
+
 
 
   template <int dim, int spacedim>
@@ -3139,6 +3186,29 @@ namespace DataOutBase
   write_gnuplot(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const GnuplotFlags &flags,
+    std::ostream &      out)
+  {
+    write_gnuplot(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_gnuplot(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -3344,6 +3414,29 @@ namespace DataOutBase
     out.flush();
 
     AssertThrow(out, ExcIO());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_povray(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const PovrayFlags &flags,
+    std::ostream &     out)
+  {
+    write_povray(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
   }
 
 
@@ -3686,6 +3779,21 @@ namespace DataOutBase
   write_eps(
     const std::vector<Patch<dim, spacedim>> & /*patches*/,
     const std::vector<std::string> & /*data_names*/,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const EpsFlags & /*flags*/,
+    std::ostream & /*out*/)
+  {
+    // not implemented, see the documentation of the function
+    AssertThrow(dim == 2, ExcNotImplemented());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_eps(
+    const std::vector<Patch<dim, spacedim>> & /*patches*/,
+    const std::vector<std::string> & /*data_names*/,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -3697,6 +3805,30 @@ namespace DataOutBase
     // not implemented, see the documentation of the function
     AssertThrow(dim == 2, ExcNotImplemented());
   }
+
+
+
+  template <int spacedim>
+  void
+  write_eps(
+    const std::vector<Patch<2, spacedim>> &patches,
+    const std::vector<std::string> &       data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const EpsFlags &flags,
+    std::ostream &  out)
+  {
+    write_eps(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
+  }
+
 
 
   template <int spacedim>
@@ -4035,6 +4167,29 @@ namespace DataOutBase
   write_gmv(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const GmvFlags &flags,
+    std::ostream &  out)
+  {
+    write_gmv(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_gmv(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -4163,6 +4318,29 @@ namespace DataOutBase
 
     // assert the stream is still ok
     AssertThrow(out, ExcIO());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_tecplot(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const TecplotFlags &flags,
+    std::ostream &      out)
+  {
+    write_tecplot(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
   }
 
 
@@ -4395,6 +4573,42 @@ namespace DataOutBase
 
 #endif
   //---------------------------------------------------------------------------
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_tecplot_binary(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+      &                 nonscalar_data_ranges,
+    const TecplotFlags &flags,
+    std::ostream &      out)
+  {
+    const unsigned int size = nonscalar_data_ranges.size();
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      new_nonscalar_data_ranges(size);
+    for (unsigned int i = 0; i < size; ++i)
+      {
+        new_nonscalar_data_ranges[i] =
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>(
+            std::get<0>(nonscalar_data_ranges[i]),
+            std::get<1>(nonscalar_data_ranges[i]),
+            std::get<2>(nonscalar_data_ranges[i]),
+            DataComponentInterpretation::component_is_part_of_vector);
+      }
+
+    write_tecplot_binary(
+      patches, data_names, new_nonscalar_data_ranges, flags, out);
+  }
 
 
 
@@ -4733,6 +4947,41 @@ namespace DataOutBase
   write_vtk(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+      &             nonscalar_data_ranges,
+    const VtkFlags &flags,
+    std::ostream &  out)
+  {
+    const unsigned int size = nonscalar_data_ranges.size();
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      new_nonscalar_data_ranges(size);
+    for (unsigned int i = 0; i < size; ++i)
+      {
+        new_nonscalar_data_ranges[i] =
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>(
+            std::get<0>(nonscalar_data_ranges[i]),
+            std::get<1>(nonscalar_data_ranges[i]),
+            std::get<2>(nonscalar_data_ranges[i]),
+            DataComponentInterpretation::component_is_part_of_vector);
+      }
+
+    write_vtk(patches, data_names, new_nonscalar_data_ranges, flags, out);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_vtk(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -5021,6 +5270,25 @@ namespace DataOutBase
   write_vtu(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+      &             nonscalar_data_ranges,
+    const VtkFlags &flags,
+    std::ostream &  out)
+  {
+    write_vtu_header(out, flags);
+    write_vtu_main(patches, data_names, nonscalar_data_ranges, flags, out);
+    write_vtu_footer(out);
+
+    out << std::flush;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_vtu(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -5036,6 +5304,42 @@ namespace DataOutBase
 
     out << std::flush;
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_vtu_main(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+      &             nonscalar_data_ranges,
+    const VtkFlags &flags,
+    std::ostream &  out)
+  {
+    const unsigned int size = nonscalar_data_ranges.size();
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      new_nonscalar_data_ranges(size);
+    for (unsigned int i = 0; i < size; ++i)
+      {
+        new_nonscalar_data_ranges[i] =
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>(
+            std::get<0>(nonscalar_data_ranges[i]),
+            std::get<1>(nonscalar_data_ranges[i]),
+            std::get<2>(nonscalar_data_ranges[i]),
+            DataComponentInterpretation::component_is_part_of_vector);
+      }
+
+    write_vtu_main(patches, data_names, new_nonscalar_data_ranges, flags, out);
+  }
+
 
 
   template <int dim, int spacedim>
@@ -5369,6 +5673,39 @@ namespace DataOutBase
     std::ostream &                  out,
     const std::vector<std::string> &piece_names,
     const std::vector<std::string> &data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+      &nonscalar_data_ranges)
+  {
+    const unsigned int size = nonscalar_data_ranges.size();
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      new_nonscalar_data_ranges(size);
+    for (unsigned int i = 0; i < size; ++i)
+      {
+        new_nonscalar_data_ranges[i] =
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>(
+            std::get<0>(nonscalar_data_ranges[i]),
+            std::get<1>(nonscalar_data_ranges[i]),
+            std::get<2>(nonscalar_data_ranges[i]),
+            DataComponentInterpretation::component_is_part_of_vector);
+      }
+
+    write_pvtu_record(out, piece_names, data_names, new_nonscalar_data_ranges);
+  }
+
+
+
+  void
+  write_pvtu_record(
+    std::ostream &                  out,
+    const std::vector<std::string> &piece_names,
+    const std::vector<std::string> &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -5585,6 +5922,20 @@ namespace DataOutBase
   write_svg(
     const std::vector<Patch<dim, spacedim>> &,
     const std::vector<std::string> &,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
+    const SvgFlags &,
+    std::ostream &)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_svg(
+    const std::vector<Patch<dim, spacedim>> &,
+    const std::vector<std::string> &,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -5595,6 +5946,32 @@ namespace DataOutBase
   {
     Assert(false, ExcNotImplemented());
   }
+
+
+
+  template <int spacedim>
+  void
+  write_svg(
+    const std::vector<Patch<2, spacedim>> &patches,
+    const std::vector<std::string> &       data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &
+    /*nonscalar_data_ranges*/,
+    const SvgFlags &flags,
+    std::ostream &  out)
+  {
+    write_svg(
+      patches,
+      data_names,
+      std::vector<
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>>{},
+      flags,
+      out);
+  }
+
+
 
   template <int spacedim>
   void
@@ -6591,6 +6968,42 @@ namespace DataOutBase
   write_deal_II_intermediate(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+      &                              nonscalar_data_ranges,
+    const Deal_II_IntermediateFlags &flags,
+    std::ostream &                   out)
+  {
+    const unsigned int size = nonscalar_data_ranges.size();
+    std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      new_nonscalar_data_ranges(size);
+    for (unsigned int i = 0; i < size; ++i)
+      {
+        new_nonscalar_data_ranges[i] =
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>(
+            std::get<0>(nonscalar_data_ranges[i]),
+            std::get<1>(nonscalar_data_ranges[i]),
+            std::get<2>(nonscalar_data_ranges[i]),
+            DataComponentInterpretation::component_is_part_of_vector);
+      }
+
+    write_deal_II_intermediate(
+      patches, data_names, new_nonscalar_data_ranges, flags, out);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  write_deal_II_intermediate(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -7066,6 +7479,8 @@ DataOutInterface<dim, spacedim>::write_filtered_data(
                                    filtered_data);
 }
 
+
+
 template <int dim, int spacedim>
 void
 DataOutBase::write_filtered_data(
@@ -7076,6 +7491,43 @@ DataOutBase::write_filtered_data(
                unsigned int,
                std::string,
                DataComponentInterpretation::DataComponentInterpretation>>
+    &                         nonscalar_data_ranges,
+  DataOutBase::DataOutFilter &filtered_data)
+{
+  const unsigned int size = nonscalar_data_ranges.size();
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    new_nonscalar_data_ranges(size);
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      new_nonscalar_data_ranges[i] =
+        std::tuple<unsigned int,
+                   unsigned int,
+                   std::string,
+                   DataComponentInterpretation::DataComponentInterpretation>(
+          std::get<0>(nonscalar_data_ranges[i]),
+          std::get<1>(nonscalar_data_ranges[i]),
+          std::get<2>(nonscalar_data_ranges[i]),
+          DataComponentInterpretation::component_is_part_of_vector);
+    }
+
+  DataOutBase::write_filtered_data(patches,
+                                   data_names,
+                                   new_nonscalar_data_ranges,
+                                   filtered_data);
+}
+
+
+
+template <int dim, int spacedim>
+void
+DataOutBase::write_filtered_data(
+  const std::vector<Patch<dim, spacedim>> &patches,
+  const std::vector<std::string> &         data_names,
+  const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
     &                         nonscalar_data_ranges,
   DataOutBase::DataOutFilter &filtered_data)
 {
@@ -7842,6 +8294,29 @@ DataOutInterface<dim, spacedim>::get_nonscalar_data_ranges() const
                std::string,
                DataComponentInterpretation::DataComponentInterpretation>>();
 }
+
+
+
+template <int dim, int spacedim>
+std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+DataOutInterface<dim, spacedim>::get_vector_data_ranges() const
+{
+  const auto &nonscalar_data_ranges = get_nonscalar_data_ranges();
+
+  const unsigned int size = nonscalar_data_ranges.size();
+  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+    vector_data_ranges(size);
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      vector_data_ranges[i] =
+        std::tuple<unsigned int, unsigned int, std::string>(
+          std::get<0>(nonscalar_data_ranges[i]),
+          std::get<1>(nonscalar_data_ranges[i]),
+          std::get<2>(nonscalar_data_ranges[i]));
+    }
+  return vector_data_ranges;
+}
+
 
 
 template <int dim, int spacedim>

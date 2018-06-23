@@ -39,11 +39,31 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                             patches,
         const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &             nonscalar_data_ranges,
+        const VtkFlags &flags,
+        std::ostream &  out);
+
+      template void
+      write_vtk(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
         const std::vector<
           std::tuple<unsigned int,
                      unsigned int,
                      std::string,
                      DataComponentInterpretation::DataComponentInterpretation>>
+          &             nonscalar_data_ranges,
+        const VtkFlags &flags,
+        std::ostream &  out);
+
+      template void
+      write_vtu(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
           &             nonscalar_data_ranges,
         const VtkFlags &flags,
         std::ostream &  out);
@@ -67,6 +87,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                             patches,
         const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &             nonscalar_data_ranges,
+        const UcdFlags &flags,
+        std::ostream &  out);
+
+      template void
+      write_ucd(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
         const std::vector<
           std::tuple<unsigned int,
                      unsigned int,
@@ -75,6 +105,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
           &             nonscalar_data_ranges,
         const UcdFlags &flags,
         std::ostream &  out);
+
+      template void
+      write_dx(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &            nonscalar_data_ranges,
+        const DXFlags &flags,
+        std::ostream & out);
 
       template void
       write_dx(
@@ -95,6 +135,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                             patches,
         const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &                 nonscalar_data_ranges,
+        const GnuplotFlags &flags,
+        std::ostream &      out);
+
+      template void
+      write_gnuplot(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
         const std::vector<
           std::tuple<unsigned int,
                      unsigned int,
@@ -103,6 +153,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
           &                 nonscalar_data_ranges,
         const GnuplotFlags &flags,
         std::ostream &      out);
+
+      template void
+      write_povray(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &                nonscalar_data_ranges,
+        const PovrayFlags &flags,
+        std::ostream &     out);
 
       template void
       write_povray(
@@ -123,6 +183,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                             patches,
         const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &             nonscalar_data_ranges,
+        const EpsFlags &flags,
+        std::ostream &  out);
+
+      template void
+      write_eps(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
         const std::vector<
           std::tuple<unsigned int,
                      unsigned int,
@@ -130,6 +200,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
                      DataComponentInterpretation::DataComponentInterpretation>>
           &             nonscalar_data_ranges,
         const EpsFlags &flags,
+        std::ostream &  out);
+
+      template void
+      write_gmv(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &             nonscalar_data_ranges,
+        const GmvFlags &flags,
         std::ostream &  out);
 
       template void
@@ -151,11 +231,31 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                             patches,
         const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &                 nonscalar_data_ranges,
+        const TecplotFlags &flags,
+        std::ostream &      out);
+
+      template void
+      write_tecplot(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
         const std::vector<
           std::tuple<unsigned int,
                      unsigned int,
                      std::string,
                      DataComponentInterpretation::DataComponentInterpretation>>
+          &                 nonscalar_data_ranges,
+        const TecplotFlags &flags,
+        std::ostream &      out);
+
+      template void
+      write_tecplot_binary(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
           &                 nonscalar_data_ranges,
         const TecplotFlags &flags,
         std::ostream &      out);
@@ -180,6 +280,16 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                             patches,
         const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &             nonscalar_data_ranges,
+        const SvgFlags &flags,
+        std::ostream &  out);
+
+      template void
+      write_svg(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
         const std::vector<
           std::tuple<unsigned int,
                      unsigned int,
@@ -189,6 +299,17 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const SvgFlags &flags,
         std::ostream &  out);
 #  endif
+
+      template void
+      write_deal_II_intermediate(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &                              nonscalar_data_ranges,
+        const Deal_II_IntermediateFlags &flags,
+        std::ostream &                   out);
+
       template void
       write_deal_II_intermediate(
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
@@ -210,6 +331,14 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const DataOutFilter &data_filter,
         const std::string &  filename,
         MPI_Comm             comm);
+
+      template void
+      write_filtered_data(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>> &,
+        const std::vector<std::string> &,
+        const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+          &,
+        DataOutBase::DataOutFilter &);
 
       template void
       write_filtered_data(
