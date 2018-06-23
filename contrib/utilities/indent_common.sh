@@ -24,6 +24,13 @@
 # to ensure that the rest of the indentation pipeline makes sense.
 #
 
+#
+# DEAL_II_CLANG_FORMAT can be used to change the default version of
+# clang-format
+#
+
+export DEAL_II_CLANG_FORMAT="${DEAL_II_CLANG_FORMAT:-clang-format}"
+
 checks() {
   if test ! -d source -o ! -d include -o ! -d examples ; then
     echo "*** This script must be run from the top-level directory of deal.II."
@@ -35,7 +42,7 @@ checks() {
   CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
-  if ! [ -x "$(command -v clang-format)" ]; then
+  if ! [ -x "$(command -v ${DEAL_II_CLANG_FORMAT})" ]; then
     echo "***   No clang-format program found."
     echo "***"
     echo "***   You can run the './contrib/utilities/download_clang_format'"
@@ -46,7 +53,7 @@ checks() {
 
   # Make sure to have the right version. We know that clang-6.0.0
   # and clang-6.0.1 work. Hence, test for clang-6.0.
-  CLANG_FORMAT_VERSION="$(clang-format --version)"
+  CLANG_FORMAT_VERSION="$(${DEAL_II_CLANG_FORMAT} --version)"
   CLANG_FORMAT_MAJOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
   CLANG_FORMAT_MINOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
 
@@ -103,7 +110,7 @@ format_file()
   file="${1}"
   tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
 
-  clang-format "${file}" > "${tmpfile}"
+  "${DEAL_II_CLANG_FORMAT}" "${file}" > "${tmpfile}"
   fix_or_report "${file}" "${tmpfile}" "file indented incorrectly"
   rm -f "${tmpfile}"
 }
@@ -131,7 +138,7 @@ format_inst()
   # picks up and uses the .clang-format style-sheet in the current
   # directory.
   #
-  clang-format < "${tmpfile}" > "${tmpfile}new"
+  "${DEAL_II_CLANG_FORMAT}" < "${tmpfile}" > "${tmpfile}new"
 
   sed -i -e 's#{ // namespace#\\{#g' "${tmpfile}new"
   sed -i -e 's#}[ ]*// namespace.*#\\}#g' "${tmpfile}new"
