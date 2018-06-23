@@ -96,11 +96,9 @@ namespace Step45
     std::vector<IndexSet>     owned_partitioning;
     std::vector<IndexSet>     relevant_partitioning;
 
-    TrilinosWrappers::BlockSparsityPattern sparsity_pattern;
-    TrilinosWrappers::BlockSparseMatrix    system_matrix;
+    TrilinosWrappers::BlockSparseMatrix system_matrix;
 
-    TrilinosWrappers::BlockSparsityPattern preconditioner_sparsity_pattern;
-    TrilinosWrappers::BlockSparseMatrix    preconditioner_matrix;
+    TrilinosWrappers::BlockSparseMatrix preconditioner_matrix;
 
     TrilinosWrappers::MPI::BlockVector solution;
     TrilinosWrappers::MPI::BlockVector system_rhs;
