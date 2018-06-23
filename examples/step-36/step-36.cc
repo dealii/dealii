@@ -106,7 +106,7 @@ namespace Step36
     // had adaptively refined meshes (which we don't have in the current
     // program). Here, we will store the constraints for boundary nodes
     // $U_i=0$.
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
   };
 
   // @sect3{Implementation of the <code>EigenvalueProblem</code> class}
@@ -258,12 +258,7 @@ namespace Step36
                          typename FunctionParser<dim>::ConstMap());
 
     std::vector<double> potential_values(n_q_points);
-
-
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         cell_stiffness_matrix = 0;
@@ -276,17 +271,21 @@ namespace Step36
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                cell_stiffness_matrix(i, j) +=
-                  (fe_values.shape_grad(i, q_point) *
-                     fe_values.shape_grad(j, q_point) +
-                   potential_values[q_point] *
-                     fe_values.shape_value(i, q_point) *
-                     fe_values.shape_value(j, q_point)) *
-                  fe_values.JxW(q_point);
+                cell_stiffness_matrix(i, j) +=           //
+                  (fe_values.shape_grad(i, q_point) *    //
+                     fe_values.shape_grad(j, q_point)    //
+                   +                                     //
+                   potential_values[q_point] *           //
+                     fe_values.shape_value(i, q_point) * //
+                     fe_values.shape_value(j, q_point)   //
+                   ) *                                   //
+                  fe_values.JxW(q_point);                //
 
-                cell_mass_matrix(i, j) += (fe_values.shape_value(i, q_point) *
-                                           fe_values.shape_value(j, q_point)) *
-                                          fe_values.JxW(q_point);
+                cell_mass_matrix(i, j) +=              //
+                  (fe_values.shape_value(i, q_point) * //
+                   fe_values.shape_value(j, q_point)   //
+                   ) *                                 //
+                  fe_values.JxW(q_point);              //
               }
 
         // Now that we have the local matrix contributions, we transfer them
