@@ -415,7 +415,7 @@ namespace Step18
 
     DoFHandler<dim> dof_handler;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     // One difference of this program is that we declare the quadrature
     // formula in the class declaration. The reason is that in all the other
@@ -774,10 +774,7 @@ namespace Step18
   {
     const double inner_radius = 0.8, outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation, 3, inner_radius, outer_radius);
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (auto cell : triangulation.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
@@ -965,10 +962,7 @@ namespace Step18
 
     // As in step-17, we only need to loop over all cells that belong to the
     // present processor:
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
@@ -993,8 +987,11 @@ namespace Step18
                     eps_phi_i = get_strain(fe_values, i, q_point),
                     eps_phi_j = get_strain(fe_values, j, q_point);
 
-                  cell_matrix(i, j) += (eps_phi_i * stress_strain_tensor *
-                                        eps_phi_j * fe_values.JxW(q_point));
+                  cell_matrix(i, j) += (eps_phi_i *            //
+                                        stress_strain_tensor * //
+                                        eps_phi_j              //
+                                        ) *                    //
+                                       fe_values.JxW(q_point); //
                 }
 
 
@@ -1150,8 +1147,9 @@ namespace Step18
       locally_owned_dofs, mpi_communicator);
     distributed_incremental_displacement = incremental_displacement;
 
-    SolverControl           solver_control(dof_handler.n_dofs(),
+    SolverControl solver_control(dof_handler.n_dofs(),
                                  1e-16 * system_rhs.l2_norm());
+
     PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
@@ -1230,10 +1228,7 @@ namespace Step18
     Vector<double> norm_of_stress(triangulation.n_active_cells());
     {
       // Loop over all the cells...
-      typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active(),
-        endc = triangulation.end();
-      for (; cell != endc; ++cell)
+      for (auto cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           {
             // On these cells, add up the stresses over all quadrature
@@ -1578,10 +1573,7 @@ namespace Step18
     pcout << "    Moving mesh..." << std::endl;
 
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (auto cell : dof_handler.active_cell_iterators())
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
@@ -1626,10 +1618,7 @@ namespace Step18
     // pointer of a cell which we should not have accessed, a segmentation
     // fault will let us know that this should not have happened:
     unsigned int our_cells = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (auto cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         ++our_cells;
 
@@ -1659,10 +1648,7 @@ namespace Step18
     // quadrature point objects corresponding to this cell in the vector of
     // such objects:
     unsigned int history_index = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (auto cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell->set_user_pointer(&quadrature_point_history[history_index]);
@@ -1736,18 +1722,16 @@ namespace Step18
     // the incremental displacements and the gradients thereof at the
     // quadrature points, together with a vector that will hold this
     // information:
-    FEValues<dim>                            fe_values(fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients);
+
     std::vector<std::vector<Tensor<1, dim>>> displacement_increment_grads(
       quadrature_formula.size(), std::vector<Tensor<1, dim>>(dim));
 
     // Then loop over all cells and do the job in the cells that belong to our
     // subdomain:
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (auto cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           // Next, get a pointer to the quadrature point history data local to
