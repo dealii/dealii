@@ -20,6 +20,8 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#warning This file is deprecated. Use <deal.II/lac/la_parallel_vector.h> and LinearAlgebra::distributed::Vector instead.
+
 #include <cstring>
 #include <iomanip>
 
