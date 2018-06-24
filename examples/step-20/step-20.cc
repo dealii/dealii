@@ -256,12 +256,12 @@ namespace Step20
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
-    for (unsigned int p = 0; p < points.size(); ++p)
+    for (auto &value : values)
       {
-        values[p].clear();
+        value.clear();
 
         for (unsigned int d = 0; d < dim; ++d)
-          values[p][d][d] = 1.;
+          value[d][d] = 1.;
       }
   }
 
@@ -473,8 +473,8 @@ namespace Step20
     // refer to the velocities (a set of <code>dim</code> components starting
     // at component zero) or the pressure (a scalar component located at
     // position <code>dim</code>):
-    const FEValuesExtractors::Vector u(0);
-    const FEValuesExtractors::Scalar p(dim);
+    const FEValuesExtractors::Vector velocities(0);
+    const FEValuesExtractors::Scalar pressure(dim);
 
     // With all this in place, we can go on with the loop over all cells. The
     // body of this loop has been discussed in the introduction, and will not
@@ -493,15 +493,17 @@ namespace Step20
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const Tensor<1, dim> phi_i_u     = fe_values[u].value(i, q);
-              const double         div_phi_i_u = fe_values[u].divergence(i, q);
-              const double         phi_i_p     = fe_values[p].value(i, q);
+              const Tensor<1, dim> phi_i_u = fe_values[velocities].value(i, q);
+              const double div_phi_i_u = fe_values[velocities].divergence(i, q);
+              const double phi_i_p     = fe_values[pressure].value(i, q);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const Tensor<1, dim> phi_j_u = fe_values[u].value(j, q);
-                  const double div_phi_j_u     = fe_values[u].divergence(j, q);
-                  const double phi_j_p         = fe_values[p].value(j, q);
+                  const Tensor<1, dim> phi_j_u =
+                    fe_values[velocities].value(j, q);
+                  const double div_phi_j_u =
+                    fe_values[velocities].divergence(j, q);
+                  const double phi_j_p = fe_values[pressure].value(j, q);
 
                   local_matrix(i, j) +=
                     (phi_i_u * k_inverse_values[q] * phi_j_u //
@@ -525,9 +527,9 @@ namespace Step20
 
               for (unsigned int q = 0; q < n_face_q_points; ++q)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  local_rhs(i) += -(fe_face_values[u].value(i, q) *   //
-                                    fe_face_values.normal_vector(q) * //
-                                    boundary_values[q] *              //
+                  local_rhs(i) += -(fe_face_values[velocities].value(i, q) * //
+                                    fe_face_values.normal_vector(q) *        //
+                                    boundary_values[q] *                     //
                                     fe_face_values.JxW(q));
             }
 
