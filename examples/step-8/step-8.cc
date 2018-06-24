@@ -304,7 +304,7 @@ namespace Step8
     std::vector<Tensor<1, dim>> rhs_values(n_q_points);
 
     // Now we can begin with the loop over all cells:
-    for (const auto cell : dof_handler.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_matrix = 0;
         cell_rhs    = 0;

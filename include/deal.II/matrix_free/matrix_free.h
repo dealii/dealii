@@ -45,8 +45,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
-#include <stdlib.h>
-
+#include <cstdlib>
 #include <limits>
 #include <list>
 #include <memory>
