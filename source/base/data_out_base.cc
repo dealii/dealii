@@ -7486,11 +7486,7 @@ void
 DataOutBase::write_filtered_data(
   const std::vector<Patch<dim, spacedim>> &patches,
   const std::vector<std::string> &         data_names,
-  const std::vector<
-    std::tuple<unsigned int,
-               unsigned int,
-               std::string,
-               DataComponentInterpretation::DataComponentInterpretation>>
+  const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
     &                         nonscalar_data_ranges,
   DataOutBase::DataOutFilter &filtered_data)
 {
@@ -7527,7 +7523,11 @@ void
 DataOutBase::write_filtered_data(
   const std::vector<Patch<dim, spacedim>> &patches,
   const std::vector<std::string> &         data_names,
-  const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+  const std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
     &                         nonscalar_data_ranges,
   DataOutBase::DataOutFilter &filtered_data)
 {
