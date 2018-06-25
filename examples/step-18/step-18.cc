@@ -962,7 +962,7 @@ namespace Step18
 
     // As in step-17, we only need to loop over all cells that belong to the
     // present processor:
-    for (const auto cell : dof_handler.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;

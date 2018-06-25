@@ -258,7 +258,7 @@ namespace Step36
                          typename FunctionParser<dim>::ConstMap());
 
     std::vector<double> potential_values(n_q_points);
-    for (const auto cell : dof_handler.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         cell_stiffness_matrix = 0;
