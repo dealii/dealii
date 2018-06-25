@@ -767,7 +767,7 @@ namespace ColorEnriched
      * operator()) defining the subdomain 1. The function takes in a cell and
      * returns a boolean.
      * @param[in] predicate_2 Same as @p predicate_1 but defines subdomain 2.
-     * @return A boolean "true" if the subdomains share atleast a vertex.
+     * @return A boolean "true" if the subdomains share at least a vertex.
      */
     template <int dim, int spacedim>
     bool
@@ -779,7 +779,8 @@ namespace ColorEnriched
     /**
      * Assign colors to subdomains using Graph coloring algorithm where each
      * subdomain is considered as a graph node. Subdomains which are
-     * connected i.e share atleast a vertex have different color. Each subdomain
+     * connected i.e share at least a vertex have different color. Each
+     * subdomain
      * is defined using a predicate function of @p predicates.
      *
      * @param[in] dof_handler a hp::DoFHandler object
@@ -897,10 +898,10 @@ namespace ColorEnriched
         &fe_sets, // total list of color sets possible
       const std::vector<std::function<const Function<spacedim> *(
         const typename Triangulation<dim, spacedim>::cell_iterator &)>>
-        &color_enrichments,               // color wise enrichment functions
-      const FE_Q<dim, spacedim> &fe_base, // basic FE element
-      const FE_Q<dim, spacedim>
-        &fe_enriched, // FE element multiplied by enrichment function
+        &color_enrichments, // color wise enrichment functions
+      const FiniteElement<dim, spacedim> &fe_base, // basic FE element
+      const FiniteElement<dim, spacedim>
+        &fe_enriched, // FE multiplied by enrichment function
       const FE_Nothing<dim, spacedim> &fe_nothing,
       hp::FECollection<dim, spacedim> &fe_collection);
   } // namespace internal
@@ -1067,6 +1068,11 @@ namespace ColorEnriched
    * const hp::FECollection<dim>&
    * fe_collection(FE_helper.build_fe_collection(dof_handler));
    * @endcode
+   *
+   * @warning The current implementation relies on assigning each cell a
+   * material id, which shall not be modified after the setup
+   * and h-adaptive refinement. For a given cell, the material id is used
+   * to define color predicate map, which doesn't change with refinement.
    */
   template <int dim, int spacedim = dim>
   struct Helper
@@ -1081,8 +1087,8 @@ namespace ColorEnriched
      * belongs to a sub-domain with index (i).
      * @param enrichments std::vector of enrichment functions
      */
-    Helper(const FE_Q<dim, spacedim> &                             fe_base,
-           const FE_Q<dim, spacedim> &                             fe_enriched,
+    Helper(const FiniteElement<dim, spacedim> &                    fe_base,
+           const FiniteElement<dim, spacedim> &                    fe_enriched,
            const std::vector<predicate_function<dim, spacedim>> &  predicates,
            const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments);
 
@@ -1090,8 +1096,6 @@ namespace ColorEnriched
      * Prepares an hp::DoFHandler object. The active FE indices of
      * mesh cells are initialized to work with
      * ColorEnriched::Helper<dim,spacedim>::fe_collection.
-     *
-     * Returns an hp::FECollection object.
      *
      * @param dof_handler an hp::DoFHandler object
      * @return hp::FECollection, a collection of
@@ -1111,13 +1115,13 @@ namespace ColorEnriched
      * A base FiniteElement used for constructing FE_Enriched
      * object required by ColorEnriched::Helper<dim,spacedim>::fe_collection.
      */
-    const FE_Q<dim, spacedim> &fe_base;
+    const FiniteElement<dim, spacedim> &fe_base;
 
     /**
      * An enriched FiniteElement used for constructing FE_Enriched
      * object required by ColorEnriched::Helper<dim,spacedim>::fe_collection.
      */
-    const FE_Q<dim, spacedim> &fe_enriched;
+    const FiniteElement<dim, spacedim> &fe_enriched;
 
     /**
      * A finite element with zero degrees of freedom used for
@@ -1157,10 +1161,9 @@ namespace ColorEnriched
      * and return a function pointer. These are needed while constructing
      * fe_collection.
      *
-     * color_enrichments[i](cell_iterator) calls the correct enrichment function
-     * (i.e. whose corresponding predicate has the color i) for the cell.
-     * Note that this call to cell_iterator returns the enrichment function
-     * which is a pointer to class derived from Function<dim>.
+     * color_enrichments[i](cell_iterator) returns a pointer to
+     * the correct enrichment function (i.e. whose corresponding
+     * predicate has the color i) for the cell.
      */
     std::vector<cell_iterator_function> color_enrichments;
 

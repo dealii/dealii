@@ -1165,10 +1165,8 @@ namespace ColorEnriched
        * function ensures. The number of pairs is equal to the number
        * of predicates active in the given cell.
        */
-      unsigned int map_index(0);
-      auto         cell = dof_handler.begin_active();
-      auto         endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      unsigned int map_index = 0;
+      for (auto cell : dof_handler.active_cell_iterators())
         {
           // set default FE index ==> no enrichment and no active predicates
           cell->set_active_fe_index(0);
@@ -1189,6 +1187,8 @@ namespace ColorEnriched
           // pairs (1, 4) and (2, 5) at key 100 (i.e unique id of cell is
           // mapped with a map which associates color with predicate id)
           // Note that color list for the cell would be {1,2}.
+          std::map<unsigned int, unsigned int> &cell_map =
+            cellwise_color_predicate_map[map_index];
           for (unsigned int i = 0; i < predicates.size(); ++i)
             {
               if (predicates[i](cell))
@@ -1197,7 +1197,7 @@ namespace ColorEnriched
                    * create a pair predicate color and predicate id and add it
                    * to a map associated with each enriched cell
                    */
-                  auto ret = cellwise_color_predicate_map[map_index].insert(
+                  auto ret = cell_map.insert(
                     std::pair<unsigned int, unsigned int>(predicate_colors[i],
                                                           i));
 
@@ -1255,7 +1255,7 @@ namespace ColorEnriched
        * If we don't take further actions, we may find a dominating FE that
        * is too restrictive, i.e. enriched FE consisting of only FE_Nothing.
        * New elements needs to be added to FECollection object to help
-       * find the correct enriched FE element underlying the spaces in the
+       * find the correct enriched FE underlying the spaces in the
        * adjacent cells. This is done by creating an appropriate
        * set in fe_sets and a call to the function
        * make_fe_collection_from_colored_enrichments at a later stage.
@@ -1276,48 +1276,48 @@ namespace ColorEnriched
        */
 
       // loop through faces
-      for (auto cell = dof_handler.begin_active(); cell != dof_handler.end();
-           ++cell)
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          {
-            unsigned int fe_index = cell->active_fe_index();
-            auto         fe_set   = fe_sets[fe_index];
+      for (auto cell : dof_handler.active_cell_iterators())
+        {
+          const unsigned int           fe_index = cell->active_fe_index();
+          const std::set<unsigned int> fe_set   = fe_sets.at(fe_index);
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+               ++face)
+            {
+              // find active indices of neighboring cells
+              if (!cell->at_boundary(face))
+                {
+                  const unsigned int nbr_fe_index =
+                    cell->neighbor(face)->active_fe_index();
+                  // find corresponding fe set
+                  auto nbr_fe_set = fe_sets.at(nbr_fe_index);
 
-            // find active indices of neighboring cells
-            if (!cell->at_boundary(face))
-              {
-                unsigned int nbr_fe_index =
-                  cell->neighbor(face)->active_fe_index();
-                // find corresponding fe set
-                auto nbr_fe_set = fe_sets[nbr_fe_index];
+                  // find intersection of the fe_sets
+                  std::set<unsigned int> intersection_set;
+                  for (auto s : fe_set)
+                    if (nbr_fe_set.find(s) != nbr_fe_set.end())
+                      intersection_set.insert(s);
 
-                // find intersection of the fe_sets
-                std::set<unsigned int> intersection_set;
-                for (auto s : fe_set)
-                  if (nbr_fe_set.find(s) != nbr_fe_set.end())
-                    intersection_set.insert(s);
+                  // add only the new sets
+                  bool found = false;
+                  if (!intersection_set.empty())
+                    {
+                      for (unsigned int j = 0; j < fe_sets.size(); ++j)
+                        {
+                          if (fe_sets[j] == intersection_set)
+                            {
+                              found = true;
+                              break;
+                            }
+                        }
 
-                // add only the new sets
-                bool found = false;
-                if (!intersection_set.empty())
-                  {
-                    for (unsigned int j = 0; j < fe_sets.size(); ++j)
-                      {
-                        if (fe_sets[j] == intersection_set)
-                          {
-                            found = true;
-                            break;
-                          }
-                      }
-
-                    if (!found)
-                      {
-                        fe_sets.push_back(intersection_set);
-                      }
-                  }
-              }
-          }
+                      if (!found)
+                        {
+                          fe_sets.push_back(intersection_set);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -1373,11 +1373,11 @@ namespace ColorEnriched
       const std::vector<std::set<unsigned int>> &fe_sets,
       const std::vector<std::function<const Function<spacedim> *(
         const typename Triangulation<dim, spacedim>::cell_iterator &)>>
-        &                              color_enrichments,
-      const FE_Q<dim, spacedim> &      fe_base,
-      const FE_Q<dim, spacedim> &      fe_enriched,
-      const FE_Nothing<dim, spacedim> &fe_nothing,
-      hp::FECollection<dim, spacedim> &fe_collection)
+        &                                 color_enrichments,
+      const FiniteElement<dim, spacedim> &fe_base,
+      const FiniteElement<dim, spacedim> &fe_enriched,
+      const FE_Nothing<dim, spacedim> &   fe_nothing,
+      hp::FECollection<dim, spacedim> &   fe_collection)
     {
       // define dummy function which is associated with FE_Nothing
       using cell_function = std::function<const Function<spacedim> *(
@@ -1443,8 +1443,8 @@ namespace ColorEnriched
 
   template <int dim, int spacedim>
   Helper<dim, spacedim>::Helper(
-    const FE_Q<dim, spacedim> &                             fe_base,
-    const FE_Q<dim, spacedim> &                             fe_enriched,
+    const FiniteElement<dim, spacedim> &                    fe_base,
+    const FiniteElement<dim, spacedim> &                    fe_enriched,
     const std::vector<predicate_function<dim, spacedim>> &  predicates,
     const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments)
     : fe_base(fe_base)
