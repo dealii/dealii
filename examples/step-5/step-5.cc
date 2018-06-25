@@ -134,8 +134,7 @@ void Step5<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: " //
-            << dof_handler.n_dofs()                //
+  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -197,14 +196,15 @@ void Step5<dim>::assemble_system()
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += (current_coefficient *              //
-                                      fe_values.shape_grad(i, q_index) * //
-                                      fe_values.shape_grad(j, q_index) * //
-                                      fe_values.JxW(q_index));
+                cell_matrix(i, j) +=
+                  (current_coefficient *              // a(x_q)
+                   fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
+                   fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
+                   fe_values.JxW(q_index));           // dx
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_index) * //
-                              1.0 *                               //
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
+                              1.0 *                               // f(x_q)
+                              fe_values.JxW(q_index));            // dx
             }
         }
 
@@ -272,10 +272,8 @@ void Step5<dim>::solve()
 
   solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-  std::cout << "   "                                          //
-            << solver_control.last_step()                     //
-            << " CG iterations needed to obtain convergence." //
-            << std::endl;
+  std::cout << "   " << solver_control.last_step()
+            << " CG iterations needed to obtain convergence." << std::endl;
 }
 
 
@@ -312,13 +310,13 @@ void Step5<dim>::output_results(const unsigned int cycle) const
   // They are initialized with the default values, so we only have to change
   // those that we don't like. For example, we would like to scale the z-axis
   // differently (stretch each data point in z-direction by a factor of four):
-  eps_flags.z_scaling = 4;
+  eps_flags.z_scaling = 4.;
   // Then we would also like to alter the viewpoint from which we look at the
   // solution surface. The default is at an angle of 60 degrees down from the
   // vertical axis, and 30 degrees rotated against it in mathematical positive
   // sense. We raise our viewpoint a bit and look more along the y-axis:
-  eps_flags.azimut_angle = 40;
-  eps_flags.turn_angle   = 10;
+  eps_flags.azimut_angle = 40.;
+  eps_flags.turn_angle   = 10.;
   // That shall suffice. There are more flags, for example whether to draw the
   // mesh lines, which data vectors to use for colorization of the interior of
   // the cells, and so on. You may want to take a look at the documentation of
