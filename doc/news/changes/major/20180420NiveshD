@@ -6,4 +6,4 @@ multiple enrichment functions associated with them. This is implemented
 using a general constructor of FE_Enriched which allows different
 enrichment functions.
 <br>
-(Nivesh Dommaraju, 2018/04/20)
+(Nivesh Dommaraju, Denis Davydov, 2018/04/20)

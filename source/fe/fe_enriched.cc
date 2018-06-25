@@ -1222,26 +1222,33 @@ namespace ColorEnriched
            * to fe_sets and a new active FE index 3 because 0 to 2 FE indices
            * are already taken by existing sets in fe_sets.
            */
-          bool found = false;
           if (!color_list.empty())
             {
-              for (unsigned int j = 0; j < fe_sets.size(); ++j)
-                {
-                  if (fe_sets[j] == color_list)
-                    {
-                      found = true;
-                      cell->set_active_fe_index(j);
-                      break;
-                    }
-                }
-
-              if (!found)
+              const auto it =
+                std::find(fe_sets.begin(), fe_sets.end(), color_list);
+              // when entry is not found
+              if (it == fe_sets.end())
                 {
                   fe_sets.push_back(color_list);
                   cell->set_active_fe_index(fe_sets.size() - 1);
                 }
+              // when entry is found
+              else
+                {
+                  cell->set_active_fe_index(std::distance(fe_sets.begin(), it));
+                }
             }
-          ++map_index; // map_index should be unique to cells
+          /*
+           * map_index is used to identify cells and should be unique. The
+           * index is stored in the material_id of the cell and hence
+           * stays relevant even when the cells are refined (which is
+           * why cell_id is not used).
+           * Two distant cells can have the same set of colors but different
+           * enrichment functions can be associated with any given
+           * color. So, in order to figure which enrichment function
+           * belongs to a color, we use a map that uses this index.
+           */
+          ++map_index;
         }
 
 
@@ -1266,7 +1273,7 @@ namespace ColorEnriched
        * entry as zero since the 3rd enrichment function is not relevant for
        * the cell. If the interface has enriched FE [1 0 1] and [0 1 1]
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
-       * found as the dominating finite element for the two cells by
+       * found as the least dominating finite element for the two cells by
        * DoFTools::make_hanging_node_constraints using a call to the function
        * hp::FECollection::find_least_face_dominating_fe.
        * Denoting the fe set in adjacent cells as {1,3} and {2,3}, this
@@ -1283,34 +1290,36 @@ namespace ColorEnriched
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
                ++face)
             {
-              // find active indices of neighboring cells
-              if (!cell->at_boundary(face))
+              // cell shouldn't be at the boundary and
+              // neigboring cell is not already visited (to avoid visiting
+              // same face twice). Note that the cells' material ids are
+              // labeled according to their order in dof_handler previously.
+              if (!cell->at_boundary(face) &&
+                  cell->material_id() < cell->neighbor(face)->material_id())
                 {
-                  const unsigned int nbr_fe_index =
+                  const auto nbr_fe_index =
                     cell->neighbor(face)->active_fe_index();
-                  // find corresponding fe set
-                  auto nbr_fe_set = fe_sets.at(nbr_fe_index);
 
-                  // find intersection of the fe_sets
+                  // find corresponding fe set
+                  const auto nbr_fe_set = fe_sets.at(nbr_fe_index);
+
+                  // find intersection of the fe sets: fe_set and nbr_fe_set
                   std::set<unsigned int> intersection_set;
-                  for (auto s : fe_set)
-                    if (nbr_fe_set.find(s) != nbr_fe_set.end())
-                      intersection_set.insert(s);
+                  std::set_intersection(
+                    fe_set.begin(),
+                    fe_set.end(),
+                    nbr_fe_set.begin(),
+                    nbr_fe_set.end(),
+                    std::inserter(intersection_set, intersection_set.begin()));
 
                   // add only the new sets
-                  bool found = false;
                   if (!intersection_set.empty())
                     {
-                      for (unsigned int j = 0; j < fe_sets.size(); ++j)
-                        {
-                          if (fe_sets[j] == intersection_set)
-                            {
-                              found = true;
-                              break;
-                            }
-                        }
-
-                      if (!found)
+                      const auto it = std::find(fe_sets.begin(),
+                                                fe_sets.end(),
+                                                intersection_set);
+                      // add the set if it is not found
+                      if (it == fe_sets.end())
                         {
                           fe_sets.push_back(intersection_set);
                         }
@@ -1340,18 +1349,22 @@ namespace ColorEnriched
       // function for a given cell.
       //
       // Assume that a cell has a active predicates with ids 4 (color = 1) and
-      // 5 (color = 2). cellwise_color_predicate_map has this information
+      // 5 (color = 2). cellwise_color_predicate_map has this information,
       // provided we know the material id.
       //
-      // Now a call to color_enrichment[1](cell) should in turn call
-      // enrichments[4](cell). That is just what this lambda is doing.
+      // The constructed color_enrichments is such that
+      // color_enrichments[1](cell) will return return a pointer to
+      // function with id=4, i.e. enrichments[4].
+      // In other words, using the previously collected information in
+      // this function we translate a vector of user provided enrichment
+      // functions into a vector of functions suitable for FE_Enriched class.
       color_enrichments.resize(num_colors);
       for (unsigned int i = 0; i < num_colors; ++i)
         {
           color_enrichments[i] =
             [&, i](const typename Triangulation<dim, spacedim>::cell_iterator
                      &cell) {
-              unsigned int id = cell->material_id();
+              const unsigned int id = cell->material_id();
 
               /*
                * i'th color_enrichment function corresponds to (i+1)'th color.
@@ -1380,39 +1393,35 @@ namespace ColorEnriched
       hp::FECollection<dim, spacedim> &   fe_collection)
     {
       // define dummy function which is associated with FE_Nothing
-      using cell_function = std::function<const Function<spacedim> *(
-        const typename Triangulation<dim, spacedim>::cell_iterator &)>;
-      cell_function dummy_function;
-      dummy_function =
-        [=](const typename Triangulation<dim, spacedim>::cell_iterator &)
+      const std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>
+        dummy_function =
+          [=](const typename Triangulation<dim, spacedim>::cell_iterator &)
         -> const Function<spacedim> * {
         AssertThrow(false,
                     ExcMessage("Called enrichment function for FE_Nothing"));
         return nullptr;
       };
 
-      using EnrichmentFunctions_2DVector =
-        std::vector<std::vector<std::function<const Function<spacedim> *(
-          const typename Triangulation<dim, spacedim>::cell_iterator &)>>>;
 
       // loop through color sets and create FE_enriched element for each
       // of them provided before calling this function, we have color
       // enrichment function associated with each color.
-      for (unsigned int color_set_id = 0; color_set_id != fe_sets.size();
+      for (unsigned int color_set_id = 0; color_set_id < fe_sets.size();
            ++color_set_id)
         {
           std::vector<const FiniteElement<dim, spacedim> *> vec_fe_enriched(
             num_colors, &fe_nothing);
-          EnrichmentFunctions_2DVector functions(num_colors, {dummy_function});
+          std::vector<std::vector<std::function<const Function<spacedim> *(
+            const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
+            functions(num_colors, {dummy_function});
 
-          for (auto it = fe_sets[color_set_id].begin();
-               it != fe_sets[color_set_id].end();
-               ++it)
+          for (const auto it : fe_sets[color_set_id])
             {
-              // Given a color id ( = *it), corresponding color enrichment
-              // function is at index id-1 because color_enrichments is
-              // is indexed from zero.
-              const unsigned int ind = *it - 1;
+              // Given a color id ( = it), corresponding color enrichment
+              // function is at index id-1 because color_enrichments are
+              // indexed from zero and colors are indexed from 1.
+              const unsigned int ind = it - 1;
 
               AssertIndexRange(ind, vec_fe_enriched.size());
               AssertIndexRange(ind, functions.size());
@@ -1426,7 +1435,7 @@ namespace ColorEnriched
 
               // color_set_id'th color function is (color_set_id-1)
               // element of color wise enrichments
-              functions[ind].assign(1, color_enrichments[ind]);
+              functions[ind][0] = color_enrichments[ind];
             }
 
           AssertDimension(vec_fe_enriched.size(), functions.size());
@@ -1449,10 +1458,15 @@ namespace ColorEnriched
     const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments)
     : fe_base(fe_base)
     , fe_enriched(fe_enriched)
-    , fe_nothing(1, true)
+    , fe_nothing(fe_base.n_components(), true)
     , predicates(predicates)
     , enrichments(enrichments)
-  {}
+  {
+    AssertDimension(predicates.size(), enrichments.size());
+    AssertDimension(fe_base.n_components(), fe_enriched.n_components());
+    AssertThrow(predicates.size() > 0,
+                ExcMessage("Number of predicates should be positive"));
+  }
 
 
 
@@ -1463,11 +1477,8 @@ namespace ColorEnriched
   {
     // color the predicates based on connections between corresponding
     // subdomains
-    if (predicates.size() != 0)
-      num_colors =
-        internal::color_predicates(dof_handler, predicates, predicate_colors);
-    else
-      num_colors = 0;
+    num_colors =
+      internal::color_predicates(dof_handler, predicates, predicate_colors);
 
     // create color maps and color list for each cell
     internal::set_cellwise_color_set_and_fe_index(dof_handler,

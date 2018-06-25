@@ -1051,6 +1051,11 @@ namespace ColorEnriched
    * and constructed when the predicates and enrichment functions are
    * available.
    *
+   * @warning The current implementation relies on assigning each cell a
+   * material id, which shall not be modified after the setup
+   * and h-adaptive refinement. For a given cell, the material id is used
+   * to define color predicate map, which doesn't change with refinement.
+   *
    * <h3>Example usage:</h3>
    * @code
    * FE_Q<dim> fe_base(2);
@@ -1069,10 +1074,7 @@ namespace ColorEnriched
    * fe_collection(FE_helper.build_fe_collection(dof_handler));
    * @endcode
    *
-   * @warning The current implementation relies on assigning each cell a
-   * material id, which shall not be modified after the setup
-   * and h-adaptive refinement. For a given cell, the material id is used
-   * to define color predicate map, which doesn't change with refinement.
+   * @authors Nivesh Dommaraju, Denis Davydov, 2018
    */
   template <int dim, int spacedim = dim>
   struct Helper
