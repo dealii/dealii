@@ -256,12 +256,12 @@ namespace Step20
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
-    for (unsigned int p = 0; p < points.size(); ++p)
+    for (auto &value : values)
       {
-        values[p].clear();
+        value.clear();
 
         for (unsigned int d = 0; d < dim; ++d)
-          values[p][d][d] = 1.;
+          value[d][d] = 1.;
       }
   }
 
@@ -479,10 +479,7 @@ namespace Step20
     // With all this in place, we can go on with the loop over all cells. The
     // body of this loop has been discussed in the introduction, and will not
     // be commented any further here:
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         local_matrix = 0;
@@ -509,9 +506,10 @@ namespace Step20
                   const double phi_j_p = fe_values[pressure].value(j, q);
 
                   local_matrix(i, j) +=
-                    (phi_i_u * k_inverse_values[q] * phi_j_u -
-                     div_phi_i_u * phi_j_p - phi_i_p * div_phi_j_u) *
-                    fe_values.JxW(q);
+                    (phi_i_u * k_inverse_values[q] * phi_j_u //
+                     - phi_i_p * div_phi_j_u                 //
+                     - div_phi_i_u * phi_j_p)                //
+                    * fe_values.JxW(q);
                 }
 
               local_rhs(i) += -phi_i_p * rhs_values[q] * fe_values.JxW(q);
@@ -529,9 +527,10 @@ namespace Step20
 
               for (unsigned int q = 0; q < n_face_q_points; ++q)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  local_rhs(i) += -(fe_face_values[velocities].value(i, q) *
-                                    fe_face_values.normal_vector(q) *
-                                    boundary_values[q] * fe_face_values.JxW(q));
+                  local_rhs(i) += -(fe_face_values[velocities].value(i, q) * //
+                                    fe_face_values.normal_vector(q) *        //
+                                    boundary_values[q] *                     //
+                                    fe_face_values.JxW(q));
             }
 
         // The final step in the loop over all cells is to transfer local
