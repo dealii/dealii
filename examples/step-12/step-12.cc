@@ -37,10 +37,10 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/mapping_q1.h>
-// Here the discontinuous finite elements are defined. They are used in the
-// same way as all other finite elements, though -- as you have seen in
-// previous tutorial programs -- there isn't much user interaction with finite
-// element classes at all: they are passed to <code>DoFHandler</code> and
+// Here the discontinuous finite elements are defined. They are used in the same
+// way as all other finite elements, though -- as you have seen in previous
+// tutorial programs -- there isn't much user interaction with finite element
+// classes at all: they are passed to <code>DoFHandler</code> and
 // <code>FEValues</code> objects, and that is about it.
 #include <deal.II/fe/fe_dgq.h>
 // We are going to use the simplest possible solver, called Richardson
@@ -53,24 +53,24 @@
 // We are going to use gradients as refinement indicator.
 #include <deal.II/numerics/derivative_approximation.h>
 
-// Here come the new include files for using the MeshWorker framework. The
-// first contains the class MeshWorker::DoFInfo, which provides local
-// integrators with a mapping between local and global degrees of freedom. It
-// stores the results of local integrals as well in its base class
-// Meshworker::LocalResults.  In the second of these files, we find an object
-// of type MeshWorker::IntegrationInfo, which is mostly a wrapper around a
-// group of FEValues objects. The file <tt>meshworker/simple.h</tt> contains
-// classes assembling locally integrated data into a global system containing
-// only a single matrix. Finally, we will need the file that runs the loop
-// over all mesh cells and faces.
+// Here come the new include files for using the MeshWorker framework. The first
+// contains the class MeshWorker::DoFInfo, which provides local integrators with
+// a mapping between local and global degrees of freedom. It stores the results
+// of local integrals as well in its base class MeshWorker::LocalResults.
+// In the second of these files, we find an object of type
+// MeshWorker::IntegrationInfo, which is mostly a wrapper around a group of
+// FEValues objects. The file <tt>meshworker/simple.h</tt> contains classes
+// assembling locally integrated data into a global system containing only a
+// single matrix. Finally, we will need the file that runs the loop over all
+// mesh cells and faces.
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
 #include <deal.II/meshworker/simple.h>
 #include <deal.II/meshworker/loop.h>
 
 // Like in all programs, we finish this section by including the needed C++
-// headers and declaring we want to use objects in the dealii namespace
-// without prefix.
+// headers and declaring we want to use objects in the dealii namespace without
+// prefix.
 #include <iostream>
 #include <fstream>
 
@@ -81,30 +81,31 @@ namespace Step12
 
   // @sect3{Equation data}
   //
-  // First, we define a class describing the inhomogeneous boundary
-  // data. Since only its values are used, we implement value_list(), but
-  // leave all other functions of Function undefined.
+  // First, we define a class describing the inhomogeneous boundary data. Since
+  // only its values are used, we implement value_list(), but leave all other
+  // functions of Function undefined.
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues()
-    {}
+    BoundaryValues() = default;
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
                             const unsigned int component = 0) const override;
   };
 
-  // Given the flow direction, the inflow boundary of the unit square
-  // $[0,1]^2$ are the right and the lower boundaries. We prescribe
-  // discontinuous boundary values 1 and 0 on the x-axis and value 0 on the
-  // right boundary. The values of this function on the outflow boundaries
-  // will not be used within the DG scheme.
+  // Given the flow direction, the inflow boundary of the unit square $[0,1]^2$
+  // are the right and the lower boundaries. We prescribe discontinuous boundary
+  // values 1 and 0 on the x-axis and value 0 on the right boundary. The values
+  // of this function on the outflow boundaries will not be used within the DG
+  // scheme.
   template <int dim>
   void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
                                        std::vector<double> &          values,
-                                       const unsigned int) const
+                                       const unsigned int component) const
   {
+    (void)component;
+    AssertIndexRange(component, 1);
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
@@ -119,10 +120,10 @@ namespace Step12
 
 
   // Finally, a function that computes and returns the wind field
-  // $\beta=\beta(\mathbf x)$. As explained in the introduction, we
-  // will use a rotational field around the origin in 2d. In 3d, we
-  // simply leave the $z$-component unset (i.e., at zero), whereas
-  // the function can not be used in 1d in its current implementation:
+  // $\beta=\beta(\mathbf x)$. As explained in the introduction, we will use a
+  // rotational field around the origin in 2d. In 3d, we simply leave the
+  // $z$-component unset (i.e., at zero), whereas the function can not be used
+  // in 1d in its current implementation:
   template <int dim>
   Tensor<1, dim> beta(const Point<dim> &p)
   {
@@ -141,7 +142,7 @@ namespace Step12
   //
   // After this preparations, we proceed with the main class of this program,
   // called AdvectionProblem. It is basically the main class of step-6. We do
-  // not have a ConstraintMatrix, because there are no hanging node
+  // not have a AffineConstraints object, because there are no hanging node
   // constraints in DG discretizations.
 
   // Major differences will only come up in the implementation of the assemble
@@ -172,12 +173,11 @@ namespace Step12
     FE_DGQ<dim>     fe;
     DoFHandler<dim> dof_handler;
 
-    // The next four members represent the linear system to be
-    // solved. <code>system_matrix</code> and <code>right_hand_side</code> are
-    // generated by <code>assemble_system()</code>, the <code>solution</code>
-    // is computed in <code>solve()</code>. The <code>sparsity_pattern</code>
-    // is used to determine the location of nonzero elements in
-    // <code>system_matrix</code>.
+    // The next four members represent the linear system to be solved.
+    // <code>system_matrix</code> and <code>right_hand_side</code> are generated
+    // by <code>assemble_system()</code>, the <code>solution</code> is computed
+    // in <code>solve()</code>. The <code>sparsity_pattern</code> is used to
+    // determine the location of nonzero elements in <code>system_matrix</code>.
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
@@ -185,28 +185,28 @@ namespace Step12
     Vector<double> right_hand_side;
 
     // Finally, we have to provide functions that assemble the cell, boundary,
-    // and inner face terms. Within the MeshWorker framework, the loop over
-    // all cells and much of the setup of operations will be done outside this
+    // and inner face terms. Within the MeshWorker framework, the loop over all
+    // cells and much of the setup of operations will be done outside this
     // class, so all we have to provide are these three operations. They will
     // then work on intermediate objects for which first, we here define
-    // typedefs to the info objects handed to the local integration functions
+    // alias to the info objects handed to the local integration functions
     // in order to make our life easier below.
-    typedef MeshWorker::DoFInfo<dim>         DoFInfo;
-    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+    using DoFInfo  = MeshWorker::DoFInfo<dim>;
+    using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
     // The following three functions are then the ones that get called inside
     // the generic loop over all cells and faces. They are the ones doing the
     // actual integration.
     //
-    // In our code below, these functions do not access member variables of
-    // the current class, so we can mark them as <code>static</code> and
-    // simply pass pointers to these functions to the MeshWorker
-    // framework. If, however, these functions would want to access member
-    // variables (or needed additional arguments beyond the ones specified
-    // below), we could use the facilities of boost::bind (or std::bind,
-    // respectively) to provide the MeshWorker framework with objects that act
-    // as if they had the required number and types of arguments, but have in
-    // fact other arguments already bound.
+    // In our code below, these functions do not access member variables of the
+    // current class, so we can mark them as <code>static</code> and simply pass
+    // pointers to these functions to the MeshWorker framework. If, however,
+    // these functions would want to access member variables (or needed
+    // additional arguments beyond the ones specified below), we could use the
+    // facilities of boost::bind (or std::bind, respectively) to provide the
+    // MeshWorker framework with objects that act as if they had the required
+    // number and types of arguments, but have in fact other arguments already
+    // bound.
     static void integrate_cell_term(DoFInfo &dinfo, CellInfo &info);
     static void integrate_boundary_term(DoFInfo &dinfo, CellInfo &info);
     static void integrate_face_term(DoFInfo & dinfo1,
@@ -229,14 +229,14 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::setup_system()
   {
-    // In the function that sets up the usual finite element data structures,
-    // we first need to distribute the DoFs.
+    // In the function that sets up the usual finite element data structures, we
+    // first need to distribute the DoFs.
     dof_handler.distribute_dofs(fe);
 
     // We start by generating the sparsity pattern. To this end, we first fill
-    // an intermediate object of type DynamicSparsityPattern with the
-    // couplings appearing in the system. After building the pattern, this
-    // object is copied to <code>sparsity_pattern</code> and can be discarded.
+    // an intermediate object of type DynamicSparsityPattern with the couplings
+    // appearing in the system. After building the pattern, this object is
+    // copied to <code>sparsity_pattern</code> and can be discarded.
 
     // To build the sparsity pattern for DG discretizations, we can call the
     // function analogue to DoFTools::make_sparsity_pattern, which is called
@@ -245,8 +245,7 @@ namespace Step12
     DoFTools::make_flux_sparsity_pattern(dof_handler, dsp);
     sparsity_pattern.copy_from(dsp);
 
-    // Finally, we set up the structure of all components of the linear
-    // system.
+    // Finally, we set up the structure of all components of the linear system.
     system_matrix.reinit(sparsity_pattern);
     solution.reinit(dof_handler.n_dofs());
     right_hand_side.reinit(dof_handler.n_dofs());
@@ -254,11 +253,11 @@ namespace Step12
 
   // @sect4{The assemble_system function}
 
-  // Here we see the major difference to assembling by hand. Instead of
-  // writing loops over cells and faces, we leave all this to the MeshWorker
-  // framework. In order to do so, we just have to define local integration
-  // functions and use one of the classes in namespace MeshWorker::Assembler
-  // to build the global system.
+  // Here we see the major difference to assembling by hand. Instead of writing
+  // loops over cells and faces, we leave all this to the MeshWorker framework.
+  // In order to do so, we just have to define local integration functions and
+  // use one of the classes in namespace MeshWorker::Assembler to build the
+  // global system.
   template <int dim>
   void AdvectionProblem<dim>::assemble_system()
   {
@@ -271,11 +270,11 @@ namespace Step12
     // global sparse matrix and the right hand side vector.
     MeshWorker::IntegrationInfoBox<dim> info_box;
 
-    // First, we initialize the quadrature formulae and the update flags in
-    // the worker base class. For quadrature, we play safe and use a QGauss
-    // formula with number of points one higher than the polynomial degree
-    // used. Since the quadratures for cells, boundary and interior faces can
-    // be selected independently, we have to hand over this value three times.
+    // First, we initialize the quadrature formulae and the update flags in the
+    // worker base class. For quadrature, we play safe and use a QGauss formula
+    // with number of points one higher than the polynomial degree used. Since
+    // the quadratures for cells, boundary and interior faces can be selected
+    // independently, we have to hand over this value three times.
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
     info_box.initialize_gauss_quadrature(n_gauss_points,
                                          n_gauss_points,
@@ -290,18 +289,17 @@ namespace Step12
       update_quadrature_points | update_values | update_gradients;
     info_box.add_update_flags(update_flags, true, true, true, true);
 
-    // After preparing all data in <tt>info_box</tt>, we initialize the
-    // FEValues objects in there.
+    // After preparing all data in <tt>info_box</tt>, we initialize the FEValues
+    // objects in there.
     info_box.initialize(fe, mapping);
 
-    // The object created so far helps us do the local integration on each
-    // cell and face. Now, we need an object which receives the integrated
-    // (local) data and forwards them to the assembler.
+    // The object created so far helps us do the local integration on each cell
+    // and face. Now, we need an object which receives the integrated (local)
+    // data and forwards them to the assembler.
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-    // Now, we have to create the assembler object and tell it, where to put
-    // the local data. These will be our system matrix and the right hand
-    // side.
+    // Now, we have to create the assembler object and tell it, where to put the
+    // local data. These will be our system matrix and the right hand side.
     MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
       assembler;
     assembler.initialize(system_matrix, right_hand_side);
@@ -309,14 +307,13 @@ namespace Step12
     // Finally, the integration loop over all active cells (determined by the
     // first argument, which is an active iterator).
     //
-    // As noted in the discussion when declaring the local integration
-    // functions in the class declaration, the arguments expected by the
-    // assembling integrator class are not actually function pointers. Rather,
-    // they are objects that can be called like functions with a certain
-    // number of arguments. Consequently, we could also pass objects with
-    // appropriate operator() implementations here, or the result of std::bind
-    // if the local integrators were, for example, non-static member
-    // functions.
+    // As noted in the discussion when declaring the local integration functions
+    // in the class declaration, the arguments expected by the assembling
+    // integrator class are not actually function pointers. Rather, they are
+    // objects that can be called like functions with a certain number of
+    // arguments. Consequently, we could also pass objects with appropriate
+    // operator() implementations here, or the result of std::bind if the local
+    // integrators were, for example, non-static member functions.
     MeshWorker::loop<dim,
                      dim,
                      MeshWorker::DoFInfo<dim>,
@@ -334,9 +331,9 @@ namespace Step12
 
   // @sect4{The local integrators}
 
-  // These are the functions given to the MeshWorker::integration_loop()
-  // called just above. They compute the local contributions to the system
-  // matrix and right hand side on cells and faces.
+  // These are the functions given to the MeshWorker::integration_loop() called
+  // just above. They compute the local contributions to the system matrix and
+  // right hand side on cells and faces.
   template <int dim>
   void AdvectionProblem<dim>::integrate_cell_term(DoFInfo & dinfo,
                                                   CellInfo &info)
@@ -348,26 +345,27 @@ namespace Step12
     FullMatrix<double> &       local_matrix = dinfo.matrix(0).matrix;
     const std::vector<double> &JxW          = fe_values.get_JxW_values();
 
-    // With these objects, we continue local integration like always. First,
-    // we loop over the quadrature points and compute the advection vector in
-    // the current point.
+    // With these objects, we continue local integration like always. First, we
+    // loop over the quadrature points and compute the advection vector in the
+    // current point.
     for (unsigned int point = 0; point < fe_values.n_quadrature_points; ++point)
       {
         const Tensor<1, dim> beta_at_q_point =
           beta(fe_values.quadrature_point(point));
 
-        // We solve a homogeneous equation, thus no right hand side shows up
-        // in the cell term.  What's left is integrating the matrix entries.
+        // We solve a homogeneous equation, thus no right hand side shows up in
+        // the cell term.  What's left is integrating the matrix entries.
         for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
           for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
-            local_matrix(i, j) += -beta_at_q_point *
-                                  fe_values.shape_grad(i, point) *
-                                  fe_values.shape_value(j, point) * JxW[point];
+            local_matrix(i, j) += -beta_at_q_point *                //
+                                  fe_values.shape_grad(i, point) *  //
+                                  fe_values.shape_value(j, point) * //
+                                  JxW[point];
       }
   }
 
-  // Now the same for the boundary terms. Note that now we use FEValuesBase,
-  // the base class for both FEFaceValues and FESubfaceValues, in order to get
+  // Now the same for the boundary terms. Note that now we use FEValuesBase, the
+  // base class for both FEFaceValues and FESubfaceValues, in order to get
   // access to normal vectors.
   template <int dim>
   void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo & dinfo,
@@ -394,13 +392,15 @@ namespace Step12
         if (beta_dot_n > 0)
           for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
             for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-              local_matrix(i, j) +=
-                beta_dot_n * fe_face_values.shape_value(j, point) *
-                fe_face_values.shape_value(i, point) * JxW[point];
+              local_matrix(i, j) += beta_dot_n *                           //
+                                    fe_face_values.shape_value(j, point) * //
+                                    fe_face_values.shape_value(i, point) * //
+                                    JxW[point];
         else
           for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-            local_vector(i) += -beta_dot_n * g[point] *
-                               fe_face_values.shape_value(i, point) *
+            local_vector(i) += -beta_dot_n *                          //
+                               g[point] *                             //
+                               fe_face_values.shape_value(i, point) * //
                                JxW[point];
       }
   }
@@ -417,17 +417,20 @@ namespace Step12
     // For quadrature points, weights, etc., we use the FEValuesBase object of
     // the first argument.
     const FEValuesBase<dim> &fe_face_values = info1.fe_values();
+    const unsigned int       dofs_per_cell  = fe_face_values.dofs_per_cell;
 
     // For additional shape functions, we have to ask the neighbors
     // FEValuesBase.
     const FEValuesBase<dim> &fe_face_values_neighbor = info2.fe_values();
+    const unsigned int       neighbor_dofs_per_cell =
+      fe_face_values_neighbor.dofs_per_cell;
 
     // Then we get references to the four local matrices. The letters u and v
     // refer to trial and test functions, respectively. The %numbers indicate
     // the cells provided by info1 and info2. By convention, the two matrices
-    // in each info object refer to the test functions on the respective
-    // cell. The first matrix contains the interior couplings of that cell,
-    // while the second contains the couplings between cells.
+    // in each info object refer to the test functions on the respective cell.
+    // The first matrix contains the interior couplings of that cell, while the
+    // second contains the couplings between cells.
     FullMatrix<double> &u1_v1_matrix = dinfo1.matrix(0, false).matrix;
     FullMatrix<double> &u2_v1_matrix = dinfo1.matrix(0, true).matrix;
     FullMatrix<double> &u1_v2_matrix = dinfo2.matrix(0, true).matrix;
@@ -449,42 +452,43 @@ namespace Step12
         if (beta_dot_n > 0)
           {
             // This term we've already seen:
-            for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-              for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-                u1_v1_matrix(i, j) +=
-                  beta_dot_n * fe_face_values.shape_value(j, point) *
-                  fe_face_values.shape_value(i, point) * JxW[point];
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                u1_v1_matrix(i, j) += beta_dot_n *                           //
+                                      fe_face_values.shape_value(j, point) * //
+                                      fe_face_values.shape_value(i, point) * //
+                                      JxW[point];
 
             // We additionally assemble the term $(\beta\cdot n u,\hat
             // v)_{\partial \kappa_+}$,
-            for (unsigned int k = 0; k < fe_face_values_neighbor.dofs_per_cell;
-                 ++k)
-              for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
+            for (unsigned int k = 0; k < neighbor_dofs_per_cell; ++k)
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 u1_v2_matrix(k, j) +=
-                  -beta_dot_n * fe_face_values.shape_value(j, point) *
-                  fe_face_values_neighbor.shape_value(k, point) * JxW[point];
+                  -beta_dot_n *                                   //
+                  fe_face_values.shape_value(j, point) *          //
+                  fe_face_values_neighbor.shape_value(k, point) * //
+                  JxW[point];
           }
         else
           {
             // This one we've already seen, too:
-            for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-              for (unsigned int l = 0;
-                   l < fe_face_values_neighbor.dofs_per_cell;
-                   ++l)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (unsigned int l = 0; l < neighbor_dofs_per_cell; ++l)
                 u2_v1_matrix(i, l) +=
-                  beta_dot_n * fe_face_values_neighbor.shape_value(l, point) *
-                  fe_face_values.shape_value(i, point) * JxW[point];
+                  beta_dot_n *                                    //
+                  fe_face_values_neighbor.shape_value(l, point) * //
+                  fe_face_values.shape_value(i, point) *          //
+                  JxW[point];
 
             // And this is another new one: $(\beta\cdot n \hat u,\hat
             // v)_{\partial \kappa_-}$:
-            for (unsigned int k = 0; k < fe_face_values_neighbor.dofs_per_cell;
-                 ++k)
-              for (unsigned int l = 0;
-                   l < fe_face_values_neighbor.dofs_per_cell;
-                   ++l)
+            for (unsigned int k = 0; k < neighbor_dofs_per_cell; ++k)
+              for (unsigned int l = 0; l < neighbor_dofs_per_cell; ++l)
                 u2_v2_matrix(k, l) +=
-                  -beta_dot_n * fe_face_values_neighbor.shape_value(l, point) *
-                  fe_face_values_neighbor.shape_value(k, point) * JxW[point];
+                  -beta_dot_n *                                   //
+                  fe_face_values_neighbor.shape_value(l, point) * //
+                  fe_face_values_neighbor.shape_value(k, point) * //
+                  JxW[point];
           }
       }
   }
@@ -493,15 +497,14 @@ namespace Step12
   // @sect3{All the rest}
   //
   // For this simple problem we use the simplest possible solver, called
-  // Richardson iteration, that represents a simple defect correction. This,
-  // in combination with a block SSOR preconditioner, that uses the special
-  // block matrix structure of system matrices arising from DG
-  // discretizations. The size of these blocks are the number of DoFs per
-  // cell. Here, we use a SSOR preconditioning as we have not renumbered the
-  // DoFs according to the flow field. If the DoFs are renumbered in the
-  // downstream direction of the flow, then a block Gauss-Seidel
-  // preconditioner (see the PreconditionBlockSOR class with relaxation=1)
-  // does a much better job.
+  // Richardson iteration, that represents a simple defect correction. This, in
+  // combination with a block SSOR preconditioner, that uses the special block
+  // matrix structure of system matrices arising from DG discretizations. The
+  // size of these blocks are the number of DoFs per cell. Here, we use a SSOR
+  // preconditioning as we have not renumbered the DoFs according to the flow
+  // field. If the DoFs are renumbered in the downstream direction of the flow,
+  // then a block Gauss-Seidel preconditioner (see the PreconditionBlockSOR
+  // class with relaxation=1) does a much better job.
   template <int dim>
   void AdvectionProblem<dim>::solve(Vector<double> &solution)
   {
@@ -519,32 +522,31 @@ namespace Step12
   }
 
 
-  // We refine the grid according to a very simple refinement criterion,
-  // namely an approximation to the gradient of the solution. As here we
-  // consider the DG(1) method (i.e. we use piecewise bilinear shape
-  // functions) we could simply compute the gradients on each cell. But we do
-  // not want to base our refinement indicator on the gradients on each cell
-  // only, but want to base them also on jumps of the discontinuous solution
-  // function over faces between neighboring cells. The simplest way of doing
-  // that is to compute approximative gradients by difference quotients
-  // including the cell under consideration and its neighbors. This is done by
-  // the <code>DerivativeApproximation</code> class that computes the
-  // approximate gradients in a way similar to the
-  // <code>GradientEstimation</code> described in step-9 of this tutorial. In
-  // fact, the <code>DerivativeApproximation</code> class was developed
-  // following the <code>GradientEstimation</code> class of step-9. Relating
-  // to the discussion in step-9, here we consider $h^{1+d/2}|\nabla_h
-  // u_h|$. Furthermore we note that we do not consider approximate second
-  // derivatives because solutions to the linear advection equation are in
-  // general not in $H^2$ but only in $H^1$ (or, to be more precise: in
-  // $H^1_\beta$, i.e., the space of functions whose derivatives in direction
-  // $\beta$ are square integrable).
+  // We refine the grid according to a very simple refinement criterion, namely
+  // an approximation to the gradient of the solution. As here we consider the
+  // DG(1) method (i.e. we use piecewise bilinear shape functions) we could
+  // simply compute the gradients on each cell. But we do not want to base our
+  // refinement indicator on the gradients on each cell only, but want to base
+  // them also on jumps of the discontinuous solution function over faces
+  // between neighboring cells. The simplest way of doing that is to compute
+  // approximative gradients by difference quotients including the cell under
+  // consideration and its neighbors. This is done by the
+  // <code>DerivativeApproximation</code> class that computes the approximate
+  // gradients in a way similar to the <code>GradientEstimation</code> described
+  // in step-9 of this tutorial. In fact, the
+  // <code>DerivativeApproximation</code> class was developed following the
+  // <code>GradientEstimation</code> class of step-9. Relating to the discussion
+  // in step-9, here we consider $h^{1+d/2}|\nabla_h u_h|$. Furthermore we note
+  // that we do not consider approximate second derivatives because solutions to
+  // the linear advection equation are in general not in $H^2$ but only in $H^1$
+  // (or, to be more precise: in $H^1_\beta$, i.e., the space of functions whose
+  // derivatives in direction $\beta$ are square integrable).
   template <int dim>
   void AdvectionProblem<dim>::refine_grid()
   {
-    // The <code>DerivativeApproximation</code> class computes the gradients
-    // to float precision. This is sufficient as they are approximate and
-    // serve as refinement indicators only.
+    // The <code>DerivativeApproximation</code> class computes the gradients to
+    // float precision. This is sufficient as they are approximate and serve as
+    // refinement indicators only.
     Vector<float> gradient_indicator(triangulation.n_active_cells());
 
     // Now the approximate gradients are computed
@@ -554,11 +556,9 @@ namespace Step12
                                                   gradient_indicator);
 
     // and they are cell-wise scaled by the factor $h^{1+d/2}$
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-      gradient_indicator(cell_no) *=
+    unsigned int cell_no = 0;
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      gradient_indicator(cell_no++) *=
         std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
 
     // Finally they serve as refinement indicator.
@@ -571,8 +571,8 @@ namespace Step12
   }
 
 
-  // The output of this program consists of eps-files of the adaptively
-  // refined grids and the numerical solutions given in gnuplot format.
+  // The output of this program consists of eps-files of the adaptively refined
+  // grids and the numerical solutions given in gnuplot format.
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
