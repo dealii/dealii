@@ -56,11 +56,6 @@ namespace LA
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_solver.h>
-#include <deal.II/lac/petsc_precondition.h>
-
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -143,13 +138,14 @@ namespace Step40
   //   we own on the current processor and which we need (as ghost elements) for
   //   the algorithms in this program to work.
   // - The fact that all matrices and vectors are now distributed. We use
-  //   their PETScWrapper versions for this since deal.II's own classes do not
-  //   provide %parallel functionality. Note that as part of this class, we
-  //   store a solution vector that does not only contain the degrees of freedom
-  //   the current processor owns, but also (as ghost elements) all those vector
-  //   elements that correspond to "locally relevant" degrees of freedom
-  //   (i.e. all those that live on locally owned cells or the layer of ghost
-  //   cells that surround it).
+  //   either the PETSc or Trilinos wrapper classes so that we can use one of
+  //   the sophisticated preconditioners offered by Hypre (with PETSc) or ML
+  //   (with Trilinos). Note that as part of this class, we store a solution
+  //   vector that does not only contain the degrees of freedom the current
+  //   processor owns, but also (as ghost elements) all those vector elements
+  //   that correspond to "locally relevant" degrees of freedom (i.e. all
+  //   those that live on locally owned cells or the layer of ghost cells that
+  //   surround it).
   template <int dim>
   class LaplaceProblem
   {
@@ -304,7 +300,7 @@ namespace Step40
     // The last part of this function deals with initializing the matrix with
     // accompanying sparsity pattern. As in previous tutorial programs, we use
     // the DynamicSparsityPattern as an intermediate with which we
-    // then initialize the PETSc matrix. To do so we have to tell the sparsity
+    // then initialize the system matrix. To do so we have to tell the sparsity
     // pattern its size but as above there is no way the resulting object will
     // be able to store even a single pointer for each global degree of
     // freedom; the best we can hope for is that it stores information about
@@ -357,11 +353,11 @@ namespace Step40
   //   distributing constraints and boundary values. In other words, we cannot
   //   (as we did in step-6) first copy every local contribution into the global
   //   matrix and only in a later step take care of hanging node constraints and
-  //   boundary values. The reason is, as discussed in step-17, that PETSc does
-  //   not provide access to arbitrary elements of the matrix once they have
-  //   been assembled into it -- in parts because they may simply no longer
-  //   reside on the current processor but have instead been shipped to a
-  //   different machine.
+  //   boundary values. The reason is, as discussed in step-17, that the
+  //   parallel vector classes do not provide access to arbitrary elements of
+  //   the matrix once they have been assembled into it -- in parts because they
+  //   may simply no longer reside on the current processor but have instead
+  //   been shipped to a different machine.
   // - The way we compute the right hand side (given the
   //   formula stated in the introduction) may not be the most elegant but will
   //   do for a program whose focus lies somewhere entirely different.
@@ -442,18 +438,19 @@ namespace Step40
   // at least at the outside -- relatively simple. Most of the parts you've
   // seen before. There are really only two things worth mentioning:
   // - Solvers and preconditioners are built on the deal.II wrappers of PETSc
-  //   functionality. It is relatively well known that the primary bottleneck of
-  //   massively %parallel linear solvers is not actually the communication
-  //   between processors, but the fact that it is difficult to produce
-  //   preconditioners that scale well to large numbers of processors. Over the
-  //   second half of the first decade of the 21st century, it has become clear
-  //   that algebraic multigrid (AMG) methods turn out to be extremely efficient
-  //   in this context, and we will use one of them -- the BoomerAMG
-  //   implementation of the Hypre package that can be interfaced to through
-  //   PETSc -- for the current program. The rest of the solver itself is
-  //   boilerplate and has been shown before. Since the linear system is
-  //   symmetric and positive definite, we can use the CG method as the outer
-  //   solver.
+  //   and Trilinos functionality. It is relatively well known that the
+  //   primary bottleneck of massively %parallel linear solvers is not
+  //   actually the communication between processors, but the fact that it is
+  //   difficult to produce preconditioners that scale well to large numbers
+  //   of processors. Over the second half of the first decade of the 21st
+  //   century, it has become clear that algebraic multigrid (AMG) methods
+  //   turn out to be extremely efficient in this context, and we will use one
+  //   of them -- either the BoomerAMG implementation of the Hypre package
+  //   that can be interfaced to through PETSc, or a preconditioner provided
+  //   by ML, which is part of Trilinos -- for the current program. The rest
+  //   of the solver itself is boilerplate and has been shown before. Since
+  //   the linear system is symmetric and positive definite, we can use the CG
+  //   method as the outer solver.
   // - Ultimately, we want a vector that stores not only the elements
   //   of the solution for degrees of freedom the current processor owns, but
   //   also all other locally relevant degrees of freedom. On the other hand,
@@ -692,13 +689,13 @@ namespace Step40
 
 // The final function, <code>main()</code>, again has the same structure as in
 // all other programs, in particular step-6. Like the other programs that use
-// PETSc, we have to initialize and finalize PETSc, which is done using the
-// helper object Utilities::MPI::MPI_InitFinalize. The constructor of that
-// class initializes MPI other libraries that depend on it, such as p4est,
-// SLEPc, and Zoltan (though the last two are not used in this tutorial). The
-// order here is important: we cannot use any of these libraries until they
-// are initialized, so it does not make sense to do anything before creating
-// an instance of Utilities::MPI::MPI_InitFinalize.
+// MPI, we have to initialize and finalize MPI, which is done using the helper
+// object Utilities::MPI::MPI_InitFinalize. The constructor of that class also
+// initializes libraries that depend on MPI, such as p4est, PETSc, SLEPc, and
+// Zoltan (though the last two are not used in this tutorial). The order here
+// is important: we cannot use any of these libraries until they are
+// initialized, so it does not make sense to do anything before creating an
+// instance of Utilities::MPI::MPI_InitFinalize.
 //
 // After the solver finishes, the LaplaceProblem destructor will run followed
 // by Utilities::MPI::MPI_InitFinalize::~MPI_InitFinalize(). This order is
