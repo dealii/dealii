@@ -167,8 +167,7 @@ void Step3::make_grid()
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(5);
 
-  std::cout << "Number of active cells: "     //
-            << triangulation.n_active_cells() //
+  std::cout << "Number of active cells: " << triangulation.n_active_cells()
             << std::endl;
 }
 
@@ -197,8 +196,7 @@ void Step3::make_grid()
 void Step3::setup_system()
 {
   dof_handler.distribute_dofs(fe);
-  std::cout << "Number of degrees of freedom: " //
-            << dof_handler.n_dofs()             //
+  std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
   // There should be one DoF for each vertex. Since we have a 32 times 32
   // grid, the number of DoFs should be 33 times 33, or 1089.
@@ -437,9 +435,10 @@ void Step3::assemble_system()
           // this is repeated for all shape functions $i$ and $j$:
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) += (fe_values.shape_grad(i, q_index) * //
-                                    fe_values.shape_grad(j, q_index) * //
-                                    fe_values.JxW(q_index));
+              cell_matrix(i, j) +=
+                (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
+                 fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
+                 fe_values.JxW(q_index));           // dx
 
           // We then do the same thing for the right hand side. Here,
           // the integral is over the shape function i times the right
@@ -447,9 +446,9 @@ void Step3::assemble_system()
           // with constant value one (more interesting examples will
           // be considered in the following programs).
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            cell_rhs(i) += (fe_values.shape_value(i, q_index) * //
-                            1 *                                 //
-                            fe_values.JxW(q_index));
+            cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
+                            1 *                                 // f(x_q)
+                            fe_values.JxW(q_index));            // dx
         }
       // Now that we have the contribution of this cell, we have to transfer
       // it to the global matrix and right hand side. To this end, we first
