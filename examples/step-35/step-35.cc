@@ -100,7 +100,9 @@ namespace Step35
 
       Method form;
 
-      double dt, initial_time, final_time;
+      double dt;
+      double initial_time;
+      double final_time;
 
       double Reynolds;
 
@@ -112,7 +114,8 @@ namespace Step35
       unsigned int vel_Krylov_size;
       unsigned int vel_off_diagonals;
       unsigned int vel_update_prec;
-      double       vel_eps, vel_diag_strength;
+      double       vel_eps;
+      double       vel_diag_strength;
 
       bool         verbose;
       unsigned int output_interval;
@@ -438,7 +441,9 @@ namespace Step35
     RunTimeParameters::Method type;
 
     const unsigned int deg;
-    const double       dt, t_0, T;
+    const double       dt;
+    const double       t_0;
+    const double       T;
     const double       Re;
 
     EquationData::Velocity<dim>               vel_exact;
