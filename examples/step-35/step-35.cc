@@ -74,23 +74,21 @@ namespace Step35
 {
   using namespace dealii;
 
-
-
   // @sect3{Run time parameters}
   //
-  // Since our method has several parameters that can be fine-tuned we put
-  // them into an external file, so that they can be determined at run-time.
+  // Since our method has several parameters that can be fine-tuned we put them
+  // into an external file, so that they can be determined at run-time.
   //
   // This includes, in particular, the formulation of the equation for the
-  // auxiliary variable $\phi$, for which we declare an <code>enum</code>.
-  // Next, we declare a class that is going to read and store all the
-  // parameters that our program needs to run.
+  // auxiliary variable $\phi$, for which we declare an <code>enum</code>. Next,
+  // we declare a class that is going to read and store all the parameters that
+  // our program needs to run.
   namespace RunTimeParameters
   {
-    enum MethodFormulation
+    enum class Method
     {
-      METHOD_STANDARD,
-      METHOD_ROTATIONAL
+      standard,
+      rotational
     };
 
     class Data_Storage
@@ -98,14 +96,27 @@ namespace Step35
     public:
       Data_Storage();
 
-      void              read_data(const char *filename);
-      MethodFormulation form;
-      double            initial_time, final_time, Reynolds;
-      double            dt;
-      unsigned int      n_global_refines, pressure_degree;
-      unsigned int      vel_max_iterations, vel_Krylov_size, vel_off_diagonals,
-        vel_update_prec;
-      double       vel_eps, vel_diag_strength;
+      void read_data(const std::string &filename);
+
+      Method form;
+
+      double dt;
+      double initial_time;
+      double final_time;
+
+      double Reynolds;
+
+      unsigned int n_global_refines;
+
+      unsigned int pressure_degree;
+
+      unsigned int vel_max_iterations;
+      unsigned int vel_Krylov_size;
+      unsigned int vel_off_diagonals;
+      unsigned int vel_update_prec;
+      double       vel_eps;
+      double       vel_diag_strength;
+
       bool         verbose;
       unsigned int output_interval;
 
@@ -117,11 +128,11 @@ namespace Step35
     // details of how this works have been discussed elsewhere, for example in
     // step-19 and step-29.
     Data_Storage::Data_Storage()
-      : form(METHOD_ROTATIONAL)
+      : form(Method::rotational)
+      , dt(5e-4)
       , initial_time(0.)
       , final_time(1.)
       , Reynolds(1.)
-      , dt(5e-4)
       , n_global_refines(0)
       , pressure_degree(1)
       , vel_max_iterations(1000)
@@ -224,7 +235,7 @@ namespace Step35
 
 
 
-    void Data_Storage::read_data(const char *filename)
+    void Data_Storage::read_data(const std::string &filename)
     {
       std::ifstream file(filename);
       AssertThrow(file, ExcFileNotOpen(filename));
@@ -232,9 +243,9 @@ namespace Step35
       prm.parse_input(file);
 
       if (prm.get("Method_Form") == std::string("rotational"))
-        form = METHOD_ROTATIONAL;
+        form = Method::rotational;
       else
-        form = METHOD_STANDARD;
+        form = Method::standard;
 
       prm.enter_subsection("Physical data");
       {
@@ -282,12 +293,12 @@ namespace Step35
   namespace EquationData
   {
     // As we have chosen a completely decoupled formulation, we will not take
-    // advantage of deal.II's capabilities to handle vector valued
-    // problems. We do, however, want to use an interface for the equation
-    // data that is somehow dimension independent. To be able to do that, our
-    // functions should be able to know on which spatial component we are
-    // currently working, and we should be able to have a common interface to
-    // do that. The following class is an attempt in that direction.
+    // advantage of deal.II's capabilities to handle vector valued problems. We
+    // do, however, want to use an interface for the equation data that is
+    // somehow dimension independent. To be able to do that, our functions
+    // should be able to know on which spatial component we are currently
+    // working, and we should be able to have a common interface to do that. The
+    // following class is an attempt in that direction.
     template <int dim>
     class MultiComponentFunction : public Function<dim>
     {
@@ -387,16 +398,21 @@ namespace Step35
 
 
     template <int dim>
-    double Pressure<dim>::value(const Point<dim> &p, const unsigned int) const
+    double Pressure<dim>::value(const Point<dim> & p,
+                                const unsigned int component) const
     {
+      (void)component;
+      AssertIndexRange(component, 1);
       return 25. - p(0);
     }
 
     template <int dim>
     void Pressure<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<double> &          values,
-                                   const unsigned int) const
+                                   const unsigned int component) const
     {
+      (void)component;
+      AssertIndexRange(component, 1);
       const unsigned int n_points = points.size();
       Assert(values.size() == n_points,
              ExcDimensionMismatch(values.size(), n_points));
@@ -410,8 +426,8 @@ namespace Step35
   // @sect3{The <code>NavierStokesProjection</code> class}
 
   // Now for the main class of the program. It implements the various versions
-  // of the projection method for Navier-Stokes equations.  The names for all
-  // the methods and member variables should be self-explanatory, taking into
+  // of the projection method for Navier-Stokes equations. The names for all the
+  // methods and member variables should be self-explanatory, taking into
   // account the implementation details given in the introduction.
   template <int dim>
   class NavierStokesProjection
@@ -422,11 +438,13 @@ namespace Step35
     void run(const bool verbose = false, const unsigned int n_plots = 10);
 
   protected:
-    RunTimeParameters::MethodFormulation type;
+    RunTimeParameters::Method type;
 
     const unsigned int deg;
     const double       dt;
-    const double       t_0, T, Re;
+    const double       t_0;
+    const double       T;
+    const double       Re;
 
     EquationData::Velocity<dim>               vel_exact;
     std::map<types::global_dof_index, double> boundary_values;
@@ -508,35 +526,35 @@ namespace Step35
     // The next few structures and functions are for doing various things in
     // parallel. They follow the scheme laid out in @ref threads, using the
     // WorkStream class. As explained there, this requires us to declare two
-    // structures for each of the assemblers, a per-task data and a scratch
-    // data structure. These are then handed over to functions that assemble
-    // local contributions and that copy these local contributions to the
-    // global objects.
+    // structures for each of the assemblers, a per-task data and a scratch data
+    // structure. These are then handed over to functions that assemble local
+    // contributions and that copy these local contributions to the global
+    // objects.
     //
-    // One of the things that are specific to this program is that we don't
-    // just have a single DoFHandler object that represents both the
-    // velocities and the pressure, but we use individual DoFHandler objects
-    // for these two kinds of variables. We pay for this optimization when we
-    // want to assemble terms that involve both variables, such as the
-    // divergence of the velocity and the gradient of the pressure, times the
-    // respective test functions. When doing so, we can't just anymore use a
-    // single FEValues object, but rather we need two, and they need to be
-    // initialized with cell iterators that point to the same cell in the
-    // triangulation but different DoFHandlers.
+    // One of the things that are specific to this program is that we don't just
+    // have a single DoFHandler object that represents both the velocities and
+    // the pressure, but we use individual DoFHandler objects for these two
+    // kinds of variables. We pay for this optimization when we want to assemble
+    // terms that involve both variables, such as the divergence of the velocity
+    // and the gradient of the pressure, times the respective test functions.
+    // When doing so, we can't just anymore use a single FEValues object, but
+    // rather we need two, and they need to be initialized with cell iterators
+    // that point to the same cell in the triangulation but different
+    // DoFHandlers.
     //
-    // To do this in practice, we declare a "synchronous" iterator -- an
-    // object that internally consists of several (in our case two) iterators,
-    // and each time the synchronous iteration is moved forward one step, each
-    // of the iterators stored internally is moved forward one step as well,
-    // thereby always staying in sync. As it so happens, there is a deal.II
-    // class that facilitates this sort of thing. (What is important here is to
-    // know that two DoFHandler objects built on the same triangulation will
-    // walk over the cells of the triangulation in the same order.)
-    typedef std::tuple<typename DoFHandler<dim>::active_cell_iterator,
-                       typename DoFHandler<dim>::active_cell_iterator>
-      IteratorTuple;
+    // To do this in practice, we declare a "synchronous" iterator -- an object
+    // that internally consists of several (in our case two) iterators, and each
+    // time the synchronous iteration is moved forward one step, each of the
+    // iterators stored internally is moved forward one step as well, thereby
+    // always staying in sync. As it so happens, there is a deal.II class that
+    // facilitates this sort of thing. (What is important here is to know that
+    // two DoFHandler objects built on the same triangulation will walk over the
+    // cells of the triangulation in the same order.)
+    using IteratorTuple =
+      std::tuple<typename DoFHandler<dim>::active_cell_iterator,
+                 typename DoFHandler<dim>::active_cell_iterator>;
 
-    typedef SynchronousIterators<IteratorTuple> IteratorPair;
+    using IteratorPair = SynchronousIterators<IteratorTuple>;
 
     void initialize_gradient_operator();
 
@@ -645,8 +663,7 @@ namespace Step35
     void copy_advection_local_to_global(const AdvectionPerTaskData &data);
 
     // The final few functions implement the diffusion solve as well as
-    // postprocessing the output, including computing the curl of the
-    // velocity:
+    // postprocessing the output, including computing the curl of the velocity:
     void diffusion_component_solve(const unsigned int d);
 
     void output_results(const unsigned int step);
@@ -659,9 +676,9 @@ namespace Step35
   // @sect4{ <code>NavierStokesProjection::NavierStokesProjection</code> }
 
   // In the constructor, we just read all the data from the
-  // <code>Data_Storage</code> object that is passed as an argument, verify
-  // that the data we read is reasonable and, finally, create the
-  // triangulation and load the initial data.
+  // <code>Data_Storage</code> object that is passed as an argument, verify that
+  // the data we read is reasonable and, finally, create the triangulation and
+  // load the initial data.
   template <int dim>
   NavierStokesProjection<dim>::NavierStokesProjection(
     const RunTimeParameters::Data_Storage &data)
@@ -698,13 +715,12 @@ namespace Step35
   }
 
 
-  // @sect4{ <code>NavierStokesProjection::create_triangulation_and_dofs</code>
-  // }
+  // @sect4{<code>NavierStokesProjection::create_triangulation_and_dofs</code>}
 
-  // The method that creates the triangulation and refines it the needed
-  // number of times.  After creating the triangulation, it creates the mesh
-  // dependent data, i.e. it distributes degrees of freedom and renumbers
-  // them, and initializes the matrices and vectors that we will use.
+  // The method that creates the triangulation and refines it the needed number
+  // of times. After creating the triangulation, it creates the mesh dependent
+  // data, i.e. it distributes degrees of freedom and renumbers them, and
+  // initializes the matrices and vectors that we will use.
   template <int dim>
   void NavierStokesProjection<dim>::create_triangulation_and_dofs(
     const unsigned int n_refines)
@@ -750,10 +766,11 @@ namespace Step35
     v_tmp.reinit(dof_handler_velocity.n_dofs());
     rot_u.reinit(dof_handler_velocity.n_dofs());
 
-    std::cout << "dim (X_h) = " << (dof_handler_velocity.n_dofs() * dim)
-              << std::endl
-              << "dim (M_h) = " << dof_handler_pressure.n_dofs() << std::endl
-              << "Re        = " << Re << std::endl
+    std::cout << "dim (X_h) = " << (dof_handler_velocity.n_dofs() * dim) //
+              << std::endl                                               //
+              << "dim (M_h) = " << dof_handler_pressure.n_dofs()         //
+              << std::endl                                               //
+              << "Re        = " << Re << std::endl                       //
               << std::endl;
   }
 
@@ -789,20 +806,19 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code>
-  // methods }
+  // @sect4{ <code>NavierStokesProjection::initialize_*_matrices</code> }
 
-  // In this set of methods we initialize the sparsity patterns, the
-  // constraints (if any) and assemble the matrices that do not depend on the
-  // timestep <code>dt</code>. Note that for the Laplace and mass matrices, we
-  // can use functions in the library that do this. Because the expensive
-  // operations of this function -- creating the two matrices -- are entirely
-  // independent, we could in principle mark them as tasks that can be worked
-  // on in %parallel using the Threads::new_task functions. We won't do that
-  // here since these functions internally already are parallelized, and in
-  // particular because the current function is only called once per program
-  // run and so does not incur a cost in each time step. The necessary
-  // modifications would be quite straightforward, however.
+  // In this set of methods we initialize the sparsity patterns, the constraints
+  // (if any) and assemble the matrices that do not depend on the timestep
+  // <code>dt</code>. Note that for the Laplace and mass matrices, we can use
+  // functions in the library that do this. Because the expensive operations of
+  // this function -- creating the two matrices -- are entirely independent, we
+  // could in principle mark them as tasks that can be worked on in %parallel
+  // using the Threads::new_task functions. We won't do that here since these
+  // functions internally already are parallelized, and in particular because
+  // the current function is only called once per program run and so does not
+  // incur a cost in each time step. The necessary modifications would be quite
+  // straightforward, however.
   template <int dim>
   void NavierStokesProjection<dim>::initialize_velocity_matrices()
   {
@@ -853,12 +869,11 @@ namespace Step35
 
 
   // For the gradient operator, we start by initializing the sparsity pattern
-  // and compressing it.  It is important to notice here that the gradient
+  // and compressing it. It is important to notice here that the gradient
   // operator acts from the pressure space into the velocity space, so we have
   // to deal with two different finite element spaces. To keep the loops
   // synchronized, we use the <code>typedef</code>'s that we have defined
-  // before, namely <code>PairedIterators</code> and
-  // <code>IteratorPair</code>.
+  // before, namely <code>PairedIterators</code> and <code>IteratorPair</code>.
   template <int dim>
   void NavierStokesProjection<dim>::initialize_gradient_operator()
   {
@@ -937,8 +952,8 @@ namespace Step35
   // @sect4{ <code>NavierStokesProjection::run</code> }
 
   // This is the time marching function, which starting at <code>t_0</code>
-  // advances in time using the projection method with time step
-  // <code>dt</code> until <code>T</code>.
+  // advances in time using the projection method with time step <code>dt</code>
+  // until <code>T</code>.
   //
   // Its second parameter, <code>verbose</code> indicates whether the function
   // should output information what it is doing at any given moment: for
@@ -962,7 +977,7 @@ namespace Step35
   {
     ConditionalOStream verbose_cout(std::cout, verbose);
 
-    const unsigned int n_steps = static_cast<unsigned int>((T - t_0) / dt);
+    const auto n_steps = static_cast<unsigned int>((T - t_0) / dt);
     vel_exact.set_time(2. * dt);
     output_results(1);
     for (unsigned int n = 2; n <= n_steps; ++n)
@@ -1006,16 +1021,16 @@ namespace Step35
   // @sect4{<code>NavierStokesProjection::diffusion_step</code>}
 
   // The implementation of a diffusion step. Note that the expensive operation
-  // is the diffusion solve at the end of the function, which we have to do
-  // once for each velocity component. To accelerate things a bit, we allow
-  // to do this in %parallel, using the Threads::new_task function which makes
-  // sure that the <code>dim</code> solves are all taken care of and are
-  // scheduled to available processors: if your machine has more than one
-  // processor core and no other parts of this program are using resources
-  // currently, then the diffusion solves will run in %parallel. On the other
-  // hand, if your system has only one processor core then running things in
-  // %parallel would be inefficient (since it leads, for example, to cache
-  // congestion) and things will be executed sequentially.
+  // is the diffusion solve at the end of the function, which we have to do once
+  // for each velocity component. To accelerate things a bit, we allow to do
+  // this in %parallel, using the Threads::new_task function which makes sure
+  // that the <code>dim</code> solves are all taken care of and are scheduled to
+  // available processors: if your machine has more than one processor core and
+  // no other parts of this program are using resources currently, then the
+  // diffusion solves will run in %parallel. On the other hand, if your system
+  // has only one processor core then running things in %parallel would be
+  // inefficient (since it leads, for example, to cache congestion) and things
+  // will be executed sequentially.
   template <int dim>
   void NavierStokesProjection<dim>::diffusion_step(const bool reinit_prec)
   {
@@ -1039,23 +1054,20 @@ namespace Step35
 
         vel_exact.set_component(d);
         boundary_values.clear();
-        for (std::vector<types::boundary_id>::const_iterator boundaries =
-               boundary_ids.begin();
-             boundaries != boundary_ids.end();
-             ++boundaries)
+        for (const auto &boundary_id : boundary_ids)
           {
-            switch (*boundaries)
+            switch (boundary_id)
               {
                 case 1:
                   VectorTools::interpolate_boundary_values(
                     dof_handler_velocity,
-                    *boundaries,
+                    boundary_id,
                     Functions::ZeroFunction<dim>(),
                     boundary_values);
                   break;
                 case 2:
                   VectorTools::interpolate_boundary_values(dof_handler_velocity,
-                                                           *boundaries,
+                                                           boundary_id,
                                                            vel_exact,
                                                            boundary_values);
                   break;
@@ -1063,14 +1075,14 @@ namespace Step35
                   if (d != 0)
                     VectorTools::interpolate_boundary_values(
                       dof_handler_velocity,
-                      *boundaries,
+                      boundary_id,
                       Functions::ZeroFunction<dim>(),
                       boundary_values);
                   break;
                 case 4:
                   VectorTools::interpolate_boundary_values(
                     dof_handler_velocity,
-                    *boundaries,
+                    boundary_id,
                     Functions::ZeroFunction<dim>(),
                     boundary_values);
                   break;
@@ -1111,13 +1123,12 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code>
-  // method and related}
+  // @sect4{ <code>NavierStokesProjection::assemble_advection_term</code> }
 
-  // The following few functions deal with assembling the advection terms,
-  // which is the part of the system matrix for the diffusion step that
-  // changes at every time step. As mentioned above, we will run the assembly
-  // loop over all cells in %parallel, using the WorkStream class and other
+  // The following few functions deal with assembling the advection terms, which
+  // is the part of the system matrix for the diffusion step that changes at
+  // every time step. As mentioned above, we will run the assembly loop over all
+  // cells in %parallel, using the WorkStream class and other
   // facilities as described in the documentation module on @ref threads.
   template <int dim>
   void NavierStokesProjection<dim>::assemble_advection_term()
@@ -1170,12 +1181,15 @@ namespace Step35
     for (unsigned int q = 0; q < scratch.nqp; ++q)
       for (unsigned int i = 0; i < scratch.dpc; ++i)
         for (unsigned int j = 0; j < scratch.dpc; ++j)
-          data.local_advection(i, j) +=
-            (scratch.u_star_local[q] * scratch.fe_val.shape_grad(j, q) *
-               scratch.fe_val.shape_value(i, q) +
-             0.5 * scratch.u_star_tmp[q] * scratch.fe_val.shape_value(i, q) *
-               scratch.fe_val.shape_value(j, q)) *
-            scratch.fe_val.JxW(q);
+          data.local_advection(i, j) += (scratch.u_star_local[q] *            //
+                                           scratch.fe_val.shape_grad(j, q) *  //
+                                           scratch.fe_val.shape_value(i, q)   //
+                                         +                                    //
+                                         0.5 *                                //
+                                           scratch.u_star_tmp[q] *            //
+                                           scratch.fe_val.shape_value(i, q) * //
+                                           scratch.fe_val.shape_value(j, q))  //
+                                        * scratch.fe_val.JxW(q);
   }
 
 
@@ -1234,17 +1248,17 @@ namespace Step35
   // This is the pressure update step of the projection method. It implements
   // the standard formulation of the method, that is @f[ p^{n+1} = p^n +
   // \phi^{n+1}, @f] or the rotational form, which is @f[ p^{n+1} = p^n +
-  // \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.  @f]
+  // \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}. @f]
   template <int dim>
   void NavierStokesProjection<dim>::update_pressure(const bool reinit_prec)
   {
     pres_n_minus_1 = pres_n;
     switch (type)
       {
-        case RunTimeParameters::METHOD_STANDARD:
+        case RunTimeParameters::Method::standard:
           pres_n += phi_n;
           break;
-        case RunTimeParameters::METHOD_ROTATIONAL:
+        case RunTimeParameters::Method::rotational:
           if (reinit_prec)
             prec_mass.initialize(pres_Mass);
           pres_n = pres_tmp;
@@ -1260,21 +1274,21 @@ namespace Step35
 
   // @sect4{ <code>NavierStokesProjection::output_results</code> }
 
-  // This method plots the current solution. The main difficulty is that we
-  // want to create a single output file that contains the data for all
-  // velocity components, the pressure, and also the vorticity of the flow. On
-  // the other hand, velocities and the pressure live on separate DoFHandler
-  // objects, and so can't be written to the same file using a single DataOut
-  // object. As a consequence, we have to work a bit harder to get the various
-  // pieces of data into a single DoFHandler object, and then use that to
-  // drive graphical output.
+  // This method plots the current solution. The main difficulty is that we want
+  // to create a single output file that contains the data for all velocity
+  // components, the pressure, and also the vorticity of the flow. On the other
+  // hand, velocities and the pressure live on separate DoFHandler objects, and
+  // so can't be written to the same file using a single DataOut object. As a
+  // consequence, we have to work a bit harder to get the various pieces of data
+  // into a single DoFHandler object, and then use that to drive graphical
+  // output.
   //
   // We will not elaborate on this process here, but rather refer to step-32,
-  // where a similar procedure is used (and is documented) to
-  // create a joint DoFHandler object for all variables.
+  // where a similar procedure is used (and is documented) to create a joint
+  // DoFHandler object for all variables.
   //
-  // Let us also note that we here compute the vorticity as a scalar quantity
-  // in a separate function, using the $L^2$ projection of the quantity
+  // Let us also note that we here compute the vorticity as a scalar quantity in
+  // a separate function, using the $L^2$ projection of the quantity
   // $\text{curl} u$ onto the finite element space used for the components of
   // the velocity. In principle, however, we could also have computed as a
   // pointwise quantity from the velocity, and do so through the
@@ -1358,10 +1372,10 @@ namespace Step35
 
 
 
-  // Following is the helper function that computes the vorticity by
-  // projecting the term $\text{curl} u$ onto the finite element space used
-  // for the components of the velocity. The function is only called whenever
-  // we generate graphical output, so not very often, and as a consequence we
+  // Following is the helper function that computes the vorticity by projecting
+  // the term $\text{curl} u$ onto the finite element space used for the
+  // components of the velocity. The function is only called whenever we
+  // generate graphical output, so not very often, and as a consequence we
   // didn't bother parallelizing it using the WorkStream concept as we do for
   // the other assembly functions. That should not be overly complicated,
   // however, if needed. Moreover, the implementation that we have here only
@@ -1385,11 +1399,7 @@ namespace Step35
     std::vector<Tensor<1, dim>> grad_u1(nqp), grad_u2(nqp);
     rot_u = 0.;
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity
-                                                            .begin_active(),
-                                                   end =
-                                                     dof_handler_velocity.end();
-    for (; cell != end; ++cell)
+    for (const auto &cell : dof_handler_velocity.active_cell_iterators())
       {
         fe_val_vel.reinit(cell);
         cell->get_dof_indices(ldi);
@@ -1398,8 +1408,9 @@ namespace Step35
         loc_rot = 0.;
         for (unsigned int q = 0; q < nqp; ++q)
           for (unsigned int i = 0; i < dpc; ++i)
-            loc_rot(i) += (grad_u2[q][0] - grad_u1[q][1]) *
-                          fe_val_vel.shape_value(i, q) * fe_val_vel.JxW(q);
+            loc_rot(i) += (grad_u2[q][0] - grad_u1[q][1]) * //
+                          fe_val_vel.shape_value(i, q) *    //
+                          fe_val_vel.JxW(q);
 
         for (unsigned int i = 0; i < dpc; ++i)
           rot_u(ldi[i]) += loc_rot(i);
@@ -1412,8 +1423,8 @@ namespace Step35
 
 // @sect3{ The main function }
 
-// The main function looks very much like in all the other tutorial programs,
-// so there is little to comment on here:
+// The main function looks very much like in all the other tutorial programs, so
+// there is little to comment on here:
 int main()
 {
   try
