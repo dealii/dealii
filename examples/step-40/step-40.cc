@@ -278,8 +278,8 @@ namespace Step40
     // processor can store all information about the entire universe. As a
     // consequence, we need to tell the AffineConstraints object for which
     // degrees of freedom it can store constraints and for which it may not
-    // expect any information to store. In our case, as explained in the @ref
-    // distributed module, the degrees of freedom we need to care about on
+    // expect any information to store. In our case, as explained in the
+    // @ref distributed module, the degrees of freedom we need to care about on
     // each processor are the locally relevant ones, so we pass this to the
     // AffineConstraints::reinit function. As a side note, if you forget to
     // pass this argument, the AffineConstraints class will allocate an array
@@ -305,10 +305,10 @@ namespace Step40
     // be able to store even a single pointer for each global degree of
     // freedom; the best we can hope for is that it stores information about
     // each locally relevant degree of freedom, i.e. all those that we may
-    // ever touch in the process of assembling the matrix (the @ref
-    // distributed_paper "distributed computing paper" has a long discussion
-    // why one really needs the locally relevant, and not the small set of
-    // locally active degrees of freedom in this context).
+    // ever touch in the process of assembling the matrix (the
+    // @ref distributed_paper "distributed computing paper" has a long
+    // discussion why one really needs the locally relevant, and not the small
+    // set of locally active degrees of freedom in this context).
     //
     // So we tell the sparsity pattern its size and what DoFs to store
     // anything for and then ask DoFTools::make_sparsity_pattern to fill it
@@ -423,7 +423,7 @@ namespace Step40
     // Notice that the assembling above is just a local operation. So, to
     // form the "global" linear system, a synchronization between all
     // processors is needed. This could be done by invoking the function
-    // compress(). See @ref GlossCompress  "Compressing distributed objects"
+    // compress(). See @ref GlossCompress "Compressing distributed objects"
     // for more information on what is compress() designed to do.
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
