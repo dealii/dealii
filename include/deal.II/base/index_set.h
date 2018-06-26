@@ -691,7 +691,7 @@ public:
      * Dereferencing operator. The returned value is the index of the element
      * inside the IndexSet.
      */
-    size_type operator*() const;
+    const size_type &operator*() const;
 
     /**
      * Does this iterator point to an existing element?
@@ -1283,7 +1283,7 @@ IndexSet::ElementIterator::is_valid() const
 
 
 
-inline IndexSet::size_type IndexSet::ElementIterator::operator*() const
+inline const IndexSet::size_type &IndexSet::ElementIterator::operator*() const
 {
   Assert(
     is_valid(),
