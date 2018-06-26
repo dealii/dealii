@@ -253,8 +253,13 @@ namespace Step20
   void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                  std::vector<Tensor<2, dim>> &  values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    // The value we are going to store for a given point does not depend on its
+    // coordinates and we use the `points` object only for checking that the
+    // `values` object has the correct size. In release mode, `AssertDimension`
+    // is defined empty and the compiler will complain that the `points` object
+    // is unused. The following line silences this warning.
+    (void)points;
+    AssertDimension(points.size(), values.size());
 
     for (auto &value : values)
       {
