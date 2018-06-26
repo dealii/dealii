@@ -854,8 +854,12 @@ namespace ColorEnriched
      * 5 (color = 2). cellwise_color_predicate_map has this information
      * provided we know the material id.
      *
-     * Now a call to color_enrichment[1](cell) should in turn call
-     * enrichments[4](cell).
+     * The constructed color_enrichments is such that
+     * color_enrichments[color=1](cell) will return a pointer to
+     * the enrichment function with id=4, i.e. enrichments[4].
+     * In other words, using the previously collected information in
+     * this function we translate a vector of user provided enrichment
+     * functions into a vector of functions suitable for FE_Enriched class.
      *
      * @param[in] num_colors number of colors for predicates
      * @param[in] enrichments vector of enrichment functions
