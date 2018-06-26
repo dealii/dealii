@@ -34,10 +34,10 @@
 void
 test()
 {
-  const auto MyPID{Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)};
-  const auto NumProc{Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)};
+  const unsigned int MyPID   = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int NumProc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (!MyPID)
+  if (MyPID == 0)
     deallog << "NumProc=" << NumProc << std::endl;
 
   // create non-contiguous index set for NumProc > 1
@@ -89,14 +89,14 @@ test()
     {
       const auto &el = M1.el(i, i);
 
-      if (!MyPID)
+      if (MyPID == 0)
         deallog << "i = " << i << " , j = " << i << " , el = " << el
                 << std::endl;
 
       AssertThrow(el == dealii::numbers::PI, dealii::ExcInternalError());
     }
 
-  if (!MyPID)
+  if (MyPID == 0)
     deallog << "OK" << std::endl;
 }
 
