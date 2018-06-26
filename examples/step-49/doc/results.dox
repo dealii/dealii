@@ -98,28 +98,28 @@ void create_2d_grid(
 void create_3d_grid(Triangulation<3> &triangulation)
 {
   // Generate first cross section
-  std::vector<Point<2>> vertices_1{Point<2>(-1.5, 0.),
-                                   Point<2>(-0.5, 0.),
-                                   Point<2>(0.5, 0.),
-                                   Point<2>(1.5, 0.),
+  const std::vector<Point<2>> vertices_1{{-1.5, 0.},
+                                         {-0.5, 0.},
+                                         {0.5, 0.},
+                                         {1.5, 0.},
 
-                                   Point<2>(-1.5, 1.5),
-                                   Point<2>(-0.5, 1.5),
-                                   Point<2>(0.5, 1.5),
-                                   Point<2>(1.5, 1.5),
+                                         {-1.5, 1.5},
+                                         {-0.5, 1.5},
+                                         {0.5, 1.5},
+                                         {1.5, 1.5},
 
-                                   Point<2>(-1.5, 3.),
-                                   Point<2>(-0.5, 3.),
-                                   Point<2>(0.5, 3.),
-                                   Point<2>(1.5, 3.),
+                                         {-1.5, 3.},
+                                         {-0.5, 3.},
+                                         {0.5, 3.},
+                                         {1.5, 3.},
 
-                                   Point<2>(-0.5, 3 + 0.5 * sqrt(3)),
-                                   Point<2>(0.5, 3 + 0.5 * sqrt(3)),
+                                         {-0.5, 3 + 0.5 * sqrt(3)},
+                                         {0.5, 3 + 0.5 * sqrt(3)},
 
-                                   Point<2>(-0.75, 3 + 0.75 * sqrt(3)),
-                                   Point<2>(0.75, 3 + 0.75 * sqrt(3))};
+                                         {-0.75, 3 + 0.75 * sqrt(3)},
+                                         {0.75, 3 + 0.75 * sqrt(3)}};
 
-  std::vector<std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
+  const std::vector<std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
     cell_vertices_1 = {{{0, 1, 4, 5}},
                        {{1, 2, 5, 6}},
                        {{3, 7, 2, 6}},
@@ -143,39 +143,37 @@ void create_3d_grid(Triangulation<3> &triangulation)
                                        triangulation_3d_1);
 
   // Now do the same with the second volume
-  const std::vector<Point<2>> vertices_2 = {
-    Point<2>(-2.5, 0.),
-    Point<2>(-1.5, 0.),
-    Point<2>(-0.5, 0.),
-    Point<2>(0.5, 0.),
-    Point<2>(1.5, 0.),
-    Point<2>(2.5, 0.),
+  const std::vector<Point<2>> vertices_2{{-2.5, 0.},
+                                         {-1.5, 0.},
+                                         {-0.5, 0.},
+                                         {0.5, 0.},
+                                         {1.5, 0.},
+                                         {2.5, 0.},
 
-    Point<2>(-2.5, 1.5),
-    Point<2>(-1.5, 1.5),
-    Point<2>(-0.5, 1.5),
-    Point<2>(0.5, 1.5),
-    Point<2>(1.5, 1.5),
-    Point<2>(2.5, 1.5),
+                                         {-2.5, 1.5},
+                                         {-1.5, 1.5},
+                                         {-0.5, 1.5},
+                                         {0.5, 1.5},
+                                         {1.5, 1.5},
+                                         {2.5, 1.5},
 
-    Point<2>(-2.5, 3.),
-    Point<2>(-1.5, 3.),
-    Point<2>(-0.5, 3.),
-    Point<2>(0.5, 3.),
-    Point<2>(1.5, 3.),
-    Point<2>(2.5, 3.),
+                                         {-2.5, 3.},
+                                         {-1.5, 3.},
+                                         {-0.5, 3.},
+                                         {0.5, 3.},
+                                         {1.5, 3.},
+                                         {2.5, 3.},
 
-    Point<2>(-0.5, 3. + 0.5 * sqrt(3)),
-    Point<2>(0.5, 3. + 0.5 * sqrt(3)),
+                                         {-0.5, 3. + 0.5 * sqrt(3)},
+                                         {0.5, 3. + 0.5 * sqrt(3)},
 
-    Point<2>(-0.75, 3. + 0.75 * sqrt(3)),
-    Point<2>(0.75, 3. + 0.75 * sqrt(3)),
+                                         {-0.75, 3. + 0.75 * sqrt(3)},
+                                         {0.75, 3. + 0.75 * sqrt(3)},
 
-    Point<2>(-1.25, 3. + 1.25 * sqrt(3)),
-    Point<2>(1.25, 3. + 1.25 * sqrt(3))};
+                                         {-1.25, 3. + 1.25 * sqrt(3)},
+                                         {1.25, 3. + 1.25 * sqrt(3)}};
 
-  const std::vector<
-    std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
+  const std::vector<std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
     cell_vertices_2 = {{{0, 1, 6, 7}},
                        {{1, 2, 7, 8}},
                        {{2, 3, 8, 9}},
