@@ -158,12 +158,6 @@ void Step5<dim>::setup_system()
 // side can take a comparable time, and you should think about using one or
 // two optimizations at some places.
 //
-// What we will show here is how we can avoid calls to the shape_value,
-// shape_grad, and quadrature_point functions of the FEValues object. The way
-// to do so will be explained in the following, while those parts of this
-// function that are not changed with respect to the previous example are not
-// commented on.
-//
 // The first parts of the function are completely unchanged from before:
 template <int dim>
 void Step5<dim>::assemble_system()
@@ -190,8 +184,8 @@ void Step5<dim>::assemble_system()
   // coefficient value at each quadrature point.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      cell_matrix = 0;
-      cell_rhs    = 0;
+      cell_matrix = 0.;
+      cell_rhs    = 0.;
 
       fe_values.reinit(cell);
 
@@ -203,11 +197,14 @@ void Step5<dim>::assemble_system()
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i, j) +=
-                  (current_coefficient * fe_values.shape_grad(i, q_index) *
-                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+                  (current_coefficient *              // a(x_q)
+                   fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
+                   fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
+                   fe_values.JxW(q_index));           // dx
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
+                              1.0 *                               // f(x_q)
+                              fe_values.JxW(q_index));            // dx
             }
         }
 
@@ -313,13 +310,13 @@ void Step5<dim>::output_results(const unsigned int cycle) const
   // They are initialized with the default values, so we only have to change
   // those that we don't like. For example, we would like to scale the z-axis
   // differently (stretch each data point in z-direction by a factor of four):
-  eps_flags.z_scaling = 4;
+  eps_flags.z_scaling = 4.;
   // Then we would also like to alter the viewpoint from which we look at the
   // solution surface. The default is at an angle of 60 degrees down from the
   // vertical axis, and 30 degrees rotated against it in mathematical positive
   // sense. We raise our viewpoint a bit and look more along the y-axis:
-  eps_flags.azimut_angle = 40;
-  eps_flags.turn_angle   = 10;
+  eps_flags.azimut_angle = 40.;
+  eps_flags.turn_angle   = 10.;
   // That shall suffice. There are more flags, for example whether to draw the
   // mesh lines, which data vectors to use for colorization of the interior of
   // the cells, and so on. You may want to take a look at the documentation of
@@ -458,9 +455,11 @@ void Step5<dim>::run()
 
       // Now that we have a mesh for sure, we write some output and do all the
       // things that we have already seen in the previous examples.
-      std::cout << "   Number of active cells: "
-                << triangulation.n_active_cells() << std::endl
-                << "   Total number of cells: " << triangulation.n_cells()
+      std::cout << "   Number of active cells: "  //
+                << triangulation.n_active_cells() //
+                << std::endl                      //
+                << "   Total number of cells: "   //
+                << triangulation.n_cells()        //
                 << std::endl;
 
       setup_system();
