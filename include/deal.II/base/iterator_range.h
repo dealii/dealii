@@ -142,7 +142,7 @@ public:
      * Dereferencing operator.
      * @return The iterator within the collection currently pointed to.
      */
-    BaseIterator operator*() const;
+    const BaseIterator &operator*() const;
 
     /**
      * Dereferencing operator.
@@ -231,8 +231,8 @@ private:
   /**
    * Iterators characterizing the begin and end of the range.
    */
-  const iterator it_begin;
-  const iterator it_end;
+  const IteratorOverIterators it_begin;
+  const IteratorOverIterators it_end;
 };
 
 
@@ -248,7 +248,8 @@ inline IteratorRange<Iterator>::IteratorOverIterators::IteratorOverIterators(
 
 
 template <typename Iterator>
-inline typename IteratorRange<Iterator>::IteratorOverIterators::BaseIterator
+inline const typename IteratorRange<
+  Iterator>::IteratorOverIterators::BaseIterator &
   IteratorRange<Iterator>::IteratorOverIterators::operator*() const
 {
   return element_of_iterator_collection;
@@ -316,7 +317,7 @@ template <typename Iterator>
 inline typename IteratorRange<Iterator>::IteratorOverIterators
 IteratorRange<Iterator>::begin()
 {
-  return IteratorOverIterators(it_begin);
+  return it_begin;
 }
 
 
@@ -324,7 +325,7 @@ template <typename Iterator>
 inline typename IteratorRange<Iterator>::IteratorOverIterators
 IteratorRange<Iterator>::end()
 {
-  return IteratorOverIterators(it_end);
+  return it_end;
 }
 
 
