@@ -436,8 +436,9 @@ void Step3::assemble_system()
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i, j) +=
-                (fe_values.shape_grad(i, q_index) *
-                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+                (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
+                 fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
+                 fe_values.JxW(q_index));           // dx
 
           // We then do the same thing for the right hand side. Here,
           // the integral is over the shape function i times the right
@@ -445,8 +446,9 @@ void Step3::assemble_system()
           // with constant value one (more interesting examples will
           // be considered in the following programs).
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            cell_rhs(i) +=
-              (fe_values.shape_value(i, q_index) * 1 * fe_values.JxW(q_index));
+            cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
+                            1 *                                 // f(x_q)
+                            fe_values.JxW(q_index));            // dx
         }
       // Now that we have the contribution of this cell, we have to transfer
       // it to the global matrix and right hand side. To this end, we first
