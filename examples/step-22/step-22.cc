@@ -501,13 +501,10 @@ namespace Step22
     const unsigned int n_u = dofs_per_block[0];
     const unsigned int n_p = dofs_per_block[1];
 
-    std::cout << "   Number of active cells: "       //
-              << triangulation.n_active_cells()      //
-              << std::endl                           //
-              << "   Number of degrees of freedom: " //
-              << dof_handler.n_dofs()                //
-              << " (" << n_u << '+' << n_p << ')'    //
-              << std::endl;
+    std::cout << "   Number of active cells: " << triangulation.n_active_cells()
+              << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+              << " (" << n_u << '+' << n_p << ')' << std::endl;
 
     // The next task is to allocate a sparsity pattern for the system matrix we
     // will create and one for the preconditioner matrix. We could do this in
@@ -619,12 +616,10 @@ namespace Step22
 
     QGauss<dim> quadrature_formula(degree + 2);
 
-    FEValues<dim> fe_values(fe,                          //
-                            quadrature_formula,          //
-                            update_values |              //
-                              update_quadrature_points | //
-                              update_JxW_values |        //
-                              update_gradients);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_quadrature_points |
+                              update_JxW_values | update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -697,13 +692,15 @@ namespace Step22
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) //
-                       - div_phi_u[i] * phi_p[j]                 //
-                       - phi_p[i] * div_phi_u[j])                //
-                      * fe_values.JxW(q);
+                      (2 * (symgrad_phi_u[i]      // ((2 * grad^s v_i(x_q)
+                            * symgrad_phi_u[j])   //     * grad^s u_j(x_q))
+                       - div_phi_u[i] * phi_p[j]  // - div v_i(x_q) * p_j(x_q)
+                       - phi_p[i] * div_phi_u[j]) // - q_i(x_q) * div u_j(x_q))
+                      * fe_values.JxW(q);         // * dx
 
                     local_preconditioner_matrix(i, j) +=
-                      (phi_p[i] * phi_p[j]) * fe_values.JxW(q);
+                      (phi_p[i] * phi_p[j]) // (q_i(x_q) * p_j(x_q))
+                      * fe_values.JxW(q);   // * dx
                   }
 
                 // For the right-hand side we use the fact that the shape
@@ -720,9 +717,9 @@ namespace Step22
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
-                local_rhs(i) += fe_values.shape_value(i, q) * //
-                                rhs_values[q](component_i) *  //
-                                fe_values.JxW(q);
+                local_rhs(i) += (fe_values.shape_value(i, q)   // (v_i(x_q)
+                                 * rhs_values[q](component_i)) // * f(x_q))
+                                * fe_values.JxW(q);            // * dx
               }
           }
 
@@ -852,9 +849,8 @@ namespace Step22
       // pressure field.
       constraints.distribute(solution);
 
-      std::cout << "  "                                                 //
-                << solver_control.last_step()                           //
-                << " outer CG Schur complement iterations for pressure" //
+      std::cout << "  " << solver_control.last_step()
+                << " outer CG Schur complement iterations for pressure"
                 << std::endl;
     }
 
@@ -982,12 +978,13 @@ namespace Step22
       std::vector<unsigned int> subdivisions(dim, 1);
       subdivisions[0] = 4;
 
-      const Point<dim> bottom_left = (dim == 2 ?             //
-                                        Point<dim>(-2, -1) : //
-                                        Point<dim>(-2, 0, -1));
-      const Point<dim> top_right   = (dim == 2 ?           //
-                                      Point<dim>(2, 0) : //
-                                      Point<dim>(2, 1, 0));
+      const Point<dim> bottom_left = (dim == 2 ?                //
+                                        Point<dim>(-2, -1) :    // 2d case
+                                        Point<dim>(-2, 0, -1)); // 3d case
+
+      const Point<dim> top_right = (dim == 2 ?              //
+                                      Point<dim>(2, 0) :    // 2d case
+                                      Point<dim>(2, 1, 0)); // 3d case
 
       GridGenerator::subdivided_hyper_rectangle(triangulation,
                                                 subdivisions,
@@ -1013,8 +1010,7 @@ namespace Step22
     // As first seen in step-6, we cycle over the different refinement levels
     // and refine (except for the first cycle), setup the degrees of freedom
     // and matrices, assemble, solve and create output:
-    for (unsigned int refinement_cycle = 0; //
-         refinement_cycle < 6;              //
+    for (unsigned int refinement_cycle = 0; refinement_cycle < 6;
          ++refinement_cycle)
       {
         std::cout << "Refinement cycle " << refinement_cycle << std::endl;
