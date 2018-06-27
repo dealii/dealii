@@ -85,18 +85,13 @@ namespace
   // domain
   namespace base64
   {
-    typedef enum
-    {
-      step_A,
-      step_B,
-      step_C
-    } base64_encodestep;
+    using base64_encodestep = enum { step_A, step_B, step_C };
 
-    typedef struct
+    using base64_encodestate = struct
     {
       base64_encodestep step;
       char              result;
-    } base64_encodestate;
+    };
 
     void
     base64_init_encodestate(base64_encodestate *state_in)
@@ -5540,7 +5535,7 @@ namespace DataOutBase
         << ascii_or_binary << "\">\n";
 
     {
-      // uint8_t might be a typedef to unsigned char which is then not printed
+      // uint8_t might be an alias to unsigned char which is then not printed
       // as ascii integers
 #ifdef DEAL_II_WITH_ZLIB
       std::vector<uint8_t> cell_types(n_cells,
@@ -8492,7 +8487,7 @@ template <int dim, int spacedim>
 void
 DataOutReader<dim, spacedim>::merge(const DataOutReader<dim, spacedim> &source)
 {
-  typedef typename dealii::DataOutBase::Patch<dim, spacedim> Patch;
+  using Patch = typename dealii::DataOutBase::Patch<dim, spacedim>;
 
 
   const std::vector<Patch> &source_patches = source.get_patches();

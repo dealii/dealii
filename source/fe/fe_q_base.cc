@@ -1191,7 +1191,7 @@ std::vector<unsigned int>
 FE_Q_Base<PolynomialType, dim, spacedim>::get_dpo_vector(
   const unsigned int degree)
 {
-  typedef FE_Q_Base<PolynomialType, dim, spacedim> FEQ;
+  using FEQ = FE_Q_Base<PolynomialType, dim, spacedim>;
   AssertThrow(degree > 0, typename FEQ::ExcFEQCannotHaveDegree0());
   std::vector<unsigned int> dpo(dim + 1, 1U);
   for (unsigned int i = 1; i < dpo.size(); ++i)

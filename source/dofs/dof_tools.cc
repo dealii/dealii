@@ -2319,12 +2319,11 @@ namespace DoFTools
   {
     AssertThrow(out, ExcIO());
 
-    typedef std::map<types::global_dof_index, Point<spacedim>> dof_map_t;
+    using dof_map_t = std::map<types::global_dof_index, Point<spacedim>>;
 
-    typedef std::map<Point<spacedim>,
-                     std::vector<types::global_dof_index>,
-                     typename internal::ComparisonHelper<spacedim>>
-      point_map_t;
+    using point_map_t = std::map<Point<spacedim>,
+                                 std::vector<types::global_dof_index>,
+                                 typename internal::ComparisonHelper<spacedim>>;
 
     point_map_t point_map;
 

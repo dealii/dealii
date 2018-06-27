@@ -147,8 +147,8 @@ namespace internal
         }
 
 
-        typedef std::vector<std::pair<unsigned int, unsigned int>>
-          DoFIdentities;
+        using DoFIdentities =
+          std::vector<std::pair<unsigned int, unsigned int>>;
 
 
         /**
@@ -3625,9 +3625,8 @@ namespace internal
           // build list of cells to request for each neighbor
           std::set<dealii::types::subdomain_id> level_ghost_owners =
             tria.level_ghost_owners();
-          typedef std::map<dealii::types::subdomain_id,
-                           CellDataTransferBuffer<dim>>
-                    cellmap_t;
+          using cellmap_t =
+            std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>;
           cellmap_t neighbor_cell_list;
           for (std::set<dealii::types::subdomain_id>::iterator it =
                  level_ghost_owners.begin();

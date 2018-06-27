@@ -88,13 +88,13 @@ namespace DerivativeApproximation
        * Declare the data type which holds the derivative described by this
        * class.
        */
-      typedef Tensor<1, dim> Derivative;
+      using Derivative = Tensor<1, dim>;
 
       /**
        * Likewise declare the data type that holds the derivative projected to a
        * certain directions.
        */
-      typedef Tensor<0, dim> ProjectedDerivative;
+      using ProjectedDerivative = Tensor<0, dim>;
 
       /**
        * Given an FEValues object initialized to a cell, and a solution vector,
@@ -201,13 +201,13 @@ namespace DerivativeApproximation
        * Declare the data type which holds the derivative described by this
        * class.
        */
-      typedef Tensor<2, dim> Derivative;
+      using Derivative = Tensor<2, dim>;
 
       /**
        * Likewise declare the data type that holds the derivative projected to a
        * certain directions.
        */
-      typedef Tensor<1, dim> ProjectedDerivative;
+      using ProjectedDerivative = Tensor<1, dim>;
 
       /**
        * Given an FEValues object initialized to a cell, and a solution vector,
@@ -538,13 +538,13 @@ namespace DerivativeApproximation
        * holds the derivative described
        * by this class.
        */
-      typedef Tensor<3, dim> Derivative;
+      using Derivative = Tensor<3, dim>;
 
       /**
        * Likewise declare the data type that holds the derivative projected to a
        * certain directions.
        */
-      typedef Tensor<2, dim> ProjectedDerivative;
+      using ProjectedDerivative = Tensor<2, dim>;
 
       /**
        * Given an FEValues object initialized to a cell, and a solution vector,
@@ -676,32 +676,32 @@ namespace DerivativeApproximation
     {
     public:
       /**
-       * typedef to select the DerivativeDescription corresponding to the
+       * alias to select the DerivativeDescription corresponding to the
        * <tt>order</tt>th derivative. In this general template we set an unvalid
-       * typedef to void, the real typedefs have to be specialized.
+       * alias to void, the real alias have to be specialized.
        */
-      typedef void DerivDescr;
+      using DerivDescr = void;
     };
 
     template <int dim>
     class DerivativeSelector<1, dim>
     {
     public:
-      typedef Gradient<dim> DerivDescr;
+      using DerivDescr = Gradient<dim>;
     };
 
     template <int dim>
     class DerivativeSelector<2, dim>
     {
     public:
-      typedef SecondDerivative<dim> DerivDescr;
+      using DerivDescr = SecondDerivative<dim>;
     };
 
     template <int dim>
     class DerivativeSelector<3, dim>
     {
     public:
-      typedef ThirdDerivative<dim> DerivDescr;
+      using DerivDescr = ThirdDerivative<dim>;
     };
   } // namespace internal
 } // namespace DerivativeApproximation
@@ -986,11 +986,10 @@ namespace DerivativeApproximation
       Assert(component < dof_handler.get_fe(0).n_components(),
              ExcIndexRange(component, 0, dof_handler.get_fe(0).n_components()));
 
-      typedef std::tuple<
+      using Iterators = std::tuple<
         TriaActiveIterator<
           dealii::DoFCellAccessor<DoFHandlerType<dim, spacedim>, false>>,
-        Vector<float>::iterator>
-                                      Iterators;
+        Vector<float>::iterator>;
       SynchronousIterators<Iterators> begin(
         Iterators(dof_handler.begin_active(), derivative_norm.begin())),
         end(Iterators(dof_handler.end(), derivative_norm.end()));

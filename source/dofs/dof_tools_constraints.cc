@@ -2245,7 +2245,7 @@ namespace DoFTools
 
       // have an array that stores the location of each vector-dof tuple we want
       // to rotate.
-      typedef std::array<unsigned int, spacedim> DoFTuple;
+      using DoFTuple = std::array<unsigned int, spacedim>;
 
       // start with a pristine interpolation matrix...
       FullMatrix<double> transformation = IdentityMatrix(n_dofs_per_face);
@@ -2544,9 +2544,8 @@ namespace DoFTools
     const ComponentMask &            component_mask,
     const std::vector<unsigned int> &first_vector_components)
   {
-    typedef std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
-                                        FaceVector;
+    using FaceVector = std::vector<
+      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>;
     typename FaceVector::const_iterator it, end_periodic;
     it           = periodic_faces.begin();
     end_periodic = periodic_faces.end();
@@ -2554,7 +2553,7 @@ namespace DoFTools
     // Loop over all periodic faces...
     for (; it != end_periodic; ++it)
       {
-        typedef typename DoFHandlerType::face_iterator FaceIterator;
+        using FaceIterator        = typename DoFHandlerType::face_iterator;
         const FaceIterator face_1 = it->cell[0]->face(it->face_idx[0]);
         const FaceIterator face_2 = it->cell[1]->face(it->face_idx[1]);
 

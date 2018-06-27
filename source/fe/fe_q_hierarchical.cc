@@ -908,7 +908,7 @@ FE_Q_Hierarchical<dim>::get_face_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Q_Hierarchical element
-  typedef FE_Q_Hierarchical<dim> FEQHierarchical;
+  using FEQHierarchical = FE_Q_Hierarchical<dim>;
   AssertThrow((x_source_fe.get_name().find("FE_Q_Hierarchical<") == 0) ||
                 (dynamic_cast<const FEQHierarchical *>(&x_source_fe) !=
                  nullptr),
@@ -995,7 +995,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Q_Hierarchical element
-  typedef FE_Q_Hierarchical<dim> FEQHierarchical;
+  using FEQHierarchical = FE_Q_Hierarchical<dim>;
   AssertThrow((x_source_fe.get_name().find("FE_Q_Hierarchical<") == 0) ||
                 (dynamic_cast<const FEQHierarchical *>(&x_source_fe) !=
                  nullptr),

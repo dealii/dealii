@@ -468,7 +468,7 @@ namespace TrilinosWrappers
 
   namespace
   {
-    typedef SparseMatrix::size_type size_type;
+    using size_type = SparseMatrix::size_type;
 
     template <typename SparsityPatternType>
     void
@@ -2223,7 +2223,7 @@ namespace TrilinosWrappers
 
   namespace internals
   {
-    typedef dealii::types::global_dof_index size_type;
+    using size_type = dealii::types::global_dof_index;
 
     void
     perform_mmult(const SparseMatrix &inputleft,
@@ -3219,10 +3219,10 @@ namespace TrilinosWrappers
       operator+(const TrilinosPayload &first_op,
                 const TrilinosPayload &second_op)
       {
-        typedef typename TrilinosPayload::Domain     Domain;
-        typedef typename TrilinosPayload::Range      Range;
-        typedef typename TrilinosPayload::VectorType Intermediate;
-        typedef TrilinosWrappers::MPI::Vector        GVMVectorType;
+        using Domain        = typename TrilinosPayload::Domain;
+        using Range         = typename TrilinosPayload::Range;
+        using Intermediate  = typename TrilinosPayload::VectorType;
+        using GVMVectorType = TrilinosWrappers::MPI::Vector;
 
         Assert(first_op.locally_owned_domain_indices() ==
                  second_op.locally_owned_domain_indices(),
@@ -3414,10 +3414,10 @@ namespace TrilinosWrappers
       TrilinosPayload operator*(const TrilinosPayload &first_op,
                                 const TrilinosPayload &second_op)
       {
-        typedef typename TrilinosPayload::Domain     Domain;
-        typedef typename TrilinosPayload::Range      Range;
-        typedef typename TrilinosPayload::VectorType Intermediate;
-        typedef TrilinosWrappers::MPI::Vector        GVMVectorType;
+        using Domain        = typename TrilinosPayload::Domain;
+        using Range         = typename TrilinosPayload::Range;
+        using Intermediate  = typename TrilinosPayload::VectorType;
+        using GVMVectorType = TrilinosWrappers::MPI::Vector;
 
         AssertThrow(first_op.locally_owned_domain_indices() ==
                       second_op.locally_owned_range_indices(),

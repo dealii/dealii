@@ -2649,8 +2649,8 @@ namespace internal
       scalars.resize(n_scalars);
       for (unsigned int component = 0; component < n_scalars; ++component)
         {
-          // Use a typedef here to work around an issue with gcc-4.1:
-          typedef dealii::FEValuesViews::Scalar<dim, spacedim> ScalarView;
+          // Use an alias here to work around an issue with gcc-4.1:
+          using ScalarView = dealii::FEValuesViews::Scalar<dim, spacedim>;
           scalars[component].ScalarView::~ScalarView();
 
           new (&scalars[component])
@@ -2665,8 +2665,8 @@ namespace internal
       vectors.resize(n_vectors);
       for (unsigned int component = 0; component < n_vectors; ++component)
         {
-          // Use a typedef here to work around an issue with gcc-4.1:
-          typedef dealii::FEValuesViews::Vector<dim, spacedim> VectorView;
+          // Use an alias here to work around an issue with gcc-4.1:
+          using VectorView = dealii::FEValuesViews::Vector<dim, spacedim>;
           vectors[component].VectorView::~VectorView();
 
           new (&vectors[component])
@@ -2683,9 +2683,9 @@ namespace internal
            component < n_symmetric_second_order_tensors;
            ++component)
         {
-          // Use a typedef here to work around an issue with gcc-4.1:
-          typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim>
-            SymmetricTensorView;
+          // Use an alias here to work around an issue with gcc-4.1:
+          using SymmetricTensorView =
+            dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim>;
           symmetric_second_order_tensors[component]
             .SymmetricTensorView::~SymmetricTensorView();
 
@@ -2703,8 +2703,8 @@ namespace internal
       for (unsigned int component = 0; component < n_second_order_tensors;
            ++component)
         {
-          // Use a typedef here to work around an issue with gcc-4.1:
-          typedef dealii::FEValuesViews::Tensor<2, dim, spacedim> TensorView;
+          // Use an alias here to work around an issue with gcc-4.1:
+          using TensorView = dealii::FEValuesViews::Tensor<2, dim, spacedim>;
           second_order_tensors[component].TensorView::~TensorView();
 
           new (&second_order_tensors[component])
@@ -3251,7 +3251,7 @@ namespace internal
     const bool                             quadrature_points_fastest = false,
     const unsigned int                     component_multiple        = 1)
   {
-    typedef typename VectorType::value_type Number;
+    using Number = typename VectorType::value_type;
     // initialize with zero
     for (unsigned int i = 0; i < values.size(); ++i)
       std::fill_n(values[i].begin(),
@@ -3658,7 +3658,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   const InputVector &                            fe_function,
   std::vector<typename InputVector::value_type> &values) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe->n_components(), 1);
@@ -3684,7 +3684,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   const VectorSlice<const std::vector<types::global_dof_index>> &indices,
   std::vector<typename InputVector::value_type> &                values) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe->n_components(), 1);
@@ -3707,7 +3707,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   const InputVector &                                    fe_function,
   std::vector<Vector<typename InputVector::value_type>> &values) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -3736,7 +3736,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   const VectorSlice<const std::vector<types::global_dof_index>> &indices,
   std::vector<Vector<typename InputVector::value_type>> &        values) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
@@ -3769,7 +3769,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
        values,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
 
@@ -3801,7 +3801,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
   const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension(fe->n_components(), 1);
@@ -3828,7 +3828,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
   const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension(fe->n_components(), 1);
@@ -3853,7 +3853,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
     std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
     &gradients) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   Assert(present_cell.get() != nullptr,
@@ -3884,7 +3884,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
        gradients,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
@@ -3915,7 +3915,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
   const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   AssertDimension(fe->n_components(), 1);
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -3942,7 +3942,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
   const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe_function.size(), present_cell->n_dofs_for_dof_handler());
@@ -3968,7 +3968,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
     &  hessians,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(present_cell.get() != nullptr,
@@ -4000,7 +4000,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
        hessians,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(indices.size() % dofs_per_cell == 0,
@@ -4028,7 +4028,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   const InputVector &                            fe_function,
   std::vector<typename InputVector::value_type> &laplacians) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe->n_components(), 1);
@@ -4054,7 +4054,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   const VectorSlice<const std::vector<types::global_dof_index>> &indices,
   std::vector<typename InputVector::value_type> &laplacians) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe->n_components(), 1);
@@ -4077,7 +4077,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   const InputVector &                                    fe_function,
   std::vector<Vector<typename InputVector::value_type>> &laplacians) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   Assert(this->update_flags & update_hessians,
@@ -4105,7 +4105,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   const VectorSlice<const std::vector<types::global_dof_index>> &indices,
   std::vector<Vector<typename InputVector::value_type>> &laplacians) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
@@ -4137,7 +4137,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   std::vector<std::vector<typename InputVector::value_type>> &   laplacians,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert(this->update_flags & update_hessians,
@@ -4166,7 +4166,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
     &third_derivatives) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   AssertDimension(fe->n_components(), 1);
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
@@ -4194,7 +4194,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
     &third_derivatives) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertDimension(fe_function.size(), present_cell->n_dofs_for_dof_handler());
@@ -4221,7 +4221,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
     &  third_derivatives,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(present_cell.get() != nullptr,
@@ -4253,7 +4253,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
        third_derivatives,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type Number;
+  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(indices.size() % dofs_per_cell == 0,

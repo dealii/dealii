@@ -929,9 +929,8 @@ namespace SparsityTools
     for (DynamicSparsityPattern::size_type i = 0; i < rows_per_cpu.size(); ++i)
       start_index[i + 1] = start_index[i] + rows_per_cpu[i];
 
-    typedef std::map<DynamicSparsityPattern::size_type,
-                     std::vector<DynamicSparsityPattern::size_type>>
-      map_vec_t;
+    using map_vec_t = std::map<DynamicSparsityPattern::size_type,
+                               std::vector<DynamicSparsityPattern::size_type>>;
 
     map_vec_t send_data;
 
@@ -1073,9 +1072,9 @@ namespace SparsityTools
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
 
-    typedef std::map<BlockDynamicSparsityPattern::size_type,
-                     std::vector<BlockDynamicSparsityPattern::size_type>>
-              map_vec_t;
+    using map_vec_t =
+      std::map<BlockDynamicSparsityPattern::size_type,
+               std::vector<BlockDynamicSparsityPattern::size_type>>;
     map_vec_t send_data;
 
     {

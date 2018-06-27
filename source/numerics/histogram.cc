@@ -96,8 +96,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
 
       case logarithmic:
         {
-          typedef bool (*comparator)(const number, const number);
-          const comparator logarithmic_less_function =
+          const auto logarithmic_less_function =
             &Histogram::template logarithmic_less<number>;
 
           min_value = *std::min_element(values[0].begin(),

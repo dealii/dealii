@@ -40,7 +40,7 @@ namespace internal
           return QGaussLobatto<1>(degree + 1).get_points();
         else
           {
-            typedef dealii::FE_Q_Base<TensorProductPolynomials<1>, 1, 1> FEQ;
+            using FEQ = dealii::FE_Q_Base<TensorProductPolynomials<1>, 1, 1>;
             AssertThrow(false, FEQ::ExcFEQCannotHaveDegree0());
           }
         return std::vector<Point<1>>();

@@ -4112,7 +4112,7 @@ namespace internal
               const GridOutFlags::Eps<2> &                eps_flags_2,
               const GridOutFlags::Eps<3> &                eps_flags_3)
     {
-      typedef std::list<LineEntry> LineList;
+      using LineList = std::list<LineEntry>;
 
       // We should never get here in 1D since this function is overloaded for
       // all dim == 1 cases.

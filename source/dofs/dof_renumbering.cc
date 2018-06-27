@@ -70,17 +70,16 @@ namespace DoFRenumbering
       using namespace ::boost;
       using namespace std;
 
-      typedef adjacency_list<vecS,
-                             vecS,
-                             undirectedS,
-                             property<vertex_color_t,
-                                      default_color_type,
-                                      property<vertex_degree_t, int>>>
-                                                      Graph;
-      typedef graph_traits<Graph>::vertex_descriptor  Vertex;
-      typedef graph_traits<Graph>::vertices_size_type size_type;
+      using Graph     = adjacency_list<vecS,
+                                   vecS,
+                                   undirectedS,
+                                   property<vertex_color_t,
+                                            default_color_type,
+                                            property<vertex_degree_t, int>>>;
+      using Vertex    = graph_traits<Graph>::vertex_descriptor;
+      using size_type = graph_traits<Graph>::vertices_size_type;
 
-      typedef std::pair<size_type, size_type> Pair;
+      using Pair = std::pair<size_type, size_type>;
     } // namespace boosttypes
 
 
@@ -281,7 +280,7 @@ namespace DoFRenumbering
       int delta = 0;
 
       // must be BGL directed graph now
-      typedef adjacency_list<vecS, vecS, directedS> Graph;
+      using Graph = adjacency_list<vecS, vecS, directedS>;
 
       int n = dof_handler.n_dofs();
 
@@ -310,7 +309,7 @@ namespace DoFRenumbering
         }
 
 
-      typedef std::vector<int> Vector;
+      using Vector = std::vector<int>;
 
 
       Vector inverse_perm(n, 0);

@@ -927,7 +927,7 @@ namespace
                           unsigned int>,
                 std::bitset<3>>> &periodic_face_map)
   {
-    typedef typename Triangulation<dim, spacedim>::face_iterator FaceIterator;
+    using FaceIterator = typename Triangulation<dim, spacedim>::face_iterator;
     const FaceIterator face_1 = cell_1->face(n_face_1);
     const FaceIterator face_2 = cell_2->face(n_face_2);
 
@@ -952,9 +952,9 @@ namespace
            ExcMessage("Periodic faces must be on the boundary"));
 
     // insert periodic face pair for both cells
-    typedef std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
-                      unsigned int>
-                                              CellFace;
+    using CellFace =
+      std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
+                unsigned int>;
     const CellFace                            cell_face_1(cell_1, n_face_1);
     const CellFace                            cell_face_2(cell_2, n_face_2);
     const std::pair<CellFace, std::bitset<3>> cell_face_orientation_2(
@@ -1312,7 +1312,7 @@ namespace internal
      *
      * Ideally, we would make this class a member class of the
      * Triangulation<dim,spacedim> class, since then our implementation
-     * functions have immediate access to the typedefs and static functions of
+     * functions have immediate access to the alias and static functions of
      * the surrounding Triangulation class. I.e., we do not have to write
      * "typename Triangulation<dim,spacedim>::active_cell_iterator" but can
      * write "active_cell_iterator" right away. This is, in fact, the way it was
@@ -1374,8 +1374,8 @@ namespace internal
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<1> &number_cache)
       {
-        typedef
-          typename Triangulation<dim, spacedim>::line_iterator line_iterator;
+        using line_iterator =
+          typename Triangulation<dim, spacedim>::line_iterator;
 
         number_cache.n_levels = 0;
         if (level_objects > 0)
@@ -1475,8 +1475,8 @@ namespace internal
           static_cast<internal::TriangulationImplementation::NumberCache<1> &>(
             number_cache));
 
-        typedef
-          typename Triangulation<dim, spacedim>::quad_iterator quad_iterator;
+        using quad_iterator =
+          typename Triangulation<dim, spacedim>::quad_iterator;
 
         ///////////////////////////////////
         // update the number of quads on the different levels in the
@@ -1581,8 +1581,8 @@ namespace internal
           static_cast<internal::TriangulationImplementation::NumberCache<2> &>(
             number_cache));
 
-        typedef
-          typename Triangulation<dim, spacedim>::hex_iterator hex_iterator;
+        using hex_iterator =
+          typename Triangulation<dim, spacedim>::hex_iterator;
 
         ///////////////////////////////////
         // update the number of hexes on the different levels in the

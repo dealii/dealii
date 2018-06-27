@@ -23,7 +23,7 @@ namespace PETScWrappers
 {
   namespace MPI
   {
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     void
     BlockVector::reinit(const unsigned int num_blocks)
