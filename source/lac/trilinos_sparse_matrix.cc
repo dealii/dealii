@@ -1158,7 +1158,8 @@ namespace TrilinosWrappers
         else
           Assert(
             false,
-            "compress() can only be called with VectorOperation add, insert, or unknown");
+            ExcMessage(
+              "compress() can only be called with VectorOperation add, insert, or unknown"));
       }
     else
       {

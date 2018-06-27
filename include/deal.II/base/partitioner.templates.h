@@ -329,10 +329,10 @@ namespace Utilities
         return a;
       }
 
-      // In the import_from_ghosted_array_finish we need to calculate maximal
-      // and minimal value on number types, which is not straight forward for
-      // complex numbers. Therfore, comparison of complex numbers is
-      // prohibited and throw an assert.
+      // In the import_from_ghosted_array_finish we might need to calculate the
+      // maximal and minimal value for the given number type, which is not
+      // straight forward for complex numbers. Therefore, comparison of complex
+      // numbers is prohibited and throws an exception.
       template <typename Number>
       Number
       get_min(const Number a, const Number b)
@@ -345,7 +345,7 @@ namespace Utilities
       get_min(const std::complex<Number> a, const std::complex<Number>)
       {
         AssertThrow(false,
-                    ExcMessage("VectorOperation::min max not"
+                    ExcMessage("VectorOperation::min not "
                                "implemented for complex numbers"));
         return a;
       }
@@ -362,7 +362,7 @@ namespace Utilities
       get_max(const std::complex<Number> a, const std::complex<Number>)
       {
         AssertThrow(false,
-                    ExcMessage("VectorOperation::min max not "
+                    ExcMessage("VectorOperation::max not "
                                "implemented for complex numbers"));
         return a;
       }
