@@ -189,10 +189,10 @@ namespace Step12
     // all cells and much of the setup of operations will be done outside this
     // class, so all we have to provide are these three operations. They will
     // then work on intermediate objects for which first, we here define
-    // typedefs to the info objects handed to the local integration functions
+    // alias to the info objects handed to the local integration functions
     // in order to make our life easier below.
-    typedef MeshWorker::DoFInfo<dim>         DoFInfo;
-    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+    using DoFInfo  = MeshWorker::DoFInfo<dim>;
+    using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
     // The following three functions are then the ones that get called inside
     // the generic loop over all cells and faces. They are the ones doing the

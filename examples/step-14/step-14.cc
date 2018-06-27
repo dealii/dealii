@@ -1240,8 +1240,8 @@ namespace Step14
     {
       // We need a class to denote the boundary values of the problem. In this
       // case, this is simple: it's the zero function, so don't even declare a
-      // class, just a typedef:
-      typedef Functions::ZeroFunction<dim> BoundaryValues;
+      // class, just an alias:
+      using BoundaryValues = Functions::ZeroFunction<dim>;
 
       // Second, a class that denotes the right hand side. Since they are
       // constant, just subclass the corresponding class of the library and be
@@ -1760,8 +1760,8 @@ namespace Step14
       // Then declare abbreviations for active cell iterators, to avoid that
       // we have to write this lengthy name over and over again:
 
-      typedef
-        typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+      using active_cell_iterator =
+        typename DoFHandler<dim>::active_cell_iterator;
 
       // Next, declare a data type that we will us to store the contribution
       // of faces to the error estimator. The idea is that we can compute the
@@ -1774,8 +1774,8 @@ namespace Step14
       // cells a second time and grabbing the values from the map.
       //
       // The data type of this map is declared here:
-      typedef typename std::map<typename DoFHandler<dim>::face_iterator, double>
-        FaceIntegrals;
+      using FaceIntegrals =
+        typename std::map<typename DoFHandler<dim>::face_iterator, double>;
 
       // In the computation of the error estimates on cells and faces, we need
       // a number of helper objects, such as <code>FEValues</code> and
@@ -2660,8 +2660,8 @@ namespace Step14
   public:
     // First, we declare two abbreviations for simple use of the respective
     // data types:
-    typedef Evaluation::EvaluationBase<dim> Evaluator;
-    typedef std::list<Evaluator *>          EvaluatorList;
+    using Evaluator     = Evaluation::EvaluationBase<dim>;
+    using EvaluatorList = std::list<Evaluator *>;
 
 
     // Then we have the structure which declares all the parameters that may

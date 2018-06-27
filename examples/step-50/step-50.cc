@@ -122,8 +122,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -726,8 +726,7 @@ namespace Step50
     // SOR, Jacobi or Richardson method). The MGSmootherPrecondition
     // class provides support for this kind of smoother. Here, we opt
     // for the application of a single SOR iteration. To this end, we
-    // define an appropriate <code>typedef</code> and then setup a
-    // smoother object.
+    // define an appropriate alias and then setup a smoother object.
     //
     // The last step is to initialize the smoother object with our
     // level matrices and to set some smoothing parameters.  The
@@ -751,7 +750,7 @@ namespace Step50
     // preconditioner make sure that we get a
     // symmetric operator even for nonsymmetric
     // smoothers:
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);

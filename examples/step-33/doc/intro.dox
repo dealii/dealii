@@ -250,7 +250,7 @@ used:
 #include <Sacado.hpp>
 #include <iostream>
 
-typedef Sacado::Fad::DFad<double> fad_double;
+using fad_double = Sacado::Fad::DFad<double>;
 
 main() {
 

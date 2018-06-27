@@ -1373,7 +1373,7 @@ namespace Step13
 
         // Now solve the problem on the present grid, and run the evaluators
         // on it. The long type name of iterators into the list is a little
-        // annoying, but could be shortened by a typedef, if so desired.
+        // annoying, but could be shortened by an alias, if so desired.
         solver.solve_problem();
 
         for (typename std::list<

@@ -896,7 +896,7 @@ namespace Step56
         MGCoarseGridHouseholder<> coarse_grid_solver;
         coarse_grid_solver.initialize(coarse_matrix);
 
-        typedef PreconditionSOR<SparseMatrix<double>>    Smoother;
+        using Smoother = PreconditionSOR<SparseMatrix<double>>;
         mg::SmootherRelaxation<Smoother, Vector<double>> mg_smoother;
         mg_smoother.initialize(mg_matrices);
         mg_smoother.set_steps(2);
