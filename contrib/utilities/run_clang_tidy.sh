@@ -51,7 +51,8 @@ CHECKS="-*,
         performance-*,
         -performance-inefficient-string-concatenation,
         modernize-use-emplace,
-        modernize-deprecated-headers"
+        modernize-deprecated-headers,
+        modernize-use-using"
 
 CHECKS="$(echo "${CHECKS}" | tr -d '[:space:]')"
 echo "$CHECKS"
