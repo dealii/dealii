@@ -50,7 +50,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Constructor. Does nothing, so you have to call @p decompose sometimes
@@ -74,7 +74,7 @@ public:
    * Make the @p AdditionalData type in the base class accessible to this
    * class as well.
    */
-  typedef typename SparseLUDecomposition<number>::AdditionalData AdditionalData;
+  using AdditionalData = typename SparseLUDecomposition<number>::AdditionalData;
 
   /**
    * Perform the incomplete LU factorization of the given matrix.

@@ -56,12 +56,13 @@ DEAL_II_NAMESPACE_OPEN
  *   {
  *   public:
  *     // const iterators store a const pointer
- *     typedef typename std::conditional<Constness, const Container<T>*,
- *                                       Container<T>*>::type
- *     container_pointer_type;
+ *     using container_pointer_type
+ *       = typename std::conditional<Constness,
+ *                                   const Container<T>*,
+ *                                   Container<T>*>::type;
  *
- *     // This typedef is assumed to exist.
- *     typedef std::size_t size_type;
+ *     // This alias is assumed to exist.
+ *     using size_type = std::size_t;
  *
  *     // constructor.
  *     Accessor(const container_pointer_type container,
@@ -94,9 +95,9 @@ DEAL_II_NAMESPACE_OPEN
  *   };
  *
  * public:
- *   typedef std::size_t size_type;
- *   typedef Iterator<true> const_iterator;
- *   typedef Iterator<false> iterator;
+ *   using size_type = std::size_t;
+ *   using const_iterator = Iterator<true>;
+ *   using iterator = Iterator<false>;
  *
  *   iterator begin ();
  *   iterator end ();
@@ -143,33 +144,33 @@ public:
   /**
    * Iterator category.
    */
-  typedef std::random_access_iterator_tag iterator_category;
+  using iterator_category = std::random_access_iterator_tag;
 
   /**
-   * A typedef for the type you get when you dereference an iterator of the
+   * An alias for the type you get when you dereference an iterator of the
    * current kind.
    */
-  typedef AccessorType value_type;
+  using value_type = AccessorType;
 
   /**
    * Difference type.
    */
-  typedef std::ptrdiff_t difference_type;
+  using difference_type = std::ptrdiff_t;
 
   /**
    * Reference type.
    */
-  typedef const value_type &reference;
+  using reference = const value_type &;
 
   /**
    * Pointer type.
    */
-  typedef const value_type *pointer;
+  using pointer = const value_type *;
 
   /**
    * Size type used by the underlying container.
    */
-  typedef typename value_type::size_type size_type;
+  using size_type = typename value_type::size_type;
 
   /**
    * Copy operator.

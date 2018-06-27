@@ -1534,10 +1534,8 @@ namespace internal
                         face_data.quadrature_points[q]);
                 }
 
-              typedef Tensor<1,
-                             VectorizedArray<Number>::n_array_elements,
-                             Number>
-                           VEC_ARRAY;
+              using VEC_ARRAY =
+                Tensor<1, VectorizedArray<Number>::n_array_elements, Number>;
               unsigned int insert_position = data.first[my_q].JxW_values.size();
 
               // Fill in JxW values, apply compression

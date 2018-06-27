@@ -71,13 +71,13 @@ public:
   /**
    * A type of used to index into this container.
    */
-  typedef std::size_t size_type;
+  using size_type = std::size_t;
 
   /**
-   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * Type of matrix entries. This alias is analogous to <tt>value_type</tt>
    * in the standard library containers.
    */
-  typedef number value_type;
+  using value_type = number;
 
 
   /**
@@ -87,9 +87,9 @@ public:
    * If the template argument is a std::complex type then real_type equals the
    * type underlying the complex numbers.
    *
-   * This typedef is used to represent the return type of norms.
+   * This alias is used to represent the return type of norms.
    */
-  typedef typename numbers::NumberTraits<number>::real_type real_type;
+  using real_type = typename numbers::NumberTraits<number>::real_type;
 
 
   class const_iterator;

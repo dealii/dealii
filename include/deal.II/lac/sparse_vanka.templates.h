@@ -152,7 +152,8 @@ SparseVanka<number>::compute_inverses()
     };
   blocking[n_threads - 1].second = matrix->m();
 
-  typedef void (SparseVanka<number>::*FunPtr)(const size_type, const size_type);
+  using FunPtr =
+    void (SparseVanka<number>::*)(const size_type, const size_type);
   const FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
 
   // Now spawn the threads
@@ -612,31 +613,22 @@ SparseBlockVanka<number>::vmult(Vector<number2> &      dst,
 {
   dst = 0;
 
-  // if no blocking is required, pass
-  // down to the underlying class
+  // if no blocking is required, pass down to the underlying class
   if (n_blocks == 1)
     this->apply_preconditioner(dst, src);
   else
     // otherwise: blocking requested
     {
 #ifdef DEAL_II_WITH_THREADS
-      // spawn threads. since
-      // some compilers have
-      // trouble finding out
-      // which 'encapsulate'
-      // function to take of all
-      // those possible ones if
-      // we simply drop in the
-      // address of an overloaded
-      // template member
-      // function, make it
-      // simpler for the compiler
-      // by giving it the correct
-      // type right away:
-      typedef void (
-        SparseVanka<number>::*mem_fun_p)(Vector<number2> &,
-                                         const Vector<number2> &,
-                                         const std::vector<bool> *const) const;
+      // spawn threads. since some compilers have trouble finding out which
+      // 'encapsulate' function to take of all those possible ones if we simply
+      // idrop in the address of an overloaded template member function, make it
+      // simpler for the compiler by giving it the correct type right away:
+      using mem_fun_p =
+        void (SparseVanka<number>::*)(Vector<number2> &,
+                                      const Vector<number2> &,
+                                      const std::vector<bool> *const) const;
+
       const mem_fun_p comp =
         &SparseVanka<number>::template apply_preconditioner<number2>;
       Threads::ThreadGroup<> threads;

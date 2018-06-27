@@ -118,7 +118,7 @@ public:
   /**
    * Typedef to the iterator type of the grid class under consideration.
    */
-  typedef typename MeshType::cell_iterator cell_iterator;
+  using cell_iterator = typename MeshType::cell_iterator;
 
   /**
    * Constructor setting the class name arguments in the SmartPointer members.

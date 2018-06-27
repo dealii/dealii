@@ -329,7 +329,7 @@ namespace VectorTools
       // to the JxW values.
       //
 
-      typedef typename VectorType::value_type number;
+      using number = typename VectorType::value_type;
 
       const hp::FECollection<dim, spacedim> &fe(
         dof_handler.get_fe_collection());
@@ -590,7 +590,7 @@ namespace VectorTools
               const InVector &                 data_1,
               OutVector &                      data_2)
   {
-    typedef typename OutVector::value_type number;
+    using number = typename OutVector::value_type;
     Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
     Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
 
@@ -634,8 +634,8 @@ namespace VectorTools
     for (unsigned int i = 0; i < dof_2.n_dofs(); ++i)
       {
         Assert(touch_count[i] != 0, ExcInternalError());
-        typedef typename OutVector::value_type value_type;
-        const value_type                       val =
+        using value_type = typename OutVector::value_type;
+        const value_type val =
           ::dealii::internal::ElementAccess<OutVector>::get(data_2, i);
 
         ::dealii::internal::ElementAccess<OutVector>::set(
@@ -1017,7 +1017,7 @@ namespace VectorTools
       const Q_or_QC<dim - 1> &q_boundary,
       const bool              project_to_boundary_first)
     {
-      typedef typename VectorType::value_type number;
+      using number = typename VectorType::value_type;
       Assert(dof.get_fe(0).n_components() == function.n_components,
              ExcDimensionMismatch(dof.get_fe(0).n_components(),
                                   function.n_components));
@@ -1150,13 +1150,12 @@ namespace VectorTools
                           constraints,
                           QGauss<1>(dof.get_fe().degree + 2),
                           additional_data);
-      typedef MatrixFreeOperators::MassOperator<
+      using MatrixType = MatrixFreeOperators::MassOperator<
         dim,
         fe_degree,
         fe_degree + 2,
         components,
-        LinearAlgebra::distributed::Vector<Number>>
-                 MatrixType;
+        LinearAlgebra::distributed::Vector<Number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
@@ -1473,7 +1472,7 @@ namespace VectorTools
         const unsigned int)> &                                  func,
       VectorType &                                              vec_result)
     {
-      typedef typename VectorType::value_type Number;
+      using Number = typename VectorType::value_type;
       Assert(dof.get_fe(0).n_components() == 1,
              ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
       Assert(vec_result.size() == dof.n_dofs(),
@@ -1495,18 +1494,17 @@ namespace VectorTools
                           constraints,
                           QGauss<1>(dof.get_fe().degree + 2),
                           additional_data);
-      typedef MatrixFreeOperators::MassOperator<
+      using MatrixType = MatrixFreeOperators::MassOperator<
         dim,
         fe_degree,
         fe_degree + 2,
         1,
-        LinearAlgebra::distributed::Vector<Number>>
-                 MatrixType;
+        LinearAlgebra::distributed::Vector<Number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
 
-      typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec);
       matrix_free->initialize_dof_vector(rhs);
@@ -1596,7 +1594,7 @@ namespace VectorTools
       const DoFHandler<dim, spacedim> &dof =
         matrix_free->get_dof_handler(fe_component);
 
-      typedef typename VectorType::value_type Number;
+      using Number = typename VectorType::value_type;
       Assert(dof.get_fe(0).n_components() == 1,
              ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
       Assert(vec_result.size() == dof.n_dofs(),
@@ -1605,18 +1603,17 @@ namespace VectorTools
                dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
-      typedef MatrixFreeOperators::MassOperator<
+      using MatrixType = MatrixFreeOperators::MassOperator<
         dim,
         fe_degree,
         n_q_points_1d,
         1,
-        LinearAlgebra::distributed::Vector<Number>>
-                 MatrixType;
+        LinearAlgebra::distributed::Vector<Number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free, {fe_component});
       mass_matrix.compute_diagonal();
 
-      typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec, fe_component);
       matrix_free->initialize_dof_vector(rhs, fe_component);
@@ -1912,7 +1909,7 @@ namespace VectorTools
     VectorType &                                               rhs_vector,
     const AffineConstraints<typename VectorType::value_type> & constraints)
   {
-    typedef typename VectorType::value_type Number;
+    using Number = typename VectorType::value_type;
 
     const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
     Assert(fe.n_components() == rhs_function.n_components,
@@ -2052,7 +2049,7 @@ namespace VectorTools
     VectorType &                                               rhs_vector,
     const AffineConstraints<typename VectorType::value_type> & constraints)
   {
-    typedef typename VectorType::value_type Number;
+    using Number = typename VectorType::value_type;
 
     const hp::FECollection<dim, spacedim> &fe = dof_handler.get_fe_collection();
     Assert(fe.n_components() == rhs_function.n_components,
@@ -6991,11 +6988,10 @@ namespace VectorTools
     // (i.e. constrain not just the *average normal direction* but *all normal
     // directions* we find). consequently, we also have to store which cell a
     // normal vector was computed on
-    typedef std::multimap<
+    using DoFToNormalsMap = std::multimap<
       internal::VectorDoFTuple<dim>,
       std::pair<Tensor<1, dim>,
-                typename DoFHandlerType<dim, spacedim>::active_cell_iterator>>
-      DoFToNormalsMap;
+                typename DoFHandlerType<dim, spacedim>::active_cell_iterator>>;
     std::map<internal::VectorDoFTuple<dim>, Vector<double>>
       dof_vector_to_b_values;
 
@@ -7177,10 +7173,9 @@ namespace VectorTools
         // contributed to the current set of vector dofs, add up the normal
         // vectors. the values of the map are pairs of normal vectors and
         // number of cells that have contributed
-        typedef std::map<
-          typename DoFHandlerType<dim, spacedim>::active_cell_iterator,
-          std::pair<Tensor<1, dim>, unsigned int>>
-          CellToNormalsMap;
+        using CellToNormalsMap =
+          std::map<typename DoFHandlerType<dim, spacedim>::active_cell_iterator,
+                   std::pair<Tensor<1, dim>, unsigned int>>;
 
         CellToNormalsMap cell_to_normals_map;
         for (typename DoFToNormalsMap::const_iterator q = same_dof_range[0];
@@ -7354,10 +7349,9 @@ namespace VectorTools
                 // std::list instead of a std::set (which would be more natural)
                 // because std::set requires that the stored elements are
                 // comparable with operator<
-                typedef std::map<
+                using CellContributions = std::map<
                   typename DoFHandlerType<dim, spacedim>::active_cell_iterator,
-                  std::list<Tensor<1, dim>>>
-                                  CellContributions;
+                  std::list<Tensor<1, dim>>>;
                 CellContributions cell_contributions;
 
                 for (typename DoFToNormalsMap::const_iterator q =
@@ -8172,7 +8166,7 @@ namespace VectorTools
       const Function<spacedim> *                          weight,
       const double                                        exponent_1)
     {
-      typedef typename InVector::value_type Number;
+      using Number = typename InVector::value_type;
       // we mark the "exponent" parameter to this function "const" since it is
       // strictly incoming, but we need to set it to something different later
       // on, if necessary, so have a read-write version of it:
@@ -8508,8 +8502,8 @@ namespace VectorTools
     Vector<typename VectorType::value_type> &                  difference,
     const Point<spacedim> &                                    point)
   {
-    typedef typename VectorType::value_type Number;
-    const FiniteElement<dim> &              fe = dof.get_fe();
+    using Number                 = typename VectorType::value_type;
+    const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(difference.size() == fe.n_components(),
            ExcDimensionMismatch(difference.size(), fe.n_components()));
@@ -8608,8 +8602,8 @@ namespace VectorTools
               const Point<spacedim> &                  point,
               Vector<typename VectorType::value_type> &value)
   {
-    typedef typename VectorType::value_type Number;
-    const FiniteElement<dim> &              fe = dof.get_fe();
+    using Number                 = typename VectorType::value_type;
+    const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
            ExcDimensionMismatch(value.size(), fe.n_components()));
@@ -8650,8 +8644,8 @@ namespace VectorTools
               const Point<spacedim> &                     point,
               Vector<typename VectorType::value_type> &   value)
   {
-    typedef typename VectorType::value_type Number;
-    const hp::FECollection<dim, spacedim> & fe = dof.get_fe_collection();
+    using Number                              = typename VectorType::value_type;
+    const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
     Assert(value.size() == fe.n_components(),
            ExcDimensionMismatch(value.size(), fe.n_components()));
@@ -8822,7 +8816,7 @@ namespace VectorTools
 
     // then use this to get the gradients of
     // the given fe_function at this point
-    typedef typename VectorType::value_type          Number;
+    using Number = typename VectorType::value_type;
     std::vector<std::vector<Tensor<1, dim, Number>>> u_gradient(
       1, std::vector<Tensor<1, dim, Number>>(fe.n_components()));
     fe_values.get_function_gradients(fe_function, u_gradient);
@@ -8840,8 +8834,8 @@ namespace VectorTools
     const Point<spacedim> &                     point,
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &gradient)
   {
-    typedef typename VectorType::value_type Number;
-    const hp::FECollection<dim, spacedim> & fe = dof.get_fe_collection();
+    using Number                              = typename VectorType::value_type;
+    const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
     Assert(gradient.size() == fe.n_components(),
            ExcDimensionMismatch(gradient.size(), fe.n_components()));
@@ -9007,7 +9001,7 @@ namespace VectorTools
                      const VectorType &               v,
                      const unsigned int               component)
   {
-    typedef typename VectorType::value_type Number;
+    using Number = typename VectorType::value_type;
     Assert(v.size() == dof.n_dofs(),
            ExcDimensionMismatch(v.size(), dof.n_dofs()));
     Assert(component < dof.get_fe(0).n_components(),

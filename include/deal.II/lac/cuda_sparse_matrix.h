@@ -51,18 +51,18 @@ namespace CUDAWrappers
     /**
      * Declare type for container size.
      */
-    typedef unsigned int size_type;
+    using size_type = unsigned int;
 
     /**
      * Type of the matrix entries.
      */
-    typedef Number value_type;
+    using value_type = Number;
 
     /**
      * Declare a type that holds real-valued numbers with the same precision
      * as the template argument to this class.
      */
-    typedef Number real_type;
+    using real_type = Number;
 
     /**
      * @name Constructors and initialization

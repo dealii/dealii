@@ -81,7 +81,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * This function is only present to provide the interface of a
@@ -200,7 +200,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Parameters for Richardson preconditioner.
@@ -367,8 +367,8 @@ public:
   /**
    * Type of the preconditioning function of the matrix.
    */
-  typedef void (MatrixType::*function_ptr)(VectorType &,
-                                           const VectorType &) const;
+  using function_ptr = void (MatrixType::*)(VectorType &,
+                                            const VectorType &) const;
 
   /**
    * Constructor.  This constructor stores a reference to the matrix object
@@ -413,7 +413,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef typename MatrixType::size_type size_type;
+  using size_type = typename MatrixType::size_type;
 
   /**
    * Class for parameters.
@@ -508,10 +508,10 @@ class PreconditionJacobi : public PreconditionRelaxation<MatrixType>
 {
 public:
   /**
-   * A typedef to the base class AdditionalData.
+   * An alias to the base class AdditionalData.
    */
-  typedef
-    typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+  using AdditionalData =
+    typename PreconditionRelaxation<MatrixType>::AdditionalData;
 
   /**
    * Apply preconditioner.
@@ -596,10 +596,10 @@ class PreconditionSOR : public PreconditionRelaxation<MatrixType>
 {
 public:
   /**
-   * A typedef to the base class AdditionalData.
+   * An alias to the base class AdditionalData.
    */
-  typedef
-    typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+  using AdditionalData =
+    typename PreconditionRelaxation<MatrixType>::AdditionalData;
 
   /**
    * Apply preconditioner.
@@ -665,20 +665,20 @@ class PreconditionSSOR : public PreconditionRelaxation<MatrixType>
 {
 public:
   /**
-   * A typedef to the base class AdditionalData.
+   * An alias to the base class AdditionalData.
    */
-  typedef
-    typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+  using AdditionalData =
+    typename PreconditionRelaxation<MatrixType>::AdditionalData;
 
   /**
    * Declare type for container size.
    */
-  typedef typename MatrixType::size_type size_type;
+  using size_type = typename MatrixType::size_type;
 
   /**
-   * A typedef to the base class.
+   * An alias to the base class.
    */
-  typedef PreconditionRelaxation<MatrixType> BaseClass;
+  using BaseClass = PreconditionRelaxation<MatrixType>;
 
 
   /**
@@ -769,7 +769,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef typename MatrixType::size_type size_type;
+  using size_type = typename MatrixType::size_type;
 
   /**
    * Parameters for PreconditionPSOR.
@@ -964,7 +964,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   // avoid warning about use of deprecated variables
 

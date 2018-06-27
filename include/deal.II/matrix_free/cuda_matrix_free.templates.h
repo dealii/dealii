@@ -549,14 +549,13 @@ namespace CUDAWrappers
       this, mapping, fe, quad, shape_info, update_flags);
 
     // Create a graph coloring
-    typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-               CellFilter;
+    using CellFilter =
+      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
     CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                      dof_handler.begin_active());
     CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    typedef std::function<std::vector<types::global_dof_index>(
-      CellFilter const &)>
-               fun_type;
+    using fun_type =
+      std::function<std::vector<types::global_dof_index>(CellFilter const &)>;
     const auto fun = [&](const CellFilter &filter) {
       return internal::get_conflict_indices<dim, Number>(filter, constraints);
     };

@@ -302,7 +302,7 @@ namespace MeshWorker
     /**
      * The type of the @p info object for cells.
      */
-    typedef IntegrationInfo<dim, spacedim> CellInfo;
+    using CellInfo = IntegrationInfo<dim, spacedim>;
 
     /**
      * Default constructor.

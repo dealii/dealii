@@ -25,7 +25,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A namespace in which we declare typedefs for types used in deal.II, as well
+ * A namespace in which we declare alias for types used in deal.II, as well
  * as special values for these types.
  */
 namespace types
@@ -40,12 +40,12 @@ namespace types
    * There is a special value, numbers::invalid_subdomain_id that is used to
    * indicate an invalid value of this type.
    */
-  typedef unsigned int subdomain_id;
+  using subdomain_id = unsigned int;
 
   /**
    * The type used for global indices of vertices.
    */
-  typedef unsigned long long int global_vertex_index;
+  using global_vertex_index = unsigned long long int;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -69,7 +69,7 @@ namespace types
    */
   // TODO: we should check that unsigned long long int
   // has the same size as uint64_t
-  typedef unsigned long long int global_dof_index;
+  using global_dof_index = unsigned long long int;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -86,7 +86,7 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  typedef unsigned int global_dof_index;
+  using global_dof_index = unsigned int;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -108,7 +108,7 @@ namespace types
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  typedef unsigned int boundary_id;
+  using boundary_id = unsigned int;
 
   /**
    * The type used to denote manifold indicators associated with every object
@@ -120,7 +120,7 @@ namespace types
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  typedef unsigned int manifold_id;
+  using manifold_id = unsigned int;
 
   /**
    * The type used to denote material indicators associated with every cell.
@@ -131,13 +131,13 @@ namespace types
    * @see
    * @ref GlossMaterialId "Glossary entry on material indicators"
    */
-  typedef unsigned int material_id;
+  using material_id = unsigned int;
 } // namespace types
 
 /**
  * Declare type used in Epetra.
  */
-typedef double TrilinosScalar;
+using TrilinosScalar = double;
 
 
 namespace TrilinosWrappers
@@ -148,12 +148,12 @@ namespace TrilinosWrappers
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    typedef long long int_type;
+    using int_type = long long;
 #else
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    typedef int int_type;
+    using int_type = int;
 #endif
   } // namespace types
 } // namespace TrilinosWrappers

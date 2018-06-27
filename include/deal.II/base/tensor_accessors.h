@@ -49,14 +49,14 @@ DEAL_II_NAMESPACE_OPEN
  * The methods and algorithms implemented in this namespace, however, are
  * fully generic. More precisely, it can operate on nested c-style arrays, or
  * on class types <code>T</code> with a minimal interface that provides a
- * local typedef <code>value_type</code> and an index operator
+ * local alias <code>value_type</code> and an index operator
  * <code>operator[](unsigned int)</code> that returns a (const or non-const)
  * reference of <code>value_type</code>:
  * @code
  *   template <...>
  *   class T
  *   {
- *     typedef ... value_type;
+ *     using value_type = ...;
  *     value_type & operator[](unsigned int);
  *     const value_type & operator[](unsigned int) const;
  *   };
@@ -86,16 +86,16 @@ namespace TensorAccessors
 
 
   /**
-   * This class provides a local typedef @p value_type denoting the resulting
+   * This class provides a local alias @p value_type denoting the resulting
    * type of an access with operator[](unsigned int). More precisely, @p
    * value_type will be
-   *  - <code>T::value_type</code> if T is a tensorial class providing a
-   * typedef <code>value_type</code> and does not have a const qualifier.
+   *  - <code>T::value_type</code> if T is a tensorial class providing an
+   * alias <code>value_type</code> and does not have a const qualifier.
    *  - <code>const T::value_type</code> if T is a tensorial class
-   * providing a typedef <code>value_type</code> and does have a const
+   * providing an alias <code>value_type</code> and does have a const
    * qualifier.
    *  - <code>const T::value_type</code> if T is a tensorial class
-   * providing a typedef <code>value_type</code> and does have a const
+   * providing an alias <code>value_type</code> and does have a const
    * qualifier.
    *  - <code>A</code> if T is of array type <code>A[...]</code>
    *  - <code>const A</code> if T is of array type <code>A[...]</code> and
@@ -104,31 +104,31 @@ namespace TensorAccessors
   template <typename T>
   struct ValueType
   {
-    typedef typename T::value_type value_type;
+    using value_type = typename T::value_type;
   };
 
   template <typename T>
   struct ValueType<const T>
   {
-    typedef const typename T::value_type value_type;
+    using value_type = const typename T::value_type;
   };
 
   template <typename T, std::size_t N>
   struct ValueType<T[N]>
   {
-    typedef T value_type;
+    using value_type = T;
   };
 
   template <typename T, std::size_t N>
   struct ValueType<const T[N]>
   {
-    typedef const T value_type;
+    using value_type = const T;
   };
 
 
   /**
-   * This class provides a local typedef @p value_type that is equal to the
-   * typedef <code>value_type</code> after @p deref_steps recursive
+   * This class provides a local alias @p value_type that is equal to the
+   * alias <code>value_type</code> after @p deref_steps recursive
    * dereferences via ```operator[](unsigned int)```. Further, constness is
    * preserved via the ValueType type trait, i.e., if T is const,
    * ReturnType<rank, T>::value_type will also be const.
@@ -136,15 +136,15 @@ namespace TensorAccessors
   template <int deref_steps, typename T>
   struct ReturnType
   {
-    typedef typename ReturnType<deref_steps - 1,
-                                typename ValueType<T>::value_type>::value_type
-      value_type;
+    using value_type =
+      typename ReturnType<deref_steps - 1,
+                          typename ValueType<T>::value_type>::value_type;
   };
 
   template <typename T>
   struct ReturnType<0, T>
   {
-    typedef T value_type;
+    using value_type = T;
   };
 
 
@@ -174,14 +174,14 @@ namespace TensorAccessors
    * tensors.
    *
    * @note This function returns an internal class object consisting of an
-   * array subscript operator <code>operator[](unsigned int)</code> and a
-   * typedef <code>value_type</code> describing its return value.
+   * array subscript operator <code>operator[](unsigned int)</code> and an
+   * alias <code>value_type</code> describing its return value.
    *
    * @tparam index The index to be shifted to the end. Indices are counted
    * from 0, thus the valid range is $0\le\text{index}<\text{rank}$.
    * @tparam rank Rank of the tensorial object @p t
    * @tparam T A tensorial object of rank @p rank. @p T must provide a local
-   * typedef <code>value_type</code> and an index operator
+   * alias <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const) reference
    * of <code>value_type</code>.
    *
@@ -209,7 +209,7 @@ namespace TensorAccessors
    * This is equivalent to <code>tensor[0][1][2][3][4] = 42.</code>.
    *
    * @tparam T A tensorial object of rank @p rank. @p T must provide a local
-   * typedef <code>value_type</code> and an index operator
+   * alias <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const) reference
    * of <code>value_type</code>. Further, its tensorial rank must be equal or
    * greater than @p rank.
@@ -361,19 +361,19 @@ namespace TensorAccessors
     template <typename T>
     struct ReferenceType
     {
-      typedef T &type;
+      using type = T &;
     };
 
     template <int rank, typename S>
     struct ReferenceType<StoreIndex<rank, S>>
     {
-      typedef StoreIndex<rank, S> type;
+      using type = StoreIndex<rank, S>;
     };
 
     template <int index, int rank, typename T>
     struct ReferenceType<ReorderedIndexView<index, rank, T>>
     {
-      typedef ReorderedIndexView<index, rank, T> type;
+      using type = ReorderedIndexView<index, rank, T>;
     };
 
 
@@ -413,10 +413,9 @@ namespace TensorAccessors
         : t_(t)
       {}
 
-      typedef ReorderedIndexView<index - 1,
-                                 rank - 1,
-                                 typename ValueType<T>::value_type>
-        value_type;
+      using value_type = ReorderedIndexView<index - 1,
+                                            rank - 1,
+                                            typename ValueType<T>::value_type>;
 
       // Recurse by applying index j directly:
       inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
@@ -447,7 +446,7 @@ namespace TensorAccessors
         : t_(t)
       {}
 
-      typedef StoreIndex<rank - 1, internal::Identity<T>> value_type;
+      using value_type = StoreIndex<rank - 1, internal::Identity<T>>;
 
       inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
@@ -469,8 +468,8 @@ namespace TensorAccessors
         : t_(t)
       {}
 
-      typedef typename ReferenceType<typename ValueType<T>::value_type>::type
-        value_type;
+      using value_type =
+        typename ReferenceType<typename ValueType<T>::value_type>::type;
 
       inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
@@ -494,7 +493,7 @@ namespace TensorAccessors
         : t_(t)
       {}
 
-      typedef typename ValueType<T>::value_type return_type;
+      using return_type = typename ValueType<T>::value_type;
 
       inline DEAL_II_ALWAYS_INLINE typename ReferenceType<return_type>::type
       apply(unsigned int j) const
@@ -523,15 +522,15 @@ namespace TensorAccessors
         , i_(i)
       {}
 
-      typedef StoreIndex<rank - 1, StoreIndex<rank, S>> value_type;
+      using value_type = StoreIndex<rank - 1, StoreIndex<rank, S>>;
 
       inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
         return value_type(*this, j);
       }
 
-      typedef
-        typename ValueType<typename S::return_type>::value_type return_type;
+      using return_type =
+        typename ValueType<typename S::return_type>::value_type;
 
       inline typename ReferenceType<return_type>::type
       apply(unsigned int j) const
@@ -557,9 +556,9 @@ namespace TensorAccessors
         , i_(i)
       {}
 
-      typedef
-        typename ValueType<typename S::return_type>::value_type return_type;
-      typedef return_type                                       value_type;
+      using return_type =
+        typename ValueType<typename S::return_type>::value_type;
+      using value_type = return_type;
 
       inline DEAL_II_ALWAYS_INLINE return_type &operator[](unsigned int j) const
       {

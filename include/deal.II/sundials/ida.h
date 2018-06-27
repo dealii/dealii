@@ -173,7 +173,7 @@ namespace SUNDIALS
    *
    * This is achieved by the following snippet of code:
    * @code
-   * typedef Vector<double> VectorType;
+   * using VectorType = Vector<double>;
    *
    * VectorType y(2);
    * VectorType y_dot(2);
@@ -827,7 +827,7 @@ namespace SUNDIALS
     /**
      * MPI communicator. SUNDIALS solver runs happily in
      * parallel. Note that if the library is compiled without MPI
-     * support, MPI_Comm is typedefed as int.
+     * support, MPI_Comm is aliased as int.
      */
     MPI_Comm communicator;
 

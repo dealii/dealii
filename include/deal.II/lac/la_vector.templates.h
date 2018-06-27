@@ -430,9 +430,9 @@ namespace LinearAlgebra
   {
     Assert(this->size(), ExcEmptyObject());
 
-    typedef typename VectorSpaceVector<Number>::real_type real_type;
-    value_type                                            sum;
-    internal::VectorOperations::MeanValue<Number>         mean_value(
+    using real_type = typename VectorSpaceVector<Number>::real_type;
+    value_type                                    sum;
+    internal::VectorOperations::MeanValue<Number> mean_value(
       this->values.get());
     internal::VectorOperations::parallel_reduce(
       mean_value, 0, this->size(), sum, this->thread_loop_partitioner);
@@ -448,9 +448,9 @@ namespace LinearAlgebra
   {
     Assert(this->size(), ExcEmptyObject());
 
-    typedef typename VectorSpaceVector<Number>::real_type real_type;
-    real_type                                             sum;
-    internal::VectorOperations::Norm1<Number, real_type>  norm1(
+    using real_type = typename VectorSpaceVector<Number>::real_type;
+    real_type                                            sum;
+    internal::VectorOperations::Norm1<Number, real_type> norm1(
       this->values.get());
     internal::VectorOperations::parallel_reduce(
       norm1, 0, this->size(), sum, this->thread_loop_partitioner);
@@ -471,9 +471,9 @@ namespace LinearAlgebra
     // might still be finite. In that case, recompute ig (this is a rare case,
     // so working on the vector twice is uncritical and paid off by the extended
     // precision) using the BLAS approach with a weight, see e.g. dnrm2.f.
-    typedef typename VectorSpaceVector<Number>::real_type real_type;
-    real_type                                             norm_square;
-    internal::VectorOperations::Norm2<Number, real_type>  norm2(
+    using real_type = typename VectorSpaceVector<Number>::real_type;
+    real_type                                            norm_square;
+    internal::VectorOperations::Norm2<Number, real_type> norm2(
       this->values.get());
     internal::VectorOperations::parallel_reduce(
       norm2, 0, this->size(), norm_square, this->thread_loop_partitioner);

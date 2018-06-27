@@ -64,12 +64,12 @@ namespace BlockMatrixIterators
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     /**
      * Typedef the value type of the matrix we point into.
      */
-    typedef typename BlockMatrixType::value_type value_type;
+    using value_type = typename BlockMatrixType::value_type;
 
     /**
      * Initialize data fields to default values.
@@ -125,17 +125,17 @@ namespace BlockMatrixIterators
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     /**
      * Type of the matrix used in this accessor.
      */
-    typedef BlockMatrixType MatrixType;
+    using MatrixType = BlockMatrixType;
 
     /**
      * Typedef the value type of the matrix we point into.
      */
-    typedef typename BlockMatrixType::value_type value_type;
+    using value_type = typename BlockMatrixType::value_type;
 
     /**
      * Constructor. Since we use accessors only for read access, a const
@@ -210,17 +210,17 @@ namespace BlockMatrixIterators
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     /**
      * Type of the matrix used in this accessor.
      */
-    typedef const BlockMatrixType MatrixType;
+    using MatrixType = const BlockMatrixType;
 
     /**
      * Typedef the value type of the matrix we point into.
      */
-    typedef typename BlockMatrixType::value_type value_type;
+    using value_type = typename BlockMatrixType::value_type;
 
     /**
      * Constructor. Since we use accessors only for read access, a const
@@ -357,24 +357,24 @@ public:
   /**
    * Typedef the type of the underlying matrix.
    */
-  typedef MatrixType BlockType;
+  using BlockType = MatrixType;
 
   /**
-   * Type of matrix entries. These are analogous to typedefs in the standard
+   * Type of matrix entries. These are analogous to alias in the standard
    * library containers.
    */
-  typedef typename BlockType::value_type value_type;
-  typedef value_type *                   pointer;
-  typedef const value_type *             const_pointer;
-  typedef value_type &                   reference;
-  typedef const value_type &             const_reference;
-  typedef types::global_dof_index        size_type;
+  using value_type      = typename BlockType::value_type;
+  using pointer         = value_type *;
+  using const_pointer   = const value_type *;
+  using reference       = value_type &;
+  using const_reference = const value_type &;
+  using size_type       = types::global_dof_index;
 
-  typedef MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, false>>
-    iterator;
+  using iterator =
+    MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, false>>;
 
-  typedef MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, true>>
-    const_iterator;
+  using const_iterator =
+    MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, true>>;
 
 
   /**
@@ -1830,7 +1830,7 @@ BlockMatrixBase<MatrixType>::add(const size_type  i,
   // save some cycles for zero additions, but
   // only if it is safe for the matrix we are
   // working with
-  typedef typename MatrixType::Traits MatrixTraits;
+  using MatrixTraits = typename MatrixType::Traits;
   if ((MatrixTraits::zero_addition_can_be_elided == true) &&
       (value == value_type()))
     return;
@@ -2086,7 +2086,7 @@ BlockMatrixBase<MatrixType>::add(const value_type                   factor,
   // save some cycles for zero additions, but
   // only if it is safe for the matrix we are
   // working with
-  typedef typename MatrixType::Traits MatrixTraits;
+  using MatrixTraits = typename MatrixType::Traits;
   if ((MatrixTraits::zero_addition_can_be_elided == true) && (factor == 0))
     return;
 

@@ -44,43 +44,43 @@ namespace internal
   template <typename T>
   struct ProductTypeImpl<Sacado::Fad::DFad<T>, float>
   {
-    typedef Sacado::Fad::DFad<T> type;
+    using type = Sacado::Fad::DFad<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<float, Sacado::Fad::DFad<T>>
   {
-    typedef Sacado::Fad::DFad<T> type;
+    using type = Sacado::Fad::DFad<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<Sacado::Fad::DFad<T>, double>
   {
-    typedef Sacado::Fad::DFad<T> type;
+    using type = Sacado::Fad::DFad<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<double, Sacado::Fad::DFad<T>>
   {
-    typedef Sacado::Fad::DFad<T> type;
+    using type = Sacado::Fad::DFad<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<Sacado::Fad::DFad<T>, int>
   {
-    typedef Sacado::Fad::DFad<T> type;
+    using type = Sacado::Fad::DFad<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<int, Sacado::Fad::DFad<T>>
   {
-    typedef Sacado::Fad::DFad<T> type;
+    using type = Sacado::Fad::DFad<T>;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Fad::DFad<T>, Sacado::Fad::DFad<U>>
   {
-    typedef Sacado::Fad::DFad<typename ProductType<T, U>::type> type;
+    using type = Sacado::Fad::DFad<typename ProductType<T, U>::type>;
   };
 
 
@@ -93,26 +93,23 @@ namespace internal
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Fad::Expr<T>, U>
   {
-    typedef
-      typename ProductType<typename Sacado::Fad::Expr<T>::value_type, U>::type
-        type;
+    using type =
+      typename ProductType<typename Sacado::Fad::Expr<T>::value_type, U>::type;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<T, Sacado::Fad::Expr<U>>
   {
-    typedef
-      typename ProductType<T, typename Sacado::Fad::Expr<U>::value_type>::type
-        type;
+    using type =
+      typename ProductType<T, typename Sacado::Fad::Expr<U>::value_type>::type;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Fad::Expr<T>, Sacado::Fad::Expr<U>>
   {
-    typedef
+    using type =
       typename ProductType<typename Sacado::Fad::Expr<T>::value_type,
-                           typename Sacado::Fad::Expr<U>::value_type>::type
-        type;
+                           typename Sacado::Fad::Expr<U>::value_type>::type;
   };
 
 } // namespace internal
@@ -121,13 +118,13 @@ namespace internal
 template <typename T>
 struct EnableIfScalar<Sacado::Fad::DFad<T>>
 {
-  typedef Sacado::Fad::DFad<T> type;
+  using type = Sacado::Fad::DFad<T>;
 };
 
 template <typename T>
 struct EnableIfScalar<Sacado::Fad::Expr<T>>
 {
-  typedef typename Sacado::Fad::Expr<T>::value_type type;
+  using type = typename Sacado::Fad::Expr<T>::value_type;
 };
 
 
@@ -141,43 +138,43 @@ namespace internal
   template <typename T>
   struct ProductTypeImpl<Sacado::Rad::ADvar<T>, float>
   {
-    typedef Sacado::Rad::ADvar<T> type;
+    using type = Sacado::Rad::ADvar<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<float, Sacado::Rad::ADvar<T>>
   {
-    typedef Sacado::Rad::ADvar<T> type;
+    using type = Sacado::Rad::ADvar<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<Sacado::Rad::ADvar<T>, double>
   {
-    typedef Sacado::Rad::ADvar<T> type;
+    using type = Sacado::Rad::ADvar<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<double, Sacado::Rad::ADvar<T>>
   {
-    typedef Sacado::Rad::ADvar<T> type;
+    using type = Sacado::Rad::ADvar<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<Sacado::Rad::ADvar<T>, int>
   {
-    typedef Sacado::Rad::ADvar<T> type;
+    using type = Sacado::Rad::ADvar<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<int, Sacado::Rad::ADvar<T>>
   {
-    typedef Sacado::Rad::ADvar<T> type;
+    using type = Sacado::Rad::ADvar<T>;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Rad::ADvar<T>, Sacado::Rad::ADvar<U>>
   {
-    typedef Sacado::Rad::ADvar<typename ProductType<T, U>::type> type;
+    using type = Sacado::Rad::ADvar<typename ProductType<T, U>::type>;
   };
 
   /* --- Sacado::Rad::ADvar: Temporary type --- */
@@ -185,43 +182,43 @@ namespace internal
   template <typename T>
   struct ProductTypeImpl<Sacado::Rad::ADvari<T>, float>
   {
-    typedef Sacado::Rad::ADvari<T> type;
+    using type = Sacado::Rad::ADvari<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<float, Sacado::Rad::ADvari<T>>
   {
-    typedef Sacado::Rad::ADvari<T> type;
+    using type = Sacado::Rad::ADvari<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<Sacado::Rad::ADvari<T>, double>
   {
-    typedef Sacado::Rad::ADvari<T> type;
+    using type = Sacado::Rad::ADvari<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<double, Sacado::Rad::ADvari<T>>
   {
-    typedef Sacado::Rad::ADvari<T> type;
+    using type = Sacado::Rad::ADvari<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<Sacado::Rad::ADvari<T>, int>
   {
-    typedef Sacado::Rad::ADvari<T> type;
+    using type = Sacado::Rad::ADvari<T>;
   };
 
   template <typename T>
   struct ProductTypeImpl<int, Sacado::Rad::ADvari<T>>
   {
-    typedef Sacado::Rad::ADvari<T> type;
+    using type = Sacado::Rad::ADvari<T>;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Rad::ADvari<T>, Sacado::Rad::ADvari<U>>
   {
-    typedef Sacado::Rad::ADvari<typename ProductType<T, U>::type> type;
+    using type = Sacado::Rad::ADvari<typename ProductType<T, U>::type>;
   };
 
   /* --- Sacado::Rad::ADvar: Main and temporary type --- */
@@ -229,13 +226,13 @@ namespace internal
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Rad::ADvar<T>, Sacado::Rad::ADvari<U>>
   {
-    typedef Sacado::Rad::ADvar<typename ProductType<T, U>::type> type;
+    using type = Sacado::Rad::ADvar<typename ProductType<T, U>::type>;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<Sacado::Rad::ADvari<T>, Sacado::Rad::ADvar<U>>
   {
-    typedef Sacado::Rad::ADvar<typename ProductType<T, U>::type> type;
+    using type = Sacado::Rad::ADvar<typename ProductType<T, U>::type>;
   };
 
 } // namespace internal
@@ -244,14 +241,14 @@ namespace internal
 template <typename T>
 struct EnableIfScalar<Sacado::Rad::ADvar<T>>
 {
-  typedef Sacado::Rad::ADvar<T> type;
+  using type = Sacado::Rad::ADvar<T>;
 };
 
 
 template <typename T>
 struct EnableIfScalar<Sacado::Rad::ADvari<T>>
 {
-  typedef Sacado::Rad::ADvari<T> type;
+  using type = Sacado::Rad::ADvari<T>;
 };
 
 

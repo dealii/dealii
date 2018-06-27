@@ -201,10 +201,9 @@ class BlockLinearOperator
   : public LinearOperator<Range, Domain, typename BlockPayload::BlockType>
 {
 public:
-  typedef LinearOperator<typename Range::BlockType,
-                         typename Domain::BlockType,
-                         typename BlockPayload::BlockType>
-    BlockType;
+  using BlockType = LinearOperator<typename Range::BlockType,
+                                   typename Domain::BlockType,
+                                   typename BlockPayload::BlockType>;
 
   /**
    * Create an empty BlockLinearOperator object.
@@ -578,7 +577,7 @@ namespace internal
       /**
        * Type of payload held by each subblock
        */
-      typedef PayloadBlockType BlockType;
+      using BlockType = PayloadBlockType;
 
       /**
        * Default constructor
@@ -620,8 +619,8 @@ template <typename Range,
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_operator(const BlockMatrixType &block_matrix)
 {
-  typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType
-    BlockType;
+  using BlockType =
+    typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
   BlockLinearOperator<Range, Domain, BlockPayload> return_op(
     BlockPayload(block_matrix, block_matrix));
@@ -695,8 +694,8 @@ block_operator(
   static_assert(m > 0 && n > 0,
                 "a blocked LinearOperator must consist of at least one block");
 
-  typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType
-    BlockType;
+  using BlockType =
+    typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
   BlockLinearOperator<Range, Domain, BlockPayload> return_op(
     (BlockPayload())); // TODO: Create block payload so that this can be
@@ -741,8 +740,8 @@ template <typename Range,
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const BlockMatrixType &block_matrix)
 {
-  typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType
-    BlockType;
+  using BlockType =
+    typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
   BlockLinearOperator<Range, Domain, BlockPayload> return_op(
     BlockPayload(block_matrix, block_matrix));
@@ -804,8 +803,8 @@ block_diagonal_operator(
   static_assert(
     m > 0, "a blockdiagonal LinearOperator must consist of at least one block");
 
-  typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType
-    BlockType;
+  using BlockType =
+    typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
   std::array<std::array<BlockType, m>, m> new_ops;
 
@@ -853,8 +852,8 @@ block_diagonal_operator(
                 "a blockdiagonal LinearOperator must consist of at least "
                 "one block");
 
-  typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType
-                           BlockType;
+  using BlockType =
+    typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
   std::array<BlockType, m> new_ops;
   new_ops.fill(op);
 

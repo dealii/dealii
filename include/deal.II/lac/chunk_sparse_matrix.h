@@ -100,7 +100,7 @@ namespace ChunkSparseMatrixIterators
      * Typedef for the type (including constness) of the matrix to be used
      * here.
      */
-    typedef const ChunkSparseMatrix<number> MatrixType;
+    using MatrixType = const ChunkSparseMatrix<number>;
 
     /**
      * Constructor.
@@ -238,7 +238,7 @@ namespace ChunkSparseMatrixIterators
      * Typedef for the type (including constness) of the matrix to be used
      * here.
      */
-    typedef ChunkSparseMatrix<number> MatrixType;
+    using MatrixType = ChunkSparseMatrix<number>;
 
     /**
      * Constructor.
@@ -300,13 +300,13 @@ namespace ChunkSparseMatrixIterators
     /**
      * Typedef for the matrix type (including constness) we are to operate on.
      */
-    typedef typename Accessor<number, Constness>::MatrixType MatrixType;
+    using MatrixType = typename Accessor<number, Constness>::MatrixType;
 
     /**
-     * A typedef for the type you get when you dereference an iterator of the
+     * An alias for the type you get when you dereference an iterator of the
      * current kind.
      */
-    typedef const Accessor<number, Constness> &value_type;
+    using value_type = const Accessor<number, Constness> &;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
@@ -427,13 +427,13 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
-   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * Type of matrix entries. This alias is analogous to <tt>value_type</tt>
    * in the standard library containers.
    */
-  typedef number value_type;
+  using value_type = number;
 
   /**
    * Declare a type that has holds real-valued numbers with the same precision
@@ -442,15 +442,15 @@ public:
    * If the template argument is a std::complex type then real_type equals the
    * type underlying the complex numbers.
    *
-   * This typedef is used to represent the return type of norms.
+   * This alias is used to represent the return type of norms.
    */
-  typedef typename numbers::NumberTraits<number>::real_type real_type;
+  using real_type = typename numbers::NumberTraits<number>::real_type;
 
   /**
    * Typedef of an iterator class walking over all the nonzero entries of this
    * matrix. This iterator cannot change the values of the matrix.
    */
-  typedef ChunkSparseMatrixIterators::Iterator<number, true> const_iterator;
+  using const_iterator = ChunkSparseMatrixIterators::Iterator<number, true>;
 
   /**
    * Typedef of an iterator class walking over all the nonzero entries of this
@@ -458,7 +458,7 @@ public:
    * course can't change the sparsity pattern as this is fixed once a sparse
    * matrix is attached to it.
    */
-  typedef ChunkSparseMatrixIterators::Iterator<number, false> iterator;
+  using iterator = ChunkSparseMatrixIterators::Iterator<number, false>;
 
   /**
    * A structure that describes some of the traits of this class in terms of
@@ -1642,11 +1642,10 @@ ChunkSparseMatrix<number>::copy_from(const ForwardIterator begin,
   Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
          ExcIteratorRange(std::distance(begin, end), m()));
 
-  // for use in the inner loop, we define a typedef to the type of the inner
+  // for use in the inner loop, we define an alias to the type of the inner
   // iterators
-  typedef
-    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator
-            inner_iterator;
+  using inner_iterator =
+    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator;
   size_type row = 0;
   for (ForwardIterator i = begin; i != end; ++i, ++row)
     {

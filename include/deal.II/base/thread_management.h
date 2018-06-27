@@ -474,7 +474,7 @@ namespace Threads
    * If using POSIX functions, then alias the POSIX wrapper classes to the
    * names we use throughout the library.
    */
-  typedef PosixThreadBarrier Barrier;
+  using Barrier = PosixThreadBarrier;
 
 #  else
   /**
@@ -482,21 +482,21 @@ namespace Threads
    * aliased to dummy classes that actually do nothing, in particular not lock
    * objects. Likewise for the barrier class.
    */
-  typedef DummyThreadMutex Mutex;
+  using Mutex = DummyThreadMutex;
 
   /**
    * In non-multithread mode, the mutex and thread management classes are
    * aliased to dummy classes that actually do nothing, in particular not lock
    * objects. Likewise for the barrier class.
    */
-  typedef DummyThreadCondition ConditionVariable;
+  using ConditionVariable = DummyThreadCondition;
 
   /**
    * In non-multithread mode, the mutex and thread management classes are
    * aliased to dummy classes that actually do nothing, in particular not lock
    * objects. Likewise for the barrier class.
    */
-  typedef DummyBarrier Barrier;
+  using Barrier = DummyBarrier;
 #  endif
 
 } // namespace Threads
@@ -661,7 +661,7 @@ namespace Threads
               const ForwardIterator &end,
               const unsigned int     n_intervals)
   {
-    typedef std::pair<ForwardIterator, ForwardIterator> IteratorPair;
+    using IteratorPair = std::pair<ForwardIterator, ForwardIterator>;
 
     // in non-multithreaded mode, we often have the case that this
     // function is called with n_intervals==1, so have a shortcut here
@@ -724,7 +724,7 @@ namespace Threads
       RT value;
 
     public:
-      typedef RT &reference_type;
+      using reference_type = RT &;
 
       inline return_value()
         : value()
@@ -760,7 +760,7 @@ namespace Threads
       RT *value;
 
     public:
-      typedef RT &reference_type;
+      using reference_type = RT &;
 
       inline return_value()
         : value(nullptr)
@@ -791,7 +791,7 @@ namespace Threads
     template <>
     struct return_value<void>
     {
-      typedef void reference_type;
+      using reference_type = void;
 
       static inline void
       get()
@@ -1280,7 +1280,7 @@ namespace Threads
   new_thread(FunctionObjectType function_object)
     -> Thread<decltype(function_object())>
   {
-    typedef decltype(function_object()) return_type;
+    using return_type = decltype(function_object());
     return Thread<return_type>(std::function<return_type()>(function_object));
   }
 
@@ -1953,7 +1953,7 @@ namespace Threads
   new_task(FunctionObjectType function_object)
     -> Task<decltype(function_object())>
   {
-    typedef decltype(function_object()) return_type;
+    using return_type = decltype(function_object());
     dealii::MultithreadInfo::initialize_multithreading();
     return Task<return_type>(std::function<return_type()>(function_object));
   }

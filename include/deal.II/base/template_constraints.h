@@ -97,7 +97,7 @@ struct constraint_and_return_value;
 
 /**
  * This specialization of the general template for the case of a <tt>true</tt>
- * first template argument declares a local typedef <tt>type</tt> to the
+ * first template argument declares a local alias <tt>type</tt> to the
  * second template argument. It is used in order to construct constraints on
  * template arguments in template (and member template) functions. The
  * negative specialization is missing.
@@ -124,7 +124,7 @@ struct constraint_and_return_value;
  * @code
  *   template <bool, typename> struct constraint_and_return_value;
  *   template <typename T> struct constraint_and_return_value<true,T> {
- *     typedef T type;
+ *     using type = T;
  *   };
  * @endcode
  * constraint_and_return_value<false,T> is not defined. Given something like
@@ -155,14 +155,14 @@ struct constraint_and_return_value;
 template <typename T>
 struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
 {
-  typedef T type;
+  using type = T;
 };
 
 
 
 /**
  * A template class that simply exports its template argument as a local
- * typedef. This class, while at first appearing useless, makes sense in the
+ * alias. This class, while at first appearing useless, makes sense in the
  * following context: if you have a function template as follows:
  * @code
  *   template <typename T> void f(T, T);
@@ -214,7 +214,7 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
 template <typename T>
 struct identity
 {
-  typedef T type;
+  using type = T;
 };
 
 
@@ -390,7 +390,7 @@ namespace internal
   template <typename T, typename U>
   struct ProductTypeImpl
   {
-    typedef decltype(std::declval<T>() * std::declval<U>()) type;
+    using type = decltype(std::declval<T>() * std::declval<U>());
   };
 
 } // namespace internal
@@ -398,7 +398,7 @@ namespace internal
 
 
 /**
- * A class with a local typedef that represents the type that results from the
+ * A class with a local alias that represents the type that results from the
  * product of two variables of type @p T and @p U. In other words, we would
  * like to infer the type of the <code>product</code> variable in code like
  * this:
@@ -407,7 +407,7 @@ namespace internal
  *   U u;
  *   auto product = t*u;
  * @endcode
- * The local typedef of this structure represents the type the variable
+ * The local alias of this structure represents the type the variable
  * <code>product</code> would have.
  *
  *
@@ -448,9 +448,9 @@ namespace internal
 template <typename T, typename U>
 struct ProductType
 {
-  typedef
+  using type =
     typename internal::ProductTypeImpl<typename std::decay<T>::type,
-                                       typename std::decay<U>::type>::type type;
+                                       typename std::decay<U>::type>::type;
 };
 
 namespace internal
@@ -463,37 +463,37 @@ namespace internal
   template <typename T>
   struct ProductTypeImpl<std::complex<T>, std::complex<T>>
   {
-    typedef std::complex<T> type;
+    using type = std::complex<T>;
   };
 
   template <typename T, typename U>
   struct ProductTypeImpl<std::complex<T>, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<T, U>::type> type;
+    using type = std::complex<typename ProductType<T, U>::type>;
   };
 
   template <typename U>
   struct ProductTypeImpl<double, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<double, U>::type> type;
+    using type = std::complex<typename ProductType<double, U>::type>;
   };
 
   template <typename T>
   struct ProductTypeImpl<std::complex<T>, double>
   {
-    typedef std::complex<typename ProductType<T, double>::type> type;
+    using type = std::complex<typename ProductType<T, double>::type>;
   };
 
   template <typename U>
   struct ProductTypeImpl<float, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<float, U>::type> type;
+    using type = std::complex<typename ProductType<float, U>::type>;
   };
 
   template <typename T>
   struct ProductTypeImpl<std::complex<T>, float>
   {
-    typedef std::complex<typename ProductType<T, float>::type> type;
+    using type = std::complex<typename ProductType<T, float>::type>;
   };
 
 } // namespace internal
@@ -501,12 +501,12 @@ namespace internal
 
 
 /**
- * This class provides a local typedef @p type that is equal to the template
+ * This class provides a local alias @p type that is equal to the template
  * argument but only if the template argument corresponds to a scalar type
  * (i.e., one of the floating point types, signed or unsigned integer, or a
  * complex number). If the template type @p T is not a scalar, then no class
  * <code>EnableIfScalar@<T@></code> is declared and, consequently, no local
- * typedef is available.
+ * alias is available.
  *
  * The purpose of the class is to disable certain template functions if one of
  * the arguments is not a scalar number. By way of (nonsensical) example,
@@ -558,37 +558,37 @@ struct EnableIfScalar;
 template <>
 struct EnableIfScalar<double>
 {
-  typedef double type;
+  using type = double;
 };
 
 template <>
 struct EnableIfScalar<float>
 {
-  typedef float type;
+  using type = float;
 };
 
 template <>
 struct EnableIfScalar<long double>
 {
-  typedef long double type;
+  using type = long double;
 };
 
 template <>
 struct EnableIfScalar<int>
 {
-  typedef int type;
+  using type = int;
 };
 
 template <>
 struct EnableIfScalar<unsigned int>
 {
-  typedef unsigned int type;
+  using type = unsigned int;
 };
 
 template <typename T>
 struct EnableIfScalar<std::complex<T>>
 {
-  typedef std::complex<T> type;
+  using type = std::complex<T>;
 };
 
 

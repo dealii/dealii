@@ -70,7 +70,7 @@ public:
    * (using 2 times 32 bit for storage), a limitation that is identical to
    * the one used by p4est.
    */
-  typedef std::array<unsigned int, 4> binary_type;
+  using binary_type = std::array<unsigned int, 4>;
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and vector of

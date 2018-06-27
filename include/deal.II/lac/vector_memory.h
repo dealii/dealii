@@ -323,7 +323,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Constructor.  The argument allows to preallocate a certain number of
@@ -400,7 +400,7 @@ private:
    * is be a flag telling whether the vector is used, the second
    * a pointer to the vector itself.
    */
-  typedef std::pair<bool, std::unique_ptr<VectorType>> entry_type;
+  using entry_type = std::pair<bool, std::unique_ptr<VectorType>>;
 
   /**
    * The class providing the actual storage for the memory pool.

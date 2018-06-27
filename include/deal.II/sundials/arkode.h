@@ -279,7 +279,7 @@ namespace SUNDIALS
    * following code snippet:
    *
    * @code
-   * typedef Vector<double> VectorType;
+   * using VectorType = Vector<double>;
    *
    * SUNDIALS::ARKode<VectorType> ode;
    *
@@ -883,7 +883,7 @@ namespace SUNDIALS
     /**
      * MPI communicator. SUNDIALS solver runs happily in
      * parallel. Note that if the library is compiled without MPI
-     * support, MPI_Comm is typedefed as int.
+     * support, MPI_Comm is aliased as int.
      */
     MPI_Comm communicator;
 

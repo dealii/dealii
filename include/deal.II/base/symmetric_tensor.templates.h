@@ -98,7 +98,7 @@ eigenvalues(const SymmetricTensor<2, 3, Number> &T)
       // and p = (tr((T - q.I)^{2})/6)^{1/2} . Then solve the equation
       // 0 = det(\lambda*I - B) = \lambda^{3} - 3*\lambda - det(B)
       // which has the solution
-      // \lambda = 2*cos(1/3 * acos(det(B)/2) +2/3*pi*k ) ; k = 0,1,2
+      // \lambda = 2*cos(1/3 * acos(det(B)/2) +2/3*pi*k ); k = 0,1,2
       // when substituting  \lambda = 2.cos(theta) and using trig identities.
       const Number tr_T = trace(T);
       const Number q    = tr_T / 3.0;
@@ -918,9 +918,8 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                 AssertThrow(false, ExcNotImplemented());
             }
 
-          typedef
-            typename Differentiation::AD::ADNumberTraits<Number>::scalar_type
-                       scalar_type;
+          using scalar_type =
+            typename Differentiation::AD::ADNumberTraits<Number>::scalar_type;
           const double delta = sf * std::numeric_limits<scalar_type>::epsilon();
           const double rotation_angle = delta * numbers::PI / 180.0;
 

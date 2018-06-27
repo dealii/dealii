@@ -1292,9 +1292,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
 {
   std::vector<std::string> names;
   // collect the names of dof and cell data
-  typedef typename std::vector<std::shared_ptr<
+  using data_iterator = typename std::vector<std::shared_ptr<
     internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>::
-    const_iterator data_iterator;
+    const_iterator;
 
   for (data_iterator d = dof_data.begin(); d != dof_data.end(); ++d)
     for (unsigned int i = 0; i < (*d)->names.size(); ++i)
@@ -1339,9 +1339,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     ranges;
 
   // collect the ranges of dof and cell data
-  typedef typename std::vector<std::shared_ptr<
+  using data_iterator = typename std::vector<std::shared_ptr<
     internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>::
-    const_iterator data_iterator;
+    const_iterator;
 
   unsigned int output_component = 0;
   for (data_iterator d = dof_data.begin(); d != dof_data.end(); ++d)

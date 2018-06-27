@@ -46,7 +46,7 @@ namespace Particles
      * uniquely identifies the slot of memory that is reserved for this
      * particle.
      */
-    typedef double *Handle;
+    using Handle = double *;
 
     /**
      * Define a default (invalid) value for handles.

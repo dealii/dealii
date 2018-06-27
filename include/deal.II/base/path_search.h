@@ -197,7 +197,7 @@ private:
   /**
    * Type of values in the class maps.
    */
-  typedef std::map<std::string, std::vector<std::string>>::value_type map_type;
+  using map_type = std::map<std::string, std::vector<std::string>>::value_type;
 
   /**
    * Initialize the static list objects for further use.

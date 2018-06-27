@@ -524,13 +524,13 @@ namespace internal
  * quite inconvenient if one attempted to operate on it directly, since data
  * is spread over quite a lot of arrays and other places. However, there are
  * ways powerful enough to work on these data structures without knowing their
- * exact relations. deal.II uses class local typedefs (see below) to make
+ * exact relations. deal.II uses class local alias (see below) to make
  * things as easy and dimension independent as possible.
  *
  * The Triangulation class provides iterators which enable looping over all
  * cells without knowing the exact representation used to describe them. For
  * more information see the documentation of <tt>TriaIterator</tt>. Their
- * names are typedefs imported from the Iterators class (thus making them
+ * names are alias imported from the Iterators class (thus making them
  * local types to this class) and are as follows:
  *
  * <ul>
@@ -540,16 +540,16 @@ namespace internal
  *
  * For <tt>dim==1</tt>, these iterators are mapped as follows:
  *  @code
- *    typedef line_iterator        cell_iterator;
- *    typedef active_line_iterator active_cell_iterator;
+ *    using cell_iterator = line_iterator;
+ *    using active_cell_iterator = active_line_iterator;
  *  @endcode
  * while for @p dim==2 we have the additional face iterator:
  *  @code
- *    typedef quad_iterator        cell_iterator;
- *    typedef active_quad_iterator active_cell_iterator;
+ *    using cell_iterator = quad_iterator;
+ *    using active_cell_iterator = active_quad_iterator;
  *
- *    typedef line_iterator        face_iterator;
- *    typedef active_line_iterator active_face_iterator;
+ *    using face_iterator = line_iterator;
+ *    using active_face_iterator = active_line_iterator;
  *  @endcode
  *
  * By using the cell iterators, you can write code independent of the spatial
@@ -1281,12 +1281,11 @@ class Triangulation : public Subscriptor
 {
 private:
   /**
-   * An internal typedef to make the definition of the iterator classes
+   * An internal alias to make the definition of the iterator classes
    * simpler.
    */
-  typedef dealii::internal::TriangulationImplementation::Iterators<dim,
-                                                                   spacedim>
-    IteratorSelector;
+  using IteratorSelector =
+    dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>;
 
 public:
   /**
@@ -1494,11 +1493,11 @@ public:
   };
 
   /**
-   * A typedef that is used to identify cell iterators. The concept of
+   * An alias that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
-   * The current typedef identifies cells in a triangulation. The TriaIterator
+   * The current alias identifies cells in a triangulation. The TriaIterator
    * class works like a pointer that when you dereference it yields an object
    * of type CellAccessor. CellAccessor is a class that identifies properties
    * that are specific to cells in a triangulation, but it is derived (and
@@ -1508,15 +1507,15 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
+  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
 
   /**
-   * A typedef that is used to identify
+   * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
-   * The current typedef identifies active cells in a triangulation. The
+   * The current alias identifies active cells in a triangulation. The
    * TriaActiveIterator class works like a pointer to active objects that when
    * you dereference it yields an object of type CellAccessor. CellAccessor is
    * a class that identifies properties that are specific to cells in a
@@ -1526,14 +1525,14 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef TriaActiveIterator<CellAccessor<dim, spacedim>> active_cell_iterator;
+  using active_cell_iterator = TriaActiveIterator<CellAccessor<dim, spacedim>>;
 
   /**
-   * A typedef that is used to identify iterators that point to faces.
+   * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
-   * The current typedef identifies faces in a triangulation. The
+   * The current alias identifies faces in a triangulation. The
    * TriaIterator class works like a pointer to objects that when
    * you dereference it yields an object of type TriaAccessor, i.e.,
    * class that can be used to query geometric properties of faces
@@ -1541,55 +1540,55 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> face_iterator;
+  using face_iterator = TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>;
 
   /**
-   * A typedef that is used to identify iterators that point to active faces,
+   * An alias that is used to identify iterators that point to active faces,
    * i.e., to faces that have no children. Active faces must be faces of at
    * least one active cell.
    *
-   * Other than the "active" qualification, this typedef is identical to the
-   * @p face_iterator typedef. In particular, dereferencing either yields
+   * Other than the "active" qualification, this alias is identical to the
+   * @p face_iterator alias. In particular, dereferencing either yields
    * the same kind of object.
    *
    * @ingroup Iterators
    */
-  typedef TriaActiveIterator<TriaAccessor<dim - 1, dim, spacedim>>
-    active_face_iterator;
+  using active_face_iterator =
+    TriaActiveIterator<TriaAccessor<dim - 1, dim, spacedim>>;
 
   /**
-   * A typedef that defines an iterator type to iterate over
+   * An alias that defines an iterator type to iterate over
    * vertices of a mesh.  The concept of iterators is discussed at
    * length in the
    * @ref Iterators "iterators documentation module".
    *
    * @ingroup Iterators
    */
-  typedef TriaIterator<dealii::TriaAccessor<0, dim, spacedim>> vertex_iterator;
+  using vertex_iterator = TriaIterator<dealii::TriaAccessor<0, dim, spacedim>>;
 
   /**
-   * A typedef that defines an iterator type to iterate over
+   * An alias that defines an iterator type to iterate over
    * vertices of a mesh.  The concept of iterators is discussed at
    * length in the
    * @ref Iterators "iterators documentation module".
    *
-   * This typedef is in fact identical to the @p vertex_iterator typedef
+   * This alias is in fact identical to the @p vertex_iterator alias
    * above since all vertices in a mesh are active (i.e., are a vertex of
    * an active cell).
    *
    * @ingroup Iterators
    */
-  typedef TriaActiveIterator<dealii::TriaAccessor<0, dim, spacedim>>
-    active_vertex_iterator;
+  using active_vertex_iterator =
+    TriaActiveIterator<dealii::TriaAccessor<0, dim, spacedim>>;
 
-  typedef typename IteratorSelector::line_iterator        line_iterator;
-  typedef typename IteratorSelector::active_line_iterator active_line_iterator;
+  using line_iterator        = typename IteratorSelector::line_iterator;
+  using active_line_iterator = typename IteratorSelector::active_line_iterator;
 
-  typedef typename IteratorSelector::quad_iterator        quad_iterator;
-  typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
+  using quad_iterator        = typename IteratorSelector::quad_iterator;
+  using active_quad_iterator = typename IteratorSelector::active_quad_iterator;
 
-  typedef typename IteratorSelector::hex_iterator        hex_iterator;
-  typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
+  using hex_iterator        = typename IteratorSelector::hex_iterator;
+  using active_hex_iterator = typename IteratorSelector::active_hex_iterator;
 
   /**
    * A structure that is used as an exception object by the
@@ -2106,7 +2105,7 @@ public:
   template <typename T>
   struct CellWeightSum
   {
-    typedef T result_type;
+    using result_type = T;
 
     template <typename InputIterator>
     T
@@ -3447,14 +3446,14 @@ private:
    * Since users should never have to access these internal properties of how
    * we store data, these iterator types are made private.
    */
-  typedef TriaRawIterator<CellAccessor<dim, spacedim>> raw_cell_iterator;
-  typedef TriaRawIterator<TriaAccessor<dim - 1, dim, spacedim>>
-    raw_face_iterator;
-  typedef TriaRawIterator<dealii::TriaAccessor<0, dim, spacedim>>
-                                                       raw_vertex_iterator;
-  typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
-  typedef typename IteratorSelector::raw_quad_iterator raw_quad_iterator;
-  typedef typename IteratorSelector::raw_hex_iterator  raw_hex_iterator;
+  using raw_cell_iterator = TriaRawIterator<CellAccessor<dim, spacedim>>;
+  using raw_face_iterator =
+    TriaRawIterator<TriaAccessor<dim - 1, dim, spacedim>>;
+  using raw_vertex_iterator =
+    TriaRawIterator<dealii::TriaAccessor<0, dim, spacedim>>;
+  using raw_line_iterator = typename IteratorSelector::raw_line_iterator;
+  using raw_quad_iterator = typename IteratorSelector::raw_quad_iterator;
+  using raw_hex_iterator  = typename IteratorSelector::raw_hex_iterator;
 
   /**
    * Iterator to the first cell, used or not, on level @p level. If a level

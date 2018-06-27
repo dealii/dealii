@@ -79,10 +79,10 @@ namespace internal
   namespace DoFAccessorImplementation
   {
     /**
-     * This is a switch class which only declares a @p typedef. It is meant to
+     * This is a switch class which only declares an @p alias. It is meant to
      * determine which class a DoFAccessor class is to be derived from. By
      * default, <tt>DoFAccessor@<structdim,dim,spacedim@></tt> derives from
-     * the typedef in the general
+     * the alias in the general
      * <tt>Inheritance@<structdim,dim,spacedim@></tt> class, which is
      * <tt>TriaAccessor@<structdim,dim,spacedim@></tt>, but if
      * <tt>structdim==dim</tt>, then the specialization
@@ -99,10 +99,10 @@ namespace internal
     struct Inheritance
     {
       /**
-       * Declaration of the @p typedef.  See the full documentation for more
+       * Declaration of the @p alias. See the full documentation for more
        * information.
        */
-      typedef dealii::TriaAccessor<structdim, dim, spacedim> BaseClass;
+      using BaseClass = dealii::TriaAccessor<structdim, dim, spacedim>;
     };
 
 
@@ -115,10 +115,10 @@ namespace internal
     struct Inheritance<dim, dim, spacedim>
     {
       /**
-       * Declaration of the @p typedef.  See the full documentation for more
+       * Declaration of the @p alias. See the full documentation for more
        * information.
        */
-      typedef dealii::CellAccessor<dim, spacedim> BaseClass;
+      using BaseClass = dealii::CellAccessor<dim, spacedim>;
     };
   } // namespace DoFAccessorImplementation
 } // namespace internal
@@ -148,9 +148,9 @@ namespace internal
  * function get_active_or_mg_dof_indices(). See the section on Generic loops
  * below.
  *
- * <h3>Typedefs</h3>
+ * <h3>Alias</h3>
  *
- * Usage is best to happen through the typedefs to the various kinds of
+ * Usage is best to happen through the alias to the various kinds of
  * iterators provided by the DoFHandler and hp::DoFHandler classes, since they
  * are more secure to changes in the class naming and template interface as
  * well as providing easier typing (much less complicated names!).
@@ -226,16 +226,16 @@ public:
   static const unsigned int space_dimension = DoFHandlerType::space_dimension;
 
   /**
-   * Declare a typedef to the base class to make accessing some of the
+   * Declare an alias to the base class to make accessing some of the
    * exception classes simpler.
    */
-  typedef typename dealii::internal::DoFAccessorImplementation::
-    Inheritance<structdim, dimension, space_dimension>::BaseClass BaseClass;
+  using BaseClass = typename dealii::internal::DoFAccessorImplementation::
+    Inheritance<structdim, dimension, space_dimension>::BaseClass;
 
   /**
    * Data type passed by the iterator class.
    */
-  typedef DoFHandlerType AccessorData;
+  using AccessorData = DoFHandlerType;
 
   /**
    * @name Constructors
@@ -778,15 +778,15 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Declare a typedef to the base class to make accessing some of the
+   * Declare an alias to the base class to make accessing some of the
    * exception classes simpler.
    */
-  typedef TriaAccessor<0, 1, spacedim> BaseClass;
+  using BaseClass = TriaAccessor<0, 1, spacedim>;
 
   /**
    * Data type passed by the iterator class.
    */
-  typedef DoFHandlerType<1, spacedim> AccessorData;
+  using AccessorData = DoFHandlerType<1, spacedim>;
 
   /**
    * @name Constructors
@@ -1252,10 +1252,10 @@ class DoFInvalidAccessor : public InvalidAccessor<structdim, dim, spacedim>
 {
 public:
   /**
-   * Propagate typedef from base class to this class.
+   * Propagate alias from base class to this class.
    */
-  typedef typename InvalidAccessor<structdim, dim, spacedim>::AccessorData
-    AccessorData;
+  using AccessorData =
+    typename InvalidAccessor<structdim, dim, spacedim>::AccessorData;
 
   /**
    * Constructor.  This class is used for iterators that do not make
@@ -1334,30 +1334,27 @@ public:
   /**
    * Data type passed by the iterator class.
    */
-  typedef DoFHandlerType AccessorData;
+  using AccessorData = DoFHandlerType;
 
   /**
-   * Declare a typedef to the base class to make accessing some of the
+   * Declare an alias to the base class to make accessing some of the
    * exception classes simpler.
    */
-  typedef DoFAccessor<DoFHandlerType::dimension,
-                      DoFHandlerType,
-                      level_dof_access>
-    BaseClass;
+  using BaseClass =
+    DoFAccessor<DoFHandlerType::dimension, DoFHandlerType, level_dof_access>;
 
   /**
    * Define the type of the container this is part of.
    */
-  typedef DoFHandlerType Container;
+  using Container = DoFHandlerType;
 
   /**
    * A type for an iterator over the faces of a cell. This is what the face()
    * function returns.
    */
-  typedef TriaIterator<DoFAccessor<DoFHandlerType::dimension - 1,
-                                   DoFHandlerType,
-                                   level_dof_access>>
-    face_iterator;
+  using face_iterator = TriaIterator<DoFAccessor<DoFHandlerType::dimension - 1,
+                                                 DoFHandlerType,
+                                                 level_dof_access>>;
 
   /**
    * @name Constructors and initialization

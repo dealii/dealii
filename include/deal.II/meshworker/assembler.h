@@ -327,11 +327,10 @@ namespace MeshWorker
     class MGMatrixLocalBlocksToGlobalBlocks
     {
     public:
-      typedef MGMatrixBlockVector<MatrixType> MatrixPtrVector;
-      typedef SmartPointer<
-        MatrixPtrVector,
-        MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
-        MatrixPtrVectorPtr;
+      using MatrixPtrVector = MGMatrixBlockVector<MatrixType>;
+      using MatrixPtrVectorPtr =
+        SmartPointer<MatrixPtrVector,
+                     MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>;
 
       /**
        * Constructor, initializing the #threshold, which limits how small

@@ -581,8 +581,7 @@ namespace internal
     /**
      * Typedef to deprecated name.
      */
-    DEAL_II_DEPRECATED
-    typedef TaskInfo SizeInfo;
+    using SizeInfo DEAL_II_DEPRECATED = TaskInfo;
 
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal

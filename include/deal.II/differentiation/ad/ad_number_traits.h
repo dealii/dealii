@@ -97,9 +97,9 @@ namespace Differentiation
        *   // State whether the auto-differentiable number uses taping or not.
        *   static const bool             is_taped;
        *   // The real-type for the auto-differentiable number
-       *   typedef <ADNumberType>        real_type;
+       *   using real_type = <ADNumberType>;
        *   // The type of number returned when taking the first derivative of the @p real_type.
-       *   typedef <Scalar/ADNumberType> derivative_type;
+       *   using derivative_type = <Scalar/ADNumberType>;
        *   // The number of derivative levels computable from the @p real_type.
        *   static const unsigned int     n_supported_derivative_levels;
        *
@@ -513,7 +513,7 @@ namespace Differentiation
       template <typename Number>
       struct RemoveComplexWrapper
       {
-        typedef Number type;
+        using type = Number;
       };
 
 
@@ -525,7 +525,7 @@ namespace Differentiation
       template <typename Number>
       struct RemoveComplexWrapper<std::complex<Number>>
       {
-        typedef typename RemoveComplexWrapper<Number>::type type;
+        using type = typename RemoveComplexWrapper<Number>::type;
       };
 
 
@@ -735,10 +735,10 @@ namespace Differentiation
      * internal::ADNumberInfoFromEnum is to be defined, from which we require
      * the following basic information determine all of the required information
      * and type traits for our helper classes:
-     *   - A typedef called @p scalar_type, which defines the scalar or
+     *   - An alias called @p scalar_type, which defines the scalar or
      *     floating-point valued counterpart to the auto-differentiable number
      * type. This can be real or complex valued.
-     *   - A typedef called @p derivative_type, which defines the
+     *   - An alias called @p derivative_type, which defines the
      *     number type for directional derivatives.
      *   - A boolean called @p is_taped, which defines whether the auto-differentiable
      *     number is a taped number or not.
@@ -855,41 +855,40 @@ namespace Differentiation
        * Underlying floating point value type.
        * This could real-valued or complex-valued.
        */
-      typedef ScalarType scalar_type;
+      using scalar_type = ScalarType;
 
 
       /**
        * Type for real numbers
        */
-      typedef typename internal::ADNumberInfoFromEnum<
+      using real_type = typename internal::ADNumberInfoFromEnum<
         typename internal::RemoveComplexWrapper<ScalarType>::type,
-        ADNumberTypeCode>::real_type real_type;
+        ADNumberTypeCode>::real_type;
 
 
       /**
        * Type for complex numbers
        */
-      typedef std::complex<real_type> complex_type;
+      using complex_type = std::complex<real_type>;
 
 
       /**
        * The actual auto-differentiable number type
        */
-      typedef
-        typename std::conditional<is_real_valued, real_type, complex_type>::type
-          ad_type;
+      using ad_type = typename std::
+        conditional<is_real_valued, real_type, complex_type>::type;
 
       /**
        * The actual auto-differentiable number directional derivative type
        */
-      typedef typename std::conditional<
+      using derivative_type = typename std::conditional<
         is_real_valued,
         typename internal::ADNumberInfoFromEnum<
           typename internal::RemoveComplexWrapper<ScalarType>::type,
           ADNumberTypeCode>::derivative_type,
         std::complex<typename internal::ADNumberInfoFromEnum<
           typename internal::RemoveComplexWrapper<ScalarType>::type,
-          ADNumberTypeCode>::derivative_type>>::type derivative_type;
+          ADNumberTypeCode>::derivative_type>>::type;
 
 
       /**
@@ -1038,7 +1037,7 @@ namespace Differentiation
        * Underlying floating point value type.
        * This could real-valued or complex-valued.
        */
-      typedef ScalarType scalar_type;
+      using scalar_type = ScalarType;
 
       static ScalarType
       get_directional_derivative(const ScalarType & /*x*/,

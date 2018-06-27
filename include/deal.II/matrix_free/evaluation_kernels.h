@@ -157,12 +157,11 @@ namespace internal
 
     const EvaluatorVariant variant =
       EvaluatorSelector<type, (fe_degree + n_q_points_1d > 4)>::variant;
-    typedef EvaluatorTensorProduct<variant,
-                                   dim,
-                                   fe_degree + 1,
-                                   n_q_points_1d,
-                                   Number>
-         Eval;
+    using Eval = EvaluatorTensorProduct<variant,
+                                        dim,
+                                        fe_degree + 1,
+                                        n_q_points_1d,
+                                        Number>;
     Eval eval(variant == evaluate_evenodd ? shape_info.shape_values_eo :
                                             shape_info.shape_values,
               variant == evaluate_evenodd ? shape_info.shape_gradients_eo :
@@ -429,12 +428,11 @@ namespace internal
   {
     const EvaluatorVariant variant =
       EvaluatorSelector<type, (fe_degree + n_q_points_1d > 4)>::variant;
-    typedef EvaluatorTensorProduct<variant,
-                                   dim,
-                                   fe_degree + 1,
-                                   n_q_points_1d,
-                                   Number>
-         Eval;
+    using Eval = EvaluatorTensorProduct<variant,
+                                        dim,
+                                        fe_degree + 1,
+                                        n_q_points_1d,
+                                        Number>;
     Eval eval(variant == evaluate_evenodd ? shape_info.shape_values_eo :
                                             shape_info.shape_values,
               variant == evaluate_evenodd ? shape_info.shape_gradients_eo :
@@ -1365,14 +1363,14 @@ namespace internal
              data.shape_gradients :
              data.gradients_within_subface[subface_index / 2]);
 
-      typedef internal::EvaluatorTensorProduct<symmetric_evaluate ?
-                                                 internal::evaluate_evenodd :
-                                                 internal::evaluate_general,
-                                               dim - 1,
-                                               fe_degree + 1,
-                                               n_q_points_1d,
-                                               Number>
-           Eval;
+      using Eval =
+        internal::EvaluatorTensorProduct<symmetric_evaluate ?
+                                           internal::evaluate_evenodd :
+                                           internal::evaluate_general,
+                                         dim - 1,
+                                         fe_degree + 1,
+                                         n_q_points_1d,
+                                         Number>;
       Eval eval1(val1,
                  grad1,
                  AlignedVector<Number>(),
@@ -1526,14 +1524,14 @@ namespace internal
              data.shape_gradients :
              data.gradients_within_subface[subface_index / 2]);
 
-      typedef internal::EvaluatorTensorProduct<symmetric_evaluate ?
-                                                 internal::evaluate_evenodd :
-                                                 internal::evaluate_general,
-                                               dim - 1,
-                                               fe_degree + 1,
-                                               n_q_points_1d,
-                                               Number>
-           Eval;
+      using Eval =
+        internal::EvaluatorTensorProduct<symmetric_evaluate ?
+                                           internal::evaluate_evenodd :
+                                           internal::evaluate_general,
+                                         dim - 1,
+                                         fe_degree + 1,
+                                         n_q_points_1d,
+                                         Number>;
       Eval eval1(val1, grad1, val1, data.fe_degree + 1, data.n_q_points_1d);
       Eval eval2(val2, grad2, val1, data.fe_degree + 1, data.n_q_points_1d);
 

@@ -188,14 +188,14 @@ namespace MatrixFreeOperators
   {
   public:
     /**
-     * Number typedef.
+     * Number alias.
      */
-    typedef typename VectorType::value_type value_type;
+    using value_type = typename VectorType::value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    typedef typename VectorType::size_type size_type;
+    using size_type = typename VectorType::size_type;
 
     /**
      * Default constructor.
@@ -532,14 +532,14 @@ namespace MatrixFreeOperators
   {
   public:
     /**
-     * Number typedef.
+     * Number alias.
      */
-    typedef typename OperatorType::value_type value_type;
+    using value_type = typename OperatorType::value_type;
 
     /**
      * Size type.
      */
-    typedef typename OperatorType::size_type size_type;
+    using size_type = typename OperatorType::size_type;
 
     /**
      * Default constructor.
@@ -677,14 +677,14 @@ namespace MatrixFreeOperators
   {
   public:
     /**
-     * Number typedef.
+     * Number alias.
      */
-    typedef typename Base<dim, VectorType>::value_type value_type;
+    using value_type = typename Base<dim, VectorType>::value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    typedef typename Base<dim, VectorType>::size_type size_type;
+    using size_type = typename Base<dim, VectorType>::size_type;
 
     /**
      * Constructor.
@@ -741,14 +741,14 @@ namespace MatrixFreeOperators
   {
   public:
     /**
-     * Number typedef.
+     * Number alias.
      */
-    typedef typename Base<dim, VectorType>::value_type value_type;
+    using value_type = typename Base<dim, VectorType>::value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    typedef typename Base<dim, VectorType>::size_type size_type;
+    using size_type = typename Base<dim, VectorType>::size_type;
 
     /**
      * Constructor.
@@ -1233,8 +1233,8 @@ namespace MatrixFreeOperators
   void
   Base<dim, VectorType>::vmult(VectorType &dst, const VectorType &src) const
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
-    dst = Number(0.);
+    using Number = typename Base<dim, VectorType>::value_type;
+    dst          = Number(0.);
     vmult_add(dst, src);
   }
 
@@ -1265,7 +1265,7 @@ namespace MatrixFreeOperators
     const VectorType &src,
     const bool        is_row) const
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     for (unsigned int i = 0; i < BlockHelper::n_blocks(src); ++i)
       {
         const unsigned int mf_component =
@@ -1301,7 +1301,7 @@ namespace MatrixFreeOperators
   Base<dim, VectorType>::preprocess_constraints(VectorType &      dst,
                                                 const VectorType &src) const
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
 
@@ -1381,7 +1381,7 @@ namespace MatrixFreeOperators
   Base<dim, VectorType>::vmult_interface_down(VectorType &      dst,
                                               const VectorType &src) const
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     AssertDimension(dst.size(), src.size());
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
@@ -1433,7 +1433,7 @@ namespace MatrixFreeOperators
   Base<dim, VectorType>::vmult_interface_up(VectorType &      dst,
                                             const VectorType &src) const
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     AssertDimension(dst.size(), src.size());
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
@@ -1471,8 +1471,8 @@ namespace MatrixFreeOperators
   void
   Base<dim, VectorType>::Tvmult(VectorType &dst, const VectorType &src) const
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
-    dst = Number(0.);
+    using Number = typename Base<dim, VectorType>::value_type;
+    dst          = Number(0.);
     Tvmult_add(dst, src);
   }
 
@@ -1651,7 +1651,7 @@ namespace MatrixFreeOperators
   MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
     compute_diagonal()
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
 
     this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
@@ -1708,7 +1708,7 @@ namespace MatrixFreeOperators
       const VectorType &                                                 src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef typename Base<dim, VectorType>::value_type                Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
@@ -1800,7 +1800,7 @@ namespace MatrixFreeOperators
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
     compute_diagonal()
   {
-    typedef typename Base<dim, VectorType>::value_type Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
 
     unsigned int dummy = 0;
@@ -1918,7 +1918,7 @@ namespace MatrixFreeOperators
       const VectorType &                                                 src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef typename Base<dim, VectorType>::value_type                Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
@@ -1944,7 +1944,7 @@ namespace MatrixFreeOperators
       const unsigned int &,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef typename Base<dim, VectorType>::value_type                Number;
+    using Number = typename Base<dim, VectorType>::value_type;
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)

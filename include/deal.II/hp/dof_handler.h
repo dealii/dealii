@@ -168,68 +168,64 @@ namespace hp
   template <int dim, int spacedim = dim>
   class DoFHandler : public Subscriptor
   {
-    typedef dealii::internal::DoFHandlerImplementation::
-      Iterators<DoFHandler<dim, spacedim>, false>
-        ActiveSelector;
-    typedef dealii::internal::DoFHandlerImplementation::
-      Iterators<DoFHandler<dim, spacedim>, true>
-        LevelSelector;
+    using ActiveSelector = dealii::internal::DoFHandlerImplementation::
+      Iterators<DoFHandler<dim, spacedim>, false>;
+    using LevelSelector = dealii::internal::DoFHandlerImplementation::
+      Iterators<DoFHandler<dim, spacedim>, true>;
 
   public:
-    typedef typename ActiveSelector::CellAccessor cell_accessor;
-    typedef typename ActiveSelector::FaceAccessor face_accessor;
+    using cell_accessor = typename ActiveSelector::CellAccessor;
+    using face_accessor = typename ActiveSelector::FaceAccessor;
 
-    typedef typename ActiveSelector::line_iterator        line_iterator;
-    typedef typename ActiveSelector::active_line_iterator active_line_iterator;
+    using line_iterator        = typename ActiveSelector::line_iterator;
+    using active_line_iterator = typename ActiveSelector::active_line_iterator;
 
-    typedef typename ActiveSelector::quad_iterator        quad_iterator;
-    typedef typename ActiveSelector::active_quad_iterator active_quad_iterator;
+    using quad_iterator        = typename ActiveSelector::quad_iterator;
+    using active_quad_iterator = typename ActiveSelector::active_quad_iterator;
 
-    typedef typename ActiveSelector::hex_iterator        hex_iterator;
-    typedef typename ActiveSelector::active_hex_iterator active_hex_iterator;
+    using hex_iterator        = typename ActiveSelector::hex_iterator;
+    using active_hex_iterator = typename ActiveSelector::active_hex_iterator;
 
     /**
      * @copydoc ::DoFHandler::active_cell_iterator
      * @ingroup Iterators
      */
 #ifndef _MSC_VER
-    typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
 #else
-    typedef TriaActiveIterator<
-      dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>
-      active_cell_iterator;
+    using active_cell_iterator = TriaActiveIterator<
+      dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>;
 #endif
 
-    typedef typename LevelSelector::cell_iterator level_cell_iterator;
+    using level_cell_iterator = typename LevelSelector::cell_iterator;
 
     /**
      * @copydoc ::DoFHandler::cell_iterator
      * @ingroup Iterators
      */
 #ifndef _MSC_VER
-    typedef typename ActiveSelector::cell_iterator cell_iterator;
+    using cell_iterator = typename ActiveSelector::cell_iterator;
 #else
-    typedef TriaIterator<
-      dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>
-      cell_iterator;
+    using cell_iterator =
+      TriaIterator<dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>;
 #endif
 
     /**
      * @copydoc ::DoFHandler::face_iterator
      * @ingroup Iterators
      */
-    typedef typename ActiveSelector::face_iterator face_iterator;
+    using face_iterator = typename ActiveSelector::face_iterator;
 
     /**
      * @copydoc ::DoFHandler::active_face_iterator
      * @ingroup Iterators
      */
-    typedef typename ActiveSelector::active_face_iterator active_face_iterator;
+    using active_face_iterator = typename ActiveSelector::active_face_iterator;
 
-    typedef typename LevelSelector::CellAccessor level_cell_accessor;
-    typedef typename LevelSelector::FaceAccessor level_face_accessor;
+    using level_cell_accessor = typename LevelSelector::CellAccessor;
+    using level_face_accessor = typename LevelSelector::FaceAccessor;
 
-    typedef typename LevelSelector::face_iterator level_face_iterator;
+    using level_face_iterator = typename LevelSelector::face_iterator;
 
     /**
      * Make the dimension available in function templates.

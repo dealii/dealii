@@ -140,8 +140,8 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator
-    cell_iterator;
+  using cell_iterator =
+    typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator;
 
   /**
    * This is the central function of this class since it builds the list of

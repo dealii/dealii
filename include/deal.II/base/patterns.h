@@ -732,7 +732,7 @@ namespace Patterns
    * or, if you want to exploit ParameterHandler::add_parameter():
    *
    * @code
-   * typedef std::tuple<std::string, Point<3>, unsigned int> T;
+   * using T = std::tuple<std::string, Point<3>, unsigned int>;
    *
    * T a = Patterns::Tools::Convert<T>::to_value("Ciao : 1.0, 2.0, 3.0 : 33");
    *
@@ -1203,7 +1203,7 @@ namespace Patterns
    * A typical usage of these tools is in the following example:
    *
    * @code
-   * typedef std::vector<unsigned int> T;
+   * using T = std::vector<unsigned int>;
    *
    * T vec(3);
    * vec[0] = 1;
@@ -1884,7 +1884,7 @@ namespace Patterns
     template <int rank, int dim, class Number>
     struct Convert<Tensor<rank, dim, Number>>
     {
-      typedef Tensor<rank, dim, Number> T;
+      using T = Tensor<rank, dim, Number>;
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
       {
@@ -1951,7 +1951,7 @@ namespace Patterns
     template <int dim, class Number>
     struct Convert<Point<dim, Number>>
     {
-      typedef Point<dim, Number> T;
+      using T = Point<dim, Number>;
 
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -1981,7 +1981,7 @@ namespace Patterns
     template <class Number>
     struct Convert<std::complex<Number>>
     {
-      typedef std::complex<Number> T;
+      using T = std::complex<Number>;
 
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -2045,7 +2045,7 @@ namespace Patterns
     template <>
     struct Convert<std::string>
     {
-      typedef std::string T;
+      using T = std::string;
 
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -2076,7 +2076,7 @@ namespace Patterns
     template <class Key, class Value>
     struct Convert<std::pair<Key, Value>>
     {
-      typedef std::pair<Key, Value> T;
+      using T = std::pair<Key, Value>;
 
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -2121,7 +2121,7 @@ namespace Patterns
     template <class... Args>
     struct Convert<std::tuple<Args...>>
     {
-      typedef std::tuple<Args...> T;
+      using T = std::tuple<Args...>;
 
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()

@@ -91,10 +91,10 @@ template <int dim, int n_components_, typename Number, bool is_face = false>
 class FEEvaluationBase
 {
 public:
-  typedef Number                                            number_type;
-  typedef Tensor<1, n_components_, VectorizedArray<Number>> value_type;
-  typedef Tensor<1, n_components_, Tensor<1, dim, VectorizedArray<Number>>>
-                                gradient_type;
+  using number_type = Number;
+  using value_type  = Tensor<1, n_components_, VectorizedArray<Number>>;
+  using gradient_type =
+    Tensor<1, n_components_, Tensor<1, dim, VectorizedArray<Number>>>;
   static constexpr unsigned int dimension    = dim;
   static constexpr unsigned int n_components = n_components_;
 
@@ -1109,13 +1109,13 @@ class FEEvaluationAccess
   : public FEEvaluationBase<dim, n_components_, Number, is_face>
 {
 public:
-  typedef Number                                            number_type;
-  typedef Tensor<1, n_components_, VectorizedArray<Number>> value_type;
-  typedef Tensor<1, n_components_, Tensor<1, dim, VectorizedArray<Number>>>
-                                gradient_type;
+  using number_type = Number;
+  using value_type  = Tensor<1, n_components_, VectorizedArray<Number>>;
+  using gradient_type =
+    Tensor<1, n_components_, Tensor<1, dim, VectorizedArray<Number>>>;
   static constexpr unsigned int dimension    = dim;
   static constexpr unsigned int n_components = n_components_;
-  typedef FEEvaluationBase<dim, n_components_, Number, is_face> BaseClass;
+  using BaseClass = FEEvaluationBase<dim, n_components_, Number, is_face>;
 
 protected:
   /**
@@ -1175,11 +1175,11 @@ class FEEvaluationAccess<dim, 1, Number, is_face>
   : public FEEvaluationBase<dim, 1, Number, is_face>
 {
 public:
-  typedef Number                                    number_type;
-  typedef VectorizedArray<Number>                   value_type;
-  typedef Tensor<1, dim, VectorizedArray<Number>>   gradient_type;
-  static constexpr unsigned int                     dimension = dim;
-  typedef FEEvaluationBase<dim, 1, Number, is_face> BaseClass;
+  using number_type   = Number;
+  using value_type    = VectorizedArray<Number>;
+  using gradient_type = Tensor<1, dim, VectorizedArray<Number>>;
+  static constexpr unsigned int dimension = dim;
+  using BaseClass = FEEvaluationBase<dim, 1, Number, is_face>;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_dof_value()
    */
@@ -1307,12 +1307,12 @@ class FEEvaluationAccess<dim, dim, Number, is_face>
   : public FEEvaluationBase<dim, dim, Number, is_face>
 {
 public:
-  typedef Number                                      number_type;
-  typedef Tensor<1, dim, VectorizedArray<Number>>     value_type;
-  typedef Tensor<2, dim, VectorizedArray<Number>>     gradient_type;
-  static constexpr unsigned int                       dimension    = dim;
-  static constexpr unsigned int                       n_components = dim;
-  typedef FEEvaluationBase<dim, dim, Number, is_face> BaseClass;
+  using number_type   = Number;
+  using value_type    = Tensor<1, dim, VectorizedArray<Number>>;
+  using gradient_type = Tensor<2, dim, VectorizedArray<Number>>;
+  static constexpr unsigned int dimension    = dim;
+  static constexpr unsigned int n_components = dim;
+  using BaseClass = FEEvaluationBase<dim, dim, Number, is_face>;
 
   /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_gradient()
    */
@@ -1462,11 +1462,11 @@ class FEEvaluationAccess<1, 1, Number, is_face>
   : public FEEvaluationBase<1, 1, Number, is_face>
 {
 public:
-  typedef Number                                  number_type;
-  typedef VectorizedArray<Number>                 value_type;
-  typedef Tensor<1, 1, VectorizedArray<Number>>   gradient_type;
-  static constexpr unsigned int                   dimension = 1;
-  typedef FEEvaluationBase<1, 1, Number, is_face> BaseClass;
+  using number_type   = Number;
+  using value_type    = VectorizedArray<Number>;
+  using gradient_type = Tensor<1, 1, VectorizedArray<Number>>;
+  static constexpr unsigned int dimension = 1;
+  using BaseClass = FEEvaluationBase<1, 1, Number, is_face>;
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_dof_value()
    */
@@ -2147,28 +2147,28 @@ class FEEvaluation
 {
 public:
   /**
-   * A typedef to the base class.
+   * An alias to the base class.
    */
-  typedef FEEvaluationAccess<dim, n_components_, Number, false> BaseClass;
+  using BaseClass = FEEvaluationAccess<dim, n_components_, Number, false>;
 
   /**
    * An underlying number type specified as template argument.
    */
-  typedef Number number_type;
+  using number_type = Number;
 
   /**
    * The type of function values, e.g. `VectorizedArray<Number>` for
    * `n_components=1` or `Tensor<1,dim,VectorizedArray<Number> >` for
    * `n_components=dim`.
    */
-  typedef typename BaseClass::value_type value_type;
+  using value_type = typename BaseClass::value_type;
 
   /**
    * The type of gradients, e.g. `Tensor<1,dim,VectorizedArray<Number>>` for
    * `n_components=1` or `Tensor<2,dim,VectorizedArray<Number> >` for
    * `n_components=dim`.
    */
-  typedef typename BaseClass::gradient_type gradient_type;
+  using gradient_type = typename BaseClass::gradient_type;
 
   /**
    * The dimension given as template argument.
@@ -2550,28 +2550,28 @@ class FEFaceEvaluation
 {
 public:
   /**
-   * A typedef to the base class.
+   * An alias to the base class.
    */
-  typedef FEEvaluationAccess<dim, n_components_, Number, true> BaseClass;
+  using BaseClass = FEEvaluationAccess<dim, n_components_, Number, true>;
 
   /**
    * A underlying number type specified as template argument.
    */
-  typedef Number number_type;
+  using number_type = Number;
 
   /**
    * The type of function values, e.g. `VectorizedArray<Number>` for
    * `n_components=1` or `Tensor<1,dim,VectorizedArray<Number> >` for
    * `n_components=dim`.
    */
-  typedef typename BaseClass::value_type value_type;
+  using value_type = typename BaseClass::value_type;
 
   /**
    * The type of gradients, e.g. `Tensor<1,dim,VectorizedArray<Number>>` for
    * `n_components=1` or `Tensor<2,dim,VectorizedArray<Number> >` for
    * `n_components=dim`.
    */
-  typedef typename BaseClass::gradient_type gradient_type;
+  using gradient_type = typename BaseClass::gradient_type;
 
   /**
    * The dimension given as template argument.
@@ -3760,7 +3760,7 @@ namespace internal
   template <typename VectorType>
   struct BlockVectorSelector<VectorType, true>
   {
-    typedef typename VectorType::BlockType BaseVectorType;
+    using BaseVectorType = typename VectorType::BlockType;
 
     static BaseVectorType *
     get_vector_component(VectorType &vec, const unsigned int component)
@@ -3773,7 +3773,7 @@ namespace internal
   template <typename VectorType>
   struct BlockVectorSelector<VectorType, false>
   {
-    typedef VectorType BaseVectorType;
+    using BaseVectorType = VectorType;
 
     static BaseVectorType *
     get_vector_component(VectorType &vec, const unsigned int component)
@@ -3798,7 +3798,7 @@ namespace internal
   template <typename VectorType>
   struct BlockVectorSelector<std::vector<VectorType>, false>
   {
-    typedef VectorType BaseVectorType;
+    using BaseVectorType = VectorType;
 
     static BaseVectorType *
     get_vector_component(std::vector<VectorType> &vec,
@@ -3812,7 +3812,7 @@ namespace internal
   template <typename VectorType>
   struct BlockVectorSelector<std::vector<VectorType *>, false>
   {
-    typedef VectorType BaseVectorType;
+    using BaseVectorType = VectorType;
 
     static BaseVectorType *
     get_vector_component(std::vector<VectorType *> &vec,

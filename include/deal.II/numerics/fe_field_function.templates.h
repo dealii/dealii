@@ -131,7 +131,7 @@ namespace Functions
     std::vector<Tensor<1, dim, typename VectorType::value_type>> &gradients)
     const
   {
-    typedef typename VectorType::value_type number;
+    using number = typename VectorType::value_type;
     Assert(gradients.size() == this->n_components,
            ExcDimensionMismatch(gradients.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();

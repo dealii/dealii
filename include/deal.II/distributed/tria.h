@@ -252,12 +252,12 @@ namespace parallel
     {
     public:
       /**
-       * A typedef that is used to identify cell iterators. The concept of
+       * An alias that is used to identify cell iterators. The concept of
        * iterators is discussed at length in the
        * @ref Iterators "iterators documentation module".
        *
-       * The current typedef identifies cells in a triangulation. You can find
-       * the exact type it refers to in the base class's own typedef, but it
+       * The current alias identifies cells in a triangulation. You can find
+       * the exact type it refers to in the base class's own alias, but it
        * should be TriaIterator<CellAccessor<dim,spacedim> >. The TriaIterator
        * class works like a pointer that when you dereference it yields an
        * object of type CellAccessor. CellAccessor is a class that identifies
@@ -268,17 +268,17 @@ namespace parallel
        *
        * @ingroup Iterators
        */
-      typedef typename dealii::Triangulation<dim, spacedim>::cell_iterator
-        cell_iterator;
+      using cell_iterator =
+        typename dealii::Triangulation<dim, spacedim>::cell_iterator;
 
       /**
-       * A typedef that is used to identify
+       * An alias that is used to identify
        * @ref GlossActive "active cell iterators".
        * The concept of iterators is discussed at length in the
        * @ref Iterators "iterators documentation module".
        *
-       * The current typedef identifies active cells in a triangulation. You
-       * can find the exact type it refers to in the base class's own typedef,
+       * The current alias identifies active cells in a triangulation. You
+       * can find the exact type it refers to in the base class's own alias,
        * but it should be TriaActiveIterator<CellAccessor<dim,spacedim> >. The
        * TriaActiveIterator class works like a pointer to active objects that
        * when you dereference it yields an object of type CellAccessor.
@@ -289,12 +289,11 @@ namespace parallel
        *
        * @ingroup Iterators
        */
-      typedef
-        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-          active_cell_iterator;
+      using active_cell_iterator =
+        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator;
 
-      typedef
-        typename dealii::Triangulation<dim, spacedim>::CellStatus CellStatus;
+      using CellStatus =
+        typename dealii::Triangulation<dim, spacedim>::CellStatus;
 
       /**
        * Configuration flags for distributed Triangulations to be set in the
@@ -917,11 +916,10 @@ namespace parallel
        * description of the latter, see the documentation for the member
        * function register_data_attach.
        */
-      typedef typename std::tuple<
+      using quadrant_cell_relation_t = typename std::tuple<
         typename dealii::internal::p4est::types<dim>::quadrant *,
         CellStatus,
-        cell_iterator>
-        quadrant_cell_relation_t;
+        cell_iterator>;
 
       /**
        * Vector of tuples, which each contain a p4est quadrant, a deal.II cell

@@ -110,7 +110,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef unsigned int size_type;
+  using size_type = unsigned int;
 
   /**
    * Constructor for a rectangular matrix with @p n_rows and @p n_cols

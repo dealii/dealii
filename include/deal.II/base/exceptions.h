@@ -1391,7 +1391,7 @@ namespace internal
   template <typename T, typename U>
   struct argument_type<T(U)>
   {
-    typedef U type;
+    using type = U;
   };
 } // namespace internal
 

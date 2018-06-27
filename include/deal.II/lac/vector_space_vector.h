@@ -54,9 +54,9 @@ namespace LinearAlgebra
   class VectorSpaceVector
   {
   public:
-    typedef Number                                            value_type;
-    typedef types::global_dof_index                           size_type;
-    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+    using value_type = Number;
+    using size_type  = types::global_dof_index;
+    using real_type  = typename numbers::NumberTraits<Number>::real_type;
 
     /**
      * Change the dimension to that of the vector V. The elements of V are not

@@ -36,7 +36,7 @@
 #if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
 #  include <mpi.h>
 #else
-typedef int MPI_Comm;
+using MPI_Comm = int;
 #  ifndef MPI_COMM_WORLD
 #    define MPI_COMM_WORLD 0
 #  endif
@@ -79,14 +79,14 @@ public:
    * @p size_type is the type used for storing the size and the individual
    * entries in the IndexSet.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * One can see an IndexSet as a container of size size(), where the elements
    * of the containers are bool values that are either false or true,
    * depending on whether a particular index is an element of the IndexSet or
    * not. In other words, an IndexSet is a bit like a vector in which the
-   * elements we store are booleans. In this view, the correct local typedef
+   * elements we store are booleans. In this view, the correct local alias
    * indicating the type of the elements of the vector would then be @p bool.
    *
    * On the other hand, @p bool has the disadvantage that it is not a
@@ -98,7 +98,7 @@ public:
    * other words, declaring the type of the elements of the vector as a signed
    * integer is only a small lie, but it is a useful one.
    */
-  typedef signed int value_type;
+  using value_type = signed int;
 
 
   /**
@@ -650,15 +650,15 @@ public:
     operator-(const IntervalIterator &p) const;
 
     /**
-     * Mark the class as forward iterator and declare some typedefs which are
+     * Mark the class as forward iterator and declare some alias which are
      * standard for iterators and are used by algorithms to enquire about the
      * specifics of the iterators they work on.
      */
-    typedef std::forward_iterator_tag iterator_category;
-    typedef IntervalAccessor          value_type;
-    typedef std::ptrdiff_t            difference_type;
-    typedef IntervalAccessor *        pointer;
-    typedef IntervalAccessor &        reference;
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = IntervalAccessor;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = IntervalAccessor *;
+    using reference         = IntervalAccessor &;
 
   private:
     /**
@@ -741,15 +741,15 @@ public:
     operator-(const ElementIterator &p) const;
 
     /**
-     * Mark the class as forward iterator and declare some typedefs which are
+     * Mark the class as forward iterator and declare some alias which are
      * standard for iterators and are used by algorithms to enquire about the
      * specifics of the iterators they work on.
      */
-    typedef std::forward_iterator_tag iterator_category;
-    typedef size_type                 value_type;
-    typedef std::ptrdiff_t            difference_type;
-    typedef size_type *               pointer;
-    typedef size_type &               reference;
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = size_type;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = size_type *;
+    using reference         = size_type &;
 
   private:
     /**

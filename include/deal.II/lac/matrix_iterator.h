@@ -38,12 +38,12 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Typedef for the matrix type (including constness) we are to operate on.
    */
-  typedef typename ACCESSOR::MatrixType MatrixType;
+  using MatrixType = typename ACCESSOR::MatrixType;
 
   /**
    * Constructor. Create an iterator into the matrix <tt>matrix</tt> for the

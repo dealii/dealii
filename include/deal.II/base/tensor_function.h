@@ -58,11 +58,11 @@ class TensorFunction : public FunctionTime<Number>, public Subscriptor
 {
 public:
   /**
-   * Define typedefs for the return types of the <tt>value</tt> functions.
+   * Define alias for the return types of the <tt>value</tt> functions.
    */
-  typedef Tensor<rank, dim, Number> value_type;
+  using value_type = Tensor<rank, dim, Number>;
 
-  typedef Tensor<rank + 1, dim, Number> gradient_type;
+  using gradient_type = Tensor<rank + 1, dim, Number>;
 
   /**
    * Constructor. May take an initial value for the time variable, which

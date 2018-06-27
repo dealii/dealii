@@ -165,7 +165,7 @@ namespace internal
 {
   namespace SparseMatrixImplementation
   {
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     template <typename T>
     typename std::enable_if<std::is_trivial<T>::value>::type

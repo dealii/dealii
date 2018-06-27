@@ -80,7 +80,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Define a value which is used to indicate that a certain value in the @p
@@ -468,7 +468,7 @@ public:
  * This class extends the base class to implement an array of compressed
  * sparsity patterns that can be used to initialize objects of type
  * BlockSparsityPattern. It does not add additional member functions, but
- * rather acts as a @p typedef to introduce the name of this class, without
+ * rather acts as an @p alias to introduce the name of this class, without
  * requiring the user to specify the templated name of the base class. For
  * information on the interface of this class refer to the base class. The
  * individual blocks are based on the DynamicSparsityPattern class.

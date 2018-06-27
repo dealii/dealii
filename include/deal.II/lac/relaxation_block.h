@@ -60,18 +60,18 @@ private:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * Value type for inverse matrices.
    */
-  typedef InverseNumberType value_type;
+  using value_type = InverseNumberType;
 
 public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Parameters for block relaxation methods. In addition to typical control
@@ -299,7 +299,7 @@ public:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * Make type publicly available.
@@ -397,7 +397,7 @@ public:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * Make type publicly available.
@@ -490,7 +490,7 @@ public:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * Make type publicly available.

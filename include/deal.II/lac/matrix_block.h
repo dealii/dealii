@@ -112,12 +112,12 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Declare a type for matrix entries.
    */
-  typedef typename MatrixType::value_type value_type;
+  using value_type = typename MatrixType::value_type;
 
   /**
    * Constructor rendering an uninitialized object.
@@ -348,18 +348,18 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * The type of object stored.
    */
-  typedef MatrixBlock<MatrixType> value_type;
+  using value_type = MatrixBlock<MatrixType>;
 
   /**
    * The pointer type used for storing the objects. We use a shard pointer,
    * such that they get deleted automatically when not used anymore.
    */
-  typedef std::shared_ptr<value_type> ptr_type;
+  using ptr_type = std::shared_ptr<value_type>;
 
   /**
    * Add a new matrix block at the position <tt>(row,column)</tt> in the block
@@ -438,12 +438,12 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * The type of object stored.
    */
-  typedef MGLevelObject<MatrixBlock<MatrixType>> value_type;
+  using value_type = MGLevelObject<MatrixBlock<MatrixType>>;
   /**
    * Constructor, determining which matrices should be stored.
    *

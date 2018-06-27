@@ -53,7 +53,7 @@ namespace internal
   namespace p4est
   {
     /**
-     * A structure whose explicit specializations contain typedefs to the
+     * A structure whose explicit specializations contain alias to the
      * relevant p4est_* and p8est_* types. Using this structure, for example
      * by saying <tt>types<dim>::connectivity</tt> we can write code in a
      * dimension independent way, either referring to p4est_connectivity_t or
@@ -65,35 +65,35 @@ namespace internal
     template <>
     struct types<2>
     {
-      typedef p4est_connectivity_t connectivity;
-      typedef p4est_t              forest;
-      typedef p4est_tree_t         tree;
-      typedef p4est_quadrant_t     quadrant;
-      typedef p4est_topidx_t       topidx;
-      typedef p4est_locidx_t       locidx;
+      using connectivity = p4est_connectivity_t;
+      using forest       = p4est_t;
+      using tree         = p4est_tree_t;
+      using quadrant     = p4est_quadrant_t;
+      using topidx       = p4est_topidx_t;
+      using locidx       = p4est_locidx_t;
 #  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-      typedef p4est_connect_type_t balance_type;
+      using balance_type = p4est_connect_type_t;
 #  else
-      typedef p4est_balance_type_t balance_type;
+      using balance_type = p4est_balance_type_t;
 #  endif
-      typedef p4est_ghost_t ghost;
+      using ghost = p4est_ghost_t;
     };
 
     template <>
     struct types<3>
     {
-      typedef p8est_connectivity_t connectivity;
-      typedef p8est_t              forest;
-      typedef p8est_tree_t         tree;
-      typedef p8est_quadrant_t     quadrant;
-      typedef p4est_topidx_t       topidx;
-      typedef p4est_locidx_t       locidx;
+      using connectivity = p8est_connectivity_t;
+      using forest       = p8est_t;
+      using tree         = p8est_tree_t;
+      using quadrant     = p8est_quadrant_t;
+      using topidx       = p4est_topidx_t;
+      using locidx       = p4est_locidx_t;
 #  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-      typedef p8est_connect_type_t balance_type;
+      using balance_type = p8est_connect_type_t;
 #  else
-      typedef p8est_balance_type_t balance_type;
+      using balance_type = p8est_balance_type_t;
 #  endif
-      typedef p8est_ghost_t ghost;
+      using ghost = p8est_ghost_t;
     };
 
 
@@ -430,26 +430,26 @@ namespace internal
     template <>
     struct iter<2>
     {
-      typedef p4est_iter_corner_info_t corner_info;
-      typedef p4est_iter_corner_side_t corner_side;
-      typedef p4est_iter_corner_t      corner_iter;
-      typedef p4est_iter_face_info_t   face_info;
-      typedef p4est_iter_face_side_t   face_side;
-      typedef p4est_iter_face_t        face_iter;
+      using corner_info = p4est_iter_corner_info_t;
+      using corner_side = p4est_iter_corner_side_t;
+      using corner_iter = p4est_iter_corner_t;
+      using face_info   = p4est_iter_face_info_t;
+      using face_side   = p4est_iter_face_side_t;
+      using face_iter   = p4est_iter_face_t;
     };
 
     template <>
     struct iter<3>
     {
-      typedef p8est_iter_corner_info_t corner_info;
-      typedef p8est_iter_corner_side_t corner_side;
-      typedef p8est_iter_corner_t      corner_iter;
-      typedef p8est_iter_edge_info_t   edge_info;
-      typedef p8est_iter_edge_side_t   edge_side;
-      typedef p8est_iter_edge_t        edge_iter;
-      typedef p8est_iter_face_info_t   face_info;
-      typedef p8est_iter_face_side_t   face_side;
-      typedef p8est_iter_face_t        face_iter;
+      using corner_info = p8est_iter_corner_info_t;
+      using corner_side = p8est_iter_corner_side_t;
+      using corner_iter = p8est_iter_corner_t;
+      using edge_info   = p8est_iter_edge_info_t;
+      using edge_side   = p8est_iter_edge_side_t;
+      using edge_iter   = p8est_iter_edge_t;
+      using face_info   = p8est_iter_face_info_t;
+      using face_side   = p8est_iter_face_side_t;
+      using face_iter   = p8est_iter_face_t;
     };
 
 

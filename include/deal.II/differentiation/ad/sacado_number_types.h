@@ -160,10 +160,10 @@ namespace Differentiation
           SacadoNumber,
           Sacado::Fad::DFad<typename SacadoNumber::value_type>>::value>::type>
       {
-        typedef SacadoNumber                  ad_type;
-        typedef typename ad_type::scalar_type scalar_type;
-        typedef typename ad_type::value_type  value_type;
-        typedef typename ad_type::value_type  derivative_type;
+        using ad_type         = SacadoNumber;
+        using scalar_type     = typename ad_type::scalar_type;
+        using value_type      = typename ad_type::value_type;
+        using derivative_type = typename ad_type::value_type;
 
         static const unsigned int n_supported_derivative_levels =
           1 + SacadoNumberInfo<derivative_type>::n_supported_derivative_levels;
@@ -180,10 +180,10 @@ namespace Differentiation
           SacadoNumber,
           Sacado::Rad::ADvar<typename SacadoNumber::value_type>>::value>::type>
       {
-        typedef SacadoNumber                          ad_type;
-        typedef typename ad_type::ADVari::scalar_type scalar_type;
-        typedef typename ad_type::ADVari::value_type  value_type;
-        typedef typename ad_type::ADVari::value_type  derivative_type;
+        using ad_type         = SacadoNumber;
+        using scalar_type     = typename ad_type::ADVari::scalar_type;
+        using value_type      = typename ad_type::ADVari::value_type;
+        using derivative_type = typename ad_type::ADVari::value_type;
 
         static const unsigned int n_supported_derivative_levels =
           1 + SacadoNumberInfo<derivative_type>::n_supported_derivative_levels;
@@ -217,10 +217,10 @@ namespace Differentiation
         typename std::enable_if<
           std::is_floating_point<ScalarType>::value>::type>
       {
-        static const bool                     is_taped = false;
-        typedef Sacado::Fad::DFad<ScalarType> real_type;
-        typedef
-          typename SacadoNumberInfo<real_type>::derivative_type derivative_type;
+        static const bool is_taped = false;
+        using real_type            = Sacado::Fad::DFad<ScalarType>;
+        using derivative_type =
+          typename SacadoNumberInfo<real_type>::derivative_type;
         static const unsigned int n_supported_derivative_levels =
           SacadoNumberInfo<real_type>::n_supported_derivative_levels;
       };
@@ -238,9 +238,9 @@ namespace Differentiation
           std::is_floating_point<ScalarType>::value>::type>
       {
         static const bool is_taped = false;
-        typedef Sacado::Fad::DFad<Sacado::Fad::DFad<ScalarType>> real_type;
-        typedef
-          typename SacadoNumberInfo<real_type>::derivative_type derivative_type;
+        using real_type = Sacado::Fad::DFad<Sacado::Fad::DFad<ScalarType>>;
+        using derivative_type =
+          typename SacadoNumberInfo<real_type>::derivative_type;
         static const unsigned int n_supported_derivative_levels =
           SacadoNumberInfo<real_type>::n_supported_derivative_levels;
       };
@@ -257,10 +257,10 @@ namespace Differentiation
         typename std::enable_if<
           std::is_floating_point<ScalarType>::value>::type>
       {
-        static const bool                      is_taped = false;
-        typedef Sacado::Rad::ADvar<ScalarType> real_type;
-        typedef
-          typename SacadoNumberInfo<real_type>::derivative_type derivative_type;
+        static const bool is_taped = false;
+        using real_type            = Sacado::Rad::ADvar<ScalarType>;
+        using derivative_type =
+          typename SacadoNumberInfo<real_type>::derivative_type;
         static const unsigned int n_supported_derivative_levels =
           SacadoNumberInfo<real_type>::n_supported_derivative_levels;
       };
@@ -278,9 +278,9 @@ namespace Differentiation
           std::is_floating_point<ScalarType>::value>::type>
       {
         static const bool is_taped = false;
-        typedef Sacado::Rad::ADvar<Sacado::Fad::DFad<ScalarType>> real_type;
-        typedef
-          typename SacadoNumberInfo<real_type>::derivative_type derivative_type;
+        using real_type = Sacado::Rad::ADvar<Sacado::Fad::DFad<ScalarType>>;
+        using derivative_type =
+          typename SacadoNumberInfo<real_type>::derivative_type;
         static const unsigned int n_supported_derivative_levels =
           SacadoNumberInfo<real_type>::n_supported_derivative_levels;
       };
@@ -293,14 +293,12 @@ namespace Differentiation
       template <typename NumberType>
       struct Marking<Sacado::Fad::DFad<NumberType>>
       {
-        typedef
-          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::ad_type
-            ad_type;
-        typedef typename SacadoNumberInfo<
-          Sacado::Fad::DFad<NumberType>>::derivative_type derivative_type;
-        typedef
-          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::scalar_type
-            scalar_type;
+        using ad_type =
+          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::ad_type;
+        using derivative_type = typename SacadoNumberInfo<
+          Sacado::Fad::DFad<NumberType>>::derivative_type;
+        using scalar_type =
+          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::scalar_type;
 
         /*
          * Initialize the state of an independent variable.
@@ -338,14 +336,12 @@ namespace Differentiation
       template <typename NumberType>
       struct Marking<Sacado::Rad::ADvar<NumberType>>
       {
-        typedef
-          typename SacadoNumberInfo<Sacado::Rad::ADvar<NumberType>>::ad_type
-            ad_type;
-        typedef typename SacadoNumberInfo<
-          Sacado::Rad::ADvar<NumberType>>::derivative_type derivative_type;
-        typedef
-          typename SacadoNumberInfo<Sacado::Rad::ADvar<NumberType>>::scalar_type
-            scalar_type;
+        using ad_type =
+          typename SacadoNumberInfo<Sacado::Rad::ADvar<NumberType>>::ad_type;
+        using derivative_type = typename SacadoNumberInfo<
+          Sacado::Rad::ADvar<NumberType>>::derivative_type;
+        using scalar_type = typename SacadoNumberInfo<
+          Sacado::Rad::ADvar<NumberType>>::scalar_type;
 
         /*
          * Initialize the state of an independent variable.
@@ -391,14 +387,12 @@ namespace Differentiation
       template <typename NumberType>
       struct ExtractData<Sacado::Fad::DFad<NumberType>>
       {
-        typedef typename SacadoNumberInfo<
-          Sacado::Fad::DFad<NumberType>>::derivative_type derivative_type;
-        typedef
-          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::scalar_type
-            scalar_type;
-        typedef
-          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::value_type
-            value_type;
+        using derivative_type = typename SacadoNumberInfo<
+          Sacado::Fad::DFad<NumberType>>::derivative_type;
+        using scalar_type =
+          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::scalar_type;
+        using value_type =
+          typename SacadoNumberInfo<Sacado::Fad::DFad<NumberType>>::value_type;
 
         /**
          * Extract the real scalar value.
@@ -445,14 +439,12 @@ namespace Differentiation
       template <typename NumberType>
       struct ExtractData<Sacado::Rad::ADvar<NumberType>>
       {
-        typedef typename SacadoNumberInfo<
-          Sacado::Rad::ADvar<NumberType>>::derivative_type derivative_type;
-        typedef
-          typename SacadoNumberInfo<Sacado::Rad::ADvar<NumberType>>::scalar_type
-            scalar_type;
-        typedef
-          typename SacadoNumberInfo<Sacado::Rad::ADvar<NumberType>>::value_type
-            value_type;
+        using derivative_type = typename SacadoNumberInfo<
+          Sacado::Rad::ADvar<NumberType>>::derivative_type;
+        using scalar_type = typename SacadoNumberInfo<
+          Sacado::Rad::ADvar<NumberType>>::scalar_type;
+        using value_type =
+          typename SacadoNumberInfo<Sacado::Rad::ADvar<NumberType>>::value_type;
 
         /**
          * Extract the real scalar value.

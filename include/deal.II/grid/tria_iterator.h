@@ -150,7 +150,7 @@ class TriaActiveIterator;
  *
  * <li> It must have void operators <tt>++</tt> and <tt>--</tt>.
  *
- * <li> It must declare a local <tt>typedef AccessorData</tt> which states the
+ * <li> It must declare a local alias <tt>AccessorData</tt> which states the
  * data type the accessor expects to get passed as fourth constructor
  * argument. By declaring a local data type, the respective iterator class may
  * type-safely enforce that data type to be one of its own constructor
@@ -234,7 +234,7 @@ public:
    * other functions can use the Accessor's type without knowledge of how the
    * exact implementation actually is.
    */
-  typedef Accessor AccessorType;
+  using AccessorType = Accessor;
 
   /**
    * Empty constructor. Such an object is not usable!
@@ -486,15 +486,15 @@ public:
   memory_consumption() const;
 
   /**
-   * Mark the class as bidirectional iterator and declare some typedefs which
+   * Mark the class as bidirectional iterator and declare some alias which
    * are standard for iterators and are used by algorithms to enquire about the
    * specifics of the iterators they work on.
    */
-  typedef std::bidirectional_iterator_tag iterator_category;
-  typedef Accessor                        value_type;
-  typedef int                             difference_type;
-  typedef Accessor *                      pointer;
-  typedef Accessor &                      reference;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using value_type        = Accessor;
+  using difference_type   = int;
+  using pointer           = Accessor *;
+  using reference         = Accessor &;
 
   /**@name Exceptions*/
   /*@{*/
@@ -717,16 +717,16 @@ public:
   /*@}*/
 
   /**
-   * Declare some typedefs which are standard for iterators and are used
+   * Declare some alias which are standard for iterators and are used
    * by algorithms to enquire about the specifics of the iterators they
    * work on.
    */
-  typedef
-    typename TriaRawIterator<Accessor>::iterator_category     iterator_category;
-  typedef typename TriaRawIterator<Accessor>::value_type      value_type;
-  typedef typename TriaRawIterator<Accessor>::pointer         pointer;
-  typedef typename TriaRawIterator<Accessor>::reference       reference;
-  typedef typename TriaRawIterator<Accessor>::difference_type difference_type;
+  using iterator_category =
+    typename TriaRawIterator<Accessor>::iterator_category;
+  using value_type      = typename TriaRawIterator<Accessor>::value_type;
+  using pointer         = typename TriaRawIterator<Accessor>::pointer;
+  using reference       = typename TriaRawIterator<Accessor>::reference;
+  using difference_type = typename TriaRawIterator<Accessor>::difference_type;
 
   /**
    * Exception
@@ -906,15 +906,15 @@ public:
   /*@}*/
 
   /**
-   * Declare some typedefs which are standard for iterators and are used
+   * Declare some alias which are standard for iterators and are used
    * by algorithms to enquire about the specifics of the iterators they
    * work on.
    */
-  typedef typename TriaIterator<Accessor>::iterator_category iterator_category;
-  typedef typename TriaIterator<Accessor>::value_type        value_type;
-  typedef typename TriaIterator<Accessor>::pointer           pointer;
-  typedef typename TriaIterator<Accessor>::reference         reference;
-  typedef typename TriaIterator<Accessor>::difference_type   difference_type;
+  using iterator_category = typename TriaIterator<Accessor>::iterator_category;
+  using value_type        = typename TriaIterator<Accessor>::value_type;
+  using pointer           = typename TriaIterator<Accessor>::pointer;
+  using reference         = typename TriaIterator<Accessor>::reference;
+  using difference_type   = typename TriaIterator<Accessor>::difference_type;
 
   /**
    * Exception

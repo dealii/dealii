@@ -440,9 +440,8 @@ namespace Functions
     /**
      * Typedef holding the local cell_hint.
      */
-    typedef Threads::ThreadLocalStorage<
-      typename DoFHandlerType::active_cell_iterator>
-      cell_hint_t;
+    using cell_hint_t = Threads::ThreadLocalStorage<
+      typename DoFHandlerType::active_cell_iterator>;
 
     /**
      * Pointer to the dof handler.

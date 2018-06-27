@@ -81,7 +81,7 @@ namespace PETScWrappers
       /**
        * Declare type for container size.
        */
-      typedef types::global_dof_index size_type;
+      using size_type = types::global_dof_index;
 
     private:
       /**
@@ -244,11 +244,11 @@ namespace PETScWrappers
      * parallel those in the <tt>C++</tt> standard libraries
      * <tt>vector<...></tt> class.
      */
-    typedef PetscScalar                     value_type;
-    typedef PetscReal                       real_type;
-    typedef types::global_dof_index         size_type;
-    typedef internal::VectorReference       reference;
-    typedef const internal::VectorReference const_reference;
+    using value_type      = PetscScalar;
+    using real_type       = PetscReal;
+    using size_type       = types::global_dof_index;
+    using reference       = internal::VectorReference;
+    using const_reference = const internal::VectorReference;
 
     /**
      * Default constructor. It doesn't do anything, derived classes will have

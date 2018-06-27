@@ -120,22 +120,22 @@ public:
    * corresponds to type number, and it is equal to Number for all other
    * cases. See also the respective field in Vector<Number>.
    *
-   * This typedef is used to represent the return type of norms.
+   * This alias is used to represent the return type of norms.
    */
-  typedef typename numbers::NumberTraits<Number>::real_type real_type;
+  using real_type = typename numbers::NumberTraits<Number>::real_type;
 
   /**
    * Type of objects encapsulated by this container and returned by
    * operator[](). This is a scalar number type for a rank 0 tensor.
    */
-  typedef Number value_type;
+  using value_type = Number;
 
   /**
    * Declare an array type which can be used to initialize an object of this
    * type statically. In case of a tensor of rank 0 this is just the scalar
    * number type Number.
    */
-  typedef Number array_type;
+  using array_type = Number;
 
   /**
    * Constructor. Set to zero.
@@ -327,7 +327,7 @@ public:
    * Internal type declaration that is used to specialize the return type of
    * operator[]() for Tensor<1,dim,Number>
    */
-  typedef Number tensor_type;
+  using tensor_type = Number;
 
 private:
   /**
@@ -424,16 +424,14 @@ public:
    * operator[](). This is a tensor of lower rank for a general tensor, and a
    * scalar number type for Tensor<1,dim,Number>.
    */
-  typedef typename Tensor<rank_ - 1, dim, Number>::tensor_type value_type;
+  using value_type = typename Tensor<rank_ - 1, dim, Number>::tensor_type;
 
   /**
    * Declare an array type which can be used to initialize an object of this
-   * type statically.
+   * type statically. For `dim == 0`, its size is 1. Otherwise, it is `dim`.
    */
-  typedef typename Tensor<rank_ - 1, dim, Number>::array_type
-    array_type[(dim != 0) ? dim : 1];
-  // ... avoid a compiler warning in case of dim == 0 and ensure that the
-  // array always has positive size.
+  using array_type =
+    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1];
 
   /**
    * Constructor. Initialize all entries to zero.
@@ -664,7 +662,7 @@ public:
    * Internal type declaration that is used to specialize the return type of
    * operator[]() for Tensor<1,dim,Number>
    */
-  typedef Tensor<rank_, dim, Number> tensor_type;
+  using tensor_type = Tensor<rank_, dim, Number>;
 
 private:
   /**
@@ -1962,8 +1960,8 @@ contract3(const TensorT1<rank_1, dim, T1> &         left,
           const TensorT2<rank_1 + rank_2, dim, T2> &middle,
           const TensorT3<rank_2, dim, T3> &         right)
 {
-  typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
-    return_type;
+  using return_type =
+    typename ProductType<T1, typename ProductType<T2, T3>::type>::type;
   return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(left,
                                                                       middle,
                                                                       right);

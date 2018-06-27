@@ -71,7 +71,7 @@ public:
    * This was defined to make this matrix a possible template argument to
    * BlockMatrixArray.
    */
-  typedef typename VectorType::value_type value_type;
+  using value_type = typename VectorType::value_type;
 
   /**
    * Virtual destructor.  Does nothing except making sure that the destructor

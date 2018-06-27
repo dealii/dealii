@@ -1134,8 +1134,8 @@ namespace TimeStepBase_Tria_Flags
      * process. See the general description of this class for more
      * information.
      */
-    typedef std::vector<std::vector<std::pair<unsigned int, double>>>
-      CorrectionRelaxations;
+    using CorrectionRelaxations =
+      std::vector<std::vector<std::pair<unsigned int, double>>>;
 
     /**
      * Default values for the relaxations: no relaxations.
@@ -1310,10 +1310,10 @@ public:
    * Typedef the data types of the TimeStepBase_Tria_Flags() namespace into
    * local scope.
    */
-  typedef typename TimeStepBase_Tria_Flags::Flags<dim> Flags;
-  typedef typename TimeStepBase_Tria_Flags::RefinementFlags<dim>
-                                                                RefinementFlags;
-  typedef typename TimeStepBase_Tria_Flags::RefinementData<dim> RefinementData;
+  using Flags = typename TimeStepBase_Tria_Flags::Flags<dim>;
+  using RefinementFlags =
+    typename TimeStepBase_Tria_Flags::RefinementFlags<dim>;
+  using RefinementData = typename TimeStepBase_Tria_Flags::RefinementData<dim>;
 
 
   /**

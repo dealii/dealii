@@ -80,20 +80,20 @@ class ArrayView
 {
 public:
   /**
-   * A typedef that denotes the "value_type" of this container-like class,
+   * An alias that denotes the "value_type" of this container-like class,
    * i.e., the type of the element it "stores" or points to.
    */
-  typedef ElementType value_type;
+  using value_type = ElementType;
 
   /**
-   * A typedef for iterators pointing into the array.
+   * An alias for iterators pointing into the array.
    */
-  typedef value_type *iterator;
+  using iterator = value_type *;
 
   /**
-   * A typedef for const iterators pointing into the array.
+   * An alias for const iterators pointing into the array.
    */
-  typedef const ElementType *const_iterator;
+  using const_iterator = const ElementType *;
 
   /**
    * Constructor.

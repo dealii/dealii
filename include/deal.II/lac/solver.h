@@ -328,9 +328,9 @@ class Solver : public Subscriptor
 {
 public:
   /**
-   * A typedef for the underlying vector type
+   * An alias for the underlying vector type
    */
-  typedef VectorType vector_type;
+  using vector_type = VectorType;
 
   /**
    * Constructor. Takes a control object which evaluates the conditions for
@@ -417,7 +417,7 @@ private:
    */
   struct StateCombiner
   {
-    typedef SolverControl::State result_type;
+    using result_type = SolverControl::State;
 
     SolverControl::State
     operator()(const SolverControl::State state1,

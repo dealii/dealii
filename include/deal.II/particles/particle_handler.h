@@ -57,12 +57,12 @@ namespace Particles
     /**
      * A type that can be used to iterate over all particles in the domain.
      */
-    typedef ParticleIterator<dim, spacedim> particle_iterator;
+    using particle_iterator = ParticleIterator<dim, spacedim>;
 
     /**
      * A type that represents a range of particles.
      */
-    typedef boost::iterator_range<particle_iterator> particle_iterator_range;
+    using particle_iterator_range = boost::iterator_range<particle_iterator>;
 
     /**
      * Default constructor.

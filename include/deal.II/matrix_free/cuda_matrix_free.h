@@ -77,9 +77,9 @@ namespace CUDAWrappers
   class MatrixFree : public Subscriptor
   {
   public:
-    typedef Tensor<2, dim, Tensor<1, dim, Number>> jacobian_type;
+    using jacobian_type = Tensor<2, dim, Tensor<1, dim, Number>>;
     // TODO this should really be a CUDAWrappers::Point
-    typedef Tensor<1, dim, Number> point_type;
+    using point_type = Tensor<1, dim, Number>;
 
     // Use Number2 so we don't hide the template parameter Number
     template <typename Number2>

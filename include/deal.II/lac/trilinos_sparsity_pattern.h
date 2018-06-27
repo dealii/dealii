@@ -76,7 +76,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef dealii::types::global_dof_index size_type;
+      using size_type = dealii::types::global_dof_index;
 
       /**
        * Constructor.
@@ -175,7 +175,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef dealii::types::global_dof_index size_type;
+      using size_type = dealii::types::global_dof_index;
 
       /**
        * Constructor. Create an iterator into the matrix @p matrix for the
@@ -278,12 +278,12 @@ namespace TrilinosWrappers
     /**
      * Declare type for container size.
      */
-    typedef dealii::types::global_dof_index size_type;
+    using size_type = dealii::types::global_dof_index;
 
     /**
-     * Declare a typedef for the iterator class.
+     * Declare an alias for the iterator class.
      */
-    typedef SparsityPatternIterators::Iterator const_iterator;
+    using const_iterator = SparsityPatternIterators::Iterator;
 
     /**
      * @name Basic constructors and initialization.

@@ -175,8 +175,8 @@ MGTransferSelect<number>::do_copy_from_mg(
   for (; level_cell != endc; ++level_cell)
     {
       const unsigned int level = level_cell->level();
-      typedef std::vector<
-        std::pair<types::global_dof_index, unsigned int>>::const_iterator IT;
+      using IT                 = std::vector<
+        std::pair<types::global_dof_index, unsigned int>>::const_iterator;
       for (IT i = copy_to_and_from_indices[level].begin();
            i != copy_to_and_from_indices[level].end();
            ++i)
@@ -207,8 +207,8 @@ MGTransferSelect<number>::do_copy_from_mg_add(
   for (; level_cell != endc; ++level_cell)
     {
       const unsigned int level = level_cell->level();
-      typedef std::vector<
-        std::pair<types::global_dof_index, unsigned int>>::const_iterator IT;
+      using IT                 = std::vector<
+        std::pair<types::global_dof_index, unsigned int>>::const_iterator;
       for (IT i = copy_to_and_from_indices[level].begin();
            i != copy_to_and_from_indices[level].end();
            ++i)

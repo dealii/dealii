@@ -98,27 +98,27 @@ namespace LinearAlgebra
       static constexpr unsigned int communication_block_size = 20;
 
       /**
-       * Typedef the base class for simpler access to its own typedefs.
+       * Typedef the base class for simpler access to its own alias.
        */
-      typedef BlockVectorBase<Vector<Number>> BaseClass;
+      using BaseClass = BlockVectorBase<Vector<Number>>;
 
       /**
        * Typedef the type of the underlying vector.
        */
-      typedef typename BaseClass::BlockType BlockType;
+      using BlockType = typename BaseClass::BlockType;
 
       /**
-       * Import the typedefs from the base class.
+       * Import the alias from the base class.
        */
-      typedef typename BaseClass::value_type      value_type;
-      typedef typename BaseClass::real_type       real_type;
-      typedef typename BaseClass::pointer         pointer;
-      typedef typename BaseClass::const_pointer   const_pointer;
-      typedef typename BaseClass::reference       reference;
-      typedef typename BaseClass::const_reference const_reference;
-      typedef typename BaseClass::size_type       size_type;
-      typedef typename BaseClass::iterator        iterator;
-      typedef typename BaseClass::const_iterator  const_iterator;
+      using value_type      = typename BaseClass::value_type;
+      using real_type       = typename BaseClass::real_type;
+      using pointer         = typename BaseClass::pointer;
+      using const_pointer   = typename BaseClass::const_pointer;
+      using reference       = typename BaseClass::reference;
+      using const_reference = typename BaseClass::const_reference;
+      using size_type       = typename BaseClass::size_type;
+      using iterator        = typename BaseClass::iterator;
+      using const_iterator  = typename BaseClass::const_iterator;
 
       /**
        * @name 1: Basic operations

@@ -942,9 +942,9 @@ namespace DataOutBase
      * Besides the actual value by which the color is to be computed, min and
      * max values of the data to be colorized are given as well.
      */
-    typedef RgbValues (*ColorFunction)(const double value,
-                                       const double min_value,
-                                       const double max_value);
+    using ColorFunction = RgbValues (*)(const double value,
+                                        const double min_value,
+                                        const double max_value);
 
     /**
      * This is a pointer to the function which is used to colorize the cells.
@@ -1447,7 +1447,7 @@ namespace DataOutBase
       }
     };
 
-    typedef std::multimap<Point<3>, unsigned int, Point3Comp> Map3DPoint;
+    using Map3DPoint = std::multimap<Point<3>, unsigned int, Point3Comp>;
 
     /**
      * Flags used to specify filtering behavior.

@@ -102,11 +102,10 @@ namespace parallel
     class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
     {
     public:
-      typedef
-        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-          active_cell_iterator;
-      typedef typename dealii::Triangulation<dim, spacedim>::cell_iterator
-        cell_iterator;
+      using active_cell_iterator =
+        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator;
+      using cell_iterator =
+        typename dealii::Triangulation<dim, spacedim>::cell_iterator;
 
       /**
        * Configuration flags for distributed Triangulations to be set in the

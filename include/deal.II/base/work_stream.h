@@ -227,7 +227,7 @@ namespace WorkStream
            * Typedef to a list of scratch data objects. The rationale for this
            * list is provided in the variables that use these lists.
            */
-          typedef std::list<ScratchDataObject> ScratchDataList;
+          using ScratchDataList = std::list<ScratchDataObject>;
 
           /**
            * A list of iterators that need to be worked on. Only the first
@@ -490,10 +490,10 @@ namespace WorkStream
         operator()(void *item) override
         {
           // first unpack the current item
-          typedef
+          using ItemType =
             typename IteratorRangeToItemStream<Iterator,
                                                ScratchData,
-                                               CopyData>::ItemType ItemType;
+                                               CopyData>::ItemType;
 
           ItemType *current_item = static_cast<ItemType *>(item);
 
@@ -635,10 +635,10 @@ namespace WorkStream
         operator()(void *item) override
         {
           // first unpack the current item
-          typedef
+          using ItemType =
             typename IteratorRangeToItemStream<Iterator,
                                                ScratchData,
-                                               CopyData>::ItemType ItemType;
+                                               CopyData>::ItemType;
 
           ItemType *current_item = static_cast<ItemType *>(item);
 
@@ -854,15 +854,14 @@ namespace WorkStream
         }
 
       private:
-        typedef typename Implementation3::
-          ScratchAndCopyDataObjects<Iterator, ScratchData, CopyData>
-            ScratchAndCopyDataObjects;
+        using ScratchAndCopyDataObjects = typename Implementation3::
+          ScratchAndCopyDataObjects<Iterator, ScratchData, CopyData>;
 
         /**
          * Typedef to a list of scratch data objects. The rationale for this
          * list is provided in the variables that use these lists.
          */
-        typedef std::list<ScratchAndCopyDataObjects> ScratchAndCopyDataList;
+        using ScratchAndCopyDataList = std::list<ScratchAndCopyDataObjects>;
 
         Threads::ThreadLocalStorage<ScratchAndCopyDataList> data;
 
@@ -1145,11 +1144,10 @@ namespace WorkStream
         for (unsigned int color = 0; color < colored_iterators.size(); ++color)
           if (colored_iterators[color].size() > 0)
             {
-              typedef internal::Implementation3::
-                WorkerAndCopier<Iterator, ScratchData, CopyData>
-                  WorkerAndCopier;
+              using WorkerAndCopier = internal::Implementation3::
+                WorkerAndCopier<Iterator, ScratchData, CopyData>;
 
-              typedef typename std::vector<Iterator>::const_iterator RangeType;
+              using RangeType = typename std::vector<Iterator>::const_iterator;
 
               WorkerAndCopier worker_and_copier(worker,
                                                 copier,
