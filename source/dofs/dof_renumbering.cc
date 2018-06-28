@@ -528,7 +528,7 @@ namespace DoFRenumbering
             active_but_not_owned_dofs.subtract_set(locally_owned_dofs);
 
             std::set<types::global_dof_index> erase_these_indices;
-            for (const auto &p : active_but_not_owned_dofs)
+            for (const auto p : active_but_not_owned_dofs)
               {
                 const auto index = index_set_to_use.index_within_set(p);
                 Assert(index < index_set_to_use.n_elements(),

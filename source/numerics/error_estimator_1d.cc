@@ -348,7 +348,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
                     "indicator for internal boundaries in your boundary "
                     "value map."));
 
-  for (const auto boundary_function : neumann_bc)
+  for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
       Assert(boundary_function.second->n_components == n_components,

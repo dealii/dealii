@@ -411,7 +411,7 @@ namespace TrilinosWrappers
         // Try to copy all the rows of the matrix one by one. In case of error
         // (i.e., the column indices are different), we need to abort and blow
         // away the matrix.
-        for (const auto &row : locally_owned_range_indices())
+        for (const auto row : locally_owned_range_indices())
           {
             const int row_local = matrix->RowMap().LID(
               static_cast<TrilinosWrappers::types::int_type>(row));
@@ -1905,7 +1905,7 @@ namespace TrilinosWrappers
 
     const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
 
-    for (const auto &row : locally_owned_range_indices())
+    for (const auto row : locally_owned_range_indices())
       {
         const int row_local = matrix->RowMap().LID(
           static_cast<TrilinosWrappers::types::int_type>(row));
