@@ -89,7 +89,7 @@ public:
    * your points, and do not call set_points() again, then all following results
    * will likely be wrong.
    */
-  KDTree(const unsigned int &           max_leaf_size = 10,
+  KDTree(const unsigned int             max_leaf_size = 10,
          const std::vector<Point<dim>> &pts = std::vector<Point<dim>>());
 
 
