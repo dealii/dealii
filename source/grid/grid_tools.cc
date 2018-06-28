@@ -1740,7 +1740,7 @@ namespace GridTools
     // Creating a bounding box for all active cell on coarser level
 
     for (unsigned int i = 0; i < refinement_level; ++i)
-      for (typename MeshType::cell_iterator cell :
+      for (const typename MeshType::cell_iterator &cell :
            mesh.active_cell_iterators_on_level(i))
         {
           bool                  has_predicate = false;

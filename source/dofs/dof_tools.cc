@@ -1040,7 +1040,7 @@ namespace DoFTools
            ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
     // preset all values by false
     std::fill(selected_dofs.begin(), selected_dofs.end(), false);
-    for (const auto &index : selected_dofs_as_index_set)
+    for (const auto index : selected_dofs_as_index_set)
       selected_dofs[index] = true;
   }
 
