@@ -212,7 +212,7 @@ FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix) const
 {
   // this is only implemented, if the source FE is also a Q_DG0 element
-  typedef FE_Q_DG0<dim, spacedim> FEQDG0;
+  using FEQDG0 = FE_Q_DG0<dim, spacedim>;
 
   AssertThrow(
     (x_source_fe.get_name().find("FE_Q_DG0<") == 0) ||

@@ -385,7 +385,7 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
   // We don't know how to do this properly, yet.
   // However, for SolutionTransfer to work we need to provide an implementation
   // for the case that the x_source_fe is identical to this FE
-  typedef FE_Q_Bubbles<dim, spacedim> FEQBUBBLES;
+  using FEQBUBBLES = FE_Q_Bubbles<dim, spacedim>;
 
   AssertThrow(
     (x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||

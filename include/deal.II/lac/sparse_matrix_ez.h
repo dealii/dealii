@@ -107,7 +107,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * The class for storing the column number of an entry together with its
@@ -296,10 +296,10 @@ public:
   };
 
   /**
-   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * Type of matrix entries. This alias is analogous to <tt>value_type</tt>
    * in the standard library containers.
    */
-  typedef number value_type;
+  using value_type = number;
 
   /**
    * @name Constructors and initialization

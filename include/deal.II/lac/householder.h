@@ -83,7 +83,7 @@ public:
   /**
    * Declare type of container size type.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Create an empty object.

@@ -115,17 +115,17 @@ namespace Rol
   class VectorAdaptor : public ROL::Vector<typename VectorType::value_type>
   {
     /**
-     * A typedef for size type of <tt>VectorType</tt>.
+     * An alias for size type of <tt>VectorType</tt>.
      */
     using size_type = typename VectorType::size_type;
 
     /**
-     * A typedef for element type stored in the <tt>VectorType</tt>.
+     * An alias for element type stored in the <tt>VectorType</tt>.
      */
     using value_type = typename VectorType::value_type;
 
     /**
-     * A typedef for real-valued numbers.
+     * An alias for real-valued numbers.
      */
     using real_type = typename VectorType::real_type;
 

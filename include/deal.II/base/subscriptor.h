@@ -187,12 +187,12 @@ private:
   /**
    * The data type used in #counter_map.
    */
-  typedef std::map<const char *, unsigned int>::value_type map_value_type;
+  using map_value_type = std::map<const char *, unsigned int>::value_type;
 
   /**
    * The iterator type used in #counter_map.
    */
-  typedef std::map<const char *, unsigned int>::iterator map_iterator;
+  using map_iterator = std::map<const char *, unsigned int>::iterator;
 
   /**
    * Store the number of objects which subscribed to this object. Initially,

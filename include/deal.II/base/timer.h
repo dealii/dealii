@@ -42,22 +42,22 @@ struct CPUClock
    * 1/64th of a second and POSIX uses microseconds, so go with microseconds
    * for uniformity.
    */
-  typedef std::chrono::microseconds duration;
+  using duration = std::chrono::microseconds;
 
   /**
    * Signed integral type used to store the value returned by count().
    */
-  typedef duration::rep rep;
+  using rep = duration::rep;
 
   /**
    * Ratio representing the length of a period (in seconds).
    */
-  typedef duration::period period;
+  using period = duration::period;
 
   /**
    * Time point type.
    */
-  typedef std::chrono::time_point<CPUClock, duration> time_point;
+  using time_point = std::chrono::time_point<CPUClock, duration>;
 
   /**
    * Boolean indicating that the clock monotonically increases.
@@ -313,8 +313,8 @@ private:
    *
    * @tparam clock_type_ The type of the clock whose measurements are being
    * stored. This class should conform to the usual clock interface expected
-   * by <code>std::chrono</code> (i.e., the correct <code>typedef</code>s and
-   * a static <code>now()</code> method).
+   * by <code>std::chrono</code> (i.e., the correct alias and a static
+   * <code>now()</code> method).
    */
   template <class clock_type_>
   struct ClockMeasurements
@@ -322,17 +322,17 @@ private:
     /**
      * Store the clock type.
      */
-    typedef clock_type_ clock_type;
+    using clock_type = clock_type_;
 
     /**
      * The time point type of the provided clock.
      */
-    typedef typename clock_type::time_point time_point_type;
+    using time_point_type = typename clock_type::time_point;
 
     /**
      * The duration type of the provided clock.
      */
-    typedef typename clock_type::duration duration_type;
+    using duration_type = typename clock_type::duration;
 
     /**
      * The time point corresponding to the start of the current lap. This is
@@ -365,14 +365,14 @@ private:
   };
 
   /**
-   * typedef for the wall clock.
+   * Alias for the wall clock.
    */
-  typedef std::chrono::steady_clock wall_clock_type;
+  using wall_clock_type = std::chrono::steady_clock;
 
   /**
-   * typedef for the CPU clock.
+   * Alias for the CPU clock.
    */
-  typedef CPUClock cpu_clock_type;
+  using cpu_clock_type = CPUClock;
 
   /**
    * Collection of wall time measurements.

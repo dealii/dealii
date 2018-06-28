@@ -164,9 +164,9 @@ namespace internal
               typename OtherNumber = Number>
     struct double_contraction_result
     {
-      typedef typename ProductType<Number, OtherNumber>::type value_type;
-      typedef ::dealii::SymmetricTensor<rank1 + rank2 - 4, dim, value_type>
-        type;
+      using value_type = typename ProductType<Number, OtherNumber>::type;
+      using type =
+        ::dealii::SymmetricTensor<rank1 + rank2 - 4, dim, value_type>;
     };
 
 
@@ -181,13 +181,13 @@ namespace internal
     template <int dim, typename Number, typename OtherNumber>
     struct double_contraction_result<2, 2, dim, Number, OtherNumber>
     {
-      typedef typename ProductType<Number, OtherNumber>::type type;
+      using type = typename ProductType<Number, OtherNumber>::type;
     };
 
 
 
     /**
-     * Declaration of typedefs for the type of data structures which are used
+     * Declaration of alias for the type of data structures which are used
      * to store symmetric tensors. For example, for rank-2 symmetric tensors,
      * we use a flat vector to store all the elements. On the other hand,
      * symmetric rank-4 tensors are mappings from symmetric rank-2 tensors
@@ -217,7 +217,7 @@ namespace internal
       /**
        * Declare the type in which we actually store the data.
        */
-      typedef Tensor<1, n_independent_components, Number> base_tensor_type;
+      using base_tensor_type = Tensor<1, n_independent_components, Number>;
     };
 
 
@@ -248,7 +248,7 @@ namespace internal
        * can represent the data as a matrix if we represent the rank-2 tensors
        * as vectors.
        */
-      typedef Tensor<2, n_rank2_components, Number> base_tensor_type;
+      using base_tensor_type = Tensor<2, n_rank2_components, Number>;
     };
 
 
@@ -269,9 +269,9 @@ namespace internal
     template <int rank, int dim, typename Number>
     struct AccessorTypes<rank, dim, true, Number>
     {
-      typedef const ::dealii::SymmetricTensor<rank, dim, Number> tensor_type;
+      using tensor_type = const ::dealii::SymmetricTensor<rank, dim, Number>;
 
-      typedef Number reference;
+      using reference = Number;
     };
 
     /**
@@ -283,9 +283,9 @@ namespace internal
     template <int rank, int dim, typename Number>
     struct AccessorTypes<rank, dim, false, Number>
     {
-      typedef ::dealii::SymmetricTensor<rank, dim, Number> tensor_type;
+      using tensor_type = ::dealii::SymmetricTensor<rank, dim, Number>;
 
-      typedef Number &reference;
+      using reference = Number &;
     };
 
 
@@ -328,12 +328,12 @@ namespace internal
     {
     public:
       /**
-       * Import two typedefs from the switch class above.
+       * Import two alias from the switch class above.
        */
-      typedef typename AccessorTypes<rank, dim, constness, Number>::reference
-        reference;
-      typedef typename AccessorTypes<rank, dim, constness, Number>::tensor_type
-        tensor_type;
+      using reference =
+        typename AccessorTypes<rank, dim, constness, Number>::reference;
+      using tensor_type =
+        typename AccessorTypes<rank, dim, constness, Number>::tensor_type;
 
     private:
       /**
@@ -411,12 +411,12 @@ namespace internal
     {
     public:
       /**
-       * Import two typedefs from the switch class above.
+       * Import two alias from the switch class above.
        */
-      typedef typename AccessorTypes<rank, dim, constness, Number>::reference
-        reference;
-      typedef typename AccessorTypes<rank, dim, constness, Number>::tensor_type
-        tensor_type;
+      using reference =
+        typename AccessorTypes<rank, dim, constness, Number>::reference;
+      using tensor_type =
+        typename AccessorTypes<rank, dim, constness, Number>::tensor_type;
 
     private:
       /**
@@ -883,13 +883,13 @@ private:
   /**
    * A structure that describes properties of the base tensor.
    */
-  typedef internal::SymmetricTensorAccessors::StorageType<rank_, dim, Number>
-    base_tensor_descriptor;
+  using base_tensor_descriptor =
+    internal::SymmetricTensorAccessors::StorageType<rank_, dim, Number>;
 
   /**
    * Data storage type for a symmetric tensor.
    */
-  typedef typename base_tensor_descriptor::base_tensor_type base_tensor_type;
+  using base_tensor_type = typename base_tensor_descriptor::base_tensor_type;
 
   /**
    * The place where we store the data of the tensor.
@@ -1575,9 +1575,8 @@ namespace internal
       const typename SymmetricTensorAccessors::
         StorageType<2, dim, OtherNumber>::base_tensor_type &sdata)
   {
-    typedef typename SymmetricTensorAccessors::
-      double_contraction_result<2, 2, dim, Number, OtherNumber>::type
-        result_type;
+    using result_type = typename SymmetricTensorAccessors::
+      double_contraction_result<2, 2, dim, Number, OtherNumber>::type;
 
     switch (dim)
       {
@@ -1610,12 +1609,10 @@ namespace internal
       const typename SymmetricTensorAccessors::
         StorageType<2, dim, OtherNumber>::base_tensor_type &sdata)
   {
-    typedef typename SymmetricTensorAccessors::
-      double_contraction_result<4, 2, dim, Number, OtherNumber>::type
-        result_type;
-    typedef typename SymmetricTensorAccessors::
-      double_contraction_result<4, 2, dim, Number, OtherNumber>::value_type
-        value_type;
+    using result_type = typename SymmetricTensorAccessors::
+      double_contraction_result<4, 2, dim, Number, OtherNumber>::type;
+    using value_type = typename SymmetricTensorAccessors::
+      double_contraction_result<4, 2, dim, Number, OtherNumber>::value_type;
 
     const unsigned int data_dim = SymmetricTensorAccessors::
       StorageType<2, dim, value_type>::n_independent_components;
@@ -1641,11 +1638,10 @@ namespace internal
       const typename SymmetricTensorAccessors::
         StorageType<4, dim, OtherNumber>::base_tensor_type &sdata)
   {
-    typedef typename SymmetricTensorAccessors::
-      double_contraction_result<2, 4, dim, Number, OtherNumber>::value_type
-        value_type;
-    typedef typename SymmetricTensorAccessors::StorageType<2, dim, value_type>::
-      base_tensor_type base_tensor_type;
+    using value_type = typename SymmetricTensorAccessors::
+      double_contraction_result<2, 4, dim, Number, OtherNumber>::value_type;
+    using base_tensor_type = typename SymmetricTensorAccessors::
+      StorageType<2, dim, value_type>::base_tensor_type;
 
     base_tensor_type tmp;
     for (unsigned int i = 0; i < tmp.dimension; ++i)
@@ -1679,11 +1675,10 @@ namespace internal
       const typename SymmetricTensorAccessors::
         StorageType<4, dim, OtherNumber>::base_tensor_type &sdata)
   {
-    typedef typename SymmetricTensorAccessors::
-      double_contraction_result<4, 4, dim, Number, OtherNumber>::value_type
-        value_type;
-    typedef typename SymmetricTensorAccessors::StorageType<4, dim, value_type>::
-      base_tensor_type base_tensor_type;
+    using value_type = typename SymmetricTensorAccessors::
+      double_contraction_result<4, 4, dim, Number, OtherNumber>::value_type;
+    using base_tensor_type = typename SymmetricTensorAccessors::
+      StorageType<4, dim, value_type>::base_tensor_type;
 
     const unsigned int data_dim = SymmetricTensorAccessors::
       StorageType<2, dim, value_type>::n_independent_components;
@@ -3091,7 +3086,7 @@ namespace internal
     template <int dim, typename Number>
     struct SortEigenValuesVectors
     {
-      typedef std::pair<Number, Tensor<1, dim, Number>> EigValsVecs;
+      using EigValsVecs = std::pair<Number, Tensor<1, dim, Number>>;
       bool
       operator()(const EigValsVecs &lhs, const EigValsVecs &rhs)
       {
@@ -3605,8 +3600,8 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
   // standard committee saw it fit to not define an
   //   operator*(float,std::complex<double>)
   // (as well as with switched arguments and double<->float).
-  typedef typename ProductType<Number, OtherNumber>::type product_type;
-  SymmetricTensor<rank_, dim, product_type>               tt(t);
+  using product_type = typename ProductType<Number, OtherNumber>::type;
+  SymmetricTensor<rank_, dim, product_type> tt(t);
   // we used to shorten the following by 'tt *= product_type(factor);'
   // which requires that a converting constructor
   // 'product_type::product_type(const OtherNumber) is defined.

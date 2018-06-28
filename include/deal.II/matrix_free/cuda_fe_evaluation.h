@@ -79,12 +79,12 @@ namespace CUDAWrappers
   class FEEvaluation
   {
   public:
-    typedef Number                                 value_type;
-    typedef Tensor<1, dim, Number>                 gradient_type;
-    typedef typename MatrixFree<dim, Number>::Data data_type;
-    static constexpr unsigned int                  dimension    = dim;
-    static constexpr unsigned int                  n_components = n_components_;
-    static constexpr unsigned int                  n_q_points =
+    using value_type    = Number;
+    using gradient_type = Tensor<1, dim, Number>;
+    using data_type     = typename MatrixFree<dim, Number>::Data;
+    static constexpr unsigned int dimension    = dim;
+    static constexpr unsigned int n_components = n_components_;
+    static constexpr unsigned int n_q_points =
       Utilities::pow(n_q_points_1d, dim);
     static constexpr unsigned int tensor_dofs_per_cell =
       Utilities::pow(fe_degree + 1, dim);

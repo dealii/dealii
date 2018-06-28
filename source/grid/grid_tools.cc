@@ -1982,8 +1982,8 @@ namespace GridTools
 
 #else
 
-    typedef typename Triangulation<dim, spacedim>::active_cell_iterator
-      active_cell_iterator;
+    using active_cell_iterator =
+      typename Triangulation<dim, spacedim>::active_cell_iterator;
     const std::vector<std::set<active_cell_iterator>> vertex_to_cell =
       vertex_to_cell_map(triangulation);
 

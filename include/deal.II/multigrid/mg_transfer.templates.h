@@ -273,9 +273,9 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
       AssertThrowMPI(ierr);
 #endif
 
-      typedef std::vector<std::pair<types::global_dof_index,
-                                    types::global_dof_index>>::const_iterator
-                  dof_pair_iterator;
+      using dof_pair_iterator =
+        std::vector<std::pair<types::global_dof_index,
+                              types::global_dof_index>>::const_iterator;
       VectorType &dst_level = dst[level];
 
       // first copy local unknowns
@@ -340,9 +340,9 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
       AssertThrowMPI(ierr);
 #endif
 
-      typedef std::vector<std::pair<types::global_dof_index,
-                                    types::global_dof_index>>::const_iterator
-                        dof_pair_iterator;
+      using dof_pair_iterator =
+        std::vector<std::pair<types::global_dof_index,
+                              types::global_dof_index>>::const_iterator;
       const VectorType &src_level = src[level];
 
       // First copy all indices local to this process
@@ -391,9 +391,9 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg_add(
   // basis functions
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
-      typedef std::vector<std::pair<types::global_dof_index,
-                                    types::global_dof_index>>::const_iterator
-                        dof_pair_iterator;
+      using dof_pair_iterator =
+        std::vector<std::pair<types::global_dof_index,
+                              types::global_dof_index>>::const_iterator;
       const VectorType &src_level = src[level];
 
       // First add all indices local to this process
@@ -495,8 +495,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
     {
       --level;
 
-      typedef std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-                                                  dof_pair_iterator;
+      using dof_pair_iterator =
+        std::vector<std::pair<unsigned int, unsigned int>>::const_iterator;
       LinearAlgebra::distributed::Vector<Number> &dst_level = dst[level];
 
       // first copy local unknowns
@@ -560,8 +560,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
   dst = 0;
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
-      typedef std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-        dof_pair_iterator;
+      using dof_pair_iterator =
+        std::vector<std::pair<unsigned int, unsigned int>>::const_iterator;
 
       // the ghosted vector should already have the correct local size (but
       // different parallel layout)
@@ -609,8 +609,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   dst.zero_out_ghosts();
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
-      typedef std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-        dof_pair_iterator;
+      using dof_pair_iterator =
+        std::vector<std::pair<unsigned int, unsigned int>>::const_iterator;
 
       // the ghosted vector should already have the correct local size (but
       // different parallel layout)

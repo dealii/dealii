@@ -27,9 +27,9 @@
 // without MPI, we would still like to use
 // some constructs with MPI data
 // types. Therefore, create some dummies
-typedef int MPI_Comm;
-typedef int MPI_Datatype;
-typedef int MPI_Op;
+using MPI_Comm     = int;
+using MPI_Datatype = int;
+using MPI_Op       = int;
 #  ifndef MPI_COMM_WORLD
 #    define MPI_COMM_WORLD 0
 #  endif

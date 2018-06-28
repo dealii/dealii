@@ -64,7 +64,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef typename SparseLUDecomposition<number>::size_type size_type;
+  using size_type = typename SparseLUDecomposition<number>::size_type;
 
   /**
    * Constructor. Does nothing.
@@ -78,7 +78,7 @@ public:
    * Make SparseLUDecomposition::AdditionalData accessible to this class as
    * well.
    */
-  typedef typename SparseLUDecomposition<number>::AdditionalData AdditionalData;
+  using AdditionalData = typename SparseLUDecomposition<number>::AdditionalData;
 
   /**
    * Perform the incomplete LU factorization of the given matrix.

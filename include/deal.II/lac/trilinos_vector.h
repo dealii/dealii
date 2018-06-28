@@ -77,7 +77,7 @@ namespace TrilinosWrappers
     /**
      * Declare type for container size.
      */
-    typedef dealii::types::global_dof_index size_type;
+    using size_type = dealii::types::global_dof_index;
 
     /**
      * This class implements a wrapper for accessing the Trilinos vector in
@@ -398,13 +398,13 @@ namespace TrilinosWrappers
        * parallel those in the <tt>C</tt> standard libraries
        * <tt>vector<...></tt> class.
        */
-      typedef TrilinosScalar                  value_type;
-      typedef TrilinosScalar                  real_type;
-      typedef dealii::types::global_dof_index size_type;
-      typedef value_type *                    iterator;
-      typedef const value_type *              const_iterator;
-      typedef internal::VectorReference       reference;
-      typedef const internal::VectorReference const_reference;
+      using value_type      = TrilinosScalar;
+      using real_type       = TrilinosScalar;
+      using size_type       = dealii::types::global_dof_index;
+      using iterator        = value_type *;
+      using const_iterator  = const value_type *;
+      using reference       = internal::VectorReference;
+      using const_reference = const internal::VectorReference;
 
       /**
        * @name 1: Basic Object-handling

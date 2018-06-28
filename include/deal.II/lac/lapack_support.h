@@ -29,12 +29,12 @@ namespace types
   /**
    * Integer type in BLAS.
    */
-  typedef long long blas_int;
+  using blas_int = long long;
 #else
   /**
    * Integer type in BLAS.
    */
-  typedef int blas_int;
+  using blas_int = int;
 #endif
 } // namespace types
 

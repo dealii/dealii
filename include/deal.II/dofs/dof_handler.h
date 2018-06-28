@@ -199,34 +199,32 @@ namespace internal
 template <int dim, int spacedim = dim>
 class DoFHandler : public Subscriptor
 {
-  typedef dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, false>
-      ActiveSelector;
-  typedef dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, true>
-      LevelSelector;
+  using ActiveSelector = dealii::internal::DoFHandlerImplementation::
+    Iterators<DoFHandler<dim, spacedim>, false>;
+  using LevelSelector = dealii::internal::DoFHandlerImplementation::
+    Iterators<DoFHandler<dim, spacedim>, true>;
 
 public:
-  typedef typename ActiveSelector::CellAccessor cell_accessor;
-  typedef typename ActiveSelector::FaceAccessor face_accessor;
+  using cell_accessor = typename ActiveSelector::CellAccessor;
+  using face_accessor = typename ActiveSelector::FaceAccessor;
 
-  typedef typename ActiveSelector::line_iterator        line_iterator;
-  typedef typename ActiveSelector::active_line_iterator active_line_iterator;
+  using line_iterator        = typename ActiveSelector::line_iterator;
+  using active_line_iterator = typename ActiveSelector::active_line_iterator;
 
-  typedef typename ActiveSelector::quad_iterator        quad_iterator;
-  typedef typename ActiveSelector::active_quad_iterator active_quad_iterator;
+  using quad_iterator        = typename ActiveSelector::quad_iterator;
+  using active_quad_iterator = typename ActiveSelector::active_quad_iterator;
 
-  typedef typename ActiveSelector::hex_iterator        hex_iterator;
-  typedef typename ActiveSelector::active_hex_iterator active_hex_iterator;
+  using hex_iterator        = typename ActiveSelector::hex_iterator;
+  using active_hex_iterator = typename ActiveSelector::active_hex_iterator;
 
   /**
-   * A typedef that is used to identify
+   * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
-   * The current typedef identifies active cells in a DoFHandler object. While
-   * the actual data type of the typedef is hidden behind a few layers of
+   * The current alias identifies active cells in a DoFHandler object. While
+   * the actual data type of the alias is hidden behind a few layers of
    * (unfortunately necessary) indirections, it is in essence
    * TriaActiveIterator<DoFCellAccessor>. The TriaActiveIterator class works
    * like a pointer to active objects that when you dereference it yields an
@@ -239,22 +237,22 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
+  using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
 
   /**
-   * A typedef that is used to identify cell iterators. The concept of
+   * An alias that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
-   * The current typedef identifies cells in a DoFHandler object. Some of
+   * The current alias identifies cells in a DoFHandler object. Some of
    * these cells may in fact be active (see
    * @ref GlossActive "active cell iterators")
    * in which case they can in fact be asked for the degrees of freedom that
    * live on them. On the other hand, if the cell is not active, any such
    * query will result in an error. Note that this is what distinguishes this
-   * typedef from the level_cell_iterator typedef.
+   * alias from the level_cell_iterator alias.
    *
-   * While the actual data type of the typedef is hidden behind a few layers
+   * While the actual data type of the alias is hidden behind a few layers
    * of (unfortunately necessary) indirections, it is in essence
    * TriaIterator<DoFCellAccessor>. The TriaIterator class works like a
    * pointer to objects that when you dereference it yields an object of type
@@ -267,14 +265,14 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef typename ActiveSelector::cell_iterator cell_iterator;
+  using cell_iterator = typename ActiveSelector::cell_iterator;
 
   /**
-   * A typedef that is used to identify iterators that point to faces.
+   * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
-   * While the actual data type of the typedef is hidden behind a few layers
+   * While the actual data type of the alias is hidden behind a few layers
    * of (unfortunately necessary) indirections, it is in essence
    * TriaIterator<DoFAccessor>. The
    * TriaIterator class works like a pointer to objects that when
@@ -285,26 +283,26 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef typename ActiveSelector::face_iterator face_iterator;
+  using face_iterator = typename ActiveSelector::face_iterator;
 
   /**
-   * A typedef that is used to identify iterators that point to active faces,
+   * An alias that is used to identify iterators that point to active faces,
    * i.e., to faces that have no children. Active faces must be faces of at
    * least one active cell.
    *
-   * Other than the "active" qualification, this typedef is identical to the
-   * @p face_iterator typedef. In particular, dereferencing either yields
+   * Other than the "active" qualification, this alias is identical to the
+   * @p face_iterator alias. In particular, dereferencing either yields
    * the same kind of object.
    *
    * @ingroup Iterators
    */
-  typedef typename ActiveSelector::active_face_iterator active_face_iterator;
+  using active_face_iterator = typename ActiveSelector::active_face_iterator;
 
-  typedef typename LevelSelector::CellAccessor level_cell_accessor;
-  typedef typename LevelSelector::FaceAccessor level_face_accessor;
+  using level_cell_accessor = typename LevelSelector::CellAccessor;
+  using level_face_accessor = typename LevelSelector::FaceAccessor;
 
-  typedef typename LevelSelector::cell_iterator level_cell_iterator;
-  typedef typename LevelSelector::face_iterator level_face_iterator;
+  using level_cell_iterator = typename LevelSelector::cell_iterator;
+  using level_face_iterator = typename LevelSelector::face_iterator;
 
 
   /**

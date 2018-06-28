@@ -351,10 +351,10 @@ namespace parallel
         "User's DataType class should be derived from TransferableQuadraturePointData");
 
       /**
-       * A typedef for a cell.
+       * An alias for a cell.
        */
-      typedef typename parallel::distributed::Triangulation<dim>::cell_iterator
-        CellIteratorType;
+      using CellIteratorType =
+        typename parallel::distributed::Triangulation<dim>::cell_iterator;
 
       /**
        * Constructor which takes the FiniteElement @p projection_fe , the quadrature

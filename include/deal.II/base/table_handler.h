@@ -130,9 +130,8 @@ namespace internal
     /**
      * Abbreviation for the data type stored by this object.
      */
-    typedef boost::
-      variant<int, unsigned int, unsigned long long int, double, std::string>
-        value_type;
+    using value_type = boost::
+      variant<int, unsigned int, unsigned long long int, double, std::string>;
 
     /**
      * Stored value.

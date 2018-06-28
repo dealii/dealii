@@ -58,12 +58,12 @@ class AffineConstraints;
 
 /**
  * ConstraintMatrix has been renamed to AffineConstraints. Provide a
- * compatibility typedef that defaults to AffineConstraints<double>.
+ * compatibility alias that defaults to AffineConstraints<double>.
  *
  * @deprecated Use AffineConstraints<double> instead of ConstraintMatrix
  */
 using ConstraintMatrix DEAL_II_DEPRECATED = AffineConstraints<double>;
-// Note: Unfortunately, we cannot move this compatibility typedef into
+// Note: Unfortunately, we cannot move this compatibility alias into
 // constraint_matrix.h directly. This would break a lot of user projects
 // that include constraint_matrix.h transitively due to various deal.II
 // headers that include the file.
@@ -159,7 +159,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * An enum that describes what should happen if the two AffineConstraints
@@ -1190,7 +1190,7 @@ public:
      * A data type in which we store the list of entries that make up the
      * homogenous part of a constraint.
      */
-    typedef std::vector<std::pair<size_type, number>> Entries;
+    using Entries = std::vector<std::pair<size_type, number>>;
 
     /**
      * Global DoF index of this line. Since only very few lines are stored,
@@ -1250,14 +1250,14 @@ public:
   };
 
   /**
-   * Typedef for the iterator type that is used in the LineRange container.
+   * Alias for the iterator type that is used in the LineRange container.
    */
-  typedef typename std::vector<ConstraintLine>::const_iterator const_iterator;
+  using const_iterator = typename std::vector<ConstraintLine>::const_iterator;
 
   /**
-   * Typedef for the return type used by get_lines().
+   * Alias for the return type used by get_lines().
    */
-  typedef boost::iterator_range<const_iterator> LineRange;
+  using LineRange = boost::iterator_range<const_iterator>;
 
   /**
    * Return a range object containing (const) iterators to all line entries

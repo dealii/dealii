@@ -120,9 +120,9 @@ namespace Differentiation
         typename std::enable_if<
           std::is_floating_point<ScalarType>::value>::type>
       {
-        static const bool         is_taped = true;
-        typedef adouble           real_type;
-        typedef double            derivative_type;
+        static const bool is_taped = true;
+        using real_type            = adouble;
+        using derivative_type      = double;
         static const unsigned int n_supported_derivative_levels =
           std::numeric_limits<unsigned int>::max();
       };
@@ -139,9 +139,9 @@ namespace Differentiation
         typename std::enable_if<
           std::is_floating_point<ScalarType>::value>::type>
       {
-        static const bool         is_taped = false;
-        typedef adtl::adouble     real_type;
-        typedef double            derivative_type;
+        static const bool is_taped                              = false;
+        using real_type                                         = adtl::adouble;
+        using derivative_type                                   = double;
         static const unsigned int n_supported_derivative_levels = 1;
       };
 
@@ -153,7 +153,7 @@ namespace Differentiation
           ADNumberTraits<ADNumberType>::type_code == NumberTypes::adolc_taped &&
           ADNumberTraits<ADNumberType>::is_real_valued>::type>
       {
-        typedef typename ADNumberTraits<ADNumberType>::scalar_type scalar_type;
+        using scalar_type = typename ADNumberTraits<ADNumberType>::scalar_type;
 
         /*
          * Initialize the state of an independent variable.
@@ -191,7 +191,7 @@ namespace Differentiation
                          NumberTypes::adolc_tapeless &&
                        ADNumberTraits<ADNumberType>::is_real_valued>::type>
       {
-        typedef typename ADNumberTraits<ADNumberType>::scalar_type scalar_type;
+        using scalar_type = typename ADNumberTraits<ADNumberType>::scalar_type;
 
         /*
          * Initialize the state of an independent variable.

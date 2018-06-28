@@ -1056,7 +1056,7 @@ namespace internal
       // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
       // otherwise it is std::false_type
 
-      typedef decltype(test<T>(nullptr, nullptr)) type;
+      using type = decltype(test<T>(nullptr, nullptr));
     };
 
 

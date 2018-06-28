@@ -86,10 +86,10 @@ class Quadrature : public Subscriptor
 {
 public:
   /**
-   * Define a typedef for a quadrature that acts on an object of one dimension
+   * Define an alias for a quadrature that acts on an object of one dimension
    * less. For cells, this would then be a face quadrature.
    */
-  typedef Quadrature<dim - 1> SubQuadrature;
+  using SubQuadrature = Quadrature<dim - 1>;
 
   /**
    * Constructor.

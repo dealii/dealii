@@ -101,9 +101,9 @@ public:
   struct PointCloudAdaptor
   {
     /**
-     * A typedef used by nanoflann.
+     * An alias used by nanoflann.
      */
-    typedef double coord_t;
+    using coord_t = double;
 
 
     /**
@@ -157,14 +157,13 @@ public:
 
 
   /**
-   * A typedef for the actual KDTree object.
+   * An alias for the actual KDTree object.
    */
-  typedef typename nanoflann::KDTreeSingleIndexAdaptor<
+  using NanoFlannKDTree = typename nanoflann::KDTreeSingleIndexAdaptor<
     nanoflann::L2_Simple_Adaptor<double, PointCloudAdaptor>,
     PointCloudAdaptor,
     dim,
-    unsigned int>
-    NanoFlannKDTree;
+    unsigned int>;
 
 
   /**

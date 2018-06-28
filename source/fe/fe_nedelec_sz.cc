@@ -52,7 +52,7 @@ double
 FE_NedelecSZ<dim, spacedim>::shape_value(const unsigned int /*i*/,
                                          const Point<dim> & /*p*/) const
 {
-  typedef FiniteElement<dim, dim> FEE;
+  using FEE = FiniteElement<dim, dim>;
   Assert(false, typename FEE::ExcFENotPrimitive());
   return 0.;
 }
@@ -78,7 +78,7 @@ Tensor<1, dim>
 FE_NedelecSZ<dim, spacedim>::shape_grad(const unsigned int /*i*/,
                                         const Point<dim> & /*p*/) const
 {
-  typedef FiniteElement<dim, dim> FEE;
+  using FEE = FiniteElement<dim, dim>;
   Assert(false, typename FEE::ExcFENotPrimitive());
   return Tensor<1, dim>();
 }
@@ -103,7 +103,7 @@ Tensor<2, dim>
 FE_NedelecSZ<dim, spacedim>::shape_grad_grad(const unsigned int /*i*/,
                                              const Point<dim> & /*p*/) const
 {
-  typedef FiniteElement<dim, dim> FEE;
+  using FEE = FiniteElement<dim, dim>;
   Assert(false, typename FEE::ExcFENotPrimitive());
   return Tensor<2, dim>();
 }

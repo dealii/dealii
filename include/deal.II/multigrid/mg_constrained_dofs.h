@@ -42,7 +42,7 @@ class DoFHandler;
 class MGConstrainedDoFs : public Subscriptor
 {
 public:
-  typedef std::vector<std::set<types::global_dof_index>>::size_type size_dof;
+  using size_dof = std::vector<std::set<types::global_dof_index>>::size_type;
   /**
    * Fill the internal data structures with hanging node constraints extracted
    * from the dof handler object. Works with natural boundary conditions only.

@@ -902,7 +902,7 @@ PointValueHistory<dim>::evaluate_field_at_requested_location(
   const std::string &vector_name,
   const VectorType & solution)
 {
-  typedef typename VectorType::value_type number;
+  using number = typename VectorType::value_type;
   // must be closed to add data to internal
   // members.
   Assert(closed, ExcInvalidState());

@@ -243,8 +243,8 @@ MGTransferSelect<number>::do_copy_to_mg(
     {
       --level;
 
-      typedef std::vector<
-        std::pair<types::global_dof_index, unsigned int>>::const_iterator IT;
+      using IT = std::vector<
+        std::pair<types::global_dof_index, unsigned int>>::const_iterator;
       for (IT i = copy_to_and_from_indices[level].begin();
            i != copy_to_and_from_indices[level].end();
            ++i)

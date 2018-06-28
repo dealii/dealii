@@ -270,7 +270,7 @@ namespace TrilinosWrappers
 
   namespace
   {
-    typedef SparsityPattern::size_type size_type;
+    using size_type = SparsityPattern::size_type;
 
     void
     reinit_sp(const Epetra_Map &                  row_map,

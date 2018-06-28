@@ -336,12 +336,12 @@ namespace numbers
     static const bool is_complex = false;
 
     /**
-     * For this data type, typedef the corresponding real type. Since the
+     * For this data type, alias the corresponding real type. Since the
      * general template is selected for all data types that are not
      * specializations of std::complex<T>, the underlying type must be real-
      * values, so the real_type is equal to the underlying type.
      */
-    typedef number real_type;
+    using real_type = number;
 
     /**
      * Return the complex-conjugate of the given number. Since the general
@@ -386,12 +386,12 @@ namespace numbers
     static const bool is_complex = true;
 
     /**
-     * For this data type, typedef the corresponding real type. Since this
+     * For this data type, alias the corresponding real type. Since this
      * specialization of the template is selected for number types
      * std::complex<T>, the real type is equal to the type used to store the
      * two components of the complex number.
      */
-    typedef number real_type;
+    using real_type = number;
 
     /**
      * Return the complex-conjugate of the given number.

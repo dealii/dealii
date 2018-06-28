@@ -2523,7 +2523,7 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
    * We decided to use the 2nd option.
    */
   AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
+  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   // my_it : is the iterator to the current cell.
   cell_iterator my_it(*this);
   if (this->tria->periodic_face_map.find(
@@ -2548,8 +2548,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor(const unsigned int i_face) const
    * being the current cell_face.
    */
   AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
-  cell_iterator                                     my_it(*this);
+  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+  cell_iterator my_it(*this);
 
   const typename std::map<std::pair<cell_iterator, unsigned int>,
                           std::pair<std::pair<cell_iterator, unsigned int>,
@@ -2600,8 +2600,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
    *                    neighboring face.
    */
   AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
-  cell_iterator                                     my_it(*this);
+  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+  cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
                           std::pair<std::pair<cell_iterator, unsigned int>,
                                     std::bitset<3>>>::const_iterator
@@ -2653,7 +2653,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
    * cell.
    */
   AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
+  using cell_iterator         = TriaIterator<CellAccessor<dim, spacedim>>;
   const int     my_face_index = this->face_index(i_face);
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2744,8 +2744,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_face_no(
    * being the current cell_face.
    */
   AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
-  cell_iterator                                     my_it(*this);
+  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+  cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
                           std::pair<std::pair<cell_iterator, unsigned int>,
                                     std::bitset<3>>>::const_iterator
@@ -2786,8 +2786,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser(
    * first pair being the periodic neighbor cell_face.
    */
   AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
-  typedef TriaIterator<CellAccessor<dim, spacedim>> cell_iterator;
-  cell_iterator                                     my_it(*this);
+  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+  cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
                           std::pair<std::pair<cell_iterator, unsigned int>,
                                     std::bitset<3>>>::const_iterator

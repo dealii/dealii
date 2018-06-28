@@ -61,7 +61,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Choose a method for inverting the blocks, and thus the data type for the

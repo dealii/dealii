@@ -144,7 +144,7 @@ namespace Functions
      *
      *  @code
      *
-     *  set Function expression = cos(pi*x) ; cos(pi*y)
+     *  set Function expression = cos(pi*x); cos(pi*y)
      *
      *  @endcode
      *

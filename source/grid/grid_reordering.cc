@@ -209,7 +209,7 @@ namespace
      * An iterator that allows iterating over all cells adjacent
      * to the edge represented by the current object.
      */
-    typedef const AdjacentCell *const_iterator;
+    using const_iterator = const AdjacentCell *;
 
     /**
      * Add the given cell to the collection of cells adjacent to
@@ -435,7 +435,7 @@ namespace
     /**
      * Iterator type for the elements of the set.
      */
-    typedef const unsigned int *const_iterator;
+    using const_iterator = const unsigned int *;
 
     /**
      * Default constructor. Initialize both slots as unused, corresponding

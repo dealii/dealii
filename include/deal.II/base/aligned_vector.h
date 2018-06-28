@@ -65,14 +65,14 @@ public:
    * Declare standard types used in all containers. These types parallel those
    * in the <tt>C++</tt> standard libraries <tt>vector<...></tt> class.
    */
-  typedef T                 value_type;
-  typedef value_type *      pointer;
-  typedef const value_type *const_pointer;
-  typedef value_type *      iterator;
-  typedef const value_type *const_iterator;
-  typedef value_type &      reference;
-  typedef const value_type &const_reference;
-  typedef std::size_t       size_type;
+  using value_type      = T;
+  using pointer         = value_type *;
+  using const_pointer   = const value_type *;
+  using iterator        = value_type *;
+  using const_iterator  = const value_type *;
+  using reference       = value_type &;
+  using const_reference = const value_type &;
+  using size_type       = std::size_t;
 
   /**
    * Empty constructor. Sets the vector size to zero.

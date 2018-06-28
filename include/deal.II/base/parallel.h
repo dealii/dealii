@@ -184,9 +184,9 @@ namespace parallel
     for (OutputIterator in = begin_in; in != end_in;)
       *out++ = predicate(*in++);
 #else
-    typedef std::tuple<InputIterator, OutputIterator> Iterators;
-    typedef SynchronousIterators<Iterators>           SyncIterators;
-    Iterators                                         x_begin(begin_in, out);
+    using Iterators     = std::tuple<InputIterator, OutputIterator>;
+    using SyncIterators = SynchronousIterators<Iterators>;
+    Iterators x_begin(begin_in, out);
     Iterators x_end(end_in, OutputIterator());
     tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin,
                                                         x_end,
@@ -241,10 +241,10 @@ namespace parallel
     for (OutputIterator in1 = begin_in1; in1 != end_in1;)
       *out++ = predicate(*in1++, *in2++);
 #else
-    typedef std::tuple<InputIterator1, InputIterator2, OutputIterator>
-                                            Iterators;
-    typedef SynchronousIterators<Iterators> SyncIterators;
-    Iterators                               x_begin(begin_in1, in2, out);
+    using Iterators =
+      std::tuple<InputIterator1, InputIterator2, OutputIterator>;
+    using SyncIterators = SynchronousIterators<Iterators>;
+    Iterators x_begin(begin_in1, in2, out);
     Iterators x_end(end_in1, InputIterator2(), OutputIterator());
     tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin,
                                                         x_end,
@@ -301,12 +301,11 @@ namespace parallel
     for (OutputIterator in1 = begin_in1; in1 != end_in1;)
       *out++ = predicate(*in1++, *in2++, *in3++);
 #else
-    typedef std::
-      tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>
-                                            Iterators;
-    typedef SynchronousIterators<Iterators> SyncIterators;
-    Iterators                               x_begin(begin_in1, in2, in3, out);
-    Iterators                               x_end(end_in1,
+    using Iterators = std::
+      tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>;
+    using SyncIterators = SynchronousIterators<Iterators>;
+    Iterators x_begin(begin_in1, in2, in3, out);
+    Iterators x_end(end_in1,
                     InputIterator2(),
                     InputIterator3(),
                     OutputIterator());

@@ -126,15 +126,15 @@ namespace Particles
     operator--(int);
 
     /**
-     * Mark the class as bidirectional iterator and declare some typedefs which
+     * Mark the class as bidirectional iterator and declare some alias which
      * are standard for iterators and are used by algorithms to enquire about
      * the specifics of the iterators they work on.
      */
-    typedef std::bidirectional_iterator_tag  iterator_category;
-    typedef ParticleAccessor<dim, spacedim>  value_type;
-    typedef std::ptrdiff_t                   difference_type;
-    typedef ParticleAccessor<dim, spacedim> *pointer;
-    typedef ParticleAccessor<dim, spacedim> &reference;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type        = ParticleAccessor<dim, spacedim>;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = ParticleAccessor<dim, spacedim> *;
+    using reference         = ParticleAccessor<dim, spacedim> &;
 
   private:
     /**

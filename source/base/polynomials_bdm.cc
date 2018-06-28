@@ -400,8 +400,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
             }
 //      std::cerr << p
 //                << '\t' << moment_weight[0].value(x)
-//                << '\t' << moment_weight[1].value(x)
-//        ;
+//                << '\t' << moment_weight[1].value(x);
 
           compute (p, values, grads, grad_grads);
 

@@ -74,7 +74,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Default constructor. Creates a zero-sized matrix that should be resized
@@ -85,7 +85,7 @@ public:
   /**
    * Constructor. Creates a identity matrix of size #n.
    */
-  IdentityMatrix(const size_type n);
+  explicit IdentityMatrix(const size_type n);
 
   /**
    * Resize the matrix to be of size #n by #n.

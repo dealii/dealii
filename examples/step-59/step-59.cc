@@ -175,7 +175,7 @@ namespace Step59
   class LaplaceOperator : public Subscriptor
   {
   public:
-    typedef number value_type;
+    using value_type = number;
 
     LaplaceOperator() = default;
 
@@ -235,7 +235,7 @@ namespace Step59
   class PreconditionBlockJacobi
   {
   public:
-    typedef number value_type;
+    using value_type = number;
 
     void clear()
     {
@@ -929,11 +929,11 @@ namespace Step59
     FE_DGQHermite<dim> fe;
     DoFHandler<dim>    dof_handler;
 
-    typedef LaplaceOperator<dim, fe_degree, double> SystemMatrixType;
-    SystemMatrixType                                system_matrix;
+    using SystemMatrixType = LaplaceOperator<dim, fe_degree, double>;
+    SystemMatrixType system_matrix;
 
-    typedef LaplaceOperator<dim, fe_degree, float> LevelMatrixType;
-    MGLevelObject<LevelMatrixType>                 mg_matrices;
+    using LevelMatrixType = LaplaceOperator<dim, fe_degree, float>;
+    MGLevelObject<LevelMatrixType> mg_matrices;
 
     LinearAlgebra::distributed::Vector<double> solution;
     LinearAlgebra::distributed::Vector<double> system_rhs;
@@ -1220,11 +1220,10 @@ namespace Step59
                  << " s\n";
     time.restart();
 
-    typedef PreconditionChebyshev<
-      LevelMatrixType,
-      LinearAlgebra::distributed::Vector<float>,
-      PreconditionBlockJacobi<dim, fe_degree, float>>
-      SmootherType;
+    using SmootherType =
+      PreconditionChebyshev<LevelMatrixType,
+                            LinearAlgebra::distributed::Vector<float>,
+                            PreconditionBlockJacobi<dim, fe_degree, float>>;
     mg::SmootherRelaxation<SmootherType,
                            LinearAlgebra::distributed::Vector<float>>
                                                          mg_smoother;

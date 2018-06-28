@@ -40,7 +40,7 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  typedef unsigned long long int particle_index;
+  using particle_index = unsigned long long int;
 
 #  ifdef DEAL_II_WITH_MPI
   /**
@@ -61,7 +61,7 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  typedef unsigned int particle_index;
+  using particle_index = unsigned int;
 
 #  ifdef DEAL_II_WITH_MPI
   /**
@@ -82,9 +82,9 @@ namespace Particles
   namespace internal
   {
     /**
-     * Internal typedef of cell level/index pair.
+     * Internal alias of cell level/index pair.
      */
-    typedef std::pair<int, int> LevelInd;
+    using LevelInd = std::pair<int, int>;
   } // namespace internal
 
   /**

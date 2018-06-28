@@ -166,15 +166,14 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef
+  using cell_iterator =
     typename DataOut_DoFData<DoFHandlerType,
                              DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>::cell_iterator
-      cell_iterator;
-  typedef typename DataOut_DoFData<
+                             DoFHandlerType::space_dimension>::cell_iterator;
+  using active_cell_iterator = typename DataOut_DoFData<
     DoFHandlerType,
     DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>::active_cell_iterator active_cell_iterator;
+    DoFHandlerType::space_dimension>::active_cell_iterator;
 
   /**
    * Enumeration describing the part of the domain in which cells

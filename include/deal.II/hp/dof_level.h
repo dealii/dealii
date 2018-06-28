@@ -109,18 +109,18 @@ namespace internal
       /**
        * The type in which we store the offsets into the dof_indices array.
        */
-      typedef unsigned int offset_type;
+      using offset_type = unsigned int;
 
       /**
        * The type in which we store the active FE index.
        */
-      typedef unsigned short int active_fe_index_type;
+      using active_fe_index_type = unsigned short int;
 
       /**
        * A signed type that matches the type in which we store the active FE
        * index. We use this in computing binary complements.
        */
-      typedef signed short int signed_active_fe_index_type;
+      using signed_active_fe_index_type = signed short int;
 
       /**
        * Given an active_fe_index, return whether the corresponding

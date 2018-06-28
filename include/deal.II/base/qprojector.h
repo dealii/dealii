@@ -77,10 +77,10 @@ class QProjector
 {
 public:
   /**
-   * Define a typedef for a quadrature that acts on an object of one dimension
+   * Define an alias for a quadrature that acts on an object of one dimension
    * less. For cells, this would then be a face quadrature.
    */
-  typedef Quadrature<dim - 1> SubQuadrature;
+  using SubQuadrature = Quadrature<dim - 1>;
 
   /**
    * Compute the quadrature points on the cell if the given quadrature formula

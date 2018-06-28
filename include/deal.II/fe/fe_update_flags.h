@@ -552,23 +552,23 @@ namespace internal
        * components are non-zero and thus have a row in the array presently
        * under discussion.
        */
-      typedef dealii::Table<2, double> ShapeVector;
+      using ShapeVector = dealii::Table<2, double>;
 
       /**
        * Storage type for gradients. The layout of data is the same as for the
        * #ShapeVector data type.
        */
-      typedef dealii::Table<2, Tensor<1, spacedim>> GradientVector;
+      using GradientVector = dealii::Table<2, Tensor<1, spacedim>>;
 
       /**
        * Likewise for second order derivatives.
        */
-      typedef dealii::Table<2, Tensor<2, spacedim>> HessianVector;
+      using HessianVector = dealii::Table<2, Tensor<2, spacedim>>;
 
       /**
        * And the same also applies to the third order derivatives.
        */
-      typedef dealii::Table<2, Tensor<3, spacedim>> ThirdDerivativeVector;
+      using ThirdDerivativeVector = dealii::Table<2, Tensor<3, spacedim>>;
 
       /**
        * Store the values of the shape functions at the quadrature points. See

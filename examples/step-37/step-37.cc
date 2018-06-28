@@ -246,7 +246,7 @@ namespace Step37
         Base<dim, LinearAlgebra::distributed::Vector<number>>
   {
   public:
-    typedef number value_type;
+    using value_type = number;
 
     LaplaceOperator();
 
@@ -719,13 +719,13 @@ namespace Step37
     DoFHandler<dim> dof_handler;
 
     ConstraintMatrix constraints;
-    typedef LaplaceOperator<dim, degree_finite_element, double>
-                     SystemMatrixType;
+    using SystemMatrixType =
+      LaplaceOperator<dim, degree_finite_element, double>;
     SystemMatrixType system_matrix;
 
     MGConstrainedDoFs mg_constrained_dofs;
-    typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
-    MGLevelObject<LevelMatrixType>                             mg_matrices;
+    using LevelMatrixType = LaplaceOperator<dim, degree_finite_element, float>;
+    MGLevelObject<LevelMatrixType> mg_matrices;
 
     LinearAlgebra::distributed::Vector<double> solution;
     LinearAlgebra::distributed::Vector<double> system_rhs;
@@ -1014,9 +1014,9 @@ namespace Step37
     // methods. The former involves only local communication between neighbors
     // in the (coarse) mesh, whereas the latter requires global communication
     // over all processors.
-    typedef PreconditionChebyshev<LevelMatrixType,
-                                  LinearAlgebra::distributed::Vector<float>>
-      SmootherType;
+    using SmootherType =
+      PreconditionChebyshev<LevelMatrixType,
+                            LinearAlgebra::distributed::Vector<float>>;
     mg::SmootherRelaxation<SmootherType,
                            LinearAlgebra::distributed::Vector<float>>
                                                          mg_smoother;

@@ -45,9 +45,9 @@ namespace numbers
         const std::function<adouble(const adouble &, const adouble &)>
           &comparator)
       {
-        typedef typename Differentiation::AD::NumberTraits<
+        using ad_type = typename Differentiation::AD::NumberTraits<
           double,
-          Differentiation::AD::NumberTypes::adolc_taped>::ad_type ad_type;
+          Differentiation::AD::NumberTypes::adolc_taped>::ad_type;
         static_assert(
           std::is_same<adouble, ad_type>::value,
           "The type of the AD number is not that which was expected.");

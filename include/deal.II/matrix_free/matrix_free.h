@@ -113,10 +113,10 @@ class MatrixFree : public Subscriptor
 {
 public:
   /**
-   * A typedef for the underlying number type specified by the template
+   * An alias for the underlying number type specified by the template
    * argument.
    */
-  typedef Number value_type;
+  using value_type = Number;
 
   /**
    * The dimension set by the template argument `dim`.
@@ -2311,8 +2311,8 @@ template <int dim, typename Number>
 AlignedVector<VectorizedArray<Number>> *
 MatrixFree<dim, Number>::acquire_scratch_data() const
 {
-  typedef std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>
-             list_type;
+  using list_type =
+    std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>;
   list_type &data = scratch_pad.get();
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
     if (it->first == false)
@@ -2332,8 +2332,8 @@ void
 MatrixFree<dim, Number>::release_scratch_data(
   const AlignedVector<VectorizedArray<Number>> *scratch) const
 {
-  typedef std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>
-             list_type;
+  using list_type =
+    std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>;
   list_type &data = scratch_pad.get();
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
     if (&it->second == scratch)
@@ -3600,14 +3600,14 @@ namespace internal
     struct InterfaceSelector
     {};
 
-    // Version of constant functions
+    // Version for constant functions
     template <typename MF,
               typename InVector,
               typename OutVector,
               typename Container>
     struct InterfaceSelector<MF, InVector, OutVector, Container, true>
     {
-      typedef void (Container::*function_type)(
+      using function_type = void (Container::*)(
         const MF &,
         OutVector &,
         const InVector &,
@@ -3621,11 +3621,11 @@ namespace internal
               typename Container>
     struct InterfaceSelector<MF, InVector, OutVector, Container, false>
     {
-      typedef void (Container::*function_type)(
-        const MF &,
-        OutVector &,
-        const InVector &,
-        const std::pair<unsigned int, unsigned int> &);
+      using function_type =
+        void (Container::*)(const MF &,
+                            OutVector &,
+                            const InVector &,
+                            const std::pair<unsigned int, unsigned int> &);
     };
   } // namespace MatrixFreeFunctions
 
@@ -3641,10 +3641,10 @@ namespace internal
   class MFWorker : public MFWorkerInterface
   {
   public:
-    // A typedef to make the arguments further down more readable
-    typedef typename MatrixFreeFunctions::
+    // An alias to make the arguments further down more readable
+    using function_type = typename MatrixFreeFunctions::
       InterfaceSelector<MF, InVector, OutVector, Container, is_constant>::
-        function_type function_type;
+        function_type;
 
     // constructor, binds all the arguments to this class
     MFWorker(const MF &                           matrix_free,
@@ -3777,11 +3777,11 @@ namespace internal
   template <class MF, typename InVector, typename OutVector>
   struct MFClassWrapper
   {
-    typedef std::function<void(const MF &,
-                               OutVector &,
-                               const InVector &,
-                               const std::pair<unsigned int, unsigned int> &)>
-      function_type;
+    using function_type =
+      std::function<void(const MF &,
+                         OutVector &,
+                         const InVector &,
+                         const std::pair<unsigned int, unsigned int> &)>;
 
     MFClassWrapper(const function_type cell,
                    const function_type face,
@@ -3844,8 +3844,8 @@ MatrixFree<dim, Number>::cell_loop(
   const InVector &src,
   const bool      zero_dst_vector) const
 {
-  typedef internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector>
-          Wrapper;
+  using Wrapper =
+    internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector>;
   Wrapper wrap(cell_operation, nullptr, nullptr);
   internal::
     MFWorker<MatrixFree<dim, Number>, InVector, OutVector, Wrapper, true>
@@ -3888,8 +3888,8 @@ MatrixFree<dim, Number>::loop(
   const DataAccessOnFaces dst_vector_face_access,
   const DataAccessOnFaces src_vector_face_access) const
 {
-  typedef internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector>
-          Wrapper;
+  using Wrapper =
+    internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector>;
   Wrapper wrap(cell_operation, face_operation, boundary_operation);
   internal::
     MFWorker<MatrixFree<dim, Number>, InVector, OutVector, Wrapper, true>

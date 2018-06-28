@@ -46,8 +46,8 @@ namespace internal
   template <typename VectorType>
   struct MatrixSelector
   {
-    typedef ::dealii::SparsityPattern                               Sparsity;
-    typedef ::dealii::SparseMatrix<typename VectorType::value_type> Matrix;
+    using Sparsity = ::dealii::SparsityPattern;
+    using Matrix   = ::dealii::SparseMatrix<typename VectorType::value_type>;
 
     static const bool requires_distributed_sparsity_pattern = false;
 
@@ -69,8 +69,8 @@ namespace internal
   template <typename Number>
   struct MatrixSelector<LinearAlgebra::distributed::Vector<Number>>
   {
-    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
-    typedef ::dealii::TrilinosWrappers::SparseMatrix    Matrix;
+    using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
+    using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;
 
     static const bool requires_distributed_sparsity_pattern = false;
 
@@ -102,8 +102,8 @@ namespace internal
   template <>
   struct MatrixSelector<dealii::TrilinosWrappers::MPI::Vector>
   {
-    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
-    typedef ::dealii::TrilinosWrappers::SparseMatrix    Matrix;
+    using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
+    using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;
 
     static const bool requires_distributed_sparsity_pattern = false;
 
@@ -135,8 +135,8 @@ namespace internal
   template <>
   struct MatrixSelector<dealii::LinearAlgebra::EpetraWrappers::Vector>
   {
-    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
-    typedef ::dealii::TrilinosWrappers::SparseMatrix    Matrix;
+    using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
+    using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;
 
     static const bool requires_distributed_sparsity_pattern = false;
 
@@ -170,8 +170,8 @@ namespace internal
   template <typename Number>
   struct MatrixSelector<LinearAlgebra::distributed::Vector<Number>>
   {
-    typedef ::dealii::SparsityPattern      Sparsity;
-    typedef ::dealii::SparseMatrix<Number> Matrix;
+    using Sparsity = ::dealii::SparsityPattern;
+    using Matrix   = ::dealii::SparseMatrix<Number>;
 
     static const bool requires_distributed_sparsity_pattern = false;
 
@@ -197,8 +197,8 @@ namespace internal
   template <>
   struct MatrixSelector<dealii::PETScWrappers::MPI::Vector>
   {
-    typedef ::dealii::DynamicSparsityPattern           Sparsity;
-    typedef ::dealii::PETScWrappers::MPI::SparseMatrix Matrix;
+    using Sparsity = ::dealii::DynamicSparsityPattern;
+    using Matrix   = ::dealii::PETScWrappers::MPI::SparseMatrix;
 
     static const bool requires_distributed_sparsity_pattern = true;
 

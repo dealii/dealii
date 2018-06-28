@@ -76,7 +76,7 @@ namespace internal
   template <class NumberType>
   struct CurlType<1, NumberType>
   {
-    typedef Tensor<1, 1, NumberType> type;
+    using type = Tensor<1, 1, NumberType>;
   };
 
   /**
@@ -88,7 +88,7 @@ namespace internal
   template <class NumberType>
   struct CurlType<2, NumberType>
   {
-    typedef Tensor<1, 1, NumberType> type;
+    using type = Tensor<1, 1, NumberType>;
   };
 
   /**
@@ -100,7 +100,7 @@ namespace internal
   template <class NumberType>
   struct CurlType<3, NumberType>
   {
-    typedef Tensor<1, 3, NumberType> type;
+    using type = Tensor<1, 3, NumberType>;
   };
 } // namespace internal
 
@@ -145,32 +145,32 @@ namespace FEValuesViews
   {
   public:
     /**
-     * A typedef for the data type of values of the view this class
+     * An alias for the data type of values of the view this class
      * represents. Since we deal with a single components, the value type is a
      * scalar double.
      */
-    typedef double value_type;
+    using value_type = double;
 
     /**
-     * A typedef for the type of gradients of the view this class represents.
+     * An alias for the type of gradients of the view this class represents.
      * Here, for a scalar component of the finite element, the gradient is a
      * <code>Tensor@<1,dim@></code>.
      */
-    typedef dealii::Tensor<1, spacedim> gradient_type;
+    using gradient_type = dealii::Tensor<1, spacedim>;
 
     /**
-     * A typedef for the type of second derivatives of the view this class
+     * An alias for the type of second derivatives of the view this class
      * represents. Here, for a scalar component of the finite element, the
      * Hessian is a <code>Tensor@<2,dim@></code>.
      */
-    typedef dealii::Tensor<2, spacedim> hessian_type;
+    using hessian_type = dealii::Tensor<2, spacedim>;
 
     /**
-     * A typedef for the type of third derivatives of the view this class
+     * An alias for the type of third derivatives of the view this class
      * represents. Here, for a scalar component of the finite element, the
      * Third derivative is a <code>Tensor@<3,dim@></code>.
      */
-    typedef dealii::Tensor<3, spacedim> third_derivative_type;
+    using third_derivative_type = dealii::Tensor<3, spacedim>;
 
     /**
      * A struct that provides the output type for the product of the value
@@ -180,48 +180,44 @@ namespace FEValuesViews
     struct OutputType
     {
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * values of the view the Scalar class.
        */
-      typedef
+      using value_type =
         typename ProductType<Number,
-                             typename Scalar<dim, spacedim>::value_type>::type
-          value_type;
+                             typename Scalar<dim, spacedim>::value_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * gradients of the view the Scalar class.
        */
-      typedef typename ProductType<
+      using gradient_type = typename ProductType<
         Number,
-        typename Scalar<dim, spacedim>::gradient_type>::type gradient_type;
+        typename Scalar<dim, spacedim>::gradient_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * laplacians of the view the Scalar class.
        */
-      typedef
+      using laplacian_type =
         typename ProductType<Number,
-                             typename Scalar<dim, spacedim>::value_type>::type
-          laplacian_type;
+                             typename Scalar<dim, spacedim>::value_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * hessians of the view the Scalar class.
        */
-      typedef
-        typename ProductType<Number,
-                             typename Scalar<dim, spacedim>::hessian_type>::type
-          hessian_type;
+      using hessian_type = typename ProductType<
+        Number,
+        typename Scalar<dim, spacedim>::hessian_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * third derivatives of the view the Scalar class.
        */
-      typedef typename ProductType<
+      using third_derivative_type = typename ProductType<
         Number,
-        typename Scalar<dim, spacedim>::third_derivative_type>::type
-        third_derivative_type;
+        typename Scalar<dim, spacedim>::third_derivative_type>::type;
     };
 
     /**
@@ -585,24 +581,24 @@ namespace FEValuesViews
   {
   public:
     /**
-     * A typedef for the data type of values of the view this class
+     * An alias for the data type of values of the view this class
      * represents. Since we deal with a set of <code>dim</code> components,
      * the value type is a Tensor<1,spacedim>.
      */
-    typedef dealii::Tensor<1, spacedim> value_type;
+    using value_type = dealii::Tensor<1, spacedim>;
 
     /**
-     * A typedef for the type of gradients of the view this class represents.
+     * An alias for the type of gradients of the view this class represents.
      * Here, for a set of <code>dim</code> components of the finite element,
      * the gradient is a <code>Tensor@<2,spacedim@></code>.
      *
      * See the general documentation of this class for how exactly the
      * gradient of a vector is defined.
      */
-    typedef dealii::Tensor<2, spacedim> gradient_type;
+    using gradient_type = dealii::Tensor<2, spacedim>;
 
     /**
-     * A typedef for the type of symmetrized gradients of the view this class
+     * An alias for the type of symmetrized gradients of the view this class
      * represents. Here, for a set of <code>dim</code> components of the
      * finite element, the symmetrized gradient is a
      * <code>SymmetricTensor@<2,spacedim@></code>.
@@ -611,36 +607,36 @@ namespace FEValuesViews
      * $\varepsilon(\mathbf v)=\frac 12 (\nabla \mathbf v + \nabla \mathbf
      * v^T)$.
      */
-    typedef dealii::SymmetricTensor<2, spacedim> symmetric_gradient_type;
+    using symmetric_gradient_type = dealii::SymmetricTensor<2, spacedim>;
 
     /**
-     * A typedef for the type of the divergence of the view this class
+     * An alias for the type of the divergence of the view this class
      * represents. Here, for a set of <code>dim</code> components of the
      * finite element, the divergence of course is a scalar.
      */
-    typedef double divergence_type;
+    using divergence_type = double;
 
     /**
-     * A typedef for the type of the curl of the view this class represents.
+     * An alias for the type of the curl of the view this class represents.
      * Here, for a set of <code>spacedim=2</code> components of the finite
      * element, the curl is a <code>Tensor@<1, 1@></code>. For
      * <code>spacedim=3</code> it is a <code>Tensor@<1, dim@></code>.
      */
-    typedef typename dealii::internal::CurlType<spacedim>::type curl_type;
+    using curl_type = typename dealii::internal::CurlType<spacedim>::type;
 
     /**
-     * A typedef for the type of second derivatives of the view this class
+     * An alias for the type of second derivatives of the view this class
      * represents. Here, for a set of <code>dim</code> components of the
      * finite element, the Hessian is a <code>Tensor@<3,dim@></code>.
      */
-    typedef dealii::Tensor<3, spacedim> hessian_type;
+    using hessian_type = dealii::Tensor<3, spacedim>;
 
     /**
-     * A typedef for the type of third derivatives of the view this class
+     * An alias for the type of third derivatives of the view this class
      * represents. Here, for a set of <code>dim</code> components of the
      * finite element, the third derivative is a <code>Tensor@<4,dim@></code>.
      */
-    typedef dealii::Tensor<4, spacedim> third_derivative_type;
+    using third_derivative_type = dealii::Tensor<4, spacedim>;
 
     /**
      * A struct that provides the output type for the product of the value
@@ -650,74 +646,68 @@ namespace FEValuesViews
     struct OutputType
     {
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * values of the view the Vector class.
        */
-      typedef
+      using value_type =
         typename ProductType<Number,
-                             typename Vector<dim, spacedim>::value_type>::type
-          value_type;
+                             typename Vector<dim, spacedim>::value_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * gradients of the view the Vector class.
        */
-      typedef typename ProductType<
+      using gradient_type = typename ProductType<
         Number,
-        typename Vector<dim, spacedim>::gradient_type>::type gradient_type;
+        typename Vector<dim, spacedim>::gradient_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * symmetric gradients of the view the Vector class.
        */
-      typedef typename ProductType<
+      using symmetric_gradient_type = typename ProductType<
         Number,
-        typename Vector<dim, spacedim>::symmetric_gradient_type>::type
-        symmetric_gradient_type;
+        typename Vector<dim, spacedim>::symmetric_gradient_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * divergences of the view the Vector class.
        */
-      typedef typename ProductType<
+      using divergence_type = typename ProductType<
         Number,
-        typename Vector<dim, spacedim>::divergence_type>::type divergence_type;
+        typename Vector<dim, spacedim>::divergence_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * laplacians of the view the Vector class.
        */
-      typedef
+      using laplacian_type =
         typename ProductType<Number,
-                             typename Vector<dim, spacedim>::value_type>::type
-          laplacian_type;
+                             typename Vector<dim, spacedim>::value_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * curls of the view the Vector class.
        */
-      typedef
+      using curl_type =
         typename ProductType<Number,
-                             typename Vector<dim, spacedim>::curl_type>::type
-          curl_type;
+                             typename Vector<dim, spacedim>::curl_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * hessians of the view the Vector class.
        */
-      typedef
-        typename ProductType<Number,
-                             typename Vector<dim, spacedim>::hessian_type>::type
-          hessian_type;
+      using hessian_type = typename ProductType<
+        Number,
+        typename Vector<dim, spacedim>::hessian_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * third derivatives of the view the Vector class.
        */
-      typedef typename ProductType<
+      using third_derivative_type = typename ProductType<
         Number,
-        typename Vector<dim, spacedim>::third_derivative_type>::type
-        third_derivative_type;
+        typename Vector<dim, spacedim>::third_derivative_type>::type;
     };
 
     /**
@@ -1267,15 +1257,15 @@ namespace FEValuesViews
   {
   public:
     /**
-     * A typedef for the data type of values of the view this class
+     * An alias for the data type of values of the view this class
      * represents. Since we deal with a set of <code>(dim*dim + dim)/2</code>
      * components (i.e. the unique components of a symmetric second-order
      * tensor), the value type is a SymmetricTensor<2,spacedim>.
      */
-    typedef dealii::SymmetricTensor<2, spacedim> value_type;
+    using value_type = dealii::SymmetricTensor<2, spacedim>;
 
     /**
-     * A typedef for the type of the divergence of the view this class
+     * An alias for the type of the divergence of the view this class
      * represents. Here, for a set of <code>(dim*dim + dim)/2</code> unique
      * components of the finite element representing a symmetric second-order
      * tensor, the divergence of course is a * <code>Tensor@<1,dim@></code>.
@@ -1283,7 +1273,7 @@ namespace FEValuesViews
      * See the general discussion of this class for a definition of the
      * divergence.
      */
-    typedef dealii::Tensor<1, spacedim> divergence_type;
+    using divergence_type = dealii::Tensor<1, spacedim>;
 
     /**
      * A struct that provides the output type for the product of the value
@@ -1293,22 +1283,20 @@ namespace FEValuesViews
     struct OutputType
     {
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * values of the view the SymmetricTensor class.
        */
-      typedef typename ProductType<
+      using value_type = typename ProductType<
         Number,
-        typename SymmetricTensor<2, dim, spacedim>::value_type>::type
-        value_type;
+        typename SymmetricTensor<2, dim, spacedim>::value_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * divergences of the view the SymmetricTensor class.
        */
-      typedef typename ProductType<
+      using divergence_type = typename ProductType<
         Number,
-        typename SymmetricTensor<2, dim, spacedim>::divergence_type>::type
-        divergence_type;
+        typename SymmetricTensor<2, dim, spacedim>::divergence_type>::type;
     };
 
     /**
@@ -1560,18 +1548,18 @@ namespace FEValuesViews
      * Data type for what you get when you apply an extractor of this kind to
      * a vector-valued finite element.
      */
-    typedef dealii::Tensor<2, spacedim> value_type;
+    using value_type = dealii::Tensor<2, spacedim>;
 
     /**
      * Data type for taking the divergence of a tensor: a vector.
      */
-    typedef dealii::Tensor<1, spacedim> divergence_type;
+    using divergence_type = dealii::Tensor<1, spacedim>;
 
     /**
      * Data type for taking the gradient of a second order tensor: a third order
      * tensor.
      */
-    typedef dealii::Tensor<3, spacedim> gradient_type;
+    using gradient_type = dealii::Tensor<3, spacedim>;
 
     /**
      * A struct that provides the output type for the product of the value
@@ -1581,29 +1569,28 @@ namespace FEValuesViews
     struct OutputType
     {
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * values of the view the Tensor class.
        */
-      typedef typename ProductType<
+      using value_type = typename ProductType<
         Number,
-        typename Tensor<2, dim, spacedim>::value_type>::type value_type;
+        typename Tensor<2, dim, spacedim>::value_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * divergences of the view the Tensor class.
        */
-      typedef typename ProductType<
+      using divergence_type = typename ProductType<
         Number,
-        typename Tensor<2, dim, spacedim>::divergence_type>::type
-        divergence_type;
+        typename Tensor<2, dim, spacedim>::divergence_type>::type;
 
       /**
-       * A typedef for the data type of the product of a @p Number and the
+       * An alias for the data type of the product of a @p Number and the
        * gradient of the view the Tensor class.
        */
-      typedef typename ProductType<
+      using gradient_type = typename ProductType<
         Number,
-        typename Tensor<2, dim, spacedim>::gradient_type>::type gradient_type;
+        typename Tensor<2, dim, spacedim>::gradient_type>::type;
     };
 
     /**

@@ -335,20 +335,19 @@ following tutorial programs.
 
 <h3> A note on types </h3>
 
-deal.II defines a number of integral %types via <code>typedef</code>s in
-namespace types. In particular, in this program you will see
-types::global_dof_index in a couple of places: an integer type that is used to
-denote the <i>global</i> index of a degree of freedom, i.e., the index of a
-particular degree of freedom within the DoFHandler object that is defined on
-top of a triangulation (as opposed to the index of a particular degree of
-freedom within a particular cell). For the current program
-(as well as almost all of the tutorial programs), you will have a few thousand
-to maybe a few million unknowns globally (and, for $Q_1$ elements, you will
-have 4 <i>locally on each cell</i> in 2d and 8 in 3d). Consequently, a data
-type that allows to store sufficiently large numbers for global DoF indices is
-<code>unsigned int</code> given that it allows to store numbers between 0 and
-slightly more than 4 billion (on most systems, where integers are 32-bit). In
-fact, this is what types::global_dof_index is.
+deal.II defines a number of integral %types via alias in namespace types. In
+particular, in this program you will see types::global_dof_index in a couple of
+places: an integer type that is used to denote the <i>global</i> index of a
+degree of freedom, i.e., the index of a particular degree of freedom within the
+DoFHandler object that is defined on top of a triangulation (as opposed to the
+index of a particular degree of freedom within a particular cell). For the
+current program (as well as almost all of the tutorial programs), you will have
+a few thousand to maybe a few million unknowns globally (and, for $Q_1$
+elements, you will have 4 <i>locally on each cell</i> in 2d and 8 in 3d).
+Consequently, a data type that allows to store sufficiently large numbers for
+global DoF indices is <code>unsigned int</code> given that it allows to store
+numbers between 0 and slightly more than 4 billion (on most systems, where
+integers are 32-bit). In fact, this is what types::global_dof_index is.
 
 So, why not just use <code>unsigned int</code> right away? deal.II used to do
 this until version 7.3. However, deal.II supports very large computations (via
@@ -392,13 +391,12 @@ global indices of those degrees of freedom locally defined on the current
 cell" -- but variables that hold this information are universally named this
 way throughout the library.
 
-@note types::global_dof_index is not the only type defined in this
-namespace. Rather, there is a whole family, including types::subdomain_id,
-types::boundary_id, and types::material_id. All of these are
-<code>typedef</code>s for integer data types but, as explained above, they are
-used throughout the library so that (i) the intent of a variable becomes more
-easily discerned, and (ii) so that it becomes possible to change the actual
-type to a larger one if necessary without having to go through the entire
-library and figure out whether a particular use of <code>unsigned int</code>
-corresponds to, say, a material indicator.
+@note types::global_dof_index is not the only type defined in this namespace.
+Rather, there is a whole family, including types::subdomain_id,
+types::boundary_id, and types::material_id. All of these are alias for integer
+data types but, as explained above, they are used throughout the library so that
+(i) the intent of a variable becomes more easily discerned, and (ii) so that it
+becomes possible to change the actual type to a larger one if necessary without
+having to go through the entire library and figure out whether a particular use
+of <code>unsigned int</code> corresponds to, say, a material indicator.
 

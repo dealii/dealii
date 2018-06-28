@@ -111,7 +111,7 @@ namespace TrilinosWrappers
       /**
        * Declare the type for container size.
        */
-      typedef dealii::types::global_dof_index size_type;
+      using size_type = dealii::types::global_dof_index;
 
       /**
        * Constructor.
@@ -221,7 +221,7 @@ namespace TrilinosWrappers
        * Typedef for the type (including constness) of the matrix to be used
        * here.
        */
-      typedef const SparseMatrix MatrixType;
+      using MatrixType = const SparseMatrix;
 
       /**
        * Constructor. Since we use accessors only for read access, a const
@@ -312,7 +312,7 @@ namespace TrilinosWrappers
        * Typedef for the type (including constness) of the matrix to be used
        * here.
        */
-      typedef SparseMatrix MatrixType;
+      using MatrixType = SparseMatrix;
 
       /**
        * Constructor. Since we use accessors only for read access, a const
@@ -359,13 +359,13 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef dealii::types::global_dof_index size_type;
+      using size_type = dealii::types::global_dof_index;
 
       /**
        * Typedef for the matrix type (including constness) we are to operate
        * on.
        */
-      typedef typename Accessor<Constness>::MatrixType MatrixType;
+      using MatrixType = typename Accessor<Constness>::MatrixType;
 
       /**
        * Constructor. Create an iterator into the matrix @p matrix for the
@@ -517,7 +517,7 @@ namespace TrilinosWrappers
     /**
      * Declare the type for container size.
      */
-    typedef dealii::types::global_dof_index size_type;
+    using size_type = dealii::types::global_dof_index;
 
     /**
      * Exception
@@ -546,19 +546,19 @@ namespace TrilinosWrappers
     };
 
     /**
-     * Declare a typedef for the iterator class.
+     * Declare an alias for the iterator class.
      */
-    typedef SparseMatrixIterators::Iterator<false> iterator;
+    using iterator = SparseMatrixIterators::Iterator<false>;
 
     /**
-     * Declare a typedef for the const iterator class.
+     * Declare an alias for the const iterator class.
      */
-    typedef SparseMatrixIterators::Iterator<true> const_iterator;
+    using const_iterator = SparseMatrixIterators::Iterator<true>;
 
     /**
-     * Declare a typedef in analogy to all the other container classes.
+     * Declare an alias in analogy to all the other container classes.
      */
-    typedef TrilinosScalar value_type;
+    using value_type = TrilinosScalar;
 
     /**
      * @name Constructors and initialization.
@@ -2244,17 +2244,17 @@ namespace TrilinosWrappers
         /**
          * Definition for the internally supported vector type.
          */
-        typedef Epetra_MultiVector VectorType;
+        using VectorType = Epetra_MultiVector;
 
         /**
          * Definition for the vector type for the domain space of the operator.
          */
-        typedef VectorType Range;
+        using Range = VectorType;
 
         /**
          * Definition for the vector type for the range space of the operator.
          */
-        typedef VectorType Domain;
+        using Domain = VectorType;
 
         /**
          * @name Constructors / destructor

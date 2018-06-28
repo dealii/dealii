@@ -100,9 +100,9 @@ class SolverSelector : public Subscriptor
 {
 public:
   /**
-   * A typedef for the underlying vector type
+   * An alias for the underlying vector type
    */
-  typedef VectorType vector_type;
+  using vector_type = VectorType;
 
   /**
    * Constructor, filling in default values

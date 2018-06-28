@@ -150,8 +150,8 @@ public:
     f_cycle
   };
 
-  typedef VectorType       vector_type;
-  typedef const VectorType const_vector_type;
+  using vector_type       = VectorType;
+  using const_vector_type = const VectorType;
 
   /**
    * Constructor. The DoFHandler is used to check whether the provided

@@ -66,8 +66,8 @@ namespace LinearAlgebra
                  public VectorSpaceVector<Number>
   {
   public:
-    typedef types::global_dof_index                      size_type;
-    typedef typename ReadWriteVector<Number>::value_type value_type;
+    using size_type  = types::global_dof_index;
+    using value_type = typename ReadWriteVector<Number>::value_type;
 
     /**
      * Constructor. Create a vector of dimension zero.

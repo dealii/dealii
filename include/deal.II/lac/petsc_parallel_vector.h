@@ -161,7 +161,7 @@ namespace PETScWrappers
       /**
        * Declare type for container size.
        */
-      typedef types::global_dof_index size_type;
+      using size_type = types::global_dof_index;
 
       /**
        * Default constructor. Initialize the vector as empty.

@@ -486,10 +486,13 @@ namespace IteratorFilters
  *
  * The same can be achieved by the following snippet, though harder to read:
  * @code
- *   typedef FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
- * FI; n_flagged_cells = std::distance (FI(IteratorFilters::UserFlagSet())
- *                            .set_to_next_positive(tria.begin_active()),
- *                     FI(IteratorFilters::UserFlagSet(), tria.end()));
+ *   using FI =
+ *     FilteredIterator<typename Triangulation<dim>::active_cell_iterator>;
+ *   n_flagged_cells =
+ *     std::distance (
+ *       FI(IteratorFilters::UserFlagSet()).set_to_next_positive(
+ *         tria.begin_active()),
+ *       FI(IteratorFilters::UserFlagSet(), tria.end()));
  * @endcode
  * It relies on the fact that if we create an unnamed filtered iterator with a
  * given predicate but no iterator value and assign it the next positive value
@@ -526,7 +529,7 @@ public:
   /**
    * Typedef to the accessor type of the underlying iterator.
    */
-  typedef typename BaseIterator::AccessorType AccessorType;
+  using AccessorType = typename BaseIterator::AccessorType;
 
   /**
    * Constructor. Set the iterator to the default state and use the given
@@ -812,16 +815,15 @@ namespace internal
     template <typename BaseIterator, typename Predicate>
     struct NestFilteredIterators<BaseIterator, std::tuple<Predicate>>
     {
-      typedef ::dealii::FilteredIterator<BaseIterator> type;
+      using type = ::dealii::FilteredIterator<BaseIterator>;
     };
 
     template <typename BaseIterator, typename Predicate, typename... Targs>
     struct NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>
     {
-      typedef ::dealii::FilteredIterator<
+      using type = ::dealii::FilteredIterator<
         typename NestFilteredIterators<BaseIterator,
-                                       std::tuple<Targs...>>::type>
-        type;
+                                       std::tuple<Targs...>>::type>;
     };
   } // namespace FilteredIteratorImplementation
 } // namespace internal

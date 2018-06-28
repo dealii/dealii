@@ -354,12 +354,11 @@ namespace GridTools
 #endif
     {
 #ifndef _MSC_VER
-      typedef
-        typename MeshType<dim, spacedim>::active_cell_iterator cell_iterator;
+      using cell_iterator =
+        typename MeshType<dim, spacedim>::active_cell_iterator;
 #else
-      typedef typename dealii::internal::
-        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
-          cell_iterator;
+      using cell_iterator = typename dealii::internal::
+        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type;
 #endif
 
       // update the searched cells
@@ -423,9 +422,8 @@ namespace GridTools
       const std::vector<bool> &      marked_vertices,
       const double                   tolerance)
     {
-      typedef typename dealii::internal::
-        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
-          active_cell_iterator;
+      using active_cell_iterator = typename dealii::internal::
+        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type;
 
       // The best distance is set to the
       // maximum allowable distance from
@@ -1154,10 +1152,8 @@ namespace GridTools
     // non-active cells, we will get to
     // the later on for further
     // consideration
-    typedef std::list<std::pair<typename MeshType::cell_iterator,
-                                typename MeshType::cell_iterator>>
-      CellList;
-
+    using CellList = std::list<std::pair<typename MeshType::cell_iterator,
+                                         typename MeshType::cell_iterator>>;
     CellList cell_list;
 
     // first push the coarse level cells
@@ -1275,8 +1271,8 @@ namespace GridTools
                       "or size equal to the number of elements in "
                       "the FECollection."));
 
-    typedef typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-      cell_iterator;
+    using cell_iterator =
+      typename hp::DoFHandler<dim, spacedim>::active_cell_iterator;
 
     std::pair<cell_iterator, Point<dim>> best_cell;
     // If we have only one element in the MappingCollection,
@@ -2056,9 +2052,8 @@ namespace GridTools
 
     // Match with a complexity of O(n^2). This could be improved...
     std::bitset<3> orientation;
-    typedef
-      typename std::set<std::pair<CellIterator, unsigned int>>::const_iterator
-        PairIterator;
+    using PairIterator =
+      typename std::set<std::pair<CellIterator, unsigned int>>::const_iterator;
     for (PairIterator it1 = pairs1.begin(); it1 != pairs1.end(); ++it1)
       {
         for (PairIterator it2 = pairs2.begin(); it2 != pairs2.end(); ++it2)
@@ -2303,8 +2298,8 @@ namespace GridTools
   template <>
   struct OrientationLookupTable<1>
   {
-    typedef std::array<unsigned int, GeometryInfo<1>::vertices_per_face>
-      MATCH_T;
+    using MATCH_T =
+      std::array<unsigned int, GeometryInfo<1>::vertices_per_face>;
     static inline std::bitset<3>
     lookup(const MATCH_T &)
     {
@@ -2316,8 +2311,8 @@ namespace GridTools
   template <>
   struct OrientationLookupTable<2>
   {
-    typedef std::array<unsigned int, GeometryInfo<2>::vertices_per_face>
-      MATCH_T;
+    using MATCH_T =
+      std::array<unsigned int, GeometryInfo<2>::vertices_per_face>;
     static inline std::bitset<3>
     lookup(const MATCH_T &matching)
     {
@@ -2342,8 +2337,8 @@ namespace GridTools
   template <>
   struct OrientationLookupTable<3>
   {
-    typedef std::array<unsigned int, GeometryInfo<3>::vertices_per_face>
-      MATCH_T;
+    using MATCH_T =
+      std::array<unsigned int, GeometryInfo<3>::vertices_per_face>;
     static inline std::bitset<3>
     lookup(const MATCH_T &matching)
     {

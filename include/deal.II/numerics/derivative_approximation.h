@@ -149,7 +149,7 @@ DEAL_II_NAMESPACE_OPEN
  * order derivatives than are presently implemented. Basically, only an
  * additional class along the lines of the derivative descriptor classes @p
  * Gradient and @p SecondDerivative has to be implemented, with the respective
- * typedefs and functions replaced by the appropriate analogues for the
+ * alias and functions replaced by the appropriate analogues for the
  * derivative that is to be approximated.
  *
  * @ingroup numerics

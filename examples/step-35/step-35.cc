@@ -872,8 +872,8 @@ namespace Step35
   // and compressing it. It is important to notice here that the gradient
   // operator acts from the pressure space into the velocity space, so we have
   // to deal with two different finite element spaces. To keep the loops
-  // synchronized, we use the <code>typedef</code>'s that we have defined
-  // before, namely <code>PairedIterators</code> and <code>IteratorPair</code>.
+  // synchronized, we use the alias that we have defined before, namely
+  // <code>PairedIterators</code> and <code>IteratorPair</code>.
   template <int dim>
   void NavierStokesProjection<dim>::initialize_gradient_operator()
   {

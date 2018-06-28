@@ -53,9 +53,9 @@ namespace LinearAlgebra
     class Vector : public VectorSpaceVector<Number>
     {
     public:
-      typedef typename VectorSpaceVector<Number>::value_type value_type;
-      typedef typename VectorSpaceVector<Number>::size_type  size_type;
-      typedef typename VectorSpaceVector<Number>::real_type  real_type;
+      using value_type = typename VectorSpaceVector<Number>::value_type;
+      using size_type  = typename VectorSpaceVector<Number>::size_type;
+      using real_type  = typename VectorSpaceVector<Number>::real_type;
 
       /**
        * Constructor. Create a vector of dimension zero.

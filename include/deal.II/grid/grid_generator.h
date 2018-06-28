@@ -1184,9 +1184,9 @@ namespace GridGenerator
   template <template <int, int> class MeshType, int dim, int spacedim>
   struct ExtractBoundaryMesh
   {
-    typedef std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
-                     typename MeshType<dim, spacedim>::face_iterator>
-      return_type;
+    using return_type =
+      std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
+               typename MeshType<dim, spacedim>::face_iterator>;
   };
 #endif
 

@@ -102,7 +102,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef typename MatrixType::size_type size_type;
+  using size_type = typename MatrixType::size_type;
 
   /**
    * Constructor. @p omega denotes the damping parameter of the

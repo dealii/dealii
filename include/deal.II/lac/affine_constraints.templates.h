@@ -1905,7 +1905,7 @@ namespace internal
 {
   namespace AffineConstraintsImplementation
   {
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     template <class VectorType>
     void
@@ -2301,8 +2301,8 @@ AffineConstraints<number>::distribute(VectorType &vec) const
       // following.
       IndexSet needed_elements = vec_owned_elements;
 
-      typedef typename std::vector<ConstraintLine>::const_iterator
-        constraint_iterator;
+      using constraint_iterator =
+        typename std::vector<ConstraintLine>::const_iterator;
       for (constraint_iterator it = lines.begin(); it != lines.end(); ++it)
         if (vec_owned_elements.is_element(it->index))
           for (unsigned int i = 0; i < it->entries.size(); ++i)
@@ -2367,7 +2367,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
 // Some helper definitions for the local_to_global functions.
 namespace internals
 {
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   // this struct contains all the information we need to store about each of
   // the global entries (global_row): are they obtained directly by some local
@@ -2742,9 +2742,9 @@ namespace internals
                                             const size_type local_row,
                                             const number    constraint_value)
   {
-    typedef std::vector<Distributing>::iterator index_iterator;
-    index_iterator                              pos, pos1;
-    Distributing                                row_value(global_row);
+    using index_iterator = std::vector<Distributing>::iterator;
+    index_iterator               pos, pos1;
+    Distributing                 row_value(global_row);
     std::pair<size_type, number> constraint(local_row, constraint_value);
 
     // check whether the list was really sorted before entering here
@@ -2972,7 +2972,7 @@ namespace internals
   {
     AssertDimension(block_starts.size(), block_object.n_block_rows() + 1);
 
-    typedef std::vector<Distributing>::iterator row_iterator;
+    using row_iterator         = std::vector<Distributing>::iterator;
     row_iterator block_indices = global_rows.total_row_indices.begin();
 
     const size_type num_blocks    = block_object.n_block_rows();
@@ -3008,8 +3008,8 @@ namespace internals
   {
     AssertDimension(block_starts.size(), block_object.n_block_rows() + 1);
 
-    typedef std::vector<size_type>::iterator row_iterator;
-    row_iterator                             col_indices = row_indices.begin();
+    using row_iterator       = std::vector<size_type>::iterator;
+    row_iterator col_indices = row_indices.begin();
 
     const size_type num_blocks = block_object.n_block_rows();
 

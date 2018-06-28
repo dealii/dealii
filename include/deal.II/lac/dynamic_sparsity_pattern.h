@@ -50,7 +50,7 @@ namespace DynamicSparsityPatternIterators
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Accessor class for iterators into objects of type DynamicSparsityPattern.
@@ -306,7 +306,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Typedef an for iterator class that allows to walk over all nonzero
@@ -315,13 +315,13 @@ public:
    * Since the iterator does not allow to modify the sparsity pattern, this
    * type is the same as that for @p const_iterator.
    */
-  typedef DynamicSparsityPatternIterators::Iterator iterator;
+  using iterator = DynamicSparsityPatternIterators::Iterator;
 
   /**
    * Typedef for an iterator class that allows to walk over all nonzero
    * elements of a sparsity pattern.
    */
-  typedef DynamicSparsityPatternIterators::Iterator const_iterator;
+  using const_iterator = DynamicSparsityPatternIterators::Iterator;
 
   /**
    * Initialize as an empty object. This is useful if you want such objects as

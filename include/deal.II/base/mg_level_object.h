@@ -286,7 +286,7 @@ std::size_t
 MGLevelObject<Object>::memory_consumption() const
 {
   std::size_t result = sizeof(*this);
-  typedef typename std::vector<std::shared_ptr<Object>>::const_iterator Iter;
+  using Iter = typename std::vector<std::shared_ptr<Object>>::const_iterator;
   const Iter end = objects.end();
   for (Iter o = objects.begin(); o != end; ++o)
     result += (*o)->memory_consumption();

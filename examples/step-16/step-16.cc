@@ -504,8 +504,8 @@ namespace Step16
     // (such as CG or GMRES). The mg::SmootherRelaxation and
     // MGSmootherPrecondition classes provide support for these two kinds of
     // smoothers. Here, we opt for the application of a single SOR
-    // iteration. To this end, we define an appropriate <code>typedef</code>
-    // and then setup a smoother object.
+    // iteration. To this end, we define an appropriate alias and then setup a
+    // smoother object.
     //
     // The last step is to initialize the smoother object with our level
     // matrices and to set some smoothing parameters.  The
@@ -523,7 +523,7 @@ namespace Step16
     // iteration (which requires a symmetric preconditioner) below, we need to
     // let the multilevel preconditioner make sure that we get a symmetric
     // operator even for nonsymmetric smoothers:
-    typedef PreconditionSOR<SparseMatrix<double>>    Smoother;
+    using Smoother = PreconditionSOR<SparseMatrix<double>>;
     mg::SmootherRelaxation<Smoother, Vector<double>> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);

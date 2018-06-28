@@ -74,7 +74,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Class holding various variables which are used to modify the output of
@@ -146,7 +146,7 @@ private:
    * Abbreviate the somewhat lengthy name for the dealii::DataOutBase::Patch
    * class.
    */
-  typedef DataOutBase::Patch<2, 2> Patch;
+  using Patch = DataOutBase::Patch<2, 2>;
 
   /**
    * This is a list of patches that is created each time build_patches() is

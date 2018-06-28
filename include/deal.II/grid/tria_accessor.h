@@ -116,7 +116,7 @@ namespace internal
     template <int dim>
     struct PresentLevelType<dim, dim>
     {
-      typedef int type;
+      using type = int;
     };
 
   } // namespace TriaAccessorImplementation
@@ -316,7 +316,7 @@ protected:
    * the iterator classes. Since the pure triangulation iterators need no
    * additional data, this data type is @p void.
    */
-  typedef void AccessorData;
+  using AccessorData = void;
 
   /**
    * Constructor. Protected, thus only callable from friend classes.
@@ -423,7 +423,7 @@ public:
    * accessor classes in a unified way, no matter what the type of number of
    * these parameters is.
    */
-  typedef void *LocalData;
+  using LocalData = void *;
 
   /**
    * @name Iterator address and state
@@ -553,10 +553,10 @@ class InvalidAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 {
 public:
   /**
-   * Propagate typedef from base class to this class.
+   * Propagate alias from base class to this class.
    */
-  typedef typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData
-    AccessorData;
+  using AccessorData =
+    typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData;
 
   /**
    * Constructor.  This class is used for iterators that do not make
@@ -676,10 +676,10 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 {
 public:
   /**
-   * Propagate typedef from base class to this class.
+   * Propagate alias from base class to this class.
    */
-  typedef typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData
-    AccessorData;
+  using AccessorData =
+    typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData;
 
   /**
    * Constructor.
@@ -1743,7 +1743,7 @@ public:
   /**
    * Pointer to internal data.
    */
-  typedef void AccessorData;
+  using AccessorData = void;
 
   /**
    * Constructor. The second argument is the global index of the vertex we
@@ -2124,7 +2124,7 @@ public:
   /**
    * Pointer to internal data.
    */
-  typedef void AccessorData;
+  using AccessorData = void;
 
   /**
    * Whether the vertex represented here is at the left end of the domain, the
@@ -2585,12 +2585,12 @@ public:
   /**
    * Propagate the AccessorData type into the present class.
    */
-  typedef typename TriaAccessor<dim, dim, spacedim>::AccessorData AccessorData;
+  using AccessorData = typename TriaAccessor<dim, dim, spacedim>::AccessorData;
 
   /**
    * Define the type of the container this is part of.
    */
-  typedef Triangulation<dim, spacedim> Container;
+  using Container = Triangulation<dim, spacedim>;
 
   /**
    * @name Constructors

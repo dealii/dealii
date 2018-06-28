@@ -88,18 +88,18 @@ private:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * Value type for inverse matrices.
    */
-  typedef inverse_type value_type;
+  using value_type = inverse_type;
 
 public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Parameters for block preconditioners.
@@ -387,13 +387,13 @@ private:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
 public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Standard-conforming iterator.
@@ -666,7 +666,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Default constructor.
@@ -676,7 +676,7 @@ public:
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * import types and functions from protected base class.
@@ -831,12 +831,12 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Define number type of matrix.
    */
-  typedef typename MatrixType::value_type number;
+  using number = typename MatrixType::value_type;
 
   /**
    * Constructor.

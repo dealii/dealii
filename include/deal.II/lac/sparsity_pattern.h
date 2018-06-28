@@ -70,7 +70,7 @@ namespace internals
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     /**
      * Helper function to get the column index from a dereferenced iterator in
@@ -113,7 +113,7 @@ namespace SparsityPatternIterators
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Accessor class for iterators into sparsity patterns. This class is also
@@ -376,13 +376,13 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Typedef an iterator class that allows to walk over all nonzero elements
    * of a sparsity pattern.
    */
-  typedef SparsityPatternIterators::Iterator const_iterator;
+  using const_iterator = SparsityPatternIterators::Iterator;
 
   /**
    * Typedef an iterator class that allows to walk over all nonzero elements
@@ -391,7 +391,7 @@ public:
    * Since the iterator does not allow to modify the sparsity pattern, this
    * type is the same as that for @p const_iterator.
    */
-  typedef SparsityPatternIterators::Iterator iterator;
+  using iterator = SparsityPatternIterators::Iterator;
 
 
   /**
@@ -1536,7 +1536,7 @@ namespace internal
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     inline size_type
     get_column_index_from_iterator(const size_type i)
@@ -1591,12 +1591,11 @@ SparsityPattern::copy_from(const size_type       n_rows,
   // now enter all the elements into the matrix. note that if the matrix is
   // quadratic, then we already have the diagonal element preallocated
   //
-  // for use in the inner loop, we define a typedef to the type of the inner
+  // for use in the inner loop, we define an alias to the type of the inner
   // iterators
   size_type row = 0;
-  typedef
-    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator
-      inner_iterator;
+  using inner_iterator =
+    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator;
   for (ForwardIterator i = begin; i != end; ++i, ++row)
     {
       size_type *          cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);

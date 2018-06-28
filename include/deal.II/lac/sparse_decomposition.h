@@ -123,7 +123,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef typename SparseMatrix<number>::size_type size_type;
+  using size_type = typename SparseMatrix<number>::size_type;
 
   /**
    * Destruction. Mark the destructor pure to ensure that this class isn't

@@ -250,7 +250,7 @@ namespace hp
      * FECollection, namely 2.
      *
      * For the purpose of this function by domination we consider either
-     * this_element_dominate or either_element_can_dominate ; therefore the
+     * this_element_dominate or either_element_can_dominate; therefore the
      * element can dominate itself. Thus if FECollection contains
      * {Q1,Q2,Q4,Q3} and @p fes = {3}, the function returns 3.
      *

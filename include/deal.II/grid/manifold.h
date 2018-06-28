@@ -346,8 +346,8 @@ public:
    *
    * For obvious reasons, this type is not useful in 1d.
    */
-  typedef Tensor<1, spacedim>
-    FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
+  using FaceVertexNormals =
+    std::array<Tensor<1, spacedim>, GeometryInfo<dim>::vertices_per_face>;
 
 
   /**

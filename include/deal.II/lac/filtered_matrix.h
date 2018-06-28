@@ -204,7 +204,7 @@ public:
   /**
    * Declare the type of container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Accessor class for iterators
@@ -329,7 +329,7 @@ public:
    * Typedef defining a type that represents a pair of degree of freedom index
    * and the value it shall have.
    */
-  typedef std::pair<size_type, double> IndexValuePair;
+  using IndexValuePair = std::pair<size_type, double>;
 
   /**
    * @name Constructors and initialization
@@ -520,8 +520,8 @@ private:
    * since that data type is so often used and is rather awkward to write out
    * each time.
    */
-  typedef typename std::vector<IndexValuePair>::const_iterator
-    const_index_value_iterator;
+  using const_index_value_iterator =
+    typename std::vector<IndexValuePair>::const_iterator;
 
   /**
    * Helper class used to sort pairs of indices and values. Only the index is

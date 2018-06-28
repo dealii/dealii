@@ -80,9 +80,9 @@ namespace internal
   {
   public:
 #  ifndef _MSC_VER
-    typedef typename MeshType::active_cell_iterator type;
+    using type = typename MeshType::active_cell_iterator;
 #  else
-    typedef TriaActiveIterator<dealii::CellAccessor<dim, spacedim>> type;
+    using type = TriaActiveIterator<dealii::CellAccessor<dim, spacedim>>;
 #  endif
   };
 
@@ -91,18 +91,16 @@ namespace internal
   class ActiveCellIterator<dim, spacedim, dealii::DoFHandler<dim, spacedim>>
   {
   public:
-    typedef TriaActiveIterator<
-      dealii::DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, false>>
-      type;
+    using type = TriaActiveIterator<
+      dealii::DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, false>>;
   };
 
   template <int dim, int spacedim>
   class ActiveCellIterator<dim, spacedim, dealii::hp::DoFHandler<dim, spacedim>>
   {
   public:
-    typedef TriaActiveIterator<
-      dealii::DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>, false>>
-      type;
+    using type = TriaActiveIterator<
+      dealii::DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>, false>>;
   };
 #  endif
 } // namespace internal
@@ -737,7 +735,7 @@ namespace GridTools
    * describes the locally owned part of the mesh for each process. The bounding
    * boxes describing which part of the mesh is locally owned by process with
    * rank rk are contained in global_bboxes[rk]. The local description can be
-   * obtained from GridTools::compute_mesh_predicate_bounding_box ; then the
+   * obtained from GridTools::compute_mesh_predicate_bounding_box; then the
    * global one can be obtained using either
    * GridTools::exchange_local_bounding_boxes or Utilities::MPI::all_gather
    * @return A tuple containing the quadrature information
@@ -3558,9 +3556,9 @@ namespace GridTools
         "The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
 
     // map neighbor_id -> data_buffer where we accumulate the data to send
-    typedef std::map<dealii::types::subdomain_id,
-                     CellDataTransferBuffer<dim, DataType>>
-                           DestinationToBufferMap;
+    using DestinationToBufferMap =
+      std::map<dealii::types::subdomain_id,
+               CellDataTransferBuffer<dim, DataType>>;
     DestinationToBufferMap destination_to_data_buffer_map;
 
     std::map<unsigned int, std::set<dealii::types::subdomain_id>>

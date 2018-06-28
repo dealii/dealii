@@ -111,8 +111,8 @@ FE_DGP<dim, spacedim>::get_face_interpolation_matrix(
   // interpolation matrix is necessarily empty -- i.e. there isn't much we
   // need to do here.
   (void)interpolation_matrix;
-  typedef FiniteElement<dim, spacedim> FE;
-  typedef FE_DGP<dim, spacedim>        FEDGP;
+  using FE    = FiniteElement<dim, spacedim>;
+  using FEDGP = FE_DGP<dim, spacedim>;
   AssertThrow((x_source_fe.get_name().find("FE_DGP<") == 0) ||
                 (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
               typename FE::ExcInterpolationNotImplemented());
@@ -137,8 +137,8 @@ FE_DGP<dim, spacedim>::get_subface_interpolation_matrix(
   // interpolation matrix is necessarily empty -- i.e. there isn't much we
   // need to do here.
   (void)interpolation_matrix;
-  typedef FiniteElement<dim, spacedim> FE;
-  typedef FE_DGP<dim, spacedim>        FEDGP;
+  using FE    = FiniteElement<dim, spacedim>;
+  using FEDGP = FE_DGP<dim, spacedim>;
   AssertThrow((x_source_fe.get_name().find("FE_DGP<") == 0) ||
                 (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
               typename FE::ExcInterpolationNotImplemented());

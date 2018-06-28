@@ -72,26 +72,26 @@ namespace TrilinosWrappers
     {
     public:
       /**
-       * Typedef the base class for simpler access to its own typedefs.
+       * Typedef the base class for simpler access to its own alias.
        */
-      typedef dealii::BlockVectorBase<MPI::Vector> BaseClass;
+      using BaseClass = dealii::BlockVectorBase<MPI::Vector>;
 
       /**
        * Typedef the type of the underlying vector.
        */
-      typedef BaseClass::BlockType BlockType;
+      using BlockType = BaseClass::BlockType;
 
       /**
-       * Import the typedefs from the base class.
+       * Import the alias from the base class.
        */
-      typedef BaseClass::value_type      value_type;
-      typedef BaseClass::pointer         pointer;
-      typedef BaseClass::const_pointer   const_pointer;
-      typedef BaseClass::reference       reference;
-      typedef BaseClass::const_reference const_reference;
-      typedef BaseClass::size_type       size_type;
-      typedef BaseClass::iterator        iterator;
-      typedef BaseClass::const_iterator  const_iterator;
+      using value_type      = BaseClass::value_type;
+      using pointer         = BaseClass::pointer;
+      using const_pointer   = BaseClass::const_pointer;
+      using reference       = BaseClass::reference;
+      using const_reference = BaseClass::const_reference;
+      using size_type       = BaseClass::size_type;
+      using iterator        = BaseClass::iterator;
+      using const_iterator  = BaseClass::const_iterator;
 
       /**
        * Default constructor. Generate an empty vector without any blocks.

@@ -138,24 +138,24 @@ namespace internal
        * Type of the vector underlying the block vector used in non-const
        * iterators. There, the vector must not be constant.
        */
-      typedef typename BlockVectorType::BlockType Vector;
+      using Vector = typename BlockVectorType::BlockType;
 
       /**
        * Type of the block vector used in non-const iterators. There, the
        * block vector must not be constant.
        */
-      typedef BlockVectorType BlockVector;
+      using BlockVector = BlockVectorType;
 
       /**
        * Type of the numbers we point to. Here, they are not constant.
        */
-      typedef typename BlockVector::value_type value_type;
+      using value_type = typename BlockVector::value_type;
 
       /**
        * Typedef the result of a dereferencing operation for an iterator of
        * the underlying iterator.
        */
-      typedef typename Vector::reference dereference_type;
+      using dereference_type = typename Vector::reference;
     };
 
 
@@ -173,26 +173,26 @@ namespace internal
        * Type of the vector underlying the block vector used in
        * const_iterator. There, the vector must be constant.
        */
-      typedef const typename BlockVectorType::BlockType Vector;
+      using Vector = const typename BlockVectorType::BlockType;
 
       /**
        * Type of the block vector used in const_iterator. There, the block
        * vector must be constant.
        */
-      typedef const BlockVectorType BlockVector;
+      using BlockVector = const BlockVectorType;
 
       /**
        * Type of the numbers we point to. Here, they are constant since the
        * block vector we use is constant.
        */
-      typedef const typename BlockVector::value_type value_type;
+      using value_type = const typename BlockVector::value_type;
 
       /**
        * Typedef the result of a dereferencing operation for an iterator of
        * the underlying iterator. Since this is for constant iterators, we can
        * only return values, not actual references.
        */
-      typedef value_type dereference_type;
+      using dereference_type = value_type;
     };
 
 
@@ -220,34 +220,34 @@ namespace internal
       /**
        * Declare the type for container size.
        */
-      typedef types::global_dof_index size_type;
+      using size_type = types::global_dof_index;
 
       /**
        * Type of the number this iterator points to. Depending on the value of
        * the second template parameter, this is either a constant or non-const
        * number.
        */
-      typedef typename Types<BlockVectorType, Constness>::value_type value_type;
+      using value_type = typename Types<BlockVectorType, Constness>::value_type;
 
       /**
-       * Declare some typedefs which are standard for iterators and are used
+       * Declare some alias which are standard for iterators and are used
        * by algorithms to enquire about the specifics of the iterators they
        * work on.
        */
-      typedef std::random_access_iterator_tag     iterator_category;
-      typedef std::ptrdiff_t                      difference_type;
-      typedef typename BlockVectorType::reference reference;
-      typedef value_type *                        pointer;
+      using iterator_category = std::random_access_iterator_tag;
+      using difference_type   = std::ptrdiff_t;
+      using reference         = typename BlockVectorType::reference;
+      using pointer           = value_type *;
 
-      typedef typename Types<BlockVectorType, Constness>::dereference_type
-        dereference_type;
+      using dereference_type =
+        typename Types<BlockVectorType, Constness>::dereference_type;
 
       /**
        * Typedef the type of the block vector (which differs in constness,
        * depending on the second template parameter).
        */
-      typedef
-        typename Types<BlockVectorType, Constness>::BlockVector BlockVector;
+      using BlockVector =
+        typename Types<BlockVectorType, Constness>::BlockVector;
 
       /**
        * Construct an iterator from a vector to which we point and the global
@@ -529,7 +529,7 @@ public:
   /**
    * Typedef the type of the underlying vector.
    */
-  typedef VectorType BlockType;
+  using BlockType = VectorType;
 
   /*
    * Declare standard types used in
@@ -541,18 +541,16 @@ public:
    * class. This includes iterator
    * types.
    */
-  typedef typename BlockType::value_type value_type;
-  typedef value_type *                   pointer;
-  typedef const value_type *             const_pointer;
-  typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,
-                                                           false>
-    iterator;
-  typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,
-                                                           true>
-                                              const_iterator;
-  typedef typename BlockType::reference       reference;
-  typedef typename BlockType::const_reference const_reference;
-  typedef types::global_dof_index             size_type;
+  using value_type    = typename BlockType::value_type;
+  using pointer       = value_type *;
+  using const_pointer = const value_type *;
+  using iterator =
+    dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase, false>;
+  using const_iterator =
+    dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase, true>;
+  using reference       = typename BlockType::reference;
+  using const_reference = typename BlockType::const_reference;
+  using size_type       = types::global_dof_index;
 
   /**
    * Declare a type that has holds real-valued numbers with the same precision
@@ -561,9 +559,9 @@ public:
    * If the template argument is a std::complex type then real_type equals the
    * type underlying the complex numbers.
    *
-   * This typedef is used to represent the return type of norms.
+   * This alias is used to represent the return type of norms.
    */
-  typedef typename BlockType::real_type real_type;
+  using real_type = typename BlockType::real_type;
 
   /**
    * Default constructor.

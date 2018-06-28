@@ -312,7 +312,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Strategy            strategy)
 {
   AssertThrow(strategy == cell_diameter_over_24, ExcNotImplemented());
-  typedef typename InputVector::value_type number;
+  using number = typename InputVector::value_type;
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)

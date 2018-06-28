@@ -83,7 +83,7 @@ namespace FETools
 
     private:
       // A shortcut for the type of the OutVector
-      typedef typename OutVector::value_type value_type;
+      using value_type = typename OutVector::value_type;
 
       // A structure holding all data to
       // set dofs recursively on cells of arbitrary level

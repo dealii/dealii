@@ -220,12 +220,12 @@ public:
   /**
    * Type for the constant map. Used by the initialize() method.
    */
-  typedef std::map<std::string, double> ConstMap;
+  using ConstMap = std::map<std::string, double>;
 
   /**
    * Iterator for the constants map. Used by the initialize() method.
    */
-  typedef ConstMap::iterator ConstMapIterator;
+  using ConstMapIterator = ConstMap::iterator;
 
   /**
    * Initialize the function.  This methods accepts the following parameters:

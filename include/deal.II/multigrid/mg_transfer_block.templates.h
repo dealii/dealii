@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
 /* --------------------- MGTransferBlockSelect -------------- */
 
 // Simplify some things below
-typedef std::vector<std::pair<unsigned int, unsigned int>>::const_iterator IT;
+using IT = std::vector<std::pair<unsigned int, unsigned int>>::const_iterator;
 
 
 template <typename number>

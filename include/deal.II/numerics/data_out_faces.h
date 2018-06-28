@@ -85,7 +85,7 @@ namespace internal
  * face (think of discontinuous finite elements, where the value of the finite
  * element field depend on the direction from which you approach a face, thus
  * it is necessary to use a pair of cell and face, rather than only a face
- * iterator). Therefore, this class defines a @p typedef which creates a type
+ * iterator). Therefore, this class defines an @p alias which creates a type
  * @p FaceDescriptor that is an abbreviation for a pair of cell iterator and
  * face number. The functions @p first_face and @p next_face operate on
  * objects of this type.
@@ -132,11 +132,12 @@ public:
   static const unsigned int space_dimension = DoFHandlerType::space_dimension;
 
   /**
-   * Typedef to the iterator type of the dof handler class under
+   * Alias to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType, dimension - 1, dimension>::
-    cell_iterator cell_iterator;
+  using cell_iterator = typename DataOut_DoFData<DoFHandlerType,
+                                                 dimension - 1,
+                                                 dimension>::cell_iterator;
 
   /**
    * Constructor determining whether a surface mesh (default) or the whole
@@ -193,7 +194,7 @@ public:
    * of a cell and the number of the face. This pair is here aliased to a name
    * that is better to type.
    */
-  typedef typename std::pair<cell_iterator, unsigned int> FaceDescriptor;
+  using FaceDescriptor = typename std::pair<cell_iterator, unsigned int>;
 
 
   /**

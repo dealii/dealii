@@ -100,6 +100,9 @@ executable.
 <li> %Function and variable names may not consist of only one or two
   letters, unless the variable is a pure counting index.</li>
 
+<li> Type aliases (<code>using<code>-declarations) are preferred to
+  <code>typedef</code>-declarations.</li>
+
 <li> Use the geometry information in GeometryInfo to get the
   number of faces per cell, the number of children per cell, the
   child indices of the child cells adjacent to face 3, etc, rather
@@ -137,17 +140,14 @@ executable.
 <li> Sometimes it makes sense to implement a class by using several
   non-member functions that are not part of the public interface and are only
   meant to be called in the current source file. Such free functions should be
-  put in an anonymous namespace structured in the following way:
+  put in an internal namespace structured in the following way:
   <code>
   <pre>
   namespace internal
   {
-    namespace ClassName
+    namespace ClassNameImplementation
     {
-      namespace
-      {
-        // free functions go here
-      }
+      // free functions go here
     }
   }
   </pre>
@@ -159,7 +159,7 @@ executable.
   <a href="http://en.wikipedia.org/wiki/Camel_case"><i>camel
   case</i></a> &mdash; while functions and variables
   use lowercase letters and underscores to separate words.
-  The only exception are the iterator typedefs in Triangulation
+  The only exception are the iterator alias in Triangulation
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
   to make the connection to the standard library container classes clear.</li>
 
@@ -353,8 +353,8 @@ we list here:
   too much locally. You may end up with a code of the following kind:
   <code>
   <pre>
-    for (cell=triangulation.begin(); ...)
-      for (face=0; ...)
+    for (const auto &cell = triangulation.active_cell_iterators())
+      for (unsigned int face=0; ...)
         {
           if (something)
             { ... }
@@ -389,11 +389,13 @@ we list here:
     {
       Point<dim> cell_center;
       ... // something lengthy and complicated
-      for (cell = dof_handler.begin_active(); ...)
+      for (const auto &cell = dof_handler.active_cell_iterators())
         {
           cell_center = (cell->vertex(0) + cell->vertex(1)) / 2;
           ...
         }
+      ...
+    }
   </pre>
   </code>
   The problem is that if the code between the declaration and initialization
@@ -409,11 +411,13 @@ we list here:
     void foo ()
     {
       ... // something lengthy and complicated
-      for (cell = dof_handler.begin_active(); ...)
+      for (const auto &cell = dof_handler.active_cell_iterators())
         {
           Point<dim> cell_center = (cell->vertex(0) + cell->vertex(1)) / 2;
           ...
         }
+      ...
+    }
   </pre>
   </code>
   This makes it much clearer what the type of the variable is
@@ -444,12 +448,14 @@ we list here:
     void foo ()
     {
       ... // something lengthy and complicated
-      for (cell = dof_handler.begin_active(); ...)
+      for (const auto &cell = dof_handler.active_cell_iterators())
         {
           <b>const</b> Point<dim> cell_center = (cell->vertex(0) +
                                                  cell->vertex(1)) / 2;
           ...
         }
+      ...
+    }
   </pre>
   </code>
   By marking the variable as constant we make sure that we don't accidentally
@@ -479,7 +485,7 @@ we list here:
      typename Triangulation<dim>::cell_iterator
      CellAccessor<dim>::child (const unsigned int child_no)
      {
-       ...;
+       ...
        return something;
      }
   </pre>

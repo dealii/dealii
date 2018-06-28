@@ -241,12 +241,12 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
   /**
    * Typedef an iterator class that allows to walk over all nonzero elements
    * of a sparsity pattern.
    */
-  typedef ChunkSparsityPatternIterators::Iterator const_iterator;
+  using const_iterator = ChunkSparsityPatternIterators::Iterator;
 
   /**
    * Typedef an iterator class that allows to walk over all nonzero elements
@@ -255,7 +255,7 @@ public:
    * Since the iterator does not allow to modify the sparsity pattern, this
    * type is the same as that for @p const_iterator.
    */
-  typedef ChunkSparsityPatternIterators::Iterator iterator;
+  using iterator = ChunkSparsityPatternIterators::Iterator;
 
   /**
    * Define a value which is used to indicate that a certain value in the
@@ -1192,9 +1192,8 @@ ChunkSparsityPattern::copy_from(const size_type       n_rows,
 
   // now enter all the elements into the matrix
   size_type row = 0;
-  typedef
-    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator
-      inner_iterator;
+  using inner_iterator =
+    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator;
   for (ForwardIterator i = begin; i != end; ++i, ++row)
     {
       const inner_iterator end_of_row = i->end();

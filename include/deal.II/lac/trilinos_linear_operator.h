@@ -76,9 +76,9 @@ namespace TrilinosWrappers
   linear_operator(const TrilinosWrappers::SparseMatrix &operator_exemplar,
                   const Matrix &                        matrix)
   {
-    typedef TrilinosWrappers::SparseMatrix OperatorExemplar;
-    typedef TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload Payload;
+    using OperatorExemplar = TrilinosWrappers::SparseMatrix;
+    using Payload =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
     return dealii::
       linear_operator<Range, Domain, Payload, OperatorExemplar, Matrix>(
         operator_exemplar, matrix);
@@ -106,9 +106,9 @@ namespace TrilinosWrappers
     TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
   linear_operator(const TrilinosWrappers::SparseMatrix &matrix)
   {
-    typedef TrilinosWrappers::SparseMatrix Matrix;
-    typedef TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload Payload;
+    using Matrix = TrilinosWrappers::SparseMatrix;
+    using Payload =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
     return dealii::linear_operator<Range, Domain, Payload, Matrix, Matrix>(
       matrix, matrix);
   }
@@ -143,12 +143,11 @@ namespace TrilinosWrappers
                              LinearOperatorImplementation::TrilinosPayload>>
   block_operator(const TrilinosWrappers::BlockSparseMatrix &block_matrix)
   {
-    typedef TrilinosWrappers::BlockSparseMatrix BlockMatrix;
-    typedef TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload PayloadBlockType;
-    typedef TrilinosWrappers::internal::BlockLinearOperatorImplementation::
-      TrilinosBlockPayload<PayloadBlockType>
-        BlockPayload;
+    using BlockMatrix = TrilinosWrappers::BlockSparseMatrix;
+    using PayloadBlockType =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
+    using BlockPayload = TrilinosWrappers::internal::
+      BlockLinearOperatorImplementation::TrilinosBlockPayload<PayloadBlockType>;
     return dealii::block_operator<Range, Domain, BlockPayload, BlockMatrix>(
       block_matrix);
   }
@@ -186,11 +185,10 @@ namespace TrilinosWrappers
         n>,
       m> &ops)
   {
-    typedef TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload PayloadBlockType;
-    typedef TrilinosWrappers::internal::BlockLinearOperatorImplementation::
-      TrilinosBlockPayload<PayloadBlockType>
-        BlockPayload;
+    using PayloadBlockType =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
+    using BlockPayload = TrilinosWrappers::internal::
+      BlockLinearOperatorImplementation::TrilinosBlockPayload<PayloadBlockType>;
     return dealii::block_operator<m, n, Range, Domain, BlockPayload>(ops);
   }
 
@@ -222,12 +220,11 @@ namespace TrilinosWrappers
   block_diagonal_operator(
     const TrilinosWrappers::BlockSparseMatrix &block_matrix)
   {
-    typedef TrilinosWrappers::BlockSparseMatrix BlockMatrix;
-    typedef TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload PayloadBlockType;
-    typedef TrilinosWrappers::internal::BlockLinearOperatorImplementation::
-      TrilinosBlockPayload<PayloadBlockType>
-        BlockPayload;
+    using BlockMatrix = TrilinosWrappers::BlockSparseMatrix;
+    using PayloadBlockType =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
+    using BlockPayload = TrilinosWrappers::internal::
+      BlockLinearOperatorImplementation::TrilinosBlockPayload<PayloadBlockType>;
     return dealii::
       block_diagonal_operator<Range, Domain, BlockPayload, BlockMatrix>(
         block_matrix);
@@ -264,11 +261,10 @@ namespace TrilinosWrappers
                        TrilinosPayload>,
       m> &ops)
   {
-    typedef TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload PayloadBlockType;
-    typedef TrilinosWrappers::internal::BlockLinearOperatorImplementation::
-      TrilinosBlockPayload<PayloadBlockType>
-        BlockPayload;
+    using PayloadBlockType =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
+    using BlockPayload = TrilinosWrappers::internal::
+      BlockLinearOperatorImplementation::TrilinosBlockPayload<PayloadBlockType>;
     return dealii::block_diagonal_operator<m, Range, Domain, BlockPayload>(ops);
   }
 

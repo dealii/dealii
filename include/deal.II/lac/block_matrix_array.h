@@ -121,7 +121,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Default constructor creating a useless object. initialize() must be
@@ -425,7 +425,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Default constructor creating a useless object. initialize() must be
@@ -584,10 +584,9 @@ BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
 
   Table<2, std::string> array(n_block_rows(), n_block_cols());
 
-  typedef std::map<
-    const PointerMatrixBase<typename BlockVectorType::BlockType> *,
-    std::string>
-          NameMap;
+  using NameMap =
+    std::map<const PointerMatrixBase<typename BlockVectorType::BlockType> *,
+             std::string>;
   NameMap matrix_names;
 
   typename std::vector<Entry>::const_iterator m   = entries.begin();

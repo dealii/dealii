@@ -47,8 +47,8 @@ template <typename VectorType = Vector<double>>
 class DiagonalMatrix : public Subscriptor
 {
 public:
-  typedef typename VectorType::value_type value_type;
-  typedef typename VectorType::size_type  size_type;
+  using value_type = typename VectorType::value_type;
+  using size_type  = typename VectorType::size_type;
 
   /**
    * Constructor.

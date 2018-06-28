@@ -79,7 +79,7 @@ namespace Step22
   // distinguish between them by the use of the spatial dimension as a
   // template parameter. See step-4 for details on templates. We are not going
   // to create any preconditioner object here, all we do is to create class
-  // that holds a local typedef determining the preconditioner class so we can
+  // that holds a local alias determining the preconditioner class so we can
   // write our program in a dimension-independent way.
   template <int dim>
   struct InnerPreconditioner;
@@ -88,14 +88,14 @@ namespace Step22
   template <>
   struct InnerPreconditioner<2>
   {
-    typedef SparseDirectUMFPACK type;
+    using type = SparseDirectUMFPACK;
   };
 
   // And the ILU preconditioning in 3D, called by SparseILU:
   template <>
   struct InnerPreconditioner<3>
   {
-    typedef SparseILU<double> type;
+    using type = SparseILU<double>;
   };
 
 
@@ -757,7 +757,7 @@ namespace Step22
     // preconditioner for the velocity-velocity matrix, i.e.,
     // <code>block(0,0)</code> in the system matrix. As mentioned above, this
     // depends on the spatial dimension. Since the two classes described by
-    // the <code>InnerPreconditioner::type</code> typedef have the same
+    // the <code>InnerPreconditioner::type</code> alias have the same
     // interface, we do not have to do anything different whether we want to
     // use a sparse direct solver or an ILU:
     std::cout << "   Computing preconditioner..." << std::endl << std::flush;

@@ -2200,8 +2200,8 @@ namespace parallel
         // {6,7} belong together, respectively). If periodicity is set in x and
         // z direction, the output is {0,0,2,2,0,0,2,2}, and if periodicity is
         // in all directions, the output is simply {0,0,0,0,0,0,0,0}.
-        typedef
-          typename Triangulation<dim, spacedim>::cell_iterator cell_iterator;
+        using cell_iterator =
+          typename Triangulation<dim, spacedim>::cell_iterator;
         typename std::map<std::pair<cell_iterator, unsigned int>,
                           std::pair<std::pair<cell_iterator, unsigned int>,
                                     std::bitset<3>>>::const_iterator it;
@@ -3111,9 +3111,9 @@ namespace parallel
 
       // now collect cells and their vertices
       // for the interested neighbors
-      typedef std::map<dealii::types::subdomain_id,
-                       CommunicateLocallyMovedVertices::CellInfo<dim, spacedim>>
-                cellmap_t;
+      using cellmap_t =
+        std::map<dealii::types::subdomain_id,
+                 CommunicateLocallyMovedVertices::CellInfo<dim, spacedim>>;
       cellmap_t needs_to_get_cells;
 
       for (typename Triangulation<dim, spacedim>::cell_iterator cell =
@@ -3509,8 +3509,8 @@ namespace parallel
       Assert(this->n_levels() == 1,
              ExcMessage("The triangulation is refined!"));
 
-      typedef std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
-                                          FaceVector;
+      using FaceVector =
+        std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>;
       typename FaceVector::const_iterator it, periodic_end;
       it           = periodicity_vector.begin();
       periodic_end = periodicity_vector.end();

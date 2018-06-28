@@ -100,7 +100,7 @@ namespace internal
 template <typename Number>
 struct EnableIfScalar<VectorizedArray<Number>>
 {
-  typedef VectorizedArray<typename EnableIfScalar<Number>::type> type;
+  using type = VectorizedArray<typename EnableIfScalar<Number>::type>;
 };
 
 

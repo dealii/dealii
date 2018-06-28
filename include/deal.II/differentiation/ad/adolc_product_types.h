@@ -36,7 +36,7 @@ namespace internal
   template <>
   struct ProductTypeImpl<adouble, adouble>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   // Typedefs for "adub"s are all that's necessary to ensure that no temporary
@@ -46,13 +46,13 @@ namespace internal
   template <>
   struct ProductTypeImpl<adub, adouble>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<adouble, adub>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   /* --- Double --- */
@@ -60,25 +60,25 @@ namespace internal
   template <>
   struct ProductTypeImpl<double, adouble>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<adouble, double>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<double, adub>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<adub, double>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   /* --- Float --- */
@@ -86,25 +86,25 @@ namespace internal
   template <>
   struct ProductTypeImpl<float, adouble>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<adouble, float>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<float, adub>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   template <>
   struct ProductTypeImpl<adub, float>
   {
-    typedef adouble type;
+    using type = adouble;
   };
 
   /* --- Complex double --- */
@@ -112,31 +112,31 @@ namespace internal
   template <>
   struct ProductTypeImpl<std::complex<double>, std::complex<adouble>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adouble>, std::complex<double>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adouble>, std::complex<adouble>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adub>, std::complex<adouble>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adouble>, std::complex<adub>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
   /* --- Complex float --- */
@@ -144,13 +144,13 @@ namespace internal
   template <>
   struct ProductTypeImpl<std::complex<float>, std::complex<adouble>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adouble>, std::complex<float>>
   {
-    typedef std::complex<adouble> type;
+    using type = std::complex<adouble>;
   };
 
 } // namespace internal
@@ -158,27 +158,27 @@ namespace internal
 template <>
 struct EnableIfScalar<adouble>
 {
-  typedef adouble type;
+  using type = adouble;
 };
 
 template <>
 struct EnableIfScalar<std::complex<adouble>>
 {
-  typedef std::complex<adouble> type;
+  using type = std::complex<adouble>;
 };
 
 
 template <>
 struct EnableIfScalar<adub>
 {
-  typedef adouble type;
+  using type = adouble;
 };
 
 
 template <>
 struct EnableIfScalar<std::complex<adub>>
 {
-  typedef std::complex<adouble> type;
+  using type = std::complex<adouble>;
 };
 
 
@@ -192,19 +192,19 @@ namespace internal
   template <>
   struct ProductTypeImpl<double, adtl::adouble>
   {
-    typedef adtl::adouble type;
+    using type = adtl::adouble;
   };
 
   template <>
   struct ProductTypeImpl<adtl::adouble, double>
   {
-    typedef adtl::adouble type;
+    using type = adtl::adouble;
   };
 
   template <>
   struct ProductTypeImpl<adtl::adouble, adtl::adouble>
   {
-    typedef adtl::adouble type;
+    using type = adtl::adouble;
   };
 
   /* --- Float --- */
@@ -212,13 +212,13 @@ namespace internal
   template <>
   struct ProductTypeImpl<float, adtl::adouble>
   {
-    typedef adtl::adouble type;
+    using type = adtl::adouble;
   };
 
   template <>
   struct ProductTypeImpl<adtl::adouble, float>
   {
-    typedef adtl::adouble type;
+    using type = adtl::adouble;
   };
 
   /* --- Complex double --- */
@@ -226,20 +226,20 @@ namespace internal
   template <>
   struct ProductTypeImpl<std::complex<double>, std::complex<adtl::adouble>>
   {
-    typedef std::complex<adtl::adouble> type;
+    using type = std::complex<adtl::adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adtl::adouble>, std::complex<double>>
   {
-    typedef std::complex<adtl::adouble> type;
+    using type = std::complex<adtl::adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adtl::adouble>,
                          std::complex<adtl::adouble>>
   {
-    typedef std::complex<adtl::adouble> type;
+    using type = std::complex<adtl::adouble>;
   };
 
   /* --- Complex float --- */
@@ -247,13 +247,13 @@ namespace internal
   template <>
   struct ProductTypeImpl<std::complex<float>, std::complex<adtl::adouble>>
   {
-    typedef std::complex<adtl::adouble> type;
+    using type = std::complex<adtl::adouble>;
   };
 
   template <>
   struct ProductTypeImpl<std::complex<adtl::adouble>, std::complex<float>>
   {
-    typedef std::complex<adtl::adouble> type;
+    using type = std::complex<adtl::adouble>;
   };
 
 } // namespace internal
@@ -262,14 +262,14 @@ namespace internal
 template <>
 struct EnableIfScalar<adtl::adouble>
 {
-  typedef adtl::adouble type;
+  using type = adtl::adouble;
 };
 
 
 template <>
 struct EnableIfScalar<std::complex<adtl::adouble>>
 {
-  typedef std::complex<adtl::adouble> type;
+  using type = std::complex<adtl::adouble>;
 };
 
 

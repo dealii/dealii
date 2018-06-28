@@ -53,26 +53,26 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number>>
 {
 public:
   /**
-   * Typedef the base class for simpler access to its own typedefs.
+   * Typedef the base class for simpler access to its own alias.
    */
-  typedef BlockMatrixBase<SparseMatrix<number>> BaseClass;
+  using BaseClass = BlockMatrixBase<SparseMatrix<number>>;
 
   /**
    * Typedef the type of the underlying matrix.
    */
-  typedef typename BaseClass::BlockType BlockType;
+  using BlockType = typename BaseClass::BlockType;
 
   /**
-   * Import the typedefs from the base class.
+   * Import the alias from the base class.
    */
-  typedef typename BaseClass::value_type      value_type;
-  typedef typename BaseClass::pointer         pointer;
-  typedef typename BaseClass::const_pointer   const_pointer;
-  typedef typename BaseClass::reference       reference;
-  typedef typename BaseClass::const_reference const_reference;
-  typedef typename BaseClass::size_type       size_type;
-  typedef typename BaseClass::iterator        iterator;
-  typedef typename BaseClass::const_iterator  const_iterator;
+  using value_type      = typename BaseClass::value_type;
+  using pointer         = typename BaseClass::pointer;
+  using const_pointer   = typename BaseClass::const_pointer;
+  using reference       = typename BaseClass::reference;
+  using const_reference = typename BaseClass::const_reference;
+  using size_type       = typename BaseClass::size_type;
+  using iterator        = typename BaseClass::iterator;
+  using const_iterator  = typename BaseClass::const_iterator;
 
   /**
    * @name Constructors and initialization

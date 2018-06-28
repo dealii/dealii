@@ -73,7 +73,7 @@ namespace internal
   namespace TableBaseAccessors
   {
     /**
-     * @internal Have a class which declares some nested typedefs, depending
+     * @internal Have a class which declares some nested alias, depending
      * on its template parameters. The general template declares nothing, but
      * there are more useful specializations regarding the last parameter
      * indicating constness of the table for which accessor objects are to be
@@ -84,39 +84,39 @@ namespace internal
     {};
 
     /**
-     * @internal Have a class which declares some nested typedefs, depending
+     * @internal Have a class which declares some nested alias, depending
      * on its template parameters. Specialization for accessors to constant
      * objects.
      */
     template <int N, typename T>
     struct Types<N, T, true>
     {
-      typedef const T               value_type;
-      typedef const TableBase<N, T> TableType;
+      using value_type = const T;
+      using TableType  = const TableBase<N, T>;
 
-      typedef typename AlignedVector<T>::const_iterator iterator;
-      typedef typename AlignedVector<T>::const_iterator const_iterator;
+      using iterator       = typename AlignedVector<T>::const_iterator;
+      using const_iterator = typename AlignedVector<T>::const_iterator;
 
-      typedef typename AlignedVector<T>::const_reference reference;
-      typedef typename AlignedVector<T>::const_reference const_reference;
+      using reference       = typename AlignedVector<T>::const_reference;
+      using const_reference = typename AlignedVector<T>::const_reference;
     };
 
     /**
-     * @internal Have a class which declares some nested typedefs, depending
+     * @internal Have a class which declares some nested alias, depending
      * on its template parameters. Specialization for accessors to non-
      * constant objects.
      */
     template <int N, typename T>
     struct Types<N, T, false>
     {
-      typedef T               value_type;
-      typedef TableBase<N, T> TableType;
+      using value_type = T;
+      using TableType  = TableBase<N, T>;
 
-      typedef typename AlignedVector<T>::iterator       iterator;
-      typedef typename AlignedVector<T>::const_iterator const_iterator;
+      using iterator       = typename AlignedVector<T>::iterator;
+      using const_iterator = typename AlignedVector<T>::const_iterator;
 
-      typedef typename AlignedVector<T>::reference       reference;
-      typedef typename AlignedVector<T>::const_reference const_reference;
+      using reference       = typename AlignedVector<T>::reference;
+      using const_reference = typename AlignedVector<T>::const_reference;
     };
 
 
@@ -162,13 +162,13 @@ namespace internal
     class Accessor
     {
     public:
-      typedef typename Types<N, T, C>::TableType TableType;
+      using TableType = typename Types<N, T, C>::TableType;
 
-      typedef typename Types<N, T, C>::iterator       iterator;
-      typedef typename Types<N, T, C>::const_iterator const_iterator;
+      using iterator       = typename Types<N, T, C>::iterator;
+      using const_iterator = typename Types<N, T, C>::const_iterator;
 
-      typedef size_t    size_type;
-      typedef ptrdiff_t difference_type;
+      using size_type       = size_t;
+      using difference_type = ptrdiff_t;
 
     private:
       /**
@@ -253,21 +253,21 @@ namespace internal
        * this row, as well as all the other types usually required for the
        * standard library algorithms.
        */
-      typedef typename Types<N, T, C>::value_type value_type;
+      using value_type = typename Types<N, T, C>::value_type;
 
-      typedef typename Types<N, T, C>::iterator       iterator;
-      typedef typename Types<N, T, C>::const_iterator const_iterator;
+      using iterator       = typename Types<N, T, C>::iterator;
+      using const_iterator = typename Types<N, T, C>::const_iterator;
 
-      typedef typename Types<N, T, C>::reference       reference;
-      typedef typename Types<N, T, C>::const_reference const_reference;
+      using reference       = typename Types<N, T, C>::reference;
+      using const_reference = typename Types<N, T, C>::const_reference;
 
-      typedef size_t    size_type;
-      typedef ptrdiff_t difference_type;
+      using size_type       = size_t;
+      using difference_type = ptrdiff_t;
 
       /**
-       * Import a typedef from the switch class above.
+       * Import an alias from the switch class above.
        */
-      typedef typename Types<N, T, C>::TableType TableType;
+      using TableType = typename Types<N, T, C>::TableType;
 
     private:
       /**
@@ -421,12 +421,12 @@ template <int N, typename T>
 class TableBase : public Subscriptor
 {
 public:
-  typedef T value_type;
+  using value_type = T;
 
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename AlignedVector<T>::size_type size_type;
+  using size_type = typename AlignedVector<T>::size_type;
 
 
   /**
@@ -730,7 +730,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<1, T>::size_type size_type;
+  using size_type = typename TableBase<1, T>::size_type;
 
   /**
    * Default constructor. Set all dimensions to zero.
@@ -848,7 +848,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<2, T>::size_type size_type;
+  using size_type = typename TableBase<2, T>::size_type;
 
   /**
    * Default constructor. Set all dimensions to zero.
@@ -1033,7 +1033,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<3, T>::size_type size_type;
+  using size_type = typename TableBase<3, T>::size_type;
 
   /**
    * Default constructor. Set all dimensions to zero.
@@ -1165,7 +1165,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<4, T>::size_type size_type;
+  using size_type = typename TableBase<4, T>::size_type;
 
   /**
    * Default constructor. Set all dimensions to zero.
@@ -1259,7 +1259,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<5, T>::size_type size_type;
+  using size_type = typename TableBase<5, T>::size_type;
 
 
   /**
@@ -1356,7 +1356,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<6, T>::size_type size_type;
+  using size_type = typename TableBase<6, T>::size_type;
 
   /**
    * Default constructor. Set all dimensions to zero.
@@ -1454,7 +1454,7 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<7, T>::size_type size_type;
+  using size_type = typename TableBase<7, T>::size_type;
 
   /**
    * Default constructor. Set all dimensions to zero.
@@ -1567,10 +1567,10 @@ namespace TransposeTableIterators
     /**
      * Type of the stored pointer to the TransposeTable.
      */
-    typedef typename std::conditional<Constness,
-                                      const TransposeTable<T> *,
-                                      TransposeTable<T> *>::type
-      container_pointer_type;
+    using container_pointer_type =
+      typename std::conditional<Constness,
+                                const TransposeTable<T> *,
+                                TransposeTable<T> *>::type;
 
     /**
      * Default constructor.
@@ -1604,7 +1604,7 @@ namespace TransposeTableIterators
     /**
      * Numerical type of the row and column indices of the TransposeTable.
      */
-    typedef typename TransposeTable<T>::size_type size_type;
+    using size_type = typename TransposeTable<T>::size_type;
 
     /**
      * Access the row of the current entry.
@@ -1706,15 +1706,15 @@ namespace TransposeTableIterators
     /**
      * Size type used by TransposeTable.
      */
-    typedef typename TransposeTable<T>::size_type size_type;
+    using size_type = typename TransposeTable<T>::size_type;
 
     /**
      * Type of the stored pointer to the TransposeTable.
      */
-    typedef typename std::conditional<Constness,
-                                      const TransposeTable<T> *,
-                                      TransposeTable<T> *>::type
-      container_pointer_type;
+    using container_pointer_type =
+      typename std::conditional<Constness,
+                                const TransposeTable<T> *,
+                                TransposeTable<T> *>::type;
 
     /**
      * Constructor from an accessor.
@@ -1767,33 +1767,33 @@ public:
   /**
    * Integer type used to count the number of elements in this container.
    */
-  typedef typename TableBase<2, T>::size_type size_type;
+  using size_type = typename TableBase<2, T>::size_type;
 
   /**
    * Typedef for the values in the table.
    */
-  typedef typename AlignedVector<T>::value_type value_type;
+  using value_type = typename AlignedVector<T>::value_type;
 
   /**
    * Typedef for the references in the table.
    */
-  typedef typename AlignedVector<T>::reference reference;
+  using reference = typename AlignedVector<T>::reference;
 
   /**
    * Typedef for the constant references in the table.
    */
-  typedef typename AlignedVector<T>::const_reference const_reference;
+  using const_reference = typename AlignedVector<T>::const_reference;
 
   /**
    * Typedef for a constant iterator that traverses the table in column-major
    * order.
    */
-  typedef TransposeTableIterators::Iterator<T, true> const_iterator;
+  using const_iterator = TransposeTableIterators::Iterator<T, true>;
 
   /**
    * Typedef for an iterator that traverses the table in column-major order.
    */
-  typedef TransposeTableIterators::Iterator<T, false> iterator;
+  using iterator = TransposeTableIterators::Iterator<T, false>;
 
   /**
    * Default constructor. Set all dimensions to zero.

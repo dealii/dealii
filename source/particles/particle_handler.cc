@@ -540,7 +540,7 @@ namespace Particles
     // sizes for these vectors. If more space is needed an automatic and
     // relatively fast (compared to other parts of this algorithm)
     // re-allocation will happen.
-    typedef typename std::vector<particle_iterator>::size_type vector_size;
+    using vector_size = typename std::vector<particle_iterator>::size_type;
     sorted_particles.reserve(
       static_cast<vector_size>(particles_out_of_cell.size() * 1.25));
 

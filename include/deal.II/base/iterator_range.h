@@ -128,7 +128,7 @@ public:
      * Typedef the elements of the collection to give them a name that is more
      * distinct.
      */
-    typedef Iterator BaseIterator;
+    using BaseIterator = Iterator;
 
     /**
      * Constructor. Initialize this iterator-over-iterator in such a way that
@@ -175,15 +175,15 @@ public:
     operator!=(const IteratorOverIterators &i_o_i);
 
     /**
-     * Mark the class as forward iterator and declare some typedefs which are
+     * Mark the class as forward iterator and declare some alias which are
      * standard for iterators and are used by algorithms to enquire about the
      * specifics of the iterators they work on.
      */
-    typedef std::forward_iterator_tag          iterator_category;
-    typedef Iterator                           value_type;
-    typedef typename Iterator::difference_type difference_type;
-    typedef Iterator *                         pointer;
-    typedef Iterator &                         reference;
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = Iterator;
+    using difference_type   = typename Iterator::difference_type;
+    using pointer           = Iterator *;
+    using reference         = Iterator &;
 
   private:
     /**
@@ -196,7 +196,7 @@ public:
   /**
    * Typedef for the iterator type represent by this class.
    */
-  typedef Iterator iterator;
+  using iterator = Iterator;
 
   /**
    * Default constructor. Create a range represented by two default

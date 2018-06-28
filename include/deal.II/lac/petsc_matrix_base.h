@@ -74,7 +74,7 @@ namespace PETScWrappers
         /**
          * Declare type for container size.
          */
-        typedef types::global_dof_index size_type;
+        using size_type = types::global_dof_index;
 
         /**
          * Constructor. Since we use accessors only for read access, a const
@@ -177,7 +177,7 @@ namespace PETScWrappers
       /**
        * Declare type for container size.
        */
-      typedef types::global_dof_index size_type;
+      using size_type = types::global_dof_index;
 
       /**
        * Constructor. Create an iterator into the matrix @p matrix for the
@@ -284,19 +284,19 @@ namespace PETScWrappers
   {
   public:
     /**
-     * Declare a typedef for the iterator class.
+     * Declare an alias for the iterator class.
      */
-    typedef MatrixIterators::const_iterator const_iterator;
+    using const_iterator = MatrixIterators::const_iterator;
 
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    using size_type = types::global_dof_index;
 
     /**
-     * Declare a typedef in analogy to all the other container classes.
+     * Declare an alias in analogy to all the other container classes.
      */
-    typedef PetscScalar value_type;
+    using value_type = PetscScalar;
 
     /**
      * Default constructor.

@@ -210,7 +210,7 @@ namespace TrilinosWrappers
     // std::shared_ptr.
 
     // For now, just use serial node, i.e. no multithreaing or GPU.
-    typedef KokkosClassic::DefaultNode::DefaultNodeType node;
+    using node = KokkosClassic::DefaultNode::DefaultNodeType;
     preconditioner.reset();
 
     // Cast matrix into a MueLu::Matrix. The constness needs to be cast away.
