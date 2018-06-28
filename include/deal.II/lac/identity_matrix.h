@@ -85,7 +85,7 @@ public:
   /**
    * Constructor. Creates a identity matrix of size #n.
    */
-  IdentityMatrix(const size_type n);
+  explicit IdentityMatrix(const size_type n);
 
   /**
    * Resize the matrix to be of size #n by #n.
