@@ -202,6 +202,11 @@ namespace Patterns
      * lower bound, then the entire set of integers is implied. The
      * default values are chosen such that no bounds are enforced on
      * parameters.
+     *
+     * Note that the range implied by an object of the current type
+     * is inclusive of both bounds values, i.e., the @p upper_bound is
+     * an allowed value, rather than indicating a half-open value as
+     * is often done in other contexts.
      */
     Integer(const int lower_bound = min_int_value,
             const int upper_bound = max_int_value);
