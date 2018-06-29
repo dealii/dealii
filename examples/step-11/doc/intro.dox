@@ -21,7 +21,7 @@ The compatibility condition allows a solution of the above equation, but it
 nevertheless retains an ambiguity: since only derivatives of the solution
 appear in the equations, the solution is only determined up to a constant. For
 this reason, we have to pose another condition for the numerical solution,
-which fixes this constant. 
+which fixes this constant.
 
 For this, there are various possibilities:
 <ol>
@@ -33,13 +33,13 @@ For this, there are various possibilities:
   functions. Therefore, even though fixing one node is allowed for
   discretized functions, it is not for continuous functions, and one can
   often see this in a resulting error spike at this point in the numerical
-  solution. 
-  
+  solution.
+
 <li> Fixing the mean value over the domain to zero or any other value. This
   is allowed on the continuous level, since $H^1(\Omega)\subset L^1(\Omega)$
   by Sobolev's inequality, and thus also on the discrete level since we
   there only consider subsets of $H^1$.
-  
+
 <li> Fixing the mean value over the boundary of the domain to zero or any
   other value. This is also allowed on the continuous level, since
   $H^{1/2}(\partial\Omega)\subset L^1(\partial\Omega)$, again by Sobolev's
