@@ -165,7 +165,6 @@ superapproximation effects of which the globally refined mesh can
 profit. Answer 2: this quick hack
 @code
   bool refinement_indicated = false;
-  typename Triangulation<dim>::active_cell_iterator cell;
   for (const auto &cell : triangulation.active_cell_iterators())
     for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 	  if (cell->vertex(v) == Point<dim>(.5,.5))
