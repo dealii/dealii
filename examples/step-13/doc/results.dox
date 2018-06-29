@@ -164,22 +164,20 @@ of the adjacent cells have hanging nodes; this destroys some
 superapproximation effects of which the globally refined mesh can
 profit. Answer 2: this quick hack
 @code
-    bool refinement_indicated = false;
-    typename Triangulation<dim>::active_cell_iterator cell;
-    for (cell=triangulation->begin_active();
-	 cell!=triangulation->end(); ++cell)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	if (cell->vertex(v) == Point<dim>(.5,.5))
-	  {
-	    cell->clear_coarsen_flag();
-	    refinement_indicated |= cell->refine_flag_set();
-	  }
-    if (refinement_indicated)
-      for (cell=triangulation->begin_active();
-	   cell!=triangulation->end(); ++cell)
-	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+  bool refinement_indicated = false;
+  typename Triangulation<dim>::active_cell_iterator cell;
+  for (const auto &cell : triangulation.active_cell_iterators())
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 	  if (cell->vertex(v) == Point<dim>(.5,.5))
-	    cell->set_refine_flag ();
+	    {
+	      cell->clear_coarsen_flag();
+	      refinement_indicated |= cell->refine_flag_set();
+	    }
+  if (refinement_indicated)
+    for (const auto &cell : triangulation.active_cell_iterators())
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	    if (cell->vertex(v) == Point<dim>(.5,.5))
+	      cell->set_refine_flag ();
 @endcode
 in the refinement function of the Kelly refinement class right before
 executing refinement would improve the results (exercise: what does
