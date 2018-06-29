@@ -15,7 +15,8 @@
 
 
 // Check that clearing a FullMatrix<Number> using a number type convertible to
-// Number is not ambiguous.
+// Number is not ambiguous. Previously, IdentityMatrix(size_type) was detected
+// as viable overload.
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
@@ -27,7 +28,7 @@ int
 main()
 {
   initlog();
-  FullMatrix<std::complex<double>> matrix1;
+  FullMatrix<std::complex<double>> matrix;
   matrix = 0.;
 
   deallog << "OK" << std::endl;
