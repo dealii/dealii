@@ -131,11 +131,11 @@ namespace Step39
     MeshWorker::DoFInfo<dim> &                 dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
-    const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
+    const unsigned int degree = info.fe_values(0).get_fe().tensor_degree();
     LocalIntegrators::Laplace::nitsche_matrix(
       dinfo.matrix(0, false).matrix,
       info.fe_values(0),
-      LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, deg, deg));
+      LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, degree, degree));
   }
 
   // Interior faces use the interior penalty method
@@ -146,7 +146,7 @@ namespace Step39
     typename MeshWorker::IntegrationInfo<dim> &info1,
     typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
-    const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
+    const unsigned int degree = info1.fe_values(0).get_fe().tensor_degree();
     LocalIntegrators::Laplace::ip_matrix(
       dinfo1.matrix(0, false).matrix,
       dinfo1.matrix(0, true).matrix,
@@ -154,7 +154,8 @@ namespace Step39
       dinfo2.matrix(0, false).matrix,
       info1.fe_values(0),
       info2.fe_values(0),
-      LocalIntegrators::Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+      LocalIntegrators::Laplace::compute_penalty(
+        dinfo1, dinfo2, degree, degree));
   }
 
   // The second local integrator builds the right hand side. In our example,
@@ -194,16 +195,16 @@ namespace Step39
     std::vector<double> boundary_values(fe.n_quadrature_points);
     exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
-    const double       penalty =
-      2. * deg * (deg + 1) * dinfo.face->measure() / dinfo.cell->measure();
+    const unsigned int degree = fe.get_fe().tensor_degree();
+    const double penalty = 2. * degree * (degree + 1) * dinfo.face->measure() /
+                           dinfo.cell->measure();
 
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         local_vector(i) +=
-          (-fe.shape_value(i, k) * penalty * boundary_values[k] +
-           (fe.normal_vector(k) * fe.shape_grad(i, k)) * boundary_values[k]) *
-          fe.JxW(k);
+          (-fe.shape_value(i, k) * penalty              // -sigma * v_i(x_k)
+           + fe.normal_vector(k) * fe.shape_grad(i, k)) // n * grad v_i(x_k)
+          * boundary_values[k] * fe.JxW(k);             // u^D(x_k) * dx
   }
 
 
@@ -268,13 +269,15 @@ namespace Step39
 
     const std::vector<double> &uh = info.values[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
-    const double       penalty =
-      2. * deg * (deg + 1) * dinfo.face->measure() / dinfo.cell->measure();
+    const unsigned int degree = fe.get_fe().tensor_degree();
+    const double penalty = 2. * degree * (degree + 1) * dinfo.face->measure() /
+                           dinfo.cell->measure();
 
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
-      dinfo.value(0) += penalty * (boundary_values[k] - uh[k]) *
-                        (boundary_values[k] - uh[k]) * fe.JxW(k);
+      {
+        const double diff = boundary_values[k] - uh[k];
+        dinfo.value(0) += penalty * diff * diff * fe.JxW(k);
+      }
     dinfo.value(0) = std::sqrt(dinfo.value(0));
   }
 
@@ -294,18 +297,18 @@ namespace Step39
     const std::vector<Tensor<1, dim>> &Duh1 = info1.gradients[0][0];
     const std::vector<Tensor<1, dim>> &Duh2 = info2.gradients[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int degree = fe.get_fe().tensor_degree();
     const double       penalty1 =
-      deg * (deg + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
+      degree * (degree + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
     const double penalty2 =
-      deg * (deg + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
+      degree * (degree + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
     const double penalty = penalty1 + penalty2;
     const double h       = dinfo1.face->measure();
 
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
       {
-        double diff1 = uh1[k] - uh2[k];
-        double diff2 =
+        const double diff1 = uh1[k] - uh2[k];
+        const double diff2 =
           fe.normal_vector(k) * Duh1[k] - fe.normal_vector(k) * Duh2[k];
         dinfo1.value(0) +=
           (penalty * diff1 * diff1 + h * diff2 * diff2) * fe.JxW(k);
@@ -398,9 +401,9 @@ namespace Step39
 
     const std::vector<double> &uh = info.values[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
-    const double       penalty =
-      2. * deg * (deg + 1) * dinfo.face->measure() / dinfo.cell->measure();
+    const unsigned int degree = fe.get_fe().tensor_degree();
+    const double penalty = 2. * degree * (degree + 1) * dinfo.face->measure() /
+                           dinfo.cell->measure();
 
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
       {
@@ -422,16 +425,16 @@ namespace Step39
     const std::vector<double> &uh1 = info1.values[0][0];
     const std::vector<double> &uh2 = info2.values[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int degree = fe.get_fe().tensor_degree();
     const double       penalty1 =
-      deg * (deg + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
+      degree * (degree + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
     const double penalty2 =
-      deg * (deg + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
+      degree * (degree + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
     const double penalty = penalty1 + penalty2;
 
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
       {
-        double diff = uh1[k] - uh2[k];
+        const double diff = uh1[k] - uh2[k];
         dinfo1.value(0) += (penalty * diff * diff) * fe.JxW(k);
       }
     dinfo1.value(0) = std::sqrt(dinfo1.value(0));
@@ -776,7 +779,10 @@ namespace Step39
   {
     // The results of the estimator are stored in a vector with one entry per
     // cell. Since cells in deal.II are not numbered, we have to create our
-    // own numbering in order to use this vector.
+    // own numbering in order to use this vector. For the assembler used below
+    // the information in which component of a vector the result is stored is
+    // transmitted by the user_index variable for each cell. We need to set this
+    // numering up here.
     //
     // On the other hand, somebody might have used the user indices
     // already. So, let's be good citizens and save them before tampering with
@@ -786,11 +792,8 @@ namespace Step39
 
     estimates.block(0).reinit(triangulation.n_active_cells());
     unsigned int i = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell, ++i)
-      cell->set_user_index(i);
+    for (const auto &cell : triangulation.active_cell_iterators())
+      cell->set_user_index(i++);
 
     // This starts like before,
     MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -860,12 +863,12 @@ namespace Step39
     BlockVector<double> errors(2);
     errors.block(0).reinit(triangulation.n_active_cells());
     errors.block(1).reinit(triangulation.n_active_cells());
+
+    std::vector<unsigned int> old_user_indices;
+    triangulation.save_user_indices(old_user_indices);
     unsigned int i = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell, ++i)
-      cell->set_user_index(i);
+    for (const auto &cell : triangulation.active_cell_iterators())
+      cell->set_user_index(i++);
 
     MeshWorker::IntegrationInfoBox<dim> info_box;
     const unsigned int                  n_gauss_points =
@@ -899,6 +902,7 @@ namespace Step39
                                            info_box,
                                            integrator,
                                            assembler);
+    triangulation.load_user_indices(old_user_indices);
 
     deallog << "energy-error: " << errors.block(0).l2_norm() << std::endl;
     deallog << "L2-error:     " << errors.block(1).l2_norm() << std::endl;

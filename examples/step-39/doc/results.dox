@@ -6,88 +6,93 @@ First, the program produces the usual logfile here stored in <tt>deallog</tt>. I
 @code
 DEAL::Element: FE_DGQ<2>(3)
 DEAL::Step 0
-DEAL::Triangulation 4 cells, 1 levels
-DEAL::DoFHandler 64 dofs, level dofs 64
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 27.1275
-DEAL:cg::Convergence step 1 value 1.97998e-14
-DEAL::Error    0.161172
-DEAL::Estimate 1.35839
-DEAL::Writing solution to <sol-00.gnuplot>...
-DEAL::
-DEAL::Step 1
-DEAL::Triangulation 10 cells, 2 levels
-DEAL::DoFHandler 160 dofs, level dofs 64 128
-DEAL::Assemble matrix
-DEAL::Assemble multilevel matrix
-DEAL::Assemble right hand side
-DEAL::Solve
-DEAL:cg::Starting value 35.5356
-DEAL:cg::Convergence step 14 value 3.21479e-13
-DEAL::Error    0.164760
-DEAL::Estimate 1.08528
-DEAL::Writing solution to <sol-01.gnuplot>...
-DEAL::
-DEAL::Step 2
 DEAL::Triangulation 16 cells, 2 levels
 DEAL::DoFHandler 256 dofs, level dofs 64 256
 DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:cg::Starting value 37.0552
-DEAL:cg::Convergence step 14 value 6.05416e-13
-DEAL::Error    0.113503
+DEAL:cg::Starting value 37.4071
+DEAL:cg::Convergence step 13 value 1.64974e-13
+DEAL::energy-error: 0.297419
+DEAL::L2-error:     0.00452447
 DEAL::Estimate 0.990460
+DEAL::Writing solution to <sol-00.gnuplot>...
+DEAL::
+DEAL::Step 1
+DEAL::Triangulation 25 cells, 3 levels
+DEAL::DoFHandler 400 dofs, level dofs 64 256 192
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 37.4071
+DEAL:cg::Convergence step 14 value 3.72262e-13
+DEAL::energy-error: 0.258559
+DEAL::L2-error:     0.00288510
+DEAL::Estimate 0.738624
+DEAL::Writing solution to <sol-01.gnuplot>...
+DEAL::
+DEAL::Step 2
+DEAL::Triangulation 34 cells, 4 levels
+DEAL::DoFHandler 544 dofs, level dofs 64 256 256 128
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 37.4071
+DEAL:cg::Convergence step 15 value 1.91610e-13
+DEAL::energy-error: 0.189234
+DEAL::L2-error:     0.00147954
+DEAL::Estimate 0.657507
 DEAL::Writing solution to <sol-02.gnuplot>...
 
 ...
 
 DEAL::Step 10
-DEAL::Triangulation 124 cells, 9 levels
-DEAL::DoFHandler 1984 dofs, level dofs 64 256 512 512 256 256 256 256 256
+DEAL::Triangulation 232 cells, 11 levels
+DEAL::DoFHandler 3712 dofs, level dofs 64 256 896 768 768 640 512 256 256 256 256
 DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:cg::Starting value 38.5798
-DEAL:cg::Convergence step 17 value 2.64999e-13
-DEAL::Error    0.0101278
-DEAL::Estimate 0.0957571
+DEAL:cg::Starting value 51.1571
+DEAL:cg::Convergence step 15 value 7.19599e-13
+DEAL::energy-error: 0.0132475
+DEAL::L2-error:     1.00423e-05
+DEAL::Estimate 0.0470724
 DEAL::Writing solution to <sol-10.gnuplot>...
 DEAL::
 DEAL::Step 11
-DEAL::Triangulation 163 cells, 10 levels
-DEAL::DoFHandler 2608 dofs, level dofs 64 256 768 576 512 256 256 256 256 256
+DEAL::Triangulation 322 cells, 12 levels
+DEAL::DoFHandler 5152 dofs, level dofs 64 256 1024 1024 896 768 768 640 448 320 320 320
 DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:cg::Starting value 44.1721
-DEAL:cg::Convergence step 17 value 3.18657e-13
-DEAL::Error    0.00716962
-DEAL::Estimate 0.0681646
+DEAL:cg::Starting value 52.2226
+DEAL:cg::Convergence step 15 value 8.15195e-13
+DEAL::energy-error: 0.00934891
+DEAL::L2-error:     5.41095e-06
+DEAL::Estimate 0.0329102
 DEAL::Writing solution to <sol-11.gnuplot>...
 DEAL::
 @endcode
 
 This log for instance shows that the number of conjugate gradient
-iteration steps is constant at approximately 17.
+iteration steps is constant at approximately 15.
 
 <h2>Postprocessing of the logfile</h2>
 
 <img src="https://www.dealii.org/images/steps/developer/step-39-convergence.png" alt="">
 Using the perl script <tt>postprocess.pl</tt>, we extract relevant
 data into <tt>output.dat</tt>, which can be used to plot graphs with
-<tt>gnuplot</tt>. The graph above for instance was produced with
+<tt>gnuplot</tt>. The graph above for instance was produced using the gnuplot
+script <tt>plot_errors.gpl</tt> via
 
 @code
-set style data linespoints
-set logscale
-set xrange [50:3000]
-plot "output.dat" using 2:3 title "error", "" using 2:4 title "estimate", \
-     "" using 2:(3000*$2**-1.5) title "3rd order"
+perl postprocess.pl deallog &> output.dat
+gnuplot plot_errors.gpl
 @endcode
+
+Reference data can be found in <tt>output.reference.dat</tt>.
