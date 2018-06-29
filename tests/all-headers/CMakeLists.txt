@@ -50,6 +50,8 @@ FILE(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
 # them from the list
 #
 LIST(REMOVE_ITEM _headers "lac/cuda_atomic.h"
+  "lac/cuda_kernels.h"
+  "lac/cuda_kernels.templates.h"
   "matrix_free/cuda_fe_evaluation.h"
   "matrix_free/cuda_matrix_free.templates.h"
   "matrix_free/cuda_tensor_product_kernels.h")
