@@ -266,10 +266,7 @@ namespace Step10
             // Now we loop over all cells, reinitialize the FEValues object
             // for each cell, and add up all the `JxW' values for this cell to
             // `area'...
-            typename DoFHandler<dim>::active_cell_iterator
-              cell = dof_handler.begin_active(),
-              endc = dof_handler.end();
-            for (; cell != endc; ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               {
                 fe_values.reinit(cell);
                 for (unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
@@ -359,11 +356,8 @@ namespace Step10
             // Now we run over all cells and over all faces of each cell. Only
             // the contributions of the `JxW' values on boundary faces are
             // added to the long double variable `perimeter'.
-            typename DoFHandler<dim>::active_cell_iterator
-              cell                = dof_handler.begin_active(),
-              endc                = dof_handler.end();
             long double perimeter = 0;
-            for (; cell != endc; ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               for (unsigned int face_no = 0;
                    face_no < GeometryInfo<dim>::faces_per_cell;
                    ++face_no)
