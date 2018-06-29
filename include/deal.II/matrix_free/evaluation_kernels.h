@@ -1407,7 +1407,7 @@ namespace internal
                                                         values_quad);
                   break;
                 case 1:
-                  values_quad[c] = values_dofs[2 * c];
+                  values_quad[0] = values_dofs[0];
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
@@ -1561,7 +1561,7 @@ namespace internal
                                                          values_dofs);
                   break;
                 case 1:
-                  values_dofs[2 * c] = values_quad[c][0];
+                  values_dofs[0] = values_quad[0];
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
