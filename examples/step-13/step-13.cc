@@ -119,7 +119,7 @@ namespace Step13
     class EvaluationBase
     {
     public:
-      virtual ~EvaluationBase();
+      virtual ~EvaluationBase() = default;
 
       void set_refinement_cycle(const unsigned int refinement_cycle);
 
@@ -129,13 +129,6 @@ namespace Step13
     protected:
       unsigned int refinement_cycle;
     };
-
-
-    // After the declaration has been discussed above, the implementation is
-    // rather straightforward:
-    template <int dim>
-    EvaluationBase<dim>::~EvaluationBase()
-    {}
 
 
 
@@ -225,54 +218,52 @@ namespace Step13
       // vertex matches the evaluation point. If this is the case, then
       // extract the point value, set a flag that we have found the point of
       // interest, and exit the loop.
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      bool evaluation_point_found                         = false;
-      for (; (cell != endc) && !evaluation_point_found; ++cell)
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
-          if (cell->vertex(vertex) == evaluation_point)
-            {
-              // In order to extract the point value from the global solution
-              // vector, pick that component that belongs to the vertex of
-              // interest, and, in case the solution is vector-valued, take
-              // the first component of it:
-              point_value = solution(cell->vertex_dof_index(vertex, 0));
-              // Note that by this we have made an assumption that is not
-              // valid always and should be documented in the class
-              // declaration if this were code for a real application rather
-              // than a tutorial program: we assume that the finite element
-              // used for the solution we try to evaluate actually has degrees
-              // of freedom associated with vertices. This, for example, does
-              // not hold for discontinuous elements, were the support points
-              // for the shape functions happen to be located at the vertices,
-              // but are not associated with the vertices but rather with the
-              // cell interior, since association with vertices would imply
-              // continuity there. It would also not hold for edge oriented
-              // elements, and the like.
-              //
-              // Ideally, we would check this at the beginning of the
-              // function, for example by a statement like <code>Assert
-              // (dof_handler.get_fe().dofs_per_vertex @> 0,
-              // ExcNotImplemented())</code>, which should make it quite clear
-              // what is going wrong when the exception is triggered. In this
-              // case, we omit it (which is indeed bad style), but knowing
-              // that that does not hurt here, since the statement
-              // <code>cell-@>vertex_dof_index(vertex,0)</code> would fail if
-              // we asked it to give us the DoF index of a vertex if there
-              // were none.
-              //
-              // We stress again that this restriction on the allowed finite
-              // elements should be stated in the class documentation.
+      bool evaluation_point_found = false;
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (!evaluation_point_found)
+          for (unsigned int vertex = 0;
+               vertex < GeometryInfo<dim>::vertices_per_cell;
+               ++vertex)
+            if (cell->vertex(vertex) == evaluation_point)
+              {
+                // In order to extract the point value from the global solution
+                // vector, pick that component that belongs to the vertex of
+                // interest, and, in case the solution is vector-valued, take
+                // the first component of it:
+                point_value = solution(cell->vertex_dof_index(vertex, 0));
+                // Note that by this we have made an assumption that is not
+                // valid always and should be documented in the class
+                // declaration if this were code for a real application rather
+                // than a tutorial program: we assume that the finite element
+                // used for the solution we try to evaluate actually has degrees
+                // of freedom associated with vertices. This, for example, does
+                // not hold for discontinuous elements, were the support points
+                // for the shape functions happen to be located at the vertices,
+                // but are not associated with the vertices but rather with the
+                // cell interior, since association with vertices would imply
+                // continuity there. It would also not hold for edge oriented
+                // elements, and the like.
+                //
+                // Ideally, we would check this at the beginning of the
+                // function, for example by a statement like <code>Assert
+                // (dof_handler.get_fe().dofs_per_vertex @> 0,
+                // ExcNotImplemented())</code>, which should make it quite clear
+                // what is going wrong when the exception is triggered. In this
+                // case, we omit it (which is indeed bad style), but knowing
+                // that that does not hurt here, since the statement
+                // <code>cell-@>vertex_dof_index(vertex,0)</code> would fail if
+                // we asked it to give us the DoF index of a vertex if there
+                // were none.
+                //
+                // We stress again that this restriction on the allowed finite
+                // elements should be stated in the class documentation.
 
-              // Since we found the right point, we now set the respective
-              // flag and exit the innermost loop. The outer loop will the
-              // also be terminated due to the set flag.
-              evaluation_point_found = true;
-              break;
-            };
+                // Since we found the right point, we now set the respective
+                // flag and exit the innermost loop. The outer loop will also be
+                // terminated due to the set flag.
+                evaluation_point_found = true;
+                break;
+              };
 
       // Finally, we'd like to make sure that we have indeed found the
       // evaluation point, since if that were not so we could not give a
@@ -507,7 +498,7 @@ namespace Step13
     {
     public:
       Base(Triangulation<dim> &coarse_grid);
-      virtual ~Base();
+      virtual ~Base() = default;
 
       virtual void solve_problem() = 0;
       virtual void postprocess(
@@ -525,11 +516,6 @@ namespace Step13
     template <int dim>
     Base<dim>::Base(Triangulation<dim> &coarse_grid)
       : triangulation(&coarse_grid)
-    {}
-
-
-    template <int dim>
-    Base<dim>::~Base()
     {}
 
 
@@ -618,10 +604,10 @@ namespace Step13
 
         void solve(Vector<double> &solution) const;
 
-        ConstraintMatrix     hanging_node_constraints;
-        SparsityPattern      sparsity_pattern;
-        SparseMatrix<double> matrix;
-        Vector<double>       rhs;
+        AffineConstraints<double> hanging_node_constraints;
+        SparsityPattern           sparsity_pattern;
+        SparseMatrix<double>      matrix;
+        Vector<double>            rhs;
       };
 
 
@@ -997,7 +983,7 @@ namespace Step13
     {
       hanging_node_constraints.clear();
 
-      void (*mhnc_p)(const DoFHandler<dim> &, ConstraintMatrix &) =
+      void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
@@ -1111,11 +1097,7 @@ namespace Step13
       std::vector<double>                  rhs_values(n_q_points);
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-      typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
-                                                              .begin_active(),
-                                                     endc =
-                                                       this->dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : this->dof_handler.active_cell_iterators())
         {
           cell_rhs = 0;
           fe_values.reinit(cell);
@@ -1124,8 +1106,9 @@ namespace Step13
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+              cell_rhs(i) += fe_values.shape_value(i, q_point) * //
+                             rhs_values[q_point] *               //
+                             fe_values.JxW(q_point);
 
           cell->get_dof_indices(local_dof_indices);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -1290,9 +1273,11 @@ namespace Step13
 
 
   template <int dim>
-  double Solution<dim>::value(const Point<dim> &p,
-                              const unsigned int /*component*/) const
+  double Solution<dim>::value(const Point<dim> & p,
+                              const unsigned int component) const
   {
+    (void)component;
+    AssertIndexRange(component, 1);
     double q = p(0);
     for (unsigned int i = 1; i < dim; ++i)
       q += std::sin(10 * p(i) + 5 * p(0) * p(0));
@@ -1316,9 +1301,11 @@ namespace Step13
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> &p,
-                                   const unsigned int /*component*/) const
+  double RightHandSide<dim>::value(const Point<dim> & p,
+                                   const unsigned int component) const
   {
+    (void)component;
+    AssertIndexRange(component, 1);
     double q = p(0);
     for (unsigned int i = 1; i < dim; ++i)
       q += std::sin(10 * p(i) + 5 * p(0) * p(0));
@@ -1376,14 +1363,10 @@ namespace Step13
         // annoying, but could be shortened by an alias, if so desired.
         solver.solve_problem();
 
-        for (typename std::list<
-               Evaluation::EvaluationBase<dim> *>::const_iterator i =
-               postprocessor_list.begin();
-             i != postprocessor_list.end();
-             ++i)
+        for (const auto &postprocessor : postprocessor_list)
           {
-            (*i)->set_refinement_cycle(step);
-            solver.postprocess(**i);
+            postprocessor->set_refinement_cycle(step);
+            solver.postprocess(*postprocessor);
           };
 
 
@@ -1433,12 +1416,18 @@ namespace Step13
 
     // Create a solver object of the kind indicated by the argument to this
     // function. If the name is not recognized, throw an exception!
-    LaplaceSolver::Base<dim> *solver = nullptr;
+    // The respective solver object is stored in a std::unique_ptr to avoid
+    // having to delete the pointer after use. For initializing, we want to use
+    // the C++14 function std::make_unique. Since deal.II only requires C++11 up
+    // to now, we define this function in a separate namespace called
+    // `std_cxx14`. In case the compiler supports C++14, this just calls
+    // std::make_unique.
+    std::unique_ptr<LaplaceSolver::Base<dim>> solver;
     if (solver_name == "global")
-      solver = new LaplaceSolver::RefinementGlobal<dim>(
+      solver = std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
         triangulation, fe, quadrature, rhs_function, boundary_values);
     else if (solver_name == "kelly")
-      solver = new LaplaceSolver::RefinementKelly<dim>(
+      solver = std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>(
         triangulation, fe, quadrature, rhs_function, boundary_values);
     else
       AssertThrow(false, ExcNotImplemented());
@@ -1464,10 +1453,8 @@ namespace Step13
     // simulation on successively refined grids:
     run_simulation(*solver, postprocessor_list);
 
-    // When this all is done, write out the results of the point evaluations,
-    // and finally delete the solver object:
+    // When this all is done, write out the results of the point evaluations:
     results_table.write_text(std::cout);
-    delete solver;
 
     // And one blank line after all results:
     std::cout << std::endl;
