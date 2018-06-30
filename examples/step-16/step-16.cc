@@ -68,12 +68,11 @@
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
-// Finally we include the MeshWorker framework. This framework through
-// its function loop() and integration_loop(), automates loops over
-// cells and assembling of data into vectors, matrices, etc. It obeys
-// constraints automatically. Since we have to build
-// several matrices and have to be aware of several sets of
-// constraints, this will save us a lot of headache.
+// Finally we include the MeshWorker framework. This framework through its
+// function loop() and integration_loop(), automates loops over cells and
+// assembling of data into vectors, matrices, etc. It obeys constraints
+// automatically. Since we have to build several matrices and have to be aware
+// of several sets of constraints, this will save us a lot of headache.
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
 #include <deal.II/meshworker/simple.h>
@@ -94,14 +93,12 @@ namespace Step16
 {
   // @sect3{The integrator on each cell}
 
-  // The MeshWorker::integration_loop() expects a class that provides
-  // functions for integration on cells and boundary and interior
-  // faces. This is done by the following class. In the constructor,
-  // we tell the loop that cell integrals should be computed (the
-  // 'true'), but integrals should not be computed on boundary and
-  // interior faces (the two 'false'). Accordingly, we only need a
-  // cell function, but none for the faces.
-
+  // The MeshWorker::integration_loop() expects a class that provides functions
+  // for integration on cells and boundary and interior faces. This is done by
+  // the following class. In the constructor, we tell the loop that cell
+  // integrals should be computed (the 'true'), but integrals should not be
+  // computed on boundary and interior faces (the two 'false'). Accordingly, we
+  // only need a cell function, but none for the faces.
   template <int dim>
   class LaplaceIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
@@ -122,32 +119,29 @@ namespace Step16
   // coefficient one in the right half plane and one tenth in the left
   // half plane.
 
-  // The MeshWorker::LocalResults base class of MeshWorker::DoFInfo
-  // contains objects that can be filled in this local integrator. How
-  // many objects is determined inside the MeshWorker framework by the
-  // assembler class. Here, we test for instance that one matrix is
-  // required (MeshWorker::LocalResults::n_matrices()). The matrices are
-  // accessed through MeshWorker::LocalResults::matrix(), which takes the number
-  // of the matrix as its first argument. The second argument is only used for
-  // integrals over faces, where there are two matrices for each test function
-  // set. In such a case, a second matrix with indicator 'true' would exist with
-  // the same index.
+  // The MeshWorker::LocalResults base class of MeshWorker::DoFInfo contains
+  // objects that can be filled in this local integrator. How many objects are
+  // created is determined inside the MeshWorker framework by the assembler
+  // class. Here, we test for instance that one matrix is required
+  // (MeshWorker::LocalResults::n_matrices()). The matrices are accessed through
+  // MeshWorker::LocalResults::matrix(), which takes the number of the matrix as
+  // its first argument. The second argument is only used for integrals over
+  // faces when there are two matrices for each test function used. Then, a
+  // second matrix with indicator 'true' would exist with the same index.
 
-  // MeshWorker::IntegrationInfo provides one or several FEValues
-  // objects, which below are used by
-  // LocalIntegrators::Laplace::cell_matrix() or
-  // LocalIntegrators::L2::L2(). Since we are assembling only a single
-  // PDE, there is also only one of these objects with index zero.
+  // MeshWorker::IntegrationInfo provides one or several FEValues objects, which
+  // below are used by LocalIntegrators::Laplace::cell_matrix() or
+  // LocalIntegrators::L2::L2(). Since we are assembling only a single PDE,
+  // there is also only one of these objects with index zero.
 
-  // In addition, we note that this integrator serves to compute the
-  // matrices for the multilevel preconditioner as well as the matrix
-  // and the right hand side for the global system. Since the
-  // assembler for a system requires an additional vector, this is
-  // indicated by MeshWorker::LocalResults::n_vectors() returning a nonzero
-  // value. Accordingly we fill a right hand side vector at the end of
-  // this function. Since LocalResults can deal with several
-  // BlockVector objects, but we are again in the simplest case here,
-  // we enter the information into block zero of vector zero.
+  // In addition, we note that this integrator serves to compute the matrices
+  // for the multilevel preconditioner as well as the matrix and the right hand
+  // side for the global system. Since the assembler for a system requires an
+  // additional vector, MeshWorker::LocalResults::n_vectors() is returning a
+  // nonzero value. Accordingly, we fill a right hand side vector at the end of
+  // this function. Since LocalResults can deal with several BlockVector
+  // objects, but we are again in the simplest case here, we enter the
+  // information into block zero of vector zero.
   template <int dim>
   void
   LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
@@ -198,28 +192,27 @@ namespace Step16
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     Vector<double> solution;
     Vector<double> system_rhs;
 
     const unsigned int degree;
 
-    // The following members are the essential data structures for the
-    // multigrid method. The first two represent the sparsity patterns
-    // and the matrices on individual levels of the multilevel
-    // hierarchy, very much like the objects for the global mesh above.
-
-    // Then we have two new matrices only needed for multigrid
-    // methods with local smoothing on adaptive meshes. They convey
-    // data between the interior part of the refined region and the
-    // refinement edge, as outline in detail in @ref mg_paper.
-
-    // The last object stores information about the boundary indices
-    // on each level and information about indices lying on a
-    // refinement edge between two different refinement levels. It
-    // thus serves a similar purpose as ConstraintMatrix, but on each
-    // level.
+    // The following members are the essential data structures for the multigrid
+    // method. The first two represent the sparsity patterns and the matrices on
+    // individual levels of the multilevel hierarchy, very much like the objects
+    // for the global mesh above.
+    //
+    // Then we have two new matrices only needed for multigrid methods with
+    // local smoothing on adaptive meshes. They convey data between the interior
+    // part of the refined region and the refinement edge, as outlined in detail
+    // in the @ref mg_paper "multigrid paper".
+    //
+    // The last object stores information about the boundary indices on each
+    // level and information about indices lying on a refinement edge between
+    // two different refinement levels. It thus serves a similar purpose as
+    // AffineConstraints, but on each level.
     MGLevelObject<SparsityPattern>      mg_sparsity_patterns;
     MGLevelObject<SparseMatrix<double>> mg_matrices;
     MGLevelObject<SparseMatrix<double>> mg_interface_in;
@@ -303,15 +296,14 @@ namespace Step16
                                                        dirichlet_boundary_ids);
 
 
-    // Now for the things that concern the multigrid data structures. First,
-    // we resize the multilevel objects to hold matrices and sparsity
-    // patterns for every level. The coarse level is zero (this is mandatory
-    // right now but may change in a future revision). Note that these
-    // functions take a complete, inclusive range here (not a starting index
-    // and size), so the finest level is <code>n_levels-1</code>.  We first
-    // have to resize the container holding the SparseMatrix classes, since
-    // they have to release their SparsityPattern before the can be destroyed
-    // upon resizing.
+    // Now for the things that concern the multigrid data structures. First, we
+    // resize the multilevel objects to hold matrices and sparsity patterns for
+    // every level. The coarse level is zero (this is mandatory right now but
+    // may change in a future revision). Note that these functions take a
+    // complete, inclusive range here (not a starting index and size), so the
+    // finest level is <code>n_levels-1</code>. We first have to resize the
+    // container holding the SparseMatrix classes, since they have to release
+    // their SparsityPattern before the can be destroyed upon resizing.
     const unsigned int n_levels = triangulation.n_levels();
 
     mg_interface_in.resize(0, n_levels - 1);
@@ -322,21 +314,20 @@ namespace Step16
     mg_matrices.clear_elements();
     mg_sparsity_patterns.resize(0, n_levels - 1);
 
-    // Now, we have to provide a matrix on each level. To this end, we first
-    // use the MGTools::make_sparsity_pattern function to first generate a
-    // preliminary compressed sparsity pattern on each level (see the @ref
-    // Sparsity module for more information on this topic) and then copy it
-    // over to the one we really want. The next step is to initialize both
-    // kinds of level matrices with these sparsity patterns.
+    // Now, we have to provide a matrix on each level. To this end, we first use
+    // the MGTools::make_sparsity_pattern function to generate a preliminary
+    // compressed sparsity pattern on each level (see the @ref Sparsity module
+    // for more information on this topic) and then copy it over to the one we
+    // really want. The next step is to initialize both kinds of level matrices
+    // with these sparsity patterns.
     //
     // It may be worth pointing out that the interface matrices only have
     // entries for degrees of freedom that sit at or next to the interface
     // between coarser and finer levels of the mesh. They are therefore even
     // sparser than the matrices on the individual levels of our multigrid
-    // hierarchy. If we were more concerned about memory usage (and possibly
-    // the speed with which we can multiply with these matrices), we should
-    // use separate and different sparsity patterns for these two kinds of
-    // matrices.
+    // hierarchy. If we were more concerned about memory usage (and possibly the
+    // speed with which we can multiply with these matrices), we should use
+    // separate and different sparsity patterns for these two kinds of matrices.
     for (unsigned int level = 0; level < n_levels; ++level)
       {
         DynamicSparsityPattern dsp(dof_handler.n_dofs(level),
@@ -355,34 +346,29 @@ namespace Step16
   // @sect4{LaplaceProblem::assemble_system}
 
   // The following function assembles the linear system on the finest level of
-  // the mesh. Since we want to reuse the code here for the level
-  // assembling below, we use the local integrator class
-  // LaplaceIntegrator and leave the loops to the MeshWorker
-  // framework. Thus, this function first sets up the objects
-  // necessary for this framework, namely
-  // <ol>
-  // <li>an MeshWorker::IntegrationInfoBox, which will provide all the required
-  // data in quadrature points on the cell. This object can be seen as
-  // an extension of FEValues, providing a lot more useful
-  // information,</li>
-  // <li>a MeshWorker::DoFInfo object, which on the one hand side extends the
-  // functionality of cell iterators, but also provides space for
-  // return values in its base class LocalResults,</li>
-  // <li>an assembler, in this case for the whole system. The term
-  // 'simple' here refers to the fact that the global system does not
-  // have a block structure,</li>
-  // <li>an the local integrator, which implements the actual forms.
-  // </ol>
+  // the mesh. Since we want to reuse the code here for the level assembling
+  // below, we use the local integrator class LaplaceIntegrator and leave the
+  // loops to the MeshWorker framework. Thus, this function first sets up the
+  // objects necessary for this framework, namely
+  //   - a MeshWorker::IntegrationInfoBox object, which will provide all the
+  //     required data in quadrature points on the cell. This object can be seen
+  //     as an extension of FEValues, providing a lot more useful information,
+  //   - a MeshWorker::DoFInfo object, which on the one hand side extends the
+  //     functionality of cell iterators, but also provides space for return
+  //     values in its base class LocalResults,
+  //   - an assembler, in this case for the whole system. The term 'simple' here
+  //     refers to the fact that the global system does not have a block
+  //     structure,
+  //   - the local integrator, which implements the actual forms.
   //
-  // After the loop has combined all of these into a matrix and a
-  // right hand side, there is one thing left to do: the assemblers
-  // leave matrix rows and columns of constrained degrees of freedom
-  // untouched. Therefore, we put a one on the diagonal to make the
-  // whole system well posed. The value one, or any fixed value has
-  // the advantage, that its effect on the spectrum of the matrix is
-  // easily understood. Since the corresponding eigenvectors form an
-  // invariant subspace, the value chosen does not affect the
-  // convergence of Krylov space solvers.
+  // After the loop has combined all of these into a matrix and a right hand
+  // side, there is one thing left to do: the assemblers leave matrix rows and
+  // columns of constrained degrees of freedom untouched. Therefore, we put a
+  // one on the diagonal to make the whole system well posed. The value one, or
+  // any fixed value has the advantage, that its effect on the spectrum of the
+  // matrix is easily understood. Since the corresponding eigenvectors form an
+  // invariant subspace, the value chosen does not affect the convergence of
+  // Krylov space solvers.
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
@@ -417,13 +403,12 @@ namespace Step16
   // @sect4{LaplaceProblem::assemble_multigrid}
 
   // The next function is the one that builds the linear operators (matrices)
-  // that define the multigrid method on each level of the mesh. The
-  // integration core is the same as above, but the loop below will go over
-  // all existing cells instead of just the active ones, and the results must
-  // be entered into the correct level matrices. Fortunately,
-  // MeshWorker hides most of that from us, and thus the difference
-  // between this function and the previous lies only in the setup of
-  // the assembler and the different iterators in the loop.
+  // that define the multigrid method on each level of the mesh. The integration
+  // core is the same as above, but the loop below will go over all existing
+  // cells instead of just the active ones, and the results must be entered into
+  // the correct level matrices. Fortunately, MeshWorker hides most of that from
+  // us, and thus the difference between this function and the previous lies
+  // only in the setup of the assembler and the different iterators in the loop.
   // Also, fixing up the matrices in the end is a little more complicated.
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
@@ -499,16 +484,15 @@ namespace Step16
 
     // The next component of a multilevel solver or preconditioner is that we
     // need a smoother on each level. A common choice for this is to use the
-    // application of a relaxation method (such as the SOR, Jacobi or
-    // Richardson method) or a small number of iterations of a solver method
-    // (such as CG or GMRES). The mg::SmootherRelaxation and
-    // MGSmootherPrecondition classes provide support for these two kinds of
-    // smoothers. Here, we opt for the application of a single SOR
-    // iteration. To this end, we define an appropriate alias and then setup a
-    // smoother object.
+    // application of a relaxation method (such as the SOR, Jacobi or Richardson
+    // method) or a small number of iterations of a solver method (such as CG or
+    // GMRES). The mg::SmootherRelaxation and MGSmootherPrecondition classes
+    // provide support for these two kinds of smoothers. Here, we opt for the
+    // application of a single SOR iteration. To this end, we define an
+    // appropriate alias and then setup a smoother object.
     //
     // The last step is to initialize the smoother object with our level
-    // matrices and to set some smoothing parameters.  The
+    // matrices and to set some smoothing parameters. The
     // <code>initialize()</code> function can optionally take additional
     // arguments that will be passed to the smoother object on each level. In
     // the current case for the SOR smoother, this could, for example, include
