@@ -369,7 +369,7 @@ private:
  *
  * This class was developed to be used in conjunction with the @p cylinder or
  * @p cylinder_shell functions of GridGenerator. This function will throw a
- * compile time exception whenever spacedim is not equal to three.
+ * run time exception whenever spacedim is not equal to three.
  *
  * @ingroup manifold
  *
