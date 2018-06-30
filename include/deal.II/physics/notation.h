@@ -277,7 +277,7 @@ namespace Physics
      * <a
      * href="https://en.wikipedia.org/wiki/Voigt_notation#Mandel_notation">this
      * wikipedia page</a> and <a
-     * href="https://github.com/dealii/dealii/tree/master/tests/physics/notation_02.cc">the
+     * href="https://github.com/dealii/dealii/tree/master/tests/physics/notation-kelvin_02.cc">the
      * unit tests</a>.
      *
      * @author Jean-Paul Pelteret, 2017
