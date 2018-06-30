@@ -149,14 +149,14 @@ namespace Utilities
      * following publication:
      * @code{.bib}
      * @inproceedings{dinan2011noncollective,
-     *  title={Noncollective communicator creation in MPI},
-     *  author={Dinan, James and Krishnamoorthy, Sriram and Balaji, Pavan and
-     *          Hammond, Jeff R and Krishnan, Manojkumar and Tipparaju, Vinod
-     *          and Vishnu, Abhinav},
-     *  booktitle={European MPI Users' Group Meeting},
-     *  pages={282--291},
-     *  year={2011},
-     *  organization={Springer}
+     *   title        = {Noncollective communicator creation in MPI},
+     *   author       = {Dinan, James and Krishnamoorthy, Sriram and Balaji,
+     *                   Pavan and Hammond, Jeff R and Krishnan, Manojkumar and
+     *                   Tipparaju, Vinod and Vishnu, Abhinav},
+     *   booktitle    = {European MPI Users' Group Meeting},
+     *   pages        = {282--291},
+     *   year         = {2011},
+     *   organization = {Springer}
      * }
      * @endcode
      */

@@ -255,12 +255,14 @@ DEAL_II_NAMESPACE_OPEN
  * and has the following complete reference:
  * @code{.bib}
  * @article{park2003p,
- *   title =     {P 1-nonconforming quadrilateral finite element methods for
- * second-order elliptic problems}, author =    {Park, Chunjae and Sheen,
- * Dongwoo}, journal =   {SIAM Journal on Numerical Analysis}, volume =    {41},
- *   number =    {2},
- *   pages =     {624--640},
- *   year =      {2003},
+ *   title     = {P1-nonconforming quadrilateral finite element methods for
+ *                second-order elliptic problems},
+ *   author    = {Park, Chunjae and Sheen, Dongwoo},
+ *   journal   = {SIAM Journal on Numerical Analysis},
+ *   volume    = {41},
+ *   number    = {2},
+ *   pages     = {624--640},
+ *   year      = {2003},
  *   publisher = {SIAM}
  * }
  * @endcode

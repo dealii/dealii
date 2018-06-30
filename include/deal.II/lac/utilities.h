@@ -115,12 +115,15 @@ namespace Utilities
      *
      * This function implements the algorithm from
      * @code{.bib}
-     * @Article{Zhou2006,
-     *  Title     = {Self-consistent-field Calculations Using Chebyshev-filtered
-     * Subspace Iteration}, Author    = {Zhou, Yunkai and Saad, Yousef and
-     * Tiago, Murilo L. and Chelikowsky, James R.}, Journal   = {Journal of
-     * Computational Physics}, Year      = {2006}, Volume    = {219}, Pages =
-     * {172--184},
+     * @article{Zhou2006,
+     *   Title   = {Self-consistent-field Calculations Using Chebyshev-filtered
+     *              Subspace Iteration},
+     *   Author  = {Zhou, Yunkai and Saad, Yousef and Tiago, Murilo L. and
+     *              Chelikowsky, James R.},
+     *   Journal = {Journal of Computational Physics},
+     *   Year    = {2006},
+     *   Volume  = {219},
+     *   Pages   = {172--184},
      * }
      * @endcode
      *
@@ -173,12 +176,14 @@ namespace Utilities
      * This function implements the algorithm (with a minor fix of sign of
      * $\sigma_1$) from
      * @code{.bib}
-     * @Article{Zhou2014,
-     *  Title     = {Chebyshev-filtered subspace iteration method free of sparse
-     * diagonalization for solving the Kohn--Sham equation}, Author    = {Zhou,
-     * Yunkai and Chelikowsky, James R and Saad, Yousef}, Journal   = {Journal
-     * of Computational Physics}, Year      = {2014}, Volume    = {274}, Pages
-     * = {770--782},
+     * @article{Zhou2014,
+     *   Title   = {Chebyshev-filtered subspace iteration method free of sparse
+     *              diagonalization for solving the Kohn--Sham equation},
+     *   Author  = {Zhou, Yunkai and Chelikowsky, James R and Saad, Yousef},
+     *   Journal = {Journal of Computational Physics},
+     *   Year    = {2014},
+     *   Volume  = {274},
+     *   Pages   = {770--782},
      * }
      * @endcode
      *
