@@ -2900,26 +2900,31 @@ namespace internal
      * Tridiagonalize a rank-2 symmetric tensor using the Householder method.
      * The specialized algorithm implemented here is given in
      * @code{.bib}
-     * @Article{Kopp2008,
-     *   title        = {Efficient numerical diagonalization of hermitian 3x3
-     * matrices}, author       = {Kopp, J.}, journal      = {International
-     * Journal of Modern Physics C}, year         = {2008}, volume       = {19},
-     *   number       = {3},
-     *   pages        = {523--548},
-     *   doi          = {10.1142/S0129183108012303},
-     *   eprinttype   = {arXiv},
-     *   eprint       = {physics/0610206v3},
-     *   eprintclass  = {physics.comp-ph},
-     *   url          =
+     * @article{Kopp2008,
+     *   title       = {Efficient numerical diagonalization of hermitian 3x3
+     *                  matrices},
+     *   author      = {Kopp, J.},
+     *   journal     = {International Journal of Modern Physics C},
+     *   year        = {2008},
+     *   volume      = {19},
+     *   number      = {3},
+     *   pages       = {523--548},
+     *   doi         = {10.1142/S0129183108012303},
+     *   eprinttype  = {arXiv},
+     *   eprint      = {physics/0610206v3},
+     *   eprintclass = {physics.comp-ph},
+     *   url         =
      * {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
      * }
      * @endcode
      * and is based off of the generic algorithm presented in section 11.3.2 of
      * @code{.bib}
-     * @Book{Press2007,
-     *   title        = {Numerical recipes 3rd edition: The art of scientific
-     * computing}, author       = {Press, W. H.}, journal      = {Cambridge
-     * university press}, year         = {2007}
+     * @book{Press2007,
+     *   title   = {Numerical recipes 3rd edition: The art of scientific
+     *              computing},
+     *   author  = {Press, W. H.},
+     *   journal = {Cambridge university press},
+     *   year    = {2007}
      * }
      * @endcode
      *
@@ -2944,26 +2949,31 @@ namespace internal
      * symmetric tensor using the QL algorithm with implicit shifts.
      * The specialized algorithm implemented here is given in
      * @code{.bib}
-     * @Article{Kopp2008,
-     *   title        = {Efficient numerical diagonalization of hermitian 3x3
-     * matrices}, author       = {Kopp, J.}, journal      = {International
-     * Journal of Modern Physics C}, year         = {2008}, volume       = {19},
-     *   number       = {3},
-     *   pages        = {523--548},
-     *   doi          = {10.1142/S0129183108012303},
-     *   eprinttype   = {arXiv},
-     *   eprint       = {physics/0610206v3},
-     *   eprintclass  = {physics.comp-ph},
-     *   url          =
+     * @article{Kopp2008,
+     *   title       = {Efficient numerical diagonalization of hermitian 3x3
+     *                  matrices},
+     *   author      = {Kopp, J.},
+     *   journal     = {International Journal of Modern Physics C},
+     *   year        = {2008},
+     *   volume      = {19},
+     *   number      = {3},
+     *   pages       = {523--548},
+     *   doi         = {10.1142/S0129183108012303},
+     *   eprinttype  = {arXiv},
+     *   eprint      = {physics/0610206v3},
+     *   eprintclass = {physics.comp-ph},
+     *   url         =
      * {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
      * }
      * @endcode
      * and is based off of the generic algorithm presented in section 11.4.3 of
      * @code{.bib}
-     * @Book{Press2007,
-     *   title        = {Numerical recipes 3rd edition: The art of scientific
-     * computing}, author       = {Press, W. H.}, journal      = {Cambridge
-     * university press}, year         = {2007}
+     * @book{Press2007,
+     *   title   = {Numerical recipes 3rd edition: The art of scientific
+     *              computing},
+     *   author  = {Press, W. H.},
+     *   journal = {Cambridge university press},
+     *   year    = {2007}
      * }
      * @endcode
      *
@@ -2986,26 +2996,31 @@ namespace internal
      * symmetric tensor using the Jacobi algorithm.
      * The specialized algorithm implemented here is given in
      * @code{.bib}
-     * @Article{Kopp2008,
-     *   title        = {Efficient numerical diagonalization of hermitian 3x3
-     * matrices}, author       = {Kopp, J.}, journal      = {International
-     * Journal of Modern Physics C}, year         = {2008}, volume       = {19},
-     *   number       = {3},
-     *   pages        = {523--548},
-     *   doi          = {10.1142/S0129183108012303},
-     *   eprinttype   = {arXiv},
-     *   eprint       = {physics/0610206v3},
-     *   eprintclass  = {physics.comp-ph},
-     *   url          =
+     * @article{Kopp2008,
+     *   title       = {Efficient numerical diagonalization of hermitian 3x3
+     *                  matrices},
+     *   author      = {Kopp, J.},
+     *   journal     = {International Journal of Modern Physics C},
+     *   year        = {2008},
+     *   volume      = {19},
+     *   number      = {3},
+     *   pages       = {523--548},
+     *   doi         = {10.1142/S0129183108012303},
+     *   eprinttype  = {arXiv},
+     *   eprint      = {physics/0610206v3},
+     *   eprintclass = {physics.comp-ph},
+     *   url         =
      * {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
      * }
      * @endcode
      * and is based off of the generic algorithm presented in section 11.4.3 of
      * @code{.bib}
-     * @Book{Press2007,
-     *   title        = {Numerical recipes 3rd edition: The art of scientific
-     * computing}, author       = {Press, W. H.}, journal      = {Cambridge
-     * university press}, year         = {2007}
+     * @book{Press2007,
+     *   title   = {Numerical recipes 3rd edition: The art of scientific
+     *              computing},
+     *   author  = {Press, W. H.},
+     *   journal = {Cambridge university press},
+     *   year    = {2007}
      * }
      * @endcode
      *
@@ -3052,17 +3067,20 @@ namespace internal
      * method falls back to ql_implicit_shifts. The specialized algorithm
      * implemented here is given in
      * @code{.bib}
-     * @Article{Kopp2008,
-     *   title        = {Efficient numerical diagonalization of hermitian 3x3
-     * matrices}, author       = {Kopp, J.}, journal      = {International
-     * Journal of Modern Physics C}, year         = {2008}, volume       = {19},
-     *   number       = {3},
-     *   pages        = {523--548},
-     *   doi          = {10.1142/S0129183108012303},
-     *   eprinttype   = {arXiv},
-     *   eprint       = {physics/0610206v3},
-     *   eprintclass  = {physics.comp-ph},
-     *   url          =
+     * @article{Kopp2008,
+     *   title       = {Efficient numerical diagonalization of hermitian 3x3
+     *                  matrices},
+     *   author      = {Kopp, J.},
+     *   journal     = {International Journal of Modern Physics C},
+     *   year        = {2008},
+     *   volume      = {19},
+     *   number      = {3},
+     *   pages       = {523--548},
+     *   doi         = {10.1142/S0129183108012303},
+     *   eprinttype  = {arXiv},
+     *   eprint      = {physics/0610206v3},
+     *   eprintclass = {physics.comp-ph},
+     *   url         =
      * {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
      * }
      * @endcode
@@ -3113,15 +3131,20 @@ namespace internal
  * The specialized algorithms utilized in computing the eigenvectors are
  * presented in
  * @code{.bib}
- * @Article{Kopp2008,
- *   title        = {Efficient numerical diagonalization of hermitian 3x3
- * matrices}, author       = {Kopp, J.}, journal      = {International Journal
- * of Modern Physics C}, year         = {2008}, volume       = {19}, number =
- * {3}, pages        = {523--548}, doi          = {10.1142/S0129183108012303},
- *   eprinttype   = {arXiv},
- *   eprint       = {physics/0610206v3},
- *   eprintclass  = {physics.comp-ph},
- *   url          =
+ * @article{Kopp2008,
+ *   title       = {Efficient numerical diagonalization of hermitian 3x3
+ *                  matrices},
+ *   author      = {Kopp, J.},
+ *   journal     = {International Journal of Modern Physics C},
+ *   year        = {2008},
+ *   volume      = {19},
+ *   number      = {3},
+ *   pages       = {523--548},
+ *   doi         = {10.1142/S0129183108012303},
+ *   eprinttype  = {arXiv},
+ *   eprint      = {physics/0610206v3},
+ *   eprintclass = {physics.comp-ph},
+ *   url         =
  * {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
  * }
  * @endcode
@@ -3168,15 +3191,20 @@ enum struct SymmetricTensorEigenvectorMethod
  * The specialized algorithms utilized in computing the eigenvectors are
  * presented in
  * @code{.bib}
- * @Article{Kopp2008,
- *   title        = {Efficient numerical diagonalization of hermitian 3x3
- * matrices}, author       = {Kopp, J.}, journal      = {International Journal
- * of Modern Physics C}, year         = {2008}, volume       = {19}, number =
- * {3}, pages        = {523--548}, doi          = {10.1142/S0129183108012303},
- *   eprinttype   = {arXiv},
- *   eprint       = {physics/0610206v3},
- *   eprintclass  = {physics.comp-ph},
- *   url          =
+ * @article{Kopp2008,
+ *   title       = {Efficient numerical diagonalization of hermitian 3x3
+ *                  matrices},
+ *   author      = {Kopp, J.},
+ *   journal     = {International Journal of Modern Physics C},
+ *   year        = {2008},
+ *   volume      = {19},
+ *   number      = {3},
+ *   pages       = {523--548},
+ *   doi         = {10.1142/S0129183108012303},
+ *   eprinttype  = {arXiv},
+ *   eprint      = {physics/0610206v3},
+ *   eprintclass = {physics.comp-ph},
+ *   url         =
  * {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
  * }
  * @endcode

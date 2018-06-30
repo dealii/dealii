@@ -921,13 +921,13 @@ private:
  *
  * For details on the algorithm, see section 5.1 of
  * @code{.bib}
- * @Book{Varga2009,
- *   Title       = {Matrix iterative analysis},
- *   Author      = {Varga, R. S.},
- *   Publisher   = {Springer},
- *   Address     = {Berlin},
- *   Edition     = {2nd},
- *   Year        = {2009},
+ * @book{Varga2009,
+ *   Title     = {Matrix iterative analysis},
+ *   Author    = {Varga, R. S.},
+ *   Publisher = {Springer},
+ *   Address   = {Berlin},
+ *   Edition   = {2nd},
+ *   Year      = {2009},
  * }
  * @endcode
  *

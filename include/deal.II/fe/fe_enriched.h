@@ -141,34 +141,43 @@ DEAL_II_NAMESPACE_OPEN
  *
  * When using this class, please cite
  * @code{.bib}
- * @Article{Davydov2017,
- *  author    = {Denis Davydov and Tymofiy Gerasimov and Jean-Paul Pelteret and
- * Paul Steinmann}, title     = {Convergence study of the h-adaptive PUM and the
- * hp-adaptive FEM applied to eigenvalue problems in quantum mechanics}, journal
- * = {Advanced Modeling and Simulation in Engineering Sciences}, year      =
- * {2017}, volume    = {4}, number    = {1}, pages     = {7}, month     = {Dec},
- *  issn      = {2213-7467},
- *  day       = {12},
- *  doi       = {10.1186/s40323-017-0093-0},
- *  url       = {https://doi.org/10.1186/s40323-017-0093-0},
+ * @article{Davydov2017,
+ *   author  = {Denis Davydov and Tymofiy Gerasimov and Jean-Paul Pelteret and
+ *              Paul Steinmann},
+ *   title   = {Convergence study of the h-adaptive PUM and the hp-adaptive FEM
+ *              applied to eigenvalue problems in quantum mechanics},
+ *   journal = {Advanced Modeling and Simulation in Engineering Sciences},
+ *   year    = {2017},
+ *   volume  = {4},
+ *   number  = {1},
+ *   pages   = {7},
+ *   month   = {Dec},
+ *   issn    = {2213-7467},
+ *   day     = {12},
+ *   doi     = {10.1186/s40323-017-0093-0},
+ *   url     = {https://doi.org/10.1186/s40323-017-0093-0},
  * }
  * @endcode
  * The PUM was introduced in
  * @code{.bib}
- * @Article{Melenk1996,
- *   Title                    = {The partition of unity finite element method:
- * Basic theory and applications }, Author                   = {Melenk, J.M. and
- * Babu\v{s}ka, I.}, Journal                  = {Computer Methods in Applied
- * Mechanics and Engineering}, Year                     = {1996}, Number =
- * {1--4}, Pages                    = {289 -- 314}, Volume                   =
- * {139},
+ * @article{Melenk1996,
+ *   title   = {The partition of unity finite element method: Basic theory and
+ *              applications},
+ *   author  = {Melenk, J.M. and Babu\v{s}ka, I.},
+ *   journal = {Computer Methods in Applied Mechanics and Engineering},
+ *   year    = {1996},
+ *   number  = {1--4},
+ *   pages   = {289 -- 314},
+ *   volume  = {139},
  * }
- * @Article{Babuska1997,
- *   Title                    = {The partition of unity method},
- *   Author                   = {Babu\v{s}ka, I. and Melenk, J. M.},
- *   Journal                  = {International Journal for Numerical Methods in
- * Engineering}, Year                     = {1997}, Number                   =
- * {4}, Pages                    = {727--758}, Volume                   = {40},
+ * @article{Babuska1997,
+ *   title   = {The partition of unity method},
+ *   author  = {Babu\v{s}ka, I. and Melenk, J. M.},
+ *   journal = {International Journal for Numerical Methods in Engineering},
+ *   year    = {1997},
+ *   number  = {4},
+ *   pages   = {727--758},
+ *   volume  = {40},
  * }
  * @endcode
  *

@@ -81,14 +81,15 @@ namespace hp
  * The full reference for the paper in which this error estimator is defined
  * is as follows:
  * @code{.bib}
- * @Article{KGZB83,
- *   author =       {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O.
- * C. and Babu\v{s}ka, I.}, title =        {A posteriori error analysis and
- * adaptive processes in the finite element method: Part {I}--Error Analysis},
- *   journal =      {Int. J. Num. Meth. Engrg.},
- *   year =         {1983},
- *   volume =       {19},
- *   pages =        {1593--1619}
+ * @article{KGZB83,
+ *   author  = {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
+ *              and Babu\v{s}ka, I.},
+ *   title   = {A posteriori error analysis and adaptive processes in the
+ *              finite element method: Part {I}--Error Analysis},
+ *   journal = {Int. J. Num. Meth. Engrg.},
+ *   year    = {1983},
+ *   volume  = {19},
+ *   pages   = {1593--1619}
  * }
  * @endcode
  *
