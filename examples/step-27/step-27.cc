@@ -115,7 +115,7 @@ namespace Step27
     std::vector<double>                     ln_k;
     Table<dim, std::complex<double>>        fourier_coefficients;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -328,10 +328,7 @@ namespace Step27
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 
@@ -354,11 +351,13 @@ namespace Step27
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i, j) +=
-                  (fe_values.shape_grad(i, q_point) *
-                   fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+                  (fe_values.shape_grad(i, q_point) * // grad phi_i(x_q)
+                   fe_values.shape_grad(j, q_point) * // grad phi_j(x_q)
+                   fe_values.JxW(q_point));           // dx
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+              cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
+                              rhs_values[q_point] *               // f(x_q)
+                              fe_values.JxW(q_point));            // dx
             }
 
         local_dof_indices.resize(dofs_per_cell);
@@ -438,14 +437,9 @@ namespace Step27
     // all integers, so that it what we use:
     {
       Vector<float> fe_degrees(triangulation.n_active_cells());
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          fe_degrees(cell->active_cell_index()) =
-            fe_collection[cell->active_fe_index()].degree;
-      }
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        fe_degrees(cell->active_cell_index()) =
+          fe_collection[cell->active_fe_index()].degree;
 
       // With now all data vectors available -- solution, estimated errors and
       // smoothness indicators, and finite element degrees --, we create a
@@ -499,21 +493,16 @@ namespace Step27
                                                smoothness_indicators.end()),
             min_smoothness = *std::max_element(smoothness_indicators.begin(),
                                                smoothness_indicators.end());
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          if (cell->refine_flag_set())
-            {
-              max_smoothness =
-                std::max(max_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
-              min_smoothness =
-                std::min(min_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
-            }
-      }
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (cell->refine_flag_set())
+          {
+            max_smoothness =
+              std::max(max_smoothness,
+                       smoothness_indicators(cell->active_cell_index()));
+            min_smoothness =
+              std::min(min_smoothness,
+                       smoothness_indicators(cell->active_cell_index()));
+          }
       const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
 
       // With this, we can go back, loop over all cells again, and for those
@@ -524,20 +513,15 @@ namespace Step27
       // degree and in return remove the flag indicating that the cell should
       // undergo bisection. For all other cells, the refinement flags remain
       // untouched:
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          if (cell->refine_flag_set() &&
-              (smoothness_indicators(cell->active_cell_index()) >
-               threshold_smoothness) &&
-              (cell->active_fe_index() + 1 < fe_collection.size()))
-            {
-              cell->clear_refine_flag();
-              cell->set_active_fe_index(cell->active_fe_index() + 1);
-            }
-      }
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (cell->refine_flag_set() &&
+            (smoothness_indicators(cell->active_cell_index()) >
+             threshold_smoothness) &&
+            (cell->active_fe_index() + 1 < fe_collection.size()))
+          {
+            cell->clear_refine_flag();
+            cell->set_active_fe_index(cell->active_fe_index() + 1);
+          }
 
       // At the end of this procedure, we then refine the mesh. During this
       // process, children of cells undergoing bisection inherit their mother
@@ -561,43 +545,28 @@ namespace Step27
   {
     const unsigned int dim = 2;
 
-    static const Point<2> vertices_1[] = {
-      Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
-      Point<2>(0., -1.),       Point<2>(+1. / 2, -1.),
-      Point<2>(+1, -1.),
+    const std::vector<Point<2>> vertices = {
+      {-1.0, -1.0}, {-0.5, -1.0}, {+0.0, -1.0}, {+0.5, -1.0}, {+1.0, -1.0}, //
+      {-1.0, -0.5}, {-0.5, -0.5}, {+0.0, -0.5}, {+0.5, -0.5}, {+1.0, -0.5}, //
+      {-1.0, +0.0}, {-0.5, +0.0}, {+0.5, +0.0}, {+1.0, +0.0},               //
+      {-1.0, +0.5}, {-0.5, +0.5}, {+0.0, +0.5}, {+0.5, +0.5}, {+1.0, +0.5}, //
+      {-1.0, +1.0}, {-0.5, +1.0}, {+0.0, +1.0}, {+0.5, +1.0}, {+1.0, +1.0}};
 
-      Point<2>(-1., -1. / 2.), Point<2>(-1. / 2, -1. / 2.),
-      Point<2>(0., -1. / 2.),  Point<2>(+1. / 2, -1. / 2.),
-      Point<2>(+1, -1. / 2.),
+    const std::vector<std::array<int, GeometryInfo<dim>::vertices_per_cell>>
+      cell_vertices = {{0, 1, 5, 6},
+                       {1, 2, 6, 7},
+                       {2, 3, 7, 8},
+                       {3, 4, 8, 9},
+                       {5, 6, 10, 11},
+                       {8, 9, 12, 13},
+                       {10, 11, 14, 15},
+                       {12, 13, 17, 18},
+                       {14, 15, 19, 20},
+                       {15, 16, 20, 21},
+                       {16, 17, 21, 22},
+                       {17, 18, 22, 23}};
 
-      Point<2>(-1., 0.),       Point<2>(-1. / 2, 0.),
-      Point<2>(+1. / 2, 0.),   Point<2>(+1, 0.),
-
-      Point<2>(-1., 1. / 2.),  Point<2>(-1. / 2, 1. / 2.),
-      Point<2>(0., 1. / 2.),   Point<2>(+1. / 2, 1. / 2.),
-      Point<2>(+1, 1. / 2.),
-
-      Point<2>(-1., 1.),       Point<2>(-1. / 2, 1.),
-      Point<2>(0., 1.),        Point<2>(+1. / 2, 1.),
-      Point<2>(+1, 1.)};
-    const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
-    const std::vector<Point<dim>> vertices(&vertices_1[0],
-                                           &vertices_1[n_vertices]);
-    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
-      {0, 1, 5, 6},
-      {1, 2, 6, 7},
-      {2, 3, 7, 8},
-      {3, 4, 8, 9},
-      {5, 6, 10, 11},
-      {8, 9, 12, 13},
-      {10, 11, 14, 15},
-      {12, 13, 17, 18},
-      {14, 15, 19, 20},
-      {15, 16, 20, 21},
-      {16, 17, 21, 22},
-      {17, 18, 22, 23}};
-    const unsigned int n_cells =
-      sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+    const unsigned int n_cells = cell_vertices.size();
 
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
@@ -698,10 +667,7 @@ namespace Step27
     Vector<double> local_dof_values;
 
     // Then here is the loop:
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         // Inside the loop, we first need to get the values of the local
         // degrees of freedom (which we put into the
@@ -752,8 +718,8 @@ namespace Step27
         // We have to calculate the logarithms of absolute
         // values of coefficients and use it in linear regression fit to
         // obtain $\mu$.
-        for (unsigned int f = 0; f < res.second.size(); f++)
-          res.second[f] = std::log(res.second[f]);
+        for (double &f : res.second)
+          f = std::log(f);
 
         std::pair<double, double> fit =
           FESeries::linear_regression(ln_k, res.second);
