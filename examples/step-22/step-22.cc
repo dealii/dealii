@@ -692,13 +692,15 @@ namespace Step22
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      // (2 * (grad^s phi_u_i(x_q) * grad^s phi_u_j(x_q))
-                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
-                       // - div phi_u_i(x_q) * phi_p_j(x_q)
-                       - div_phi_u[i] * phi_p[j]
-                       // - phi_p_i(x_q) * div phi_u_j(x_q))
-                       - phi_p[i] * div_phi_u[j]) //
-                      * fe_values.JxW(q);         // * dx
+                      (
+                        // 2 * (grad^s phi_u_i(x_q) * grad^s phi_u_j(x_q))
+                        2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
+                        // - [div phi_u_i(x_q)] * phi_p_j(x_q)
+                        - div_phi_u[i] * phi_p[j]
+                        // - phi_p_i(x_q) * [div phi_u_j(x_q)]
+                        - phi_p[i] * div_phi_u[j] //
+                        ) *
+                      fe_values.JxW(q); // * dx
 
                     local_preconditioner_matrix(i, j) +=
                       (phi_p[i] * phi_p[j]) // (phi_p_i(x_q) * phi_p_j(x_q))
