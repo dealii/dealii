@@ -715,11 +715,10 @@ namespace Step27
                 std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
           }
 
-        // We have to calculate the logarithms of absolute
-        // values of coefficients and use it in linear regression fit to
-        // obtain $\mu$.
-        for (double &f : res.second)
-          f = std::log(f);
+        // We have to calculate the logarithms of absolute values of
+        // coefficients and use it in a linear regression fit to obtain $\mu$.
+        for (double &residual_element : res.second)
+          residual_element = std::log(residual_element);
 
         std::pair<double, double> fit =
           FESeries::linear_regression(ln_k, res.second);
