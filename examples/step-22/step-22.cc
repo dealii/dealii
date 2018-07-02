@@ -692,14 +692,16 @@ namespace Step22
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      (2 * (symgrad_phi_u[i]      // ((2 * grad^s v_i(x_q)
-                            * symgrad_phi_u[j])   //     * grad^s u_j(x_q))
-                       - div_phi_u[i] * phi_p[j]  // - div v_i(x_q) * p_j(x_q)
-                       - phi_p[i] * div_phi_u[j]) // - q_i(x_q) * div u_j(x_q))
+                      // (2 * (grad^s phi_u_i(x_q) * grad^s phi_u_j(x_q))
+                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
+                       // - div phi_u_i(x_q) * phi_p_j(x_q)
+                       - div_phi_u[i] * phi_p[j]
+                       // - phi_p_i(x_q) * div phi_u_j(x_q))
+                       - phi_p[i] * div_phi_u[j]) //
                       * fe_values.JxW(q);         // * dx
 
                     local_preconditioner_matrix(i, j) +=
-                      (phi_p[i] * phi_p[j]) // (q_i(x_q) * p_j(x_q))
+                      (phi_p[i] * phi_p[j]) // (phi_p_i(x_q) * phi_p_j(x_q))
                       * fe_values.JxW(q);   // * dx
                   }
 
@@ -717,7 +719,7 @@ namespace Step22
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
-                local_rhs(i) += (fe_values.shape_value(i, q)   // (v_i(x_q)
+                local_rhs(i) += (fe_values.shape_value(i, q)   // (phi_u_i(x_q)
                                  * rhs_values[q](component_i)) // * f(x_q))
                                 * fe_values.JxW(q);            // * dx
               }
