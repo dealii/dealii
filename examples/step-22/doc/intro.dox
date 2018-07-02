@@ -621,13 +621,13 @@ left by the outward motion of material at this location.
 
 <h4>Using imhomogeneous constraints for implementing Dirichlet boundary conditions</h4>
 
-In all the previous tutorial programs, we used the ConstraintMatrix merely
+In all the previous tutorial programs, we used the AffineConstraints object merely
 for handling hanging node constraints (with exception of step-11). However,
 the class can also be used to implement Dirichlet boundary conditions, as we
 will show in this program, by fixing some node values $x_i = b_i$. Note that
 these are inhomogeneous constraints, and we have to pay some special
 attention to that. The way we are going to implement this is to first read
-in the boundary values into the ConstraintMatrix object by using the call
+in the boundary values into the AffineConstraints object by using the call
 
 @code
   VectorTools::interpolate_boundary_values (dof_handler,
@@ -639,7 +639,7 @@ in the boundary values into the ConstraintMatrix object by using the call
 very similar to how we were making the list of boundary nodes
 before (note that we set Dirichlet conditions only on boundaries with
 boundary flag 1). The actual application of the boundary values is then
-handled by the ConstraintMatrix object directly, without any additional
+handled by the AffineConstraints object directly, without any additional
 interference.
 
 We could then proceed as before, namely by filling the matrix, and then
@@ -652,7 +652,7 @@ Note that we call this on the system matrix and system right hand side
 simultaneously, since resolving inhomogeneous constraints requires knowledge
 about both the matrix entries and the right hand side. For efficiency
 reasons, though, we choose another strategy: all the constraints collected
-in the ConstraintMatrix can be resolved on the fly while writing local data
+in the AffineConstraints object can be resolved on the fly while writing local data
 into the global matrix, by using the call
 @code
   constraints.distribute_local_to_global (local_matrix, local_rhs,
@@ -667,13 +667,13 @@ side, it distributes the hanging node constraints and additionally
 implements (inhomogeneous) Dirichlet boundary conditions. That's nice, isn't
 it?
 
-We can conclude that the ConstraintMatrix provides an alternative to using
+We can conclude that the AffineConstraints class provides an alternative to using
 MatrixTools::apply_boundary_values for implementing Dirichlet boundary
 conditions.
 
 
 <a name="constraint-matrix">
-<h4>Using ConstraintMatrix for increasing performance</h4>
+<h4>Using AffineConstraints for increasing performance</h4>
 </a>
 
 Frequently, a sparse matrix contains a substantial amount of elements that
@@ -752,10 +752,10 @@ consumption. Likewise, the implementation of the decomposition step in the
 SparseILU class was very inefficient and has been replaced by one that is
 about 10 times faster. Even the vmult function of the SparseILU has been
 improved to save about twenty percent of time. Small improvements were
-applied here and there. Moreover, the ConstraintMatrix object has been used
+applied here and there. Moreover, the AffineConstraints object has been used
 to eliminate a lot of entries in the sparse matrix that are eventually going
 to be zero, see <a href="#constraint-matrix">the section on using advanced
-features of the ConstraintMatrix class</a>.
+features of the AffineConstraints class</a>.
 
 A profile of how many CPU instructions are spent at the various
 different places in the program during refinement cycles

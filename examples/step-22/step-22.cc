@@ -108,8 +108,8 @@ namespace Step22
   // <code>preconditioner_sparsity_pattern</code>.
   // In this example we also use adaptive grid refinement, which is handled
   // in analogy to step-6. According to the discussion in the introduction,
-  // we are also going to use the ConstraintMatrix for implementing Dirichlet
-  // boundary conditions. Hence, we change the name
+  // we are also going to use the AffineConstraints object for implementing
+  // Dirichlet boundary conditions. Hence, we change the name
   // <code>hanging_node_constraints</code> into <code>constraints</code>.
   template <int dim>
   class StokesProblem
@@ -131,7 +131,7 @@ namespace Step22
     FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
@@ -498,7 +498,8 @@ namespace Step22
     DoFTools::count_dofs_per_block(dof_handler,
                                    dofs_per_block,
                                    block_component);
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const unsigned int n_u = dofs_per_block[0];
+    const unsigned int n_p = dofs_per_block[1];
 
     std::cout << "   Number of active cells: " << triangulation.n_active_cells()
               << std::endl
@@ -666,10 +667,7 @@ namespace Step22
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         local_matrix                = 0;
@@ -694,12 +692,17 @@ namespace Step22
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) -
-                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
-                      fe_values.JxW(q);
+                      // (2 * (grad^s phi_u_i(x_q) * grad^s phi_u_j(x_q))
+                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
+                       // - div phi_u_i(x_q) * phi_p_j(x_q)
+                       - div_phi_u[i] * phi_p[j]
+                       // - phi_p_i(x_q) * div phi_u_j(x_q))
+                       - phi_p[i] * div_phi_u[j]) //
+                      * fe_values.JxW(q);         // * dx
 
                     local_preconditioner_matrix(i, j) +=
-                      (phi_p[i] * phi_p[j]) * fe_values.JxW(q);
+                      (phi_p[i] * phi_p[j]) // (phi_p_i(x_q) * phi_p_j(x_q))
+                      * fe_values.JxW(q);   // * dx
                   }
 
                 // For the right-hand side we use the fact that the shape
@@ -716,8 +719,9 @@ namespace Step22
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
-                local_rhs(i) += fe_values.shape_value(i, q) *
-                                rhs_values[q](component_i) * fe_values.JxW(q);
+                local_rhs(i) += (fe_values.shape_value(i, q)   // (phi_u_i(x_q)
+                                 * rhs_values[q](component_i)) // * f(x_q))
+                                * fe_values.JxW(q);            // * dx
               }
           }
 
@@ -726,9 +730,9 @@ namespace Step22
         // line of the local matrix contribution.
 
         // Before we can write the local data into the global matrix (and
-        // simultaneously use the ConstraintMatrix object to apply Dirichlet
-        // boundary conditions and eliminate hanging node constraints, as we
-        // discussed in the introduction), we have to be careful about one
+        // simultaneously use the AffineConstraints object to apply
+        // Dirichlet boundary conditions and eliminate hanging node constraints,
+        // as we discussed in the introduction), we have to be careful about one
         // thing, though. We have only built half of the local matrices
         // because of symmetry, but we're going to save the full matrices
         // in order to use the standard functions for solving. This is done
@@ -976,10 +980,13 @@ namespace Step22
       std::vector<unsigned int> subdivisions(dim, 1);
       subdivisions[0] = 4;
 
-      const Point<dim> bottom_left =
-        (dim == 2 ? Point<dim>(-2, -1) : Point<dim>(-2, 0, -1));
-      const Point<dim> top_right =
-        (dim == 2 ? Point<dim>(2, 0) : Point<dim>(2, 1, 0));
+      const Point<dim> bottom_left = (dim == 2 ?                //
+                                        Point<dim>(-2, -1) :    // 2d case
+                                        Point<dim>(-2, 0, -1)); // 3d case
+
+      const Point<dim> top_right = (dim == 2 ?              //
+                                      Point<dim>(2, 0) :    // 2d case
+                                      Point<dim>(2, 1, 0)); // 3d case
 
       GridGenerator::subdivided_hyper_rectangle(triangulation,
                                                 subdivisions,
@@ -991,10 +998,7 @@ namespace Step22
     // Dirichlet boundary conditions, i.e.  to faces that are located at 0 in
     // the last coordinate direction. See the example description above for
     // details.
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->center()[dim - 1] == 0)
           cell->face(f)->set_all_boundary_ids(1);
