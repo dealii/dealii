@@ -1389,16 +1389,11 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               }
 
           // finally add a corresponding range
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>
-            range(output_component,
-                  output_component + patch_space_dim - 1,
-                  name,
-                  DataComponentInterpretation::component_is_part_of_vector);
-
-          ranges.push_back(range);
+          ranges.push_back(std::make_tuple(
+            output_component,
+            output_component + patch_space_dim - 1,
+            name,
+            DataComponentInterpretation::component_is_part_of_vector));
 
           // increase the 'component' counter by the appropriate amount, same
           // for 'i', since we have already dealt with all these components
