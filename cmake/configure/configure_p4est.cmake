@@ -27,15 +27,16 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
-    # We require at least version 0.3.4.1
+    # We require at least version 2.0
     #
-    IF(P4EST_VERSION VERSION_LESS  "0.3.4.1")
+    SET(_version_required 2.0)
+    IF(P4EST_VERSION VERSION_LESS ${_version_required})
       MESSAGE(STATUS "Insufficient p4est installation found: "
-        "At least version 0.3.4.1 is required."
+        "At least version ${_version_required} is required."
         )
       SET(P4EST_ADDITIONAL_ERROR_STRING
         "Insufficient p4est installation found!\n"
-        "At least version 0.3.4.1 is required.\n"
+        "At least version ${_version_required} is required.\n"
         )
       SET(${var} FALSE)
     ENDIF()
