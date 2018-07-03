@@ -40,6 +40,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/array.hpp>
+#include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
 
 #ifdef DEAL_II_WITH_ZLIB
@@ -448,11 +449,15 @@ namespace Utilities
    * Creates and returns a buffer solely for the given object, using the
    * above mentioned pack function.
    *
+   * If the library has been compiled with ZLIB enabled, then the output buffer
+   * can be compressed. This can be triggered with the parameter
+   * @p allow_compression, and is only of effect if ZLIB is enabled.
+   *
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   std::vector<char>
-  pack(const T &object);
+  pack(const T &object, const bool allow_compression = true);
 
   /**
    * Given a vector of characters, obtained through a call to the function
@@ -461,6 +466,10 @@ namespace Utilities
    * This function uses boost::serialization utilities to unpack the object
    * from a vector of characters, and it is the inverse of the function
    * Utilities::pack().
+   *
+   * The @p allow_compression parameter denotes if the buffer to
+   * read from could have been previously compressed with ZLIB, and
+   * is only of effect if ZLIB is enabled.
    *
    * @note Since no arguments to this function depend on the template type
    *  @p T, you must manually specify the template argument when calling
@@ -484,7 +493,7 @@ namespace Utilities
    */
   template <typename T>
   T
-  unpack(const std::vector<char> &buffer);
+  unpack(const std::vector<char> &buffer, const bool allow_compression = true);
 
   /**
    * Same unpack function as above, but takes constant iterators on
@@ -510,6 +519,10 @@ namespace Utilities
    * from a vector of characters, and it is the inverse of the function
    * Utilities::pack().
    *
+   * The @p allow_compression parameter denotes if the buffer to
+   * read from could have been previously compressed with ZLIB, and
+   * is only of effect if ZLIB is enabled.
+   *
    * @note This function exists due to a quirk of C++. Specifically,
    *  if you want to pack() or unpack() arrays of objects, then the
    *  following works:
@@ -534,7 +547,9 @@ namespace Utilities
    */
   template <typename T, int N>
   void
-  unpack(const std::vector<char> &buffer, T (&unpacked_object)[N]);
+  unpack(const std::vector<char> &buffer,
+         T (&unpacked_object)[N],
+         const bool allow_compression = true);
 
   /**
    * Same unpack function as above, but takes constant iterators on
@@ -1082,10 +1097,10 @@ namespace Utilities
 
   template <typename T>
   std::vector<char>
-  pack(const T &object)
+  pack(const T &object, const bool allow_compression)
   {
     std::vector<char> buffer;
-    pack<T>(object, buffer);
+    pack<T>(object, buffer, allow_compression);
     return buffer;
   }
 
@@ -1152,9 +1167,9 @@ namespace Utilities
 
   template <typename T>
   T
-  unpack(const std::vector<char> &buffer)
+  unpack(const std::vector<char> &buffer, const bool allow_compression)
   {
-    return unpack<T>(buffer.cbegin(), buffer.cend());
+    return unpack<T>(buffer.cbegin(), buffer.cend(), allow_compression);
   }
 
 
@@ -1216,9 +1231,14 @@ namespace Utilities
 
   template <typename T, int N>
   void
-  unpack(const std::vector<char> &buffer, T (&unpacked_object)[N])
+  unpack(const std::vector<char> &buffer,
+         T (&unpacked_object)[N],
+         const bool allow_compression)
   {
-    unpack<T, N>(buffer.cbegin(), buffer.cend(), unpacked_object);
+    unpack<T, N>(buffer.cbegin(),
+                 buffer.cend(),
+                 unpacked_object,
+                 allow_compression);
   }
 
 } // namespace Utilities

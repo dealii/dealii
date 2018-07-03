@@ -65,29 +65,31 @@ namespace internal
     template <>
     struct types<2>
     {
-      using connectivity = p4est_connectivity_t;
-      using forest       = p4est_t;
-      using tree         = p4est_tree_t;
-      using quadrant     = p4est_quadrant_t;
-      using topidx       = p4est_topidx_t;
-      using locidx       = p4est_locidx_t;
-      using gloidx       = p4est_gloidx_t;
-      using balance_type = p4est_connect_type_t;
-      using ghost        = p4est_ghost_t;
+      using connectivity     = p4est_connectivity_t;
+      using forest           = p4est_t;
+      using tree             = p4est_tree_t;
+      using quadrant         = p4est_quadrant_t;
+      using topidx           = p4est_topidx_t;
+      using locidx           = p4est_locidx_t;
+      using gloidx           = p4est_gloidx_t;
+      using balance_type     = p4est_connect_type_t;
+      using ghost            = p4est_ghost_t;
+      using transfer_context = p4est_transfer_context_t;
     };
 
     template <>
     struct types<3>
     {
-      using connectivity = p8est_connectivity_t;
-      using forest       = p8est_t;
-      using tree         = p8est_tree_t;
-      using quadrant     = p8est_quadrant_t;
-      using topidx       = p4est_topidx_t;
-      using locidx       = p4est_locidx_t;
-      using gloidx       = p4est_gloidx_t;
-      using balance_type = p8est_connect_type_t;
-      using ghost        = p8est_ghost_t;
+      using connectivity     = p8est_connectivity_t;
+      using forest           = p8est_t;
+      using tree             = p8est_tree_t;
+      using quadrant         = p8est_quadrant_t;
+      using topidx           = p4est_topidx_t;
+      using locidx           = p4est_locidx_t;
+      using gloidx           = p4est_gloidx_t;
+      using balance_type     = p8est_connect_type_t;
+      using ghost            = p8est_ghost_t;
+      using transfer_context = p8est_transfer_context_t;
     };
 
 
@@ -228,6 +230,46 @@ namespace internal
                 void *                                     user_data);
 
       static constexpr unsigned int max_level = P4EST_MAXLEVEL;
+
+      static void (&transfer_fixed)(const types<2>::gloidx *dest_gfq,
+                                    const types<2>::gloidx *src_gfq,
+                                    MPI_Comm                mpicomm,
+                                    int                     tag,
+                                    void *                  dest_data,
+                                    const void *            src_data,
+                                    size_t                  data_size);
+
+      static types<2>::transfer_context *(&transfer_fixed_begin)(
+        const types<2>::gloidx *dest_gfq,
+        const types<2>::gloidx *src_gfq,
+        MPI_Comm                mpicomm,
+        int                     tag,
+        void *                  dest_data,
+        const void *            src_data,
+        size_t                  data_size);
+
+      static void (&transfer_fixed_end)(types<2>::transfer_context *tc);
+
+      static void (&transfer_custom)(const types<2>::gloidx *dest_gfq,
+                                     const types<2>::gloidx *src_gfq,
+                                     MPI_Comm                mpicomm,
+                                     int                     tag,
+                                     void *                  dest_data,
+                                     const int *             dest_sizes,
+                                     const void *            src_data,
+                                     const int *             src_sizes);
+
+      static types<2>::transfer_context *(&transfer_custom_begin)(
+        const types<2>::gloidx *dest_gfq,
+        const types<2>::gloidx *src_gfq,
+        MPI_Comm                mpicomm,
+        int                     tag,
+        void *                  dest_data,
+        const int *             dest_sizes,
+        const void *            src_data,
+        const int *             src_sizes);
+
+      static void (&transfer_custom_end)(types<2>::transfer_context *tc);
     };
 
 
@@ -349,9 +391,47 @@ namespace internal
 
       static size_t (&connectivity_memory_used)(types<3>::connectivity *p4est);
 
-
-
       static constexpr unsigned int max_level = P8EST_MAXLEVEL;
+
+      static void (&transfer_fixed)(const types<3>::gloidx *dest_gfq,
+                                    const types<3>::gloidx *src_gfq,
+                                    MPI_Comm                mpicomm,
+                                    int                     tag,
+                                    void *                  dest_data,
+                                    const void *            src_data,
+                                    size_t                  data_size);
+
+      static types<3>::transfer_context *(&transfer_fixed_begin)(
+        const types<3>::gloidx *dest_gfq,
+        const types<3>::gloidx *src_gfq,
+        MPI_Comm                mpicomm,
+        int                     tag,
+        void *                  dest_data,
+        const void *            src_data,
+        size_t                  data_size);
+
+      static void (&transfer_fixed_end)(types<3>::transfer_context *tc);
+
+      static void (&transfer_custom)(const types<3>::gloidx *dest_gfq,
+                                     const types<3>::gloidx *src_gfq,
+                                     MPI_Comm                mpicomm,
+                                     int                     tag,
+                                     void *                  dest_data,
+                                     const int *             dest_sizes,
+                                     const void *            src_data,
+                                     const int *             src_sizes);
+
+      static types<3>::transfer_context *(&transfer_custom_begin)(
+        const types<3>::gloidx *dest_gfq,
+        const types<3>::gloidx *src_gfq,
+        MPI_Comm                mpicomm,
+        int                     tag,
+        void *                  dest_data,
+        const int *             dest_sizes,
+        const void *            src_data,
+        const int *             src_sizes);
+
+      static void (&transfer_custom_end)(types<3>::transfer_context *tc);
     };
 
 

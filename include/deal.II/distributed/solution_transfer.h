@@ -198,13 +198,6 @@ namespace parallel
 
 
       /**
-       * Return the size in bytes that need to be stored per cell.
-       */
-      unsigned int
-      get_data_size() const;
-
-
-      /**
        * Prepare the serialization of the given vector. The serialization is
        * done by Triangulation::save(). The given vector needs all information
        * on the locally active DoFs (it must be ghosted). See documentation of
@@ -267,8 +260,8 @@ namespace parallel
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
           cell_iterator &cell,
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus status,
-        void *       data);
+          CellStatus       status,
+        std::vector<char> &data);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -280,16 +273,19 @@ namespace parallel
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
           cell_iterator &cell,
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus               status,
-        const void *               data,
+          CellStatus status,
+        const boost::iterator_range<std::vector<char>::const_iterator>
+                                   data_range,
         std::vector<VectorType *> &all_out);
 
 
       /**
-       *
+       * Registers the pack_callback() function to the
+       * parallel::distributed::Triangulation that has been assigned to the
+       * DoFHandler class member and stores the returning handle.
        */
       void
-      register_data_attach(const std::size_t size);
+      register_data_attach();
     };
 
 

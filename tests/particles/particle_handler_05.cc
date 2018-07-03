@@ -106,8 +106,7 @@ test()
     tr.signals.pre_distributed_refinement.connect(std::bind(
       &Particles::ParticleHandler<dim,
                                   spacedim>::register_store_callback_function,
-      &particle_handler,
-      false));
+      &particle_handler));
 
     tr.signals.post_distributed_refinement.connect(std::bind(
       &Particles::ParticleHandler<dim,

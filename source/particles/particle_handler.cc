@@ -1024,8 +1024,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim, spacedim>::register_store_callback_function(
-    const bool serialization)
+  ParticleHandler<dim, spacedim>::register_store_callback_function()
   {
     parallel::distributed::Triangulation<dim, spacedim>
       *non_const_triangulation =
@@ -1041,7 +1040,7 @@ namespace Particles
         const std::function<
           void(const typename Triangulation<dim, spacedim>::cell_iterator &,
                const typename Triangulation<dim, spacedim>::CellStatus,
-               void *)>
+               std::vector<char> &)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::store_particles,
                       std::cref(*this),
@@ -1049,28 +1048,8 @@ namespace Particles
                       std::placeholders::_2,
                       std::placeholders::_3);
 
-        // Compute the size per serialized particle. This is simple if we own
-        // particles, simply ask one of them. Otherwise create a temporary
-        // particle, ask it for its size and add the size of its properties.
-        const std::size_t size_per_particle =
-          (particles.size() > 0) ?
-            begin()->serialized_size_in_bytes() :
-            Particle<dim, spacedim>().serialized_size_in_bytes() +
-              property_pool->n_properties_per_slot() * sizeof(double);
-
-        // We need to transfer the number of particles for this cell and
-        // the particle data itself. If we are in the process of refinement
-        // (i.e. not in serialization) we need to provide 2^dim times the
-        // space for the data in case a cell is coarsened and all particles
-        // of the children have to be stored in the parent cell.
-        const std::size_t transfer_size_per_cell =
-          sizeof(unsigned int) +
-          (size_per_particle * global_max_particles_per_cell) *
-            (serialization ? 1 : std::pow(2, dim));
-
         handle =
-          non_const_triangulation->register_data_attach(transfer_size_per_cell,
-                                                        callback_function);
+          non_const_triangulation->register_data_attach(callback_function);
       }
   }
 
@@ -1099,7 +1078,7 @@ namespace Particles
         const std::function<
           void(const typename Triangulation<dim, spacedim>::cell_iterator &,
                const typename Triangulation<dim, spacedim>::CellStatus,
-               void *)>
+               std::vector<char> &)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::store_particles,
                       std::cref(*this),
@@ -1107,24 +1086,8 @@ namespace Particles
                       std::placeholders::_2,
                       std::placeholders::_3);
 
-        // Compute the size per serialized particle. This is simple if we own
-        // particles, simply ask one of them. Otherwise create a temporary
-        // particle, ask it for its size and add the size of its properties.
-        const std::size_t size_per_particle =
-          (particles.size() > 0) ?
-            begin()->serialized_size_in_bytes() :
-            Particle<dim, spacedim>().serialized_size_in_bytes() +
-              property_pool->n_properties_per_slot() * sizeof(double);
-
-        // We need to transfer the number of particles for this cell and
-        // the particle data itself and we need to provide 2^dim times the
-        // space for the data in case a cell is coarsened
-        const std::size_t transfer_size_per_cell =
-          sizeof(unsigned int) +
-          (size_per_particle * global_max_particles_per_cell);
         handle =
-          non_const_triangulation->register_data_attach(transfer_size_per_cell,
-                                                        callback_function);
+          non_const_triangulation->register_data_attach(callback_function);
       }
 
     // Check if something was stored and load it
@@ -1133,7 +1096,7 @@ namespace Particles
         const std::function<
           void(const typename Triangulation<dim, spacedim>::cell_iterator &,
                const typename Triangulation<dim, spacedim>::CellStatus,
-               const void *)>
+               const boost::iterator_range<std::vector<char>::const_iterator>)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::load_particles,
                       std::ref(*this),
@@ -1158,8 +1121,39 @@ namespace Particles
   ParticleHandler<dim, spacedim>::store_particles(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const typename Triangulation<dim, spacedim>::CellStatus     status,
-    void *                                                      data) const
+    std::vector<char> &data_vector) const
   {
+    // -------------------
+    // HOTFIX: resize memory and static_cast std::vector to void*
+    // TODO: Apply ParticleHandler to variable size transfer
+
+    // ----- Copied from the old register_store_callback_function -----
+    // Compute the size per serialized particle. This is simple if we own
+    // particles, simply ask one of them. Otherwise create a temporary
+    // particle, ask it for its size and add the size of its properties.
+    const std::size_t size_per_particle =
+      (particles.size() > 0) ?
+        begin()->serialized_size_in_bytes() :
+        Particle<dim, spacedim>().serialized_size_in_bytes() +
+          property_pool->n_properties_per_slot() * sizeof(double);
+
+    // We need to transfer the number of particles for this cell and
+    // the particle data itself. If we are in the process of refinement
+    // (i.e. not in serialization) we need to provide 2^dim times the
+    // space for the data in case a cell is coarsened and all particles
+    // of the children have to be stored in the parent cell.
+    // (Note: In this hotfix we always reserve sufficient memory)
+    const bool        serialization = false;
+    const std::size_t transfer_size_per_cell =
+      sizeof(unsigned int) +
+      (size_per_particle * global_max_particles_per_cell) *
+        (serialization ? 1 : std::pow(2, dim));
+
+    const size_t previous_size = data_vector.size();
+    data_vector.resize(previous_size + transfer_size_per_cell);
+    void *data = static_cast<void *>(data_vector.data() + previous_size);
+    // --------------------
+
     unsigned int n_particles(0);
 
     // If the cell persist or is refined store all particles of the current
@@ -1228,10 +1222,17 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::load_particles(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename Triangulation<dim, spacedim>::CellStatus     status,
-    const void *                                                data)
+    const typename Triangulation<dim, spacedim>::cell_iterator &   cell,
+    const typename Triangulation<dim, spacedim>::CellStatus        status,
+    const boost::iterator_range<std::vector<char>::const_iterator> data_range)
   {
+    // -------------------
+    // HOTFIX: static_cast std::vector to void*
+    // TODO: Apply ParticleHandler to variable size transfer
+    //    const void *data = static_cast<const void *>(data_vector.data());
+    const void *data = static_cast<const void *>(&*(data_range.begin()));
+    // -------------------
+
     const unsigned int *n_particles_in_cell_ptr =
       static_cast<const unsigned int *>(data);
     const void *pdata =

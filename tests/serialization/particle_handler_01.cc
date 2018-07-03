@@ -111,8 +111,7 @@ test()
   tr.signals.pre_distributed_save.connect(std::bind(
     &Particles::ParticleHandler<dim,
                                 spacedim>::register_store_callback_function,
-    &particle_handler,
-    true));
+    &particle_handler));
 
   // save data to archive
   std::ostringstream oss;

@@ -342,11 +342,11 @@ namespace Particles
 
     /**
      * Callback function that should be called before every refinement
-     * and when writing checkpoints.  This function is used to
+     * and when writing checkpoints. This function is used to
      * register store_particles() with the triangulation.
      */
     void
-    register_store_callback_function(const bool serialization);
+    register_store_callback_function();
 
     /**
      * Callback function that should be called after every refinement
@@ -511,7 +511,7 @@ namespace Particles
     store_particles(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const typename Triangulation<dim, spacedim>::CellStatus     status,
-      void *                                                      data) const;
+      std::vector<char> &                                         data) const;
 
     /**
      * Called by listener functions after a refinement step. The local map
@@ -521,7 +521,8 @@ namespace Particles
     load_particles(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const typename Triangulation<dim, spacedim>::CellStatus     status,
-      const void *                                                data);
+      const boost::iterator_range<std::vector<char>::const_iterator>
+        data_range);
   };
 
   /* ---------------------- inline and template functions ------------------ */
