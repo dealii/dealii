@@ -113,6 +113,35 @@ DEAL_II_NAMESPACE_OPEN
  * soltrans.interpolate(solution, interpolated_solution);
  * @endcode
  *
+ * If the grid is partitioned across several MPI processes, then it is
+ * important to note that the old solution(s) must be copied to one that
+ * also provides access to the locally relevant DoF values (these values
+ * required for the interpolation process):
+ * @code
+ * // Create initial indexsets pertaining to the grid before refinement
+ * IndexSet locally_owned_dofs, locally_relevant_dofs;
+ * locally_owned_dofs = dof_handler.locally_owned_dofs();
+ * DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+ *
+ * // The solution vector only knows about locally owned DoFs
+ * TrilinosWrappers::MPI::Vector solution;
+ * solution.reinit(locally_owned_dofs,
+ *                 mpi_communicator);
+ * ...
+ * // Transfer solution to vector that provides access to locally relevant DoFs
+ * TrilinosWrappers::MPI::Vector old_solution;
+ * old_solution.reinit(locally_owned_dofs,
+ *                     locally_relevant_dofs,
+ *                     mpi_communicator);
+ * old_solution = solution;
+ * ...
+ * // Refine grid
+ * // Recreate locally_owned_dofs and locally_relevant_dofs index sets
+ * ...
+ * solution.reinit(locally_owned_dofs, mpi_communicator);
+ * soltrans.refine_interpolate(old_solution, solution);
+ * @endcode
+ *
  * Multiple calls to the function <code>interpolate (const Vector<number> &in,
  * Vector<number> &out)</code> are NOT allowed. Interpolating several
  * functions can be performed in one step by using <tt>void interpolate (const
