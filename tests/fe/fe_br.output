@@ -1,0 +1,131 @@
+
+DEAL::FE=FE_BR<2>(1)
+DEAL::Cell nodes:
+DEAL::0: ( 0.00 0.00 )
+DEAL::1: ( 1.00 0.00 )
+DEAL::2: ( 0.00 1.15 )
+DEAL::3: ( 1.00 1.15 )
+DEAL::    bulk integral=-0.575 -0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.575 -0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=-0.575 0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.575 0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=-0.767 -1.99e-17
+DEAL::    bulk integral=0.767 -2.78e-17
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=-0.575 -0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.575 -0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=-0.575 0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.575 0.500
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=0.00 0.00
+DEAL::    bulk integral=1.21e-17 -0.667
+DEAL::    bulk integral=-2.78e-17 0.667
+DEAL::FE=FE_BR<3>(1)
+DEAL::Cell nodes:
+DEAL::0: ( 0.00 0.00 0.00 )
+DEAL::1: ( 1.00 0.00 0.00 )
+DEAL::2: ( 0.00 1.00 0.00 )
+DEAL::3: ( 1.00 1.00 0.00 )
+DEAL::4: ( 0.00 0.00 1.15 )
+DEAL::5: ( 1.00 0.00 1.15 )
+DEAL::6: ( 0.00 1.00 1.15 )
+DEAL::7: ( 1.00 1.00 1.15 )
+DEAL::    bulk integral=-0.287 -0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 -0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 -0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 -0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.511 1.04e-17 -5.81e-17
+DEAL::    bulk integral=0.511 1.21e-17 3.04e-17
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 -0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 -0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 -0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 -0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-4.77e-18 -0.511 4.94e-17
+DEAL::    bulk integral=-6.94e-18 0.511 1.30e-17
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 -0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 -0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 0.287 -0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 -0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 -0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-0.287 0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.287 0.287 0.250
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=0.00 0.00 0.00
+DEAL::    bulk integral=-6.88e-18 1.08e-17 -0.444
+DEAL::    bulk integral=-6.07e-18 3.38e-17 0.444
