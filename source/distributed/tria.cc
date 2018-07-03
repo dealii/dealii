@@ -1785,15 +1785,6 @@ namespace parallel
              ExcMessage("Incompatible version found in .info file."));
       Assert(this->n_cells(0) == n_coarse_cells,
              ExcMessage("Number of coarse cells differ!"));
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-#  else
-      AssertThrow(
-        numcpus <= Utilities::MPI::n_mpi_processes(this->mpi_communicator),
-        ExcMessage(
-          "parallel::distributed::Triangulation::load() only supports loading "
-          "saved data with a greater or equal number of processes than were used to "
-          "save() when using p4est 0.3.4.2."));
-#  endif
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
@@ -1801,7 +1792,6 @@ namespace parallel
       cell_attached_data.n_attached_datas           = 0;
       cell_attached_data.n_attached_deserialize     = attached_count;
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext(
         filename,
         this->mpi_communicator,
@@ -1811,16 +1801,7 @@ namespace parallel
         0,
         this,
         &connectivity);
-#  else
-      (void)autopartition;
-      parallel_forest =
-        dealii::internal::p4est::functions<dim>::load(filename,
-                                                      this->mpi_communicator,
-                                                      attached_size,
-                                                      attached_size > 0,
-                                                      this,
-                                                      &connectivity);
-#  endif
+
       if (numcpus != Utilities::MPI::n_mpi_processes(this->mpi_communicator))
         // We are changing the number of CPUs so we need to repartition.
         // Note that p4est actually distributes the cells between the changed
@@ -3503,7 +3484,6 @@ namespace parallel
       const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
         &periodicity_vector)
     {
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 1)
       Assert(triangulation_has_content == true,
              ExcMessage("The triangulation is empty!"));
       Assert(this->n_levels() == 1,
@@ -3663,9 +3643,6 @@ namespace parallel
 
       // The range of ghost_owners might have changed so update that information
       this->update_number_cache();
-#  else
-      Assert(false, ExcMessage("Need p4est version >= 0.3.4.1!"));
-#  endif
     }
 
 

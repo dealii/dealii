@@ -71,12 +71,9 @@ namespace internal
       using quadrant     = p4est_quadrant_t;
       using topidx       = p4est_topidx_t;
       using locidx       = p4est_locidx_t;
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
+      using gloidx       = p4est_gloidx_t;
       using balance_type = p4est_connect_type_t;
-#  else
-      using balance_type = p4est_balance_type_t;
-#  endif
-      using ghost = p4est_ghost_t;
+      using ghost        = p4est_ghost_t;
     };
 
     template <>
@@ -88,12 +85,9 @@ namespace internal
       using quadrant     = p8est_quadrant_t;
       using topidx       = p4est_topidx_t;
       using locidx       = p4est_locidx_t;
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
+      using gloidx       = p4est_gloidx_t;
       using balance_type = p8est_connect_type_t;
-#  else
-      using balance_type = p8est_balance_type_t;
-#  endif
-      using ghost = p8est_ghost_t;
+      using ghost        = p8est_ghost_t;
     };
 
 
@@ -182,21 +176,14 @@ namespace internal
                              types<2>::balance_type btype,
                              p4est_init_t           init_fn);
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-      static p4est_gloidx_t (&partition)(types<2>::forest *p4est,
-                                         int partition_for_coarsening,
-                                         p4est_weight_t weight_fn);
-#  else
-      static void (&partition)(types<2>::forest *p4est,
-                               int               partition_for_coarsening,
-                               p4est_weight_t    weight_fn);
-#  endif
+      static types<2>::gloidx (&partition)(types<2>::forest *p4est,
+                                           int partition_for_coarsening,
+                                           p4est_weight_t weight_fn);
 
       static void (&save)(const char *      filename,
                           types<2>::forest *p4est,
                           int               save_data);
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
       static types<2>::forest *(&load_ext)(const char *filename,
                                            MPI_Comm    mpicomm,
                                            size_t      data_size,
@@ -205,35 +192,14 @@ namespace internal
                                            int         broadcasthead,
                                            void *      user_pointer,
                                            types<2>::connectivity **p4est);
-#  else
-      static types<2>::forest *(&load)(const char *             filename,
-                                       MPI_Comm                 mpicomm,
-                                       size_t                   data_size,
-                                       int                      load_data,
-                                       void *                   user_pointer,
-                                       types<2>::connectivity **p4est);
-#  endif
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
       static int (&connectivity_save)(const char *            filename,
                                       types<2>::connectivity *connectivity);
-#  else
-      static void (&connectivity_save)(const char *            filename,
-                                       types<2>::connectivity *connectivity);
-#  endif
 
       static int (&connectivity_is_valid)(types<2>::connectivity *connectivity);
 
-#  if DEAL_II_P4EST_VERSION_GTE(1, 0, 0, 0)
       static types<2>::connectivity *(&connectivity_load)(const char *filename,
                                                           size_t *    length);
-#  elif DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-      static types<2>::connectivity *(
-        &connectivity_load)(const char *filename, long unsigned *length);
-#  else
-      static types<2>::connectivity *(&connectivity_load)(const char *filename,
-                                                          long *      length);
-#  endif
 
       static unsigned int (&checksum)(types<2>::forest *p4est);
 
@@ -261,7 +227,7 @@ namespace internal
                 dealii::internal::p4est::types<2>::ghost * parallel_ghost,
                 void *                                     user_data);
 
-      static const unsigned int max_level = P4EST_MAXLEVEL;
+      static constexpr unsigned int max_level = P4EST_MAXLEVEL;
     };
 
 
@@ -339,21 +305,14 @@ namespace internal
                              types<3>::balance_type btype,
                              p8est_init_t           init_fn);
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-      static p4est_gloidx_t (&partition)(types<3>::forest *p8est,
-                                         int partition_for_coarsening,
-                                         p8est_weight_t weight_fn);
-#  else
-      static void (&partition)(types<3>::forest *p8est,
-                               int               partition_for_coarsening,
-                               p8est_weight_t    weight_fn);
-#  endif
+      static types<3>::gloidx (&partition)(types<3>::forest *p8est,
+                                           int partition_for_coarsening,
+                                           p8est_weight_t weight_fn);
 
       static void (&save)(const char *      filename,
                           types<3>::forest *p4est,
                           int               save_data);
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
       static types<3>::forest *(&load_ext)(const char *filename,
                                            MPI_Comm    mpicomm,
                                            std::size_t data_size,
@@ -362,35 +321,14 @@ namespace internal
                                            int         broadcasthead,
                                            void *      user_pointer,
                                            types<3>::connectivity **p4est);
-#  else
-      static types<3>::forest *(&load)(const char *             filename,
-                                       MPI_Comm                 mpicomm,
-                                       std::size_t              data_size,
-                                       int                      load_data,
-                                       void *                   user_pointer,
-                                       types<3>::connectivity **p4est);
-#  endif
 
-#  if DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
       static int (&connectivity_save)(const char *            filename,
                                       types<3>::connectivity *connectivity);
-#  else
-      static void (&connectivity_save)(const char *            filename,
-                                       types<3>::connectivity *connectivity);
-#  endif
 
       static int (&connectivity_is_valid)(types<3>::connectivity *connectivity);
 
-#  if DEAL_II_P4EST_VERSION_GTE(1, 0, 0, 0)
       static types<3>::connectivity *(&connectivity_load)(const char *filename,
                                                           size_t *    length);
-#  elif DEAL_II_P4EST_VERSION_GTE(0, 3, 4, 3)
-      static types<3>::connectivity *(
-        &connectivity_load)(const char *filename, long unsigned *length);
-#  else
-      static types<3>::connectivity *(&connectivity_load)(const char *filename,
-                                                          long *      length);
-#  endif
 
       static unsigned int (&checksum)(types<3>::forest *p8est);
 
@@ -413,7 +351,7 @@ namespace internal
 
 
 
-      static const unsigned int max_level = P8EST_MAXLEVEL;
+      static constexpr unsigned int max_level = P8EST_MAXLEVEL;
     };
 
 
