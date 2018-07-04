@@ -687,24 +687,52 @@ namespace Step22
                 phi_p[k]     = fe_values[pressure].value(k, q);
               }
 
+            // Now finally for the bilinear forms of both the system matrix and
+            // the matrix we use for the preconditioner. Recall that the
+            // formulas for these two are
+            // @f{align*}{
+            //   A_{ij} &= a(\varphi_i,\varphi_j)
+            //   \\     &= \underbrace{2(\varepsilon(\varphi_{i,\textbf{u}}),
+            //                           \varepsilon(\varphi_{j,\textbf{u}}))_{\Omega}}
+            //                        _{(1)}
+            //           \;
+            //             \underbrace{- (\textrm{div}\; \varphi_{i,\textbf{u}},
+            //                            \varphi_{j,p})_{\Omega}}
+            //                        _{(2)}
+            //           \;
+            //             \underbrace{- (\varphi_{i,p},
+            //                            \textrm{div}\;
+            //                            \varphi_{j,\textbf{u}})_{\Omega}}
+            //                        _{(3)}
+            // @f}
+            // and
+            // @f{align*}{
+            //   M_{ij} &= \underbrace{(\varphi_{i,p},
+            //                          \varphi_{j,p})_{\Omega}}
+            //                        _{(4)},
+            // @f}
+            // respectively, where $\varphi_{i,\textbf{u}}$ and $\varphi_{i,p}$
+            // are the velocity and pressure components of the $i$th shape
+            // function. The various terms above are then easily recognized in
+            // the following implementation:
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      // (2 * (grad^s phi_u_i(x_q) * grad^s phi_u_j(x_q))
-                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
-                       // - div phi_u_i(x_q) * phi_p_j(x_q)
-                       - div_phi_u[i] * phi_p[j]
-                       // - phi_p_i(x_q) * div phi_u_j(x_q))
-                       - phi_p[i] * div_phi_u[j]) //
-                      * fe_values.JxW(q);         // * dx
+                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) // (1)
+                       - div_phi_u[i] * phi_p[j]                 // (2)
+                       - phi_p[i] * div_phi_u[j])                // (3)
+                      * fe_values.JxW(q);                        // * dx
 
                     local_preconditioner_matrix(i, j) +=
-                      (phi_p[i] * phi_p[j]) // (phi_p_i(x_q) * phi_p_j(x_q))
+                      (phi_p[i] * phi_p[j]) // (4)
                       * fe_values.JxW(q);   // * dx
                   }
-
+                // Note that in the implementation of (1) above, `operator*`
+                // is overloaded for symmetric tensors, yielding the scalar
+                // product between the two tensors.
+                //
                 // For the right-hand side we use the fact that the shape
                 // functions are only non-zero in one component (because our
                 // elements are primitive).  Instead of multiplying the tensor
@@ -716,7 +744,6 @@ namespace Step22
                 // 1=y velocity, 2=pressure in 2d), which we use to pick out
                 // the correct component of the right-hand side vector to
                 // multiply with.
-
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
                 local_rhs(i) += (fe_values.shape_value(i, q)   // (phi_u_i(x_q)
@@ -724,10 +751,6 @@ namespace Step22
                                 * fe_values.JxW(q);            // * dx
               }
           }
-
-        // Note that operator* is overloaded for symmetric tensors,
-        // yielding the scalar product between the two tensors in the first
-        // line of the local matrix contribution.
 
         // Before we can write the local data into the global matrix (and
         // simultaneously use the AffineConstraints object to apply
