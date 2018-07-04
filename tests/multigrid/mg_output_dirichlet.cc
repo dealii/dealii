@@ -16,7 +16,7 @@
 
 // Check the results of MGTransferPrebuilt with Dirichlet boundary conditions
 
-// TODO:[GK] Add checks for RT again!
+//TODO:[GK] Add checks for RT again!
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/mg_level_object.h>
@@ -89,7 +89,7 @@ refine_mesh(Triangulation<dim> &triangulation)
             }
         }
     }
-  if (!cell_refined) // if no cell was selected for refinement, refine global
+  if (!cell_refined) //if no cell was selected for refinement, refine global
     for (typename Triangulation<dim>::active_cell_iterator cell =
            triangulation.begin_active();
          cell != triangulation.end();
@@ -289,6 +289,6 @@ main()
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  // check_simple (FESystem<2>(FE_Q<2>(1), 2));
+  //check_simple (FESystem<2>(FE_Q<2>(1), 2));
   check_simple(FESystem<2>(FE_Q<2>(1), 4));
 }

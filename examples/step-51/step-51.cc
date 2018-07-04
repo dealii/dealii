@@ -300,8 +300,8 @@ namespace Step51
   // @sect3{The HDG solver class}
 
   // The HDG solution procedure follows closely that of step-7. The major
-  // difference is the use of three different sets of <code>DoFHandler</code>
-  // and FE objects, along with the <code>ChunkSparseMatrix</code> and the
+  // difference is the use of three different sets of <code>DoFHandler</code> and FE
+  // objects, along with the <code>ChunkSparseMatrix</code> and the
   // corresponding solutions vectors. We also use WorkStream to enable a
   // multithreaded local solution process which exploits the embarrassingly
   // parallel nature of the local solver. For WorkStream, we define the local
@@ -365,8 +365,8 @@ namespace Step51
     Vector<double>  solution_local;
 
     // The new finite element type and corresponding <code>DoFHandler</code> are
-    // used for the global skeleton solution that couples the element-level
-    // local solutions.
+    // used for the global skeleton solution that couples the element-level local
+    // solutions.
     FE_FaceQ<dim>   fe;
     DoFHandler<dim> dof_handler;
     Vector<double>  solution;
@@ -947,10 +947,10 @@ namespace Step51
           }
       }
 
-    // Once assembly of all of the local contributions is complete, we must
-    // either: (1) assemble the global system, or (2) compute the local solution
-    // values and save them. In either case, the first step is to invert the
-    // local-local matrix.
+    // Once assembly of all of the local contributions is complete, we must either:
+    // (1) assemble the global system, or (2) compute the local solution values and
+    // save them.
+    // In either case, the first step is to invert the local-local matrix.
     scratch.ll_matrix.gauss_jordan();
 
     // For (1), we compute the Schur complement and add it to the @p
@@ -1036,8 +1036,7 @@ namespace Step51
   // the errors for the scalar variable and the gradient variable. In step-7,
   // we did this by computing @p L2_norm or @p H1_seminorm
   // contributions. Here, we have a DoFHandler with these two contributions
-  // computed and sorted by their vector component, <code>[0, dim)</code> for
-  // the
+  // computed and sorted by their vector component, <code>[0, dim)</code> for the
   // gradient and @p dim for the scalar. To compute their value, we hence use
   // a ComponentSelectFunction with either of them, together with the @p
   // SolutionAndGradient class introduced above that contains the analytic
@@ -1195,8 +1194,8 @@ namespace Step51
 
     // Having assembled all terms, we can again go on and solve the linear
     // system. We invert the matrix and then multiply the inverse by the
-    // right hand side. An alternative (and more numerically stable) method
-    // would have been to only factorize the matrix and apply the factorization.
+    // right hand side. An alternative (and more numerically stable) method would have
+    // been to only factorize the matrix and apply the factorization.
     scratch.cell_matrix.gauss_jordan();
     scratch.cell_matrix.vmult(scratch.cell_sol, scratch.cell_rhs);
     cell->distribute_local_to_global(scratch.cell_sol, solution_u_post);
@@ -1205,14 +1204,13 @@ namespace Step51
 
 
   // @sect4{HDG::output_results}
-  // We have 3 sets of results that we would like to output:  the local
-  // solution, the post-processed local solution, and the skeleton solution. The
-  // former 2 both 'live' on element volumes, whereas the latter lives on
-  // codimension-1 surfaces
+  // We have 3 sets of results that we would like to output:  the local solution,
+  // the post-processed local solution, and the skeleton solution.  The former 2
+  // both 'live' on element volumes, whereas the latter lives on codimension-1 surfaces
   // of the triangulation.  Our @p output_results function writes all local solutions
-  // to the same vtk file, even though they correspond to different
-  // <code>DoFHandler</code> objects.  The graphical output for the skeleton
-  // variable is done through use of the <code>DataOutFaces</code> class.
+  // to the same vtk file, even though they correspond to different <code>DoFHandler</code>
+  // objects.  The graphical output for the skeleton variable is done through
+  // use of the <code>DataOutFaces</code> class.
   template <int dim>
   void HDG<dim>::output_results(const unsigned int cycle)
   {
@@ -1272,10 +1270,10 @@ namespace Step51
     face_out += ".vtk";
     std::ofstream face_output(face_out);
 
-    // The <code>DataOutFaces</code> class works analogously to the
-    // <code>DataOut</code> class when we have a <code>DoFHandler</code> that
-    // defines the solution on the skeleton of the triangulation.  We treat it
-    // as such here, and the code is similar to that above.
+    // The <code>DataOutFaces</code> class works analogously to the <code>DataOut</code>
+    // class when we have a <code>DoFHandler</code> that defines the solution on
+    // the skeleton of the triangulation.  We treat it as such here, and the code is
+    // similar to that above.
     DataOutFaces<dim>        data_out_face(false);
     std::vector<std::string> face_name(1, "u_hat");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>

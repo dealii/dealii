@@ -96,13 +96,13 @@ namespace MeshWorker
    * drop-in replacement for that method.
    *
    * The two data types ScratchData and CopyData need to have a working copy
-   * constructor. ScratchData is only used in the worker function, while
-   * CopyData is the object passed from the worker to the copier.
+   * constructor. ScratchData is only used in the worker function, while CopyData is
+   * the object passed from the worker to the copier.
    *
-   * The queue_length argument indicates the number of items that can be live at
-   * any given time. Each item consists of chunk_size elements of the input
-   * stream that will be worked on by the worker and copier functions one after
-   * the other on the same thread.
+   * The queue_length argument indicates the number of items that can be live at any
+   * given time. Each item consists of chunk_size elements of the input stream that
+   * will be worked on by the worker and copier functions one after the other on the
+   * same thread.
    *
    * If your data objects are large, or their constructors are expensive, it is
    * helpful to keep in mind that queue_length copies of the ScratchData object
@@ -196,8 +196,7 @@ namespace MeshWorker
     auto cell_action = [&](const CellIteratorType &cell,
                            ScratchData &           scratch,
                            CopyData &              copy) {
-      // First reset the CopyData class to the empty copy_data given by the
-      // user.
+      // First reset the CopyData class to the empty copy_data given by the user.
       copy = sample_copy_data;
 
       const bool ignore_subdomain =
@@ -247,7 +246,7 @@ namespace MeshWorker
                   numbers::artificial_subdomain_id;
                 if (neighbor->is_level_cell())
                   neighbor_subdomain_id = neighbor->level_subdomain_id();
-                // subdomain id is only valid for active cells
+                //subdomain id is only valid for active cells
                 else if (neighbor->active())
                   neighbor_subdomain_id = neighbor->subdomain_id();
 
@@ -272,9 +271,8 @@ namespace MeshWorker
                       (assemble_ghost_faces_both | assemble_ghost_faces_once)))
                   continue;
 
-                // Deal with refinement edges from the refined side. Assuming
-                // one-irregular meshes, this situation should only occur if
-                // both cells are active.
+                // Deal with refinement edges from the refined side. Assuming one-irregular
+                // meshes, this situation should only occur if both cells are active.
                 const bool periodic_neighbor =
                   cell->has_periodic_neighbor(face_no);
 
@@ -309,10 +307,10 @@ namespace MeshWorker
 
                     if (flags & assemble_own_interior_faces_both)
                       {
-                        // If own faces are to be assembled from both sides,
-                        // call the faceworker again with swapped arguments.
-                        // This is because we won't be looking at an adaptively
-                        // refined edge coming from the other side.
+                        // If own faces are to be assembled from both sides, call the
+                        // faceworker again with swapped arguments. This is because
+                        // we won't be looking at an adaptively refined edge
+                        // coming from the other side.
                         face_worker(neighbor,
                                     neighbor_face_no.first,
                                     neighbor_face_no.second,
@@ -336,8 +334,8 @@ namespace MeshWorker
                            ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
-                    // AssembleFlags says otherwise). Here, we rely on cell
-                    // comparison that will look at cell->index().
+                    // AssembleFlags says otherwise). Here, we rely on cell comparison
+                    // that will look at cell->index().
                     if (own_cell && own_neighbor &&
                         (flags & assemble_own_interior_faces_once) &&
                         (neighbor < cell))
@@ -348,9 +346,9 @@ namespace MeshWorker
                     if (!own_cell)
                       continue;
 
-                    // now only one processor assembles faces_to_ghost. We let
-                    // the processor with the smaller (level-)subdomain id
-                    // assemble the face.
+                    // now only one processor assembles faces_to_ghost. We let the
+                    // processor with the smaller (level-)subdomain id assemble the
+                    // face.
                     if (own_cell && !own_neighbor &&
                         (flags & assemble_ghost_faces_once) &&
                         (neighbor_subdomain_id < current_subdomain_id))

@@ -453,8 +453,8 @@ namespace Step37
   //
   // @code
   // src.update_ghost_values();
-  // local_apply(*this->data, dst, src, std::make_pair(0U,
-  // data.n_macro_cells())); dst.compress(VectorOperation::add);
+  // local_apply(*this->data, dst, src, std::make_pair(0U, data.n_macro_cells()));
+  // dst.compress(VectorOperation::add);
   // @endcode
   //
   // Here, the two calls update_ghost_values() and compress() perform the data
@@ -1047,22 +1047,21 @@ namespace Step37
       mg_coarse;
     mg_coarse.initialize(mg_smoother);
 
-    // The next step is to set up the interface matrices that are needed for the
-    // case with hanging nodes. The adaptive multigrid realization in deal.II
-    // implements an approach called local smoothing. This means that the
-    // smoothing on the finest level only covers the local part of the mesh
-    // defined by the fixed (finest) grid level and ignores parts of the
-    // computational domain where the terminal cells are coarser than this
-    // level. As the method progresses to coarser levels, more and more of the
-    // global mesh will be covered. At some coarser level, the whole mesh will
-    // be covered. Since all level matrices in the multigrid method cover a
-    // single level in the mesh, no hanging nodes appear on the level matrices.
-    // At the interface between multigrid levels, homogeneous Dirichlet boundary
-    // conditions are set while smoothing. When the residual is transferred to
-    // the next coarser level, however, the coupling over the multigrid
-    // interface needs to be taken into account. This is done by the so-called
-    // interface (or edge) matrices that compute the part of the residual that
-    // is missed by the level matrix with
+    // The next step is to set up the interface matrices that are needed for the case
+    // with hanging nodes. The adaptive multigrid realization in deal.II implements an approach
+    // called local smoothing. This means that the smoothing on the finest level
+    // only covers the local part of the mesh defined by the fixed (finest) grid
+    // level and ignores parts of the computational domain where the terminal
+    // cells are coarser than this level. As the method progresses to coarser
+    // levels, more and more of the global mesh will be covered. At some coarser
+    // level, the whole mesh will be covered. Since all level matrices in the
+    // multigrid method cover a single level in the mesh, no hanging nodes
+    // appear on the level matrices. At the interface between multigrid levels,
+    // homogeneous Dirichlet boundary conditions are set while smoothing. When
+    // the residual is transferred to the next coarser level, however, the
+    // coupling over the multigrid interface needs to be taken into account.
+    // This is done by the so-called interface (or edge) matrices that compute
+    // the part of the residual that is missed by the level matrix with
     // homogeneous Dirichlet conditions. We refer to the @ref mg_paper
     // "Multigrid paper by Janssen and Kanschat" for more details.
     //

@@ -144,8 +144,7 @@ namespace Physics
        * contravariant tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\sharp}
-       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot
-       * \mathbf{F}^{T}
+       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
        * @f]
        *
        * @param[in] T The (referential) rank-2 tensor to be operated on
@@ -163,8 +162,7 @@ namespace Physics
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\sharp}
-       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot
-       * \mathbf{F}^{T}
+       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
        * @f]
        *
        * @param[in] T The (referential) rank-2 symmetric tensor to be operated
@@ -245,8 +243,7 @@ namespace Physics
        * contravariant tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\sharp}
-       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot
-       * \mathbf{F}^{-T}
+       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
        * @f]
        *
        * @param[in] t The (spatial) tensor to be operated on
@@ -264,8 +261,7 @@ namespace Physics
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\sharp}
-       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot
-       * \mathbf{F}^{-T}
+       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
        * @f]
        *
        * @param[in] t The (spatial) symmetric tensor to be operated on
@@ -283,8 +279,7 @@ namespace Physics
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-       *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl}
-       * F^{-1}_{Kk} F^{-1}_{Ll}
+       *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
        * @f]
        *
        * @param[in] h The (spatial) tensor to be operated on
@@ -302,8 +297,7 @@ namespace Physics
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-       *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl}
-       * F^{-1}_{Kk} F^{-1}_{Ll}
+       *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
        * @f]
        *
        * @param[in] h The (spatial) symmetric tensor to be operated on
@@ -325,11 +319,10 @@ namespace Physics
      * $\left(\bullet\right)^{\flat} = \mathbf{T}$ (and its spatial
      * counterpart $\mathbf{t}$) typically satisfy the relation
      * @f[
-     *    \int_{\partial V_{0}} \left[ \nabla_{0} \times \mathbf{T} \right]
-     * \cdot \mathbf{N} \; dA = \oint_{\partial A_{0}} \mathbf{T} \cdot
-     * \mathbf{L} \; dL = \oint_{\partial A_{t}} \mathbf{t} \cdot \mathbf{l} \;
-     * dl = \int_{\partial V_{t}} \left[ \nabla \times \mathbf{t} \right] \cdot
-     * \mathbf{n} \; da
+     *    \int_{\partial V_{0}} \left[ \nabla_{0} \times \mathbf{T} \right] \cdot \mathbf{N} \; dA
+     *      = \oint_{\partial A_{0}} \mathbf{T} \cdot \mathbf{L} \; dL
+     *      = \oint_{\partial A_{t}} \mathbf{t} \cdot \mathbf{l} \; dl
+     *      = \int_{\partial V_{t}} \left[ \nabla \times \mathbf{t} \right] \cdot \mathbf{n} \; da
      * @f]
      * where the control surfaces $\partial V_{0}$ and $\partial V_{t}$ with
      * outwards facing normals $\mathbf{N}$ and $\mathbf{n}$ are bounded by
@@ -369,8 +362,7 @@ namespace Physics
        * covariant tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\flat}
-       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot
-       * \mathbf{F}^{-1}
+       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}^{-1}
        * @f]
        *
        * @param[in] T The (referential) rank-2 tensor to be operated on
@@ -388,8 +380,7 @@ namespace Physics
        * covariant symmetric tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\flat}
-       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot
-       * \mathbf{F}^{-1}
+       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}^{-1}
        * @f]
        *
        * @param[in] T The (referential) rank-2 symmetric tensor to be operated
@@ -408,8 +399,7 @@ namespace Physics
        * covariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
-       *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL}
-       * F^{-T}_{kK} F^{-T}_{lL}
+       *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL} F^{-T}_{kK} F^{-T}_{lL}
        * @f]
        *
        * @param[in] H The (referential) rank-4 tensor to be operated on
@@ -427,8 +417,7 @@ namespace Physics
        * covariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
-       *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL}
-       * F^{-T}_{kK} F^{-T}_{lL}
+       *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL} F^{-T}_{kK} F^{-T}_{lL}
        * @f]
        *
        * @param[in] H The (referential) rank-4 symmetric tensor to be operated
@@ -472,8 +461,7 @@ namespace Physics
        * covariant tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\flat}
-       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot
-       * \mathbf{F}
+       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}
        * @f]
        *
        * @param[in] t The (spatial) tensor to be operated on
@@ -491,8 +479,7 @@ namespace Physics
        * covariant symmetric tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\flat}
-       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot
-       * \mathbf{F}
+       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}
        * @f]
        *
        * @param[in] t The (spatial) symmetric tensor to be operated on
@@ -510,8 +497,7 @@ namespace Physics
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
-       *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl}
-       * F^{T}_{Kk} F^{T}_{Ll}
+       *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl} F^{T}_{Kk} F^{T}_{Ll}
        * @f]
        *
        * @param[in] h The (spatial) tensor to be operated on
@@ -529,8 +515,7 @@ namespace Physics
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
-       *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl}
-       * F^{T}_{Kk} F^{T}_{Ll}
+       *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl} F^{T}_{Kk} F^{T}_{Ll}
        * @f]
        *
        * @param[in] h The (spatial) symmetric tensor to be operated on
@@ -565,8 +550,7 @@ namespace Physics
        * contravariant vector, i.e.
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
-       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot
-       * \left(\bullet\right)^{\sharp}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp}
        * @f]
        *
        * @param[in] V The (referential) vector to be operated on
@@ -585,8 +569,7 @@ namespace Physics
        * contravariant tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
-       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot
-       * \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
        * @f]
        *
        * @param[in] T The (referential) rank-2 tensor to be operated on
@@ -605,8 +588,7 @@ namespace Physics
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
-       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot
-       * \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
        * @f]
        *
        * @param[in] T The (referential) rank-2 symmetric tensor to be operated
@@ -625,10 +607,8 @@ namespace Physics
        * Return the result of the push forward transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
-       *  \textrm{det} \mathbf{F}^{-1} \; \left[
-       * \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
-       *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ}
-       * \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
+       *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
        * @f]
        *
        * @param[in] H The (referential) rank-4 tensor to be operated on
@@ -646,10 +626,8 @@ namespace Physics
        * Return the result of the push forward transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
-       *  \textrm{det} \mathbf{F}^{-1} \; \left[
-       * \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
-       *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ}
-       * \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
+       *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
        * @f]
        *
        * @param[in] H The (referential) rank-4 symmetric tensor to be operated
@@ -676,8 +654,7 @@ namespace Physics
        * vector, i.e.
        * @f[
        *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
-       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot
-       * \left(\bullet\right)^{\sharp}
+       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp}
        * @f]
        *
        * @param[in] v The (spatial) vector to be operated on
@@ -696,8 +673,7 @@ namespace Physics
        * contravariant tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
-       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot
-       * \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
+       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
        * @f]
        *
        * @param[in] t The (spatial) tensor to be operated on
@@ -716,8 +692,7 @@ namespace Physics
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
-       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot
-       * \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
+       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
        * @f]
        *
        * @param[in] t The (spatial) symmetric tensor to be operated on
@@ -735,10 +710,8 @@ namespace Physics
        * Return the result of the pull back transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
-       *  \textrm{det} \mathbf{F} \; \left[
-       * \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-       *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj}
-       * \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
+       *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
+       *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
        * @f]
        *
        * @param[in] h The (spatial) tensor to be operated on
@@ -756,10 +729,8 @@ namespace Physics
        * Return the result of the pull back transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
-       *  \textrm{det} \mathbf{F} \; \left[
-       * \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-       *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj}
-       * \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
+       *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
+       *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
        * @f]
        *
        * @param[in] h The (spatial) symmetric tensor to be operated on

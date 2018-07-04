@@ -15,8 +15,7 @@
 
 
 
-// Same as quadrature_point_data_2.cc, but for different base and actuall data
-// classes.
+// Same as quadrature_point_data_2.cc, but for different base and actuall data classes.
 
 
 #include <deal.II/base/quadrature_point_data.h>
@@ -108,8 +107,7 @@ DeclException3(ExcWrongValue,
 
 
 /**
- * Loop over quadrature points and check that value is the same as given by the
- * function.
+ * Loop over quadrature points and check that value is the same as given by the function.
  */
 template <int dim>
 void

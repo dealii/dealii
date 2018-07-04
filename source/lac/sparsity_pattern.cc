@@ -530,8 +530,8 @@ SparsityPattern::copy_from(const DynamicSparsityPattern &dsp)
       }
 
   // do not need to compress the sparsity pattern since we already have
-  // allocated the right amount of data, and the SparsityPatternType data is
-  // sorted, too.
+  // allocated the right amount of data, and the SparsityPatternType data is sorted,
+  // too.
   compressed = true;
 }
 

@@ -1043,8 +1043,7 @@ namespace Step9
   // passing the following as the third argument when calling WorkStream::run()
   // above:
   // @code
-  //    std::function<void (const typename DoFHandler<dim>::active_cell_iterator
-  //    &,
+  //    std::function<void (const typename DoFHandler<dim>::active_cell_iterator &,
   //                        EstimateScratchData<dim>                  &,
   //                        EstimateCopyData                          &)>
   //      (std::bind (&GradientEstimation::template estimate_cell<dim>,
@@ -1054,8 +1053,8 @@ namespace Step9
   // This creates a function object taking three arguments, but when it calls
   // the underlying function object, it simply only uses the first and second
   // argument -- we simply "forget" to use the third argument :-)
-  // In the end, this isn't completely obvious either, and so we didn't
-  // implement it, but hey -- it can be done!)
+  // In the end, this isn't completely obvious either, and so we didn't implement
+  // it, but hey -- it can be done!)
   //
   // Now for the details:
   template <int dim>

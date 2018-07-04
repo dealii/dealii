@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  // TODO: the goal of the ChunkSparseMatrix class is to stream data and use
+  //TODO: the goal of the ChunkSparseMatrix class is to stream data and use
   // the vectorization features of modern processors. to make this happen,
   // we will have to vectorize the functions in the following namespace, either
   // by hand or by using, for example, optimized BLAS versions for them.

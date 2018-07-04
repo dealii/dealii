@@ -775,9 +775,9 @@ namespace Step39
         assemble_right_hand_side();
         deallog << "Solve" << std::endl;
         solve();
-        // error();
+        //error();
         deallog << "Estimate " << estimate() << std::endl;
-        // output_results(s);
+        //output_results(s);
       }
   }
 } // namespace Step39

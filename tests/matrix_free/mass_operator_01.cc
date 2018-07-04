@@ -108,10 +108,9 @@ test()
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
-  // std::cout << "Number of cells: " << tria.n_global_active_cells() <<
-  // std::endl; std::cout << "Number of degrees of freedom: " << dof.n_dofs() <<
-  // std::endl; std::cout << "Number of constraints: " <<
-  // constraints.n_constraints() << std::endl;
+  //std::cout << "Number of cells: " << tria.n_global_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   std::shared_ptr<MatrixFree<dim, number>> mf_data(
     new MatrixFree<dim, number>());

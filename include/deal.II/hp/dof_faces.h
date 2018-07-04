@@ -36,8 +36,8 @@ namespace internal
      * the DoF indices on cells.
      *
      * The things we store here is very similar to what is stored in the
-     * internal::DoFHandlerImplementation::DoFObjects classes (see there for
-     * more information, in particular on the layout of the class hierarchy, and
+     * internal::DoFHandlerImplementation::DoFObjects classes (see there for more
+     * information, in particular on the layout of the class hierarchy, and
      * the use of file names).
      *
      * <h4>Offset computations</h4>
@@ -45,9 +45,9 @@ namespace internal
      * For hp methods, not all cells may use the same finite element, and it
      * is consequently more complicated to determine where the DoF indices for
      * a given line, quad, or hex are stored. As described in the
-     * documentation of the internal::DoFHandlerImplementation::DoFLevel class,
-     * we can compute the location of the first line DoF, for example, by
-     * calculating the offset as <code>line_index *
+     * documentation of the internal::DoFHandlerImplementation::DoFLevel class, we can
+     * compute the location of the first line DoF, for example, by calculating
+     * the offset as <code>line_index *
      * dof_handler.get_fe().dofs_per_line</code>. This of course doesn't work
      * any more if different lines may have different numbers of degrees of
      * freedom associated with them. Consequently, rather than using this

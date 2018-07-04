@@ -177,9 +177,9 @@ namespace SparsityTools
     }
 
 
-// Query functions unused if zoltan is not installed
+//Query functions unused if zoltan is not installed
 #ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
-    // Query functions for partition_zoltan
+    //Query functions for partition_zoltan
     int
     get_number_of_objects(void *data, int *ierr)
     {
@@ -207,13 +207,13 @@ namespace SparsityTools
       Assert(globalID != nullptr, ExcInternalError());
       Assert(localID != nullptr, ExcInternalError());
 
-      // set global degrees of freedom
+      //set global degrees of freedom
       auto n_dofs = graph->n_rows();
 
       for (unsigned int i = 0; i < n_dofs; i++)
         {
           globalID[i] = i;
-          localID[i]  = i; // Same as global ids.
+          localID[i]  = i; //Same as global ids.
         }
     }
 
@@ -236,7 +236,7 @@ namespace SparsityTools
 
       for (int i = 0; i < num_obj; ++i)
         {
-          if (graph->exists(i, i)) // Check if diagonal element is present
+          if (graph->exists(i, i)) //Check if diagonal element is present
             numEdges[i] = graph->row_length(globalID[i]) - 1;
           else
             numEdges[i] = graph->row_length(globalID[i]);
@@ -265,23 +265,23 @@ namespace SparsityTools
       ZOLTAN_ID_PTR nextNborGID  = nborGID;
       int *         nextNborProc = nborProc;
 
-      // Loop through rows corresponding to indices in globalID implicitly
+      //Loop through rows corresponding to indices in globalID implicitly
       for (SparsityPattern::size_type i = 0;
            i < static_cast<SparsityPattern::size_type>(num_obj);
            ++i)
         {
-          // Loop through each column to find neighbours
+          //Loop through each column to find neighbours
           for (SparsityPattern::iterator col = graph->begin(i);
                col < graph->end(i);
                ++col)
-            // Ignore diagonal entries. Not needed for partitioning.
+            //Ignore diagonal entries. Not needed for partitioning.
             if (i != col->column())
               {
                 Assert(nextNborGID != nullptr, ExcInternalError());
                 Assert(nextNborProc != nullptr, ExcInternalError());
 
                 *nextNborGID++  = col->column();
-                *nextNborProc++ = 0; // All the vertices on processor 0
+                *nextNborProc++ = 0; //All the vertices on processor 0
               }
         }
     }
@@ -310,18 +310,17 @@ namespace SparsityTools
           "The cell weighting functionality for Zoltan has not yet been implemented."));
       (void)cell_weights;
 
-      // MPI environment must have been initialized by this point.
+      //MPI environment must have been initialized by this point.
       std::unique_ptr<Zoltan> zz =
         std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
 
-      // General parameters
+      //General parameters
       // DEBUG_LEVEL call must precede the call to LB_METHOD
-      zz->Set_Param("DEBUG_LEVEL", "0"); // set level of debug info
-      zz->Set_Param(
-        "LB_METHOD",
-        "GRAPH"); // graph based partition method (LB-load balancing)
+      zz->Set_Param("DEBUG_LEVEL", "0"); //set level of debug info
+      zz->Set_Param("LB_METHOD",
+                    "GRAPH"); //graph based partition method (LB-load balancing)
       zz->Set_Param("NUM_LOCAL_PARTS",
-                    std::to_string(n_partitions)); // set number of partitions
+                    std::to_string(n_partitions)); //set number of partitions
 
       // The PHG partitioner is a hypergraph partitioner that Zoltan could use
       // for graph partitioning.
@@ -338,17 +337,17 @@ namespace SparsityTools
       // above warning.
       zz->Set_Param("PHG_EDGE_SIZE_THRESHOLD", "0.5");
 
-      // Need a non-const object equal to sparsity_pattern
+      //Need a non-const object equal to sparsity_pattern
       SparsityPattern graph;
       graph.copy_from(sparsity_pattern);
 
-      // Set query functions
+      //Set query functions
       zz->Set_Num_Obj_Fn(get_number_of_objects, &graph);
       zz->Set_Obj_List_Fn(get_object_list, &graph);
       zz->Set_Num_Edges_Multi_Fn(get_num_edges_list, &graph);
       zz->Set_Edge_List_Multi_Fn(get_edge_list, &graph);
 
-      // Variables needed by partition function
+      //Variables needed by partition function
       int           changes           = 0;
       int           num_gid_entries   = 1;
       int           num_lid_entries   = 1;
@@ -363,7 +362,7 @@ namespace SparsityTools
       int *         export_procs      = nullptr;
       int *         export_to_part    = nullptr;
 
-      // call partitioner
+      //call partitioner
       const int rc = zz->LB_Partition(changes,
                                       num_gid_entries,
                                       num_lid_entries,
@@ -379,15 +378,14 @@ namespace SparsityTools
                                       export_to_part);
       (void)rc;
 
-      // check for error code in partitioner
+      //check for error code in partitioner
       Assert(rc == ZOLTAN_OK, ExcInternalError());
 
-      // By default, all indices belong to part 0. After zoltan partition
-      // some are migrated to different part ID, which is stored in
-      // export_to_part array.
+      //By default, all indices belong to part 0. After zoltan partition
+      //some are migrated to different part ID, which is stored in export_to_part array.
       std::fill(partition_indices.begin(), partition_indices.end(), 0);
 
-      // copy from export_to_part to partition_indices, whose part_ids != 0.
+      //copy from export_to_part to partition_indices, whose part_ids != 0.
       for (int i = 0; i < num_export; i++)
         partition_indices[export_local_ids[i]] = export_to_part[i];
 #endif
@@ -463,37 +461,37 @@ namespace SparsityTools
     AssertThrow(false, ExcZOLTANNotInstalled());
     return 0;
 #else
-    // coloring algorithm is run in serial by each processor.
+    //coloring algorithm is run in serial by each processor.
     std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
 
-    // Coloring parameters
+    //Coloring parameters
     // DEBUG_LEVEL must precede all other calls
-    zz->Set_Param("DEBUG_LEVEL", "0");               // level of debug info
-    zz->Set_Param("COLORING_PROBLEM", "DISTANCE-1"); // Standard coloring
+    zz->Set_Param("DEBUG_LEVEL", "0");               //level of debug info
+    zz->Set_Param("COLORING_PROBLEM", "DISTANCE-1"); //Standard coloring
     zz->Set_Param("NUM_GID_ENTRIES", "1"); // 1 entry represents global ID
     zz->Set_Param("NUM_LID_ENTRIES", "1"); // 1 entry represents local ID
     zz->Set_Param("OBJ_WEIGHT_DIM", "0");  // object weights not used
     zz->Set_Param("RECOLORING_NUM_OF_ITERATIONS", "0");
 
-    // Zoltan::Color function requires a non-const SparsityPattern object
+    //Zoltan::Color function requires a non-const SparsityPattern object
     SparsityPattern graph;
     graph.copy_from(sparsity_pattern);
 
-    // Set query functions required by coloring function
+    //Set query functions required by coloring function
     zz->Set_Num_Obj_Fn(get_number_of_objects, &graph);
     zz->Set_Obj_List_Fn(get_object_list, &graph);
     zz->Set_Num_Edges_Multi_Fn(get_num_edges_list, &graph);
     zz->Set_Edge_List_Multi_Fn(get_edge_list, &graph);
 
-    // Variables needed by coloring function
+    //Variables needed by coloring function
     int num_gid_entries = 1;
     const int num_objects = graph.n_rows();
 
-    // Preallocate input variables. Element type fixed by ZOLTAN.
+    //Preallocate input variables. Element type fixed by ZOLTAN.
     std::vector<ZOLTAN_ID_TYPE> global_ids(num_objects);
     std::vector<int> color_exp(num_objects);
 
-    // Set ids for which coloring needs to be done
+    //Set ids for which coloring needs to be done
     for (int i = 0; i < num_objects; i++)
       global_ids[i] = i;
 
@@ -504,10 +502,10 @@ namespace SparsityTools
                        color_exp.data());
 
     (void)rc;
-    // Check for error code
+    //Check for error code
     Assert(rc == ZOLTAN_OK, ExcInternalError());
 
-    // Allocate and assign color indices
+    //Allocate and assign color indices
     color_indices.resize(num_objects);
     Assert(color_exp.size() == color_indices.size(),
            ExcDimensionMismatch(color_exp.size(), color_indices.size()));
@@ -608,8 +606,7 @@ namespace SparsityTools
               new_indices.end(),
               numbers::invalid_size_type);
 
-    // if no starting indices were given: find dof with lowest coordination
-    // number
+    // if no starting indices were given: find dof with lowest coordination number
     if (last_round_dofs.empty())
       last_round_dofs.push_back(
         internal::find_unnumbered_starting_index(sparsity, new_indices));
@@ -945,11 +942,11 @@ namespace SparsityTools
           DynamicSparsityPattern::size_type row =
             myrange.nth_index_in_set(row_idx);
 
-          // calculate destination CPU
+          //calculate destination CPU
           while (row >= start_index[dest_cpu + 1])
             ++dest_cpu;
 
-          // skip myself
+          //skip myself
           if (dest_cpu == myid)
             {
               row_idx += rows_per_cpu[myid] - 1;
@@ -958,11 +955,11 @@ namespace SparsityTools
 
           DynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
-          // skip empty lines
+          //skip empty lines
           if (!rlen)
             continue;
 
-          // save entries
+          //save entries
           std::vector<DynamicSparsityPattern::size_type> &dst =
             send_data[dest_cpu];
 
@@ -970,7 +967,7 @@ namespace SparsityTools
           dst.push_back(row);  // row index
           for (DynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
             {
-              // columns
+              //columns
               DynamicSparsityPattern::size_type column =
                 dsp.column_number(row, c);
               dst.push_back(column);
@@ -1013,7 +1010,7 @@ namespace SparsityTools
     }
 
     {
-      // receive
+      //receive
       std::vector<DynamicSparsityPattern::size_type> recv_buf;
       for (unsigned int index = 0; index < num_receive; ++index)
         {
@@ -1099,17 +1096,17 @@ namespace SparsityTools
                 dest_cpu = 0;
             }
 
-          // skip myself
+          //skip myself
           if (dest_cpu == myid)
             continue;
 
           BlockDynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
-          // skip empty lines
+          //skip empty lines
           if (!rlen)
             continue;
 
-          // save entries
+          //save entries
           std::vector<BlockDynamicSparsityPattern::size_type> &dst =
             send_data[dest_cpu];
 
@@ -1117,7 +1114,7 @@ namespace SparsityTools
           dst.push_back(row);  // row index
           for (BlockDynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
             {
-              // columns
+              //columns
               BlockDynamicSparsityPattern::size_type column =
                 dsp.column_number(row, c);
               dst.push_back(column);
@@ -1160,7 +1157,7 @@ namespace SparsityTools
     }
 
     {
-      // receive
+      //receive
       std::vector<BlockDynamicSparsityPattern::size_type> recv_buf;
       for (unsigned int index = 0; index < num_receive; ++index)
         {

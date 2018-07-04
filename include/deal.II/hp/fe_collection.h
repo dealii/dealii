@@ -101,15 +101,13 @@ namespace hp
     operator=(FECollection<dim, spacedim> &&) = default; // NOLINT
 
     /**
-     * Equality comparison operator. All stored FiniteElement objects are
-     * compared in order.
+     * Equality comparison operator. All stored FiniteElement objects are compared in order.
      */
     bool
     operator==(const FECollection<dim, spacedim> &fe_collection) const;
 
     /**
-     * Non-equality comparison operator. All stored FiniteElement objects are
-     * compared in order.
+     * Non-equality comparison operator. All stored FiniteElement objects are compared in order.
      */
     bool
     operator!=(const FECollection<dim, spacedim> &fe_collection) const;

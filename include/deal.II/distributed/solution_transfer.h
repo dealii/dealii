@@ -62,10 +62,8 @@ namespace parallel
      *                                   // prepare the triangulation,
      * tria.prepare_coarsening_and_refinement();
      *                                   // prepare the SolutionTransfer object
-     *                                   // for coarsening and refinement and
-     * give
-     *                                   // the solution vector that we intend
-     * to
+     *                                   // for coarsening and refinement and give
+     *                                   // the solution vector that we intend to
      *                                   // interpolate later,
      * soltrans.prepare_for_coarsening_and_refinement(solution);
      *                                   // actually execute the refinement,
@@ -78,9 +76,9 @@ namespace parallel
      * soltrans.interpolate(interpolated_solution);
      * @endcode
      *
-     * Different from PETSc and Trilinos vectors,
-     * LinearAlgebra::distributed::Vector allows writing into ghost elements.
-     * For a ghosted vector the interpolation step can be accomplished via
+     * Different from PETSc and Trilinos vectors, LinearAlgebra::distributed::Vector
+     * allows writing into ghost elements. For a ghosted vector the
+     * interpolation step can be accomplished via
      * @code
      * interpolated_solution.zero_out_ghosts();
      * soltrans.interpolate(interpolated_solution);
@@ -98,8 +96,8 @@ namespace parallel
      * follows:
      * *@code
      *
-     * parallel::distributed::SolutionTransfer<dim,VectorType>
-     * sol_trans(dof_handler); sol_trans.prepare_serialization (vector);
+     * parallel::distributed::SolutionTransfer<dim,VectorType> sol_trans(dof_handler);
+     * sol_trans.prepare_serialization (vector);
      *
      * triangulation.save(filename);
      * @endcode
@@ -109,8 +107,8 @@ namespace parallel
      * //[create coarse mesh...]
      * triangulation.load(filename);
      *
-     * parallel::distributed::SolutionTransfer<dim,VectorType>
-     * sol_trans(dof_handler); sol_trans.deserialize (distributed_vector);
+     * parallel::distributed::SolutionTransfer<dim,VectorType> sol_trans(dof_handler);
+     * sol_trans.deserialize (distributed_vector);
      * @endcode
      *
      *

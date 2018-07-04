@@ -14,17 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-// check   Tensor<rank,dim,std::complex<double> > operator * (const
-// Tensor<rank,dim>     &t,
-//                                                            const
-//                                                            std::complex<double>
-//                                                            factor)
+// check   Tensor<rank,dim,std::complex<double> > operator * (const Tensor<rank,dim>     &t,
+//                                                            const std::complex<double>  factor)
 // and
-// check   Tensor<rank,dim,std::complex<double> > operator * (const
-// std::complex<double>  factor,
-//                                                            const
-//                                                            Tensor<rank,dim>
-//                                                            &t)
+// check   Tensor<rank,dim,std::complex<double> > operator * (const std::complex<double>  factor,
+//                                                            const Tensor<rank,dim>     &t)
 // by multiplying on the left and on the right.
 
 #include <deal.II/base/tensor.h>

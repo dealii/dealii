@@ -346,7 +346,7 @@ LaplaceProblem<dim>::refine_local()
             }
         }
     }
-  // Wenn nichts verfeinert wurde bisher, global verfeinern!
+  //Wenn nichts verfeinert wurde bisher, global verfeinern!
   if (!cell_refined)
     for (typename Triangulation<dim>::active_cell_iterator cell =
            triangulation.begin_active();
@@ -371,7 +371,7 @@ LaplaceProblem<dim>::run()
           GridGenerator::hyper_cube(triangulation, -1, 1);
           triangulation.refine_global(1);
         }
-      // triangulation.refine_global (1);
+      //triangulation.refine_global (1);
       refine_local();
       setup_system();
       test_boundary();

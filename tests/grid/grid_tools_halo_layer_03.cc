@@ -84,8 +84,7 @@ test()
     GridOut().write_vtk(tria, f);
   }
 
-  // Compute a halo layer around material ids 2 and 3 and set it to material id
-  // 4
+  // Compute a halo layer around material ids 2 and 3 and set it to material id 4
   std::set<types::material_id> material_ids;
   material_ids.insert(2);
   material_ids.insert(3);

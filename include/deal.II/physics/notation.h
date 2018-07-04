@@ -162,12 +162,12 @@ namespace Physics
      *
      * To illustrate the purpose of this notation, consider the rank-2 symmetric
      * tensors $\mathbf{S}$ and $\mathbf{E}$ that are related to one another by
-     * $\mathbf{S} = \cal{C} : \mathbf{E}$, where the operator $\cal{C}$ is a
-     * fourth-order symmetric tensor. As opposed to the commonly used Voigt
-     * notation, Kelvin (or Mandel) notation keeps the same definition of the
-     * inner product $\mathbf{S} : \mathbf{E}$ when both $\mathbf{S}$ and
-     * $\mathbf{E}$ are symmetric. In general, the inner product of all
-     * symmetric and general tensors remain the same regardless of the notation
+     * $\mathbf{S} = \cal{C} : \mathbf{E}$, where the operator $\cal{C}$ is a fourth-order
+     * symmetric tensor.
+     * As opposed to the commonly used Voigt notation, Kelvin (or Mandel) notation
+     * keeps the same definition of the inner product $\mathbf{S} : \mathbf{E}$
+     * when both $\mathbf{S}$ and $\mathbf{E}$ are symmetric. In general, the inner product
+     * of all symmetric and general tensors remain the same regardless of the notation
      * with which it is represented.
      *
      * To achieve these two properties, namely that
@@ -183,70 +183,51 @@ namespace Physics
      * \tilde{\mathbf{S}} \cdot \tilde{\mathbf{E}} ,
      * @f]
      * it holds that the Kelvin-condensed equivalents of the previously defined
-     * symmetric tensors, indicated by the $\tilde{\left(\bullet\right)}$, must
-     * be defined as
+     * symmetric tensors, indicated by the $\tilde{\left(\bullet\right)}$, must be
+     * defined as
      * @f[
      * \tilde{\mathbf{S}}
      *   = \left[ \begin{array}{c}
-     *   S_{00} \\ S_{11} \\ S_{22} \\ \sqrt{2} S_{12} \\ \sqrt{2} S_{02} \\
-     * \sqrt{2} S_{01} \end{array}\right] \quad \text{and} \quad
+     *   S_{00} \\ S_{11} \\ S_{22} \\ \sqrt{2} S_{12} \\ \sqrt{2} S_{02} \\ \sqrt{2} S_{01}
+     *   \end{array}\right]
+     * \quad \text{and} \quad
      * \tilde{\mathbf{E}}
      *   = \left[ \begin{array}{c}
-     *   E_{00} \\ E_{11} \\ E_{22} \\ \sqrt{2} E_{12} \\ \sqrt{2} E_{02} \\
-     * \sqrt{2} E_{01} \end{array}\right] .
+     *   E_{00} \\ E_{11} \\ E_{22} \\ \sqrt{2} E_{12} \\ \sqrt{2} E_{02} \\ \sqrt{2} E_{01}
+     *   \end{array}\right] .
      * @f]
-     * The corresponding and consistent condensed fourth-order symmetric tensor
-     * is
+     * The corresponding and consistent condensed fourth-order symmetric tensor is
      * @f[
      * \tilde{\cal{C}}
      *   = \left[ \begin{array}{cccccc}
-     *   \tilde{\cal{C}}_{00} & \tilde{\cal{C}}_{01} & \tilde{\cal{C}}_{02} &
-     * \tilde{\cal{C}}_{03} & \tilde{\cal{C}}_{04} & \tilde{\cal{C}}_{05} \\
-     *   \tilde{\cal{C}}_{10} & \tilde{\cal{C}}_{11} & \tilde{\cal{C}}_{12} &
-     * \tilde{\cal{C}}_{13} & \tilde{\cal{C}}_{14} & \tilde{\cal{C}}_{15} \\
-     *   \tilde{\cal{C}}_{20} & \tilde{\cal{C}}_{21} & \tilde{\cal{C}}_{22} &
-     * \tilde{\cal{C}}_{23} & \tilde{\cal{C}}_{24} & \tilde{\cal{C}}_{25} \\
-     *   \tilde{\cal{C}}_{30} & \tilde{\cal{C}}_{31} & \tilde{\cal{C}}_{32} &
-     * \tilde{\cal{C}}_{33} & \tilde{\cal{C}}_{34} & \tilde{\cal{C}}_{35} \\
-     *   \tilde{\cal{C}}_{40} & \tilde{\cal{C}}_{41} & \tilde{\cal{C}}_{42} &
-     * \tilde{\cal{C}}_{43} & \tilde{\cal{C}}_{44} & \tilde{\cal{C}}_{45} \\
-     *   \tilde{\cal{C}}_{50} & \tilde{\cal{C}}_{51} & \tilde{\cal{C}}_{52} &
-     * \tilde{\cal{C}}_{53} & \tilde{\cal{C}}_{54} & \tilde{\cal{C}}_{55}
+     *   \tilde{\cal{C}}_{00} & \tilde{\cal{C}}_{01} & \tilde{\cal{C}}_{02} & \tilde{\cal{C}}_{03} & \tilde{\cal{C}}_{04} & \tilde{\cal{C}}_{05} \\
+     *   \tilde{\cal{C}}_{10} & \tilde{\cal{C}}_{11} & \tilde{\cal{C}}_{12} & \tilde{\cal{C}}_{13} & \tilde{\cal{C}}_{14} & \tilde{\cal{C}}_{15} \\
+     *   \tilde{\cal{C}}_{20} & \tilde{\cal{C}}_{21} & \tilde{\cal{C}}_{22} & \tilde{\cal{C}}_{23} & \tilde{\cal{C}}_{24} & \tilde{\cal{C}}_{25} \\
+     *   \tilde{\cal{C}}_{30} & \tilde{\cal{C}}_{31} & \tilde{\cal{C}}_{32} & \tilde{\cal{C}}_{33} & \tilde{\cal{C}}_{34} & \tilde{\cal{C}}_{35} \\
+     *   \tilde{\cal{C}}_{40} & \tilde{\cal{C}}_{41} & \tilde{\cal{C}}_{42} & \tilde{\cal{C}}_{43} & \tilde{\cal{C}}_{44} & \tilde{\cal{C}}_{45} \\
+     *   \tilde{\cal{C}}_{50} & \tilde{\cal{C}}_{51} & \tilde{\cal{C}}_{52} & \tilde{\cal{C}}_{53} & \tilde{\cal{C}}_{54} & \tilde{\cal{C}}_{55}
      *   \end{array}\right]
      *   \equiv
      *   \left[ \begin{array}{cccccc}
-     *   {\cal{C}}_{0000}           & {\cal{C}}_{0011}          &
-     * {\cal{C}}_{0022}           & \sqrt{2} {\cal{C}}_{0012}  & \sqrt{2}
-     * {\cal{C}}_{0002}  & \sqrt{2} {\cal{C}}_{0001} \\
-     *   {\cal{C}}_{1100}           & {\cal{C}}_{1111}          &
-     * {\cal{C}}_{1122}           & \sqrt{2} {\cal{C}}_{1112}  & \sqrt{2}
-     * {\cal{C}}_{1102}  & \sqrt{2} {\cal{C}}_{1101} \\
-     *   {\cal{C}}_{2200}           & {\cal{C}}_{2211}          &
-     * {\cal{C}}_{2222}           & \sqrt{2} {\cal{C}}_{2212}  & \sqrt{2}
-     * {\cal{C}}_{2202}  & \sqrt{2} {\cal{C}}_{2201} \\
-     *   \sqrt{2} {\cal{C}}_{1200}  & \sqrt{2} {\cal{C}}_{1211} & \sqrt{2}
-     * {\cal{C}}_{1222}  & 2 {\cal{C}}_{1212}         & 2 {\cal{C}}_{1202} & 2
-     * {\cal{C}}_{1201}        \\
-     *   \sqrt{2} {\cal{C}}_{0200}  & \sqrt{2} {\cal{C}}_{0211} & \sqrt{2}
-     * {\cal{C}}_{0222}  & 2 {\cal{C}}_{0212}         & 2 {\cal{C}}_{0202} & 2
-     * {\cal{C}}_{0201}        \\ \sqrt{2} {\cal{C}}_{0100}  & \sqrt{2}
-     * {\cal{C}}_{0111} & \sqrt{2} {\cal{C}}_{0122}  & 2 {\cal{C}}_{0112} & 2
-     * {\cal{C}}_{0102}         & 2 {\cal{C}}_{0101} \end{array}\right] .
+     *   {\cal{C}}_{0000}           & {\cal{C}}_{0011}          & {\cal{C}}_{0022}           & \sqrt{2} {\cal{C}}_{0012}  & \sqrt{2} {\cal{C}}_{0002}  & \sqrt{2} {\cal{C}}_{0001} \\
+     *   {\cal{C}}_{1100}           & {\cal{C}}_{1111}          & {\cal{C}}_{1122}           & \sqrt{2} {\cal{C}}_{1112}  & \sqrt{2} {\cal{C}}_{1102}  & \sqrt{2} {\cal{C}}_{1101} \\
+     *   {\cal{C}}_{2200}           & {\cal{C}}_{2211}          & {\cal{C}}_{2222}           & \sqrt{2} {\cal{C}}_{2212}  & \sqrt{2} {\cal{C}}_{2202}  & \sqrt{2} {\cal{C}}_{2201} \\
+     *   \sqrt{2} {\cal{C}}_{1200}  & \sqrt{2} {\cal{C}}_{1211} & \sqrt{2} {\cal{C}}_{1222}  & 2 {\cal{C}}_{1212}         & 2 {\cal{C}}_{1202}         & 2 {\cal{C}}_{1201}        \\
+     *   \sqrt{2} {\cal{C}}_{0200}  & \sqrt{2} {\cal{C}}_{0211} & \sqrt{2} {\cal{C}}_{0222}  & 2 {\cal{C}}_{0212}         & 2 {\cal{C}}_{0202}         & 2 {\cal{C}}_{0201}        \\
+     *   \sqrt{2} {\cal{C}}_{0100}  & \sqrt{2} {\cal{C}}_{0111} & \sqrt{2} {\cal{C}}_{0122}  & 2 {\cal{C}}_{0112}         & 2 {\cal{C}}_{0102}         & 2 {\cal{C}}_{0101}
+     *   \end{array}\right] .
      * @f]
-     * The mapping from the two Kelvin indices of the FullMatrix
-     * $\tilde{\cal{C}}$ to the rank-4 SymmetricTensor $\cal{C}$ can be inferred
-     * using the table shown above.
+     * The mapping from the two Kelvin indices of the FullMatrix $\tilde{\cal{C}}$ to the
+     * rank-4 SymmetricTensor $\cal{C}$ can be inferred using the table shown above.
      *
-     * An important observation is that both the left-hand side tensor
-     * $\tilde{\mathbf{S}}$ and right-hand side tensor $\tilde{\mathbf{E}}$ have
-     * the same form; this is a property that is not present in Voigt notation.
-     * The various factors introduced into $\tilde{\mathbf{S}}$,
-     * $\tilde{\mathbf{E}}$ and $\tilde{\cal{C}}$ account for the symmetry of
-     * the tensors. The Kelvin description of their non-symmetric counterparts
-     * include no such factors.
+     * An important observation is that both the left-hand side tensor $\tilde{\mathbf{S}}$
+     * and right-hand side tensor $\tilde{\mathbf{E}}$ have the same form; this is a property
+     * that is not present in Voigt notation.
+     * The various factors introduced into $\tilde{\mathbf{S}}$,  $\tilde{\mathbf{E}}$
+     * and $\tilde{\cal{C}}$ account for the symmetry of the tensors. The Kelvin
+     * description of their non-symmetric counterparts include no such factors.
      *
-     * Some useful references that show how this notation works include, amongst
-     * others,
+     * Some useful references that show how this notation works include, amongst others,
      * @code{.bib}
      * @article{Nagel2016,
      *   author  = {Nagel, T. and G{\"o}rke, U-J. and Moerman, K. and Kolditz,
@@ -456,21 +437,18 @@ namespace Physics
        * Tensor<3,dim> r3_symm_tnsr; // Some elements filled symmetrically
        *
        * const FullMatrix<double> mtrx_1
-       *   = Physics::Notation::to_matrix<dim, Tensor<2,dim>,Tensor<1,dim>
-       * >(r3_tnsr); const FullMatrix<double> mtrx_2 =
-       * Physics::Notation::to_matrix<dim, Tensor<1,dim>,SymmetricTensor<2,dim>
-       * >(r3_symm_tnsr);
+       *   = Physics::Notation::to_matrix<dim, Tensor<2,dim>,Tensor<1,dim> >(r3_tnsr);
+       * const FullMatrix<double> mtrx_2
+       *   = Physics::Notation::to_matrix<dim, Tensor<1,dim>,SymmetricTensor<2,dim> >(r3_symm_tnsr);
        * @endcode
        * the matrix @p mtrx_1 will have $dim \times dim$ rows and $dim$ columns
-       * (i.e. size Tensor<2,dim>::n_independent_components $\times$
-       * Tensor<1,dim>::n_independent_components),
+       * (i.e. size Tensor<2,dim>::n_independent_components $\times$ Tensor<1,dim>::n_independent_components),
        * while those of the matrix @p mtrx_2 will have $dim$ rows and
        * $(dim \times dim + dim)/2$ columns
-       * (i.e. size Tensor<1,dim>::n_independent_components $\times$
-       * SymmetricTensor<2,dim>::n_independent_components), as it is assumed
-       * that the entries corresponding to the alternation of the second and
-       * third indices are equal. That is to say that
-       * <code>r3_symm_tnsr[i][j][k] == r3_symm_tnsr[i][k][j]</code>.
+       * (i.e. size Tensor<1,dim>::n_independent_components $\times$ SymmetricTensor<2,dim>::n_independent_components),
+       * as it is assumed that the entries corresponding to the alternation of the
+       * second and third indices are equal.
+       * That is to say that <code>r3_symm_tnsr[i][j][k] == r3_symm_tnsr[i][k][j]</code>.
        */
       template <int dim,
                 typename SubTensor1 = Tensor<2, dim>,
@@ -494,9 +472,8 @@ namespace Physics
       /**
        * Convert a rank-4 symmetric tensor to its compressed matrix equivalent.
        *
-       * The output matrix will have
-       * SymmetricTensor<2,dim>::n_independent_components rows and
-       * SymmetricTensor<2,dim>::n_independent_components columns.
+       * The output matrix will have SymmetricTensor<2,dim>::n_independent_components
+       * rows and SymmetricTensor<2,dim>::n_independent_components columns.
        */
       template <int dim, typename Number>
       FullMatrix<Number>
@@ -794,8 +771,7 @@ namespace Physics
             return 1.0;
           else if (component_i >= dim && component_j >= dim)
             return 2.0;
-          else // ((component_i >= dim && component_j < dim) || (component_i <
-               // dim && component_j >= dim))
+          else // ((component_i >= dim && component_j < dim) || (component_i < dim && component_j >= dim))
             return numbers::SQRT2;
         }
 
@@ -1326,10 +1302,9 @@ namespace Physics
       to_tensor(const FullMatrix<Number> &       mtrx,
                 SymmetricTensor<2, dim, Number> &st)
       {
-        // Its impossible to fit the (dim^2 + dim)/2 entries into a square
-        // matrix We therefore assume that its been converted to a standard
-        // tensor format using to_matrix (SymmetricTensor<2,dim,Number>) at some
-        // point...
+        // Its impossible to fit the (dim^2 + dim)/2 entries into a square matrix
+        // We therefore assume that its been converted to a standard tensor format
+        // using to_matrix (SymmetricTensor<2,dim,Number>) at some point...
         Assert(mtrx.m() == dim, ExcDimensionMismatch(mtrx.m(), dim));
         Assert(mtrx.n() == dim, ExcDimensionMismatch(mtrx.n(), dim));
         Assert((mtrx.n_elements() ==

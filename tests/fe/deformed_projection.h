@@ -154,7 +154,7 @@ void EvaluateDerivative(DoFHandler<2> *dof_handler, Vector<double> &solution)
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
           //   double u0 = this_value[q_point](0);
-          // double v0 = this_value[q_point](1);
+          //double v0 = this_value[q_point](1);
 
           double u0 = 0;
           double v0 = 0;
@@ -554,10 +554,11 @@ project(const Mapping<dim> &             mapping,
       //   // @p{function} to hold on all parts of the
       //   // boundary
       //   std::map<types::boundary_id, const Function<dim>*>
-      //   boundary_functions; for (unsigned char c=0; c<255; ++c)
+      //     boundary_functions;
+      //   for (unsigned char c=0; c<255; ++c)
       //     boundary_functions[c] = &function;
-      //     project_boundary_values (dof,
-      //   boundary_functions, q_boundary, boundary_values);
+      //   project_boundary_values (dof, boundary_functions,
+      //                            q_boundary, boundary_values);
     }
 
 

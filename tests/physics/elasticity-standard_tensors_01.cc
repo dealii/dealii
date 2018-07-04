@@ -105,8 +105,9 @@ test_standard_tensors()
   F[1][0]                    = 0.25;
   const Tensor<2, dim> F_inv = invert(F);
 
-  // Pull-back a fictitious stress tensor, project it onto a deviatoric space,
-  // and then push it forward again tau = F.S.F^{T} --> S = F^{-1}*tau*F^{-T}
+  // Pull-back a fictitious stress tensor, project it onto a deviatoric space, and
+  // then push it forward again
+  // tau = F.S.F^{T} --> S = F^{-1}*tau*F^{-T}
   const SymmetricTensor<2, dim> s =
     symmetrize(F_inv * static_cast<Tensor<2, dim>>(t) * transpose(F_inv));
   const SymmetricTensor<2, dim> Dev_P_T_x_s =
@@ -115,10 +116,9 @@ test_standard_tensors()
 
   // Note: The extra factor J^{2/dim} arises due to the definition of Dev_P
   //       including the factor J^{-2/dim}. Ultimately the stress definitions
-  //       for s,t do not align with those required to have the direct
-  //       relationship s*Dev_P == dev_P*t. For this we would need S
-  //       = 2.dW/dC|_{C=\bar{C}} and t = F.S.F^{T} and \bar{C} =
-  //       det(F)^{-2/dim} F^{T}.F .
+  //       for s,t do not align with those required to have the direct relationship
+  //       s*Dev_P == dev_P*t. For this we would need S = 2.dW/dC|_{C=\bar{C}} and
+  //       t = F.S.F^{T} and \bar{C} = det(F)^{-2/dim} F^{T}.F .
   AssertThrow(std::fabs((symmetrize(std::pow(determinant(F), 2.0 / dim) * F *
                                     static_cast<Tensor<2, dim>>(s_x_Dev_P) *
                                     transpose(F)) -

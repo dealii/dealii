@@ -43,10 +43,10 @@ namespace internal
       //---------------------------------------------------------------------------
 
       /**
-       * On noncartesian grids, the sign of the DoFs associated with the faces
-       * of the elements has to be changed in some cases.  This procedure
-       * implements an algorithm, which determines the DoFs, which need this
-       * sign change for a given cell.
+       * On noncartesian grids, the sign of the DoFs associated with the faces of
+       * the elements has to be changed in some cases.  This procedure implements an
+       * algorithm, which determines the DoFs, which need this sign change for a
+       * given cell.
        */
       void
       get_face_sign_change_rt(const dealii::Triangulation<1>::cell_iterator &,
@@ -88,8 +88,7 @@ namespace internal
                       Assert(f * dofs_per_face + j < face_sign.size(),
                              ExcInternalError());
 
-                      // TODO: This is probably only going to work for those
-                      // elements for which all dofs are face dofs
+                      //TODO: This is probably only going to work for those elements for which all dofs are face dofs
                       face_sign[f * dofs_per_face + j] = -1.0;
                     }
               }
@@ -105,7 +104,7 @@ namespace internal
         std::vector<double> &face_sign)
       {
         std::fill(face_sign.begin(), face_sign.end(), 1.0);
-        // TODO: think about what it would take here
+        //TODO: think about what it would take here
       }
 
       void
@@ -127,7 +126,7 @@ namespace internal
         std::vector<double> &face_sign)
       {
         std::fill(face_sign.begin(), face_sign.end(), 1.0);
-        // TODO: think about what it would take here
+        //TODO: think about what it would take here
       }
 
 
@@ -139,8 +138,7 @@ namespace internal
       {
         const unsigned int dim = 3;
         std::fill(face_sign.begin(), face_sign.end(), 1.0);
-        // TODO: This is probably only going to work for those elements for
-        // which all dofs are face dofs
+        //TODO: This is probably only going to work for those elements for which all dofs are face dofs
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
           if (!(cell->line_orientation(l)))
             face_sign[l] = -1.0;
@@ -355,8 +353,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
-  // Create table with sign changes, due to the special structure of the RT
-  // elements.
+  // Create table with sign changes, due to the special structure of the RT elements.
   // TODO: Preliminary hack to demonstrate the overall prinicple!
 
   // Compute eventual sign changes depending on the neighborhood
@@ -929,10 +926,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
                                              cell->face_rotation(face_no),
                                              n_q_points);
 
-  // TODO: Size assertions
+  //TODO: Size assertions
 
-  // Create table with sign changes, due to the special structure of the RT
-  // elements.
+  // Create table with sign changes, due to the special structure of the RT elements.
   // TODO: Preliminary hack to demonstrate the overall prinicple!
 
   // Compute eventual sign changes depending
@@ -1559,9 +1555,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   //       || ( mapping_type == independent_on_cartesian
   //            && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
   //       ExcNotImplemented());
-  // TODO: Size assertions
+  //TODO: Size assertions
 
-  // TODO: Sign change for the face DoFs!
+  //TODO: Sign change for the face DoFs!
 
   // Compute eventual sign changes depending
   // on the neighborhood between two faces.

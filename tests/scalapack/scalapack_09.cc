@@ -48,11 +48,10 @@ test(const unsigned int block_size, const NumberType tol)
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, 4, 3, block_size, block_size);
 
-  // examples from
-  // https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
+  //examples from https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
   FullMatrix<NumberType> full_A_I(4, 3), full_B_I(4, 5), full_X_I(4, 5);
 
-  // FIXME: Add more tests for different cases!!!
+  //FIXME: Add more tests for different cases!!!
   pcout << "Solving least squares problem ||B - A*X||" << std::endl;
 
   full_A_I(0, 0) = 1.;
@@ -110,7 +109,7 @@ test(const unsigned int block_size, const NumberType tol)
   full_X_I(3, 3) = -2.;
   full_X_I(3, 4) = 0.;
 
-  // compute eigenpairs of s.p.d matrix
+  //compute eigenpairs of s.p.d matrix
   ScaLAPACKMatrix<NumberType> scalapack_A(
     4, 3, grid_2d, block_size, block_size);
   ScaLAPACKMatrix<NumberType> scalapack_B(

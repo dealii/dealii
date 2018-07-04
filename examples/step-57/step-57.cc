@@ -82,9 +82,9 @@ namespace Step57
   // and the update. Additionally, the evaluation point is
   // for temporarily holding Newton update in line search. A sparse matrix
   // for the pressure mass matrix is created for the operator of a block Schur
-  // complement preconditioner. We use one ConstraintMatrix for Dirichlet
-  // boundary conditions at the initial step and a zero ConstraintMatrix for the
-  // Newton is defined by 1/Re which has been discussed in the introduction.
+  // complement preconditioner. We use one ConstraintMatrix for Dirichlet boundary
+  // conditions at the initial step and a zero ConstraintMatrix for the Newton
+  // is defined by 1/Re which has been discussed in the introduction.
 
   template <int dim>
   class StationaryNavierStokes
@@ -217,10 +217,9 @@ namespace Step57
     SparseDirectUMFPACK              A_inverse;
   };
 
-  // We can notice that the initialization of the inverse of the matrix at (0,0)
-  // corner is completed in the constructor. If so, every application of the
-  // preconditioner then no longer requires the computation of the matrix
-  // factors.
+  // We can notice that the initialization of the inverse of the matrix at (0,0) corner
+  // is completed in the constructor. If so, every application of the preconditioner then
+  // no longer requires the computation of the matrix factors.
 
   template <class PreconditionerMp>
   BlockSchurPreconditioner<PreconditionerMp>::BlockSchurPreconditioner(
@@ -268,9 +267,8 @@ namespace Step57
 
   // @sect3{StationaryNavierStokes class implementation}
   // @sect4{StationaryNavierStokes::StationaryNavierStokes}
-  // The constructor of this class looks very similar to the one in step-22. The
-  // only difference is the viscosity and the Augmented Lagrangian coefficient
-  // gamma.
+  // The constructor of this class looks very similar to the one in step-22. The only
+  // difference is the viscosity and the Augmented Lagrangian coefficient gamma.
   //
 
   template <int dim>
@@ -312,10 +310,9 @@ namespace Step57
     unsigned int dof_p = dofs_per_block[1];
 
     // In Newton's scheme, we first apply the boundary condition on the solution
-    // obtained from the initial step. To make sure the boundary conditions
-    // remain satisfied during Newton's iteration, zero boundary conditions are
-    // used for the update $\delta u^k$. Therefore we set up two different
-    // constraint objects.
+    // obtained from the initial step. To make sure the boundary conditions remain
+    // satisfied during Newton's iteration, zero boundary conditions are used for
+    // the update $\delta u^k$. Therefore we set up two different constraint objects.
 
     FEValuesExtractors::Vector velocities(0);
     {
@@ -405,9 +402,9 @@ namespace Step57
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    // For the linearized system, we create temporary storage for present
-    // velocity and gradient, and present pressure. In practice, they are all
-    // obtained through their shape functions at quadrature points.
+    // For the linearized system, we create temporary storage for present velocity
+    // and gradient, and present pressure. In practice, they are
+    // all obtained through their shape functions at quadrature points.
 
     std::vector<Tensor<1, dim>> present_velocity_values(n_q_points);
     std::vector<Tensor<2, dim>> present_velocity_gradients(n_q_points);
@@ -627,15 +624,13 @@ namespace Step57
 
   // @sect4{StationaryNavierStokes<dim>::newton_iteration}
   //
-  // This function implements the Newton iteration with given tolerance, maximum
-  // number of iterations, and the number of mesh refinements to do.
-  // "is_initial_step" is the flag to tell us whether "setup_system" is
-  // necessary, and which part, system matrix or right hand side vector, should
-  // be assembled. If we do a line search, the right hand side is already
-  // assembled while checking the residual norm in the last iteration.
-  // Therefore, we just need to assemble the system matrix at the current
-  // iteration. The last argument "output_result" is whether output should be
-  // produced.
+  // This function implements the Newton iteration with given tolerance, maximum number of iterations,
+  // and the number of mesh refinements to do. "is_initial_step" is the flag to tell us whether
+  // "setup_system" is necessary, and which part,
+  // system matrix or right hand side vector, should be assembled. If we do a line search,
+  // the right hand side is already assembled while checking the residual norm in the last iteration.
+  // Therefore, we just need to assemble the system matrix at the current iteration. The last
+  // argument "output_result" is whether output should be produced.
 
   template <int dim>
   void StationaryNavierStokes<dim>::newton_iteration(
@@ -690,11 +685,10 @@ namespace Step57
                 assemble_system(first_step);
                 solve(first_step);
 
-                // To make sure our solution is getting close to the exact
-                // solution, we let the solution be updated with a weight alpha
-                // such that the new residual is smaller than the one of last
-                // step, which is done in the following loop. Also the line
-                // search method can be located in step-15.
+                // To make sure our solution is getting close to the exact solution, we
+                // let the solution be updated with a weight alpha such
+                // that the new residual is smaller than the one of last step, which is done
+                // in the following loop. Also the line search method can be located in step-15.
 
                 for (double alpha = 1.0; alpha > 1e-5; alpha *= 0.5)
                   {
@@ -829,9 +823,8 @@ namespace Step57
 
 
   // @sect4{StationaryNavierStokes::run}
-  // This is the last step of this program. In this part, we generate the grid
-  // and run the other functions respectively. The max refinement can be set by
-  // the argument.
+  // This is the last step of this program. In this part, we generate the grid and run
+  // the other functions respectively. The max refinement can be set by the argument.
   template <int dim>
   void StationaryNavierStokes<dim>::run(const unsigned int refinement)
   {

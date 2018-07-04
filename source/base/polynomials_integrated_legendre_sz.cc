@@ -51,8 +51,7 @@ IntegratedLegendreSZ::get_coefficients(const unsigned int k)
   const double b = 2.0 * k - 3.0;
   const double c = k - 3.0;
 
-  // To maintain stability, delay the division (multiplication by a) until the
-  // end.
+  // To maintain stability, delay the division (multiplication by a) until the end.
   for (unsigned int i = 1; i <= k - 2; i++)
     {
       coefficients[i] = b * coefficients_km1[i - 1] - c * coefficients_km2[i];

@@ -159,12 +159,11 @@ namespace internal
   {
     /**
      * The DataEntry classes abstract away the concrete data type of vectors
-     * users can attach to DataOut (and similar) objects and allow the
-     * underlying DataOut functions to query for individual elements of solution
-     * vectors without having to know the concrete vector type. This avoids that
+     * users can attach to DataOut (and similar) objects and allow the underlying
+     * DataOut functions to query for individual elements of solution vectors
+     * without having to know the concrete vector type. This avoids that
      * DataOut has to know what vectors are being used, but it has the downside
-     * that DataOut also doesn't know the underlying scalar type of these
-     * vectors.
+     * that DataOut also doesn't know the underlying scalar type of these vectors.
      *
      * If the underlying scalar types all represent real numbers (in the
      * mathematical sense -- i.e., the scalar type would be @p float,
@@ -435,7 +434,7 @@ namespace internal
 } // namespace internal
 
 
-// TODO: Most of the documentation of DataOut_DoFData applies to DataOut.
+//TODO: Most of the documentation of DataOut_DoFData applies to DataOut.
 
 /**
  * This is an abstract class which provides the functionality to generate

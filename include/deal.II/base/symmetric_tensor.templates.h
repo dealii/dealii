@@ -864,18 +864,15 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               "is not solved, and therefore the sensitivity of the eigenvalues with "
               "respect to one another is not resolved."));
 
-          // These parameters are heuristicaly chosen through "rigorous"
-          // eye-ball analysis of the errors of tests based on
-          // ad-common-tests/symmetric_tensor_functions_03.h. This checks the
-          // first and second derivatives of the representation of a Neo-Hookean
-          // material described by an Ogden-type model (i.e. using an
-          // eigen-decomposition of the right Cauchy-Green tensor). Using this
-          // comparison between the well-understood result expected from the
-          // Neo-Hookean model and its Ogden equivalent, these parameters are a
-          // first approximation to those required to collectively minimize
-          // error in the energy values, first and second derivatives. What's
-          // apparent is that all AD numbers and eigen-decomposition algorithms
-          // are not made equal!
+          // These parameters are heuristicaly chosen through "rigorous" eye-ball analysis of the
+          // errors of tests based on ad-common-tests/symmetric_tensor_functions_03.h. This checks
+          // the first and second derivatives of the representation of a Neo-Hookean material
+          // described by an Ogden-type model (i.e. using an eigen-decomposition of the right
+          // Cauchy-Green tensor). Using this comparison between the well-understood result expected
+          // from the Neo-Hookean model and its Ogden equivalent, these parameters are a first
+          // approximation to those required to collectively minimize error in the energy values,
+          // first and second derivatives. What's apparent is that all AD numbers and
+          // eigen-decomposition algorithms are not made equal!
           double sf = 1.0;
           if (Differentiation::AD::is_taped_ad_number<Number>::value)
             {
@@ -933,10 +930,8 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               // We can't symmetrize the tensor, otherwise the sensitivities
               // cancel out. So we take the upper triangle as an approximation
               // instead.
-              // TODO[JPP]: Perform the eigen-decomposition on the non-symmetric
-              // T_prime_ns.
-              //            This is, however, nontrivial to implement in this
-              //            context. See:
+              // TODO[JPP]: Perform the eigen-decomposition on the non-symmetric T_prime_ns.
+              //            This is, however, nontrivial to implement in this context. See:
               //            http://www.alglib.net/eigen/nonsymmetric/nonsymmetricevd.php
               //            https://groups.google.com/forum/#!topic/stan-users/QJe1TNioiyg
               SymmetricTensor<2, dim, Number> T_prime;
@@ -955,30 +950,27 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               Tensor<2, dim, Number>          T_prime_ns;
               for (unsigned int i = 0; i < dim; ++i)
                 {
-                  // This is a little bit hacky, so here's a brief explanation
-                  // as to what the principal of this operation is: What we're
-                  // trying to do here is perturb our tenosr such that the
-                  // sensitivity of the eigen-vectors with respect to each other
-                  // can be established. So, one at a time, we compute the
-                  // perturbation of the input tensor such that the maximal
-                  // number of off-diagonal entries are non-zero for any given
-                  // "i". This means that we rotation not about the "ith" axis,
-                  // but rather some offset of it. Note: This does NOT lead to
-                  // an exact value or derivative of the eigen-data being
-                  // computed, so one should be aware that for this case (where
-                  // the eigen-values are equal), the linearisation of any
+                  // This is a little bit hacky, so here's a brief explanation as to
+                  // what the principal of this operation is:
+                  // What we're trying to do here is perturb our tenosr such that the
+                  // sensitivity of the eigen-vectors with respect to each other can
+                  // be established. So, one at a time, we compute the perturbation of
+                  // the input tensor such that the maximal number of off-diagonal entries
+                  // are non-zero for any given "i". This means that we rotation not
+                  // about the "ith" axis, but rather some offset of it.
+                  // Note: This does NOT lead to an exact value or derivative of the
+                  // eigen-data being computed, so one should be aware that for this
+                  // case (where the eigen-values are equal), the linearisation of any
                   // resulting quantities is only approximate.
                   const unsigned int axis = (i + 2) % 3;
                   T_prime_ns = internal::SymmetricTensorImplementation::
                     dediagonalize_tensor(T, rotation_angle, axis);
 
                   // We can't symmetrize the tensor, otherwise the sensitivities
-                  // cancel out. So we take the upper triangle as an
-                  // approximation instead.
-                  // TODO[JPP]: Keep the full row and perform the
-                  // eigen-decomposition on the
-                  //            non-symmetric T_prime_ns. See related comment
-                  //            above in 2d case.
+                  // cancel out. So we take the upper triangle as an approximation
+                  // instead.
+                  // TODO[JPP]: Keep the full row and perform the eigen-decomposition on the
+                  //            non-symmetric T_prime_ns. See related comment above in 2d case.
                   for (unsigned int j = i; j < dim; ++j)
                     T_prime[i][j] = T_prime_ns[i][j];
                 }

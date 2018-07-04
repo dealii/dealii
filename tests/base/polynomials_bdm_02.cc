@@ -13,8 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Tests 3D polynomials_BDM grad grad at a collection of points on the unit
-// square
+// Tests 3D polynomials_BDM grad grad at a collection of points on the unit square
 
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/base/polynomials_bdm.h>

@@ -152,9 +152,9 @@ namespace Step7
   //
   // The actual classes are declared in the following. Note that in order to
   // compute the error of the numerical solution against the continuous one in
-  // the L2 and H1 (semi-)norms, we have to provide value and gradient of the
-  // exact solution. This is more than we have done in previous examples, where
-  // all we provided was the value at one or a list of points. Fortunately, the
+  // the L2 and H1 (semi-)norms, we have to provide value and gradient of the exact
+  // solution. This is more than we have done in previous examples, where all
+  // we provided was the value at one or a list of points. Fortunately, the
   // Function class also has virtual functions for the gradient, so we can
   // simply overload the respective virtual member functions in the Function
   // base class. Note that the gradient of a function in <code>dim</code>
@@ -842,9 +842,9 @@ namespace Step7
   // @sect4{HelmholtzProblem::process_solution}
 
   // Finally we want to process the solution after it has been computed. For
-  // this, we integrate the error in various (semi-)norms, and we generate
-  // tables that will later be used to display the convergence against the
-  // continuous solution in a nice format.
+  // this, we integrate the error in various (semi-)norms, and we generate tables
+  // that will later be used to display the convergence against the continuous
+  // solution in a nice format.
   template <int dim>
   void HelmholtzProblem<dim>::process_solution(const unsigned int cycle)
   {

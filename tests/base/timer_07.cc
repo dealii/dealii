@@ -61,8 +61,7 @@ main(int argc, char **argv)
   catch (const Timer07Exception &exc)
     {}
 
-  // Test that no errors are printed for MPI_COMM_SELF since no communication
-  // occurs
+  // Test that no errors are printed for MPI_COMM_SELF since no communication occurs
   try
     {
       std::cerr << "TimerOutput::Scope with MPI_COMM_SELF\n";
@@ -84,8 +83,7 @@ main(int argc, char **argv)
     std::find_if(output.begin(), output.end(), is_digit);
   while (next_number != output.end())
     {
-      // convert everything between the |s to xs so that we have consistent
-      // output.
+      // convert everything between the |s to xs so that we have consistent output.
       const std::string::iterator start_pipe =
         std::find(std::string::reverse_iterator(next_number),
                   output.rend(),

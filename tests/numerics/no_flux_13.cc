@@ -13,9 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-// bug report from mailing list from 11/15/2013 (simplified). no_normal_flux
-// throws an ExcInternalError when handing it an FE with less than dim
-// components. This is now fixed (throws ExcMessage).
+// bug report from mailing list from 11/15/2013 (simplified). no_normal_flux throws
+// an ExcInternalError when handing it an FE with less than dim components. This
+// is now fixed (throws ExcMessage).
 
 #include <deal.II/base/function.h>
 

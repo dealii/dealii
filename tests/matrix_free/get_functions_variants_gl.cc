@@ -163,7 +163,7 @@ test()
   dof.distribute_dofs(fe);
 
   deallog << "Testing " << fe.get_name() << std::endl;
-  // std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
   Vector<double> solution_dist(dof.n_dofs());
 

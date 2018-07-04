@@ -131,7 +131,7 @@ namespace internal
             std::vector<std::vector<types::global_dof_index>> child_ldi(
               nc, std::vector<types::global_dof_index>(fe.dofs_per_cell));
 
-            // now create the mass matrix and all the right_hand sides
+            //now create the mass matrix and all the right_hand sides
             unsigned int                                           child_no = 0;
             typename dealii::DoFHandler<dim>::active_cell_iterator cell =
               dh.begin_active();
@@ -158,18 +158,18 @@ namespace internal
                       }
               }
 
-            // now solve for all right-hand sides simultaneously
+            //now solve for all right-hand sides simultaneously
             dealii::FullMatrix<double> solution(n_dofs, dpc);
             fine_mass.gauss_jordan();
             fine_mass.mmult(solution, coarse_rhs_matrix);
 
-            // and distribute to the fine cell matrices
+            //and distribute to the fine cell matrices
             for (unsigned int child_no = 0; child_no < nc; ++child_no)
               for (unsigned int i = 0; i < dpc; ++i)
                 for (unsigned int j = 0; j < dpc; ++j)
                   {
                     const unsigned int gdi = child_ldi[child_no][i];
-                    // remove small entries
+                    //remove small entries
                     if (std::fabs(solution(gdi, j)) > 1.e-12)
                       matrices[ref_case - 1][child_no](i, j) = solution(gdi, j);
                   }
@@ -397,12 +397,12 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
          ExcDimensionMismatch(interpolation_matrix.m(),
                               x_source_fe.dofs_per_cell));
 
-  // Provide a short cut in case we are just inquiring the identity
+  //Provide a short cut in case we are just inquiring the identity
   auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);
   if (casted_fe != nullptr && casted_fe->degree == this->degree)
     for (unsigned int i = 0; i < interpolation_matrix.m(); ++i)
       interpolation_matrix.set(i, i, 1.);
-  // else we need to do more...
+  //else we need to do more...
   else
     Assert(
       false,
@@ -432,7 +432,7 @@ FE_Q_Bubbles<dim, spacedim>::get_dpo_vector(const unsigned int q_deg)
     dpo[i] = dpo[i - 1] * (q_deg - 1);
 
   dpo[dim] +=
-    (q_deg <= 1 ? 1 : dim); // all the bubble functions are discontinuous
+    (q_deg <= 1 ? 1 : dim); //all the bubble functions are discontinuous
   return dpo;
 }
 
@@ -501,7 +501,7 @@ FE_Q_Bubbles<dim, spacedim>::get_restriction_matrix(
   Assert(this->restriction[refinement_case - 1][child].n() != 0,
          ExcMessage("This restriction matrix has not been computed yet!"));
 
-  // finally return the matrix
+  //finally return the matrix
   return this->restriction[refinement_case - 1][child];
 }
 

@@ -15,9 +15,9 @@
 
 
 
-// this tests a failure in the design of the block sparse matrix iterators:
-// falling off the end of the matrix does not yield the iterator provided by the
-// end() function
+// this tests a failure in the design of the block sparse matrix iterators: falling
+// off the end of the matrix does not yield the iterator provided by the end()
+// function
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>

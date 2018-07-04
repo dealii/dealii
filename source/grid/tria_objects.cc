@@ -113,8 +113,8 @@ namespace internal
                 RefinementCase<G::dimension>::no_refinement);
             }
 
-          // first reserve, then resize. Otherwise the std library can decide to
-          // allocate more entries.
+          // first reserve, then resize. Otherwise the std library can decide to allocate
+          // more entries.
           boundary_or_material_id.reserve(new_size);
           boundary_or_material_id.resize(new_size);
 
@@ -142,8 +142,7 @@ namespace internal
       const dealii::Triangulation<dim, spacedim> &tria,
       const unsigned int                          level)
     {
-      // TODO: Think of a way to ensure that we are using the correct
-      // triangulation, i.e. the one containing *this.
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos = next_free_pair, last = used.size() - 1;
       for (; pos < last; ++pos)

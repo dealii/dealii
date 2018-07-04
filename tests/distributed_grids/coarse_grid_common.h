@@ -82,11 +82,11 @@ assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
   out1.close();
   out2.close();
 
-  // compare the two files
+  //compare the two files
   std::string cmd = std::string("diff -q ") + file1 + std::string(" ") + file2;
   Assert(system(cmd.c_str()) == 0, ExcInternalError());
 
-  // and delete them
+  //and delete them
   std::remove(file1.c_str());
   std::remove(file2.c_str());
 }

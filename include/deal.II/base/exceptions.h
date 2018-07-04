@@ -1187,17 +1187,15 @@ namespace deal_II_exceptions
     }
 #ifdef DEAL_II_WITH_CUDA
     /**
-     * Return a string given an error code. This is similar to the
-     * cudaGetErrorString function but there is no equivalent function for
-     * cuSPARSE.
+     * Return a string given an error code. This is similar to the cudaGetErrorString
+     * function but there is no equivalent function for cuSPARSE.
      */
     std::string
     get_cusparse_error_string(const cusparseStatus_t error_code);
 
     /**
-     * Return a string given an error code. This is similar to the
-     * cudaGetErrorString function but there is no equivalent function for
-     * cuSOLVER.
+     * Return a string given an error code. This is similar to the cudaGetErrorString
+     * function but there is no equivalent function for cuSOLVER.
      */
     std::string
     get_cusolver_error_string(const cusolverStatus_t error_code);
@@ -1209,9 +1207,9 @@ namespace deal_II_exceptions
 
 
 /**
- * A macro that serves as the main routine in the exception mechanism for debug
- * mode error checking. It asserts that a certain condition is fulfilled,
- * otherwise issues an error and aborts the program.
+ * A macro that serves as the main routine in the exception mechanism for debug mode
+ * error checking. It asserts that a certain condition is fulfilled, otherwise
+ * issues an error and aborts the program.
  *
  * A more detailed description can be found in the
  * @ref Exceptions
@@ -1309,9 +1307,8 @@ namespace deal_II_exceptions
 #endif
 
 /**
- * A macro that serves as the main routine in the exception mechanism for
- * dynamic error checking. It asserts that a certain condition is fulfilled,
- * otherwise
+ * A macro that serves as the main routine in the exception mechanism for dynamic
+ * error checking. It asserts that a certain condition is fulfilled, otherwise
  * throws an exception via the C++ @p throw mechanism. This exception can
  * be caught via a @p catch clause, as is shown in step-6 and all following
  * tutorial programs.

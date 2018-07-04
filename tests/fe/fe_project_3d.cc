@@ -192,8 +192,7 @@ void create_tria(Triangulation<3> &triangulation,
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
-  // create grid with all possible combintations of face_flip, face_orientation
-  // and face_rotation flags
+  // create grid with all possible combintations of face_flip, face_orientation and face_rotation flags
   static const int cell_vertices[][GeometryInfo<3>::vertices_per_cell] = {
     {0, 1, 9, 10, 3, 4, 12, 13},  // cell 1 standard
     {1, 2, 10, 11, 4, 5, 13, 14}, // cell 2 standard
@@ -242,7 +241,7 @@ test(const FiniteElement<dim> &fe,
   const QGauss<dim - 1>            face_quadrature(fe.degree + 1);
   const unsigned int               n_q_points      = quadrature.size();
   const unsigned int               n_face_q_points = face_quadrature.size();
-  // MappingQ<dim> mapping(2);
+  //MappingQ<dim> mapping(2);
   MappingQGeneric<dim>                                        mapping(1);
   std::vector<double>                                         div_v(n_q_points);
   std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(

@@ -27,9 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * A namespace for geometric utility functions that are not particularly
- * specific to finite element computing or numerical programs, but nevertheless
- * are needed in various contexts when writing applications.
+ * A namespace for geometric utility functions that are not particularly specific
+ * to finite element computing or numerical programs, but nevertheless are needed
+ * in various contexts when writing applications.
  *
  * @ingroup utilities
  * @author Denis Davydov, 2016

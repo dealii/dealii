@@ -47,7 +47,7 @@
 
 // test parallel (MPI) version of Step-36
 
-const unsigned int dim = 2; // run in 2d to save time
+const unsigned int dim = 2; //run in 2d to save time
 
 const double eps = 1e-10;
 
@@ -79,8 +79,7 @@ test(std::string solver_name, std::string preconditioner_name)
   triangulation.refine_global(global_mesh_refinement_steps);
 
   // we do not use metis but rather partition by hand below.
-  // dealii::GridTools::partition_triangulation (n_mpi_processes,
-  // triangulation);
+  //dealii::GridTools::partition_triangulation (n_mpi_processes, triangulation);
   {
     const double x0 = -1.0;
     const double x1 = 1.0;
@@ -146,7 +145,7 @@ test(std::string solver_name, std::string preconditioner_name)
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
     {
       eigenfunctions[i].reinit(locally_owned_dofs,
-                               mpi_communicator); // without ghost dofs
+                               mpi_communicator); //without ghost dofs
       for (unsigned int j = 0; j < locally_owned_dofs.n_elements(); ++j)
         eigenfunctions[i][locally_owned_dofs.nth_index_in_set(j)] =
           random_value<double>();
@@ -299,8 +298,7 @@ test(std::string solver_name, std::string preconditioner_name)
                                                        mpi_communicator);
       }
 
-    // Set the initial vector. This is optional, if not done the initial vector
-    // is set to random values
+    // Set the initial vector. This is optional, if not done the initial vector is set to random values
     eigensolver->set_initial_space(eigenfunctions);
 
     eigensolver->set_which_eigenpairs(EPS_LARGEST_REAL);
@@ -313,9 +311,8 @@ test(std::string solver_name, std::string preconditioner_name)
 
     // TODO make this robust on different platforms. Seems related to GHEP
     // as solve_04 works ok.
-    // dealii::deallog << "outer iterations: "<< solver_control.last_step
-    // ()<<std::endl; dealii::deallog << "last inner iterations:
-    // "<<linear_solver_control.last_step()<<std::endl;
+    //dealii::deallog << "outer iterations: "<< solver_control.last_step ()<<std::endl;
+    //dealii::deallog << "last inner iterations: "<<linear_solver_control.last_step()<<std::endl;
     for (unsigned int i = 0; i < eigenvalues.size(); i++)
       dealii::deallog << eigenvalues[i] << std::endl;
 

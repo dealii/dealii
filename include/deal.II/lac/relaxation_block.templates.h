@@ -188,8 +188,8 @@ namespace internal
   prepare_ghost_vector(const VectorType &prev, VectorType *other)
   {
     // If the following Assertion triggers, you either set temp_ghost_vector
-    // for a serial computation (don't!), or nobody implemented, instantiated,
-    // and tested the parallel version for your vector type.
+    // for a serial computation (don't!), or nobody implemented, instantiated, and
+    // tested the parallel version for your vector type.
     Assert(other == nullptr, ExcNotImplemented());
     (void)other;
     return prev;

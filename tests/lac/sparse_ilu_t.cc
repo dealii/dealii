@@ -25,7 +25,7 @@
 #include "../testmatrix.h"
 #include "../tests.h"
 
-// TODO:[WB] find test that is less sensitive to floating point accuracy
+//TODO:[WB] find test that is less sensitive to floating point accuracy
 
 int
 main()

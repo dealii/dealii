@@ -16,8 +16,7 @@
 #include "../lapack/create_matrix.h"
 #include "../tests.h"
 
-// test copying of distributed ScaLAPACKMatrices using ScaLAPACK routine
-// p_gemr2d
+// test copying of distributed ScaLAPACKMatrices using ScaLAPACK routine p_gemr2d
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/logstream.h>
@@ -44,18 +43,18 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   const unsigned int size = 500;
-  // create FullMatrix and fill it
+  //create FullMatrix and fill it
   FullMatrix<NumberType> full(size);
   unsigned int           count = 0;
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j, ++count)
       full(i, j) = count;
 
-  // create 2d process grid
+  //create 2d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_2d =
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size, size, block_size_i, block_size_i);
-  // create 1d process grid
+  //create 1d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_1d =
     std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,
                                                   n_mpi_processes,

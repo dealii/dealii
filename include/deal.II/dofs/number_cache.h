@@ -115,9 +115,9 @@ namespace internal
 
       /**
        * Number of dofs owned by this MPI process. If this is a sequential
-       * computation, then this equals n_global_dofs. (Here, "sequential" means
-       * that either the whole program does not use MPI, or that it uses MPI but
-       * only uses a single MPI process, or that there are multiple MPI
+       * computation, then this equals n_global_dofs. (Here, "sequential" means that either
+       * the whole program does not use MPI, or that it uses MPI
+       * but only uses a single MPI process, or that there are multiple MPI
        * processes but the Triangulation on which this DoFHandler builds
        * works only on one MPI process.)
        */
@@ -136,8 +136,8 @@ namespace internal
 
       /**
        * The number of dofs owned by each of the various MPI processes. If
-       * this is a sequential computation, then the vector contains a single
-       * element equal to n_global_dofs. (Here, "sequential" means that either
+       * this is a sequential computation, then the vector contains a single element
+       * equal to n_global_dofs. (Here, "sequential" means that either
        * the whole program does not use MPI, or that it uses MPI
        * but only uses a single MPI process, or that there are multiple MPI
        * processes but the Triangulation on which this DoFHandler builds

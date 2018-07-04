@@ -155,8 +155,7 @@ check_periodicity(const DoFHandler<2> &dof_handler,
   for (unsigned int i = 0; i < cycle; i++)
     n_points *= 2;
 
-  // don't test exactly at the support points, since point_value is not stable
-  // there
+  //don't test exactly at the support points, since point_value is not stable there
   const double eps = 1. / (16. * n_points);
 
   for (unsigned int i = 1; i < n_points; i++)

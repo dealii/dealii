@@ -78,9 +78,9 @@ namespace CUDAWrappers
     SparseMatrix();
 
     /**
-     * Constructor. Takes a Utilities::CUDA::Handle and a sparse matrix on the
-     * host. The sparse matrix on the host is copied on the device and the
-     * elements are reordered according to the format supported by cuSPARSE.
+     * Constructor. Takes a Utilities::CUDA::Handle and a sparse matrix on the host.
+     * The sparse matrix on the host is copied on the device and the elements
+     * are reordered according to the format supported by cuSPARSE.
      */
     SparseMatrix(Utilities::CUDA::Handle &             handle,
                  const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
@@ -273,8 +273,8 @@ namespace CUDAWrappers
 
   private:
     /**
-     * cuSPARSE handle used to call cuSPARSE functions. The cuSPARSE handle
-     * needs to be mutable to be called in a const function.
+     * cuSPARSE handle used to call cuSPARSE functions. The cuSPARSE handle needs
+     * to be mutable to be called in a const function.
      */
     mutable cusparseHandle_t cusparse_handle;
 

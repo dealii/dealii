@@ -62,8 +62,7 @@ main()
       deallog << "2d_quad.inp" << std::endl;
       abaqus_grid<2>(SOURCE_DIR "/grids/abaqus/2d/2d_quad.inp");
       //      deallog << "2d_test_pave.inp" << std::endl;
-      //      abaqus_grid<2> (SOURCE_DIR "/grids/abaqus/2d/2d_test_pave.inp");
-      //      // Failing test
+      //      abaqus_grid<2> (SOURCE_DIR "/grids/abaqus/2d/2d_test_pave.inp"); // Failing test
       deallog << "2d_test_abaqus.inp" << std::endl;
       abaqus_grid<2>(SOURCE_DIR "/grids/abaqus/2d/2d_test_abaqus.inp");
 

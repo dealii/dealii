@@ -417,8 +417,8 @@ namespace Step50
                    || (mg_constrained_dofs.is_boundary_index(
                          lvl, local_dof_indices[i]) &&
                        local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
+                         local_dof_indices
+                           [j]) // ( boundary(i) && boundary(j) && i==j )
                    ))
                 {
                 }

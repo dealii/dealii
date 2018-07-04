@@ -301,9 +301,8 @@ public:
     const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &);
 
   /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
    * by @p b to the object pointed to by @p a. However, the result of
    * dereferencing an iterator is not an object but an accessor; consequently,
    * this operation is not useful for iterators on DoF handler objects.
@@ -855,9 +854,8 @@ public:
   DoFAccessor(const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
 
   /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
    * by @p b to the object pointed to by @p a. However, the result of
    * dereferencing an iterator is not an object but an accessor; consequently,
    * this operation is not useful for iterators on DoF handler objects.
@@ -1227,8 +1225,8 @@ protected:
 
 
 /**
- * A class that represents DoF accessor objects to iterators that don't make
- * sense such as quad iterators in on 1d meshes.  This class can not be used to
+ * A class that represents DoF accessor objects to iterators that don't make sense
+ * such as quad iterators in on 1d meshes.  This class can not be used to
  * create objects (it will in fact throw an exception if this should ever be
  * attempted but it sometimes allows code to be written in a simpler way in a
  * dimension independent way. For example, it allows to write code that works
@@ -1396,9 +1394,8 @@ public:
     const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
 
   /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
    * by @p b to the object pointed to by @p a. However, the result of
    * dereferencing an iterator is not an object but an accessor; consequently,
    * this operation is not useful for iterators on DoF handler objects.

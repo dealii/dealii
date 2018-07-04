@@ -65,17 +65,17 @@ namespace hp
     /**
      * Adds a new quadrature rule to the QCollection. In most cases, you will
      * want to add quadrature rules in the same order as the elements were
-     * added to the hp::FECollection for which this quadrature rule collection
-     * is meant. If done this way, the hp::FEValues objects with which you will
+     * added to the hp::FECollection for which this quadrature rule collection is
+     * meant. If done this way, the hp::FEValues objects with which you will
      * use both hp::FECollection and hp::QCollection objects will automatically
      * choose corresponding elements and quadrature formulas. On the other hand,
      * it is possible to use arbitrary combinations of elements and quadrature
-     * formulas in hp::FECollection and hp::QCollection objects when
-     * specifically specifying appropriate indices in calls to
-     * hp::FEValues::reinit() or hp::FEFaceValues::reinit(). In those cases,
-     * there need not be a correspondence between elements of the
-     * hp::FECollection and hp::QCollection objects; they need not even be of
-     * the same size in this case.
+     * formulas in hp::FECollection and hp::QCollection objects when specifically
+     * specifying appropriate indices in calls to hp::FEValues::reinit()
+     * or hp::FEFaceValues::reinit(). In those cases, there need not be a
+     * correspondence between elements of the hp::FECollection and
+     * hp::QCollection objects; they need not even be of the same size in this
+     * case.
      *
      * The same arguments about the order of elements of collections can, by
      * the way, also be made about the elements of hp::MappingCollection

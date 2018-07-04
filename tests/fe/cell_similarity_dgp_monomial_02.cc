@@ -24,8 +24,8 @@
 // mapping. so we test that the mass matrix we get from each of these cells is
 // actually different in the latter case, but the same in the former
 //
-// the various tests cell_similarity_dgp_monomial_?? differ in the mappings and
-// finite elements in use
+// the various tests cell_similarity_dgp_monomial_?? differ in the mappings and finite
+// elements in use
 
 
 #include <deal.II/base/function.h>

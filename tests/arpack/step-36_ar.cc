@@ -17,8 +17,7 @@
  * Authors: Toby D. Young, Polish Academy of Sciences,
  *          Wolfgang Bangerth, Texas A&M University
  *
- * This file tests the ARPACK interface for a symmetric operator taken from
- step-36.
+ * This file tests the ARPACK interface for a symmetric operator taken from step-36.
  *
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0

@@ -88,35 +88,35 @@ private:
   void
   setup_system();
 
-  const unsigned int n_blocks;         // total number of blocks
+  const unsigned int n_blocks;         //total number of blocks
   const unsigned int n_components;     // total number of components
-  const unsigned int first_u_comp;     // where displacements starts
-  const unsigned int first_lamda_comp; // where lagrage multipliers start
-  const unsigned int degree;           // of shape functions
+  const unsigned int first_u_comp;     //where displacements starts
+  const unsigned int first_lamda_comp; //where lagrage multipliers start
+  const unsigned int degree;           //of shape functions
 
   std::vector<types::global_dof_index> dofs_per_block;
 
   Triangulation<dim>
-                      triangulation; // a triangulation object of the "dim"-dimensional domain;
-  hp::DoFHandler<dim> dof_handler; // is associated with triangulation;
+                      triangulation; //a triangulation object of the "dim"-dimensional domain;
+  hp::DoFHandler<dim> dof_handler; //is associated with triangulation;
 
-  FESystem<dim>         elasticity_fe;
-  FESystem<dim>         elasticity_w_lagrange_fe;
-  hp::FECollection<dim> fe; // used to stack several other elements together to
-                            // form one vector-valued finite element.
+  FESystem<dim> elasticity_fe;
+  FESystem<dim> elasticity_w_lagrange_fe;
+  hp::FECollection<dim>
+    fe; //used to stack several other elements together to form one vector-valued finite element.
 
   AffineConstraints<double>
     hanging_node_constraints; // object to hold hanging node
                               // constraints after refinement
   AffineConstraints<double> constraints;
 
-  BlockSparsityPattern sparsity_pattern; // store sparsity pattern
+  BlockSparsityPattern sparsity_pattern; //store sparsity pattern
 
   SymmetricTensor<4, dim>
     stress_strain_tensor; // elastic constitutive equations
 
-  hp::QCollection<dim> quadrature_formula; // a Gauss quadrature formula to be
-                                           // used for integral evaluation
+  hp::QCollection<dim>
+    quadrature_formula; //a Gauss quadrature formula to be used for integral evaluation
 
   const FEValuesExtractors::Vector u_fe;
   const FEValuesExtractors::Vector lamda_fe;
@@ -124,8 +124,8 @@ private:
   unsigned int id_of_lagrange_mult;
   double       beta1;
 
-  SparsityPattern sparsity_pattern_nb; // needed when switching between block
-                                       // system and non-block.
+  SparsityPattern
+    sparsity_pattern_nb; //needed when switching between block system and non-block.
 };
 
 ///
@@ -182,17 +182,16 @@ template <int dim>
 class ConstrainValues : public Function<dim>
 {
 public:
-  ConstrainValues(); // need to pass down to the base class of how many
-                     // components the function consists; default - 1
+  ConstrainValues(); //need to pass down to the base class of how many components the function consists; default - 1
   virtual void
   vector_value(const Point<dim> &p,
                Vector<double> &  values)
-    const; // returns calculated values in the second argument;
+    const; //returns calculated values in the second argument;
   virtual void
   vector_value_list(const std::vector<Point<dim>> &points,
                     std::vector<Vector<double>> &  value_list)
-    const; // values at several points at once
-  // prevent from calling virtual function "vector_value" to frequently
+    const; //values at several points at once
+  //prevent from calling virtual function "vector_value" to frequently
 };
 
 template <int dim>
@@ -208,8 +207,8 @@ ConstrainValues<dim>::vector_value(const Point<dim> &p,
 {
   Assert(values.size() == dim,
          ExcDimensionMismatch(values.size(),
-                              dim)); // check is the size of "values" is correct
-  // Assert (dim >= 2, ExcNotImplemented());//not implemented for 1d
+                              dim)); //check is the size of "values" is correct
+  //Assert (dim >= 2, ExcNotImplemented());//not implemented for 1d
   values[0] = 0.0;
 }
 
@@ -222,10 +221,10 @@ ConstrainValues<dim>::vector_value_list(
   Assert(
     value_list.size() == points.size(),
     ExcDimensionMismatch(value_list.size(),
-                         points.size())); // check if input-output is consistent
+                         points.size())); //check if input-output is consistent
 
   const unsigned int n_points =
-    points.size(); // number of points at which the function is to be evaluated
+    points.size(); //number of points at which the function is to be evaluated
 
   for (unsigned int p = 0; p < n_points; ++p)
     ConstrainValues<dim>::vector_value(points[p], value_list[p]);
@@ -245,7 +244,7 @@ ElasticProblem<dim>::ElasticProblem()
   , /*assotiate dof_handler to the triangulation */
   elasticity_fe(
     FE_Q<dim>(degree),
-    dim, // use dim FE_Q of a given degree to represent displacements
+    dim, //use dim FE_Q of a given degree to represent displacements
     FE_Nothing<dim>(),
     dim // zero extension of lagrange multipliers elsewhere in the domain
     )
@@ -259,8 +258,8 @@ ElasticProblem<dim>::ElasticProblem()
   , id_of_lagrange_mult(1)
   , beta1(1.0)
 {
-  fe.push_back(elasticity_fe);            // FE index 0
-  fe.push_back(elasticity_w_lagrange_fe); // FE index 1
+  fe.push_back(elasticity_fe);            //FE index 0
+  fe.push_back(elasticity_w_lagrange_fe); //FE index 1
 
   quadrature_formula.push_back(QGauss<dim>(degree + 2));
   quadrature_formula.push_back(QGauss<dim>(degree + 2));
@@ -308,7 +307,7 @@ ElasticProblem<dim>::make_grid()
                                       triangulationR,
                                       triangulation);
 
-  // triangulation.refine_global (2); //refine twice globally before solving
+  //triangulation.refine_global (2); //refine twice globally before solving
 }
 
 
@@ -327,7 +326,7 @@ ElasticProblem<dim>::setup_system()
                                                      endc = dof_handler.end();
   unsigned int n_lagrange_cells                           = 0;
   unsigned int n_elasticity_cells                         = 0;
-  for (; cell != endc; ++cell) // loop over all cells
+  for (; cell != endc; ++cell) //loop over all cells
     {
       if (cell->material_id() == id_of_lagrange_mult)
         {
@@ -342,37 +341,33 @@ ElasticProblem<dim>::setup_system()
     }
   deallog << " number of cells (L/E): " << n_lagrange_cells << "; "
           << n_elasticity_cells << std::endl;
-  Assert(n_lagrange_cells > 0,
-         ExcInternalError()); // there should be at least 1 cell! Otherwise
-                              // DoFHanlder crashes with 0 dofs for block 2!
+  Assert(
+    n_lagrange_cells > 0,
+    ExcInternalError()); //there should be at least 1 cell! Otherwise DoFHanlder crashes with 0 dofs for block 2!
   //
   //(2) distribute DoFs
   dof_handler.distribute_dofs(
-    fe); /*enumerate DoF based on fe object (which knows about shape-functions
-            used, their order and dimension*/
+    fe); /*enumerate DoF based on fe object (which knows about shape-functions used, their order and dimension*/
   DoFRenumbering::Cuthill_McKee(
-    dof_handler); // do renumberring; must be done
-                  // right after distributing DoF !!!
+    dof_handler); //do renumberring; must be done right after distributing DoF !!!
   DoFRenumbering::component_wise(dof_handler, block_component);
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
 
   deallog << "dofs per block:  U=" << dofs_per_block[u_block]
           << " L=" << dofs_per_block[lambda_block] << std::endl;
 
-  // related to hanging nodes and refinement:
+  //related to hanging nodes and refinement:
   //(3) create hanging nodes constrains (also add normal diricle BC here?
   hanging_node_constraints
-    .clear(); // clear all content that may left from previous calculations
+    .clear(); //clear all content that may left from previous calculations
   DoFTools::make_hanging_node_constraints(
     dof_handler,
-    hanging_node_constraints);      // fill the object representing constraints
-  hanging_node_constraints.close(); // close the object - sort and rearrange
-                                    // constraints for effective calculations
+    hanging_node_constraints); //fill the object representing constraints
+  hanging_node_constraints
+    .close(); //close the object - sort and rearrange constraints for effective calculations
 
-  //(4) create block sparsity pattern (define which elements in sparse matrix
-  // are non-zero; prescribe coupling between blocks)
-  // following step-22 use of simple compressed block sparsity pattern for
-  // efficiency
+  //(4) create block sparsity pattern (define which elements in sparse matrix are non-zero; prescribe coupling between blocks)
+  // following step-22 use of simple compressed block sparsity pattern for efficiency
   BlockDynamicSparsityPattern dynamic_sparsity_pattern(n_blocks, n_blocks);
 
   dynamic_sparsity_pattern.block(u_block, u_block)
@@ -392,10 +387,9 @@ ElasticProblem<dim>::setup_system()
       {
         if ((block_component[ii] == lambda_block) &&
             (block_component[jj] == lambda_block))
-          coupling[ii][jj] = DoFTools::none; // diagonal = 0
+          coupling[ii][jj] = DoFTools::none; //diagonal = 0
         else
-          coupling[ii][jj] = DoFTools::always; // full coupling (u,u),
-                                               // (u,lambda)
+          coupling[ii][jj] = DoFTools::always; //full coupling (u,u), (u,lambda)
       }
 
   hanging_node_constraints.condense(dynamic_sparsity_pattern);

@@ -336,8 +336,7 @@ private:
  *
  *    gmres.solve (matrix, solution, right_hand_side,
  *                 PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
- *                 (matrix,&SparseMatrix<double>::template
- * precondition_Jacobi<double>));
+ *                 (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  * This creates an unnamed object to be passed as the fourth parameter to the
  * solver function of the SolverGMRES class. It assumes that the SparseMatrix
@@ -353,8 +352,7 @@ private:
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
  *                 PreconditionUseMatrix<>
- *                   (matrix,&SparseMatrix<double>::template
- * precondition_Jacobi<double>));
+ *                   (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
@@ -495,8 +493,7 @@ protected:
  * // Define and initialize preconditioner:
  *
  * PreconditionJacobi<SparseMatrix<double> > precondition;
- * precondition.initialize (A, PreconditionJacobi<SparseMatrix<double>
- * >::AdditionalData(.6));
+ * precondition.initialize (A, PreconditionJacobi<SparseMatrix<double> >::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -583,8 +580,7 @@ public:
  * // Define and initialize preconditioner
  *
  * PreconditionSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, PreconditionSOR<SparseMatrix<double>
- * >::AdditionalData(.6));
+ * precondition.initialize (A, PreconditionSOR<SparseMatrix<double> >::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -652,8 +648,7 @@ public:
  * // Define and initialize preconditioner
  *
  * PreconditionSSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, PreconditionSSOR<SparseMatrix<double>
- * >::AdditionalData(.6));
+ * precondition.initialize (A, PreconditionSSOR<SparseMatrix<double> >::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -1819,8 +1814,8 @@ namespace internal
       apply_to_subrange(const std::size_t begin, const std::size_t end) const
       {
         // To circumvent a bug in gcc
-        // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create
-        // copies of the variables factor1 and factor2 and do not check based on
+        // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create copies
+        // of the variables factor1 and factor2 and do not check based on
         // factor1.
         const Number factor1 = this->factor1;
         const Number factor2 = this->factor2;
@@ -2084,8 +2079,7 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 }
 
 
-// avoid warning about deprecated variable
-// AdditionalData::matrix_diagonal_inverse
+// avoid warning about deprecated variable AdditionalData::matrix_diagonal_inverse
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void

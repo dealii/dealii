@@ -185,8 +185,8 @@ namespace Step50
     deallog << std::endl;
 
 
-    // solution.reinit (mg_dof_handler.n_dofs());
-    // system_rhs.reinit (mg_dof_handler.n_dofs());
+    //solution.reinit (mg_dof_handler.n_dofs());
+    //system_rhs.reinit (mg_dof_handler.n_dofs());
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
@@ -474,7 +474,7 @@ namespace Step50
           }
         else
           triangulation.refine_global(1);
-        // refine_grid ();
+        //refine_grid ();
 
 
         deallog << "   Number of active cells:       "

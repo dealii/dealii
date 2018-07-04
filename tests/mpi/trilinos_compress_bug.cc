@@ -63,8 +63,8 @@ test()
 
   test1.compress(VectorOperation::add);
 
-  // TrilinosWrappers::MPI::Vector test(test1.vector_partitioner()); // works
-  // TrilinosWrappers::MPI::Vector test(locally_owned); // works
+  //TrilinosWrappers::MPI::Vector test(test1.vector_partitioner()); // works
+  //TrilinosWrappers::MPI::Vector test(locally_owned); // works
   TrilinosWrappers::MPI::Vector test(test1); // fails
 
   test = 0;

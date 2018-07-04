@@ -64,9 +64,9 @@ test()
               deallog << std::endl;
             }
 
-          // check that all local
-          // neighbors have the
-          // correct level
+          //check that all local
+          //neighbors have the
+          //correct level
           typename Triangulation<dim, dim>::active_cell_iterator cell;
 
           for (cell = tr.begin_active(); cell != tr.end(); ++cell)

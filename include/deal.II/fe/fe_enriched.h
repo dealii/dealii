@@ -39,22 +39,22 @@ DEAL_II_NAMESPACE_OPEN
  * finite element with an enrichment function multiplied with another (usually
  * linear) finite element:
  * \f[
- * U(\mathbf x) = \sum_i N_i(\mathbf x) U_i + \sum_j N_j(\mathbf x) \sum_k
- * F_k(\mathbf x) U_{jk} \f] where $ N_i(\mathbf x) $ and $ N_j(\mathbf x) $ are
- * the underlying finite elements (including the mapping from the isoparametric
- * element to the real element); $ F_k(\mathbf x) $ are the scalar enrichment
- * functions in real space (e.g. $ 1/r $, $ \exp(-r) $, etc); $ U_i $ and $
- * U_{jk} $ are the standard and enriched DoFs. This allows to include in the
- * finite element space a priori knowledge about the partial differential
- * equation being solved which in turn improves the local approximation
- * properties of the spaces. This can be useful for highly oscillatory
+ * U(\mathbf x) = \sum_i N_i(\mathbf x) U_i + \sum_j N_j(\mathbf x) \sum_k F_k(\mathbf x) U_{jk}
+ * \f]
+ * where $ N_i(\mathbf x) $ and $ N_j(\mathbf x) $ are the underlying finite elements (including
+ * the mapping from the isoparametric element to the real element); $ F_k(\mathbf x) $
+ * are the scalar enrichment functions in real space (e.g. $ 1/r $, $ \exp(-r) $, etc);
+ * $ U_i $ and $ U_{jk} $ are the standard and enriched DoFs. This allows to
+ * include in the finite element space a priori knowledge about the partial
+ * differential equation being solved which in turn improves the local
+ * approximation properties of the spaces. This can be useful for highly oscillatory
  * solutions, problems with domain corners or on unbounded domains or sudden
  * changes of boundary conditions. PUM method uses finite element spaces which
  * satisfy the partition of unity property (e.g. FE_Q). Among other properties
  * this makes the resulting space to reproduce enrichment functions exactly.
  *
- * The simplest constructor of this class takes two finite element objects and
- * an enrichment function to be used. For example
+ * The simplest constructor of this class takes two finite element objects and an
+ * enrichment function to be used. For example
  *
  * @code
  * FE_Enriched<dim> fe(FE_Q<dim>(2),
@@ -91,8 +91,8 @@ DEAL_II_NAMESPACE_OPEN
  * </table>
  *
  * Note that evaluation of gradients (hessians) of the enriched shape functions
- * or the finite element field requires evaluation of gradients (gradients and
- * hessians) of the enrichment functions:
+ * or the finite element field requires evaluation of gradients (gradients and hessians)
+ * of the enrichment functions:
  * @f{align*}{
  *   U(\mathbf x)
  *     &= \sum_i N_i(\mathbf x) U_i
@@ -100,31 +100,31 @@ DEAL_II_NAMESPACE_OPEN
  *   \mathbf \nabla U(\mathbf x)
  *     &= \sum_i \mathbf \nabla N_i(\mathbf x) U_i
  *     + \sum_{j,k} \left[\mathbf \nabla N_j(\mathbf x) F_k(\mathbf x) +
- *                        N_j(\mathbf x) \mathbf \nabla F_k(\mathbf x) \right]
- * U_{jk} \\ \mathbf \nabla \mathbf \nabla U(\mathbf x)
+ *                        N_j(\mathbf x) \mathbf \nabla F_k(\mathbf x) \right] U_{jk} \\
+ *   \mathbf \nabla \mathbf \nabla U(\mathbf x)
  *     &= \sum_i \mathbf \nabla \mathbf \nabla N_i(\mathbf x) U_i
- *     + \sum_{j,k} \left[\mathbf \nabla \mathbf \nabla N_j(\mathbf x)
- * F_k(\mathbf x) + \mathbf \nabla F_k(\mathbf x) \mathbf \nabla N_j(\mathbf x)
- * + \mathbf \nabla N_j(\mathbf x) \mathbf \nabla F_k(\mathbf x) + N_j(\mathbf
- * x) \mathbf \nabla \mathbf \nabla F_k(\mathbf x) \right] U_{jk}
+ *     + \sum_{j,k} \left[\mathbf \nabla \mathbf \nabla N_j(\mathbf x) F_k(\mathbf x) +
+ *                        \mathbf \nabla F_k(\mathbf x) \mathbf \nabla N_j(\mathbf x) +
+ *                        \mathbf \nabla N_j(\mathbf x) \mathbf \nabla F_k(\mathbf x) +
+ *                        N_j(\mathbf x) \mathbf \nabla \mathbf \nabla F_k(\mathbf x) \right] U_{jk}
  * @f}
  *
  * <h3>Using enriched and non-enriched FEs together</h3>
  *
  * In most applications it is beneficial to introduce enrichments only in
- * some part of the domain (e.g. around a crack tip) and use standard FE (e.g.
- * FE_Q) elsewhere. This can be achieved by using the hp finite element
- * framework in deal.II that allows for the use of different elements on
- * different cells. To make the resulting space $C^0$ continuous, it is then
- * necessary for the DoFHandler class and
- * DoFTools::make_hanging_node_constraints() function to be able to figure out
- * what to do at the interface between enriched and non-enriched cells.
- * Specifically, we want the degrees of freedom corresponding to enriched shape
- * functions to be zero at these interfaces. These classes and functions can not
- * to do this automatically, but the effect can be achieved by using not just a
- * regular FE_Q on cells without enrichment, but to wrap the FE_Q into an
- * FE_Enriched object <i>without actually enriching it</i>. This can be done as
- * follows:
+ * some part of the domain (e.g. around a crack tip) and use standard FE (e.g. FE_Q)
+ * elsewhere.
+ * This can be achieved by using the hp finite element framework in deal.II
+ * that allows for the use of different elements on different cells. To make
+ * the resulting space $C^0$ continuous, it is then necessary for the DoFHandler
+ * class and DoFTools::make_hanging_node_constraints() function to be able to
+ * figure out what to do at the interface between enriched and non-enriched
+ * cells. Specifically, we want the degrees of freedom corresponding to
+ * enriched shape functions to be zero at these interfaces. These classes and
+ * functions can not to do this automatically, but the effect can be achieved
+ * by using not just a regular FE_Q on cells without enrichment, but to wrap
+ * the FE_Q into an FE_Enriched object <i>without actually enriching it</i>.
+ * This can be done as follows:
  * @code
  *   FE_Enriched<dim> fe_non_enriched(FE_Q<dim>(1));
  * @endcode
@@ -184,9 +184,8 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Implementation</h3>
  *
  * The implementation of the class is based on FESystem which is aggregated as
- * a private member. The simplest constructor <code> FE_Enriched<dim>
- * fe(FE_Q<dim>(2), FE_Q<dim>(1),function)</code> will internally initialize
- * FESystem as
+ * a private member. The simplest constructor <code> FE_Enriched<dim> fe(FE_Q<dim>(2), FE_Q<dim>(1),function)</code>
+ * will internally initialize FESystem as
  *
  * @code
  * FESystem<dim> fe_system(FE_Q<dim>(2),1,
@@ -226,8 +225,8 @@ public:
    * Constructor which only wraps the base FE @p fe_base.
    * As for the enriched finite element space, FE_Nothing is used.
    * Continuity constraints will be automatically generated when
-   * this non-enriched element is used in conjunction with enriched finite
-   * element within the hp::DoFHandler.
+   * this non-enriched element is used in conjunction with enriched finite element
+   * within the hp::DoFHandler.
    *
    * See the discussion in the class documentation on how to use this element
    * in the context of hp finite element methods.
@@ -254,12 +253,9 @@ public:
    * FE_Enriched<dim> fe
    * (&fe_base,
    * {&fe_1, &fe_2},
-   * {{[=] (const typename Triangulation<dim>::cell_iterator &) -> const
-   * Function<dim> * {return &fe_1_function1;},
-   *   [=] (const typename Triangulation<dim>::cell_iterator &) -> const
-   * Function<dim> * {return &fe_1_function2;}},
-   *  {[=] (const typename Triangulation<dim>::cell_iterator &) -> const
-   * Function<dim> * {return &fe_2_function;}}});
+   * {{[=] (const typename Triangulation<dim>::cell_iterator &) -> const Function<dim> * {return &fe_1_function1;},
+   *   [=] (const typename Triangulation<dim>::cell_iterator &) -> const Function<dim> * {return &fe_1_function2;}},
+   *  {[=] (const typename Triangulation<dim>::cell_iterator &) -> const Function<dim> * {return &fe_2_function;}}});
    * @endcode
    *
    * @note When using the same finite element for enrichment with N
@@ -282,8 +278,7 @@ private:
   /**
    * The most general private constructor. The first two input parameters are
    * consistent with those in FESystem. It is used internally only with
-   * <code>multiplicities[0]=1</code>, which is a logical requirement for this
-   * finite element.
+   * <code>multiplicities[0]=1</code>, which is a logical requirement for this finite element.
    */
   FE_Enriched(
     const std::vector<const FiniteElement<dim, spacedim> *> &fes,
@@ -468,16 +463,14 @@ public:
 
 protected:
   /**
-   * A class to hold internal data needed for evaluation of this FE at
-   * quadrature points.
+   * A class to hold internal data needed for evaluation of this FE at quadrature points.
    */
   class InternalData : public FiniteElement<dim, spacedim>::InternalDataBase
   {
   public:
     /**
-     * For each Finite Element (base number) and each enrichment function
-     * (base_index) this struct will contain values, gradients and hessians of
-     * the enrichment functions.
+     * For each Finite Element (base number) and each enrichment function (base_index)
+     * this struct will contain values, gradients and hessians of the enrichment functions.
      */
     struct EnrichmentValues
     {
@@ -491,10 +484,10 @@ protected:
      * data object. The former is called from get_data, get_subface_data and
      * get_face_data which FE_Enriched has to implement.
      *
-     * Since FESystem::get_data(), FESystem::get_face_data() and
-     * FESystem::get_subface_data() just create an object and return a pointer
-     * to it (i.e. they don't retain ownership), we store the cast result in a
-     * std::unique_ptr to indicate that InternalData owns the object.
+     * Since FESystem::get_data(), FESystem::get_face_data() and FESystem::get_subface_data()
+     * just create an object and return a pointer to it (i.e. they don't retain
+     * ownership), we store the cast result in a std::unique_ptr to indicate
+     * that InternalData owns the object.
      */
     InternalData(std::unique_ptr<typename FESystem<dim, spacedim>::InternalData>
                    fesystem_data);
@@ -522,14 +515,12 @@ protected:
       fesystem_data;
 
     /**
-     * For each FE used in enrichment (base number <code>i</code>) and each
-     * enrichment function (base multiplicity <code>j</code>),
-     * <code>enrichment_values[i][j]</code> will be used to store possibly
-     * requested values, gradients and hessians of enrichment function
-     * <code>j</code>.
+     * For each FE used in enrichment (base number <code>i</code>) and each enrichment function
+     * (base multiplicity <code>j</code>), <code>enrichment_values[i][j]</code> will be used to store
+     * possibly requested values, gradients and hessians of enrichment function <code>j</code>.
      *
-     * The variable is made mutable as InternalData's provided to fill_fe_values
-     * and alike are const.
+     * The variable is made mutable as InternalData's provided to fill_fe_values and alike
+     * are const.
      *
      * @note We do not want to store this information in the finite element object itself,
      * because this would mean that (i) only one FEValues object could use a
@@ -550,18 +541,17 @@ protected:
 
   /**
    * Enrichment functions.
-   * The size of the first vector is the same as the number of FiniteElement
-   * spaces used with enrichment. Whereas the size of the inner vector
-   * corresponds to the number of enrichment functions associated with a single
-   * FiniteElement.
+   * The size of the first vector is the same as the number of FiniteElement spaces used
+   * with enrichment. Whereas the size of the inner vector corresponds to the number
+   * of enrichment functions associated with a single FiniteElement.
    */
   const std::vector<std::vector<std::function<const Function<spacedim> *(
     const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
     enrichments;
 
   /**
-   * Auxiliary variable used to distinguish between the case when we do
-   * enrichment and when the class simply wraps another FiniteElement.
+   * Auxiliary variable used to distinguish between the case when we do enrichment
+   * and when the class simply wraps another FiniteElement.
    *
    * This variable is initialized in the constructor by looping over a vector of
    * enrichment elements and checking if all of them are FE_Nothing. If this is
@@ -590,8 +580,8 @@ protected:
   /**
    * Prepare internal data structures and fill in values independent of the
    * cell. Returns a pointer to an object of which the caller of this function
-   * (FEValues) then has to assume ownership (which includes destruction when it
-   * is no more needed).
+   * (FEValues) then has to assume ownership (which includes destruction when it is no
+   * more needed).
    */
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>

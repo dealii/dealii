@@ -100,8 +100,7 @@ namespace GridTools
 
 
     /**
-     * Return the cached vertex_to_cell_map as computed by
-     * GridTools::vertex_to_cell_map().
+     * Return the cached vertex_to_cell_map as computed by GridTools::vertex_to_cell_map().
      */
     const std::vector<
       std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>> &

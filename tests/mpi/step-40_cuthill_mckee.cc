@@ -170,8 +170,7 @@ namespace Step40
                        cell->neighbor(face)->is_ghost()))
                     {
                       fe_face_values.reinit(cell, face);
-                      // for Q_2 this is in middle of face, dim=2 or what
-                      // quadrature point to give?
+                      //for Q_2 this is in middle of face, dim=2 or what quadrature point to give?
                       u = fe_face_values.normal_vector(1);
                       if (u * down < 0)
                         {

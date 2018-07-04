@@ -385,9 +385,8 @@ namespace CUDAWrappers
                      const Number *              b_dev,
                      Number *                    x_dev)
     {
-      // cuSOLVER does not support LU factorization of sparse matrix on the
-      // device, so we need to move everything to the host first and then back
-      // to the host.
+      // cuSOLVER does not support LU factorization of sparse matrix on the device,
+      // so we need to move everything to the host first and then back to the host.
       const unsigned int  nnz    = matrix.n_nonzero_elements();
       const unsigned int  n_rows = matrix.m();
       std::vector<Number> val_host(nnz);

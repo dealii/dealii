@@ -937,9 +937,8 @@ namespace internal
       }
 
       /**
-       * Update the third derivative of the transformation from unit to real
-       * cell, the Jacobian hessians, pushed forward to the real cell
-       * coordinates.
+       * Update the third derivative of the transformation from unit to real cell,
+       * the Jacobian hessians, pushed forward to the real cell coordinates.
        *
        * Skip the computation if possible as indicated by the first argument.
        */
@@ -1096,9 +1095,8 @@ namespace internal
                                      data.local_dof_values[k]);
                       }
 
-                    // never touch any data for j,l,m,n=dim in case
-                    // dim<spacedim, so it will always be zero as it was
-                    // initialized
+                    // never touch any data for j,l,m,n=dim in case dim<spacedim, so
+                    // it will always be zero as it was initialized
                     for (unsigned int i = 0; i < spacedim; ++i)
                       for (unsigned int j = 0; j < dim; ++j)
                         for (unsigned int l = 0; l < dim; ++l)
@@ -1112,8 +1110,8 @@ namespace internal
       }
 
       /**
-       * Update the fourth derivative of the transformation from unit to real
-       * cell, the Jacobian hessian gradients, pushed forward to the real cell
+       * Update the fourth derivative of the transformation from unit to real cell,
+       * the Jacobian hessian gradients, pushed forward to the real cell
        * coordinates.
        *
        * Skip the computation if possible as indicated by the first argument.
@@ -1526,8 +1524,8 @@ namespace internal
 } // namespace internal
 
 
-// Note that the CellSimilarity flag is modifiable, since MappingFEField can
-// need to recalculate data even when cells are similar.
+// Note that the CellSimilarity flag is modifiable, since MappingFEField can need to
+// recalculate data even when cells are similar.
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 CellSimilarity::Similarity
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
@@ -1606,14 +1604,14 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
             // if dim==spacedim, then there is no cell normal to
             // compute. since this is for FEValues (and not FEFaceValues),
             // there are also no face normals to compute
-            else // codim>0 case
+            else //codim>0 case
               {
                 Tensor<1, spacedim> DX_t[dim];
                 for (unsigned int i = 0; i < spacedim; ++i)
                   for (unsigned int j = 0; j < dim; ++j)
                     DX_t[j][i] = data.contravariant[point][i][j];
 
-                Tensor<2, dim> G; // First fundamental form
+                Tensor<2, dim> G; //First fundamental form
                 for (unsigned int i = 0; i < dim; ++i)
                   for (unsigned int j = 0; j < dim; ++j)
                     G[i][j] = DX_t[i] * DX_t[j];
@@ -1638,7 +1636,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
                         if (dim == 1)
                           output_data.normal_vectors[point] =
                             cross_product_2d(-DX_t[0]);
-                        else // dim == 2
+                        else //dim == 2
                           output_data.normal_vectors[point] =
                             cross_product_3d(DX_t[0], DX_t[1]);
 
@@ -1649,7 +1647,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
                           output_data.normal_vectors[point] *= -1.;
                       }
                   }
-              } // codim>0 case
+              } //codim>0 case
           }
     }
 
@@ -1683,8 +1681,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
       fe_to_real,
       output_data.jacobian_grads);
 
-  // calculate derivatives of the Jacobians pushed forward to real cell
-  // coordinates
+  // calculate derivatives of the Jacobians pushed forward to real cell coordinates
   internal::MappingFEFieldImplementation::
     maybe_update_jacobian_pushed_forward_grads<dim,
                                                spacedim,
@@ -1909,9 +1906,9 @@ namespace internal
               }
 
 
-            // We still allow this operation as in the
-            // reference cell Derivatives are Tensor
-            // rather than DerivativeForm
+            //We still allow this operation as in the
+            //reference cell Derivatives are Tensor
+            //rather than DerivativeForm
             case mapping_covariant:
               {
                 Assert(

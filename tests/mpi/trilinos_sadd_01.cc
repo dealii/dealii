@@ -35,7 +35,7 @@ test()
   const int n_proc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   const int my_id  = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  // All processes should own 10 entries
+  //All processes should own 10 entries
   const int entries_per_process = 10;
 
   IndexSet  locally_owned(entries_per_process * n_proc);

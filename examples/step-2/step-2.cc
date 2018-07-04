@@ -185,9 +185,9 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   // With this, we can now write the results to a file:
   std::ofstream out("sparsity_pattern1.svg");
   sparsity_pattern.print_svg(out);
-  // The result is stored in an <code>.svg</code> file, where each nonzero entry
-  // in the matrix corresponds with a red square in the image. The output will
-  // be shown below.
+  // The result is stored in an <code>.svg</code> file, where each nonzero entry in the
+  // matrix corresponds with a red square in the image. The output will be
+  // shown below.
   //
   // If you look at it, you will note that the sparsity pattern is
   // symmetric. This should not come as a surprise, since we have not given

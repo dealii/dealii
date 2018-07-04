@@ -34,7 +34,7 @@ void
 test()
 {
   const int dim = 2;
-  // setup system
+  //setup system
   dealii::parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD);
 
@@ -52,7 +52,7 @@ test()
   // generate empty constraints
   AffineConstraints<double> constraints;
 
-  // generate sparsity pattern
+  //generate sparsity pattern
   TrilinosWrappers::SparsityPattern sp(dh.locally_owned_dofs(),
                                        dh.locally_owned_dofs(),
                                        relevant_partitioning,
@@ -66,7 +66,7 @@ test()
                                     MPI_COMM_WORLD));
   sp.compress();
 
-  // output
+  //output
   sp.print_gnuplot(deallog.get_file_stream());
   sp.print(deallog.get_file_stream());
 }

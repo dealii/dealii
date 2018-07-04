@@ -50,7 +50,7 @@ test_compute_pt_loc(unsigned int n_points)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(std::max(6 - dim, 2));
 
-  // Creating the finite elements needed:
+  //Creating the finite elements needed:
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
@@ -62,7 +62,7 @@ test_compute_pt_loc(unsigned int n_points)
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
-        p[d] = double(Testing::rand()) / RAND_MAX; // Normalizing the value
+        p[d] = double(Testing::rand()) / RAND_MAX; //Normalizing the value
       points.push_back(p);
     }
 
@@ -85,8 +85,7 @@ test_compute_pt_loc(unsigned int n_points)
       auto &quad      = std::get<1>(cell_qpoint_map)[i];
       auto &local_map = std::get<2>(cell_qpoint_map)[i];
 
-      // Given the std::get<1>(cell_qpoint_map) of the current cell, compute the
-      // real points
+      // Given the std::get<1>(cell_qpoint_map) of the current cell, compute the real points
       FEValues<dim> fev(fe, quad, update_quadrature_points);
       fev.reinit(cell);
       const auto &real_quad = fev.get_quadrature_points();

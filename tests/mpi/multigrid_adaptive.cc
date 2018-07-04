@@ -185,8 +185,8 @@ namespace Step50
     deallog << std::endl;
 
 
-    // solution.reinit (mg_dof_handler.n_dofs());
-    // system_rhs.reinit (mg_dof_handler.n_dofs());
+    //solution.reinit (mg_dof_handler.n_dofs());
+    //system_rhs.reinit (mg_dof_handler.n_dofs());
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
@@ -375,8 +375,8 @@ namespace Step50
                    || (mg_constrained_dofs.is_boundary_index(
                          lvl, local_dof_indices[i]) &&
                        local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
+                         local_dof_indices
+                           [j]) // ( boundary(i) && boundary(j) && i==j )
                    ))
                 {
                   // do nothing, so add entries to interface matrix

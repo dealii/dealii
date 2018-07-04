@@ -40,8 +40,7 @@ namespace GridTools
     update_nothing = 0x00,
 
     /**
-     * Update vertex_to_cell_map, as returned by
-     * GridTools::vertex_to_cell_map().
+     * Update vertex_to_cell_map, as returned by GridTools::vertex_to_cell_map().
      */
     update_vertex_to_cell_map = 0x01,
 
@@ -53,8 +52,7 @@ namespace GridTools
       update_vertex_to_cell_map | 0x0002,
 
     /**
-     * Update a KDTree object, initialized with the vertices of the
-     * Triangulation.
+     * Update a KDTree object, initialized with the vertices of the Triangulation.
      */
     update_vertex_kdtree = 0x04,
 
@@ -111,9 +109,9 @@ namespace GridTools
   /**
    * Global operator which returns an object in which all bits are set which are
    * not set in the argument. This operator exists since
-   * if it did not then the result of the bit-negation <tt>operator ~</tt> would
-   * be an integer which would in turn trigger a compiler warning when we tried
-   * to assign it to an object of type CacheUpdateFlags.
+   * if it did not then the result of the bit-negation <tt>operator ~</tt> would be an
+   * integer which would in turn trigger a compiler warning when we tried to
+   * assign it to an object of type CacheUpdateFlags.
    *
    * @ref CacheUpdateFlags
    */

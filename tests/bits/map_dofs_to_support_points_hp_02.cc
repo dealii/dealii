@@ -47,7 +47,7 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(1);
 
-  // define DoFhandler and FEs
+  //define DoFhandler and FEs
   FE_Q<dim> fe1(1);
   FE_Q<dim> fe2(2);
 
@@ -60,13 +60,13 @@ test()
 
   hp::DoFHandler<dim> hp_dof_handler(triangulation);
 
-  // distribute dofs
+  //distribute dofs
   hp_dof_handler.begin_active()->set_active_fe_index(1);
   hp_dof_handler.distribute_dofs(fe_collection);
 
 
 
-  // now map the dofs to the support points and show them on the screen
+  //now map the dofs to the support points and show them on the screen
   std::vector<Point<dim>> hp_map(hp_dof_handler.n_dofs());
 
   DoFTools::map_dofs_to_support_points(mapping_collection,

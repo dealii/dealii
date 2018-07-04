@@ -125,8 +125,7 @@ test_dim_3(const enum SymmetricTensorEigenvectorMethod method,
 {
   const unsigned int dim = 3;
 
-  // Note: We do not necessarily expect the seed directors v1,v2 to be
-  // orthogonal
+  // Note: We do not necessarily expect the seed directors v1,v2 to be orthogonal
   v1 /= v1.norm();
   v2 /= v2.norm();
   Tensor<1, dim> v3 = cross_product_3d(v1, v2);

@@ -609,8 +609,8 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
 void
 TableHandler::write_tex(std::ostream &out, const bool with_header) const
 {
-  // TODO[TH]: update code similar to
-  // write_text() to use the cache
+  //TODO[TH]: update code similar to
+  //write_text() to use the cache
   AssertThrow(out, ExcIO());
   if (with_header)
     out << "\\documentclass[10pt]{report}" << std::endl

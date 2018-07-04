@@ -13,13 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-// This test shows the ability of DataOutFilter to merge vertex duplicates
-// taking into account floating point inprecision. The test creates a distorted
-// triangulation with vertices very close to each other that are subsequently
-// merged by the DataOutFilter class. Note that while the test case will likely
-// never happen, there are cases in which vertices during mesh output have
-// slightly different positions that would not be merged if the points would
-// simply be compared for equality.
+// This test shows the ability of DataOutFilter to merge vertex duplicates taking
+// into account floating point inprecision.
+// The test creates a distorted triangulation with vertices very close to each other
+// that are subsequently merged by the DataOutFilter class.
+// Note that while the test case will likely never happen, there are cases
+// in which vertices during mesh output have slightly different positions
+// that would not be merged if the points would simply be compared for equality.
 
 #include <deal.II/dofs/dof_handler.h>
 

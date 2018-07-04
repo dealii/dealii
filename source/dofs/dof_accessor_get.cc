@@ -50,8 +50,8 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
 {
   if (!this->has_children())
     // if this cell has no children: simply return the exact values on this
-    // cell unless the finite element we need to interpolate to is different
-    // than the one we have on the current cell
+    // cell unless the finite element we need to interpolate to is different than
+    // the one we have on the current cell
     {
       if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
                                    DoFHandlerType::space_dimension> *>(
@@ -124,31 +124,30 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
 
           interpolated_values = 0;
 
-          // later on we will have to push the values interpolated from the
-          // child to the mother cell into the output vector. unfortunately,
-          // there are two types of elements: ones where you add up the
-          // contributions from the different child cells, and ones where you
-          // overwrite.
+          // later on we will have to push the values interpolated from the child
+          // to the mother cell into the output vector. unfortunately, there are
+          // two types of elements: ones where you add up the contributions from
+          // the different child cells, and ones where you overwrite.
           //
           // an example for the first is piecewise constant (and discontinuous)
           // elements, where we build the value on the coarse cell by averaging
-          // the values from the cell (i.e. by adding up a fraction of the
-          // values of their values)
+          // the values from the cell (i.e. by adding up a fraction of the values
+          // of their values)
           //
           // an example for the latter are the usual continuous elements. the
           // value on a vertex of a coarse cell must there be the same,
           // irrespective of the adjacent cell we are presently on. so we always
-          // overwrite. in fact, we must, since we cannot know in advance how
-          // many neighbors there will be, so there is no way to compute the
-          // average with fixed factors
+          // overwrite. in fact, we must, since we cannot know in advance how many
+          // neighbors there will be, so there is no way to compute the average
+          // with fixed factors
           //
           // so we have to find out to which type this element belongs. the
           // difficulty is: the finite element may be a composed one, so we can
           // only hope to do this for each shape function individually. in fact,
-          // there are even weird finite elements (for example the
-          // Raviart-Thomas element) which have shape functions that are
-          // additive (interior ones) and others that are overwriting (face
-          // degrees of freedom that need to be continuous across the face).
+          // there are even weird finite elements (for example the Raviart-Thomas
+          // element) which have shape functions that are additive (interior ones)
+          // and others that are overwriting (face degrees of freedom that need to
+          // be continuous across the face).
           for (unsigned int child = 0; child < this->n_children(); ++child)
             {
               // get the values from the present child, if necessary by

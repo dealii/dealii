@@ -104,15 +104,13 @@ Deal2PeriodicBug::make_periodicity_constraints()
   std::vector<bool> mask(1);
   mask[0] = true;
   ComponentMask cmask(mask);
-  // Here we use the DoFTools function to place periodic constraints in the
-  // constraints matrix We have set the boundary index for the left face of the
-  // boundary to 0 and the right face index to 2 (Hence the 2nd and 3rd
-  // arguments) The direction indicator is to specify that the DOFs are to be
-  // matched in the y-direction (0 in the 4th argument since they are allowed to
-  // differ in the x-direction, it compares each of the coordinates not
-  // specified by the direction integer which here is 0) Since we wanted to only
-  // specify the director and electric components for periodicity we use a
-  // component mask as well
+  // Here we use the DoFTools function to place periodic constraints in the constraints matrix
+  // We have set the boundary index for the left face of the boundary to 0 and the right face
+  // index to 2 (Hence the 2nd and 3rd arguments) The direction indicator is to specify that
+  // the DOFs are to be matched in the y-direction (0 in the 4th argument since they are allowed
+  // to differ in the x-direction, it compares each of the coordinates not specified by the direction
+  // integer which here is 0) Since we wanted to only specify the director and electric components
+  // for periodicity we use a component mask as well
   DoFTools::make_periodicity_constraints(
     dof_handler, 2, 0, 0, constraints, cmask);
 }

@@ -171,15 +171,14 @@ namespace Step48
   // one destination vector, even if we happen to use many vectors like the two
   // in this case. Note that the cell loop accepts any valid class for input and
   // output, which does not only include vectors but general data types.
-  // However, only in case it encounters a
-  // LinearAlgebra::distributed::Vector<Number> or a <tt>std::vector</tt>
-  // collecting these vectors, it calls functions that exchange data at the
-  // beginning and the end of the loop. In the loop over the cells, we first
-  // have to read in the values in the vectors related to the local values.
-  // Then, we evaluate the value and the gradient of the current solution vector
-  // and the values of the old vector at the quadrature points. Then, we combine
-  // the terms in the scheme in the loop over the quadrature points. Finally, we
-  // integrate the result against the test
+  // However, only in case it encounters a LinearAlgebra::distributed::Vector<Number>
+  // or a <tt>std::vector</tt> collecting these vectors, it calls functions that
+  // exchange data at the beginning and the end of the loop. In the loop over
+  // the cells, we first have to read in the values in the vectors related to
+  // the local values. Then, we evaluate the value and the gradient of the
+  // current solution vector and the values of the old vector at the quadrature
+  // points. Then, we combine the terms in the scheme in the loop over the
+  // quadrature points. Finally, we integrate the result against the test
   // function and accumulate the result to the global solution vector @p dst.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::local_apply(

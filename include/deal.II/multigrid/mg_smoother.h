@@ -248,11 +248,10 @@ namespace mg
      * smooth(level, u, rhs);
      * @endcode
      *
-     * In the multigrid preconditioner interfaces, the apply() method is used
-     * for the pre-smoothing operation because the previous content in the
-     * solution vector needs to be overwritten for a new incoming residual. On
-     * the other hand, all subsequent operations need to smooth the content
-     * already present
+     * In the multigrid preconditioner interfaces, the apply() method is used for
+     * the pre-smoothing operation because the previous content in the solution
+     * vector needs to be overwritten for a new incoming residual. On the other
+     * hand, all subsequent operations need to smooth the content already present
      * in the vector @p u given the right hand side, which is done by smooth().
      */
     virtual void
@@ -581,8 +580,7 @@ private:
 
 /*@}*/
 
-/* ------------------------------- Inline functions --------------------------
- */
+/* ------------------------------- Inline functions -------------------------- */
 
 #ifndef DOXYGEN
 

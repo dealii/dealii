@@ -19,12 +19,12 @@
 // and the right-hand-side-vector for this system.  But we have the following
 // two inhomogeneous constraints:
 //       x_1 = -5   and   x_4 = 2*x_0 + 1
-// And we want to test if the distribute_local_to_global function supplies the
-// correct right-hand-side-vector if the use_inhomogeneities_for_rhs-parameter
-// is set to true or false. The problem is that for the 4th component of the
-// rhs-vector it is not possible to compute the correct value because of the
-// unknown x_0. So for the 4th component of the rhs-vector
-// distribute_local_to_global fill in 1*4 ( mat(4,4)*inhomogeneity(4) ).
+// And we want to test if the distribute_local_to_global function supplies the correct
+// right-hand-side-vector if the use_inhomogeneities_for_rhs-parameter
+// is set to true or false. The problem is that for the 4th component of the rhs-vector
+// it is not possible to compute the correct value because of the unknown x_0. So
+// for the 4th component of the rhs-vector distribute_local_to_global fill in
+// 1*4 ( mat(4,4)*inhomogeneity(4) ).
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

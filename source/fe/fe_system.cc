@@ -1326,8 +1326,7 @@ FESystem<dim, spacedim>::compute_fill(
         // non-primitive elements. so we go the other way round: loop over
         // all shape functions of the composed element, and here only treat
         // those shape functions that belong to a given base element
-        // TODO: Introduce the needed table and loop only over base element
-        // shape functions. This here is not efficient at all AND very bad style
+        //TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
         const UpdateFlags base_flags = base_fe_data.update_each;
 
         // some base element might involve values that depend on the shape
@@ -1448,9 +1447,9 @@ FESystem<dim, spacedim>::build_interface_constraints()
 
             case 2:
               {
-                // the indices m=0..d_v-1 are from the center vertex.  their
-                // order is the same as for the first vertex of the whole cell,
-                // so we can use the system_to_base_table variable (using the
+                // the indices m=0..d_v-1 are from the center vertex.  their order
+                // is the same as for the first vertex of the whole cell, so we
+                // can use the system_to_base_table variable (using the
                 // face_s_t_base_t function would yield the same)
                 if (m < this->dofs_per_vertex)
                   m_index = this->system_to_base_table[m];
@@ -1463,23 +1462,22 @@ FESystem<dim, spacedim>::build_interface_constraints()
                       (m - this->dofs_per_vertex) / this->dofs_per_line;
                     Assert(sub_line < 2, ExcInternalError());
 
-                    // from this information, try to get base element and
-                    // instance of base element. we do so by constructing the
-                    // corresponding face index of m in the present element,
-                    // then use face_system_to_base_table
+                    // from this information, try to get base element and instance
+                    // of base element. we do so by constructing the corresponding
+                    // face index of m in the present element, then use
+                    // face_system_to_base_table
                     const unsigned int tmp1 =
                       2 * this->dofs_per_vertex + index_in_line;
                     m_index.first = this->face_system_to_base_table[tmp1].first;
 
-                    // what we are still missing is the index of m within the
-                    // base elements interface_constraints table
+                    // what we are still missing is the index of m within the base
+                    // elements interface_constraints table
                     //
                     // here, the second value of face_system_to_base_table can
                     // help: it denotes the face index of that shape function
                     // within the base element. since we know that it is a line
-                    // dof, we can construct the rest: tmp2 will denote the
-                    // index of this shape function among the line shape
-                    // functions:
+                    // dof, we can construct the rest: tmp2 will denote the index
+                    // of this shape function among the line shape functions:
                     Assert(
                       this->face_system_to_base_table[tmp1].second >=
                         2 * base_element(m_index.first.first).dofs_per_vertex,
@@ -1614,8 +1612,7 @@ FESystem<dim, spacedim>::initialize(
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
-  // block of code
+  // Note that we need to skip every fe with multiplicity 0 in the following block of code
 
   this->base_to_block_indices.reinit(0, 0);
 
@@ -1671,8 +1668,7 @@ FESystem<dim, spacedim>::initialize(
   init_tasks += Threads::new_task([&]() {
     // if one of the base elements has no support points, then it makes no sense
     // to define support points for the composed element, so return an empty
-    // array to demonstrate that fact. Note that we ignore FE_Nothing in this
-    // logic.
+    // array to demonstrate that fact. Note that we ignore FE_Nothing in this logic.
     for (unsigned int base_el = 0; base_el < this->n_base_elements(); ++base_el)
       if (!base_element(base_el).has_support_points() &&
           base_element(base_el).dofs_per_cell != 0)
@@ -1699,11 +1695,10 @@ FESystem<dim, spacedim>::initialize(
   // initialize face support points (for dim==2,3). same procedure as above
   if (dim > 1)
     init_tasks += Threads::new_task([&]() {
-      // if one of the base elements has no support points, then it makes no
-      // sense to define support points for the composed element. In that case,
-      // return an empty array to demonstrate that fact (note that we ask
-      // whether the base element has no support points at all, not only none on
-      // the face!)
+      // if one of the base elements has no support points, then it makes no sense
+      // to define support points for the composed element. In that case, return
+      // an empty array to demonstrate that fact (note that we ask whether the
+      // base element has no support points at all, not only none on the face!)
       //
       // on the other hand, if there is an element that simply has no degrees of
       // freedom on the face at all, then we don't care whether it has support

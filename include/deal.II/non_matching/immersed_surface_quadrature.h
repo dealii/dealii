@@ -43,8 +43,7 @@ namespace NonMatching
    * @f[
    * \int_{S\cap K} f(x) dS =
    * \int_{S\cap K} f(x) |d\bar{S}| =
-   * \int_{\hat{S}\cap\hat{K}} f(F_{K}(\hat{x})) \det(J) |\left( J^{-1} \right
-   * )^T d\hat{S}|,
+   * \int_{\hat{S}\cap\hat{K}} f(F_{K}(\hat{x})) \det(J) |\left( J^{-1} \right )^T d\hat{S}|,
    * @f]
    * where $F_K$ is the mapping from reference to real space and $J$ is its
    * Jacobian. This transformation is possible since the continuous surface

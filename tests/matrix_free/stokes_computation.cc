@@ -93,21 +93,22 @@ namespace StokesClass
     {
     public:
       /**
-       * brief Constructor
-       *
-       *  S The entire Stokes matrix
-       *  Spre The matrix whose blocks are used in the definition of
-       *     the preconditioning of the Stokes matrix, i.e. containing
-       *approximations of the A and S blocks. Mppreconditioner Preconditioner
-       *object for the Schur complement, typically chosen as the mass matrix.
-       *  Apreconditioner Preconditioner object for the matrix A.
-       *  do_solve_A A flag indicating whether we should actually solve with
-       *     the matrix $A$, or only apply one preconditioner step with it.
-       *  A_block_tolerance The tolerance for the CG solver which computes
-       *     the inverse of the A block.
-       *  S_block_tolerance The tolerance for the CG solver which computes
-       *     the inverse of the S block (Schur complement matrix).
-       **/
+         * brief Constructor
+         *
+         *  S The entire Stokes matrix
+         *  Spre The matrix whose blocks are used in the definition of
+         *     the preconditioning of the Stokes matrix, i.e. containing approximations
+         *     of the A and S blocks.
+         *  Mppreconditioner Preconditioner object for the Schur complement,
+         *     typically chosen as the mass matrix.
+         *  Apreconditioner Preconditioner object for the matrix A.
+         *  do_solve_A A flag indicating whether we should actually solve with
+         *     the matrix $A$, or only apply one preconditioner step with it.
+         *  A_block_tolerance The tolerance for the CG solver which computes
+         *     the inverse of the A block.
+         *  S_block_tolerance The tolerance for the CG solver which computes
+         *     the inverse of the S block (Schur complement matrix).
+         **/
       BlockSchurPreconditioner(const StokesMatrixType &S,
                                const MassMatrixType &  Mass,
                                const PreconditionerMp &Mppreconditioner,
@@ -117,8 +118,8 @@ namespace StokesClass
                                const double            S_block_tolerance);
 
       /**
-       * Matrix vector product with this preconditioner object.
-       */
+         * Matrix vector product with this preconditioner object.
+         */
       void
       vmult(LinearAlgebra::distributed::BlockVector<double> &      dst,
             const LinearAlgebra::distributed::BlockVector<double> &src) const;
@@ -130,17 +131,17 @@ namespace StokesClass
 
     private:
       /**
-       * References to the various matrix object this preconditioner works on.
-       */
+         * References to the various matrix object this preconditioner works on.
+         */
       const StokesMatrixType &stokes_matrix;
       const MassMatrixType &  mass_matrix;
       const PreconditionerMp &mp_preconditioner;
       const PreconditionerA & a_preconditioner;
 
       /**
-       * Whether to actually invert the $\tilde A$ part of the preconditioner
-       *matrix or to just apply a single preconditioner step with it.
-       **/
+         * Whether to actually invert the $\tilde A$ part of the preconditioner matrix
+         * or to just apply a single preconditioner step with it.
+         **/
       const bool           do_solve_A;
       mutable unsigned int n_iterations_A_;
       mutable unsigned int n_iterations_S_;
@@ -234,9 +235,9 @@ namespace StokesClass
                          mp_preconditioner);
             n_iterations_S_ += solver_control.last_step();
           }
-        // if the solver fails, report the error from processor 0 with some
-        // additional information about its location, and throw a quiet
-        // exception on all other processors
+        // if the solver fails, report the error from processor 0 with some additional
+        // information about its location, and throw a quiet exception on all other
+        // processors
         catch (const std::exception &exc)
           {
             if (Utilities::MPI::this_mpi_process(

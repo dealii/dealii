@@ -16,8 +16,8 @@
 #include "../lapack/create_matrix.h"
 #include "../tests.h"
 
-// test eigenpairs_symmetric_by_index_MRRR(const std::pair<unsigned int,unsigned
-// int> &, const bool) for all eigenvalues with eigenvectors
+// test eigenpairs_symmetric_by_index_MRRR(const std::pair<unsigned int,unsigned int> &, const bool)
+// for all eigenvalues with eigenvectors
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/logstream.h>
@@ -76,20 +76,20 @@ test(const unsigned int size,
   create_spd(full_A);
   scalapack_syevr = full_A;
 
-  // Lapack as reference
+  //Lapack as reference
   {
     std::vector<NumberType> lapack_A(size * size);
     for (unsigned int i = 0; i < size; ++i)
       for (unsigned int j = 0; j < size; ++j)
         lapack_A[i * size + j] = full_A(i, j);
 
-    int info; // Variable containing information about the successful exit of
-              // the lapack routine
+    int
+         info; //Variable containing information about the successful exit of the lapack routine
     char jobz = 'V'; //'V': all eigenpairs of A are computed
-    char uplo = 'U'; // storage format of the matrix A; not so important as
-                     // matrix is symmetric
-    char       range = 'I'; // the il-th through iu-th eigenvalues will be found
-    int        LDA   = size; // leading dimension of the matrix A
+    char uplo =
+      'U'; //storage format of the matrix A; not so important as matrix is symmetric
+    char       range = 'I';  //the il-th through iu-th eigenvalues will be found
+    int        LDA   = size; //leading dimension of the matrix A
     NumberType vl = 0, vu = 0;
     int        il = 1, iu = size;
     char       sign = 'S';
@@ -100,12 +100,12 @@ test(const unsigned int size,
     std::vector<NumberType> eigenvectors(size * size);
     int                     LDZ = size;
     std::vector<int>        isuppz(2 * size);
-    int                     lwork = -1; // length of vector/array work
+    int                     lwork = -1; //length of vector/array work
     std::vector<NumberType> work(1);
-    int                     liwork = -1; // length of vector/array iwork
+    int                     liwork = -1; //length of vector/array iwork
     std::vector<int>        iwork(1);
-    // by setting lwork to -1 a workspace query for work is done
-    // as matrix is symmetric: LDA == size of matrix
+    //by setting lwork to -1 a workspace query for work is done
+    //as matrix is symmetric: LDA == size of matrix
     syevr(&jobz,
           &range,
           &uplo,
@@ -186,12 +186,11 @@ test(const unsigned int size,
     for (unsigned int j = 0; j < size; ++j)
       p_eigenvectors_[i][j] = p_eigenvectors(j, size - 1 - i);
 
-  // product of eigenvectors computed using Lapack and ScaLapack has to be
-  // either 1 or -1
+  //product of eigenvectors computed using Lapack and ScaLapack has to be either 1 or -1
   for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
     {
       const NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
-      // the requirement for alignment of the eigenvectors has to be released
+      //the requirement for alignment of the eigenvectors has to be released
       AssertThrow(std::abs(std::abs(product) - 1) < tol * 10,
                   ExcInternalError());
     }

@@ -49,9 +49,8 @@ test()
   triangulation.refine_global(1);
 
   /*
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-  triangulation.begin_active (); cell != triangulation.end (); ++cell) if
-  (cell->is_locally_owned ())
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active (); cell != triangulation.end (); ++cell)
+    if (cell->is_locally_owned ())
     {
       if(cell->center().square() < 0.3*0.3)
         cell->set_refine_flag ();

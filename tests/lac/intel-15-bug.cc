@@ -15,8 +15,8 @@
 
 // intel 15.0 compiler bug. This is a simplification of tests/lac/vector-vector
 // It only triggers when using TBB (it will use two threads) and only with
-// SIMD for long double. We now use
-// dealii::parallel::internal::EnableOpenMPSimdFor so the test passes.
+// SIMD for long double. We now use dealii::parallel::internal::EnableOpenMPSimdFor
+// so the test passes.
 
 #include <deal.II/base/parallel.h>
 
@@ -67,7 +67,7 @@ check()
 
   if (1)
     {
-      // fails:
+      //fails:
       tbb::parallel_for(tbb::blocked_range<size_type>(0, N, 2),
                         vector_add,
                         tbb::auto_partitioner());

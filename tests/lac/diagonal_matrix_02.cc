@@ -80,10 +80,9 @@ test(const bool hanging_nodes = true)
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
-  // std::cout << "Number of cells: " << tria.n_global_active_cells() <<
-  // std::endl; std::cout << "Number of degrees of freedom: " << dof.n_dofs() <<
-  // std::endl; std::cout << "Number of constraints: " <<
-  // constraints.n_constraints() << std::endl;
+  //std::cout << "Number of cells: " << tria.n_global_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
 
   // assemble trilinos sparse matrix

@@ -37,7 +37,7 @@ test()
 
   IndexSet local_active_together(3);
   local_active_together.add_range(0, 3);
-  // local_active_together.compress();
+  //local_active_together.compress();
 
   AffineConstraints<double> cm(local_active_together);
   cm.add_line(1);

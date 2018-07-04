@@ -27,17 +27,17 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// TODO: This should all be cleaned up. Currently, only a single
-// function in the library makes use of the odd specializations, and
-// this function is Triangulation::execute_refinement() in 3D. I
-// assume, that the other refinement functions would profit from using
-// next_free_single_object() and next_free_pair_object, but they seem
-// to get around it.
+//TODO: This should all be cleaned up. Currently, only a single
+//function in the library makes use of the odd specializations, and
+//this function is Triangulation::execute_refinement() in 3D. I
+//assume, that the other refinement functions would profit from using
+//next_free_single_object() and next_free_pair_object, but they seem
+//to get around it.
 
-// TODO: The TriaObjects class contains a std::vector<G>. This is only an
-// efficient storage scheme if G is relatively well packed, i.e. it's not a
-// bool and then an integer and then a double, etc. Verify that this is
-// actually the case.
+//TODO: The TriaObjects class contains a std::vector<G>. This is only an
+//efficient storage scheme if G is relatively well packed, i.e. it's not a
+//bool and then an integer and then a double, etc. Verify that this is
+//actually the case.
 
 template <int dim, int spacedim>
 class Triangulation;
@@ -794,8 +794,7 @@ namespace internal
     TriaObjects<G>::next_free_single_object(
       const dealii::Triangulation<dim, spacedim> &tria)
     {
-      // TODO: Think of a way to ensure that we are using the correct
-      // triangulation, i.e. the one containing *this.
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos = next_free_single, last = used.size() - 1;
       if (!reverse_order_next_free_single)
@@ -847,8 +846,7 @@ namespace internal
     TriaObjects<G>::next_free_pair_object(
       const dealii::Triangulation<dim, spacedim> &tria)
     {
-      // TODO: Think of a way to ensure that we are using the correct
-      // triangulation, i.e. the one containing *this.
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
       int pos = next_free_pair, last = used.size() - 1;
       for (; pos < last; ++pos)

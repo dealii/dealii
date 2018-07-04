@@ -429,9 +429,8 @@ namespace Utilities
 
       // disable for now because at least some implementations always return
       // MPI_THREAD_SINGLE.
-      // Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
-      //    ExcMessage("MPI reports that we are not allowed to use multiple
-      //    threads."));
+      //Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
+      //    ExcMessage("MPI reports that we are not allowed to use multiple threads."));
 #else
       // make sure the compiler doesn't warn about these variables
       (void)argc;
@@ -457,14 +456,14 @@ namespace Utilities
       PetscPopSignalHandler();
 #endif
 
-      // Initialize zoltan
+      //Initialize zoltan
 #ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
       float version;
       Zoltan_Initialize(argc, argv, &version);
 #endif
 
 #ifdef DEAL_II_WITH_P4EST
-      // Initialize p4est and libsc components
+      //Initialize p4est and libsc components
 #  if !(DEAL_II_P4EST_VERSION_GTE(2, 0, 0, 0))
       // This feature is broken in version 2.0.0 for calls to
       // MPI_Comm_create_group (see cburstedde/p4est#30).

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// TODO: Do neighbors for dx and povray smooth triangles
+//TODO: Do neighbors for dx and povray smooth triangles
 
 //////////////////////////////////////////////////////////////////////
 // Remarks on the implementations
@@ -477,8 +477,7 @@ namespace DataOutBase
     const Map3DPoint::const_iterator it = existing_points.find(int_pt);
     unsigned int                     internal_ind;
 
-    // If the point isn't in the set, or we're not filtering duplicate points,
-    // add it
+    // If the point isn't in the set, or we're not filtering duplicate points, add it
     if (it == existing_points.end() || !flags.filter_duplicate_vertices)
       {
         internal_ind = existing_points.size();
@@ -636,8 +635,7 @@ namespace DataOutBase
   {
     unsigned int new_dim;
 
-    // HDF5/XDMF output only supports 1D or 3D output, so force rearrangement if
-    // needed
+    // HDF5/XDMF output only supports 1D or 3D output, so force rearrangement if needed
     if (flags.xdmf_hdf5_output && dimension != 1)
       new_dim = 3;
     else
@@ -667,7 +665,7 @@ namespace DataOutBase
 
 
 //----------------------------------------------------------------------//
-// Auxiliary data
+//Auxiliary data
 //----------------------------------------------------------------------//
 
 namespace
@@ -693,7 +691,7 @@ namespace
                                          static_cast<unsigned int>(-1)};
 
   //----------------------------------------------------------------------//
-  // Auxiliary functions
+  //Auxiliary functions
   //----------------------------------------------------------------------//
   // For a given patch, compute the node interpolating the corner nodes linearly
   // at the point (xstep, ystep, zstep)*1./n_subdivisions. If the points are
@@ -1583,7 +1581,7 @@ namespace DataOutBase
   bool
   Patch<dim, spacedim>::operator==(const Patch &patch) const
   {
-    // TODO: make tolerance relative
+    //TODO: make tolerance relative
     const double epsilon = 3e-16;
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
@@ -1679,7 +1677,7 @@ namespace DataOutBase
   {
     const unsigned int dim = 0;
 
-    // TODO: make tolerance relative
+    //TODO: make tolerance relative
     const double epsilon = 3e-16;
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
@@ -1869,7 +1867,7 @@ namespace DataOutBase
   DXFlags::parse_parameters(const ParameterHandler &prm)
   {
     write_neighbors = prm.get_bool("Write neighbors");
-    // TODO:[GK] Read the new  parameters
+    //TODO:[GK] Read the new  parameters
   }
 
 
@@ -2528,8 +2526,7 @@ namespace DataOutBase
     {
       Point<3> v_min, v_max, v_inter;
 
-      // Use the Bubblesort algorithm to sort the points with respect to the
-      // third coordinate
+      // Use the Bubblesort algorithm to sort the points with respect to the third coordinate
       for (int i = 0; i < 2; ++i)
         {
           for (int j = 0; j < 2 - i; ++j)
@@ -2977,7 +2974,7 @@ namespace DataOutBase
       out << "cubes";
     out << "\"" << '\n' << "attribute \"ref\" string \"positions\"" << '\n';
 
-    // TODO:[GK] Patches must be of same size!
+    //TODO:[GK] Patches must be of same size!
     /////////////////////////////
     // write neighbor information
     if (flags.write_neighbors)
@@ -3973,12 +3970,9 @@ namespace DataOutBase
                   // Dz = ( sz  cz 0 )
                   //      (  0   0 1 )
 
-                  //       ( cz -sz 0 )( 1 0    0 )(x)   (
-                  //       cz*x-sz*(cx*y-sx*z)+0*(sx*y+cx*z) )
-                  // Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = (
-                  // sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
-                  //       (  0   0 1 )( 0 sx  cx )(z)   (  0*x+
-                  //       *(cx*y-sx*z)+1*(sx*y+cx*z) )
+                  //       ( cz -sz 0 )( 1 0    0 )(x)   ( cz*x-sz*(cx*y-sx*z)+0*(sx*y+cx*z) )
+                  // Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = ( sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
+                  //       (  0   0 1 )( 0 sx  cx )(z)   (  0*x+  *(cx*y-sx*z)+1*(sx*y+cx*z) )
                 }
 
               // compute coordinates of center of cell
@@ -7211,7 +7205,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
                                                        MPI_Comm    comm) const
 {
 #ifndef DEAL_II_WITH_MPI
-  // without MPI fall back to the normal way to write a vtu file:
+  //without MPI fall back to the normal way to write a vtu file:
   (void)comm;
 
   std::ofstream f(filename);
@@ -7246,7 +7240,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
 
   unsigned int header_size;
 
-  // write header
+  //write header
   if (myrank == 0)
     {
       std::stringstream ss;
@@ -7280,7 +7274,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
     AssertThrowMPI(ierr);
   }
 
-  // write footer
+  //write footer
   if (myrank == 0)
     {
       std::stringstream ss;
@@ -7398,8 +7392,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                       spacedim);
       unsigned int n_data_sets = data_filter.n_data_sets();
 
-      // The vector names generated here must match those generated in the HDF5
-      // file
+      // The vector names generated here must match those generated in the HDF5 file
       unsigned int i;
       for (i = 0; i < n_data_sets; ++i)
         {
@@ -8704,8 +8697,7 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Topology>\n";
     }
-  // Otherwise, we assume the points are isolated in space and use a Polyvertex
-  // topology
+  // Otherwise, we assume the points are isolated in space and use a Polyvertex topology
   else
     {
       ss << indent(indent_level + 1)

@@ -1102,10 +1102,9 @@ namespace MatrixCreator
                 // where only normal components should be projected.
                 // For Hdiv we need to compute (u dot n, v dot n) which
                 // can be done as sum over dim components of
-                // u[c] * n[c] * v[c] * n[c] = u[c] * v[c] *
-                // normal_adjustment[c] Same approach does not work for Hcurl,
-                // so we throw an exception. Default value 1.0 allows for use
-                // with non Hdiv elements
+                // u[c] * n[c] * v[c] * n[c] = u[c] * v[c] * normal_adjustment[c]
+                // Same approach does not work for Hcurl, so we throw an exception.
+                // Default value 1.0 allows for use with non Hdiv elements
                 std::vector<std::vector<double>> normal_adjustment(
                   fe_values.n_quadrature_points,
                   std::vector<double>(n_components, 1.));
@@ -1554,10 +1553,9 @@ namespace MatrixCreator
                 // where only normal components should be projected.
                 // For Hdiv we need to compute (u dot n, v dot n) which
                 // can be done as sum over dim components of
-                // u[c] * n[c] * v[c] * n[c] = u[c] * v[c] *
-                // normal_adjustment[c] Same approach does not work for Hcurl,
-                // so we throw an exception. Default value 1.0 allows for use
-                // with non Hdiv elements
+                // u[c] * n[c] * v[c] * n[c] = u[c] * v[c] * normal_adjustment[c]
+                // Same approach does not work for Hcurl, so we throw an exception.
+                // Default value 1.0 allows for use with non Hdiv elements
                 std::vector<std::vector<double>> normal_adjustment(
                   fe_values.n_quadrature_points,
                   std::vector<double>(n_components, 1.));
@@ -1746,17 +1744,17 @@ namespace MatrixCreator
             {
 #ifdef DEBUG
               // in debug mode: compute an element in the matrix which is
-              // guaranteed to belong to a boundary dof. We do this to check
-              // that the entries in the cell matrix are guaranteed to be zero
-              // if the respective dof is not on the boundary. Since because of
+              // guaranteed to belong to a boundary dof. We do this to check that the
+              // entries in the cell matrix are guaranteed to be zero if the
+              // respective dof is not on the boundary. Since because of
               // round-off, the actual value of the matrix entry may be
-              // only close to zero, we assert that it is small relative to an
-              // element which is guaranteed to be nonzero. (absolute smallness
-              // does not suffice since the size of the domain scales in here)
+              // only close to zero, we assert that it is small relative to an element
+              // which is guaranteed to be nonzero. (absolute smallness does not
+              // suffice since the size of the domain scales in here)
               //
-              // for this purpose we seek the diagonal of the matrix, where
-              // there must be an element belonging to the boundary. we take the
-              // maximum diagonal entry.
+              // for this purpose we seek the diagonal of the matrix, where there
+              // must be an element belonging to the boundary. we take the maximum
+              // diagonal entry.
               types::global_dof_index max_element =
                 static_cast<types::global_dof_index>(0);
               for (std::vector<types::global_dof_index>::const_iterator i =

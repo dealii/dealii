@@ -66,7 +66,7 @@ main(int argc, char **argv)
                               1,
                               11);
 
-    // run twice because this errored out at some point
+    //run twice because this errored out at some point
     u = 0.;
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
     check_solver_within_range(solver.solve(A, u, f, preconditioner),

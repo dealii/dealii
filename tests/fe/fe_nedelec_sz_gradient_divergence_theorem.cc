@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// check the correctness of fe_values.shape_gradient for FE_NedelecSZ by
-// comparing the integral of all shape gradients with the flux over the boundary
-// by the divergence theorem
+// check the correctness of fe_values.shape_gradient for FE_NedelecSZ by comparing
+// the integral of all shape gradients with the flux over the boundary by the
+// divergence theorem
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

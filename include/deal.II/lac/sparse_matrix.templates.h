@@ -1861,8 +1861,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
 {
-  // TODO: Is this called anywhere? If so, multiplication with om(2-om)D is
-  // missing
+  //TODO: Is this called anywhere? If so, multiplication with om(2-om)D is missing
   Assert(false, ExcNotImplemented());
 
   Assert(cols != nullptr, ExcNotInitialized());

@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test that all of the nested Sacado number extractors return the correct
-// information
+// Test that all of the nested Sacado number extractors return the correct information
 
 #include <deal.II/differentiation/ad/ad_number_types.h>
 #include <deal.II/differentiation/ad/sacado_number_types.h>

@@ -46,16 +46,15 @@ namespace std
   erf(ADNumberType x)
   {
     // Reference:
-    // Handbook of Mathematical Functions: with Formulas, Graphs, and
-    // Mathematical Tables Abramowitz, M. and Stegun, I. Dover Books on
-    // Mathematics. 1972.
+    // Handbook of Mathematical Functions: with Formulas, Graphs, and Mathematical Tables
+    // Abramowitz, M. and Stegun, I.
+    // Dover Books on Mathematics. 1972.
     //
     // Current implementation source:
     // https://www.johndcook.com/blog/cpp_erf/
     // https://www.johndcook.com/blog/2009/01/19/stand-alone-error-function-erf/
     //
-    // Note: This implementation has a reported maximum round-off error
-    // of 1.5e-7.
+    // Note: This implementation has a reported maximum round-off error of 1.5e-7.
 
     // Constants
     const double a1 = 0.254829592;

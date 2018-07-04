@@ -42,7 +42,7 @@ TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
 
   const unsigned int comp = i - this->n_tensor_pols;
 
-  // compute \prod_{i=1}^d 4*(1-x_i^2)(p)
+  //compute \prod_{i=1}^d 4*(1-x_i^2)(p)
   double value = 1.;
   for (unsigned int j = 0; j < dim; ++j)
     value *= 4 * p(j) * (1 - p(j));
@@ -85,7 +85,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
   for (unsigned int d = 0; d < dim; ++d)
     {
       grad[d] = 1.;
-      // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
+      //compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
       for (unsigned j = 0; j < dim; ++j)
         grad[d] *= (d == j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
       // and multiply with (2*x_i-1)^{r-1}
@@ -95,11 +95,11 @@ TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
 
   if (q_degree >= 2)
     {
-      // add \prod_{i=1}^d 4*(x_i(1-x_i))(p)
+      //add \prod_{i=1}^d 4*(x_i(1-x_i))(p)
       double value = 1.;
       for (unsigned int j = 0; j < dim; ++j)
         value *= 4 * p(j) * (1 - p(j));
-      // and multiply with grad(2*x_i-1)^{r-1}
+      //and multiply with grad(2*x_i-1)^{r-1}
       double tmp = value * 2 * (q_degree - 1);
       for (unsigned int i = 0; i < q_degree - 2; ++i)
         tmp *= 2 * p(comp) - 1;
@@ -164,7 +164,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
       v[dim][2] = 0.;
   }
 
-  // calculate (\partial_j \partial_k \psi) * monomial
+  //calculate (\partial_j \partial_k \psi) * monomial
   Tensor<2, dim> grad_grad_1;
   for (unsigned int d1 = 0; d1 < dim; ++d1)
     for (unsigned int d2 = 0; d2 < dim; ++d2)
@@ -184,7 +184,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
           }
       }
 
-  // calculate (\partial_j  \psi) *(\partial_k monomial)
+  //calculate (\partial_j  \psi) *(\partial_k monomial)
   // and (\partial_k  \psi) *(\partial_j monomial)
   Tensor<2, dim> grad_grad_2;
   Tensor<2, dim> grad_grad_3;
@@ -199,7 +199,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
         }
     }
 
-  // calculate \psi *(\partial j \partial_k monomial) and sum
+  //calculate \psi *(\partial j \partial_k monomial) and sum
   Tensor<2, dim> grad_grad;
   double         psi_value = 1.;
   for (unsigned int x = 0; x < dim; ++x)

@@ -79,8 +79,7 @@ exact_integral_one_over_r(const unsigned int vertex_index,
   //     elif index = 2 then
   //        return int(int(x^N *y^M/sqrt(x^2+(y-1)^2), x=0.0..1.0), y=0.0..1.0);
   //     elif index = 3 then
-  //        return int(int((1-x)^N *(1-y)^M/sqrt(x^2+y^2), x=0.0..1.0),
-  //        y=0.0..1.0);
+  //        return int(int((1-x)^N *(1-y)^M/sqrt(x^2+y^2), x=0.0..1.0), y=0.0..1.0);
   //     end if;
   //  end proc;
   //  Digits := 20;

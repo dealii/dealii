@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::rank1_update() for rank1 downdate of a Cholesky
-// factorization
+// test LAPACKFullMatrix::rank1_update() for rank1 downdate of a Cholesky factorization
 
 /* MWE in Octave:
 A = pascal(4)

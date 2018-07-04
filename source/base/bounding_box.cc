@@ -23,9 +23,9 @@ BoundingBox<spacedim, Number>::point_inside(
 {
   for (unsigned int i = 0; i < spacedim; ++i)
     {
-      // Bottom left-top right convention: the point is outside if it's smaller
-      // than the first or bigger than the second boundary point The bounding
-      // box is defined as a closed set
+      //Bottom left-top right convention: the point is outside if it's smaller than the
+      //first or bigger than the second boundary point
+      //The bounding box is defined as a closed set
       if (std::numeric_limits<Number>::epsilon() *
               (std::abs(this->boundary_points.first[i] + p[i])) <
             this->boundary_points.first[i] - p[i] ||
@@ -107,8 +107,7 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
       if (intersect_dim == 0 || intersect_dim + 2 == spacedim)
         return NeighborType::simple_neighbors;
 
-      // Checking the two mergeable cases: first if the boxes are aligned so
-      // that they can be merged
+      // Checking the two mergeable cases: first if the boxes are aligned so that they can be merged
       unsigned int not_align_1 = 0, not_align_2 = 0;
       bool         same_direction = true;
       for (unsigned int d = 0; d < spacedim; ++d)

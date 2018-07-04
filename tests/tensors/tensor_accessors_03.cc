@@ -83,9 +83,8 @@ main()
     //     for (unsigned int k = 0; k < 4; ++k)
     //       for (unsigned int l = 0; l < 4; ++l)
     //         {
-    //           deallog << "(" << i << "," << j << "," << k << "," << l << "):
-    //           "; deallog << result[i][j][k][l] << " = " << left2[i][j] << " *
-    //           " << right2[k][l] << std::endl;
+    //           deallog << "(" << i << "," << j << "," << k << "," << l << "):  ";
+    //           deallog << result[i][j][k][l] << " = " << left2[i][j] << " * " << right2[k][l] << std::endl;
     //         }
   }
 

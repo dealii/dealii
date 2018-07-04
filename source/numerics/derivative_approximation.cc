@@ -733,9 +733,9 @@ namespace DerivativeApproximation
   namespace internal
   {
     /**
-     * Compute the derivative approximation on one cell. This computes the full
-     * derivative tensor.
-     */
+    * Compute the derivative approximation on one cell. This computes the full
+    * derivative tensor.
+    */
     template <class DerivativeDescription,
               int dim,
               template <int, int> class DoFHandlerType,
@@ -994,9 +994,8 @@ namespace DerivativeApproximation
         Iterators(dof_handler.begin_active(), derivative_norm.begin())),
         end(Iterators(dof_handler.end(), derivative_norm.end()));
 
-      // There is no need for a copier because there is no conflict between
-      // threads to write in derivative_norm. Scratch and CopyData are also
-      // useless.
+      // There is no need for a copier because there is no conflict between threads
+      // to write in derivative_norm. Scratch and CopyData are also useless.
       WorkStream::run(
         begin,
         end,

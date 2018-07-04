@@ -15,8 +15,7 @@
 
 
 
-// solves a 2D Poisson equation with FE_DGQ elements and periodic boundary
-// conditions
+// solves a 2D Poisson equation with FE_DGQ elements and periodic boundary conditions
 
 #include <deal.II/base/function.h>
 
@@ -264,8 +263,7 @@ Step4<2>::check_periodicity(const unsigned int cycle) const
   for (unsigned int i = 0; i < cycle; i++)
     n_points *= 2;
 
-  // don't test exactly at the support points, since point_value is not stable
-  // there
+  //don't test exactly at the support points, since point_value is not stable there
   const double eps = 1. / (16. * n_points);
 
   bool all_passed = true;
@@ -316,7 +314,7 @@ Step4<dim>::run()
 
       setup_system();
       solve();
-      // output_results(cycle);
+      //output_results(cycle);
       deallog.push(Utilities::int_to_string(dof_handler.n_dofs(), 5));
       check_periodicity(cycle);
       deallog.pop();

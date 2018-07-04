@@ -15,8 +15,7 @@
 
 
 // CSpline
-// take example from
-// https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
+// take example from https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
 
 #include <deal.II/base/function_cspline.h>
 
@@ -46,7 +45,7 @@ check()
     for (double xi = x[0]; xi <= x.back(); xi += 0.01)
       {
         const double yi = gsl_spline_eval(spline, xi, acc);
-        // deallog << xi << " " << yi << std::endl;
+        //deallog << xi << " " << yi << std::endl;
         y_native.push_back(yi);
       }
     gsl_spline_free(spline);
@@ -59,7 +58,7 @@ check()
     for (double xi = x[0]; xi <= x.back(); xi += 0.01)
       {
         const double yi = cspline.value(Point<dim>(xi));
-        // deallog << xi << " " << yi << std::endl;
+        //deallog << xi << " " << yi << std::endl;
         y_dealii.push_back(yi);
       }
   }

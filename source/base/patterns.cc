@@ -40,8 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-// TODO[WB]: various functions here could be simplified by using namespace
-// Utilities
+//TODO[WB]: various functions here could be simplified by using namespace Utilities
 
 namespace Patterns
 {
@@ -315,8 +314,7 @@ namespace Patterns
 
         if (is.str().size() > strlen(description_init) + 1)
           {
-            // TODO: verify that description matches the pattern "^\[Integer
-            // range \d+\.\.\.\d+\]$"
+            //TODO: verify that description matches the pattern "^\[Integer range \d+\.\.\.\d+\]$"
             int lower_bound, upper_bound;
 
             is.ignore(strlen(description_init) + strlen(" range "));
@@ -388,8 +386,8 @@ namespace Patterns
               {
                 // bounds are valid
                 description << description_init << " ";
-                // We really want to compare with ==, but -Wfloat-equal would
-                // create a warning here, so work around it.
+                // We really want to compare with ==, but -Wfloat-equal would create
+                // a warning here, so work around it.
                 if (0 == std::memcmp(&lower_bound,
                                      &min_double_value,
                                      sizeof(lower_bound)))
@@ -556,7 +554,7 @@ namespace Patterns
         tmp.erase(0, tmp.find('|') + 1);
       };
 
-    // remove whitespace at the end
+    //remove whitespace at the end
     while ((tmp.length() != 0) && (std::isspace(*(tmp.end() - 1))))
       tmp.erase(tmp.end() - 1);
 

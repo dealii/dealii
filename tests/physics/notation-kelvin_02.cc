@@ -466,10 +466,10 @@ test_rank_3_tensors()
       C, A); // This implies that a standard vmult is necessary
 
     const Vector<double>     vA = Notation::Kelvin::to_vector(A);
-    const FullMatrix<double> mC =
-      Notation::Kelvin::to_matrix<dim, Tensor<1, dim>, Tensor<2, dim>>(
-        C); // Define subtensor representation Tensor<1,dim> \otimes
-            // Tensor<2,dim>
+    const FullMatrix<double> mC = Notation::Kelvin::to_matrix<dim,
+                                                              Tensor<1, dim>,
+                                                              Tensor<2, dim>>(
+      C); // Define subtensor representation Tensor<1,dim> \otimes Tensor<2,dim>
     Vector<double> vB(mC.m()); // Note result size
     mC.vmult(vB, vA);          // Note transpose vmult
 
@@ -511,10 +511,11 @@ test_rank_3_tensors()
       C, A_ns); // This implies that a Tvmult is necessary
 
     const Vector<double>     vA = Notation::Kelvin::to_vector(A);
-    const FullMatrix<double> mC =
-      Notation::Kelvin::to_matrix<dim, SymmetricTensor<2, dim>, Tensor<1, dim>>(
-        C); // Define subtensor representation SymmetricTensor<2,dim> \otimes
-            // Tensor<1,dim>
+    const FullMatrix<double> mC = Notation::Kelvin::to_matrix<
+      dim,
+      SymmetricTensor<2, dim>,
+      Tensor<1, dim>>(
+      C); // Define subtensor representation SymmetricTensor<2,dim> \otimes Tensor<1,dim>
     Vector<double> vB(mC.n()); // Note result size
     mC.Tvmult(vB, vA);         // Note transpose vmult
 
@@ -556,10 +557,11 @@ test_rank_3_tensors()
       C, A_ns); // This implies that a standard vmult is necessary
 
     const Vector<double>     vA = Notation::Kelvin::to_vector(A);
-    const FullMatrix<double> mC =
-      Notation::Kelvin::to_matrix<dim, Tensor<1, dim>, SymmetricTensor<2, dim>>(
-        C); // Define subtensor representation Tensor<1,dim> \otimes
-            // SymmetricTensor<2,dim>
+    const FullMatrix<double> mC = Notation::Kelvin::to_matrix<
+      dim,
+      Tensor<1, dim>,
+      SymmetricTensor<2, dim>>(
+      C); // Define subtensor representation Tensor<1,dim> \otimes SymmetricTensor<2,dim>
     Vector<double> vB(mC.m()); // Note result size
     mC.vmult(vB, vA);          // Note transpose vmult
 

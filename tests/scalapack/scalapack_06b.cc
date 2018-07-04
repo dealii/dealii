@@ -16,8 +16,8 @@
 #include "../lapack/create_matrix.h"
 #include "../tests.h"
 
-// test eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int>
-// &, const bool) for some eigenvalues with eigenvectors
+// test eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int> &, const bool)
+// for some eigenvalues with eigenvectors
 
 
 #include <deal.II/base/conditional_ostream.h>
@@ -77,24 +77,24 @@ test(const unsigned int size,
   create_spd(full_A);
   scalapack_syevx = full_A;
 
-  // Lapack as reference
+  //Lapack as reference
   {
     std::vector<NumberType> lapack_A(size * size);
     for (unsigned int i = 0; i < size; ++i)
       for (unsigned int j = 0; j < size; ++j)
         lapack_A[i * size + j] = full_A(i, j);
 
-    int info; // Variable containing information about the successful exit of
-              // the lapack routine
+    int
+         info; //Variable containing information about the successful exit of the lapack routine
     char jobz = 'V'; //'V': all eigenpairs of A are computed
-    char uplo = 'U'; // storage format of the matrix A; not so important as
-                     // matrix is symmetric
-    int                     LDA = size; // leading dimension of the matrix A
-    int                     lwork;      // length of vector/array work
+    char uplo =
+      'U'; //storage format of the matrix A; not so important as matrix is symmetric
+    int                     LDA = size; //leading dimension of the matrix A
+    int                     lwork;      //length of vector/array work
     std::vector<NumberType> work(1);
 
-    // by setting lwork to -1 a workspace query for work is done
-    // as matrix is symmetric: LDA == size of matrix
+    //by setting lwork to -1 a workspace query for work is done
+    //as matrix is symmetric: LDA == size of matrix
     lwork = -1;
     syev(&jobz,
          &uplo,
@@ -158,16 +158,14 @@ test(const unsigned int size,
   pcout << "   with respect to the given tolerance the eigenvalues coincide"
         << std::endl;
 
-  // FIXME: run-time error on macOS if code between "pcout << comparing" and
-  // this line is executed. Happens at the end of the program run while freeing
-  // the MPI communicator.
+  // FIXME: run-time error on macOS if code between "pcout << comparing" and this line is executed.
+  // Happens at the end of the program run while freeing the MPI communicator.
 
   for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
     for (unsigned int j = 0; j < size; ++j)
       p_eigenvectors_[i][j] = p_eigenvectors(j, max_n_eigenvalues - 1 - i);
 
-  // product of eigenvectors computed using Lapack and ScaLapack has to be
-  // either 1 or -1
+  //product of eigenvectors computed using Lapack and ScaLapack has to be either 1 or -1
   for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
     {
       const NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
@@ -176,8 +174,7 @@ test(const unsigned int size,
                   << ": eigenvectors do not coincide: abs(" << product
                   << ") != 1" << std::endl;
 
-      // the requirement for alignment of the eigenvectors has to be released
-      // (primarily for floats)
+      //the requirement for alignment of the eigenvectors has to be released (primarily for floats)
       AssertThrow(std::abs(std::abs(product) - 1) < tol * 10,
                   ExcInternalError());
     }

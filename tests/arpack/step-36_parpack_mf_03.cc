@@ -14,8 +14,7 @@
  * ---------------------------------------------------------------------
 
  *
- * Same as step-36_parpack_mf_2 but solve for largest eigenvalues of SHEP
- Laplace.
+ * Same as step-36_parpack_mf_2 but solve for largest eigenvalues of SHEP Laplace.
  * For the same problem slepc/step-36_parallel_03.cc produces:
  * DEAL::3.98719
  * DEAL::3.98719

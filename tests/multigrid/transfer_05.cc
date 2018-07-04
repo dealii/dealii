@@ -176,8 +176,7 @@ check(const unsigned int fe_degree)
           bv.block(b).local_element(i) = random_value<double>();
 
       transfer.copy_to_mg(mgdof, lbv2, bv);
-      // Also check that the block vector has its (global) size set on each
-      // level:
+      // Also check that the block vector has its (global) size set on each level:
       for (unsigned int l = lv.min_level(); l <= lv.max_level(); ++l)
         {
           unsigned int total_size = 0;

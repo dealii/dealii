@@ -77,8 +77,7 @@ public:
 
 
   /**
-   * Constructor. Initialize the matrix as a rectangular matrix $\rm{rows}
-   * \times \rm{cols}$.
+   * Constructor. Initialize the matrix as a rectangular matrix $\rm{rows} \times \rm{cols}$.
    */
   LAPACKFullMatrix(const size_type rows, const size_type cols);
 
@@ -89,8 +88,8 @@ public:
    * function arguments are passed by value rather than by reference.
    * Unfortunately, we can't mark this copy constructor <tt>explicit</tt>,
    * since that prevents the use of this class in containers, such as
-   * <code>std::vector</code>. The responsibility to check performance of
-   * programs must therefore remain with the user of this class.
+   * <code>std::vector</code>. The responsibility to check performance of programs
+   * must therefore remain with the user of this class.
    */
   LAPACKFullMatrix(const LAPACKFullMatrix &);
 
@@ -142,9 +141,8 @@ public:
 
   /**
    * Set a particular entry of the matrix to a @p value.
-   * Thus, calling <code>A.set(1,2,3.141);</code> is entirely equivalent to the
-   * operation <code>A(1,2) = 3.141;</code>. This function exists for
-   * compatibility with the various sparse matrix objects.
+   * Thus, calling <code>A.set(1,2,3.141);</code> is entirely equivalent to the operation <code>A(1,2) = 3.141;</code>.
+   * This function exists for compatibility with the various sparse matrix objects.
    *
    * @param i The row index of the element to be set.
    * @param j The column index of the element to be set.
@@ -154,8 +152,7 @@ public:
   set(const size_type i, const size_type j, const number value);
 
   /**
-   * Simple addition of a scaled matrix, i.e. $\mathbf A \mathrel{+}= a \,
-   * \mathbf B$.
+   * Simple addition of a scaled matrix, i.e. $\mathbf A \mathrel{+}= a \, \mathbf B$.
    */
   void
   add(const number a, const LAPACKFullMatrix<number> &B);
@@ -206,8 +203,11 @@ public:
    * \end{array}
    * \right)
    * \f]
-   * Whereas if the new size is smaller, the matrix will contain the upper left
-   * block of the original one \f[ \left( \begin{array}{cc}
+   * Whereas if the new size is smaller, the matrix will contain the upper left block
+   * of the original one
+   * \f[
+   * \left(
+   * \begin{array}{cc}
    * \mathbf A_{11} & \mathbf A_{12} \\
    * \mathbf A_{21} & \mathbf A_{22}
    * \end{array}
@@ -336,8 +336,7 @@ public:
         const bool            adding = false) const;
 
   /**
-   * Adding Matrix-vector-multiplication $\mathbf w \mathrel{+}= \mathbf A \cdot
-   * \mathbf v$.
+   * Adding Matrix-vector-multiplication $\mathbf w \mathrel{+}= \mathbf A \cdot \mathbf v$.
    *
    * See the documentation of vmult() for details on the implementation.
    */
@@ -377,8 +376,7 @@ public:
          const bool            adding = false) const;
 
   /**
-   * Adding transpose matrix-vector-multiplication $\mathbf w \mathrel{+}=
-   * \mathbf A^T \cdot \mathbf v$.
+   * Adding transpose matrix-vector-multiplication $\mathbf w \mathrel{+}= \mathbf A^T \cdot \mathbf v$.
    *
    * See the documentation of vmult() for details on the implementation.
    */
@@ -455,8 +453,7 @@ public:
    *
    * If the <code>adding=false</code> then the result is stored in the matrix
    * $\mathbf C = \mathbf A^T \cdot \rm{diag}(\mathbf V) \cdot \mathbf B$
-   * otherwise it is added $\mathbf C \mathrel{+}= \mathbf A^T \cdot
-   * \rm{diag}(\mathbf V) \cdot \mathbf B$.
+   * otherwise it is added $\mathbf C \mathrel{+}= \mathbf A^T \cdot \rm{diag}(\mathbf V) \cdot \mathbf B$.
    *
    * @note It is assumed that @p A, @p B and @p V have compatible sizes and that
    * @p C already has the right size.
@@ -529,8 +526,7 @@ public:
 
   /**
    * Scale rows of this matrix by @p V . This is equivalent to premultiplication
-   * with a diagonal matrix $\mathbf A\leftarrow {\rm diag}(\mathbf V)\mathbf
-   * A$.
+   * with a diagonal matrix $\mathbf A\leftarrow {\rm diag}(\mathbf V)\mathbf A$.
    */
   void
   scale_rows(const Vector<number> &V);
@@ -542,8 +538,7 @@ public:
   compute_lu_factorization();
 
   /**
-   * Compute the Cholesky factorization of the matrix using LAPACK function
-   * Xpotrf.
+   * Compute the Cholesky factorization of the matrix using LAPACK function Xpotrf.
    *
    * @note The factorization is stored in the lower-triangular part of the matrix.
    */
@@ -551,10 +546,9 @@ public:
   compute_cholesky_factorization();
 
   /**
-   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$
-   * norm ($1/(||\mathbf A||_1 \, ||\mathbf A^{-1}||_1)$) of a symmetric
-   * positive definite matrix using Cholesky factorization. This function can
-   * only be called if the matrix is already factorized.
+   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$ norm ($1/(||\mathbf A||_1 \, ||\mathbf A^{-1}||_1)$)
+   * of a symmetric positive definite matrix using Cholesky factorization. This function can only
+   * be called if the matrix is already factorized.
    *
    * @note The condition number $k(\mathbf A)$ can be used to estimate the numerical
    * error related to the matrix inversion or the solution of the
@@ -573,11 +567,10 @@ public:
   reciprocal_condition_number(const number l1_norm) const;
 
   /**
-   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$
-   * norm for triangular matrices. The matrix has to have the
-   * LAPACKSupport::Property set to either
-   * LAPACKSupport::Property::upper_triangular or
-   * LAPACKSupport::Property::lower_triangular, see set_property().
+   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$ norm
+   * for triangular matrices. The matrix has to have
+   * the LAPACKSupport::Property set to either LAPACKSupport::Property::upper_triangular
+   * or LAPACKSupport::Property::lower_triangular, see set_property().
    */
   number
   reciprocal_condition_number() const;
@@ -616,9 +609,8 @@ public:
   trace() const;
 
   /**
-   * Invert the matrix by first computing an LU/Cholesky factorization with the
-   * LAPACK function Xgetrf/Xpotrf and then building the actual inverse using
-   * Xgetri/Xpotri.
+   * Invert the matrix by first computing an LU/Cholesky factorization with the LAPACK
+   * function Xgetrf/Xpotrf and then building the actual inverse using Xgetri/Xpotri.
    */
   void
   invert();
@@ -695,20 +687,18 @@ public:
 
   /**
    * Compute eigenvalues and eigenvectors of a real symmetric matrix. Only
-   * eigenvalues in the interval $(\rm{lower\_bound}, \rm{upper\_bound}]$ are
-   * computed with the absolute tolerance $\rm abs\_accuracy$. An approximate
-   * eigenvalue is accepted as converged when it is determined to lie in an
-   * interval $[a,b]$ of width less than or equal to $\rm{abs\_accuracy} + eps *
-   * \rm{max}(|a|,|b|)$, where $eps$ is the machine precision.  If
-   * $\rm{abs\_accuracy}$ is less than or equal to zero, then
-   * $eps\,|\mathbf{T}|_1$ will be used in its place, where $|\mathbf{T}|_1$ is
-   * the 1-norm of the tridiagonal matrix obtained by reducing $\mathbf A$ to
-   * tridiagonal form. Eigenvalues will be computed most accurately when
-   * $\rm{abs\_accuracy}$ is set to twice the underflow threshold, not zero.
-   * After this routine has been called, all eigenvalues in $(\rm{lower\_bound},
-   * \rm{upper\_bound}]$ will be stored in eigenvalues and the corresponding
-   * eigenvectors will be stored in the columns of eigenvectors, whose dimension
-   * is set accordingly.
+   * eigenvalues in the interval $(\rm{lower\_bound}, \rm{upper\_bound}]$ are computed with
+   * the absolute tolerance $\rm abs\_accuracy$. An approximate eigenvalue is
+   * accepted as converged when it is determined to lie in an interval $[a,b]$
+   * of width less than or equal to $\rm{abs\_accuracy} + eps * \rm{max}(|a|,|b|)$, where
+   * $eps$ is the machine precision.  If $\rm{abs\_accuracy}$ is less than or equal to
+   * zero, then $eps\,|\mathbf{T}|_1$ will be used in its place, where $|\mathbf{T}|_1$ is the 1-norm of
+   * the tridiagonal matrix obtained by reducing $\mathbf A$ to tridiagonal form.
+   * Eigenvalues will be computed most accurately when $\rm{abs\_accuracy}$ is set to
+   * twice the underflow threshold, not zero.  After this routine has been
+   * called, all eigenvalues in $(\rm{lower\_bound}, \rm{upper\_bound}]$ will be stored in
+   * eigenvalues and the corresponding eigenvectors will be stored in the
+   * columns of eigenvectors, whose dimension is set accordingly.
    *
    * @note Calls the LAPACK function Xsyevx.
    */
@@ -727,21 +717,19 @@ public:
    * - itype = 3: $\mathbf B \cdot \mathbf A \cdot \mathbf x=\lambda \mathbf x$
    *
    * where $\mathbf A$ is this matrix. $\mathbf A$
-   * and $\mathbf B$ are assumed to be symmetric, and $\mathbf B$ has to be
-   * positive definite. Only eigenvalues in the interval $(\rm{lower\_bound},
-   * \rm{upper\_bound}]$ are computed with the absolute tolerance
-   * $\rm{abs\_accuracy}$.  An approximate eigenvalue is accepted as converged
-   * when it is determined to lie in an interval $[a,b]$ of width less than or
-   * equal to $\rm{abs\_accuracy} + eps * \rm{max}( |a|,|b| )$, where $eps$ is
-   * the machine precision. If $\rm{abs\_accuracy}$ is less than or equal to
-   * zero, then $eps \, |\mathbf{T}|_1$ will be used in its place, where
-   * $|\mathbf{T}|_1$ is the 1-norm of the tridiagonal matrix obtained by
-   * reducing $\mathbf A$ to tridiagonal form. Eigenvalues will be computed most
-   * accurately when $\rm{abs\_accuracy}$ is set to twice the underflow
-   * threshold, not zero. After this routine has been called, all eigenvalues in
-   * $(\rm{lower\_bound}, \rm{upper\_bound}]$ will be stored in eigenvalues and
-   * the corresponding eigenvectors will be stored in eigenvectors, whose
-   * dimension is set accordingly.
+   * and $\mathbf B$ are assumed to be symmetric, and $\mathbf B$ has to be positive definite.
+   * Only eigenvalues in the interval $(\rm{lower\_bound}, \rm{upper\_bound}]$ are computed
+   * with the absolute tolerance $\rm{abs\_accuracy}$.  An approximate eigenvalue is
+   * accepted as converged when it is determined to lie in an interval $[a,b]$
+   * of width less than or equal to $\rm{abs\_accuracy} + eps * \rm{max}( |a|,|b| )$, where
+   * $eps$ is the machine precision. If $\rm{abs\_accuracy}$ is less than or equal to
+   * zero, then $eps \, |\mathbf{T}|_1$ will be used in its place, where $|\mathbf{T}|_1$ is the 1-norm of
+   * the tridiagonal matrix obtained by reducing $\mathbf A$ to tridiagonal form.
+   * Eigenvalues will be computed most accurately when $\rm{abs\_accuracy}$ is set to
+   * twice the underflow threshold, not zero. After this routine has been
+   * called, all eigenvalues in $(\rm{lower\_bound}, \rm{upper\_bound}]$ will be stored in
+   * eigenvalues and the corresponding eigenvectors will be stored in
+   * eigenvectors, whose dimension is set accordingly.
    *
    * @note Calls the LAPACK function Xsygvx.
    */

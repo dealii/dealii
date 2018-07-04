@@ -125,8 +125,7 @@ namespace MeshWorker
     };
 
     /**
-     * Control for looping over faces between a locally owned cell and a ghost
-     * cell:
+     * Control for looping over faces between a locally owned cell and a ghost cell:
      *
      * - never: Do not assembly these faces.
      * - one: Only one of the processes will assemble these faces (from the
@@ -271,7 +270,7 @@ namespace MeshWorker
               types::subdomain_id neighbid = numbers::artificial_subdomain_id;
               if (neighbor->is_level_cell())
                 neighbid = neighbor->level_subdomain_id();
-              // subdomain id is only valid for active cells
+              //subdomain id is only valid for active cells
               else if (neighbor->active())
                 neighbid = neighbor->subdomain_id();
 
@@ -294,9 +293,8 @@ namespace MeshWorker
                   loop_control.faces_to_ghost == LoopControl::never)
                 continue;
 
-              // Deal with refinement edges from the refined side. Assuming
-              // one-irregular meshes, this situation should only occur if both
-              // cells are active.
+              // Deal with refinement edges from the refined side. Assuming one-irregular
+              // meshes, this situation should only occur if both cells are active.
               const bool periodic_neighbor =
                 cell->has_periodic_neighbor(face_no);
 
@@ -357,8 +355,8 @@ namespace MeshWorker
                          ExcInternalError());
 
                   // If we own both cells only do faces from one side (unless
-                  // LoopControl says otherwise). Here, we rely on cell
-                  // comparison that will look at cell->index().
+                  // LoopControl says otherwise). Here, we rely on cell comparison
+                  // that will look at cell->index().
                   if (own_cell && own_neighbor &&
                       loop_control.own_faces == LoopControl::one &&
                       (neighbor < cell))
@@ -371,8 +369,8 @@ namespace MeshWorker
                     continue;
 
                   // now only one processor assembles faces_to_ghost. We let the
-                  // processor with the smaller (level-)subdomain id assemble
-                  // the face.
+                  // processor with the smaller (level-)subdomain id assemble the
+                  // face.
                   if (own_cell && !own_neighbor &&
                       loop_control.faces_to_ghost == LoopControl::one &&
                       (neighbid < csid))

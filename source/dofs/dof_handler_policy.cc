@@ -355,9 +355,8 @@ namespace internal
                 const typename DoFHandler<2, spacedim>::line_iterator line =
                   cell->line(side);
 
-                // distribute dofs if necessary: check whether line dof is
-                // already numbered (checking the first dof should be good
-                // enough)
+                // distribute dofs if necessary: check whether line dof is already
+                // numbered (checking the first dof should be good enough)
                 if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d = 0;
@@ -406,9 +405,8 @@ namespace internal
                 const typename DoFHandler<3, spacedim>::line_iterator line =
                   cell->line(l);
 
-                // distribute dofs if necessary: check whether line dof is
-                // already numbered (checking the first dof should be good
-                // enough)
+                // distribute dofs if necessary: check whether line dof is already
+                // numbered (checking the first dof should be good enough)
                 if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d = 0;
@@ -424,9 +422,8 @@ namespace internal
                 const typename DoFHandler<3, spacedim>::quad_iterator quad =
                   cell->quad(q);
 
-                // distribute dofs if necessary: check whether line dof is
-                // already numbered (checking the first dof should be good
-                // enough)
+                // distribute dofs if necessary: check whether line dof is already
+                // numbered (checking the first dof should be good enough)
                 if (quad->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d = 0;
@@ -791,8 +788,8 @@ namespace internal
           std::map<types::global_dof_index, types::global_dof_index>
             dof_identities;
 
-          // we will mark lines that we have already treated, so first save and
-          // clear the user flags on lines and later restore them
+          // we will mark lines that we have already treated, so first save and clear
+          // the user flags on lines and later restore them
           std::vector<bool> user_flags;
           dof_handler.get_triangulation().save_user_flags_line(user_flags);
           const_cast<dealii::Triangulation<dim, spacedim> &>(
@@ -801,8 +798,7 @@ namespace internal
 
           // exclude lines that bound cells we don't locally own, because
           // we do not have information about their dofs at this point.
-          // this is, at least the case for
-          // parallel::distributed::Triangulations.
+          // this is, at least the case for parallel::distributed::Triangulations.
           //
           // this means that we will not unify DoF indices between locally
           // owned cells and ghost cells, and this is different from what
@@ -824,25 +820,22 @@ namespace internal
                      ++l)
                   cell->line(l)->set_user_flag();
 
-          // An implementation of the algorithm described in the hp paper,
-          // including the modification mentioned later in the "complications in
-          // 3-d" subsections
+          // An implementation of the algorithm described in the hp paper, including
+          // the modification mentioned later in the "complications in 3-d" subsections
           //
-          // as explained there, we do something only if there are exactly 2
-          // finite elements associated with an object. if there is only one,
-          // then there is nothing to do anyway, and if there are 3 or more,
-          // then we can get into trouble. note that this only happens for lines
-          // in 3d and higher, and for quads only in 4d and higher, so this
-          // isn't a particularly frequent case
+          // as explained there, we do something only if there are exactly 2 finite
+          // elements associated with an object. if there is only one, then there is
+          // nothing to do anyway, and if there are 3 or more, then we can get into
+          // trouble. note that this only happens for lines in 3d and higher, and for
+          // quads only in 4d and higher, so this isn't a particularly frequent case
           //
           // there is one case, however, that we would like to handle (see, for
-          // example, the hp/crash_15 testcase): if we have
-          // FESystem(FE_Q(2),FE_DGQ(i)) elements for a bunch of values 'i',
-          // then we should be able to handle this because we can simply unify
-          // *all* dofs, not only a some. so what we do is to first treat all
-          // pairs of finite elements that have *identical* dofs, and then only
-          // deal with those that are not identical of which we can handle at
-          // most 2
+          // example, the hp/crash_15 testcase): if we have FESystem(FE_Q(2),FE_DGQ(i))
+          // elements for a bunch of values 'i', then we should be able to handle this
+          // because we can simply unify *all* dofs, not only a some. so what we do
+          // is to first treat all pairs of finite elements that have *identical* dofs,
+          // and then only deal with those that are not identical of which we can
+          // handle at most 2
           dealii::Table<2, std::unique_ptr<DoFIdentities>> line_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
@@ -880,9 +873,8 @@ namespace internal
                               dof_handler.get_fe(fe_index_1),
                               dof_handler.get_fe(fe_index_2),
                               line_dof_identities[fe_index_1][fe_index_2]);
-                            // see if these sets of dofs are identical. the
-                            // first condition for this is that indeed there are
-                            // n identities
+                            // see if these sets of dofs are identical. the first
+                            // condition for this is that indeed there are n identities
                             if (line_dof_identities[fe_index_1][fe_index_2]
                                   ->size() ==
                                 dof_handler.get_fe(fe_index_1).dofs_per_line)
@@ -903,12 +895,10 @@ namespace internal
                                 if (i == dof_handler.get_fe(fe_index_1)
                                            .dofs_per_line)
                                   {
-                                    // The line dofs (i.e., the ones interior to
-                                    // a line) of these two finite elements are
-                                    // identical. Note that there could be
-                                    // situations when one element still
-                                    // dominates another, e.g.: FE_Q(2) x
-                                    // FE_Nothing(dominate) vs FE_Q(2) x FE_Q(1)
+                                    // The line dofs (i.e., the ones interior to a line) of these two finite elements are identical.
+                                    // Note that there could be situations when one element still dominates another, e.g.:
+                                    // FE_Q(2) x FE_Nothing(dominate) vs
+                                    // FE_Q(2) x FE_Q(1)
 
                                     --unique_sets_of_dofs;
 
@@ -924,9 +914,9 @@ namespace internal
                                           slave_dof_index =
                                             line->dof_index(j, fe_index_2);
 
-                                        // if master dof was already
-                                        // constrained, constrain to that one,
-                                        // otherwise constrain slave to master
+                                        // if master dof was already constrained,
+                                        // constrain to that one, otherwise constrain
+                                        // slave to master
                                         if (dof_identities.find(
                                               master_dof_index) !=
                                             dof_identities.end())
@@ -959,37 +949,34 @@ namespace internal
                           }
                       }
 
-                  // if at this point, there is only one unique set of dofs
-                  // left, then we have taken care of everything above. if there
-                  // are two, then we need to deal with them here. if there are
-                  // more, then we punt, as described in the paper (and
-                  // mentioned above)
-                  // TODO: The check for 'dim==2' was inserted by intuition. It
-                  // fixes
-                  // the previous problems with step-27 in 3D. But an
-                  // explanation for this is still required, and what we do here
-                  // is not what we describe in the paper!.
+                  // if at this point, there is only one unique set of dofs left, then
+                  // we have taken care of everything above. if there are two, then we
+                  // need to deal with them here. if there are more, then we punt, as
+                  // described in the paper (and mentioned above)
+                  //TODO: The check for 'dim==2' was inserted by intuition. It fixes
+                  // the previous problems with step-27 in 3D. But an explanation
+                  // for this is still required, and what we do here is not what we
+                  // describe in the paper!.
                   if ((unique_sets_of_dofs == 2) && (dim == 2))
                     {
-                      // find out which is the most dominating finite element of
-                      // the ones that are used on this line
+                      // find out which is the most dominating finite element of the
+                      // ones that are used on this line
                       const unsigned int most_dominating_fe_index =
                         get_most_dominating_fe_index<dim, spacedim>(line);
 
-                      // if we found the most dominating element, then use this
-                      // to eliminate some of the degrees of freedom by
-                      // identification. otherwise, the code that computes
-                      // hanging node constraints will have to deal with it by
-                      // computing appropriate constraints along this face/edge
+                      // if we found the most dominating element, then use this to eliminate some of
+                      // the degrees of freedom by identification. otherwise, the code that computes
+                      // hanging node constraints will have to deal with it by computing
+                      // appropriate constraints along this face/edge
                       if (most_dominating_fe_index !=
                           numbers::invalid_unsigned_int)
                         {
                           const unsigned int n_active_fe_indices =
                             line->n_active_fe_indices();
 
-                          // loop over the indices of all the finite elements
-                          // that are not dominating, and identify their dofs to
-                          // the most dominating one
+                          // loop over the indices of all the finite elements that are not
+                          // dominating, and identify their dofs to the most dominating
+                          // one
                           for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                             if (line->nth_active_fe_index(f) !=
                                 most_dominating_fe_index)
@@ -1081,8 +1068,7 @@ namespace internal
 
           // exclude quads that bound cells we don't locally own, because
           // we do not have information about their dofs at this point.
-          // this is, at least the case for
-          // parallel::distributed::Triangulations.
+          // this is, at least the case for parallel::distributed::Triangulations.
           //
           // this means that we will not unify DoF indices between locally
           // owned cells and ghost cells, and this is different from what
@@ -1262,8 +1248,7 @@ namespace internal
           }
 
           // create a vector that contains the new DoF indices; first preset the
-          // ones that are identities as determined above, then enumerate the
-          // rest
+          // ones that are identities as determined above, then enumerate the rest
           std::vector<types::global_dof_index> new_dof_indices(
             n_dofs_before_identification, numbers::invalid_dof_index);
 
@@ -1396,8 +1381,8 @@ namespace internal
                     // has neighbor already been processed?
                     if (neighbor->user_flag_set() &&
                         (neighbor->level() == cell->level()))
-                      // copy dofs if the neighbor is on the same level (only
-                      // then are mg dofs the same)
+                      // copy dofs if the neighbor is on the same level (only then are
+                      // mg dofs the same)
                       {
                         if (v == 0)
                           for (unsigned int d = 0;
@@ -1481,8 +1466,8 @@ namespace internal
                 typename DoFHandler<dim, spacedim>::line_iterator line =
                   cell->line(side);
 
-                // distribute dofs if necessary: check whether line dof is
-                // already numbered (check only first dof)
+                // distribute dofs if necessary: check whether line dof is already
+                // numbered (check only first dof)
                 if (line->mg_dof_index(cell->level(), 0) ==
                     numbers::invalid_dof_index)
                   // if not: distribute dofs
@@ -1642,7 +1627,7 @@ namespace internal
             dof_handler.get_triangulation();
           Assert(tria.n_levels() > 0, ExcMessage("Empty triangulation"));
           if (level >= tria.n_levels())
-            return 0; // this is allowed for multigrid
+            return 0; //this is allowed for multigrid
 
           // Clear user flags because we will need them. But first we save
           // them and make sure that we restore them later such that at
@@ -1830,18 +1815,16 @@ namespace internal
                 dealii::internal::DoFAccessorImplementation::Implementation::
                   n_active_vertex_fe_indices(dof_handler, vertex_index);
 
-              // if this vertex is unused, then we really ought not to have
-              // allocated any space for it, i.e., n_active_fe_indices should be
-              // zero, and there is no space to actually store dof indices for
-              // this vertex
+              // if this vertex is unused, then we really ought not to have allocated
+              // any space for it, i.e., n_active_fe_indices should be zero, and
+              // there is no space to actually store dof indices for this vertex
               if (dof_handler.get_triangulation().vertex_used(vertex_index) ==
                   false)
                 Assert(n_active_fe_indices == 0, ExcInternalError());
 
-              // otherwise the vertex is used; it may still not hold any dof
-              // indices if it is located on an artificial cell and not adjacent
-              // to a ghost cell, but in that case there is simply nothing for
-              // us to do
+              // otherwise the vertex is used; it may still not hold any dof indices
+              // if it is located on an artificial cell and not adjacent to a ghost
+              // cell, but in that case there is simply nothing for us to do
               for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                 {
                   const unsigned int fe_index =
@@ -1934,8 +1917,8 @@ namespace internal
           const IndexSet & /*indices*/,
           hp::DoFHandler<1, spacedim> & /*dof_handler*/)
         {
-          // nothing to do in 1d since there are no separate faces -- we've
-          // already taken care of this when dealing with the vertices
+          // nothing to do in 1d since there are no separate faces -- we've already
+          // taken care of this when dealing with the vertices
         }
 
 
@@ -2181,8 +2164,7 @@ namespace internal
 
 
 
-        /* --------------------- renumber_mg_dofs functionality ----------------
-         */
+        /* --------------------- renumber_mg_dofs functionality ---------------- */
 
         /**
          * The part of the renumber_mg_dofs() functionality that is dimension
@@ -2271,9 +2253,9 @@ namespace internal
 
 
         /**
-         * The part of the renumber_mg_dofs() functionality that operates on
-         * faces. This part is dimension dependent and so needs to be
-         * implemented in three separate specializations of the function.
+         * The part of the renumber_mg_dofs() functionality that operates on faces.
+         * This part is dimension dependent and so needs to be implemented in
+         * three separate specializations of the function.
          *
          * See renumber_mg_dofs() for the meaning of the arguments.
          */
@@ -2625,12 +2607,12 @@ namespace internal
       namespace
       {
         /**
-         * This function is a variation of
-         * DoFTools::get_dof_subdomain_association() with the exception that it
-         * is (i) specialized for parallel::shared::Triangulation objects, and
-         * (ii) does not assume that the internal number cache of the DoFHandler
-         * has already been set up. In can, consequently, be called at a point
-         * when we are still distributing degrees of freedom.
+         * This function is a variation of DoFTools::get_dof_subdomain_association()
+         * with the exception that it is (i) specialized for
+         * parallel::shared::Triangulation objects, and (ii) does not assume that the
+         * internal number cache of the DoFHandler has already been set up. In can,
+         * consequently, be called at a point when we are still distributing degrees
+         * of freedom.
          */
         template <class DoFHandlerType>
         std::vector<types::subdomain_id>
@@ -2651,17 +2633,17 @@ namespace internal
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
             {
-              // get the owner of the cell; note that we have made sure above
-              // that all cells are either locally owned or ghosts (not
-              // artificial), so this call will always yield the true owner
+              // get the owner of the cell; note that we have made sure above that
+              // all cells are either locally owned or ghosts (not artificial), so
+              // this call will always yield the true owner
               const types::subdomain_id subdomain_id = cell->subdomain_id();
               const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
               local_dof_indices.resize(dofs_per_cell);
               cell->get_dof_indices(local_dof_indices);
 
               // set subdomain ids. if dofs already have their values set then
-              // they must be on partition interfaces. In that case assign them
-              // to the processor with the smaller subdomain id.
+              // they must be on partition interfaces. In that case assign them to the
+              // processor with the smaller subdomain id.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 if (subdomain_association[local_dof_indices[i]] ==
                     numbers::invalid_subdomain_id)
@@ -2714,18 +2696,18 @@ namespace internal
                                                  endc = dof_handler.end(level);
           for (; cell != endc; ++cell)
             {
-              // get the owner of the cell; note that we have made sure above
-              // that all cells are either locally owned or ghosts (not
-              // artificial), so this call will always yield the true owner
+              // get the owner of the cell; note that we have made sure above that
+              // all cells are either locally owned or ghosts (not artificial), so
+              // this call will always yield the true owner
               const types::subdomain_id level_subdomain_id =
                 cell->level_subdomain_id();
               const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
               local_dof_indices.resize(dofs_per_cell);
               cell->get_mg_dof_indices(local_dof_indices);
 
-              // set level subdomain ids. if dofs already have their values set
-              // then they must be on partition interfaces. In that case assign
-              // them to the processor with the smaller subdomain id.
+              // set level subdomain ids. if dofs already have their values set then
+              // they must be on partition interfaces. In that case assign them to the
+              // processor with the smaller subdomain id.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 if (level_subdomain_association[local_dof_indices[i]] ==
                     numbers::invalid_subdomain_id)
@@ -2969,20 +2951,20 @@ namespace internal
             }
 
             // Next let the sequential algorithm do its magic. it is going to
-            // enumerate DoFs on all cells on the given level, regardless of
-            // owner
+            // enumerate DoFs on all cells on the given level, regardless of owner
             const types::global_dof_index n_dofs_on_level =
               Implementation::distribute_dofs_on_level(
                 numbers::invalid_subdomain_id, *this->dof_handler, lvl);
 
-            // then re-enumerate them based on their level subdomain
-            // association. for this, we first have to identify for each current
-            // DoF index which subdomain they belong to. ideally, we would like
-            // to call DoFRenumbering::subdomain_wise(), but because the
-            // NumberCache of the current DoFHandler is not fully set up yet, we
-            // can't quite do that. also, that function has to deal with other
-            // kinds of triangulations as well, whereas we here know what kind
-            // of triangulation we have and can simplify the code accordingly
+            // then re-enumerate them based on their level subdomain association.
+            // for this, we first have to identify for each current DoF
+            // index which subdomain they belong to. ideally, we would
+            // like to call DoFRenumbering::subdomain_wise(), but
+            // because the NumberCache of the current DoFHandler is not
+            // fully set up yet, we can't quite do that. also, that
+            // function has to deal with other kinds of triangulations as
+            // well, whereas we here know what kind of triangulation
+            // we have and can simplify the code accordingly
             std::vector<types::global_dof_index> new_dof_indices(
               n_dofs_on_level, numbers::invalid_dof_index);
             {
@@ -3029,11 +3011,10 @@ namespace internal
             Implementation::renumber_mg_dofs(
               new_dof_indices, IndexSet(0), *this->dof_handler, lvl, true);
 
-            // update the number cache. for this, we first have to find the
-            // level subdomain association for each DoF again following
-            // renumbering, from which we can then compute the IndexSets of
-            // locally owned DoFs for all processors. all other fields then
-            // follow from this
+            // update the number cache. for this, we first have to find the level subdomain
+            // association for each DoF again following renumbering, from which we
+            // can then compute the IndexSets of locally owned DoFs for all processors.
+            // all other fields then follow from this
             //
             // given the way we enumerate degrees of freedom, the locally owned
             // ranges must all be contiguous and consecutive. this makes filling
@@ -3145,10 +3126,9 @@ namespace internal
 
         std::vector<types::global_dof_index> global_gathered_numbers(
           this->dof_handler->n_dofs(), 0);
-        // as we call DoFRenumbering::subdomain_wise (*dof_handler) from
-        // distribute_dofs(), we need to support sequential-like input.
-        // Distributed-like input from, for example, component_wise renumbering
-        // is also supported.
+        // as we call DoFRenumbering::subdomain_wise (*dof_handler) from distribute_dofs(),
+        // we need to support sequential-like input.
+        // Distributed-like input from, for example, component_wise renumbering is also supported.
         if (new_numbers.size() == this->dof_handler->n_dofs())
           {
             global_gathered_numbers = new_numbers;
@@ -3172,8 +3152,7 @@ namespace internal
               std::vector<types::global_dof_index> new_numbers_copy(
                 new_numbers);
 
-              // store the number of elements that are to be received from each
-              // process
+              // store the number of elements that are to be received from each process
               std::vector<int> rcounts(n_cpu);
 
               types::global_dof_index shift = 0;
@@ -3211,8 +3190,7 @@ namespace internal
               AssertThrowMPI(ierr);
             }
 
-            // put new numbers according to the current
-            // locally_owned_dofs_per_processor IndexSets
+            // put new numbers according to the current locally_owned_dofs_per_processor IndexSets
             types::global_dof_index shift = 0;
             // flag_1 and flag_2 are
             // used to control that there is a
@@ -3296,16 +3274,16 @@ namespace internal
       namespace
       {
         /**
-         * A structure that allows the transfer of DoF indices from one
-         * processor to another. It corresponds to a packed buffer that stores a
-         * list of cells (in the form of a list of coarse mesh index -- i.e.,
-         * the tree_index of the cell, and a corresponding list of quadrants
-         * within these trees), and a long array of DoF indices.
+         * A structure that allows the transfer of DoF indices from one processor
+         * to another. It corresponds to a packed buffer that stores a list of
+         * cells (in the form of a list of coarse mesh index -- i.e., the tree_index
+         * of the cell, and a corresponding list of quadrants within these trees),
+         * and a long array of DoF indices.
          *
          * The list of DoF indices stores first the number of indices for the
-         * first cell (=tree index and quadrant), then the indices for that
-         * cell, then the number of indices of the second cell, then the actual
-         * indices of the second cell, etc.
+         * first cell (=tree index and quadrant), then the indices for that cell,
+         * then the number of indices of the second cell, then the actual indices
+         * of the second cell, etc.
          *
          * The DoF indices array may or may not be used by algorithms using this
          * class.
@@ -4106,9 +4084,8 @@ namespace internal
 
 
         /*
-           The following algorithm has a number of stages that are all
-           documented in the paper that describes the parallel::distributed
-           functionality:
+           The following algorithm has a number of stages that are all documented
+           in the paper that describes the parallel::distributed functionality:
 
            1/ locally enumerate dofs on locally owned cells
            2/ un-numerate those that are on interfaces with ghost
@@ -4427,8 +4404,8 @@ namespace internal
                     }
               }
 
-            // TODO: make this code simpler with the new constructors of
-            // NumberCache make indices consecutive
+            // TODO: make this code simpler with the new constructors of NumberCache
+            // make indices consecutive
             level_number_cache.n_locally_owned_dofs = 0;
             for (std::vector<dealii::types::global_dof_index>::iterator it =
                    renumbering.begin();

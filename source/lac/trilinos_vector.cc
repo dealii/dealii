@@ -432,8 +432,7 @@ namespace TrilinosWrappers
       // somewhere. This can happen when a vector lives in GrowingVectorMemory
       // data structures. Thus, the following code is commented out.
       //
-      // if (my_comm != NULL && v_comm != NULL && my_comm->DataPtr() !=
-      // v_comm->DataPtr())
+      //if (my_comm != NULL && v_comm != NULL && my_comm->DataPtr() != v_comm->DataPtr())
       //  {
       //    int communicators_same = 0;
       //    const int ierr = MPI_Comm_compare (my_comm->GetMpiComm(),
@@ -548,11 +547,10 @@ namespace TrilinosWrappers
     void
     Vector::compress(::dealii::VectorOperation::values given_last_action)
     {
-      // Select which mode to send to Trilinos. Note that we use last_action if
-      // available and ignore what the user tells us to detect wrongly mixed
-      // operations. Typically given_last_action is only used on machines that
-      // do not execute an operation (because they have no own cells for
-      // example).
+      //Select which mode to send to Trilinos. Note that we use last_action if
+      //available and ignore what the user tells us to detect wrongly mixed
+      //operations. Typically given_last_action is only used on machines that do
+      //not execute an operation (because they have no own cells for example).
       Epetra_CombineMode mode = last_action;
       if (last_action == Zero)
         {
@@ -656,8 +654,8 @@ namespace TrilinosWrappers
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           last_action = Add;
 #  else
-          // In versions older than 11.11 the Import function is broken for
-          // adding Hence, we provide a workaround in this case
+          // In versions older than 11.11 the Import function is broken for adding
+          // Hence, we provide a workaround in this case
 
           Epetra_MultiVector dummy(vector->Map(), 1, false);
           Epetra_Import      data_exchange(dummy.Map(), v.vector->Map());
@@ -837,11 +835,11 @@ namespace TrilinosWrappers
     std::size_t
     Vector::memory_consumption() const
     {
-      // TODO[TH]: No accurate memory
-      // consumption for Trilinos vectors
-      // yet. This is a rough approximation with
-      // one index and the value per local
-      // entry.
+      //TODO[TH]: No accurate memory
+      //consumption for Trilinos vectors
+      //yet. This is a rough approximation with
+      //one index and the value per local
+      //entry.
       return sizeof(*this) +
              this->local_size() *
                (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));

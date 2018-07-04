@@ -62,9 +62,9 @@ namespace Functions
 
   /**
    * The cubic spline function using GNU Scientific Library.
-   * The resulting curve is piecewise cubic on each interval, with matching
-   * first and second derivatives at the supplied data-points. The second
-   * derivative is chosen to be zero at the first point and last point.
+   * The resulting curve is piecewise cubic on each interval, with matching first
+   * and second derivatives at the supplied data-points. The second derivative
+   * is chosen to be zero at the first point and last point.
    *
    * @note This function is only implemented for dim==1 .
    *

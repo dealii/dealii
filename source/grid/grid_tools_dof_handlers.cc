@@ -932,8 +932,9 @@ namespace GridTools
     for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
          cell != mesh.end();
          ++cell)
-      if (predicate(cell)) // True predicate --> Potential boundary cell of the
-                           // subdomain
+      if (
+        predicate(
+          cell)) // True predicate --> Potential boundary cell of the subdomain
         for (unsigned int v = 0;
              v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
              ++v)
@@ -943,8 +944,8 @@ namespace GridTools
               break; // No need to go through remaining vertices
             }
 
-    // To cheaply filter out some cells located far away from the predicate
-    // subdomain, get the bounding box of the predicate subdomain.
+    // To cheaply filter out some cells located far away from the predicate subdomain,
+    // get the bounding box of the predicate subdomain.
     std::pair<Point<spacedim>, Point<spacedim>> bounding_box =
       compute_bounding_box(mesh, predicate);
 
@@ -960,11 +961,9 @@ namespace GridTools
       }
 
     std::vector<Point<spacedim>>
-      subdomain_boundary_cells_centers; // cache all the subdomain boundary
-                                        // cells centers here
+      subdomain_boundary_cells_centers; // cache all the subdomain boundary cells centers here
     std::vector<double>
-      subdomain_boundary_cells_radii; // cache all the subdomain boundary cells
-                                      // radii
+      subdomain_boundary_cells_radii; // cache all the subdomain boundary cells radii
     subdomain_boundary_cells_centers.reserve(subdomain_boundary_cells.size());
     subdomain_boundary_cells_radii.reserve(subdomain_boundary_cells.size());
     // compute cell radius for each boundary cell of the predicate subdomain
@@ -987,12 +986,12 @@ namespace GridTools
                   subdomain_boundary_cells_centers.size(),
                 ExcInternalError());
 
-    // Find the cells that are within layer_thickness of predicate subdomain
-    // boundary distance but are inside the extended bounding box. Most cells
-    // might be outside the extended bounding box, so we could skip them. Those
-    // cells that are inside the extended bounding box but are not part of the
-    // predicate subdomain are possible candidates to be within the distance to
-    // the boundary cells of the predicate subdomain.
+    // Find the cells that are within layer_thickness of predicate subdomain boundary
+    // distance but are inside the extended bounding box.
+    // Most cells might be outside the extended bounding box, so we could skip them.
+    // Those cells that are inside the extended bounding box but are not part of the
+    // predicate subdomain are possible candidates to be within the distance to the
+    // boundary cells of the predicate subdomain.
     for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
          cell != mesh.end();
          ++cell)
@@ -1016,8 +1015,7 @@ namespace GridTools
              bounding_box.first[d]) &&
             (cell_enclosing_ball_center[d] - cell_enclosing_ball_radius <
              bounding_box.second[d]);
-        // cell_inside is true if its enclosing ball intersects the extended
-        // bounding box
+        // cell_inside is true if its enclosing ball intersects the extended bounding box
 
         // Ignore all the cells that are outside the extended bounding box
         if (cell_inside)
@@ -1030,8 +1028,7 @@ namespace GridTools
                                           layer_thickness + DOUBLE_EPSILON))
               {
                 active_cell_layer_within_distance.push_back(cell);
-                break; // Exit the loop checking all the remaining subdomain
-                       // boundary cells
+                break; // Exit the loop checking all the remaining subdomain boundary cells
               }
       }
     return active_cell_layer_within_distance;
@@ -1275,9 +1272,9 @@ namespace GridTools
       typename hp::DoFHandler<dim, spacedim>::active_cell_iterator;
 
     std::pair<cell_iterator, Point<dim>> best_cell;
-    // If we have only one element in the MappingCollection,
-    // we use find_active_cell_around_point using only one
-    // mapping.
+    //If we have only one element in the MappingCollection,
+    //we use find_active_cell_around_point using only one
+    //mapping.
     if (mapping.size() == 1)
       best_cell = find_active_cell_around_point(mapping[0], mesh, p);
     else
@@ -1364,7 +1361,7 @@ namespace GridTools
                     // to the next
                   }
               }
-            // update the number of cells searched
+            //update the number of cells searched
             cells_searched += adjacent_cells.size();
             // if we have not found the cell in
             // question and have not yet searched every
@@ -1407,9 +1404,9 @@ namespace GridTools
           if (cell->neighbor(face_number)->has_children() == false)
             patch.push_back(cell->neighbor(face_number));
           else
-            // the neighbor is refined. in 2d/3d, we can simply ask for the
-            // children of the neighbor because they can not be further refined
-            // and, consequently, the children is active
+            // the neighbor is refined. in 2d/3d, we can simply ask for the children
+            // of the neighbor because they can not be further refined and,
+            // consequently, the children is active
             if (MeshType::dimension > 1)
             {
               for (unsigned int subface = 0;
@@ -1445,9 +1442,8 @@ namespace GridTools
     Assert(patch.size() > 0,
            ExcMessage(
              "Vector containing patch cells should not be an empty vector!"));
-    // In order to extract the set of cells with the coarsest common level from
-    // the give vector of cells: First it finds the number associated with the
-    // minimum level of refinmenet, namely "min_level"
+    // In order to extract the set of cells with the coarsest common level from the give vector of cells:
+    // First it finds the number associated with the minimum level of refinmenet, namely "min_level"
     int min_level = patch[0]->level();
 
     for (unsigned int i = 0; i < patch.size(); ++i)
@@ -1458,16 +1454,14 @@ namespace GridTools
     // it loops through all cells of the input vector
     for (patch_cell = patch.begin(); patch_cell != patch.end(); ++patch_cell)
       {
-        // If the refinement level of each cell i the loop be equal to the
-        // min_level, so that that cell inserted into the set of uniform_cells,
-        // as the set of cells with the coarsest common refinement level
+        // If the refinement level of each cell i the loop be equal to the min_level, so that
+        // that cell inserted into the set of uniform_cells, as the set of cells with the coarsest common refinement level
         if ((*patch_cell)->level() == min_level)
           uniform_cells.insert(*patch_cell);
         else
-          // If not, it asks for the parent of the cell, until it finds the
-          // parent cell with the refinement level equal to the min_level and
-          // inserts that parent cell into the the set of uniform_cells, as the
-          // set of cells with the coarsest common refinement level.
+          // If not, it asks for the parent of the cell, until it finds the parent cell
+          // with the refinement level equal to the min_level and inserts that parent cell into the
+          // the set of uniform_cells, as the set of cells with the coarsest common refinement level.
           {
             typename Container::cell_iterator parent = *patch_cell;
 
@@ -1534,7 +1528,7 @@ namespace GridTools
                 i                    = i + 1;
               }
 
-          } // for vertices_per_cell
+          } //for vertices_per_cell
         k = k + 1;
       }
     local_triangulation.create_triangulation(vertices, cells, SubCellData());
@@ -1555,16 +1549,15 @@ namespace GridTools
       {
         patch_to_global_tria_map_tmp.insert(
           std::make_pair(coarse_cell, uniform_cells[index]));
-        // To ensure that the cells with the same coordinates (here, we compare
-        // their centers) are mapped into each other.
+        // To ensure that the cells with the same coordinates (here, we compare their centers) are mapped into each other.
 
         Assert(coarse_cell->center().distance(uniform_cells[index]->center()) <=
                  1e-15 * coarse_cell->diameter(),
                ExcInternalError());
       }
     bool refinement_necessary;
-    // In this loop we start to do refinement on the above coarse triangulation
-    // to reach to the same level of refinement as the patch cells are really on
+    // In this loop we start to do refinement on the above coarse triangulation to reach
+    // to the same level of refinement as the patch cells are really on
     do
       {
         refinement_necessary = false;
@@ -1625,9 +1618,8 @@ namespace GridTools
                   {
                     if (cell->has_children())
                       {
-                        // Note: Since the cell got children, then it should not
-                        // be in the map anymore children may be added into the
-                        // map, instead
+                        // Note: Since the cell got children, then it should not be in the map anymore
+                        // children may be added into the map, instead
 
                         // these children may not yet be in the map
                         for (unsigned int c = 0; c < cell->n_children(); ++c)
@@ -1644,18 +1636,18 @@ namespace GridTools
                                 // One might be tempted to assert that the cell
                                 // being added here has the same center as the
                                 // equivalent cell in the global triangulation,
-                                // but it may not be the case.  For
-                                // triangulations that have been perturbed or
-                                // smoothed, the cell indices and levels may be
-                                // the same, but the vertex locations may not.
-                                // We adjust the vertices of the cells that have
-                                // no children (ie the active cells) to be
+                                // but it may not be the case.  For triangulations
+                                // that have been perturbed or smoothed, the cell
+                                // indices and levels may be the same, but the
+                                // vertex locations may not.  We adjust
+                                // the vertices of the cells that have no
+                                // children (ie the active cells) to be
                                 // consistent with the global triangulation
                                 // later on and add assertions at that time
                                 // to guarantee the cells in the
-                                // local_triangulation are physically at the
-                                // same locations of the cells in the patch of
-                                // the global triangulation.
+                                // local_triangulation are physically at the same
+                                // locations of the cells in the patch of the
+                                // global triangulation.
                               }
                           }
                         // The parent cell whose children were added
@@ -1697,9 +1689,8 @@ namespace GridTools
       typename Container::cell_iterator>::iterator
       map_tmp_it  = patch_to_global_tria_map_tmp.begin(),
       map_tmp_end = patch_to_global_tria_map_tmp.end();
-    // Now we just need to take the temporary map of pairs of type cell_iterator
-    // "patch_to_global_tria_map_tmp" making pair of active_cell_iterators so
-    // that filling out the final map "patch_to_global_tria_map"
+    // Now we just need to take the temporary map of pairs of type cell_iterator "patch_to_global_tria_map_tmp"
+    // making pair of active_cell_iterators so that filling out the final map "patch_to_global_tria_map"
     for (; map_tmp_it != map_tmp_end; ++map_tmp_it)
       patch_to_global_tria_map[map_tmp_it->first] = map_tmp_it->second;
   }
@@ -1887,8 +1878,9 @@ namespace GridTools
                          c < cell->neighbor(f)->face(face_no)->n_children();
                          ++c)
                       {
-                        if (c != subface) // don't repeat work on dofs of
-                                          // original cell
+                        if (
+                          c !=
+                          subface) // don't repeat work on dofs of original cell
                           {
                             const unsigned int n_dofs_per_face =
                               cell->get_fe().dofs_per_face;
@@ -2082,7 +2074,7 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched
+    //Assure that all faces are matched
     AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
                 ExcMessage("Unmatched faces on periodic boundaries"));
   }
@@ -2156,7 +2148,7 @@ namespace GridTools
       pairs1, pairs2, direction, matched_pairs, offset, matrix);
 
 #ifdef DEBUG
-    // check for standard orientation
+    //check for standard orientation
     const unsigned int size_new = matched_pairs.size();
     for (unsigned int i = size_old; i < size_new; ++i)
       {

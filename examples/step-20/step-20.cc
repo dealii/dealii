@@ -720,8 +720,8 @@ namespace Step20
     InverseMatrix<SparseMatrix<double>> inverse_mass(system_matrix.block(0, 0));
     Vector<double>                      tmp(solution.block(0).size());
 
-    // Now on to the first equation. The right hand side of it is
-    // $B^TM^{-1}F-G$, which is what we compute in the first few lines:
+    // Now on to the first equation. The right hand side of it is $B^TM^{-1}F-G$,
+    // which is what we compute in the first few lines:
     {
       SchurComplement schur_complement(system_matrix, inverse_mass);
       Vector<double>  schur_rhs(solution.block(1).size());

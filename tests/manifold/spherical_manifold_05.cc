@@ -30,8 +30,7 @@ main()
   const SphericalManifold<2> manifold_2;
   const SphericalManifold<3> manifold_3;
 
-  // get tangent vectors for positions that are on a line as seen from the
-  // center
+  // get tangent vectors for positions that are on a line as seen from the center
   deallog << manifold_2.get_tangent_vector(Point<2>(0.5, 0), Point<2>(1.0, 0))
           << std::endl
           << manifold_3.get_tangent_vector(Point<3>(0, 0, -0.5),

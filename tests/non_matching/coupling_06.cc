@@ -138,8 +138,8 @@ test()
     mass_matrix.compress(VectorOperation::add);
   }
 
-  // now take the square function in space, project them onto the immersed
-  // space, get back ones, and check for the error.
+  // now take the square function in space, project them onto the immersed space,
+  // get back ones, and check for the error.
   TrilinosWrappers::MPI::Vector space_square(space_locally_owned_dofs, comm);
   TrilinosWrappers::MPI::Vector squares(locally_owned_dofs, comm);
   TrilinosWrappers::MPI::Vector Mprojected_squares(locally_owned_dofs, comm);

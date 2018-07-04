@@ -86,7 +86,7 @@ test()
     deallog << "ghost: " << get_real_assert_zero_imag(v(1)) << std::endl;
   Assert(get_real_assert_zero_imag(v(1)) == 2.0, ExcInternalError());
 
-  // assignment from ghosted to ghosted
+  //assignment from ghosted to ghosted
   v2 = v;
   Assert(get_real_assert_zero_imag(v2(1)) == 2.0, ExcInternalError());
   Assert(get_real_assert_zero_imag(v2(myid * 2)) == myid * 4.0,

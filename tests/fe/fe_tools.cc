@@ -184,7 +184,7 @@ test_renumbering()
 
   FE_Q<dim> q1(1);
   FE_Q<dim> q3(3);
-  // Todo:[GK] Test Raviart-Thomas and Nedelec?
+  //Todo:[GK] Test Raviart-Thomas and Nedelec?
 
   FESystem<dim> q1_3(q1, 3);
   test_renumbering(q1_3);

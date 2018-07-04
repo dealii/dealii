@@ -15,7 +15,7 @@
 
 
 // Connects slots to all signals in solver_cg and solver_gmres and writes all
-// output to deallog.
+//output to deallog.
 
 
 #include <deal.II/lac/precondition.h>
@@ -135,7 +135,7 @@ main()
   try
     {
       SolverCG<> solver_cg(solver_control);
-      // Attach all possible slots.
+      //Attach all possible slots.
       solver_cg.connect_coefficients_slot(&output_coefficients);
       solver_cg.connect_condition_number_slot(std::bind(output_double_number,
                                                         std::placeholders::_1,
@@ -156,7 +156,7 @@ main()
 
       u = 0;
       SolverGMRES<> solver_gmres(solver_control);
-      // Attach all possible slots.
+      //Attach all possible slots.
       solver_gmres.connect_condition_number_slot(
         std::bind(output_double_number,
                   std::placeholders::_1,

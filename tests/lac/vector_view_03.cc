@@ -65,9 +65,9 @@ checkReinit3(const Vector<number> &V)
     deallog << VV(i) << '\t';
   deallog << std::endl;
 
-  /* deallog << "Incrementing Vector<number> elements using Read-only handle of
-   VectorView<number>" << std::endl; deallog << "Function fails beyond this
-   point" << std::endl; for (unsigned int i=0; i<VV.size(); ++i)
+  /* deallog << "Incrementing Vector<number> elements using Read-only handle of VectorView<number>" << std::endl;
+   deallog << "Function fails beyond this point" << std::endl;
+   for (unsigned int i=0; i<VV.size(); ++i)
    VV(i)=VV(i)+1; */
 }
 

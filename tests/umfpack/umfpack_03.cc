@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// test the umfpack sparse direct solver on a mass matrix that is slightly
-// modified to make it nonsymmetric test for the transpose as well
+// test the umfpack sparse direct solver on a mass matrix that is slightly modified to make it nonsymmetric
+// test for the transpose as well
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

@@ -392,16 +392,18 @@ namespace GridTools
    * typically, each of the vertices at the boundary of the triangulation is
    * mapped to the corresponding points in the @p new_points map.
    *
-   * The unknown displacement field $u_d(\mathbf x)$ in direction $d$ is
-   * obtained from the minimization problem \f[ \min\, \int \frac{1}{2}
+   * The unknown displacement field $u_d(\mathbf x)$ in direction $d$ is obtained from
+   * the minimization problem
+   * \f[
+   *   \min\, \int
+   *   \frac{1}{2}
    *   c(\mathbf x)
    *   \mathbf \nabla u_d(\mathbf x) \cdot
    *   \mathbf \nabla u_d(\mathbf x)
    *   \,\rm d x
    * \f]
-   * subject to prescribed constraints. The minimizer is obtained by solving the
-   * Laplace equation of the dim components of a displacement field that maps
-   * the current
+   * subject to prescribed constraints. The minimizer is obtained by solving the Laplace equation
+   * of the dim components of a displacement field that maps the current
    * domain into one described by @p new_points . Linear finite elements with
    * four Gaussian quadrature points in each direction are used. The difference
    * between the vertex positions specified in @p new_points and their current
@@ -434,13 +436,12 @@ namespace GridTools
    * if all coefficients are positive.
    *
    * @param[in] solve_for_absolute_positions If set to <code>true</code>, the
-   * minimization problem is formulated with respect to the final vertex
-   * positions as opposed to their displacement. The two formulations are
-   * equivalent for
+   * minimization problem is formulated with respect to the final vertex positions
+   * as opposed to their displacement. The two formulations are equivalent for
    * the homogeneous problem (default value of @p coefficient), but they
-   * result in very different mesh motion otherwise. Since in most cases one
-   * will be using a non-constant coefficient in displacement formulation, the
-   * default value of this parameter is <code>false</code>.
+   * result in very different mesh motion otherwise. Since in most cases one will
+   * be using a non-constant coefficient in displacement formulation, the default
+   * value of this parameter is <code>false</code>.
    *
    * @note This function is not currently implemented for the 1d case.
    */
@@ -550,8 +551,7 @@ namespace GridTools
    * @param[in] max_iterations Maximum number of iterations allowed.
    *
    * @note In the case of parallel codes, this function should be combined
-   * with GridGenerator::flatten_triangulation and
-   * GridTools::remove_hanging_nodes.
+   * with GridGenerator::flatten_triangulation and GridTools::remove_hanging_nodes.
    *
    * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
    */
@@ -571,16 +571,15 @@ namespace GridTools
    *
    * If no boundary cells exist with two adjacent faces on the boundary, then
    * the triangulation is left untouched. If instead we do have cells with dim
-   * adjacent faces on the boundary, then the fraction between the
-   * dim-dimensional
+   * adjacent faces on the boundary, then the fraction between the dim-dimensional
    * solid angle and dim*pi/2 is checked against the parameter @p limit_angle_fraction.
    * If it is higher, the grid is refined once, and the children of the
-   * offending cell are replaced with some cells that instead respect the limit.
-   * After this process the triangulation is flattened, and all Manifold objects
-   * are restored as they were in the original triangulation.
+   * offending cell are replaced with some cells that instead respect the limit. After
+   * this process the triangulation is flattened, and all Manifold objects are restored
+   * as they were in the original triangulation.
    *
-   * An example is given by the following mesh, obtained by attaching a
-   * SphericalManifold to a mesh generated using GridGenerator::hyper_cube:
+   * An example is given by the following mesh, obtained by attaching a SphericalManifold
+   * to a mesh generated using GridGenerator::hyper_cube:
    *
    * @code
    * const SphericalManifold<dim> m0;
@@ -595,13 +594,12 @@ namespace GridTools
    * @image html regularize_mesh_01.png
    * </p>
    *
-   * The four cells that were originally the corners of a square will give you
-   * some troubles during computations, as the jacobian of the transformation
-   * from the reference cell to those cells will go to zero, affecting the error
-   * constants of the finite element estimates.
+   * The four cells that were originally the corners of a square will give you some troubles
+   * during computations, as the jacobian of the transformation from the reference cell to
+   * those cells will go to zero, affecting the error constants of the finite element estimates.
    *
-   * Those cells have a corner with an angle that is very close to 180 degrees,
-   * i.e., an angle fraction very close to one.
+   * Those cells have a corner with an angle that is very close to 180 degrees, i.e., an angle
+   * fraction very close to one.
    *
    * The same code, adding a call to regularize_corner_cells:
    * @code
@@ -613,17 +611,16 @@ namespace GridTools
    * GridTools::regularize_corner_cells(tria);
    * tria.refine_global(2);
    * @endcode
-   * generates a mesh that has a much better behaviour w.r.t. the jacobian of
-   * the Mapping:
+   * generates a mesh that has a much better behaviour w.r.t. the jacobian of the Mapping:
    *
    * <p ALIGN="center">
    * @image html regularize_mesh_02.png
    * </p>
    *
-   * This mesh is very similar to the one obtained by GridGenerator::hyper_ball.
-   * However, using GridTools::regularize_corner_cells one has the freedom to
-   * choose when to apply the regularization, i.e., one could in principle first
-   * refine a few times, and then call the regularize_corner_cells function:
+   * This mesh is very similar to the one obtained by GridGenerator::hyper_ball. However, using
+   * GridTools::regularize_corner_cells one has the freedom to choose when to apply the
+   * regularization, i.e., one could in principle first refine a few times, and then call the
+   * regularize_corner_cells function:
    *
    * @code
    * const SphericalManifold<dim> m0;
@@ -684,19 +681,19 @@ namespace GridTools
    * Mapping::transform_unit_to_real(qpoints[c][0])
    * returns @p points[a].
    *
-   * The algorithm assumes it's easier to look for a point in the cell that was
-   * used previously. For this reason random points are, computationally
-   * speaking, the worst case scenario while points grouped by the cell to which
-   * they belong are the best case. Pre-sorting points, trying to minimize
-   * distances between them, might make the function extremely faster.
+   * The algorithm assumes it's easier to look for a point in the cell that was used previously.
+   * For this reason random points are, computationally speaking, the worst case scenario while
+   * points grouped by the cell to which they belong are the best case.
+   * Pre-sorting points, trying to minimize distances between them, might make the function
+   * extremely faster.
    *
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
    * @code
    *   std::tuple<
-   *   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator
-   * >, std::vector< std::vector< Point<dim> > >, std::vector<
-   * std::vector<unsigned int> > >
+   *   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
+   *       std::vector< std::vector< Point<dim> > >,
+   *       std::vector< std::vector<unsigned int> > >
    * @endcode
    * The type is abbreviated above to improve readability of this page.
    *
@@ -724,8 +721,8 @@ namespace GridTools
    * owned part of the mesh and compute the quadrature rules for them.
    * Distributed compute point locations is a function similar to
    * GridTools::compute_point_locations but working for parallel::Triangulation
-   * objects and, unlike its serial version, also for a distributed
-   * triangulation (see parallel::distributed::Triangulation).
+   * objects and, unlike its serial version, also for a distributed triangulation
+   * (see parallel::distributed::Triangulation).
    *
    * @param[in] cache a GridTools::Cache object
    * @param[in] local_points the array of points owned by the current process.
@@ -752,8 +749,7 @@ namespace GridTools
    *  real space corresponding.
    *  to @p qpoints[i][j] . Notice @p points are the points lying on the locally
    *  owned part of the mesh; thus these can be either copies of @p local_points
-   *  or points received from other processes i.e. local_points for other
-   * processes
+   *  or points received from other processes i.e. local_points for other processes
    * - owners : a vector of vectors; @p owners[i][j] contains the rank of
    *  the process owning the point[i][j] (previous element of the tuple).
    *
@@ -768,9 +764,10 @@ namespace GridTools
    * above as @p return_type, is
    * @code
    * std::tuple<
-   *   std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator
-   * >, std::vector< std::vector< Point<dim> > >, std::vector< std::vector<
-   * unsigned int > >, std::vector< std::vector< Point<spacedim> > >,
+   *   std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
+   *       std::vector< std::vector< Point<dim> > >,
+   *       std::vector< std::vector< unsigned int > >,
+   *       std::vector< std::vector< Point<spacedim> > >,
    *       std::vector< std::vector< unsigned int > >
    *       >
    * @endcode
@@ -993,13 +990,11 @@ namespace GridTools
    * Find and return an iterator to the active cell that surrounds a given
    * point @p p.
    *
-   * The algorithm used in this function proceeds by first looking for the
-   * vertex located closest to the given point, see
-   * GridTools::find_closest_vertex(). Secondly, all adjacent cells to this
-   * vertex are found in the mesh, see
-   * GridTools::find_cells_adjacent_to_vertex(). Lastly, for each of these
-   * cells, the function tests whether the point is inside. This check is
-   * performed using
+   * The algorithm used in this function proceeds by first looking for the vertex
+   * located closest to the given point, see GridTools::find_closest_vertex(). Secondly,
+   * all adjacent cells to this vertex are found in the mesh, see
+   * GridTools::find_cells_adjacent_to_vertex(). Lastly, for each of these cells, the
+   * function tests whether the point is inside. This check is performed using
    * the given @p mapping argument to determine whether cells have straight
    * or curved boundaries, and if the latter then how exactly they are curved.
    *
@@ -1093,8 +1088,7 @@ namespace GridTools
    * A version of the previous function that exploits an already existing
    * map between vertices and cells, constructed using the function
    * GridTools::vertex_to_cell_map, a map of vertex_to_cell_centers, obtained
-   * through GridTools::vertex_to_cell_centers_directions, and a guess
-   * `cell_hint`.
+   * through GridTools::vertex_to_cell_centers_directions, and a guess `cell_hint`.
    *
    * @author Luca Heltai, Rene Gassmoeller, 2017
    */
@@ -1266,15 +1260,12 @@ namespace GridTools
    * of cells around all of those cells with a given material id,
    * @code
    * GridTools::compute_active_cell_halo_layer(tria,
-   *                                           IteratorFilters::MaterialIdEqualTo(1,
-   * true));
+   *                                           IteratorFilters::MaterialIdEqualTo(1, true));
    * @endcode
-   * or around all cells with one of a set of active FE indices for an
-   * hp::DoFHandler
+   * or around all cells with one of a set of active FE indices for an hp::DoFHandler
    * @code
    * GridTools::compute_active_cell_halo_layer(hp_dof_handler,
-   *                                           IteratorFilters::ActiveFEIndexEqualTo({1,2},
-   * true));
+   *                                           IteratorFilters::ActiveFEIndexEqualTo({1,2}, true));
    * @endcode
    * Note that in the last two examples we ensure that the predicate returns
    * true only for locally owned cells. This means that the halo layer will
@@ -1434,10 +1425,10 @@ namespace GridTools
    * see compute_active_cell_halo_layer().
    *
    * @note This function was written before the BoundingBox class was invented.
-   *   Consequently, it returns a pair of points, rather than a BoundingBox
-   * object as one may expect. However, BoundingBox has a conversion constructor
-   * from pairs of points, so the result of this function can still be assigned
-   * to a BoundingBox object.
+   *   Consequently, it returns a pair of points, rather than a BoundingBox object
+   *   as one may expect. However, BoundingBox has a conversion constructor from
+   *   pairs of points, so the result of this function can still be assigned to
+   *   a BoundingBox object.
    */
   template <class MeshType>
   std::pair<Point<MeshType::space_dimension>, Point<MeshType::space_dimension>>
@@ -1447,11 +1438,9 @@ namespace GridTools
       &predicate);
 
   /**
-   * Compute a collection of bounding boxes so that all active cells for which
-   * the given predicate is true, are completely enclosed in at least one of the
-   * bounding boxes. Notice the cover is only guaranteed to contain all these
-   * active cells but it's not necessarily exact i.e. it can include a bigger
-   * area than their union.
+   * Compute a collection of bounding boxes so that all active cells for which the given predicate is true, are
+   * completely enclosed in at least one of the bounding boxes. Notice the cover is only guaranteed to contain
+   * all these active cells but it's not necessarily exact i.e. it can include a bigger area than their union.
    *
    * For each cell at a given refinement level containing active cells for which @p predicate is true,
    * the function creates a bounding box of its children for which @p predicate is true.
@@ -1464,29 +1453,24 @@ namespace GridTools
    * - @p predicate : the property of the cells to enclose e.g. IteratorFilters::LocallyOwnedCell .
    *  The predicate is tested only on active cells.
    * - @p refinement_level : it defines the level at which the initial bounding box are created. The refinement
-   *  should be set to a coarse refinement level. A bounding box is created for
-   * each active cell at coarser
+   *  should be set to a coarse refinement level. A bounding box is created for each active cell at coarser
    *  level than @p refinement_level; if @p refinement_level is higher than the number of levels of the
    *  triangulation an exception is thrown.
    * - @p allow_merge : This flag allows for box merging and, by default, is false. The algorithm has a cost of
-   *  O(N^2) where N is the number of the bounding boxes created from the
-   * refinement level; for this reason, if
+   *  O(N^2) where N is the number of the bounding boxes created from the refinement level; for this reason, if
    *  the flag is set to true, make sure to choose wisely a coarse enough @p refinement_level.
    * - @p max_boxes : the maximum number of bounding boxes to compute. If more are created the smaller ones are
-   *  merged with neighbors. By default after merging the boxes which can be
-   * expressed as a single one no more boxes are merged. See the
-   * BoundingBox::get_neighbor_type () function for details.
+   *  merged with neighbors. By default after merging the boxes which can be expressed as a single one no
+   *  more boxes are merged. See the BoundingBox::get_neighbor_type () function for details.
    *  Notice only neighboring cells are merged (see the @p get_neighbor_type  function in bounding box class): if
-   *  the target number of bounding boxes max_boxes can't be reached by merging
-   * neighbors an exception is thrown
+   *  the target number of bounding boxes max_boxes can't be reached by merging neighbors an exception is thrown
    *
    * The following image describes an example of the algorithm with @p refinement_level = 2, @p allow_merge = true
    * and @p max_boxes = 1. The cells with the property predicate are in red, the area of a bounding box is
    * slightly orange.
    * @image html bounding_box_predicate.png
    * - 1. In black we can see the cells of the current level.
-   * - 2. For each cell containing the red area a bounding box is created: by
-   * default these are returned.
+   * - 2. For each cell containing the red area a bounding box is created: by default these are returned.
    * - 3. Because @p allow_merge = true the number of bounding boxes is reduced while not changing the cover.
    *  If @p max_boxes was left as default or bigger than 1 these two boxes would be returned.
    * - 4. Because @p max_boxes = 1 the smallest bounding box is merged to the bigger one.
@@ -1494,9 +1478,8 @@ namespace GridTools
    * @p refinement_level = 1 returns the very same bounding box but with a
    * fraction of the computational cost.
    *
-   * This function does not take into account the curvature of cells and thus it
-   * is not suited for handling curved geometry: the mapping is assumed to be
-   * linear.
+   * This function does not take into account the curvature of cells and thus it is not suited for handling
+   * curved geometry: the mapping is assumed to be linear.
    */
   template <class MeshType>
   std::vector<BoundingBox<MeshType::space_dimension>>
@@ -1509,9 +1492,9 @@ namespace GridTools
     const unsigned int max_boxes        = numbers::invalid_unsigned_int);
 
   /**
-   * Given an array of points, use the global bounding box description obtained
-   * using GridTools::compute_mesh_predicate_bounding_box to guess, for each of
-   * them, which process might own it.
+   * Given an array of points, use the global bounding box description obtained using
+   * GridTools::compute_mesh_predicate_bounding_box to guess, for each of them,
+   * which process might own it.
    *
    * @param[in] global_bboxes Vector of bounding boxes describing the portion of
    *  mesh with a property for each process.
@@ -1571,8 +1554,8 @@ namespace GridTools
    * An assertion will be thrown if the size of the input vector is not equal to
    * the number of vertices of the triangulation.
    *
-   * result[v][c] is a unit Tensor for vertex index v, indicating the direction
-   * of the center of the c-th cell with respect to the vertex v.
+   * result[v][c] is a unit Tensor for vertex index v, indicating the direction of
+   * the center of the c-th cell with respect to the vertex v.
    *
    * @author Rene Gassmoeller, Luca Heltai, 2017.
    */
@@ -1681,21 +1664,19 @@ namespace GridTools
     DynamicSparsityPattern &            connectivity);
 
   /**
-   * Use graph partitioner to partition the active cells making up the entire
-   * domain. After calling this function, the subdomain ids of all active cells
-   * will have values
+   * Use graph partitioner to partition the active cells making up the entire domain.
+   * After calling this function, the subdomain ids of all active cells will have values
    * between zero and @p n_partitions-1. You can access the subdomain id of a cell by using
    * <tt>cell-@>subdomain_id()</tt>.
    *
-   * Use the third argument to select between partitioning algorithms provided
-   * by METIS or ZOLTAN. METIS is the default partitioner.
+   * Use the third argument to select between partitioning algorithms provided by METIS or ZOLTAN.
+   * METIS is the default partitioner.
    *
-   * If deal.II was not installed with ZOLTAN or METIS, this function will
-   * generate an error
+   * If deal.II was not installed with ZOLTAN or METIS, this function will generate an error
    * when corresponding partition method is chosen, unless @p n_partitions is one.
-   * I.e., you can write a program so that it runs in the single-processor
-   * single-partition case without packages installed, and only requires them
-   * installed when multiple partitions are required.
+   * I.e., you can write a program so that it runs in the single-processor single-partition
+   * case without packages installed, and only requires them installed when
+   * multiple partitions are required.
    *
    * @note If the @p cell_weight signal has been attached to the @p triangulation,
    * then this will be used and passed to the partitioner.
@@ -1727,8 +1708,8 @@ namespace GridTools
 
   /**
    * This function does the same as the previous one, i.e. it partitions a
-   * triangulation using a partitioning algorithm into a number of subdomains
-   * identified by the <code>cell-@>subdomain_id()</code> flag.
+   * triangulation using a partitioning algorithm into a number of subdomains identified by the
+   * <code>cell-@>subdomain_id()</code> flag.
    *
    * The difference to the previous function is the second argument, a
    * sparsity pattern that represents the connectivity pattern between cells.
@@ -1740,9 +1721,9 @@ namespace GridTools
    * triangulation. If the sparsity pattern contains an entry at position
    * $(i,j)$, then this means that cells $i$ and $j$ (in the order in which
    * they are traversed by active cell iterators) are to be considered
-   * connected; partitioning algorithm will then try to partition the domain in
-   * such a way that (i) the subdomains are of roughly equal size, and (ii) a
-   * minimal number of connections are broken.
+   * connected; partitioning algorithm will then try to partition the domain in such a way that
+   * (i) the subdomains are of roughly equal size, and (ii) a minimal number
+   * of connections are broken.
    *
    * This function is mainly useful in cases where connections between cells
    * exist that are not present in the triangulation alone (otherwise the
@@ -1759,13 +1740,13 @@ namespace GridTools
    * are connected by edges or vertices. While the latter couple when using
    * continuous finite elements, they are typically still closely connected in
    * the neighborship graph, and partitioning algorithm
-   * will not usually cut important connections in this case. However, if there
-   * are vertices in the mesh where many cells (many more than the common 4 or 6
-   * in 2d and 3d, respectively) come together, then there will be a significant
-   * number of cells that are connected across a vertex, but several degrees
-   * removed in the connectivity graph built only using face neighbors. In a
-   * case like this, partitioning algorithm may sometimes make bad decisions and
-   * you may want to build your own connectivity graph.
+   * will not usually cut important connections in this case. However, if there are
+   * vertices in the mesh where many cells (many more than the common 4 or 6 in 2d and 3d,
+   * respectively) come together, then there will be a significant number of
+   * cells that are connected across a vertex, but several degrees removed in
+   * the connectivity graph built only using face neighbors. In a case like
+   * this, partitioning algorithm may sometimes make bad decisions and you may want to build
+   * your own connectivity graph.
    *
    * @note If the @p cell_weight signal has been attached to the @p triangulation,
    * then this will be used and passed to the partitioner.
@@ -1810,15 +1791,13 @@ namespace GridTools
                                  Triangulation<dim, spacedim> &triangulation);
 
   /**
-   * Partitions the cells of a multigrid hierarchy by assigning level subdomain
-   * ids using the "youngest child" rule, that is, each cell in the hierarchy is
-   * owned by the processor who owns its left most child in the forest, and
-   * active cells have the same subdomain id and level subdomain id. You can
-   * access the level subdomain id of a cell by using
-   * <tt>cell-@>level_subdomain_id()</tt>.
+   * Partitions the cells of a multigrid hierarchy by assigning level subdomain ids
+   * using the "youngest child" rule, that is, each cell in the hierarchy is owned by
+   * the processor who owns its left most child in the forest, and active cells
+   * have the same subdomain id and level subdomain id. You can access the level subdomain
+   * id of a cell by using <tt>cell-@>level_subdomain_id()</tt>.
    *
-   * Note: This function assumes that the active cells have already been
-   * partitioned.
+   * Note: This function assumes that the active cells have already been partitioned.
    */
   template <int dim, int spacedim>
   void
@@ -2150,11 +2129,11 @@ namespace GridTools
 
   /**
    * This function runs through the degrees of freedom defined by the
-   * DoFHandlerType and for each dof constructs a vector of
-   * active_cell_iterators representing the cells of support of the associated
-   * basis element at that degree of freedom. This function was originally
-   * designed for the implementation of local projections, for instance the
-   * Clement interpolant, in conjunction with other local patch functions like
+   * DoFHandlerType and for each dof constructs a vector of active_cell_iterators
+   * representing the cells of support of the associated basis element
+   * at that degree of freedom. This function was originally designed for the
+   * implementation of local projections, for instance the Clement interpolant,
+   * in conjunction with other local patch functions like
    * GridTools::build_triangulation_from_patch.
    *
    * DoFHandlerType's built on top of Triangulation or
@@ -2589,23 +2568,20 @@ namespace GridTools
    * also on those processors:
    * @code
    *    auto pack
-   *    = [] (const typename
-   * dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell) ->
-   * unsigned int
+   *    = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell) -> unsigned int
    *    {
    *      return cell->active_fe_index();
    *    };
    *
    *    auto unpack
-   *      = [] (const typename
-   * dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell, const
-   * unsigned int &active_fe_index) -> void
+   *      = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
+   *            const unsigned int                                                        &active_fe_index) -> void
    *    {
    *      cell->set_active_fe_index(active_fe_index);
    *    };
    *
-   *   GridTools::exchange_cell_data_to_ghosts<unsigned int,
-   * dealii::hp::DoFHandler<dim,spacedim>> (dof_handler, pack, unpack);
+   *   GridTools::exchange_cell_data_to_ghosts<unsigned int, dealii::hp::DoFHandler<dim,spacedim>>
+   *        (dof_handler, pack, unpack);
    * @endcode
    *
    * You will notice that the @p pack lambda function returns an `unsigned int`,
@@ -2633,12 +2609,11 @@ namespace GridTools
   /* Exchange with all processors of the MPI communicator @p mpi_communicator the vector of bounding
    * boxes @p local_bboxes.
    *
-   * This function is meant to exchange bounding boxes describing the locally
-   * owned cells in a distributed triangulation obtained with the function
+   * This function is meant to exchange bounding boxes describing the locally owned
+   * cells in a distributed triangulation obtained with the function
    * GridTools::compute_mesh_predicate_bounding_box .
    *
-   * The output vector's size is the number of processes of the MPI
-   * communicator:
+   * The output vector's size is the number of processes of the MPI communicator:
    * its i-th entry contains the vector @p local_bboxes of the i-th process.
    */
   template <int spacedim>
@@ -3076,27 +3051,27 @@ namespace GridTools
       project_to_d_linear_object(const Iterator &       object,
                                  const Point<spacedim> &trial_point)
       {
-        // let's look at this for simplicity for a quad (structdim==2) in a
-        // space with spacedim>2 (notate trial_point by y): all points on the
-        // surface are given by
+        // let's look at this for simplicity for a quad (structdim==2) in a space with
+        // spacedim>2 (notate trial_point by y): all points on the surface are
+        // given by
         //   x(\xi) = sum_i v_i phi_x(\xi)
         // where v_i are the vertices of the quad, and \xi=(\xi_1,\xi_2) are the
-        // reference coordinates of the quad. so what we are trying to do is
-        // find a point x on the surface that is closest to the point y. there
-        // are different ways to solve this problem, but in the end it's a
-        // nonlinear problem and we have to find reference coordinates \xi so
-        // that J(\xi) = 1/2 || x(\xi)-y ||^2 is minimal. x(\xi) is a function
-        // that is structdim-linear in \xi, so J(\xi) is a polynomial of degree
-        // 2*structdim that we'd like to minimize. unless structdim==1, we'll
-        // have to use a Newton method to find the answer. This leads to the
-        // following formulation of Newton steps:
+        // reference coordinates of the quad. so what we are trying to do is find
+        // a point x on the surface that is closest to the point y. there are
+        // different ways to solve this problem, but in the end it's a nonlinear
+        // problem and we have to find reference coordinates \xi so that J(\xi) =
+        // 1/2 || x(\xi)-y ||^2 is minimal. x(\xi) is a function that is
+        // structdim-linear in \xi, so J(\xi) is a polynomial of degree 2*structdim that we'd
+        // like to minimize. unless structdim==1, we'll have to use a Newton method to
+        // find the answer. This leads to the following formulation of Newton
+        // steps:
         //
         // Given \xi_k, find \delta\xi_k so that
         //   H_k \delta\xi_k = - F_k
-        // where H_k is an approximation to the second derivatives of J at
-        // \xi_k, and F_k is the first derivative of J.  We'll iterate this a
-        // number of times until the right hand side is small enough. As a
-        // stopping criterion, we terminate if ||\delta\xi||<eps.
+        // where H_k is an approximation to the second derivatives of J at \xi_k,
+        // and F_k is the first derivative of J.  We'll iterate this a number of
+        // times until the right hand side is small enough. As a stopping
+        // criterion, we terminate if ||\delta\xi||<eps.
         //
         // As for the Hessian, the best choice would be
         //   H_k = J''(\xi_k)
@@ -3243,8 +3218,7 @@ namespace GridTools
             // simplex and rewrite the optimization problem to use those
             // instead. Consider the structdim 2 case and let
             //
-            // F(c0, c1, c2, c3) = Manifold::get_new_point(vertices, {c0, c1,
-            // c2, c3})
+            // F(c0, c1, c2, c3) = Manifold::get_new_point(vertices, {c0, c1, c2, c3})
             //
             // where {c0, c1, c2, c3} are the weights for the four vertices on
             // the quadrilateral. We seek to minimize the Euclidean distance
@@ -3379,8 +3353,7 @@ namespace GridTools
                         step_size,
                         gradient_weight_objective_function);
 
-                    // avoid division by zero. Note that we limit the gradient
-                    // weight below
+                    // avoid division by zero. Note that we limit the gradient weight below
                     if (std::abs(update_denominator) == 0.0)
                       break;
                     gradient_weight =
@@ -3434,8 +3407,7 @@ namespace GridTools
                 if (!internal::weights_are_ok<structdim>(tentative_weights))
                   break;
 
-                // if we cannot get closer by traveling in the gradient
-                // direction then quit
+                // if we cannot get closer by traveling in the gradient direction then quit
                 if (get_point_from_weights(tentative_weights)
                       .distance(trial_point) <
                     get_point_from_weights(guess_weights).distance(trial_point))

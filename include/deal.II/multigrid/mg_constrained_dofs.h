@@ -193,7 +193,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
 
   const unsigned int nlevels = dof.get_triangulation().n_global_levels();
 
-  // At this point level_constraint and refinement_edge_indices are empty.
+  //At this point level_constraint and refinement_edge_indices are empty.
   level_constraints.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   for (unsigned int l = 0; l < nlevels; ++l)
@@ -202,8 +202,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
       DoFTools::extract_locally_relevant_level_dofs(dof, l, relevant_dofs);
       level_constraints[l].reinit(relevant_dofs);
 
-      // Loop through relevant cells and faces finding those which are periodic
-      // neighbors.
+      // Loop through relevant cells and faces finding those which are periodic neighbors.
       typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(l),
                                                         endc = dof.end(l);
       for (; cell != endc; ++cell)
@@ -220,8 +219,8 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                         ExcMessage(
                           "Periodic neighbor of a locally owned cell must either be owned or ghost."));
                     }
-                  // Cell is a level-ghost and its neighbor is a
-                  // level-artificial cell nothing to do here
+                  // Cell is a level-ghost and its neighbor is a level-artificial cell
+                  // nothing to do here
                   else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
                            numbers::artificial_subdomain_id)
                     {
@@ -239,10 +238,9 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                     ->face(cell->periodic_neighbor_face_no(f))
                     ->get_mg_dof_indices(l, dofs_1, 0);
                   cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
-                  // Store periodicity information in the level constraint
-                  // matrix Skip DoFs for which we've previously entered
-                  // periodicity constraints already; this can happen, for
-                  // example, for a vertex dof at a periodic boundary that we
+                  // Store periodicity information in the level constraint matrix
+                  // Skip DoFs for which we've previously entered periodicity constraints already;
+                  // this can happen, for example, for a vertex dof at a periodic boundary that we
                   // visit from more than one cell
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     if (level_constraints[l].can_store_line(dofs_2[i]) &&
@@ -279,7 +277,7 @@ MGConstrainedDoFs::initialize(
   // allocate an IndexSet for each global level. Contents will be
   // overwritten inside make_boundary_list.
   const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  // At this point boundary_indices is empty.
+  //At this point boundary_indices is empty.
   boundary_indices.resize(n_levels);
 
   MGTools::make_boundary_list(dof,

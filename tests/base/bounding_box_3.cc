@@ -86,9 +86,9 @@ test_bounding_box()
       deallog << "Is neighbor B1 with B: " << (int)b_1.get_neighbor_type(b_1)
               << std::endl;
 
-      // Case of partial edge which is still simple neighbor
-      // Note: in dimension 1 everything is only either not neighbor or
-      // mergeable neighbor
+      //Case of partial edge which is still simple neighbor
+      //Note: in dimension 1 everything is only either not neighbor or mergeable
+      //neighbor
       second_1.first[0] = 0.2;
 
       BoundingBox<spacedim> b_2(second_1);
@@ -104,7 +104,7 @@ test_bounding_box()
       deallog << "Is neighbor B2 with B: " << (int)b_2.get_neighbor_type(b_2)
               << std::endl;
 
-      // Case which is attached_neighbor
+      //Case which is attached_neighbor
 
       second_1.first[0] = 0.0;
       second_1.first[2] = 0.8;

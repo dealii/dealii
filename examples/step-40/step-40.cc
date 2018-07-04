@@ -131,8 +131,7 @@ namespace Step40
   //   this will be MPI_COMM_WORLD, i.e. all processors the batch scheduling
   //   system has assigned to this particular job.
   // - The presence of the <code>pcout</code> variable of type ConditionOStream.
-  // - The obvious use of parallel::distributed::Triangulation instead of
-  // Triangulation.
+  // - The obvious use of parallel::distributed::Triangulation instead of Triangulation.
   // - The presence of two IndexSet objects that denote which sets of degrees of
   //   freedom (and associated elements of solution and right hand side vectors)
   //   we own on the current processor and which we need (as ghost elements) for

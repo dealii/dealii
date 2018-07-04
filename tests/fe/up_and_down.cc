@@ -124,8 +124,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
           << (relative_residual < threshold ? "ok" : "botched up!")
           << std::endl;
 
-  // TODO:[WB] Why this exception with a value different from above. Output of
-  // the error should be sufficient!
+  //TODO:[WB] Why this exception with a value different from above. Output of the error should be sufficient!
   //  Assert (relative_residual < threshold*x.l2_norm(), ExcInternalError());
 }
 

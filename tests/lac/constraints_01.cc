@@ -22,7 +22,7 @@
 
 // bug in AffineConstraints<double>
 
-// index=18466 line_index=652 lines_cache[line_index]=919940456 lines.size()=21
+//index=18466 line_index=652 lines_cache[line_index]=919940456 lines.size()=21
 
 void
 test()

@@ -15,8 +15,7 @@
 
 
 
-//   Like parameter_handler_03, but use a MultipleSelection pattern that starts
-//   with a space; eat that space
+//   Like parameter_handler_03, but use a MultipleSelection pattern that starts with a space; eat that space
 
 #include <deal.II/base/parameter_handler.h>
 

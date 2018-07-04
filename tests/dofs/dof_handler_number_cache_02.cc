@@ -15,8 +15,7 @@
 
 
 
-// Check that DoFHandler::clear() clears the NumberCache (a bug that is now
-// fixed)
+// Check that DoFHandler::clear() clears the NumberCache (a bug that is now fixed)
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>

@@ -35,8 +35,7 @@ main(int argc, char **argv)
 
   {
     ConsecutiveControl solver_control(12345, 1.e-3, 3, false, false);
-    //                                                     //
-    //                                                     n_converged_iterations:
+    //                                                     // n_converged_iterations:
     deallog << solver_control.check(0, 1.e-1) << std::endl; // 0
     deallog << solver_control.check(1, 1.e-4) << std::endl; // 1
     deallog << solver_control.check(2, 1.e-5) << std::endl; // 2

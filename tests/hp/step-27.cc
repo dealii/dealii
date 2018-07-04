@@ -15,10 +15,10 @@
  */
 
 
-// A combination of step-27 from 8.4 with corrected k-vectors, that is 2\pi*k
-// instead of \pi*k and a new step-27 from 8.5 which use FESeries namespace. By
-// default, the new version is used, but the blessed output file is obtained
-// using the modified 8.4 version.
+// A combination of step-27 from 8.4 with corrected k-vectors, that is 2\pi*k instead of \pi*k
+// and a new step-27 from 8.5 which use FESeries namespace. By default, the new
+// version is used, but the blessed output file is obtained using the
+// modified 8.4 version.
 
 
 #include <deal.II/base/function.h>

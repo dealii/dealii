@@ -47,9 +47,9 @@
 #include <boost/iostreams/device/file.hpp>
 
 // The last include file is required because we will be using a feature that is
-// not part of the C++11 standard. As some of the C++14 features are very
-// useful, we provide their implementation in an internal namespace, if the
-// compiler does not support them:
+// not part of the C++11 standard. As some of the C++14 features are very useful,
+// we provide their implementation in an internal namespace, if the compiler
+// does not support them:
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <iostream>
@@ -400,17 +400,16 @@ namespace Step53
          ++cell)
       cell->set_all_manifold_ids(0);
 
-    // The last step is to refine the mesh beyond its initial $1\times 2\times
-    // 1$ coarse mesh. We could just refine globally a number of times, but
-    // since for the purpose of this tutorial program we're really only
-    // interested in what is happening close to the surface, we just refine 6
-    // times all of the cells that have a face at a boundary with indicator 5.
-    // Looking this up in the documentation of the
-    // GridGenerator::subdivided_hyper_rectangle() function we have used above
-    // reveals that boundary indicator 5 corresponds to the top surface of the
-    // domain (and this is what the last <code>true</code> argument in the call
-    // to GridGenerator::subdivided_hyper_rectangle() above meant: to "color"
-    // the boundaries by assigning each boundary a unique boundary indicator).
+    // The last step is to refine the mesh beyond its initial $1\times 2\times 1$
+    // coarse mesh. We could just refine globally a number of times, but since for
+    // the purpose of this tutorial program we're really only interested in what
+    // is happening close to the surface, we just refine 6 times all of the cells
+    // that have a face at a boundary with indicator 5. Looking this up in the
+    // documentation of the GridGenerator::subdivided_hyper_rectangle() function
+    // we have used above reveals that boundary indicator 5 corresponds to the top
+    // surface of the domain (and this is what the last <code>true</code> argument
+    // in the call to GridGenerator::subdivided_hyper_rectangle() above meant: to
+    // "color" the boundaries by assigning each boundary a unique boundary indicator).
     for (unsigned int i = 0; i < 6; ++i)
       {
         for (Triangulation<3>::active_cell_iterator cell =

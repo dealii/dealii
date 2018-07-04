@@ -176,14 +176,15 @@ extern "C"
  * of objects of type <code>V</code> that will contain the eigenvectors
  * computed.
  *
- * Currently, only three modes of (P)Arpack are implemented. In mode 3
- * (default), <code>OP</code> is an inverse operation for the matrix <code>A -
+ * Currently, only three modes of (P)Arpack are implemented. In mode 3 (default),
+ * <code>OP</code> is an inverse operation for the matrix <code>A -
  * sigma * B</code>, where <code> sigma </code> is a shift value, set to zero
- * by default. Whereas in mode 2, <code>OP</code> is an inverse of
- * <code>M</code>. Finally, mode 1 corresponds to standard eigenvalue problem
- * without spectral transformation $Ax=\lambda x$. The mode can be specified via
- * AdditionalData object. Note that for shift-and-invert (mode=3), the sought
- * eigenpairs are those after the spectral transformation is applied.
+ * by default. Whereas in mode 2, <code>OP</code> is an inverse of <code>M</code>.
+ * Finally, mode 1 corresponds to standard eigenvalue problem without
+ * spectral transformation $Ax=\lambda x$.
+ * The mode can be specified via AdditionalData object. Note that for
+ * shift-and-invert (mode=3), the sought eigenpairs are those after the
+ * spectral transformation is applied.
  *
  * The <code>OP</code> can be specified by using a LinearOperator:
  * @code
@@ -194,8 +195,7 @@ extern "C"
  *   SolverControl solver_control_lin (1000, 1e-10,false,false);
  *
  *   SolverCG<vector_t> cg(solver_control_lin);
- *   const auto op_shift_invert = inverse_operator(op_shift, cg,
- * PreconditionIdentity ());
+ *   const auto op_shift_invert = inverse_operator(op_shift, cg, PreconditionIdentity ());
  * @endcode
  *
  * The class is intended to be used with MPI and can work on arbitrary vector
@@ -661,7 +661,7 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
   , symmetric(symmetric)
   , mode(mode)
 {
-  // Check for possible options for symmetric problems
+  //Check for possible options for symmetric problems
   if (symmetric)
     {
       Assert(
@@ -929,12 +929,11 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
   // tolerance for ARPACK
   double tol = control().tolerance();
 
-  // information to the routines
+  //information to the routines
   std::vector<int> iparam(11, 0);
 
   iparam[0] = 1;
-  // shift strategy: exact shifts with respect to the current Hessenberg matrix
-  // H.
+  // shift strategy: exact shifts with respect to the current Hessenberg matrix H.
 
   // maximum number of iterations
   iparam[2] = control().max_steps();
@@ -952,7 +951,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
   iparam[6] = mode;
   std::vector<int> ipntr(14, 0);
 
-  // information out of the iteration
+  //information out of the iteration
   //  If INFO .EQ. 0, a random initial residual vector is used.
   //  If INFO .NE. 0, RESID contains the initial residual vector,
   //  possibly from a previous run.

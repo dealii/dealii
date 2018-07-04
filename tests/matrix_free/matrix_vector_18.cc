@@ -153,8 +153,7 @@ do_test(const DoFHandler<dim> &          dof,
   mf.vmult(out_dist, in_dist);
 
 
-  // assemble sparse matrix with (\nabla v, \nabla u + 3.2221 * \nabla^2 u *
-  // ones) + (v, 10 * u)
+  // assemble sparse matrix with (\nabla v, \nabla u + 3.2221 * \nabla^2 u * ones) + (v, 10 * u)
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());

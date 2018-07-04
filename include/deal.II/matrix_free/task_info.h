@@ -240,9 +240,9 @@ namespace internal
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *
-       * @param renumbering (in/out) At output, the element j of this variable
-       * gives the original number of the cell that is reordered to place j by
-       * the ordering due to the thread graph.
+       * @param renumbering (in/out) At output, the element j of this variable gives
+       * the original number of the cell that is reordered to place j by the
+       * ordering due to the thread graph.
        *
        * @param irregular_cells (in/out) Informs the current function whether
        * some SIMD lanes in VectorizedArray would not be filled for a given
@@ -279,9 +279,9 @@ namespace internal
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *
-       * @param renumbering (in/out) At output, the element j of this variable
-       * gives the original number of the cell that is reordered to place j by
-       * the ordering due to the thread graph.
+       * @param renumbering (in/out) At output, the element j of this variable gives
+       * the original number of the cell that is reordered to place j by the
+       * ordering due to the thread graph.
        *
        * @param irregular_cells (in/out) Informs the current function whether
        * some SIMD lanes in VectorizedArray would not be filled for a given
@@ -310,9 +310,9 @@ namespace internal
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *
-       * @param renumbering (in/out) At output, the element j of this variable
-       * gives the original number of the cell that is reordered to place j by
-       * the ordering due to the thread graph.
+       * @param renumbering (in/out) At output, the element j of this variable gives
+       * the original number of the cell that is reordered to place j by the
+       * ordering due to the thread graph.
        *
        * @param irregular_cells (in/out) Informs the current function whether
        * some SIMD lanes in VectorizedArray would not be filled for a given
@@ -368,8 +368,7 @@ namespace internal
         std::vector<unsigned char> &     irregular_cells);
 
       /**
-       * This function creates partitions according to the provided connectivity
-       * graph.
+       * This function creates partitions according to the provided connectivity graph.
        *
        * @param connectivity Connectivity between (blocks of cells)
        *

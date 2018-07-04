@@ -211,8 +211,7 @@ void grid_3()
 
 // @sect4{grid_4: Demonstrating extrude_triangulation}
 
-// This example takes the initial grid from the previous function and simply
-// extrudes it into the third space dimension:
+// This example takes the initial grid from the previous function and simply extrudes it into the third space dimension:
 void grid_4()
 {
   Triangulation<2> triangulation;

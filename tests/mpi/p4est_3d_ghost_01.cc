@@ -69,9 +69,9 @@ test()
           deallog << std::endl;
         }
 
-      // check that all local
-      // neighbors have the
-      // correct level
+      //check that all local
+      //neighbors have the
+      //correct level
       typename Triangulation<dim, dim>::active_cell_iterator cell;
 
       for (cell = tr.begin_active(); cell != tr.end(); ++cell)
@@ -121,7 +121,7 @@ main(int argc, char *argv[])
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   std::cout << myid << ":" << getpid() << std::endl;
-  // system("sleep 20");
+  //system("sleep 20");
 
 
   deallog.push(Utilities::int_to_string(myid));

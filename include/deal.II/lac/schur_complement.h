@@ -151,14 +151,13 @@ DEAL_II_NAMESPACE_OPEN
  *    const auto prec_A = PreconditionSelector<...>(A);
  *    const auto A_inv = inverse_operator<...>(A,prec_A);
  *    const auto S = schur_complement(A_inv,B,C,D);
- *    const auto S_prec = PreconditionSelector<...>(D); // D and S operate on
- * same space const auto S_inv = inverse_operator<...>(S,...,prec_S);
+ *    const auto S_prec = PreconditionSelector<...>(D); // D and S operate on same space
+ *    const auto S_inv = inverse_operator<...>(S,...,prec_S);
  *
  *    // Solve reduced block system
- *    auto rhs = condense_schur_rhs (A_inv,C,f,g); // PackagedOperation that
- * represents the condensed form of g y = S_inv * rhs; // Solve for y x =
- * postprocess_schur_solution (A_inv,B,y,f); // Compute x using resolved
- * solution y
+ *    auto rhs = condense_schur_rhs (A_inv,C,f,g); // PackagedOperation that represents the condensed form of g
+ *    y = S_inv * rhs; // Solve for y
+ *    x = postprocess_schur_solution (A_inv,B,y,f); // Compute x using resolved solution y
  * @endcode
  *
  * In the above example, the preconditioner for $ S $ was defined as the
@@ -181,10 +180,8 @@ DEAL_II_NAMESPACE_OPEN
  *    // Construction of approximate inverse of Schur complement
  *    const auto A_inv_approx = linear_operator(preconditioner_A);
  *    const auto S_approx = schur_complement(A_inv_approx,B,C,D);
- *    const auto S_approx_prec = PreconditionSelector<...>(D); // D and S_approx
- * operate on same space const auto S_inv_approx =
- * inverse_operator(S_approx,...,S_approx_prec); // Inner solver: Typically
- * limited to few iterations using IterationNumberControl
+ *    const auto S_approx_prec = PreconditionSelector<...>(D); // D and S_approx operate on same space
+ *    const auto S_inv_approx = inverse_operator(S_approx,...,S_approx_prec); // Inner solver: Typically limited to few iterations using IterationNumberControl
  *
  *    // Construction of exact inverse of Schur complement
  *    const auto S = schur_complement(A_inv,B,C,D);

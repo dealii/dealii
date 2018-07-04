@@ -282,8 +282,8 @@ namespace Step38
   // indicators of all faces on the outside of the boundary to zero for the
   // ones located on the perimeter of the disk/ball, and one on the straight
   // part that splits the full disk/ball into two halves. The next step is the
-  // main point: The GridGenerator::extract_boundary_mesh function creates a
-  // mesh that consists of those cells that are the faces of the previous mesh,
+  // main point: The GridGenerator::extract_boundary_mesh function creates a mesh
+  // that consists of those cells that are the faces of the previous mesh,
   // i.e. it describes the <i>surface</i> cells of the original (volume)
   // mesh. However, we do not want all faces: only those on the perimeter of
   // the disk or ball which carry boundary indicator zero; we can select these

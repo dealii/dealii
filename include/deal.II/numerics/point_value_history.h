@@ -178,8 +178,8 @@ namespace internal
  * // and setup DoFHandler, sizing solution Vectors etc
  *
  * // call the constructor
- * unsigned int n_inputs = 1; // just one independent value, which happens to be
- * an input PointValueHistory<dim> node_monitor(dof_handler, n_inputs);
+ * unsigned int n_inputs = 1; // just one independent value, which happens to be an input
+ * PointValueHistory<dim> node_monitor(dof_handler, n_inputs);
  *
  * // setup fields and points required
  * node_monitor.add_field_name("Solution");
@@ -412,8 +412,7 @@ public:
 
   /**
    * Write out a series of .gpl files named base_name + "-00.gpl", base_name +
-   * "-01.gpl" etc. The data file gives information about where the support
-   * points
+   * "-01.gpl" etc. The data file gives information about where the support points
    * selected and interpreting the data. If @p n_indep != 0 an additional file
    * base_name + "_indep.gpl" containing key and independent data. The file
    * name agrees with the order the points were added to the class. The names
@@ -449,8 +448,8 @@ public:
    * // Call the mark_locations method to get the vector with indices flagged
    * Vector<double> support_point_locations = node_monitor.mark_locations();
    *
-   * // Add the vector to the data_out object and write out a file in the usual
-   * way data_out.add_data_vector(support_point_locations, "Monitor_Locations");
+   * // Add the vector to the data_out object and write out a file in the usual way
+   * data_out.add_data_vector(support_point_locations, "Monitor_Locations");
    * data_out.build_patches(2);
    * std::ofstream output("locations.gpl");
    * data_out.write_gnuplot(output);

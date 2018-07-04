@@ -15,8 +15,7 @@
 
 
 
-// Check CellDataStorage initialize(cell,number), initialize(start,end,number)
-// and get_data() functions.
+// Check CellDataStorage initialize(cell,number), initialize(start,end,number) and get_data() functions.
 
 
 #include <deal.II/base/quadrature_point_data.h>
@@ -75,8 +74,7 @@ DeclException3(ExcWrongValue,
 
 
 /**
- * Loop over quadrature points and check that value is the same as given by the
- * function.
+ * Loop over quadrature points and check that value is the same as given by the function.
  */
 template <int dim, typename DATA>
 void

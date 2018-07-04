@@ -200,8 +200,7 @@ enum MappingType
  *  \approx
  *  \sum_{q}
  *  \hat u(\hat{\mathbf  x}_q)
- *  \underbrace{\left|\text{det}J(\hat{\mathbf  x}_q)\right| w_q}_{=:
- * \text{JxW}_q}.
+ *  \underbrace{\left|\text{det}J(\hat{\mathbf  x}_q)\right| w_q}_{=: \text{JxW}_q}.
  * @f]
  * Here, the weights $\text{JxW}_q$ of each quadrature point (where <i>JxW</i>
  * mnemonically stands for <i>Jacobian times Quadrature Weights</i>) take the
@@ -261,9 +260,8 @@ enum MappingType
  * and the derivative of the Jacobian inverse with respect to the real cell
  * coordinates is similarly given by:
  * @f[
- * \frac{\partial}{\partial x_j}\left[\left(J_{iJ}(\hat{\mathbf
- * x})\right)^{-1}\right] = -H_{nik}(\hat{\mathbf  x})\left(J_{nJ}(\hat{\mathbf
- * x})\right)^{-1}.
+ * \frac{\partial}{\partial x_j}\left[\left(J_{iJ}(\hat{\mathbf  x})\right)^{-1}\right]
+ * = -H_{nik}(\hat{\mathbf  x})\left(J_{nJ}(\hat{\mathbf  x})\right)^{-1}.
  * @f]
  *
  * In a similar fashion, higher order derivatives, with respect to the real
@@ -273,9 +271,8 @@ enum MappingType
  * pushed-forward derivative is given by:
  *
  * @f[
- * \frac{\partial}{\partial x_l}\left[H_{ijk}(\hat{\mathbf  x})\right] =
- * K_{ijkl}(\hat{\mathbf  x}) -H_{mjl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf
- * x})-H_{mkl}(\hat{\mathbf  x})H_{imj}(\hat{\mathbf  x}).
+ * \frac{\partial}{\partial x_l}\left[H_{ijk}(\hat{\mathbf  x})\right] = K_{ijkl}(\hat{\mathbf  x})
+ * -H_{mjl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf  x})-H_{mkl}(\hat{\mathbf  x})H_{imj}(\hat{\mathbf  x}).
  * @f]
  *
  * <h3>References</h3>
@@ -910,8 +907,7 @@ public:
    * <li> @p mapping_contravariant: maps a vector field on the reference cell
    * to the physical cell through the Jacobian:
    * @f[
-   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})\hat{\mathbf  u}(\hat{\mathbf
-   * x}).
+   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})\hat{\mathbf  u}(\hat{\mathbf  x}).
    * @f]
    * In physics, this is usually referred to as the contravariant
    * transformation. Mathematically, it is the push forward of a vector field.
@@ -922,8 +918,8 @@ public:
    * type with a Tensor<1,dim>). Mathematically, it is the pull back of the
    * differential form
    * @f[
-   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T}
-   * J(\hat{\mathbf  x}))^{-1}\hat{\mathbf u}(\hat{\mathbf  x}).
+   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}\hat{\mathbf
+   * u}(\hat{\mathbf  x}).
    * @f]
    * Gradients of scalar differentiable functions are transformed this way.
    *
@@ -977,8 +973,7 @@ public:
    * back of the differential form
    * @f[
    * \mathbf T(\mathbf x) = \hat{\mathbf  T}(\hat{\mathbf  x})
-   *                        J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T}
-   * J(\hat{\mathbf  x}))^{-1}.
+   *                        J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}.
    * @f]
    * Jacobians of spacedim-vector valued differentiable functions are
    * transformed this way.
@@ -1039,8 +1034,7 @@ public:
    * J(\hat{\mathbf  x})^{-1}.
    * @f]
    * <li> @p mapping_piola_gradient: it assumes $\mathbf u(\mathbf x) =
-   * \frac{1}{\text{det}\;J(\hat{\mathbf x})} J(\hat{\mathbf x}) \hat{\mathbf
-   * u}(\hat{\mathbf x})$ so that
+   * \frac{1}{\text{det}\;J(\hat{\mathbf x})} J(\hat{\mathbf x}) \hat{\mathbf  u}(\hat{\mathbf x})$ so that
    * @f[
    * \mathbf T(\mathbf x) =
    * \frac{1}{\text{det}\;J(\hat{\mathbf x})}
@@ -1087,11 +1081,9 @@ public:
    * reference cell to a field of forms on the physical cell. Mathematically,
    * it is the pull back of the differential form
    * @f[
-   * \mathbf T_{ijk}(\mathbf x) = \hat{\mathbf  T}_{iJK}(\hat{\mathbf  x})
-   * J_{jJ}^{\dagger} J_{kK}^{\dagger}@f],
+   * \mathbf T_{ijk}(\mathbf x) = \hat{\mathbf  T}_{iJK}(\hat{\mathbf  x}) J_{jJ}^{\dagger} J_{kK}^{\dagger}@f],
    *
-   * where @f[ J^{\dagger} = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T}
-   * J(\hat{\mathbf  x}))^{-1}.
+   * where @f[ J^{\dagger} = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}.
    * @f]
    * </ul>
    *
@@ -1146,8 +1138,8 @@ public:
    * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
    * @f]
    * <li> @p mapping_piola_hessian: it assumes $\mathbf u_i(\mathbf x) =
-   * \frac{1}{\text{det}\;J(\hat{\mathbf x})} J_{iI}(\hat{\mathbf x})
-   * \hat{\mathbf u}(\hat{\mathbf x})$ so that
+   * \frac{1}{\text{det}\;J(\hat{\mathbf x})} J_{iI}(\hat{\mathbf x}) \hat{\mathbf
+   * u}(\hat{\mathbf x})$ so that
    * @f[
    * \mathbf T_{ijk}(\mathbf x) =
    * \frac{1}{\text{det}\;J(\hat{\mathbf x})}

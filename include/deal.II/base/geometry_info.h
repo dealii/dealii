@@ -33,8 +33,7 @@ namespace internal
 {
   namespace GeometryInfoHelper
   {
-    // A struct that holds the values for all the arrays we want to initialize
-    // in GeometryInfo
+    // A struct that holds the values for all the arrays we want to initialize in GeometryInfo
     template <int dim>
     struct Initializers;
 
@@ -220,7 +219,7 @@ namespace internal
     };
   } // namespace GeometryInfoHelper
 } // namespace internal
-#endif // DOXYGEN
+#endif //DOXYGEN
 
 
 /**
@@ -3033,14 +3032,14 @@ GeometryInfo<3>::standard_to_real_face_vertex(const unsigned int vertex,
   // 1: face rotated by 90 degrees
 
   constexpr unsigned int vertex_translation[4][2][2][2] = {
-    {{{0, 2},   // vertex 0, face_orientation=false, face_flip=false,
-                // face_rotation=false and true
-      {3, 1}},  // vertex 0, face_orientation=false, face_flip=true,
-                // face_rotation=false and true
-     {{0, 2},   // vertex 0, face_orientation=true, face_flip=false,
-                // face_rotation=false and true
-      {3, 1}}}, // vertex 0, face_orientation=true, face_flip=true,
-                // face_rotation=false and true
+    {{{0,
+       2}, // vertex 0, face_orientation=false, face_flip=false, face_rotation=false and true
+      {3,
+       1}}, // vertex 0, face_orientation=false, face_flip=true, face_rotation=false and true
+     {{0,
+       2}, // vertex 0, face_orientation=true, face_flip=false, face_rotation=false and true
+      {3,
+       1}}}, // vertex 0, face_orientation=true, face_flip=true, face_rotation=false and true
 
     {{{2, 3}, // vertex 1 ...
       {1, 0}},
@@ -3553,8 +3552,8 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(
      RefinementCase<dim>::cut_z,
      RefinementCase<dim>::cut_yz},
 
-    {RefinementCase<dim>::no_refinement, // faces 2 and 3 (note that x and y are
-                                         // "exchanged on faces 2 and 3")
+    {RefinementCase<dim>::
+       no_refinement, // faces 2 and 3 (note that x and y are "exchanged on faces 2 and 3")
      RefinementCase<dim>::cut_z,
      RefinementCase<dim>::cut_x,
      RefinementCase<dim>::cut_xz},
@@ -3656,14 +3655,14 @@ GeometryInfo<3>::real_to_standard_face_vertex(const unsigned int vertex,
   // 1: face rotated by 90 degrees
 
   const unsigned int vertex_translation[4][2][2][2] = {
-    {{{0, 2},   // vertex 0, face_orientation=false, face_flip=false,
-                // face_rotation=false and true
-      {3, 1}},  // vertex 0, face_orientation=false, face_flip=true,
-                // face_rotation=false and true
-     {{0, 1},   // vertex 0, face_orientation=true, face_flip=false,
-                // face_rotation=false and true
-      {3, 2}}}, // vertex 0, face_orientation=true, face_flip=true,
-                // face_rotation=false and true
+    {{{0,
+       2}, // vertex 0, face_orientation=false, face_flip=false, face_rotation=false and true
+      {3,
+       1}}, // vertex 0, face_orientation=false, face_flip=true, face_rotation=false and true
+     {{0,
+       1}, // vertex 0, face_orientation=true, face_flip=false, face_rotation=false and true
+      {3,
+       2}}}, // vertex 0, face_orientation=true, face_flip=true, face_rotation=false and true
 
     {{{2, 3}, // vertex 1 ...
       {1, 0}},
@@ -3726,14 +3725,14 @@ GeometryInfo<3>::standard_to_real_face_line(const unsigned int line,
   // 1: face rotated by 90 degrees
 
   const unsigned int line_translation[4][2][2][2] = {
-    {{{2, 0},   // line 0, face_orientation=false, face_flip=false,
-                // face_rotation=false and true
-      {3, 1}},  // line 0, face_orientation=false, face_flip=true,
-                // face_rotation=false and true
-     {{0, 3},   // line 0, face_orientation=true, face_flip=false,
-                // face_rotation=false and true
-      {1, 2}}}, // line 0, face_orientation=true, face_flip=true,
-                // face_rotation=false and true
+    {{{2,
+       0}, // line 0, face_orientation=false, face_flip=false, face_rotation=false and true
+      {3,
+       1}}, // line 0, face_orientation=false, face_flip=true, face_rotation=false and true
+     {{0,
+       3}, // line 0, face_orientation=true, face_flip=false, face_rotation=false and true
+      {1,
+       2}}}, // line 0, face_orientation=true, face_flip=true, face_rotation=false and true
 
     {{{3, 1}, // line 1 ...
       {2, 0}},
@@ -3794,14 +3793,14 @@ GeometryInfo<3>::real_to_standard_face_line(const unsigned int line,
   // 1: face rotated by 90 degrees
 
   const unsigned int line_translation[4][2][2][2] = {
-    {{{2, 0},   // line 0, face_orientation=false, face_flip=false,
-                // face_rotation=false and true
-      {3, 1}},  // line 0, face_orientation=false, face_flip=true,
-                // face_rotation=false and true
-     {{0, 2},   // line 0, face_orientation=true, face_flip=false,
-                // face_rotation=false and true
-      {1, 3}}}, // line 0, face_orientation=true, face_flip=true,
-                // face_rotation=false and true
+    {{{2,
+       0}, // line 0, face_orientation=false, face_flip=false, face_rotation=false and true
+      {3,
+       1}}, // line 0, face_orientation=false, face_flip=true, face_rotation=false and true
+     {{0,
+       2}, // line 0, face_orientation=true, face_flip=false, face_rotation=false and true
+      {1,
+       3}}}, // line 0, face_orientation=true, face_flip=true, face_rotation=false and true
 
     {{{3, 1}, // line 1 ...
       {2, 0}},
@@ -3986,22 +3985,38 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
     // identical to the information
     // returned by
     // GeometryInfo<3>::real_to_standard_face_vertex()
-    {{{{0, 2, 1, 3},     // face_orientation=false, face_flip=false,
-                         // face_rotation=false, subfaces 0,1,2,3
-       {2, 3, 0, 1}},    // face_orientation=false, face_flip=false,
-                         // face_rotation=true,  subfaces 0,1,2,3
-      {{3, 1, 2, 0},     // face_orientation=false, face_flip=true,
-                         // face_rotation=false, subfaces 0,1,2,3
-       {1, 0, 3, 2}}},   // face_orientation=false, face_flip=true,
-                         // face_rotation=true,  subfaces 0,1,2,3
-     {{{0, 1, 2, 3},     // face_orientation=true,  face_flip=false,
-                         // face_rotation=false, subfaces 0,1,2,3
-       {1, 3, 0, 2}},    // face_orientation=true,  face_flip=false,
-                         // face_rotation=true,  subfaces 0,1,2,3
-      {{3, 2, 1, 0},     // face_orientation=true,  face_flip=true,
-                         // face_rotation=false, subfaces 0,1,2,3
-       {2, 0, 3, 1}}}}}; // face_orientation=true,  face_flip=true,
-                         // face_rotation=true,  subfaces 0,1,2,3
+    {{{{0,
+        2,
+        1,
+        3}, // face_orientation=false, face_flip=false, face_rotation=false, subfaces 0,1,2,3
+       {2,
+        3,
+        0,
+        1}}, // face_orientation=false, face_flip=false, face_rotation=true,  subfaces 0,1,2,3
+      {{3,
+        1,
+        2,
+        0}, // face_orientation=false, face_flip=true,  face_rotation=false, subfaces 0,1,2,3
+       {1,
+        0,
+        3,
+        2}}}, // face_orientation=false, face_flip=true,  face_rotation=true,  subfaces 0,1,2,3
+     {{{0,
+        1,
+        2,
+        3}, // face_orientation=true,  face_flip=false, face_rotation=false, subfaces 0,1,2,3
+       {1,
+        3,
+        0,
+        2}}, // face_orientation=true,  face_flip=false, face_rotation=true,  subfaces 0,1,2,3
+      {{3,
+        2,
+        1,
+        0}, // face_orientation=true,  face_flip=true,  face_rotation=false, subfaces 0,1,2,3
+       {2,
+        0,
+        3,
+        1}}}}}; // face_orientation=true,  face_flip=true,  face_rotation=true,  subfaces 0,1,2,3
 
   const unsigned int std_subface =
     subface_exchange[face_ref_case][face_orientation][face_flip][face_rotation]
@@ -4024,7 +4039,7 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
                                     {0, 0, 1, 1},  // face 3, subfaces 0,1,2,3
                                     {0, 1, 0, 1},  // face 4, subfaces 0,1,2,3
                                     {0, 1, 0, 1}}, // face 5, subfaces 0,1,2,3
-                                                   // cut_y
+                                   // cut_y
                                    {{0, 1, 0, 1},
                                     {0, 1, 0, 1},
                                     {0, 0, 0, 0},

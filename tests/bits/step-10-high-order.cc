@@ -111,7 +111,7 @@ compute_pi_by_area()
           deallog << "Evaluation of pi on in 3D "
                   << triangulation.n_active_cells() << " cells: " << area
                   << std::endl;
-          // Assert(std::abs(area - pi) < 1e-12,
+          //Assert(std::abs(area - pi) < 1e-12,
           //       ExcMessage("Calculation not accurate"));
         }
     };

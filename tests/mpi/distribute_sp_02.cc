@@ -72,8 +72,7 @@ test_mpi()
                                              MPI_COMM_WORLD,
                                              locally_rel);
   /*  {
-      std::ofstream
-     f((std::string("after")+Utilities::int_to_string(myid)).c_str());
+      std::ofstream f((std::string("after")+Utilities::int_to_string(myid)).c_str());
       csp.print(f);
       }*/
 
@@ -83,8 +82,7 @@ test_mpi()
       unsigned int indx = r + myid * num_local;
       unsigned int len  = csp.row_length(indx);
 
-      // std::cout << "myid=" << myid << " idx=" << indx << " len=" << len
-      // <<std::endl;
+      //std::cout << "myid=" << myid << " idx=" << indx << " len=" << len <<std::endl;
 
       if (myid > 0 && myid < numprocs - 1)
         Assert(len == 3, ExcInternalError());
@@ -99,7 +97,7 @@ test_mpi()
     }
 
 
-  // now a 2x2 block system where the 2,2 block has size 1x1:
+  //now a 2x2 block system where the 2,2 block has size 1x1:
   if (myid == 0)
     deallog << "part 2" << std::endl;
 
@@ -137,8 +135,7 @@ test_mpi()
       unsigned int indx = r + myid * num_local;
       unsigned int len  = csp.row_length(indx);
 
-      // std::cout << "myid=" << myid << " idx=" << indx << " len=" << len
-      // <<std::endl;
+      //std::cout << "myid=" << myid << " idx=" << indx << " len=" << len <<std::endl;
 
       if (myid > 0 && myid < numprocs - 1)
         Assert(len == 3, ExcInternalError());

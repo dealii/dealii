@@ -37,8 +37,7 @@
 #endif
 
 
-// TODO[WB]: allow calling functions to pass along a tbb::affinity_partitioner
-// object to ensure that subsequent calls use the same cache lines
+//TODO[WB]: allow calling functions to pass along a tbb::affinity_partitioner object to ensure that subsequent calls use the same cache lines
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -57,8 +56,8 @@ namespace parallel
     };
 
 #ifdef __INTEL_COMPILER
-    // Disable long double SIMD instructions on ICC. This is to work around a
-    // bug that generates wrong code at least up to intel 15 (see
+    // Disable long double SIMD instructions on ICC. This is to work around a bug
+    // that generates wrong code at least up to intel 15 (see
     // tests/lac/vector-vector, tests/lac/intel-15-bug, and the discussion at
     // https://github.com/dealii/dealii/issues/598).
     template <>
@@ -771,9 +770,8 @@ namespace internal
   namespace SparseMatrixImplementation
   {
     /**
-     * Like internal::VectorImplementation::minimum_parallel_grain_size, but now
-     * denoting the number of rows of a matrix that should be worked on as a
-     * minimum.
+     * Like internal::VectorImplementation::minimum_parallel_grain_size, but now denoting
+     * the number of rows of a matrix that should be worked on as a minimum.
      */
     extern unsigned int minimum_parallel_grain_size;
   } // namespace SparseMatrixImplementation

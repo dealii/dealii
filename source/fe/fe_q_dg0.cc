@@ -250,7 +250,7 @@ FE_Q_DG0<dim, spacedim>::get_dpo_vector(const unsigned int deg)
   for (unsigned int i = 1; i < dpo.size(); ++i)
     dpo[i] = dpo[i - 1] * (deg - 1);
 
-  dpo[dim]++; // we need an additional DG0-node for a dim-dimensional object
+  dpo[dim]++; //we need an additional DG0-node for a dim-dimensional object
   return dpo;
 }
 

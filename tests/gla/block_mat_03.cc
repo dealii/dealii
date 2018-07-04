@@ -255,7 +255,7 @@ test_alt()
       }
 
   A.compress(VectorOperation::add);
-  // A.print(deallog.get_file_stream());
+  //A.print(deallog.get_file_stream());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -281,6 +281,6 @@ main(int argc, char **argv)
   }
 
   // compile, don't run
-  // if (myid==9999)
+  //if (myid==9999)
   //  test<LA_Dummy>();
 }

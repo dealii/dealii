@@ -14,9 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// find_active_cell_around_point() stops working if some cells are refined in
-// 3d. this is caused by a bug in GridTools::find_cells_adjacent_to_vertex that
-// got fixed in r 25562.
+// find_active_cell_around_point() stops working if some cells are refined in 3d.
+// this is caused by a bug in GridTools::find_cells_adjacent_to_vertex that got fixed in r 25562.
 
 #include <deal.II/fe/mapping_q1.h>
 
@@ -52,7 +51,7 @@ check2()
 
   Point<3> p2(304.767, -57.0113, 254.766);
   deallog << inside(tria, p2) << std::endl;
-  GridTools::find_active_cell_around_point(tria, p2); // OK
+  GridTools::find_active_cell_around_point(tria, p2); //OK
 
   int idx = 0;
   for (Triangulation<3>::active_cell_iterator cell = tria.begin_active();
@@ -66,7 +65,7 @@ check2()
 
   deallog << inside(tria, p2) << std::endl;
 
-  GridTools::find_active_cell_around_point(tria, p2); // triggered exception
+  GridTools::find_active_cell_around_point(tria, p2); //triggered exception
 }
 
 void

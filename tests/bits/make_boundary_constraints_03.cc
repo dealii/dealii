@@ -58,7 +58,7 @@ test()
 
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
-  // DoFRenumbering::component_wise(dof_handler);
+  //DoFRenumbering::component_wise(dof_handler);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
   AffineConstraints<double>  constraints;

@@ -72,8 +72,8 @@ test()
       deallog << "**** n_dofs = " << n_dofs << std::endl;
 
     DoFRenumbering::component_wise(dofh);
-    // check if n_dofs() is still
-    // correct. This was a bug at some point.
+    //check if n_dofs() is still
+    //correct. This was a bug at some point.
     Assert(n_dofs == dofh.n_dofs(), ExcInternalError());
     {
       IndexSet dof_set;

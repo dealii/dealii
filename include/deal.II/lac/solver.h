@@ -39,15 +39,14 @@ class Vector;
  *
  * <h3>Requirements common to derived solver classes</h3>
  *
- * In general, iterative solvers do not rely on any special structure of
- * matrices or the format of storage. Rather, they only require that matrices
- * and vectors define certain operations such as matrix-vector products, or
- * scalar products between vectors. Consequently, this class as well as the
- * derived classes and their member functions implementing concrete linear
- * solvers are templated on the types of matrices and vectors. However, there
- * are some common requirements a matrix or vector type must fulfill to qualify
- * as an acceptable type for the solvers in this hierarchy. These requirements
- * are listed below.
+ * In general, iterative solvers do not rely on any special structure of matrices or
+ * the format of storage. Rather, they only require that matrices and vectors define
+ * certain operations such as matrix-vector products, or scalar products
+ * between vectors. Consequently, this class as well as the derived classes and their member
+ * functions implementing concrete linear solvers are templated on the types
+ * of matrices and vectors. However, there are some common requirements a
+ * matrix or vector type must fulfill to qualify as an acceptable type for the
+ * solvers in this hierarchy. These requirements are listed below.
  *
  * The classes we show below are not any concrete class. Rather, they are
  * intended to form a "signature" which a concrete class has to conform to.
@@ -250,8 +249,7 @@ class Vector;
  *  SolverControl::State
  *  Step3::write_intermediate_solution (const unsigned int    iteration,
  *                                      const double          , //check_value
- *                                      const Vector<double> &current_iterate)
- * const
+ *                                      const Vector<double> &current_iterate) const
  *    {
  *      DataOut<2> data_out;
  *      data_out.attach_dof_handler (dof_handler);
@@ -259,8 +257,8 @@ class Vector;
  *      data_out.build_patches ();
  *
  *      std::ofstream output ((std::string("solution-")
- *                             + Utilities::int_to_string(iteration,4) +
- * ".vtu").c_str()); data_out.write_vtu (output);
+ *                             + Utilities::int_to_string(iteration,4) + ".vtu").c_str());
+ *      data_out.write_vtu (output);
  *
  *      return SolverControl::success;
  *    }

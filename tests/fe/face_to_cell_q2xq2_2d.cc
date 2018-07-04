@@ -15,8 +15,8 @@
 
 
 // it turns out that FE_Q::face_to_cell_index() had a bug for elements beyond
-// Q2XQ2 when using the face flip flag. this test is for the 2d case for the
-// Q2XQ2 case
+// Q2XQ2 when using the face flip flag. this test is for the 2d case for the Q2XQ2
+// case
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>

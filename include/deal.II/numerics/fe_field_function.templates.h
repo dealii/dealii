@@ -173,9 +173,9 @@ namespace Functions
       {
         // Unfortunately we still need a temporary argument as we want to
         // evaluate a gradient of a (generally) multicomponent function at
-        // a single quadrature point. Note that the first std::vector<> is
-        // related to the number of quadrature points (always one here), whereas
-        // the second to the number of components.
+        // a single quadrature point. Note that the first std::vector<> is related
+        // to the number of quadrature points (always one here), whereas the second
+        // to the number of components.
         std::vector<std::vector<Tensor<1, dim, number>>> vgrads(
           1, std::vector<Tensor<1, dim, number>>(this->n_components));
         fe_v.get_function_gradients(data_vector, vgrads);

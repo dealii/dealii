@@ -19,8 +19,8 @@
 // intermixed. this poses PETSc some problems, since one has to flush some
 // buffer in between these two types of operations
 //
-// in contrast to trilinos_03a, we set and add the same elements here twice,
-// then overwrite them again to get the original value back
+// in contrast to trilinos_03a, we set and add the same elements here twice, then
+// overwrite them again to get the original value back
 
 #include <deal.II/base/utilities.h>
 

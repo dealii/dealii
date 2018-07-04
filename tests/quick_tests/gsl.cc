@@ -15,8 +15,7 @@
 
 
 // Test GSL by running CSpline. Copy-paste of /base/functions_cspline
-// take example from
-// https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
+// take example from https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
 
 #include <deal.II/base/function_cspline.h>
 #include <deal.II/base/logstream.h>

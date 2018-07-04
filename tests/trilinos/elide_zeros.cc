@@ -49,17 +49,18 @@
  * 2534: An error occurred in line <1678> of file
  * <.../source/lac/trilinos_sparse_matrix.cc> in function
  * 2534:     void dealii::TrilinosWrappers::SparseMatrix::add
- * (dealii::TrilinosWrappers::SparseMatrix::size_type,
- * dealii::TrilinosWrappers:: SparseMatrix::size_type, const size_type*, const
- * TrilinosScalar*, bool, bool) 2534: The violated condition was: 2534:
- * nonlocal_matrix->RowMap()
+ * (dealii::TrilinosWrappers::SparseMatrix::size_type, dealii::TrilinosWrappers::
+ * SparseMatrix::size_type, const size_type*, const TrilinosScalar*, bool, bool)
+ * 2534: The violated condition was:
+ * 2534:     nonlocal_matrix->RowMap()
  *           .LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1
  * 2534: The name and call sequence of the exception was:
- * 2534:     ExcMessage("Attempted to write into off-processor matrix row "
- * "that has not be specified as being writable upon " "initialization") 2534:
- * Additional Information: 2534: Attempted to write into off-processor matrix
- * row that has not be specified as being writable upon initialization 2534:
- * --------------------------------------------------------
+ * 2534:     ExcMessage("Attempted to write into off-processor matrix row " "that
+ * has not be specified as being writable upon " "initialization")
+ * 2534: Additional Information:
+ * 2534: Attempted to write into off-processor matrix row that has not be
+ * specified as being writable upon initialization
+ * 2534: --------------------------------------------------------
  *
  */
 
@@ -244,8 +245,7 @@ namespace LinearAdvectionTest
                 const int neighbor_index = current_cell->neighbor_index(face_n);
                 if (neighbor_index != -1) // interior face
                   {
-                    // for DG we need to access the FE space on the adjacent
-                    // cell.
+                    // for DG we need to access the FE space on the adjacent cell.
                     typename DoFHandler<dim>::active_cell_iterator
                       neighbor_cell = current_cell->neighbor(face_n);
 

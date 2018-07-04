@@ -15,8 +15,7 @@
 
 
 
-// computes points in real space starting from some quadrature points on the
-// unit element
+// computes points in real space starting from some quadrature points on the unit element
 
 #include "../tests.h"
 

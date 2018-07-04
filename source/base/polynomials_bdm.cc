@@ -408,8 +408,8 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
             {
 //          std::cerr << '\t' << std::setw(6) << values[i][1-face%2];
                                                // Integrate normal component.
-                                               // This is easy on the unit
-square for (unsigned int j=0;j<moment_weight.size();++j)
+                                               // This is easy on the unit square
+              for (unsigned int j=0;j<moment_weight.size();++j)
                 A(moment_weight.size()*face+j,i)
                   += w * values[i][1-face%2] * moment_weight[j].value(x);
             }

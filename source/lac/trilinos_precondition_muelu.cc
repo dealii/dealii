@@ -104,9 +104,9 @@ namespace TrilinosWrappers
         ML_Epetra::SetDefaults("NSSA", parameter_list);
         parameter_list.set("aggregation: block scaling", true);
       }
-    // MIS does not exist anymore, only choice are uncoupled and coupled. When
-    // using uncoupled, aggregates cannot span multiple processes. When using
-    // coupled aggregates can span multiple processes.
+    // MIS does not exist anymore, only choice are uncoupled and coupled. When using
+    // uncoupled, aggregates cannot span multiple processes. When using coupled
+    // aggregates can span multiple processes.
     parameter_list.set("aggregation: type", "Uncoupled");
 
     parameter_list.set("smoother: type", additional_data.smoother_type);

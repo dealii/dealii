@@ -90,8 +90,8 @@ DEAL_II_NAMESPACE_OPEN
  * did not fit the decomposition into $4\times 4$ sub-blocks.
  *
  * The choice of the block size is a compromise between a sufficiently large
- * size for efficient local/serial BLAS, but one that is also small enough to
- * achieve good parallel load balance.
+ * size for efficient local/serial BLAS, but one that is also small enough to achieve
+ * good parallel load balance.
  *
  * Below we show a strong scaling example of ScaLAPACKMatrix::invert()
  * on up to 5 nodes each composed of two Intel Xeon 2660v2 IvyBridge sockets
@@ -211,21 +211,17 @@ public:
    * Copy a submatrix (subset) of the distributed matrix A to a submatrix of the distributed matrix @p B.
    *
    * - The global row and column index of the first element of the submatrix A is provided by @p offset_A
-   *   with row index=<code>offset_A.first</code> and column
-   * index=<code>offset_A.second</code>.
+   *   with row index=<code>offset_A.first</code> and column index=<code>offset_A.second</code>.
    *
    * - The global row and column index of the first element of the submatrix B is provided by @p offset_B
-   *   with row index=<code>offset_B.first</code> and column
-   * index=<code>offset_B.second</code>.
+   *   with row index=<code>offset_B.first</code> and column index=<code>offset_B.second</code>.
    *
    * - The dimension of the submatrix to be copied is given by @p submatrix_size
-   *   with number of rows=<code>submatrix_size.first</code> and number of
-   * columns=<code>submatrix_size.second</code>.
+   *   with number of rows=<code>submatrix_size.first</code> and number of columns=<code>submatrix_size.second</code>.
    *
    *
-   * If it is necessary to copy complete matrices with an identical block-cyclic
-   * distribution, use
-   * ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest)
+   * If it is necessary to copy complete matrices with an identical block-cyclic distribution,
+   * use ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest)
    * with only one argument to avoid communication.
    *
    * The underlying process grids of the matrices @p A and @p B must have been built
@@ -242,8 +238,7 @@ public:
    *
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$ and
-   * $NB_A=MB_B$.
+   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$ and $NB_A=MB_B$.
    */
   void
   copy_transposed(const ScaLAPACKMatrix<NumberType> &B);
@@ -271,8 +266,7 @@ public:
    *
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=MB_B$ and
-   * $NB_A=NB_B$.
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_B$ and $NB_A=NB_B$.
    */
   void
   add(const NumberType b, const ScaLAPACKMatrix<NumberType> &B);
@@ -283,8 +277,7 @@ public:
    *
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$ and
-   * $NB_A=MB_B$.
+   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$ and $NB_A=MB_B$.
    */
   void
   Tadd(const NumberType b, const ScaLAPACKMatrix<NumberType> &B);
@@ -306,8 +299,7 @@ public:
    * that
    * $\mathbf{C}$ already has the right size.
    *
-   * The matrices $\mathbf{A}$, $\mathbf{B}$ and $\mathbf{C}$ must have the same
-   * process grid.
+   * The matrices $\mathbf{A}$, $\mathbf{B}$ and $\mathbf{C}$ must have the same process grid.
    */
   void
   mult(const NumberType                   b,
@@ -327,12 +319,10 @@ public:
    *
    * else $\mathbf{C} = \mathbf{A} \cdot \mathbf{B}$
    *
-   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and
-   * that
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
    * $\mathbf{C}$ already has the right size.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=MB_C$,
-   * $NB_A=MB_B$ and $NB_B=NB_C$.
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_C$, $NB_A=MB_B$ and $NB_B=NB_C$.
    */
   void
   mmult(ScaLAPACKMatrix<NumberType> &      C,
@@ -349,12 +339,10 @@ public:
    *
    * else $\mathbf{C} = \mathbf{A}^T \cdot \mathbf{B}$
    *
-   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and
-   * that
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
    * $\mathbf{C}$ already has the right size.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=MB_B$,
-   * $NB_A=MB_C$ and $NB_B=NB_C$.
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_B$, $NB_A=MB_C$ and $NB_B=NB_C$.
    */
   void
   Tmmult(ScaLAPACKMatrix<NumberType> &      C,
@@ -371,12 +359,10 @@ public:
    *
    * else $\mathbf{C} = \mathbf{A} \cdot \mathbf{B}^T$
    *
-   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and
-   * that
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
    * $\mathbf{C}$ already has the right size.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=MB_C$,
-   * $NB_A=NB_B$ and $MB_B=NB_C$.
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_C$, $NB_A=NB_B$ and $MB_B=NB_C$.
    */
   void
   mTmult(ScaLAPACKMatrix<NumberType> &      C,
@@ -394,12 +380,10 @@ public:
    *
    * else $\mathbf{C} = \mathbf{A}^T \cdot \mathbf{B}^T$
    *
-   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and
-   * that
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
    * $\mathbf{C}$ already has the right size.
    *
-   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$,
-   * $NB_A=MB_C$ and $MB_B=NB_C$.
+   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$, $NB_A=MB_C$ and $MB_B=NB_C$.
    */
   void
   TmTmult(ScaLAPACKMatrix<NumberType> &      C,
@@ -420,11 +404,9 @@ public:
    *
    * To tweak the I/O performance, especially for parallel I/O, the user may define the optional parameter @p chunk_size.
    * All MPI processes need to call the function with the same value.
-   * The matrix is written in chunks to the file, therefore the properties of
-   * the system define the optimal chunk size. Internally, HDF5 splits the
-   * matrix into <tt>chunk_size.first</tt> x <tt>chunk_size.second</tt> sized
-   * blocks, with <tt>chunk_size.first</tt> being the number of rows of a chunk
-   * and <tt>chunk_size.second</tt> the number of columns.
+   * The matrix is written in chunks to the file, therefore the properties of the system define the optimal chunk size.
+   * Internally, HDF5 splits the matrix into <tt>chunk_size.first</tt> x <tt>chunk_size.second</tt> sized blocks,
+   * with <tt>chunk_size.first</tt> being the number of rows of a chunk and <tt>chunk_size.second</tt> the number of columns.
    */
   void
   save(const char *                                 filename,
@@ -448,8 +430,7 @@ public:
 
   /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
-   * function <code>pXpotrf</code>. The result of the factorization is stored in
-   * this object.
+   * function <code>pXpotrf</code>. The result of the factorization is stored in this object.
    */
   void
   compute_cholesky_factorization();
@@ -478,8 +459,8 @@ public:
   invert();
 
   /**
-   * Computing selected eigenvalues and, optionally, the eigenvectors of the
-   * real symmetric matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$.
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$.
    *
    * The eigenvalues/eigenvectors are selected by prescribing a range of indices @p index_limits.
    *
@@ -489,8 +470,7 @@ public:
    *
    * If all eigenvalues/eigenvectors have to be computed, pass the closed interval $ \left[ 0, M-1 \right] $ in @p index_limits.
    *
-   * Pass the closed interval $ \left[ M-r, M-1 \right] $ if the $r$ largest
-   * eigenvalues/eigenvectors are desired.
+   * Pass the closed interval $ \left[ M-r, M-1 \right] $ if the $r$ largest eigenvalues/eigenvectors are desired.
    */
   std::vector<NumberType>
   eigenpairs_symmetric_by_index(
@@ -511,9 +491,8 @@ public:
     const bool                               compute_eigenvectors);
 
   /**
-   * Computing selected eigenvalues and, optionally, the eigenvectors of the
-   * real symmetric matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the
-   * MRRR algorithm.
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
    *
    * The eigenvalues/eigenvectors are selected by prescribing a range of indices @p index_limits.
    *
@@ -523,8 +502,7 @@ public:
    *
    * If all eigenvalues/eigenvectors have to be computed, pass the closed interval $ \left[ 0, M-1 \right] $ in @p index_limits.
    *
-   * Pass the closed interval $ \left[ M-r, M-1 \right] $ if the $r$ largest
-   * eigenvalues/eigenvectors are desired.
+   * Pass the closed interval $ \left[ M-r, M-1 \right] $ if the $r$ largest eigenvalues/eigenvectors are desired.
    */
   std::vector<NumberType>
   eigenpairs_symmetric_by_index_MRRR(
@@ -532,9 +510,8 @@ public:
     const bool                                   compute_eigenvectors);
 
   /**
-   * Computing selected eigenvalues and, optionally, the eigenvectors of the
-   * real symmetric matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the
-   * MRRR algorithm.
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
    * The eigenvalues/eigenvectors are selected by prescribing a range of values @p value_limits for the eigenvalues.
    *
    * If successful, the computed eigenvalues are arranged in ascending order.
@@ -547,100 +524,80 @@ public:
     const bool                               compute_eigenvectors);
 
   /**
-   * Computing the singular value decomposition (SVD) of a
-   * matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$, optionally computing the
-   * left and/or right singular vectors. The SVD is written as $\mathbf{A} =
-   * \mathbf{U} \cdot \mathbf{\Sigma} \cdot \mathbf{V}^T$ with $\mathbf{\Sigma}
-   * \in \mathbb{R}^{M \times N}$ as a diagonal matrix,
-   * $\mathbf{U} \in \mathbb{R}^{M \times M}$ and $\mathbf{V} \in \mathbb{R}^{M
-   * \times M}$ as orthogonal matrices. The diagonal elements of
-   * $\mathbf{\Sigma}$ are the singular values of $A$ and the columns of
-   * $\mathbf{U}$ and $\mathbf{V}$ are the corresponding left and right singular
-   * vectors, respectively. The singular values are returned in decreasing order
-   * and only the first $\min(M,N)$ columns of $\mathbf{U}$ and rows of
-   * $\mathbf{V}^T$ are computed.
-   *
-   * Upon return the content of the matrix is unusable.
-   * The matrix $\mathbf{A}$ must have identical block cyclic distribution for
-   * the rows and column.
-   *
-   * If left singular vectors are required matrices $\mathbf{A}$ and
-   * $\mathbf{U}$ have to be constructed with the same process grid and block
-   * cyclic distribution. If right singular vectors are required matrices
-   * $\mathbf{A}$ and $\mathbf{V}^T$ have to be constructed with the same
-   * process grid  and block cyclic distribution.
-   *
-   * To avoid computing the left and/or right singular vectors the function
-   * accepts <code>nullptr</code>
-   * for @p U and/or @p VT.
-   */
+  * Computing the singular value decomposition (SVD) of a
+  * matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$, optionally computing the left and/or right
+  * singular vectors. The SVD is written as $\mathbf{A} = \mathbf{U} \cdot \mathbf{\Sigma} \cdot \mathbf{V}^T$
+  * with $\mathbf{\Sigma} \in \mathbb{R}^{M \times N}$ as a diagonal matrix,
+  * $\mathbf{U} \in \mathbb{R}^{M \times M}$ and $\mathbf{V} \in \mathbb{R}^{M \times M}$
+  * as orthogonal matrices. The diagonal elements of $\mathbf{\Sigma}$
+  * are the singular values of $A$ and the columns of $\mathbf{U}$ and $\mathbf{V}$ are the
+  * corresponding left and right singular vectors, respectively. The
+  * singular values are returned in decreasing order and only the first $\min(M,N)$
+  * columns of $\mathbf{U}$ and rows of $\mathbf{V}^T$ are computed.
+  *
+  * Upon return the content of the matrix is unusable.
+  * The matrix $\mathbf{A}$ must have identical block cyclic distribution for the rows and column.
+  *
+  * If left singular vectors are required matrices $\mathbf{A}$ and $\mathbf{U}$
+  * have to be constructed with the same process grid and block cyclic distribution.
+  * If right singular vectors are required matrices $\mathbf{A}$ and $\mathbf{V}^T$
+  * have to be constructed with the same process grid  and block cyclic distribution.
+  *
+  * To avoid computing the left and/or right singular vectors the function accepts <code>nullptr</code>
+  * for @p U and/or @p VT.
+  */
   std::vector<NumberType>
   compute_SVD(ScaLAPACKMatrix<NumberType> *U  = nullptr,
               ScaLAPACKMatrix<NumberType> *VT = nullptr);
 
   /**
-   * Solving overdetermined or underdetermined real linear
-   * systems involving matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$, or its
-   * transpose $\mathbf{A}^T$, using a QR or LQ factorization of $\mathbf{A}$
-   * for $N_{\rm RHS}$ RHS vectors in the columns of matrix $\mathbf{B}$
-   *
-   * It is assumed that $\mathbf{A}$ has full rank: $\rm{rank}(\mathbf{A}) =
-   * \min(M,N)$.
-   *
-   * The following options are supported:
-   * -# If(!transpose) and $M \geq N$: least squares solution of overdetermined
-   * system
-   *    $\min \Vert \mathbf{B} - \mathbf{A}\cdot \mathbf{X}\Vert$.\n
-   *    Upon exit the rows $0$ to $N-1$ of $\mathbf{B}$ contain the least square
-   * solution vectors. The residual sum of squares for each column is given by
-   * the sum of squares of elements $N$ to $M-1$ in that column.
-   *
-   * -# If(!transpose) and $M < N$: find minimum norm solutions of
-   * underdetermined systems
-   *    $\mathbf{A} \cdot \mathbf{X} = \mathbf{B}$.\n
-   *    Upon exit the columns of $\mathbf{B}$ contain the minimum norm solution
-   * vectors.
-   *
-   * -# If(transpose) and $M \geq N$: find minimum norm solutions of
-   * underdetermined system $ \mathbf{A}^\top \cdot \mathbf{X} = \mathbf{B}$.\n
-   *    Upon exit the columns of $\mathbf{B}$ contain the minimum norm solution
-   * vectors.
-   *
-   * -# If(transpose) and $M < N$: least squares solution of overdetermined
-   * system
-   *    $\min \Vert \mathbf{B} - \mathbf{A}^\top \cdot \mathbf{X}\Vert$.\n
-   *    Upon exit the rows $0$ to $M-1$ contain the least square solution
-   * vectors. The residual sum of squares for each column is given by the sum of
-   * squares of elements $M$ to $N-1$ in that column.
-   *
-   * If(!tranpose) then $\mathbf{B} \in \mathbb{R}^{M \times N_{\rm RHS}}$,
-   * otherwise $\mathbf{B} \in \mathbb{R}^{N \times N_{\rm RHS}}$.
-   * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have an identical block
-   * cyclic distribution for rows and columns.
-   */
+  * Solving overdetermined or underdetermined real linear
+  * systems involving matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$, or its transpose $\mathbf{A}^T$,
+  * using a QR or LQ factorization of $\mathbf{A}$ for $N_{\rm RHS}$ RHS vectors in the columns of matrix $\mathbf{B}$
+  *
+  * It is assumed that $\mathbf{A}$ has full rank: $\rm{rank}(\mathbf{A}) = \min(M,N)$.
+  *
+  * The following options are supported:
+  * -# If(!transpose) and $M \geq N$: least squares solution of overdetermined system
+  *    $\min \Vert \mathbf{B} - \mathbf{A}\cdot \mathbf{X}\Vert$.\n
+  *    Upon exit the rows $0$ to $N-1$ of $\mathbf{B}$ contain the least square solution vectors. The residual sum of squares
+  *    for each column is given by the sum of squares of elements $N$ to $M-1$ in that column.
+  *
+  * -# If(!transpose) and $M < N$: find minimum norm solutions of underdetermined systems
+  *    $\mathbf{A} \cdot \mathbf{X} = \mathbf{B}$.\n
+  *    Upon exit the columns of $\mathbf{B}$ contain the minimum norm solution vectors.
+  *
+  * -# If(transpose) and $M \geq N$: find minimum norm solutions of underdetermined system
+  *    $ \mathbf{A}^\top \cdot \mathbf{X} = \mathbf{B}$.\n
+  *    Upon exit the columns of $\mathbf{B}$ contain the minimum norm solution vectors.
+  *
+  * -# If(transpose) and $M < N$: least squares solution of overdetermined system
+  *    $\min \Vert \mathbf{B} - \mathbf{A}^\top \cdot \mathbf{X}\Vert$.\n
+  *    Upon exit the rows $0$ to $M-1$ contain the least square solution vectors. The residual sum of squares
+  *    for each column is given by the sum of squares of elements $M$ to $N-1$ in that column.
+  *
+  * If(!tranpose) then $\mathbf{B} \in \mathbb{R}^{M \times N_{\rm RHS}}$,
+  * otherwise $\mathbf{B} \in \mathbb{R}^{N \times N_{\rm RHS}}$.
+  * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have an identical block cyclic distribution for rows and columns.
+  */
   void
   least_squares(ScaLAPACKMatrix<NumberType> &B, const bool transpose = false);
 
   /**
-   * Compute the pseudoinverse $\mathbf{A}^+ \in \mathbb{R}^{N \times M}$
-   * (Moore-Penrose inverse) of a real matrix $\mathbf{A} \in \mathbb{R}^{M
-   * \times N}$ using the singular value decomposition
+   * Compute the pseudoinverse $\mathbf{A}^+ \in \mathbb{R}^{N \times M}$ (Moore-Penrose inverse)
+   * of a real matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$ using the singular value decomposition
    * $\mathbf{A} = \mathbf{U} \cdot \mathbf{\Sigma} \cdot \mathbf{V}^T$.
    *
-   * Unlike the inverse, the pseudoinverse $\mathbf{A}^+ = \mathbf{V} \cdot
-   * \mathbf{\Sigma}^+ \cdot \mathbf{U}^T$ exists for both rectangular as well
-   * as singular matrices $\mathbf{A}$.
+   * Unlike the inverse, the pseudoinverse $\mathbf{A}^+ = \mathbf{V} \cdot \mathbf{\Sigma}^+ \cdot \mathbf{U}^T$
+   * exists for both rectangular as well as singular matrices $\mathbf{A}$.
    *
-   * For a rectangular $\mathbf{\Sigma}$ the pseudoinverse is computed by taking
-   * the reciprocal of each non-zero element on the diagonal, leaving the zeros
-   * in place, and then transposing $\mathbf{\Sigma}$. For the numerical
-   * computation only the singular values $\sigma_i > \sigma_{\text{max}} \,
-   * \text{ratio}$ are taken into account. Upon successful exit, the function
-   * returns the number of singular values fulfilling that condition. That value
-   * can be interpreted as the rank of $\mathbf{A}$.
+   * For a rectangular $\mathbf{\Sigma}$ the pseudoinverse is computed by taking the reciprocal
+   * of each non-zero element on the diagonal, leaving the zeros in place, and then transposing $\mathbf{\Sigma}$.
+   * For the numerical computation only the singular values $\sigma_i > \sigma_{\text{max}} \, \text{ratio}$
+   * are taken into account. Upon successful exit, the function returns the number of singular values
+   * fulfilling that condition. That value can be interpreted as the rank of $\mathbf{A}$.
    *
-   * Upon return this object contains the pseudoinverse $\mathbf{A}^+ \in
-   * \mathbb{R}^{N \times M}$.
+   * Upon return this object contains the pseudoinverse $\mathbf{A}^+ \in \mathbb{R}^{N \times M}$.
    *
    * The following alignment conditions have to be fulfilled: $MB_A = NB_A$.
    */
@@ -649,17 +606,16 @@ public:
 
   /**
    * Estimate the condition number of a SPD matrix in the $l_1$-norm.
-   * The matrix has to be in the Cholesky state (see
-   * compute_cholesky_factorization()). The reciprocal of the condition number
-   * is returned in order to avoid the possibility of overflow when the
-   * condition number is very large.
+   * The matrix has to be in the Cholesky state (see compute_cholesky_factorization()).
+   * The reciprocal of the
+   * condition number is returned in order to avoid the possibility of
+   * overflow when the condition number is very large.
    *
    * @p a_norm must contain the $l_1$-norm of the matrix prior to calling
    * Cholesky factorization (see l1_norm()).
    *
    * @note An alternative is to compute the inverse of the matrix
-   * explicitly and manually construct $k_1 = ||\mathbf{A}||_1 \,
-   * ||\mathbf{A}^{-1}||_1$.
+   * explicitly and manually construct $k_1 = ||\mathbf{A}||_1 \, ||\mathbf{A}^{-1}||_1$.
    */
   NumberType
   reciprocal_condition_number(const NumberType a_norm) const;
@@ -760,8 +716,8 @@ public:
 
 private:
   /**
-   * Calculate the norm of a distributed symmetric dense matrix using
-   * ScaLAPACK's internal function.
+   * Calculate the norm of a distributed symmetric dense matrix using ScaLAPACK's
+   * internal function.
    */
   NumberType
   norm_symmetric(const char type) const;
@@ -777,11 +733,11 @@ private:
    * Computing selected eigenvalues and, optionally, the eigenvectors.
    * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
    * or a range of values @p value_limits for the eigenvalues. The function will throw an exception
-   * if both ranges are prescribed (meaning that both ranges differ from the
-   * default value) as this ambiguity is prohibited. If successful, the computed
-   * eigenvalues are arranged in ascending order. The eigenvectors are stored in
-   * the columns of the matrix, thereby overwriting the original content of the
-   * matrix.
+   * if both ranges are prescribed (meaning that both ranges differ from the default value)
+   * as this ambiguity is prohibited.
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * The eigenvectors are stored in the columns of the matrix, thereby
+   * overwriting the original content of the matrix.
    */
   std::vector<NumberType>
   eigenpairs_symmetric(
@@ -794,18 +750,17 @@ private:
                      std::numeric_limits<NumberType>::quiet_NaN()));
 
   /**
-   * Computing selected eigenvalues and, optionally, the eigenvectors of the
-   * real symmetric matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the
-   * MRRR algorithm.
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
    * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
    * or a range of values @p value_limits for the eigenvalues. The function will throw an exception
-   * if both ranges are prescribed (meaning that both ranges differ from the
-   * default value) as this ambiguity is prohibited.
+   * if both ranges are prescribed (meaning that both ranges differ from the default value)
+   * as this ambiguity is prohibited.
    *
-   * By calling this function the original content of the matrix will be
-   * overwritten. If requested, the eigenvectors are stored in the columns of
-   * the matrix. Also in the case that just the eigenvalues are required, the
-   * content of the matrix will be overwritten.
+   * By calling this function the original content of the matrix will be overwritten.
+   * If requested, the eigenvectors are stored in the columns of the matrix.
+   * Also in the case that just the eigenvalues are required,
+   * the content of the matrix will be overwritten.
    *
    * If successful, the computed eigenvalues are arranged in ascending order.
    *
@@ -865,9 +820,8 @@ private:
   LAPACKSupport::Property property;
 
   /**
-   * A shared pointer to a Utilities::MPI::ProcessGrid object which contains a
-   * BLACS context and a MPI communicator, as well as other necessary data
-   * structures.
+   * A shared pointer to a Utilities::MPI::ProcessGrid object which contains a BLACS context
+   * and a MPI communicator, as well as other necessary data structures.
    */
   std::shared_ptr<const Utilities::MPI::ProcessGrid> grid;
 

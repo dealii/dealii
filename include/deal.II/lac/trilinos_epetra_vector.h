@@ -112,13 +112,12 @@ namespace LinearAlgebra
       operator=(const double s) override;
 
       /**
-       * Imports all the elements present in the vector's IndexSet from the
-       * input
+       * Imports all the elements present in the vector's IndexSet from the input
        * vector @p V. VectorOperation::values @p operation is used to decide if
        * the elements in @p V should be added to the current vector or replace the
        * current elements. The last parameter can be used if the same
-       * communication pattern is used multiple times. This can be used to
-       * improve performance.
+       * communication pattern is used multiple times. This can be used to improve
+       * performance.
        */
       virtual void
       import(
@@ -256,8 +255,7 @@ namespace LinearAlgebra
        *
        * The vectors need to have the same layout.
        *
-       * For complex-valued vectors, the scalar product in the second step is
-       * implemented as
+       * For complex-valued vectors, the scalar product in the second step is implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       virtual double
@@ -286,11 +284,10 @@ namespace LinearAlgebra
 
       /**
        * Return an index set that describes which elements of this vector are
-       * owned by the current processor. As a consequence, the index sets
-       * returned on different processors if this is a distributed vector will
-       * form disjoint sets that add up to the complete index set. Obviously, if
-       * a vector is created on only one processor, then the result would
-       * satisfy
+       * owned by the current processor. As a consequence, the index sets returned
+       * on different processors if this is a distributed vector will form disjoint
+       * sets that add up to the complete index set. Obviously, if a vector is
+       * created on only one processor, then the result would satisfy
        * @code
        *  vec.locally_owned_elements() == complete_index_set(vec.size())
        * @endcode

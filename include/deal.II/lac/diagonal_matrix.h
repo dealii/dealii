@@ -35,8 +35,8 @@ DEAL_II_NAMESPACE_OPEN
  * In practice this requires initialization of the vector as follows
  * @code
  * DiagonalMatrix<LinearAlgebra::distributed::Vector<double> > diagonal_matrix;
- * LinearAlgebra::distributed::Vector<double> &diagonal_vector =
- * diagonal_matrix.get_vector(); diagonal_vector.reinit(locally_owned_dofs,
+ * LinearAlgebra::distributed::Vector<double> &diagonal_vector = diagonal_matrix.get_vector();
+ * diagonal_vector.reinit(locally_owned_dofs,
  *                        locally_relevant_dofs,
  *                        mpi_communicator);
  * @endcode
@@ -65,8 +65,7 @@ public:
   /**
    * Compresses the data structures and allows the resulting matrix to be used
    * in all other operations like matrix-vector products. This is a collective
-   * operation, i.e., it needs to be run on all processors when used in
-   * parallel.
+   * operation, i.e., it needs to be run on all processors when used in parallel.
    */
   void
   compress(VectorOperation::values operation);

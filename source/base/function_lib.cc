@@ -2543,12 +2543,12 @@ namespace Functions
                  coordinate_values[d].begin());
 
         // the one we want is the index of the coordinate to the left, however,
-        // so decrease it by one (unless we have a point to the left of all, in
-        // which case we stay where we are; the formulas below are made in a way
-        // that allow us to extend the function by a constant value)
+        // so decrease it by one (unless we have a point to the left of all, in which
+        // case we stay where we are; the formulas below are made in a way that allow
+        // us to extend the function by a constant value)
         //
-        // to make this work, if we got coordinate_values[d].end(), we actually
-        // have to consider the last box which has index size()-2
+        // to make this work, if we got coordinate_values[d].end(), we actually have
+        // to consider the last box which has index size()-2
         if (ix[d] == coordinate_values[d].size())
           ix[d] = coordinate_values[d].size() - 2;
         else if (ix[d] > 0)

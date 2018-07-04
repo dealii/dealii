@@ -75,8 +75,8 @@ public:
                 "FE_NedelecSZ is only implemented for dim==spacedim!");
 
   /**
-   * Constructor for an element of given @p degree.
-   */
+  * Constructor for an element of given @p degree.
+  */
   FE_NedelecSZ(const unsigned int degree);
 
   virtual UpdateFlags
@@ -89,45 +89,45 @@ public:
   clone() const override;
 
   /**
-   * This element is vector-valued so this function will
-   * throw an exception.
-   */
+  * This element is vector-valued so this function will
+  * throw an exception.
+  */
   virtual double
   shape_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
-   */
+  * Not implemented.
+  */
   virtual double
   shape_value_component(const unsigned int i,
                         const Point<dim> & p,
                         const unsigned int component) const override;
 
   /**
-   * This element is vector-valued so this function will
-   * throw an exception.
-   */
+  * This element is vector-valued so this function will
+  * throw an exception.
+  */
   virtual Tensor<1, dim>
   shape_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
-   */
+  * Not implemented.
+  */
   virtual Tensor<1, dim>
   shape_grad_component(const unsigned int i,
                        const Point<dim> & p,
                        const unsigned int component) const override;
 
   /**
-   * This element is vector-valued so this function will
-   * throw an exception.
-   */
+  * This element is vector-valued so this function will
+  * throw an exception.
+  */
   virtual Tensor<2, dim>
   shape_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
-   */
+  * Not implemented.
+  */
   virtual Tensor<2, dim>
   shape_grad_grad_component(const unsigned int i,
                             const Point<dim> & p,
@@ -167,10 +167,10 @@ protected:
       &output_data) const override;
 
   /**
-   * Compute information about the shape functions on the cell denoted by the
-   * first argument. Note that this function must recompute the cell-dependent
-   * degrees of freedom, and so is not thread-safe at this time.
-   */
+  * Compute information about the shape functions on the cell denoted by the
+  * first argument. Note that this function must recompute the cell-dependent
+  * degrees of freedom, and so is not thread-safe at this time.
+  */
   virtual void
   fill_fe_values(
     const typename Triangulation<dim, dim>::cell_iterator &cell,
@@ -185,10 +185,10 @@ protected:
       &data) const override;
 
   /**
-   * Compute information about the shape functions on the cell and face denoted
-   * by the first two arguments. Note that this function must recompute the
-   * cell-dependent degrees of freedom, and so is not thread-safe at this time.
-   */
+  * Compute information about the shape functions on the cell and face denoted
+  * by the first two arguments. Note that this function must recompute the
+  * cell-dependent degrees of freedom, and so is not thread-safe at this time.
+  */
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, dim>::cell_iterator &cell,
@@ -203,8 +203,8 @@ protected:
       &data) const override;
 
   /**
-   * Not implemented.
-   */
+  * Not implemented.
+  */
   virtual void
   fill_fe_subface_values(
     const typename Triangulation<dim, dim>::cell_iterator &cell,
@@ -242,172 +242,169 @@ protected:
   {
   public:
     /**
-     * Storage for shape functions on the reference element. We only pre-compute
-     * cell-based DoFs, as the edge- and face-based DoFs depend on the cell.
-     *
-     * Due to the cell-dependent DoFs, this variable is declared mutable.
-     */
+    * Storage for shape functions on the reference element. We only pre-compute
+    * cell-based DoFs, as the edge- and face-based DoFs depend on the cell.
+    *
+    * Due to the cell-dependent DoFs, this variable is declared mutable.
+    */
     mutable std::vector<std::vector<Tensor<1, dim>>> shape_values;
 
     /**
-     * Storage for shape function gradients on the reference element. We only
-     * pre-compute cell-based DoFs, as the edge- and face-based DoFs depend on
-     * the cell.
-     *
-     * Due to the cell-dependent DoFs, this variable is declared mutable.
-     */
+    * Storage for shape function gradients on the reference element. We only
+    * pre-compute cell-based DoFs, as the edge- and face-based DoFs depend on
+    * the cell.
+    *
+    * Due to the cell-dependent DoFs, this variable is declared mutable.
+    */
     mutable std::vector<std::vector<DerivativeForm<1, dim, dim>>> shape_grads;
 
     /**
-     * Storage for all possible edge parameterization between vertices. These
-     * are required in the computation of edge- and face-based DoFs, which are
-     * cell-dependent.
-     *
-     * The edge parameterization of an edge, E, starting at vertex i and ending
-     * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
-     *
-     * sigma_imj_values[q][i][j] stores the value of the edge parameterization
-     * connected by vertices $i$ and $j$ at the q-th quadrature point.
-     *
-     * Note that not all of the $i$ and $j$ combinations result in valid edges
-     * on the hexahedral cell, but they are computed in this fashion for use
-     * with non-standard edge and face orientations.
-     */
+    * Storage for all possible edge parameterization between vertices. These
+    * are required in the computation of edge- and face-based DoFs, which are
+    * cell-dependent.
+    *
+    * The edge parameterization of an edge, E, starting at vertex i and ending
+    * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
+    *
+    * sigma_imj_values[q][i][j] stores the value of the edge parameterization
+    * connected by vertices $i$ and $j$ at the q-th quadrature point.
+    *
+    * Note that not all of the $i$ and $j$ combinations result in valid edges on
+    * the hexahedral cell, but they are computed in this fashion for use with
+    * non-standard edge and face orientations.
+    */
     std::vector<std::vector<std::vector<double>>> sigma_imj_values;
 
     /**
-     * Storage for gradients of all possible edge parameterizations between
-     * vertices. These are required in the computation of edge- and face-based
-     * DoFs, which are cell-dependent. Note that the components of the gradient
-     * are constant.
-     *
-     * The edge parameterization of an edge, $E$, starting at vertex $i$ and
-     * ending at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
-     *
-     * sigma_imj_grads[i][j][d] stores the gradient of the edge parameterization
-     * connected by vertices $i$ and $j$ in component $d$.
-     *
-     * Note that the gradient of the edge parameterization is constant on an
-     * edge, so we do not need to store it at every quadrature point.
-     */
+    * Storage for gradients of all possible edge parameterizations between
+    * vertices. These are required in the computation of edge- and face-based
+    * DoFs, which are cell-dependent. Note that the components of the gradient
+    * are constant.
+    *
+    * The edge parameterization of an edge, $E$, starting at vertex $i$ and ending
+    * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
+    *
+    * sigma_imj_grads[i][j][d] stores the gradient of the edge parameterization
+    * connected by vertices $i$ and $j$ in component $d$.
+    *
+    * Note that the gradient of the edge parameterization is constant on an
+    * edge, so we do not need to store it at every quadrature point.
+    */
     std::vector<std::vector<std::vector<double>>> sigma_imj_grads;
 
     /**
-     * Storage for values of edge parameterizations at quadrature points. These
-     * are stored for the 12 edges such that the global vertex numbering would
-     * follow the order defined by the "standard" deal.II cell.
-     *
-     * edge_sigma_values[m][q] stores the edge parameterization value at the
-     * q-th quadrature point on edge m.
-     *
-     * These values change with the orientation of the edges of a physical cell
-     * and so must take the "sign" into account when used for computation.
-     */
+    * Storage for values of edge parameterizations at quadrature points. These
+    * are stored for the 12 edges such that the global vertex numbering would
+    * follow the order defined by the "standard" deal.II cell.
+    *
+    * edge_sigma_values[m][q] stores the edge parameterization value at the
+    * q-th quadrature point on edge m.
+    *
+    * These values change with the orientation of the edges of a physical cell
+    * and so must take the "sign" into account when used for computation.
+    */
     std::vector<std::vector<double>> edge_sigma_values;
 
     /**
-     * Storage for gradients of edge parameterization at quadrature points.
-     * These are stored for the 12 edges such that the global vertex numbering
-     * would follow the order defined by the "standard" deal.II cell.
-     *
-     * edge_sigma_grads[m][d] stores the gradient of the edge parameterization
-     * for component d on edge m.
-     *
-     * These values change with the orientation of the edges of a physical cell
-     * and so must take the "sign" into account when used for computation.
-     *
-     */
+    * Storage for gradients of edge parameterization at quadrature points.
+    * These are stored for the 12 edges such that the global vertex numbering
+    * would follow the order defined by the "standard" deal.II cell.
+    *
+    * edge_sigma_grads[m][d] stores the gradient of the edge parameterization
+    * for component d on edge m.
+    *
+    * These values change with the orientation of the edges of a physical cell
+    * and so must take the "sign" into account when used for computation.
+    *
+    */
     std::vector<std::vector<double>> edge_sigma_grads;
 
     /**
-     * Storage for edge extension parameters at quadrature points. These are
-     * stored for the 12 edges such that the global vertex numbering would
-     * follow the order defined by the "standard" deal.II cell.
-     *
-     * The edge extension parameter of an edge, $E$, starting at vertex $i$ and
-     * ending at vertex $j$ is given by $\lambda_{E} = \lambda_{i} +
-     * \lambda_{j}$.
-     *
-     * Note that under this definition, the values of $\lambda_{E}$ do not
-     * change with the orientation of the edge.
-     *
-     * edge_lambda_values[m][q] stores the edge extension parameter value at
-     * the $q$-th quadrature point on edge $m$.
-     */
+    * Storage for edge extension parameters at quadrature points. These are
+    * stored for the 12 edges such that the global vertex numbering would
+    * follow the order defined by the "standard" deal.II cell.
+    *
+    * The edge extension parameter of an edge, $E$, starting at vertex $i$ and
+    * ending at vertex $j$ is given by $\lambda_{E} = \lambda_{i} + \lambda_{j}$.
+    *
+    * Note that under this definition, the values of $\lambda_{E}$ do not change
+    * with the orientation of the edge.
+    *
+    * edge_lambda_values[m][q] stores the edge extension parameter value at
+    * the $q$-th quadrature point on edge $m$.
+    */
     std::vector<std::vector<double>> edge_lambda_values;
 
     /**
-     * Storage for gradients of edge extension parameters in 2D. In this case
-     * they are constant. These are stored for the 12 edges such that the global
-     * vertex numbering* would follow the order defined by the "standard"
-     * deal.II cell.
-     *
-     * edge_lambda_grads_2d[m][d] stores the gradient of the edge extension
-     * parameter for component $d$ on edge $m$.
-     */
+    * Storage for gradients of edge extension parameters in 2D. In this case
+    * they are constant. These are stored for the 12 edges such that the global
+    * vertex numbering* would follow the order defined by the "standard"
+    * deal.II cell.
+    *
+    * edge_lambda_grads_2d[m][d] stores the gradient of the edge extension
+    * parameter for component $d$ on edge $m$.
+    */
     std::vector<std::vector<double>> edge_lambda_grads_2d;
 
     /**
-     * Storage for gradients of edge extension parameters in 3D. In this case
-     * they are non-constant. These are stored for the 12 edges such that the
-     * global vertex numbering* would follow the order defined by the
-     * "standard" deal.II cell.
-     *
-     * edge_lambda_grads_3d[m][q][d] stores the gradient of the edge extension
-     * parameter for component $d$ at the $q$-th quadrature point on edge m.
-     */
+    * Storage for gradients of edge extension parameters in 3D. In this case
+    * they are non-constant. These are stored for the 12 edges such that the
+    * global vertex numbering* would follow the order defined by the
+    * "standard" deal.II cell.
+    *
+    * edge_lambda_grads_3d[m][q][d] stores the gradient of the edge extension
+    * parameter for component $d$ at the $q$-th quadrature point on edge m.
+    */
     std::vector<std::vector<std::vector<double>>> edge_lambda_grads_3d;
 
     /**
-     * Storage for 2nd derivatives of edge extension parameters in 3D, which are
-     * constant across the cell. These are stored for the 12 edges such that the
-     * global vertex numbering* would follow the order defined by the
-     * "standard" deal.II cell.
-     *
-     * edge_lambda_gradgrads_3d[m][d1][d2] stores the 2nd derivatives of the
-     * edge extension parameters with respect to components d1 and d2 on edge
-     * $m$.
-     */
+    * Storage for 2nd derivatives of edge extension parameters in 3D, which are
+    * constant across the cell. These are stored for the 12 edges such that the
+    * global vertex numbering* would follow the order defined by the
+    * "standard" deal.II cell.
+    *
+    * edge_lambda_gradgrads_3d[m][d1][d2] stores the 2nd derivatives of the
+    * edge extension parameters with respect to components d1 and d2 on edge $m$.
+    */
     std::vector<std::vector<std::vector<double>>> edge_lambda_gradgrads_3d;
 
     /**
-     * Storage for the face extension parameters. These are stored for the 6
-     * faces such that the global vertex numbering would follow the order
-     * defined by the "standard" deal.II cell.
-     *
-     * The face extension parameter of a face, F, defined by the vertices
-     * v1, v2, v3, v4 is given by
-     * $\lambda_{F} = \lambda_{v1} + \lambda_{v2} + \lambda_{v3} +
-     * \lambda_{v4}$.
-     *
-     * Note that under this definition, the values of $\lambda_{F}$ do not
-     * change with the orientation of the face.
-     *
-     * face_lambda_values[m][q] stores the face extension parameter value at
-     * the $q$-th quadrature point on face $m$.
-     */
+    * Storage for the face extension parameters. These are stored for the 6
+    * faces such that the global vertex numbering would follow the order
+    * defined by the "standard" deal.II cell.
+    *
+    * The face extension parameter of a face, F, defined by the vertices
+    * v1, v2, v3, v4 is given by
+    * $\lambda_{F} = \lambda_{v1} + \lambda_{v2} + \lambda_{v3} + \lambda_{v4}$.
+    *
+    * Note that under this definition, the values of $\lambda_{F}$ do not change
+    * with the orientation of the face.
+    *
+    * face_lambda_values[m][q] stores the face extension parameter value at
+    * the $q$-th quadrature point on face $m$.
+    */
     std::vector<std::vector<double>> face_lambda_values;
 
     /**
-     * Storage for gradients of face extension parameters. These are stored for
-     * the 6 faces such that the global vertex numbering would follow the order
-     * defined by the "standard" deal.II cell.
-     *
-     * face_lambda_grads[m][d] stores the gradient of the face extension
-     * parameters for component $d$ on face $m$.
-     */
+    * Storage for gradients of face extension parameters. These are stored for
+    * the 6 faces such that the global vertex numbering would follow the order
+    * defined by the "standard" deal.II cell.
+    *
+    * face_lambda_grads[m][d] stores the gradient of the face extension
+    * parameters for component $d$ on face $m$.
+    */
     std::vector<std::vector<double>> face_lambda_grads;
   };
 
 private:
   /**
-   * Internal function to return a vector of "dofs per object"
-   * where the components of the returned vector refer to:
-   * 0 = vertex
-   * 1 = edge
-   * 2 = face (which is a cell in 2D)
-   * 3 = cell
-   */
+  * Internal function to return a vector of "dofs per object"
+  * where the components of the returned vector refer to:
+  * 0 = vertex
+  * 1 = edge
+  * 2 = face (which is a cell in 2D)
+  * 3 = cell
+  */
   static std::vector<unsigned int>
   get_dpo_vector(const unsigned int degree);
 
@@ -417,31 +414,31 @@ private:
   std::vector<Polynomials::Polynomial<double>> IntegratedLegendrePolynomials;
 
   /**
-   * Internal function to populate the internal array of integrated Legendre
-   * polynomials.
-   */
+  * Internal function to populate the internal array of integrated Legendre
+  * polynomials.
+  */
   void
   create_polynomials(const unsigned int degree);
 
   /**
-   * Returns the number of DoFs in the basis set.
-   */
+  * Returns the number of DoFs in the basis set.
+  */
   unsigned int
   compute_num_dofs(const unsigned int degree) const;
 
   /**
-   * Populates cell-dependent edge-based shape functions on the given
-   * InternalData object.
-   */
+  * Populates cell-dependent edge-based shape functions on the given
+  * InternalData object.
+  */
   void
   fill_edge_values(const typename Triangulation<dim, dim>::cell_iterator &cell,
                    const Quadrature<dim> &quadrature,
                    const InternalData &   fedata) const;
 
   /**
-   * Populates the cell-dependent face-based shape functions on the given
-   * InternalData object.
-   */
+  * Populates the cell-dependent face-based shape functions on the given
+  * InternalData object.
+  */
   void
   fill_face_values(const typename Triangulation<dim, dim>::cell_iterator &cell,
                    const Quadrature<dim> &quadrature,

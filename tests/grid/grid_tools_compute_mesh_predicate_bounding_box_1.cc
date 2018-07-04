@@ -81,7 +81,7 @@ test_hypercube(unsigned int ref, unsigned int max_bbox)
   else
     deallog << "Has no locally owned children cells" << std::endl;
 
-  // Checking if all the points are inside the bounding boxes
+  //Checking if all the points are inside the bounding boxes
   bool check = true;
 
   typename parallel::distributed::Triangulation<dim,
@@ -91,7 +91,7 @@ test_hypercube(unsigned int ref, unsigned int max_bbox)
                                                 spacedim>::active_cell_iterator
     endc = tria.last_active();
 
-  // Looking if every point is at least inside a bounding box
+  //Looking if every point is at least inside a bounding box
   for (; cell < endc; ++cell)
     if (cell->is_locally_owned())
       for (unsigned int v = 0; v < GeometryInfo<spacedim>::vertices_per_cell;

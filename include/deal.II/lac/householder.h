@@ -313,16 +313,16 @@ Householder<number>::least_squares(BlockVector<number2> &      dst,
     sum += (*aux)(i) * (*aux)(i);
   AssertIsFinite(sum);
 
-  // backward works for
-  // Vectors only, so copy
-  // them before
+  //backward works for
+  //Vectors only, so copy
+  //them before
   Vector<number2> v_dst, v_aux;
   v_dst = dst;
   v_aux = *aux;
   // Compute solution
   storage.backward(v_dst, v_aux);
-  // copy the result back
-  // to the BlockVector
+  //copy the result back
+  //to the BlockVector
   dst = v_dst;
 
   return std::sqrt(sum);

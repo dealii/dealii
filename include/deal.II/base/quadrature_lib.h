@@ -252,8 +252,7 @@ public:
 
   /**
    * Move constructor. We cannot rely on the move constructor for `Quadrature`,
-   * since it does not know about the additional member `fraction` of this
-   * class.
+   * since it does not know about the additional member `fraction` of this class.
    */
   QGaussLogR(QGaussLogR<dim> &&) noexcept = default;
 
@@ -587,8 +586,8 @@ public:
  * quadrature formula only has quadrature points in the reference simplex or on
  * its boundary.
  *
- * No transformation is applied to the weights, and the weights referring to
- * points that live outside the reference simplex are simply discarded.
+ * No transformation is applied to the weights, and the weights referring to points
+ * that live outside the reference simplex are simply discarded.
  *
  * The main use of this quadrature formula is not to chop tensor product
  * quadratures. Ideally you should pass to this class a quadrature formula
@@ -620,12 +619,11 @@ public:
   QSimplex(const Quadrature<dim> &quad);
 
   /**
-   * Return an affine transformation of this quadrature, that can be used to
-   * integrate on the simplex identified by `vertices`.
+   * Return an affine transformation of this quadrature, that can be used to integrate
+   * on the simplex identified by `vertices`.
    *
-   * Both the quadrature point locations and the weights are transformed, so
-   * that you can effectively use the resulting quadrature to integrate on the
-   * simplex.
+   * Both the quadrature point locations and the weights are transformed, so that you
+   * can effectively use the resulting quadrature to integrate on the simplex.
    *
    * The transformation is defined as
    * \f[

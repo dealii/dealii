@@ -75,7 +75,7 @@ test()
               << get_real_assert_zero_imag(v(myid * 2 + 1)) << std::endl;
     }
 
-  // assignment from ghosted to ghosted
+  //assignment from ghosted to ghosted
   v2 = v;
   Assert(get_real_assert_zero_imag(v2(1)) == 2.0, ExcInternalError());
   Assert(get_real_assert_zero_imag(v2(myid * 2)) == myid * 4.0,

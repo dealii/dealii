@@ -163,7 +163,7 @@ test(const unsigned int fe_degree)
   std::vector<types::global_dof_index> dofs_per_block(dim + 1);
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_block);
 
-  // std::cout << "   Number of active cells: "
+  //std::cout << "   Number of active cells: "
   //          << triangulation.n_active_cells()
   //          << std::endl
   //          << "   Number of degrees of freedom: "

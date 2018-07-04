@@ -75,7 +75,7 @@ namespace FETools
   }
 } // namespace FETools
 
-// forward declaration of the data type for periodic face pairs
+//forward declaration of the data type for periodic face pairs
 namespace GridTools
 {
   template <typename CellIterator>
@@ -162,8 +162,7 @@ namespace parallel
      *     #include <functional>
      *
      *     template <int dim>
-     *     void set_boundary_ids (parallel::distributed::Triangulation<dim>
-     * &triangulation)
+     *     void set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation)
      *     {
      *       ... set boundary indicators on the triangulation object ...
      *     }
@@ -171,8 +170,7 @@ namespace parallel
      *     template <int dim>
      *     void
      *     MyClass<dim>::
-     *     create_coarse_mesh (parallel::distributed::Triangulation<dim>
-     * &coarse_grid) const
+     *     create_coarse_mesh (parallel::distributed::Triangulation<dim> &coarse_grid) const
      *     {
      *       ... create the coarse mesh ...
      *
@@ -206,8 +204,7 @@ namespace parallel
      *     template <int dim>
      *     void
      *     MyClass<dim>::
-     *     set_boundary_ids (parallel::distributed::Triangulation<dim>
-     * &triangulation) const
+     *     set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation) const
      *     {
      *       ... set boundary indicators on the triangulation object ...
      *     }
@@ -215,8 +212,7 @@ namespace parallel
      *     template <int dim>
      *     void
      *     MyClass<dim>::
-     *     create_coarse_mesh (parallel::distributed::Triangulation<dim>
-     * &coarse_grid) const
+     *     create_coarse_mesh (parallel::distributed::Triangulation<dim> &coarse_grid) const
      *     {
      *       ... create the coarse mesh ...
      *
@@ -755,12 +751,12 @@ namespace parallel
        * object that now is the time when they are ready by calling the
        * current function.
        *
-       * The supplied callback function is then called for each newly locally
-       * owned cell. The first argument to the callback is an iterator that
-       * designated the cell; the second argument indicates the status of the
-       * cell in question; and the third argument points to a memory area that
-       * contains the data that was previously saved from the callback provided
-       * to register_data_attach().
+       * The supplied callback function is then called for each newly locally owned
+       * cell. The first argument to the callback is an iterator that designated
+       * the cell; the second argument indicates the status of the cell in
+       * question; and the third argument points to a memory area that contains the
+       * data that was previously saved from the callback provided to
+       * register_data_attach().
        *
        * The CellStatus will indicate if the cell was refined, coarsened, or
        * persisted unchanged. The @p cell_iterator argument to the callback
@@ -804,11 +800,10 @@ namespace parallel
       get_coarse_cell_to_p4est_tree_permutation() const;
 
       /**
-       * In addition to the action in the base class Triangulation, this
-       * function joins faces in the p4est forest for periodic boundary
-       * conditions. As a result, each pair of faces will differ by at most one
-       * refinement level and ghost neighbors will be available across these
-       * faces.
+       * In addition to the action in the base class Triangulation, this function
+       * joins faces in the p4est forest for periodic boundary conditions. As a
+       * result, each pair of faces will differ by at most one refinement
+       * level and ghost neighbors will be available across these faces.
        *
        * The vector can be filled by the function
        * GridTools::collect_periodic_faces.
@@ -899,11 +894,10 @@ namespace parallel
 
         /**
          * List of callback functions registered by register_data_attach() that
-         * are going to be called for packing data. The callback functions
-         * objects will be stored together with their offset at which each
-         * callback is allowed to write into the per-cell buffer (counted in
-         * bytes). These pairs will be stored in the order on how they have been
-         * registered.
+         * are going to be called for packing data. The callback functions objects
+         * will be stored together with their offset at which each callback is
+         * allowed to write into the per-cell buffer (counted in bytes). These
+         * pairs will be stored in the order on how they have been registered.
          */
         std::vector<std::pair<unsigned int, pack_callback_t>> pack_callbacks;
       };
@@ -1143,22 +1137,19 @@ namespace parallel
         const std::vector<bool> &vertex_locally_moved);
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       void
       load(const char *filename, const bool autopartition = true);
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       void
       save(const char *filename) const;
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       unsigned int
       register_data_attach(
@@ -1169,8 +1160,7 @@ namespace parallel
           void *)> &      pack_callback);
 
       /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
+       * This function is not implemented, but needs to be present for the compiler.
        */
       void
       notify_ready_to_unpack(
@@ -1190,8 +1180,7 @@ namespace parallel
         p4est_tree_to_coarse_cell_permutation;
 
 
-      // TODO: The following variable should really be private, but it is used
-      // in dof_handler_policy.cc ...
+      //TODO: The following variable should really be private, but it is used in dof_handler_policy.cc ...
       /**
        * dummy settings object
        */

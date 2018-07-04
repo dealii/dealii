@@ -15,8 +15,8 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator = (TrilinosScalar) with setting
-// to a nonzero value
+// check TrilinosWrappers::MPI::Vector::operator = (TrilinosScalar) with setting to a
+// nonzero value
 
 #include <deal.II/base/utilities.h>
 

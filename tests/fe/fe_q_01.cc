@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// document a bug that would fill all memory if you try to create a
-// FE_Q<dim>(0).
+// document a bug that would fill all memory if you try to create a FE_Q<dim>(0).
 
 #include <deal.II/fe/fe_q.h>
 

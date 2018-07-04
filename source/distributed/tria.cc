@@ -1138,8 +1138,8 @@ namespace parallel
                      smooth_grid,
       const Settings settings_)
       : // Do not check for distorted cells.
-        // For multigrid, we need limit_level_difference_at_vertices
-        // to make sure the transfer operators only need to consider two levels.
+      // For multigrid, we need limit_level_difference_at_vertices
+      // to make sure the transfer operators only need to consider two levels.
       dealii::parallel::Triangulation<dim, spacedim>(
         mpi_communicator,
         (settings_ & construct_multigrid_hierarchy) ?

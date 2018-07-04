@@ -18,8 +18,7 @@
  *          Guido Kanschat, 2011
  */
 
-// Check whether the restricted prolongation is the identity for nested FE
-// spaces
+//Check whether the restricted prolongation is the identity for nested FE spaces
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -76,8 +75,8 @@ check(const FiniteElement<dim, spacedim> &fe,
 
       std::vector<types::global_dof_index> ldi(dpc);
 
-      // now create the matrix coarse to fine (prolongation)
-      // and fine to coarse (restriction) with respect to all dofs
+      //now create the matrix coarse to fine (prolongation)
+      //and fine to coarse (restriction) with respect to all dofs
       unsigned int child_no = 0;
       typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator cell =
         dh.begin_active();

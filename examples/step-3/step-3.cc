@@ -504,10 +504,10 @@ void Step3::assemble_system()
   // the boundary.
   //
   // The function describing the boundary values is an object of type Function
-  // or of a derived class. One of the derived classes is
-  // Functions::ZeroFunction, which describes (not unexpectedly) a function
-  // which is zero everywhere. We create such an object in-place and pass it to
-  // the VectorTools::interpolate_boundary_values() function.
+  // or of a derived class. One of the derived classes is Functions::ZeroFunction, which
+  // describes (not unexpectedly) a function which is zero everywhere. We
+  // create such an object in-place and pass it to the
+  // VectorTools::interpolate_boundary_values() function.
   //
   // Finally, the output object is a list of pairs of global degree of freedom
   // numbers (i.e. the number of the degrees of freedom on the boundary) and
