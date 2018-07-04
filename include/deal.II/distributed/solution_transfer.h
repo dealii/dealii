@@ -55,25 +55,28 @@ namespace parallel
      * TrilinosWrappers::MPI::Vector, or corresponding blockvectors.
      * @code
      * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
-     *                                   // flag some cells for refinement
-     *                                   // and coarsening, e.g.
-     * GridRefinement::refine_and_coarsen_fixed_fraction(
-     * tria, error_indicators, 0.3, 0.05);
-     *                                   // prepare the triangulation,
+     * // flag some cells for refinement and coarsening, e.g.
+     * GridRefinement::refine_and_coarsen_fixed_fraction(tria,
+     *                                                   error_indicators,
+     *                                                   0.3,
+     *                                                   0.05);
+     *
+     * // prepare the triangulation,
      * tria.prepare_coarsening_and_refinement();
-     *                                   // prepare the SolutionTransfer object
-     *                                   // for coarsening and refinement and
-     * give
-     *                                   // the solution vector that we intend
-     * to
-     *                                   // interpolate later,
+     *
+     * // prepare the SolutionTransfer object for coarsening and refinement
+     * // and give the solution vector that we intend to interpolate later,
      * soltrans.prepare_for_coarsening_and_refinement(solution);
-     *                                   // actually execute the refinement,
+     *
+     * // actually execute the refinement,
      * tria.execute_coarsening_and_refinement ();
-     *                                   // redistribute dofs,
+     *
+     * // redistribute dofs,
      * dof_handler.distribute_dofs (fe);
-     *                                   // and interpolate the solution
+     *
+     * // and interpolate the solution
      * VectorType interpolated_solution;
+     *
      * //create VectorType in the right size here
      * soltrans.interpolate(interpolated_solution);
      * @endcode
@@ -96,10 +99,10 @@ namespace parallel
      *
      * If vector has the locally relevant DoFs, serialization works as
      * follows:
-     * *@code
-     *
+     * @code
      * parallel::distributed::SolutionTransfer<dim,VectorType>
-     * sol_trans(dof_handler); sol_trans.prepare_serialization (vector);
+     *   sol_trans(dof_handler);
+     * sol_trans.prepare_serialization (vector);
      *
      * triangulation.save(filename);
      * @endcode
@@ -110,7 +113,8 @@ namespace parallel
      * triangulation.load(filename);
      *
      * parallel::distributed::SolutionTransfer<dim,VectorType>
-     * sol_trans(dof_handler); sol_trans.deserialize (distributed_vector);
+     *   sol_trans(dof_handler);
+     * sol_trans.deserialize (distributed_vector);
      * @endcode
      *
      *

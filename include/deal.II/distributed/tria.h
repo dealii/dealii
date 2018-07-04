@@ -159,28 +159,25 @@ namespace parallel
      * information into the function. C++ provides a nice mechanism for this
      * that is best explained using an example:
      * @code
-     *     #include <functional>
+     * #include <functional>
      *
-     *     template <int dim>
-     *     void set_boundary_ids (parallel::distributed::Triangulation<dim>
-     * &triangulation)
-     *     {
-     *       ... set boundary indicators on the triangulation object ...
-     *     }
+     * template <int dim>
+     * void set_boundary_ids (
+     *   parallel::distributed::Triangulation<dim> &triangulation)
+     * {
+     *   ... set boundary indicators on the triangulation object ...
+     * }
      *
-     *     template <int dim>
-     *     void
-     *     MyClass<dim>::
-     *     create_coarse_mesh (parallel::distributed::Triangulation<dim>
-     * &coarse_grid) const
-     *     {
-     *       ... create the coarse mesh ...
+     * template <int dim>
+     * void
+     * MyClass<dim>::create_coarse_mesh (
+     *   parallel::distributed::Triangulation<dim> &coarse_grid) const
+     * {
+     *   ... create the coarse mesh ...
      *
-     *       coarse_grid.signals.post_refinement.connect
-     *         (std::bind (&set_boundary_ids<dim>,
-     *                     std::ref(coarse_grid)));
-     *
-     *     }
+     *   coarse_grid.signals.post_refinement.connect(
+     *     std::bind (&set_boundary_ids<dim>, std::ref(coarse_grid)));
+     * }
      * @endcode
      *
      * What the call to <code>std::bind</code> does is to produce an
@@ -201,30 +198,28 @@ namespace parallel
      * static, but possibly private) member function of the
      * <code>MyClass</code> class, then the following will work:
      * @code
-     *     #include <functional>
+     * #include <functional>
      *
-     *     template <int dim>
-     *     void
-     *     MyClass<dim>::
-     *     set_boundary_ids (parallel::distributed::Triangulation<dim>
-     * &triangulation) const
-     *     {
-     *       ... set boundary indicators on the triangulation object ...
-     *     }
+     * template <int dim>
+     * void
+     * MyClass<dim>::set_boundary_ids (
+     *   parallel::distributed::Triangulation<dim> &triangulation) const
+     * {
+     *   ... set boundary indicators on the triangulation object ...
+     * }
      *
-     *     template <int dim>
-     *     void
-     *     MyClass<dim>::
-     *     create_coarse_mesh (parallel::distributed::Triangulation<dim>
-     * &coarse_grid) const
-     *     {
-     *       ... create the coarse mesh ...
+     * template <int dim>
+     * void
+     * MyClass<dim>::create_coarse_mesh (
+     *   parallel::distributed::Triangulation<dim> &coarse_grid) const
+     * {
+     *   ... create the coarse mesh ...
      *
-     *       coarse_grid.signals.post_refinement.connect
-     *         (std::bind (&MyGeometry<dim>::set_boundary_ids,
-     *                     std::cref(*this),
-     *                     std::ref(coarse_grid)));
-     *     }
+     *   coarse_grid.signals.post_refinement.connect(
+     *     std::bind (&MyGeometry<dim>::set_boundary_ids,
+     *                std::cref(*this),
+     *                std::ref(coarse_grid)));
+     * }
      * @endcode
      * Here, like any other member function, <code>set_boundary_ids</code>
      * implicitly takes a pointer or reference to the object it belongs to as
