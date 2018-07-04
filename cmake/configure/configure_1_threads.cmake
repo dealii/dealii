@@ -138,6 +138,25 @@ MACRO(FEATURE_THREADS_FIND_EXTERNAL var)
   IF(TBB_FOUND)
     SET(${var} TRUE)
   ENDIF()
+
+  #
+  # TBB versions before 4.2 are missing some explicit calls to std::atomic::load
+  # in ternary expressions; these cause compilation errors in some compilers
+  # (such as GCC 8.1 and newer). To fix this we simply blacklist all older
+  # versions:
+  #
+  IF(TBB_VERSION VERSION_LESS "4.2")
+    MESSAGE(STATUS
+      "The externally provided TBB library is older than version 4.2.0, which "
+      "cannot be used with deal.II."
+      )
+    SET(THREADS_ADDITIONAL_ERROR_STRING
+      "The externally provided TBB library is older than version\n"
+      "4.2.0, which is the oldest version compatible with deal.II and its\n"
+      "supported compilers."
+      )
+    SET(${var} FALSE)
+  ENDIF()
 ENDMACRO()
 
 
