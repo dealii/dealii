@@ -939,16 +939,17 @@ namespace MatrixFreeOperators
     const VectorizedArray<Number> *               in_array,
     VectorizedArray<Number> *                     out_array) const
   {
-    constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
+    constexpr unsigned int dofs_per_component =
+      Utilities::pow(fe_degree + 1, dim);
     Assert(inverse_coefficients.size() > 0 &&
-             inverse_coefficients.size() % dofs_per_cell == 0,
+             inverse_coefficients.size() % dofs_per_component == 0,
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));
-    if (inverse_coefficients.size() != dofs_per_cell)
-      AssertDimension(n_actual_components * dofs_per_cell,
+    if (inverse_coefficients.size() != dofs_per_component)
+      AssertDimension(n_actual_components * dofs_per_component,
                       inverse_coefficients.size());
 
-    Assert(dim == 2 || dim == 3, ExcNotImplemented());
+    Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
 
     internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
                                      dim,
@@ -958,30 +959,40 @@ namespace MatrixFreeOperators
       evaluator(inverse_shape, inverse_shape, inverse_shape);
 
     const unsigned int shift_coefficient =
-      inverse_coefficients.size() > dofs_per_cell ? dofs_per_cell : 0;
+      inverse_coefficients.size() > dofs_per_component ? dofs_per_component : 0;
     const VectorizedArray<Number> *inv_coefficient = &inverse_coefficients[0];
-    VectorizedArray<Number>        temp_data_field[dofs_per_cell];
+    VectorizedArray<Number>        temp_data_field[dofs_per_component];
     for (unsigned int d = 0; d < n_actual_components; ++d)
       {
-        const VectorizedArray<Number> *in  = in_array + d * dofs_per_cell;
-        VectorizedArray<Number> *      out = out_array + d * dofs_per_cell;
+        const VectorizedArray<Number> *in  = in_array + d * dofs_per_component;
+        VectorizedArray<Number> *      out = out_array + d * dofs_per_component;
         // Need to select 'apply' method with hessian slot because values
         // assume symmetries that do not exist in the inverse shapes
         evaluator.template hessians<0, false, false>(in, temp_data_field);
-        evaluator.template hessians<1, false, false>(temp_data_field, out);
-
-        if (dim == 3)
+        if (dim > 1)
           {
-            evaluator.template hessians<2, false, false>(out, temp_data_field);
-            for (unsigned int q = 0; q < dofs_per_cell; ++q)
-              temp_data_field[q] *= inv_coefficient[q];
-            evaluator.template hessians<2, true, false>(temp_data_field, out);
-          }
-        else if (dim == 2)
-          for (unsigned int q = 0; q < dofs_per_cell; ++q)
-            out[q] *= inv_coefficient[q];
+            evaluator.template hessians<1, false, false>(temp_data_field, out);
 
-        evaluator.template hessians<1, true, false>(out, temp_data_field);
+            if (dim == 3)
+              {
+                evaluator.template hessians<2, false, false>(out,
+                                                             temp_data_field);
+                for (unsigned int q = 0; q < dofs_per_component; ++q)
+                  temp_data_field[q] *= inv_coefficient[q];
+                evaluator.template hessians<2, true, false>(temp_data_field,
+                                                            out);
+              }
+            else if (dim == 2)
+              for (unsigned int q = 0; q < dofs_per_component; ++q)
+                out[q] *= inv_coefficient[q];
+
+            evaluator.template hessians<1, true, false>(out, temp_data_field);
+          }
+        else
+          {
+            for (unsigned int q = 0; q < dofs_per_component; ++q)
+              temp_data_field[q] *= inv_coefficient[q];
+          }
         evaluator.template hessians<0, true, false>(temp_data_field, out);
 
         inv_coefficient += shift_coefficient;
