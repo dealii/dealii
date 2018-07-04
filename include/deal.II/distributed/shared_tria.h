@@ -168,47 +168,44 @@ namespace parallel
          * triangulation whenever it is first created and passing the user
          * defined function through the signal using <code>std::bind</code>.
          * Here is an example:
-         *  @code
-         *     template <int dim>
-         *     void mypartition(parallel::shared::Triangulation<dim> &tria)
-         *     {
-         *       // user defined partitioning scheme: assign subdomain_ids
-         *       // round-robin in a mostly random way:
-         *       std::vector<unsigned int> assignment =
-         * {0,0,1,2,0,0,2,1,0,2,2,1,2,2,0,0}; typename
-         * Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-         *         endc = tria.end();
-         *       unsigned int index = 0;
-         *       for (; cell != endc; ++cell, ++index)
-         *         cell->set_subdomain_id(assignment[index%16]);
-         *     }
+         * @code
+         * template <int dim>
+         * void mypartition(parallel::shared::Triangulation<dim> &tria)
+         * {
+         *   // user defined partitioning scheme: assign subdomain_ids
+         *   // round-robin in a mostly random way:
+         *   std::vector<unsigned int> assignment =
+         *     {0,0,1,2,0,0,2,1,0,2,2,1,2,2,0,0};
+         *   unsigned int index = 0;
+         *   for (const auto &cell : tria.active_cell_iterators())
+         *     cell->set_subdomain_id(assignment[(index++)%16]);
+         * }
          *
-         *     int main ()
-         *     {
-         *       parallel::shared::Triangulation<dim> tria(...,
-         *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
-         *       tria.signals.post_refinement.connect
-         * (std::bind(&mypartition<dim>, std::ref(tria)));
-         *     }
-         *  @endcode
+         * int main ()
+         * {
+         *   parallel::shared::Triangulation<dim> tria(
+         *     ...,
+         *     parallel::shared::Triangulation<dim>::partition_custom_signal);
+         *   tria.signals.post_refinement.connect(std::bind(&mypartition<dim>,
+         *                                        std::ref(tria)));
+         * }
+         * @endcode
          *
          * An equivalent code using lambda functions would look like this:
-         *  @code
-         *     int main ()
+         * @code
+         * int main ()
+         * {
+         *   parallel::shared::Triangulation<dim> tria(
+         *     ...,
+         *     parallel::shared::Triangulation<dim>::partition_custom_signal);
+         *   tria.signals.post_refinement.connect (
+         *     [&tria]()
          *     {
-         *       parallel::shared::Triangulation<dim> tria(...,
-         *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
-         *       tria.signals.post_refinement.connect ([&tria]()
-         *                                             {
-         *                                               // user defined
-         * partitioning scheme
-         *                                               // as above
-         *                                               ...
-         *                                             }
-         *                                            );
-         *     }
-         *  @endcode
-         *
+         *       // user defined partitioning scheme as above
+         *       ...
+         *     });
+         * }
+         * @endcode
          *
          * @note If you plan to use a custom partition with geometric multigrid,
          * you must manually partition the level cells in addition to the active
