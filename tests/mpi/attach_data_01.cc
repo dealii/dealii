@@ -122,15 +122,13 @@ test()
 
       for (cell = tr.begin_active(); cell != tr.end(); ++cell)
         {
-          if (cell->id().to_string() == "0_1:0")
-            {
-              cell->set_refine_flag();
-            }
-          else if (cell->parent()->id().to_string() == "3_0:")
-            cell->set_coarsen_flag();
-
           if (cell->is_locally_owned())
             {
+              if (cell->id().to_string() == "0_1:0")
+                cell->set_refine_flag();
+              else if (cell->parent()->id().to_string() == "3_0:")
+                cell->set_coarsen_flag();
+
               deallog << "myid=" << myid << " cellid=" << cell->id();
               if (cell->coarsen_flag_set())
                 deallog << " coarsening" << std::endl;
