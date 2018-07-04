@@ -614,11 +614,14 @@ public:
    * does not contain any active cells (i.e., all cells on this level are
    * further refined, then this function returns
    * <code>end_active(level)</code> so that loops of the kind
-   *  @code
-   *    for (cell=dof_handler.begin_active(level);
-   * cell!=dof_handler.end_active(level); ++cell)
-   *      ...
-   *  @endcode
+   * @code
+   *   for (cell=dof_handler.begin_active(level);
+   *        cell!=dof_handler.end_active(level);
+   *        ++cell)
+   *     {
+   *       ...
+   *     }
+   * @endcode
    * have zero iterations, as may be expected if there are no active cells on
    * this level.
    */
@@ -714,7 +717,7 @@ public:
    * @code
    *   DoFHandler<dim> dof_handler;
    *   ...
-   *   for (auto cell : dof_handler.active_cell_iterators())
+   *   for (const auto &cell : dof_handler.active_cell_iterators())
    *     {
    *       fe_values.reinit (cell);
    *       ...do the local integration on 'cell'...;

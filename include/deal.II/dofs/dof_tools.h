@@ -2460,9 +2460,11 @@ namespace DoFTools
    * single gnuplot file, use code similar to
    * @code
    * std::ofstream out("gnuplot.gpl");
-   * out << "plot '-' using 1:2 with lines, '-' with labels point pt 2 offset
-   * 1,1" << std::endl; GridOut().write_gnuplot (triangulation, out); out << "e"
-   * << std::endl;
+   * out << "plot '-' using 1:2 with lines, "
+   *     << "'-' with labels point pt 2 offset 1,1"
+   *     << std::endl;
+   * GridOut().write_gnuplot (triangulation, out);
+   * out << "e" << std::endl;
    *
    * std::map<types::global_dof_index, Point<dim> > support_points;
    * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
@@ -2482,18 +2484,19 @@ namespace DoFTools
    * @code
    * std::ofstream out("gnuplot.gpl");
    *
-   * out << "set terminal png size 400,410 enhanced font \"Helvetica,8\"" <<
-   * std::endl
-   *     << "set output \"output.png\"" << std::endl
-   *     << "set size square" << std::endl
-   *     << "set view equal xy" << std::endl
-   *     << "unset xtics" << std::endl
-   *     << "unset ytics" << std::endl
-   *     << "unset grid" << std::endl
-   *     << "unset border" << std::endl
-   *     << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2
-   * offset 1,1 notitle" << std::endl; GridOut().write_gnuplot (triangulation,
-   * out); out << "e" << std::endl;
+   * out << "set terminal png size 400,410 enhanced font \"Helvetica,8\"\n"
+   *     << "set output \"output.png\"\n"
+   *     << "set size square\n"
+   *     << "set view equal xy\n"
+   *     << "unset xtics\n"
+   *     << "unset ytics\n"
+   *     << "unset grid\n"
+   *     << "unset border\n"
+   *     << "plot '-' using 1:2 with lines notitle, "
+   *     << "'-' with labels point pt 2 offset 1,1 notitle"
+   *     << std::endl;
+   * GridOut().write_gnuplot (triangulation, out);
+   * out << "e" << std::endl;
    *
    * std::map<types::global_dof_index, Point<dim> > support_points;
    * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
