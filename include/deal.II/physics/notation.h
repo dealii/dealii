@@ -455,11 +455,14 @@ namespace Physics
        * Tensor<3,dim> r3_tnsr;      // All elements filled differently
        * Tensor<3,dim> r3_symm_tnsr; // Some elements filled symmetrically
        *
-       * const FullMatrix<double> mtrx_1
-       *   = Physics::Notation::to_matrix<dim, Tensor<2,dim>,Tensor<1,dim>
-       * >(r3_tnsr); const FullMatrix<double> mtrx_2 =
-       * Physics::Notation::to_matrix<dim, Tensor<1,dim>,SymmetricTensor<2,dim>
-       * >(r3_symm_tnsr);
+       * const FullMatrix<double> mtrx_1 =
+       *   Physics::Notation::to_matrix<dim,
+       *                                Tensor<2,dim>,
+       *                                Tensor<1,dim>*>(r3_tnsr);
+       * const FullMatrix<double> mtrx_2 =
+       *   Physics::Notation::to_matrix<dim,
+       *                                Tensor<1,dim>,
+       *                                SymmetricTensor<2,dim>*>(r3_symm_tnsr);
        * @endcode
        * the matrix @p mtrx_1 will have $dim \times dim$ rows and $dim$ columns
        * (i.e. size Tensor<2,dim>::n_independent_components $\times$
