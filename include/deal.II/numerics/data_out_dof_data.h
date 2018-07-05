@@ -149,6 +149,19 @@ namespace Exceptions
                    << "components. However, the vector component at "
                    << "position " << arg1 << " with name <" << arg2
                    << "> does not satisfy these conditions.");
+
+    DeclException2(ExcInvalidTensorDeclaration,
+                   int,
+                   std::string,
+                   << "When declaring that a number of components in a data "
+                   << "set to be output logically form a tensor instead of "
+                   << "simply a set of scalar fields, you need to specify "
+                   << "this for all relevant components. Furthermore, "
+                   << "tensors must always consist of exactly <dim*dim> "
+                   << "components. However, the tensor component at "
+                   << "position " << arg1 << " with name <" << arg2
+                   << "> does not satisfy these conditions.");
+
   } // namespace DataOutImplementation
 } // namespace Exceptions
 

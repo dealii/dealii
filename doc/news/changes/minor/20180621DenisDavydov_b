@@ -1,0 +1,3 @@
+New: Add support for output of tensor-valued data in
+DataOut::write_vtu().
+(Denis Davydov 2018/06/21)
