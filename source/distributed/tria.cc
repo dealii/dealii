@@ -1493,16 +1493,12 @@ namespace parallel
       const std::string fname_fixed = std::string(filename) + "_fixed.data";
 
       // ----- copied -----
-      // from DataOutInterface::write_vtu_parallel
+      // from DataOutInterface::write_vtu_in_parallel
       // TODO: write general MPIIO interface
-      int myrank, nproc;
-      int ierr = MPI_Comm_rank(mpi_communicator, &myrank);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Comm_size(mpi_communicator, &nproc);
-      AssertThrowMPI(ierr);
+      const int myrank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
       MPI_Info info;
-      ierr = MPI_Info_create(&info);
+      int      ierr = MPI_Info_create(&info);
       AssertThrowMPI(ierr);
       MPI_File fh;
       ierr = MPI_File_open(mpi_communicator,
@@ -1573,16 +1569,12 @@ namespace parallel
       const std::string fname_fixed = std::string(filename) + "_fixed.data";
 
       // ----- copied -----
-      // from DataOutInterface::write_vtu_parallel
+      // from DataOutInterface::write_vtu_in_parallel
       // TODO: write general MPIIO interface
-      int myrank, nproc;
-      int ierr = MPI_Comm_rank(mpi_communicator, &myrank);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Comm_size(mpi_communicator, &nproc);
-      AssertThrowMPI(ierr);
+      const int myrank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
       MPI_Info info;
-      ierr = MPI_Info_create(&info);
+      int      ierr = MPI_Info_create(&info);
       AssertThrowMPI(ierr);
       MPI_File fh;
       ierr = MPI_File_open(mpi_communicator,

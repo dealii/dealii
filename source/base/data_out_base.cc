@@ -7273,14 +7273,10 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
   write_vtu(f);
 #else
 
-  int myrank, nproc;
-  int ierr = MPI_Comm_rank(comm, &myrank);
-  AssertThrowMPI(ierr);
-  ierr = MPI_Comm_size(comm, &nproc);
-  AssertThrowMPI(ierr);
+  const int myrank = Utilities::MPI::this_mpi_process(comm);
 
   MPI_Info info;
-  ierr = MPI_Info_create(&info);
+  int ierr = MPI_Info_create(&info);
   AssertThrowMPI(ierr);
   MPI_File fh;
   ierr = MPI_File_open(comm,
@@ -7405,7 +7401,6 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   MPI_Comm                          comm) const
 {
   unsigned int local_node_cell_count[2], global_node_cell_count[2];
-  int          myrank;
 
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
@@ -7425,18 +7420,17 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
   // And compute the global total
 #ifdef DEAL_II_WITH_MPI
-  int ierr = MPI_Comm_rank(comm, &myrank);
-  AssertThrowMPI(ierr);
-  ierr = MPI_Allreduce(local_node_cell_count,
-                       global_node_cell_count,
-                       2,
-                       MPI_UNSIGNED,
-                       MPI_SUM,
-                       comm);
+  const int myrank = Utilities::MPI::this_mpi_process(comm);
+  int       ierr   = MPI_Allreduce(local_node_cell_count,
+                           global_node_cell_count,
+                           2,
+                           MPI_UNSIGNED,
+                           MPI_SUM,
+                           comm);
   AssertThrowMPI(ierr);
 #else
   (void)comm;
-  myrank = 0;
+  const int myrank = 0;
   global_node_cell_count[0] = local_node_cell_count[0];
   global_node_cell_count[1] = local_node_cell_count[1];
 #endif
@@ -7477,14 +7471,11 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
   const std::string &           filename,
   MPI_Comm                      comm) const
 {
-  int myrank;
-
 #ifdef DEAL_II_WITH_MPI
-  const int ierr = MPI_Comm_rank(comm, &myrank);
-  AssertThrowMPI(ierr);
+  const int myrank = Utilities::MPI::this_mpi_process(comm);
 #else
   (void)comm;
-  myrank = 0;
+  const int myrank = 0;
 #endif
 
   // Only rank 0 process writes the XDMF file
@@ -7780,9 +7771,7 @@ DataOutBase::write_hdf5_parallel(
   // If HDF5 is not parallel and we're using multiple processes, abort
 #  ifndef H5_HAVE_PARALLEL
 #    ifdef DEAL_II_WITH_MPI
-  int world_size;
-  ierr = MPI_Comm_size(comm, &world_size);
-  AssertThrowMPI(ierr);
+  int world_size = Utilities::MPI::n_mpi_processes(comm);
   AssertThrow(
     world_size <= 1,
     ExcMessage(

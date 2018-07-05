@@ -424,8 +424,7 @@ namespace
       {
         // do the same as in Utilities::MPI::n_mpi_processes() here,
         // but without error checking to not throw again.
-        int n_proc = 1;
-        MPI_Comm_size(MPI_COMM_WORLD, &n_proc);
+        const int n_proc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
         if (n_proc > 1)
           {
             std::cerr

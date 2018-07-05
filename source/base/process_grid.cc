@@ -51,8 +51,7 @@ namespace
 
     // Below we always try to create 2D processor grids:
 
-    int n_processes;
-    MPI_Comm_size(mpi_comm, &n_processes);
+    const int n_processes = Utilities::MPI::n_mpi_processes(mpi_comm);
 
     // Get the total number of cores we can occupy in a rectangular dense matrix
     // with rectangular blocks when every core owns only a single block:
