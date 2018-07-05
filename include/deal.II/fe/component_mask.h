@@ -59,8 +59,9 @@ DEAL_II_NAMESPACE_OPEN
  * Stokes element (see
  * @ref vector_valued):
  * @code
- *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,    // Q2 element for the
- * velocities FE_Q<dim>(1), 1);     // Q1 element for the pressure
+ *   // Q2 element for the velocities, Q1 element for the pressure
+ *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,
+ *                            FE_Q<dim>(1), 1);
  *   FEValuesExtractors::Scalar pressure(dim);
  *   ComponentMask pressure_mask = stokes_fe.component_mask (pressure);
  * @endcode

@@ -374,57 +374,65 @@ public:
    * though: the <code>create_fe_list()</code> function creates a vector of
    * pointers, but nothing destroys these. This is the solution:
    * @code
-   *   template <int dim>
-   *   class MySimulator {
-   *   public:
-   *     MySimulator (const unsigned int polynomial_degree);
+   * template <int dim>
+   * class MySimulator
+   * {
+   * public:
+   *   MySimulator (const unsigned int polynomial_degree);
    *
-   *   private:
-   *     FESystem<dim> fe;
+   * private:
+   *   FESystem<dim> fe;
    *
-   *     struct VectorElementDestroyer {
-   *       const std::vector<const FiniteElement<dim>*> data;
-   *       VectorElementDestroyer (const std::vector<const FiniteElement<dim>*>
-   * &pointers); ~VectorElementDestroyer (); // destructor to delete the
-   * pointers const std::vector<const FiniteElement<dim>*> & get_data () const;
-   *     };
+   *   struct VectorElementDestroyer
+   *   {
+   *     const std::vector<const FiniteElement<dim>*> data;
    *
-   *     static std::vector<const FiniteElement<dim>*>
-   *     create_fe_list (const unsigned int polynomial_degree);
+   *     VectorElementDestroyer(
+   *       const std::vector<const FiniteElement<dim>*> &pointers);
    *
-   *     static std::vector<unsigned int>
-   *     create_fe_multiplicities ();
+   *      // destructor to delete the pointers
+   *     ~VectorElementDestroyer ();
+   *
+   *     const std::vector<const FiniteElement<dim>*> & get_data () const;
    *   };
    *
-   *   template <int dim>
-   *   MySimulator<dim>::VectorElementDestroyer::
-   *   VectorElementDestroyer (const std::vector<const FiniteElement<dim>*>
-   * &pointers) : data(pointers)
-   *   {}
+   *   static std::vector<const FiniteElement<dim>*>
+   *   create_fe_list (const unsigned int polynomial_degree);
    *
-   *   template <int dim>
-   *   MySimulator<dim>::VectorElementDestroyer::
-   *   ~VectorElementDestroyer ()
-   *   {
-   *     for (unsigned int i=0; i<data.size(); ++i)
-   *       delete data[i];
-   *   }
+   *   static std::vector<unsigned int>
+   *   create_fe_multiplicities ();
+   * };
    *
-   *   template <int dim>
-   *   const std::vector<const FiniteElement<dim>*> &
-   *   MySimulator<dim>::VectorElementDestroyer::
-   *   get_data () const
-   *   {
-   *     return data;
-   *   }
+   * template <int dim>
+   * MySimulator<dim>::VectorElementDestroyer::
+   * VectorElementDestroyer(
+   *   const std::vector<const FiniteElement<dim>*> &pointers)
+   *   :
+   *   data(pointers)
+   * {}
    *
+   * template <int dim>
+   * MySimulator<dim>::VectorElementDestroyer::
+   * ~VectorElementDestroyer ()
+   * {
+   *   for (unsigned int i=0; i<data.size(); ++i)
+   *     delete data[i];
+   * }
    *
-   *   template <int dim>
-   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
-   *     :
-   *     fe (VectorElementDestroyer(create_fe_list
-   * (polynomial_degree)).get_data(), create_fe_multiplicities ())
-   *   {}
+   * template <int dim>
+   * const std::vector<const FiniteElement<dim>*> &
+   * MySimulator<dim>::VectorElementDestroyer::
+   * get_data () const
+   * {
+   *   return data;
+   * }
+   *
+   * template <int dim>
+   * MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   * :
+   * fe (VectorElementDestroyer(create_fe_list (polynomial_degree)).get_data(),
+   *     create_fe_multiplicities ())
+   * {}
    * @endcode
    *
    * In other words, the vector we receive from the
