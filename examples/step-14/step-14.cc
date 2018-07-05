@@ -76,7 +76,7 @@ namespace Step14
     class EvaluationBase
     {
     public:
-      virtual ~EvaluationBase();
+      virtual ~EvaluationBase() = default;
 
       void set_refinement_cycle(const unsigned int refinement_cycle);
 
@@ -86,11 +86,6 @@ namespace Step14
     protected:
       unsigned int refinement_cycle;
     };
-
-
-    template <int dim>
-    EvaluationBase<dim>::~EvaluationBase()
-    {}
 
 
 
@@ -137,22 +132,20 @@ namespace Step14
     {
       double point_value = 1e20;
 
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      bool evaluation_point_found                         = false;
-      for (; (cell != endc) && !evaluation_point_found; ++cell)
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
-          if (cell->vertex(vertex).distance(evaluation_point) <
-              cell->diameter() * 1e-8)
-            {
-              point_value = solution(cell->vertex_dof_index(vertex, 0));
+      bool evaluation_point_found = false;
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (!evaluation_point_found)
+          for (unsigned int vertex = 0;
+               vertex < GeometryInfo<dim>::vertices_per_cell;
+               ++vertex)
+            if (cell->vertex(vertex).distance(evaluation_point) <
+                cell->diameter() * 1e-8)
+              {
+                point_value = solution(cell->vertex_dof_index(vertex, 0));
 
-              evaluation_point_found = true;
-              break;
-            }
+                evaluation_point_found = true;
+                break;
+              }
 
       AssertThrow(evaluation_point_found,
                   ExcEvaluationPointNotFound(evaluation_point));
@@ -223,11 +216,8 @@ namespace Step14
 
       // ...and next loop over all cells and their vertices, and count how
       // often the vertex has been found:
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      unsigned int evaluation_point_hits                  = 0;
-      for (; cell != endc; ++cell)
+      unsigned int evaluation_point_hits = 0;
+      for (const auto &cell : dof_handler.active_cell_iterators())
         for (unsigned int vertex = 0;
              vertex < GeometryInfo<dim>::vertices_per_cell;
              ++vertex)
@@ -361,7 +351,7 @@ namespace Step14
     {
     public:
       Base(Triangulation<dim> &coarse_grid);
-      virtual ~Base();
+      virtual ~Base() = default;
 
       virtual void solve_problem() = 0;
       virtual void postprocess(
@@ -384,11 +374,6 @@ namespace Step14
     Base<dim>::Base(Triangulation<dim> &coarse_grid)
       : triangulation(&coarse_grid)
       , refinement_cycle(numbers::invalid_unsigned_int)
-    {}
-
-
-    template <int dim>
-    Base<dim>::~Base()
     {}
 
 
@@ -439,10 +424,10 @@ namespace Step14
 
         void solve(Vector<double> &solution) const;
 
-        ConstraintMatrix     hanging_node_constraints;
-        SparsityPattern      sparsity_pattern;
-        SparseMatrix<double> matrix;
-        Vector<double>       rhs;
+        AffineConstraints<double> hanging_node_constraints;
+        SparsityPattern           sparsity_pattern;
+        SparseMatrix<double>      matrix;
+        Vector<double>            rhs;
       };
 
 
@@ -665,7 +650,7 @@ namespace Step14
     {
       hanging_node_constraints.clear();
 
-      void (*mhnc_p)(const DoFHandler<dim> &, ConstraintMatrix &) =
+      void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
@@ -782,11 +767,7 @@ namespace Step14
       std::vector<double>                  rhs_values(n_q_points);
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-      typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
-                                                              .begin_active(),
-                                                     endc =
-                                                       this->dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : this->dof_handler.active_cell_iterators())
         {
           cell_rhs = 0;
 
@@ -797,8 +778,9 @@ namespace Step14
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+              cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
+                              rhs_values[q_point] *               // f((x_q)
+                              fe_values.JxW(q_point));            // dx
 
           cell->get_dof_indices(local_dof_indices);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -987,11 +969,7 @@ namespace Step14
       // one for the second cell, etc., and we could as well just keep track of
       // this index using an integer counter; but using
       // CellAccessor::active_cell_index() makes this more explicit.)
-      typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
-                                                              .begin_active(),
-                                                     endc =
-                                                       this->dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : this->dof_handler.active_cell_iterators())
         estimated_error_per_cell(cell->active_cell_index()) *=
           weighting_function->value(cell->center());
 
@@ -1287,58 +1265,32 @@ namespace Step14
       // variable. That makes it simpler if you later take this as a starting
       // point to implement a 3d version of this mesh. The next step is then
       // to have a list of vertices. Here, they are 24 (5 times 5, with the
-      // middle one omitted). It is probably best to draw a sketch here. Note
-      // that we leave the number of vertices open at first, but then let the
-      // compiler compute this number afterwards. This reduces the possibility
-      // of having the dimension to large and leaving the last ones
-      // uninitialized.
+      // middle one omitted). It is probably best to draw a sketch here.
       const unsigned int dim = 2;
 
-      static const Point<2> vertices_1[] = {
-        Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
-        Point<2>(0., -1.),       Point<2>(+1. / 2, -1.),
-        Point<2>(+1, -1.),
+      const std::vector<Point<2>> vertices = {
+        {-1.0, -1.0}, {-0.5, -1.0}, {+0.0, -1.0}, {+0.5, -1.0}, {+1.0, -1.0}, //
+        {-1.0, -0.5}, {-0.5, -0.5}, {+0.0, -0.5}, {+0.5, -0.5}, {+1.0, -0.5}, //
+        {-1.0, +0.0}, {-0.5, +0.0}, {+0.5, +0.0}, {+1.0, +0.0},               //
+        {-1.0, +0.5}, {-0.5, +0.5}, {+0.0, +0.5}, {+0.5, +0.5}, {+1.0, +0.5}, //
+        {-1.0, +1.0}, {-0.5, +1.0}, {+0.0, +1.0}, {+0.5, +1.0}, {+1.0, +1.0}};
 
-        Point<2>(-1., -1. / 2.), Point<2>(-1. / 2, -1. / 2.),
-        Point<2>(0., -1. / 2.),  Point<2>(+1. / 2, -1. / 2.),
-        Point<2>(+1, -1. / 2.),
+      // Next, we have to define the cells and the vertices they contain.
+      const std::vector<std::array<int, GeometryInfo<dim>::vertices_per_cell>>
+        cell_vertices = {{0, 1, 5, 6},
+                         {1, 2, 6, 7},
+                         {2, 3, 7, 8},
+                         {3, 4, 8, 9},
+                         {5, 6, 10, 11},
+                         {8, 9, 12, 13},
+                         {10, 11, 14, 15},
+                         {12, 13, 17, 18},
+                         {14, 15, 19, 20},
+                         {15, 16, 20, 21},
+                         {16, 17, 21, 22},
+                         {17, 18, 22, 23}};
 
-        Point<2>(-1., 0.),       Point<2>(-1. / 2, 0.),
-        Point<2>(+1. / 2, 0.),   Point<2>(+1, 0.),
-
-        Point<2>(-1., 1. / 2.),  Point<2>(-1. / 2, 1. / 2.),
-        Point<2>(0., 1. / 2.),   Point<2>(+1. / 2, 1. / 2.),
-        Point<2>(+1, 1. / 2.),
-
-        Point<2>(-1., 1.),       Point<2>(-1. / 2, 1.),
-        Point<2>(0., 1.),        Point<2>(+1. / 2, 1.),
-        Point<2>(+1, 1.)};
-      const unsigned int n_vertices =
-        sizeof(vertices_1) / sizeof(vertices_1[0]);
-
-      // From this static list of vertices, we generate a <tt>std::vector</tt>
-      // of the vertices, as this is the data type the library wants to see.
-      const std::vector<Point<dim>> vertices(&vertices_1[0],
-                                             &vertices_1[n_vertices]);
-
-      // Next, we have to define the cells and the vertices they
-      // contain. Here, we have 8 vertices, but leave the number open and let
-      // it be computed afterwards:
-      static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
-        {0, 1, 5, 6},
-        {1, 2, 6, 7},
-        {2, 3, 7, 8},
-        {3, 4, 8, 9},
-        {5, 6, 10, 11},
-        {8, 9, 12, 13},
-        {10, 11, 14, 15},
-        {12, 13, 17, 18},
-        {14, 15, 19, 20},
-        {15, 16, 20, 21},
-        {16, 17, 21, 22},
-        {17, 18, 22, 23}};
-      const unsigned int n_cells =
-        sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+      const unsigned int n_cells = cell_vertices.size();
 
       // Again, we generate a C++ vector type from this, but this time by
       // looping over the cells (yes, this is boring). Additionally, we set
@@ -1498,10 +1450,7 @@ namespace Step14
       // ...then loop over cells and find the evaluation point among the
       // vertices (or very close to a vertex, which may happen due to floating
       // point round-off):
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         for (unsigned int vertex = 0;
              vertex < GeometryInfo<dim>::vertices_per_cell;
              ++vertex)
@@ -1602,10 +1551,7 @@ namespace Step14
 
       // Then start the loop over all cells, and select those cells which are
       // close enough to the evaluation point:
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->center().distance(evaluation_point) <= cell->diameter())
           {
             // If we have found such a cell, then initialize the
@@ -1619,7 +1565,8 @@ namespace Step14
               {
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_rhs(i) +=
-                    fe_values.shape_grad(i, q)[0] * fe_values.JxW(q);
+                    fe_values.shape_grad(i, q)[0] * // grad phi_i(x_q)
+                    fe_values.JxW(q);               // dx
                 total_volume += fe_values.JxW(q);
               }
 
@@ -2104,10 +2051,8 @@ namespace Step14
       // Then note that marking cells for refinement or coarsening only works
       // if all indicators are positive, to allow their comparison. Thus, drop
       // the signs on all these indicators:
-      for (Vector<float>::iterator i = error_indicators.begin();
-           i != error_indicators.end();
-           ++i)
-        *i = std::fabs(*i);
+      for (float &error_indicator : error_indicators)
+        error_indicator = std::fabs(error_indicator);
 
       // Finally, we can select between different strategies for
       // refinement. The default here is to refine those cells with the
@@ -2131,12 +2076,12 @@ namespace Step14
     // solutions only to see them qualitatively, we contend ourselves with
     // interpolating the dual solution to the (smaller) primal space. For the
     // interpolation, there is a library function, that takes a
-    // ConstraintMatrix object including the hanging node
+    // AffineConstraints object including the hanging node
     // constraints. The rest is standard.
     template <int dim>
     void WeightedResidual<dim>::output_solution() const
     {
-      ConstraintMatrix primal_hanging_node_constraints;
+      AffineConstraints<double> primal_hanging_node_constraints;
       DoFTools::make_hanging_node_constraints(PrimalSolver<dim>::dof_handler,
                                               primal_hanging_node_constraints);
       primal_hanging_node_constraints.close();
@@ -2189,9 +2134,9 @@ namespace Step14
       // interpolated into the finite element space in which we have solved
       // the dual problem: But, again as in the
       // <code>WeightedResidual::output_solution</code> function we first need
-      // to create a ConstraintMatrix including the hanging node constraints,
-      // but this time of the dual finite element space.
-      ConstraintMatrix dual_hanging_node_constraints;
+      // to create a AffineConstraints object including the hanging node
+      // constraints, but this time of the dual finite element space.
+      AffineConstraints<double> dual_hanging_node_constraints;
       DoFTools::make_hanging_node_constraints(DualSolver<dim>::dof_handler,
                                               dual_hanging_node_constraints);
       dual_hanging_node_constraints.close();
@@ -2207,7 +2152,7 @@ namespace Step14
       // and subtracting it from z: use the
       // <code>interpolate_difference</code> function, that gives (z-I_hz) in
       // the element space of the dual solution.
-      ConstraintMatrix primal_hanging_node_constraints;
+      AffineConstraints<double> primal_hanging_node_constraints;
       DoFTools::make_hanging_node_constraints(PrimalSolver<dim>::dof_handler,
                                               primal_hanging_node_constraints);
       primal_hanging_node_constraints.close();
@@ -2244,10 +2189,8 @@ namespace Step14
       // the threads through a mutex each time they write to (and modify the
       // structure of) this map.
       FaceIntegrals face_integrals;
-      for (active_cell_iterator cell =
-             DualSolver<dim>::dof_handler.begin_active();
-           cell != DualSolver<dim>::dof_handler.end();
-           ++cell)
+      for (const auto &cell :
+           DualSolver<dim>::dof_handler.active_cell_iterators())
         for (unsigned int face_no = 0;
              face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
@@ -2281,20 +2224,21 @@ namespace Step14
       // there, and add them up. Only take minus one half of the jump term,
       // since the other half will be taken by the neighboring cell.
       unsigned int present_cell = 0;
-      for (active_cell_iterator cell =
-             DualSolver<dim>::dof_handler.begin_active();
-           cell != DualSolver<dim>::dof_handler.end();
-           ++cell, ++present_cell)
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          {
-            Assert(face_integrals.find(cell->face(face_no)) !=
-                     face_integrals.end(),
-                   ExcInternalError());
-            error_indicators(present_cell) -=
-              0.5 * face_integrals[cell->face(face_no)];
-          }
+      for (const auto &cell :
+           DualSolver<dim>::dof_handler.active_cell_iterators())
+        {
+          for (unsigned int face_no = 0;
+               face_no < GeometryInfo<dim>::faces_per_cell;
+               ++face_no)
+            {
+              Assert(face_integrals.find(cell->face(face_no)) !=
+                       face_integrals.end(),
+                     ExcInternalError());
+              error_indicators(present_cell) -=
+                0.5 * face_integrals[cell->face(face_no)];
+            }
+          ++present_cell;
+        }
       std::cout << "   Estimated error="
                 << std::accumulate(error_indicators.begin(),
                                    error_indicators.end(),
@@ -2843,13 +2787,10 @@ namespace Step14
         std::cout << "   Number of degrees of freedom=" << solver->n_dofs()
                   << std::endl;
 
-        for (typename EvaluatorList::const_iterator e =
-               descriptor.evaluator_list.begin();
-             e != descriptor.evaluator_list.end();
-             ++e)
+        for (const auto &evaluator : descriptor.evaluator_list)
           {
-            (*e)->set_refinement_cycle(step);
-            solver->postprocess(**e);
+            evaluator->set_refinement_cycle(step);
+            solver->postprocess(*evaluator);
           }
 
 
