@@ -1565,8 +1565,8 @@ namespace Step14
               {
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_rhs(i) +=
-                    fe_values.shape_grad(i, q)[0] * // grad phi_i(x_q)
-                    fe_values.JxW(q);               // dx
+                    fe_values.shape_grad(i, q)[0] // (d/dx phi_i(x_q))
+                    * fe_values.JxW(q);           // * dx
                 total_volume += fe_values.JxW(q);
               }
 
