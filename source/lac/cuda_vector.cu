@@ -615,7 +615,7 @@ namespace LinearAlgebra
                                               cudaMemcpyHostToDevice);
           AssertCuda(error_code);
         }
-      else
+      else if (operation == VectorOperation::add)
         {
           // Create a temporary vector on the device
           Number *    tmp;
@@ -644,6 +644,8 @@ namespace LinearAlgebra
           error_code = cudaFree(tmp);
           AssertCuda(error_code);
         }
+      else
+        AssertThrow(false, ExcNotImplemented());
     }
 
 

@@ -329,6 +329,43 @@ namespace Utilities
         return a;
       }
 
+      // In the import_from_ghosted_array_finish we might need to calculate the
+      // maximal and minimal value for the given number type, which is not
+      // straight forward for complex numbers. Therefore, comparison of complex
+      // numbers is prohibited and throws an exception.
+      template <typename Number>
+      Number
+      get_min(const Number a, const Number b)
+      {
+        return std::min(a, b);
+      }
+
+      template <typename Number>
+      std::complex<Number>
+      get_min(const std::complex<Number> a, const std::complex<Number>)
+      {
+        AssertThrow(false,
+                    ExcMessage("VectorOperation::min not "
+                               "implemented for complex numbers"));
+        return a;
+      }
+
+      template <typename Number>
+      Number
+      get_max(const Number a, const Number b)
+      {
+        return std::max(a, b);
+      }
+
+      template <typename Number>
+      std::complex<Number>
+      get_max(const std::complex<Number> a, const std::complex<Number>)
+      {
+        AssertThrow(false,
+                    ExcMessage("VectorOperation::max not "
+                               "implemented for complex numbers"));
+        return a;
+      }
     } // namespace internal
 
 
@@ -403,11 +440,29 @@ namespace Utilities
           // local values. For insert, nothing is done here (but in debug mode
           // we assert that the specified value is either zero or matches with
           // the ones already present
-          if (vector_operation != dealii::VectorOperation::insert)
+          if (vector_operation == dealii::VectorOperation::add)
             for (; my_imports != import_indices_data.end(); ++my_imports)
               for (unsigned int j = my_imports->first; j < my_imports->second;
                    j++)
                 locally_owned_array[j] += *read_position++;
+          else if (vector_operation == dealii::VectorOperation::min)
+            for (; my_imports != import_indices_data.end(); ++my_imports)
+              for (unsigned int j = my_imports->first; j < my_imports->second;
+                   j++)
+                {
+                  locally_owned_array[j] =
+                    internal::get_min(*read_position, locally_owned_array[j]);
+                  read_position++;
+                }
+          else if (vector_operation == dealii::VectorOperation::max)
+            for (; my_imports != import_indices_data.end(); ++my_imports)
+              for (unsigned int j = my_imports->first; j < my_imports->second;
+                   j++)
+                {
+                  locally_owned_array[j] =
+                    internal::get_max(*read_position, locally_owned_array[j]);
+                  read_position++;
+                }
           else
             for (; my_imports != import_indices_data.end(); ++my_imports)
               for (unsigned int j = my_imports->first; j < my_imports->second;

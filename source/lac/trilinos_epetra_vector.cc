@@ -187,8 +187,14 @@ namespace LinearAlgebra
 
       if (operation == VectorOperation::insert)
         vector->Export(source_vector, import, Insert);
-      else
+      else if (operation == VectorOperation::add)
         vector->Export(source_vector, import, Add);
+      else if (operation == VectorOperation::max)
+        vector->Export(source_vector, import, Epetra_Max);
+      else if (operation == VectorOperation::min)
+        vector->Export(source_vector, import, Epetra_Min);
+      else
+        AssertThrow(false, ExcNotImplemented());
     }
 
 

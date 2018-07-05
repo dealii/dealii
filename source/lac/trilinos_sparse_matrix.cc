@@ -1155,6 +1155,11 @@ namespace TrilinosWrappers
           mode = Add;
         else if (operation == ::dealii::VectorOperation::insert)
           mode = Insert;
+        else
+          Assert(
+            false,
+            ExcMessage(
+              "compress() can only be called with VectorOperation add, insert, or unknown"));
       }
     else
       {

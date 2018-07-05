@@ -402,7 +402,7 @@ namespace LinearAlgebra
        * @ref GlossCompress "Compressing distributed vectors and matrices"
        * in the glossary.
        *
-       * There are two variants for this function. If called with argument @p
+       * There are four variants for this function. If called with argument @p
        * VectorOperation::add adds all the data accumulated in ghost elements
        * to the respective elements on the owning processor and clears the
        * ghost array afterwards. If called with argument @p
@@ -416,6 +416,19 @@ namespace LinearAlgebra
        * actually consistent between processors, i.e., whenever a non-zero
        * ghost element is found, it is compared to the value on the owning
        * processor and an exception is thrown if these elements do not agree.
+       * If called with VectorOperation::min or VectorOperation::max, the
+       * minimum or maximum on all elements across the processors is set.
+       * @note This vector class has a fixed set of ghost entries attached to
+       * the local representation. As a consequence, all ghost entries are
+       * assumed to be valid and will be exchanged unconditionally according
+       * to the given VectorOperation. Make sure to initialize all ghost
+       * entries with the neutral element of the given VectorOperation or
+       * touch all ghost entries. The neutral element is zero for
+       * VectorOperation::add and VectorOperation::insert, `+inf` for
+       * VectorOperation::min, and `-inf` for VectorOperation::max. If all
+       * values are initialized with values below zero and compress is called
+       * with VectorOperation::max two times subsequently, the maximal value
+       * after the second calculation will be zero.
        */
       virtual void
       compress(::dealii::VectorOperation::values operation) override;
