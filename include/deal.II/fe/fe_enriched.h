@@ -255,11 +255,21 @@ public:
    *   &fe_base,
    *   {&fe_1, &fe_2},
    *   {{[=] (const typename Triangulation<dim>::cell_iterator &)
-   *       -> const Function<dim> * {return &fe_1_function1;},
+   *       -> const Function<dim> *
+   *     {
+   *       return &fe_1_function1;
+   *     },
    *     [=] (const typename Triangulation<dim>::cell_iterator &)
-   *       -> const Function<dim> * {return &fe_1_function2;}},
+   *       -> const Function<dim> *
+   *     {
+   *       return &fe_1_function2;
+   *     }},
    *    {[=] (const typename Triangulation<dim>::cell_iterator &)
-   *       -> const Function<dim> * {return &fe_2_function;}}});
+   *       -> const Function<dim> *
+   *     {
+   *       return &fe_2_function;
+   *     }
+   *    }});
    * @endcode
    *
    * @note When using the same finite element for enrichment with N
