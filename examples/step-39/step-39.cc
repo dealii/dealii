@@ -202,8 +202,8 @@ namespace Step39
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         local_vector(i) +=
-          (-fe.shape_value(i, k) * penalty              // -sigma * v_i(x_k)
-           + fe.normal_vector(k) * fe.shape_grad(i, k)) // n * grad v_i(x_k)
+          (-penalty * fe.shape_value(i, k)              // (-sigma * v_i(x_k)
+           + fe.normal_vector(k) * fe.shape_grad(i, k)) // + n * grad v_i(x_k))
           * boundary_values[k] * fe.JxW(k);             // u^D(x_k) * dx
   }
 
@@ -782,7 +782,7 @@ namespace Step39
     // own numbering in order to use this vector. For the assembler used below
     // the information in which component of a vector the result is stored is
     // transmitted by the user_index variable for each cell. We need to set this
-    // numering up here.
+    // numbering up here.
     //
     // On the other hand, somebody might have used the user indices
     // already. So, let's be good citizens and save them before tampering with
