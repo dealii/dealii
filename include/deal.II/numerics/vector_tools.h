@@ -924,8 +924,11 @@ namespace VectorTools
    *  dof_handler,
    *  constraints,
    *  quadrature_formula,
-   *  [&] (const typename DoFHandler<dim>::active_cell_iterator & cell, const
-   * unsigned int q) -> double { return qp_data.get_data(cell)[q]->density; },
+   *  [&] (const typename DoFHandler<dim>::active_cell_iterator & cell,
+   *       const unsigned int q) -> double
+   *  {
+   *    return qp_data.get_data(cell)[q]->density;
+   *  },
    *  field);
    * @endcode
    * where <code>qp_data</code> is a CellDataStorage object, which stores
@@ -955,8 +958,12 @@ namespace VectorTools
    * (matrix_free_data,
    *  constraints,
    *  3,
-   *  [&] (const unsigned int cell, const unsigned int q) ->
-   * VectorizedArray<double> { return qp_data(cell,q); }, field);
+   *  [&] (const unsigned int cell,
+   *       const unsigned int q) -> VectorizedArray<double>
+   *  {
+   *    return qp_data(cell,q);
+   *  },
+   *  field);
    * @endcode
    * where <code>qp_data</code> is a an object of type Table<2,
    * VectorizedArray<double> >, which stores quadrature point data.

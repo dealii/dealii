@@ -130,16 +130,17 @@ namespace DataPostprocessorInputs
    *       ... // overload other necessary member variables
    *       virtual
    *       void
-   *       evaluate_vector_field (const DataPostprocessorInputs::Vector<dim>
-   * &input_data, std::vector<Vector<double> > &computed_quantities) const
+   *       evaluate_vector_field(
+   *         const DataPostprocessorInputs::Vector<dim> &input_data,
+   *         std::vector<Vector<double> > &computed_quantities) const
    *       {
-   *         const typename hp::DoFHandler<dim>::cell_iterator
-   *           current_cell = input_data.template get_cell<hp::DoFHandler<dim>
-   * >(); const viscosity = look_up_viscosity (current_cell->material_id());
+   *         const typename hp::DoFHandler<dim>::cell_iterator current_cell =
+   *           input_data.template get_cell<hp::DoFHandler<dim> >();
+   *         const viscosity = look_up_viscosity (current_cell->material_id());
    *
    *         for (unsigned int q=0; q<input_data.solution_gradients.size(); ++q)
-   *           computed_quantities[q][0] = (viscosity *
-   * input_data.solution_gradients[q]).norm();
+   *           computed_quantities[q][0] =
+   *             (viscosity * input_data.solution_gradients[q]).norm();
    *       }
    *   };
    * @endcode
@@ -635,9 +636,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim>
- * &input_data, std::vector<Vector<double> >               &computed_quantities)
- * const
+ *   evaluate_scalar_field(
+ *     const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *     std::vector<Vector<double> >               &computed_quantities) const
  *   {
  *     // ensure that there really are as many output slots
  *     // as there are points at which DataOut provides the
@@ -721,9 +722,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim>
- * &input_data, std::vector<Vector<double> >               &computed_quantities)
- * const
+ *   evaluate_scalar_field(
+ *     const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *     std::vector<Vector<double> >               &computed_quantities) const
  *   {
  *     AssertDimension (input_data.solution_gradients.size(),
  *                      computed_quantities.size());
@@ -893,9 +894,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim>
- * &input_data, std::vector<Vector<double> >               &computed_quantities)
- * const
+ *     evaluate_vector_field(
+ *       const DataPostprocessorInputs::Vector<dim> &input_data,
+ *       std::vector<Vector<double> >               &computed_quantities) const
  *     {
  *       // ensure that there really are as many output slots
  *       // as there are points at which DataOut provides the
@@ -943,7 +944,8 @@ private:
  *     data_component_interpretation
  *     (dim, DataComponentInterpretation::component_is_part_of_vector);
  *     data_out.add_data_vector (solution,
- * std::vector<std::string>(dim,"displacement"), DataOut<dim>::type_dof_data,
+ *                               std::vector<std::string>(dim,"displacement"),
+ *                               DataOut<dim>::type_dof_data,
  *                               data_component_interpretation);
  *     data_out.add_data_vector (solution, grad_u);
  *     data_out.build_patches ();
@@ -982,9 +984,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim>
- * &input_data, std::vector<Vector<double> >               &computed_quantities)
- * const
+ *     evaluate_vector_field(
+ *       const DataPostprocessorInputs::Vector<dim> &input_data,
+ *       std::vector<Vector<double> >               &computed_quantities) const
  *     {
  *       AssertDimension (input_data.solution_gradients.size(),
  *                        computed_quantities.size());

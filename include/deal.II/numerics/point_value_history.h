@@ -177,9 +177,11 @@ namespace internal
  * //... code to setup Triangulation, perform any refinement necessary
  * // and setup DoFHandler, sizing solution Vectors etc
  *
+ * // just one independent value, which happens to be an input
+ * unsigned int n_inputs = 1;
+ *
  * // call the constructor
- * unsigned int n_inputs = 1; // just one independent value, which happens to be
- * an input PointValueHistory<dim> node_monitor(dof_handler, n_inputs);
+ * PointValueHistory<dim> node_monitor(dof_handler, n_inputs);
  *
  * // setup fields and points required
  * node_monitor.add_field_name("Solution");
@@ -449,8 +451,9 @@ public:
    * // Call the mark_locations method to get the vector with indices flagged
    * Vector<double> support_point_locations = node_monitor.mark_locations();
    *
-   * // Add the vector to the data_out object and write out a file in the usual
-   * way data_out.add_data_vector(support_point_locations, "Monitor_Locations");
+   * // Add the vector to the data_out object and
+   * // write out a file in the usual way
+   * data_out.add_data_vector(support_point_locations, "Monitor_Locations");
    * data_out.build_patches(2);
    * std::ofstream output("locations.gpl");
    * data_out.write_gnuplot(output);
