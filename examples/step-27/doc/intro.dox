@@ -149,9 +149,7 @@ inactive on it. The general outline of this reads like this:
 
 @code
   hp::DoFHandler<dim> dof_handler (triangulation);
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
+  for (auto &cell: dof_handler.active_cell_iterators())
     cell->set_active_fe_index (...);
   dof_handler.distribute_dofs (fe_collection);
 @endcode
@@ -171,9 +169,8 @@ finite element field to ensure that it is continuous. This is
 conceptually very similar to how we compute hanging node constraints,
 and in fact the code looks exactly the same:
 @code
-  ConstraintMatrix constraints;
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraints);
+  AffineConstraints<double> constraints;
+  DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 @endcode
 In other words, the DoFTools::make_hanging_node_constraints deals not
 only with hanging node constraints, but also with $hp$ constraints at
@@ -218,10 +215,7 @@ i.e. the interesting part of the loop over all cells would look like this:
 				  update_values    |  update_gradients |
 				  update_q_points  |  update_JxW_values);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  for (const auto &cell: dof_handler.active_cell_iterators())
     {
       hp_fe_values.reinit (cell,
                            cell->active_fe_index(),
@@ -624,7 +618,7 @@ challenge.
 Most programs built on deal.II use the DoFTools::make_sparsity_pattern
 function to allocate the sparsity pattern of a matrix, and later add a few
 more entries necessary to handle constrained degrees of freedom using
-ConstraintMatrix::condense. The sparsity pattern is then compressed using
+AffineConstraints::condense. The sparsity pattern is then compressed using
 SparsityPattern::compress. This method is explained in step-6 and used in
 most tutorial programs. In order to work, it needs an initial upper estimate
 for the maximal number of nonzero entries per row, something that can be had
@@ -671,7 +665,7 @@ of freedom, but is constrained against many more degrees of freedom.
 
 It turns out that the strategy presented first in step-6 to eliminate the
 constraints while computing the element matrices and vectors with
-ConstraintMatrix::distribute_local_to_global is the most efficient approach
+AffineConstraints::distribute_local_to_global is the most efficient approach
 also for this case. The alternative strategy to first build the matrix without
 constraints and then "condensing" away constrained degrees of freedom is
 considerably more expensive. It turns out that building the sparsity pattern
@@ -685,7 +679,7 @@ In our program, we will also treat the boundary conditions as (possibly
 inhomogeneous) constraints and eliminate the matrix rows and columns to
 those as well. All we have to do for this is to call the function that
 interpolates the Dirichlet boundary conditions already in the setup phase in
-order to tell the ConstraintMatrix object about them, and then do the
+order to tell the AffineConstraints object about them, and then do the
 transfer from local to global data on matrix and vector simultaneously. This
 is exactly what we've shown in step-6.
 
