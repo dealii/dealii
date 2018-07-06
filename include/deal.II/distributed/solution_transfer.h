@@ -255,13 +255,12 @@ namespace parallel
        * objects that can later be retrieved after refinement, coarsening and
        * repartitioning.
        */
-      void
+      std::vector<char>
       pack_callback(
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
           cell_iterator &cell,
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus       status,
-        std::vector<char> &data);
+          CellStatus status);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -275,7 +274,7 @@ namespace parallel
         const typename Triangulation<dim, DoFHandlerType::space_dimension>::
           CellStatus status,
         const boost::iterator_range<std::vector<char>::const_iterator>
-                                   data_range,
+          &                        data_range,
         std::vector<VectorType *> &all_out);
 
 

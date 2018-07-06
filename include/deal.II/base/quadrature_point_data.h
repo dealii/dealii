@@ -409,13 +409,12 @@ namespace parallel
        * objects that can later be retrieved after refinement, coarsening and
        * repartitioning.
        */
-      void
+      std::vector<char>
       pack_function(
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
           &cell,
         const typename parallel::distributed::Triangulation<dim>::CellStatus
-                           status,
-        std::vector<char> &data);
+          status);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -429,7 +428,7 @@ namespace parallel
         const typename parallel::distributed::Triangulation<dim>::CellStatus
           status,
         const boost::iterator_range<std::vector<char>::const_iterator>
-          data_range);
+          &data_range);
 
       /**
        * FiniteElement used to project data from and to quadrature points.
@@ -798,8 +797,7 @@ namespace parallel
         &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
         this,
         std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3));
+        std::placeholders::_2));
     }
 
 
@@ -825,13 +823,12 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    void
+    std::vector<char>
     ContinuousQuadratureDataTransfer<dim, DataType>::pack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
       const typename parallel::distributed::Triangulation<
-        dim>::CellStatus /*status*/,
-      std::vector<char> &data)
+        dim>::CellStatus /*status*/)
     {
       pack_cell_data(cell, data_storage, matrix_quadrature);
 
@@ -840,7 +837,7 @@ namespace parallel
 
       // to get consistent data sizes on each cell for the fixed size transfer,
       // we won't allow compression
-      Utilities::pack(matrix_dofs, data, /*allow_compression=*/false);
+      return Utilities::pack(matrix_dofs, /*allow_compression=*/false);
     }
 
 
@@ -851,8 +848,9 @@ namespace parallel
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
       const typename parallel::distributed::Triangulation<dim>::CellStatus
-                                                                     status,
-      const boost::iterator_range<std::vector<char>::const_iterator> data_range)
+        status,
+      const boost::iterator_range<std::vector<char>::const_iterator>
+        &data_range)
     {
       Assert((status !=
               parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN),

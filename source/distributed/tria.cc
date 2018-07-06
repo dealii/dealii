@@ -1243,7 +1243,7 @@ namespace parallel
                      callback_it != pack_callbacks.cend();
                      ++callback_it, ++data_it)
                   {
-                    (*callback_it)(dealii_cell, cell_status, *data_it);
+                    *data_it = (*callback_it)(dealii_cell, cell_status);
                   }
               }
           } // loop over quad_cell_relations
@@ -1420,7 +1420,7 @@ namespace parallel
       const std::function<void(
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
         const typename dealii::Triangulation<dim, spacedim>::CellStatus &,
-        const boost::iterator_range<std::vector<char>::const_iterator>)>
+        const boost::iterator_range<std::vector<char>::const_iterator> &)>
         &unpack_callback) const
     {
       Assert(cumulative_sizes_fixed.size() > 0,
@@ -3848,9 +3848,8 @@ namespace parallel
     template <int dim, int spacedim>
     unsigned int
     Triangulation<dim, spacedim>::register_data_attach(
-      const std::function<void(const cell_iterator &,
-                               const CellStatus,
-                               std::vector<char> &)> &pack_callback)
+      const std::function<std::vector<char>(const cell_iterator &,
+                                            const CellStatus)> &pack_callback)
     {
       // add new callback_set
       cell_attached_data.pack_callbacks.push_back(pack_callback);
@@ -3869,7 +3868,7 @@ namespace parallel
       const std::function<
         void(const cell_iterator &,
              const CellStatus,
-             const boost::iterator_range<std::vector<char>::const_iterator>)>
+             const boost::iterator_range<std::vector<char>::const_iterator> &)>
         &unpack_callback)
     {
 #  ifdef DEBUG
@@ -4458,10 +4457,10 @@ namespace parallel
     template <int spacedim>
     unsigned int
     Triangulation<1, spacedim>::register_data_attach(
-      const std::function<
-        void(const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
-             const typename dealii::Triangulation<1, spacedim>::CellStatus,
-             std::vector<char> &)> & /*pack_callback*/)
+      const std::function<std::vector<char>(
+        const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
+        const typename dealii::Triangulation<1, spacedim>::CellStatus)>
+        & /*pack_callback*/)
     {
       Assert(false, ExcNotImplemented());
       return 0;
@@ -4476,7 +4475,7 @@ namespace parallel
       const std::function<
         void(const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
              const typename dealii::Triangulation<1, spacedim>::CellStatus,
-             const boost::iterator_range<std::vector<char>::const_iterator>)>
+             const boost::iterator_range<std::vector<char>::const_iterator> &)>
         & /*unpack_callback*/)
     {
       Assert(false, ExcNotImplemented());

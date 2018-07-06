@@ -507,11 +507,10 @@ namespace Particles
      * before a refinement step. All particles have to be attached to their
      * cell to be sent around to the new processes.
      */
-    void
+    std::vector<char>
     store_particles(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const typename Triangulation<dim, spacedim>::CellStatus     status,
-      std::vector<char> &                                         data) const;
+      const typename Triangulation<dim, spacedim>::CellStatus     status) const;
 
     /**
      * Called by listener functions after a refinement step. The local map
@@ -522,7 +521,7 @@ namespace Particles
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const typename Triangulation<dim, spacedim>::CellStatus     status,
       const boost::iterator_range<std::vector<char>::const_iterator>
-        data_range);
+        &data_range);
   };
 
   /* ---------------------- inline and template functions ------------------ */
