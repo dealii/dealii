@@ -1910,6 +1910,353 @@ namespace GridGenerator
     tria.create_triangulation(points, cells, SubCellData());
   }
 
+
+
+  template <>
+  void plate_with_a_hole(Triangulation<1> & /*tria*/,
+                         const double /*inner_radius*/,
+                         const double /*outer_radius*/,
+                         const double /*pad_bottom*/,
+                         const double /*pad_top*/,
+                         const double /*pad_left*/,
+                         const double /*pad_right*/,
+                         const Point<1> /*center*/,
+                         const types::manifold_id /*polar_manifold_id*/,
+                         const types::manifold_id /*tfi_manifold_id*/,
+                         const double /*L*/,
+                         const unsigned int /*n_slices*/,
+                         const bool /*colorize*/)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  namespace internal
+  {
+    // helper function to check if point is in 2D box
+    bool inline point_in_box(const Point<2> &p,
+                             const Point<2> &c,
+                             const double    radius)
+    {
+      return (std::abs(p[0] - c[0]) < radius) &&
+             (std::abs(p[1] - c[1]) < radius);
+    }
+
+    bool inline point_in_box(const Point<3> &p,
+                             const Point<3> &center,
+                             const double    radius)
+    {
+      return point_in_box(Point<2>(p[0], p[1]),
+                          Point<2>(center[0], center[1]),
+                          radius);
+    }
+
+    /**
+     * Keep the main 2D implementation internal as we will use
+     * material id in 3D case, whereas the actual 2D function
+     * will reset material id in addition to this one.
+     */
+    void plate_with_a_hole(Triangulation<2> &       tria,
+                           const double             inner_radius,
+                           const double             outer_radius,
+                           const double             pad_bottom,
+                           const double             pad_top,
+                           const double             pad_left,
+                           const double             pad_right,
+                           const Point<2>           new_center,
+                           const types::manifold_id polar_manifold_id,
+                           const types::manifold_id tfi_manifold_id,
+                           const double             L,
+                           const unsigned int /*n_slices*/,
+                           const bool colorize)
+    {
+      Assert((pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0),
+             ExcMessage("At least one padding parameter has to be non-zero."));
+      Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
+      Assert(pad_top >= 0., ExcMessage("Negative top padding."));
+      Assert(pad_left >= 0., ExcMessage("Negative left padding."));
+      Assert(pad_right >= 0., ExcMessage("Negative right padding."));
+
+      const Point<2> center;
+
+      auto min_line_length = [](const Triangulation<2> &tria) -> double {
+        double length = std::numeric_limits<double>::max();
+        for (const auto cell : tria.active_cell_iterators())
+          for (unsigned int n = 0; n < GeometryInfo<2>::lines_per_cell; ++n)
+            length = std::min(length, cell->line(n)->diameter());
+        return length;
+      };
+
+      // start by setting up the cylinder triangulation
+      Triangulation<2> cylinder_tria;
+      GridGenerator::hyper_cube_with_cylindrical_hole(cylinder_tria,
+                                                      inner_radius,
+                                                      outer_radius,
+                                                      L,
+                                                      /*repetitions*/ 1,
+                                                      colorize);
+
+      // Mark the cylinder material ids as 2 to distinguish them from the bulk
+      // cells (these are read again about 40 lines down)
+      for (const auto &cell : cylinder_tria.active_cell_iterators())
+        cell->set_material_id(2);
+
+      // hyper_cube_with_cylindrical_hole will have 2 cells along
+      // each face, so he element size is outer_radius
+
+      auto add_sizes = [](std::vector<double> &step_sizes,
+                          const double         padding,
+                          const double         h) -> void {
+        // use std::round instead of std::ceil to improve aspect ratio
+        // in case padding is only slightly larger than h.
+        const unsigned int rounded = std::round(padding / h);
+        // in case padding is much smaller than h, make sure we
+        // have at least 1 element
+        const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;
+        for (unsigned int i = 0; i < num; ++i)
+          step_sizes.push_back(padding / num);
+      };
+
+      std::vector<std::vector<double>> step_sizes(2);
+      // x-coord
+      // left:
+      add_sizes(step_sizes[0], pad_left, outer_radius);
+      // center
+      step_sizes[0].push_back(outer_radius);
+      step_sizes[0].push_back(outer_radius);
+      // right
+      add_sizes(step_sizes[0], pad_right, outer_radius);
+      // y-coord
+      //   bottom
+      add_sizes(step_sizes[1], pad_bottom, outer_radius);
+      //   center
+      step_sizes[1].push_back(outer_radius);
+      step_sizes[1].push_back(outer_radius);
+      //   top
+      add_sizes(step_sizes[1], pad_top, outer_radius);
+
+      // now create bulk
+      Triangulation<2> bulk_tria;
+      const Point<2>   bl(-outer_radius - pad_left, -outer_radius - pad_bottom);
+      const Point<2>   tr(outer_radius + pad_right, outer_radius + pad_top);
+      GridGenerator::subdivided_hyper_rectangle(
+        bulk_tria, step_sizes, bl, tr, colorize);
+
+      // now remove cells reserved from the cylindrical hole
+      std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
+      for (const auto &cell : bulk_tria.active_cell_iterators())
+        if (point_in_box(cell->center(), center, outer_radius))
+          cells_to_remove.insert(cell);
+
+      Triangulation<2> tria_without_cylinder;
+      GridGenerator::create_triangulation_with_removed_cells(
+        bulk_tria, cells_to_remove, tria_without_cylinder);
+
+      const double tolerance = std::min(min_line_length(tria_without_cylinder),
+                                        min_line_length(cylinder_tria)) /
+                               2.0;
+
+      // set material ID in bulk part to something other than 2
+      for (const auto &cell : tria_without_cylinder.active_cell_iterators())
+        cell->set_material_id(1);
+
+      GridGenerator::merge_triangulations(tria_without_cylinder,
+                                          cylinder_tria,
+                                          tria,
+                                          tolerance);
+
+      // now set manifold ids:
+      for (const auto &cell : tria.active_cell_iterators())
+        {
+          // set all non-boundary manifold ids on the cells that came from the
+          // grid around the cylinder to the new TFI manifold id.
+          if (cell->material_id() == 2)
+            {
+              cell->set_manifold_id(tfi_manifold_id);
+              for (unsigned int face_n = 0;
+                   face_n < GeometryInfo<2>::faces_per_cell;
+                   ++face_n)
+                {
+                  const auto &face = cell->face(face_n);
+                  if (face->at_boundary() &&
+                      point_in_box(face->center(), center, outer_radius))
+                    face->set_manifold_id(polar_manifold_id);
+                  else
+                    face->set_manifold_id(tfi_manifold_id);
+                }
+            }
+          else
+            {
+              // ensure that all other manifold ids (including the faces
+              // opposite the cylinder) are set to the flat id
+              cell->set_all_manifold_ids(numbers::flat_manifold_id);
+            }
+        }
+
+      static constexpr double tol =
+        std::numeric_limits<double>::epsilon() * 10000;
+      if (colorize)
+        for (auto &cell : tria.active_cell_iterators())
+          for (unsigned int face_n = 0;
+               face_n < GeometryInfo<2>::faces_per_cell;
+               ++face_n)
+            {
+              const auto face = cell->face(face_n);
+              if (face->at_boundary())
+                {
+                  const Point<2> center = face->center();
+                  // left side
+                  if (std::abs(center[0] - bl[0]) < tol * std::abs(bl[0]))
+                    face->set_boundary_id(0);
+                  // right side
+                  else if (std::abs(center[0] - tr[0]) < tol * std::abs(tr[0]))
+                    face->set_boundary_id(1);
+                  // bottom
+                  else if (std::abs(center[1] - bl[1]) < tol * std::abs(bl[1]))
+                    face->set_boundary_id(2);
+                  // top
+                  else if (std::abs(center[1] - tr[1]) < tol * std::abs(tr[1]))
+                    face->set_boundary_id(3);
+                  // cylinder boundary
+                  else
+                    {
+                      Assert(cell->material_id() == 2, ExcInternalError());
+                      face->set_boundary_id(4);
+                    }
+                }
+            }
+
+      // move to the new center
+      GridTools::shift(new_center, tria);
+
+      PolarManifold<2> polar_manifold(new_center);
+      tria.set_manifold(polar_manifold_id, polar_manifold);
+      TransfiniteInterpolationManifold<2> inner_manifold;
+      inner_manifold.initialize(tria);
+      tria.set_manifold(tfi_manifold_id, inner_manifold);
+    }
+
+  } // namespace internal
+
+  template <>
+  void plate_with_a_hole(Triangulation<2> &       tria,
+                         const double             inner_radius,
+                         const double             outer_radius,
+                         const double             pad_bottom,
+                         const double             pad_top,
+                         const double             pad_left,
+                         const double             pad_right,
+                         const Point<2>           new_center,
+                         const types::manifold_id polar_manifold_id,
+                         const types::manifold_id tfi_manifold_id,
+                         const double             L,
+                         const unsigned int       n_slices,
+                         const bool               colorize)
+  {
+    internal::plate_with_a_hole(tria,
+                                inner_radius,
+                                outer_radius,
+                                pad_bottom,
+                                pad_top,
+                                pad_left,
+                                pad_right,
+                                new_center,
+                                polar_manifold_id,
+                                tfi_manifold_id,
+                                L,
+                                n_slices,
+                                colorize);
+
+    // reset material id
+    for (auto &cell : tria.active_cell_iterators())
+      cell->set_material_id(0);
+  }
+
+
+
+  template <>
+  void plate_with_a_hole(Triangulation<3> &       tria,
+                         const double             inner_radius,
+                         const double             outer_radius,
+                         const double             pad_bottom,
+                         const double             pad_top,
+                         const double             pad_left,
+                         const double             pad_right,
+                         const Point<3>           new_center,
+                         const types::manifold_id polar_manifold_id,
+                         const types::manifold_id tfi_manifold_id,
+                         const double             L,
+                         const unsigned int       n_slices,
+                         const bool               colorize)
+  {
+    Triangulation<2> tria_2;
+    internal::plate_with_a_hole(tria_2,
+                                inner_radius,
+                                outer_radius,
+                                pad_bottom,
+                                pad_top,
+                                pad_left,
+                                pad_right,
+                                Point<2>(new_center[0], new_center[1]),
+                                polar_manifold_id,
+                                tfi_manifold_id,
+                                L,
+                                n_slices,
+                                colorize);
+
+    // extrude to 3D
+    extrude_triangulation(tria_2, n_slices, L, tria);
+
+    // shift in Z direction to match specified center
+    GridTools::shift(Point<3>(0, 0, new_center[2] - L / 2.), tria);
+
+    // extrude will keep boundary IDs but can not keep manifolds, set them
+    // below:
+    const FlatManifold<3> flat_manifold;
+    for (const auto &cell : tria.active_cell_iterators())
+      if (cell->material_id() == 2)
+        {
+          cell->set_all_manifold_ids(tfi_manifold_id);
+          for (unsigned int face_n = 0;
+               face_n < GeometryInfo<3>::faces_per_cell;
+               ++face_n)
+            {
+              // similar check to 2D version
+              const auto face = cell->face(face_n);
+              if (face->at_boundary() &&
+                  internal::point_in_box(face->center(),
+                                         new_center,
+                                         outer_radius) &&
+                  std::abs(
+                    flat_manifold.normal_vector(face, face->center())[2]) <
+                    1.0e-10)
+                face->set_manifold_id(polar_manifold_id);
+              else
+                face->set_manifold_id(tfi_manifold_id);
+            }
+        }
+      else
+        {
+          // otherwise set everything to flat manifold
+          cell->set_all_manifold_ids(numbers::flat_manifold_id);
+        }
+
+    // set up the new manifolds
+    const Tensor<1, 3>           direction{{0.0, 0.0, 1.0}};
+    const CylindricalManifold<3> cylindrical_manifold(
+      direction, /*axial_point*/ new_center);
+    TransfiniteInterpolationManifold<3> inner_manifold;
+    inner_manifold.initialize(tria);
+    tria.set_manifold(polar_manifold_id, cylindrical_manifold);
+    tria.set_manifold(tfi_manifold_id, inner_manifold);
+
+    // finally reset material ids
+    for (auto &cell : tria.active_cell_iterators())
+      cell->set_material_id(0);
+  }
+
+
+
   template <int dim, int spacedim>
   void
   hyper_cross(Triangulation<dim, spacedim> &   tria,
