@@ -1,0 +1,48 @@
+
+DEAL:0::cells before: 16
+DEAL:0::myid=0 cellid=0_1:0 refining
+DEAL:0::myid=0 cellid=0_1:1
+DEAL:0::myid=0 cellid=0_1:2
+DEAL:0::myid=0 cellid=0_1:3
+DEAL:0::myid=0 cellid=1_1:0
+DEAL:0::myid=0 cellid=1_1:1
+DEAL:0::myid=0 cellid=1_1:2
+DEAL:0::myid=0 cellid=1_1:3
+DEAL:0::myid=0 cellid=2_1:0
+DEAL:0::myid=0 cellid=2_1:1
+DEAL:0::myid=0 cellid=2_1:2
+DEAL:0::myid=0 cellid=2_1:3
+DEAL:0::myid=0 cellid=3_1:0 coarsening
+DEAL:0::myid=0 cellid=3_1:1 coarsening
+DEAL:0::myid=0 cellid=3_1:2 coarsening
+DEAL:0::myid=0 cellid=3_1:3 coarsening
+DEAL:0::handle=0
+DEAL:0::packing cell 0_1:0 with data size=4 accumulated data=0 status=REFINE
+DEAL:0::packing cell 0_1:1 with data size=8 accumulated data=1 status=PERSIST
+DEAL:0::packing cell 0_1:2 with data size=12 accumulated data=3 status=PERSIST
+DEAL:0::packing cell 0_1:3 with data size=16 accumulated data=6 status=PERSIST
+DEAL:0::packing cell 1_1:0 with data size=20 accumulated data=10 status=PERSIST
+DEAL:0::packing cell 1_1:1 with data size=24 accumulated data=15 status=PERSIST
+DEAL:0::packing cell 1_1:2 with data size=28 accumulated data=21 status=PERSIST
+DEAL:0::packing cell 1_1:3 with data size=32 accumulated data=28 status=PERSIST
+DEAL:0::packing cell 2_1:0 with data size=36 accumulated data=36 status=PERSIST
+DEAL:0::packing cell 2_1:1 with data size=40 accumulated data=45 status=PERSIST
+DEAL:0::packing cell 2_1:2 with data size=44 accumulated data=55 status=PERSIST
+DEAL:0::packing cell 2_1:3 with data size=48 accumulated data=66 status=PERSIST
+DEAL:0::packing cell 3_0: with data size=52 accumulated data=78 status=COARSEN
+DEAL:0::cells after: 16
+DEAL:0::unpacking cell 0_1:0 with data size=4 accumulated data=0 status=REFINE
+DEAL:0::unpacking cell 0_1:1 with data size=8 accumulated data=1 status=PERSIST
+DEAL:0::unpacking cell 0_1:2 with data size=12 accumulated data=3 status=PERSIST
+DEAL:0::unpacking cell 0_1:3 with data size=16 accumulated data=6 status=PERSIST
+DEAL:0::unpacking cell 1_1:0 with data size=20 accumulated data=10 status=PERSIST
+DEAL:0::unpacking cell 1_1:1 with data size=24 accumulated data=15 status=PERSIST
+DEAL:0::unpacking cell 1_1:2 with data size=28 accumulated data=21 status=PERSIST
+DEAL:0::unpacking cell 1_1:3 with data size=32 accumulated data=28 status=PERSIST
+DEAL:0::unpacking cell 2_1:0 with data size=36 accumulated data=36 status=PERSIST
+DEAL:0::unpacking cell 2_1:1 with data size=40 accumulated data=45 status=PERSIST
+DEAL:0::unpacking cell 2_1:2 with data size=44 accumulated data=55 status=PERSIST
+DEAL:0::unpacking cell 2_1:3 with data size=48 accumulated data=66 status=PERSIST
+DEAL:0::unpacking cell 3_0: with data size=52 accumulated data=78 status=COARSEN
+DEAL:0::Checksum: 2822439380
+DEAL:0::OK

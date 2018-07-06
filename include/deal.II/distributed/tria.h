@@ -721,6 +721,11 @@ namespace parallel
        * format `std::vector<char>`, representing the packed data on a
        * certain cell.
        *
+       * The second parameter @p returns_variable_size_data indicates whether
+       * the returned size of the memory region from the callback function
+       * varies by cell (<tt>=true</tt>) or stays constant on each one
+       * throughout the whole domain (<tt>=false</tt>).
+       *
        * @note The purpose of this function is to register intent to
        *   attach data for a single, subsequent call to
        *   execute_coarsening_and_refinement() and notify_ready_to_unpack(),
@@ -733,8 +738,8 @@ namespace parallel
       unsigned int
       register_data_attach(
         const std::function<std::vector<char>(const cell_iterator &,
-                                              const CellStatus)>
-          &pack_callback);
+                                              const CellStatus)> &pack_callback,
+        const bool returns_variable_size_data);
 
       /**
        * This function is the opposite of register_data_attach(). It is called
@@ -896,10 +901,11 @@ namespace parallel
           CellStatus)>;
 
         /**
-         * These callback functions will be stored in the order on how they have
-         * been registered with the register_data_attach() function.
+         * These callback functions will be stored in the order in which they
+         * have been registered with the register_data_attach() function.
          */
-        std::vector<pack_callback_t> pack_callbacks;
+        std::vector<pack_callback_t> pack_callbacks_fixed;
+        std::vector<pack_callback_t> pack_callbacks_variable;
       };
 
       CellAttachedData cell_attached_data;
@@ -952,24 +958,30 @@ namespace parallel
         DataTransfer(MPI_Comm mpi_communicator);
 
         /**
-         * Prepare any data transfer by calling the pack callback function of
-         * each entry of @p pack_callback_sets on each cell registered in
-         * @p quad_cell_relations.
+         * Prepare data transfer by calling the pack callback functions on each
+         * cell
+         * in @p quad_cell_relations.
+         *
+         * All registered callback functions in @p pack_callbacks_fixed will write
+         * into the fixed size buffer, whereas each entry of @p pack_callbacks_variable
+         * will write its data into the variable size buffer.
          */
         void
         pack_data(
           const std::vector<quadrant_cell_relation_t> &quad_cell_relations,
           const std::vector<typename CellAttachedData::pack_callback_t>
-            &pack_callbacks);
+            &pack_callbacks_fixed,
+          const std::vector<typename CellAttachedData::pack_callback_t>
+            &pack_callbacks_variable);
 
         /**
          * Transfer data across forests.
          *
-         * Besides the actual @parallel_forest, which has been already refined
+         * Besides the actual @p parallel_forest, which has been already refined
          * and repartitioned, this function also needs information about its
          * previous state, i.e. the locally owned intervals in p4est's
-         * sc_array of each processor. These information need to be memcopyied
-         * out of the old p4est object and provided via the parameter
+         * sc_array of each processor. This information needs to be memcopyied
+         * out of the old p4est object and has to be provided via the parameter
          * @p previous_global_first_quadrant.
          *
          * Data has to be previously packed with pack_data().
@@ -1067,6 +1079,11 @@ namespace parallel
         MPI_Comm mpi_communicator;
 
         /**
+         * Flag that denotes if variable size data has been packed.
+         */
+        bool variable_size_data_stored;
+
+        /**
          * Cumulative size in bytes that those functions that have called
          * register_data_attach() want to attach to each cell. This number
          * only pertains to fixed-sized buffers where the data attached to
@@ -1074,9 +1091,9 @@ namespace parallel
          *
          * The last entry of this container corresponds to the data size
          * packed per cell in the fixed size buffer (which can be accessed
-         * calling <tt>cumulative_sizes_fixed.back()</tt>).
+         * calling <tt>sizes_fixed_cumulative.back()</tt>).
          */
-        std::vector<unsigned int> cumulative_sizes_fixed;
+        std::vector<unsigned int> sizes_fixed_cumulative;
 
         /**
          * Consecutive buffers designed for the fixed size transfer
@@ -1085,10 +1102,14 @@ namespace parallel
         std::vector<char> src_data_fixed;
         std::vector<char> dest_data_fixed;
 
-        // TODO: buffers for p4est variable size transfer
-        //       std::vector<std::vector<size_t>> cumulative_sizes_var_per_cell;
-        //       std::vector<size_t> src_sizes_var, dest_sizes_var;
-        //       std::vector<char> src_data_var, dest_data_var;
+        /**
+         * Consecutive buffers designed for the variable size transfer
+         * functions of p4est.
+         */
+        std::vector<int>  src_sizes_variable;
+        std::vector<int>  dest_sizes_variable;
+        std::vector<char> src_data_variable;
+        std::vector<char> dest_data_variable;
       };
 
       DataTransfer data_transfer;
@@ -1294,7 +1315,8 @@ namespace parallel
         const std::function<std::vector<char>(
           const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
           const typename dealii::Triangulation<1, spacedim>::CellStatus)>
-          &pack_callback);
+          &        pack_callback,
+        const bool returns_variable_size_data);
 
       /**
        * This function is not implemented, but needs to be present for the

@@ -794,11 +794,13 @@ namespace parallel
       matrix_dofs_child.reinit(dofs_per_cell, number_of_values);
       matrix_quadrature.reinit(n_q_points, number_of_values);
 
-      handle = triangulation->register_data_attach(std::bind(
-        &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2));
+      handle = triangulation->register_data_attach(
+        std::bind(
+          &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
+          this,
+          std::placeholders::_1,
+          std::placeholders::_2),
+        /*returns_variable_size_data=*/false);
     }
 
 
