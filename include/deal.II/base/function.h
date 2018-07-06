@@ -53,27 +53,30 @@ class TensorFunction;
  * object represents. Access to function objects therefore is through the
  * following methods:
  * @code
- *   // access to one component at one point
- *   double value        (const Point<dim>   &p,
- *                        const unsigned int  component = 0) const;
+ * // access to one component at one point
+ * double
+ * value(const Point<dim> & p,
+ *       const unsigned int component = 0) const;
  *
- *   // return all components at one point
- *   void   vector_value (const Point<dim>   &p,
- *                        Vector<double>     &value) const;
+ * // return all components at one point
+ * void
+ * vector_value(const Point<dim> &p,
+ *              Vector<double> &  value) const;
  * @endcode
  *
  * For more efficiency, there are other functions returning one or all
  * components at a list of points at once:
  * @code
- *   // access to one component at several points
- *   void   value_list (const std::vector<Point<dim> >  &point_list,
- *                      std::vector<double>             &value_list,
- *                      const unsigned int  component = 0) const;
+ * // access to one component at several points
+ * void
+ * value_list(const std::vector<Point<dim>> &point_list,
+ *            std::vector<double> &          value_list,
+ *            const unsigned int             component = 0) const;
  *
- *   // return all components at several points
- *   void   vector_value_list (const std::vector<Point<dim> >    &point_list,
- *                             std::vector<Vector<double> >      &value_list)
- * const;
+ * // return all components at several points
+ * void
+ * vector_value_list(const std::vector<Point<dim>> &point_list,
+ *                   std::vector<Vector<double>> &  value_list) const;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the function or
@@ -615,11 +618,11 @@ protected:
 /**
  * This class provides a way to convert a scalar function of the kind
  * @code
- *   RangeNumberType foo (const Point<dim> &);
+ * RangeNumberType foo (const Point<dim> &);
  * @endcode
  * into an object of type Function@<dim@>. Since the argument returns a
  * scalar, the result is clearly a Function object for which
- * <code>function.n_components==1</code>. The class works by storing a pointer
+ * <code>function.n_components == 1</code>. The class works by storing a pointer
  * to the given function and every time
  * <code>function.value(p,component)</code> is called, calls
  * <code>foo(p)</code> and returns the corresponding value. It also makes sure
@@ -641,52 +644,55 @@ protected:
  * argument. For example, if you need a Function object that returns the norm
  * of a point, you could write it like so:
  * @code
- *   template <int dim, typename RangeNumberType>
- *   class Norm : public Function<dim, RangeNumberType> {
- *     public:
- *       virtual RangeNumberType value (const Point<dim> &p,
- *                                  const unsigned int component) const
- *       {
- *         Assert (component == 0, ExcMessage ("This object is scalar!"));
- *         return p.norm();
- *       }
- *    };
+ * template <int dim, typename RangeNumberType>
+ * class Norm : public Function<dim, RangeNumberType>
+ * {
+ * public:
+ *   virtual RangeNumberType
+ *   value(const Point<dim> & p,
+ *         const unsigned int component) const
+ *   {
+ *     Assert (component == 0, ExcMessage ("This object is scalar!"));
+ *     return p.norm();
+ *   }
+ * };
  *
- *    Norm<2> my_norm_object;
+ * Norm<2> my_norm_object;
  * @endcode
  * and then pass the <code>my_norm_object</code> around, or you could write it
  * like so:
  * @code
- *   ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_norm_object
- * (&Point<dim>::norm);
+ * ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_norm_object(
+ *   &Point<dim>::norm);
  * @endcode
  *
  * Similarly, to generate an object that computes the distance to a point
  * <code>q</code>, we could do this:
  * @code
- *   template <int dim, typename RangeNumberType>
- *   class DistanceTo : public Function<dim, RangeNumberType> {
- *     public:
- *       DistanceTo (const Point<dim> &q) : q(q) {}
- *       virtual RangeNumberType value (const Point<dim> &p,
- *                                  const unsigned int component) const
- *       {
- *         Assert (component == 0, ExcMessage ("This object is scalar!"));
- *         return q.distance(p);
- *       }
- *     private:
- *       const Point<dim> q;
- *    };
+ * template <int dim, typename RangeNumberType>
+ * class DistanceTo : public Function<dim, RangeNumberType>
+ * {
+ * public:
+ *   DistanceTo (const Point<dim> &q) : q(q) {}
  *
- *    Point<2> q (2,3);
- *    DistanceTo<2> my_distance_object;
+ *   virtual RangeNumberType
+ *   value (const Point<dim> & p,
+ *          const unsigned int component) const
+ *   {
+ *     Assert(component == 0, ExcMessage("This object is scalar!"));
+ *     return q.distance(p);
+ *   }
+ * private:
+ *   const Point<dim> q;
+ * };
+ *
+ * Point<2> q (2, 3);
+ * DistanceTo<2> my_distance_object;
  * @endcode
  * or we could write it like so:
  * @code
- *    ScalarFunctionFromFunctionObject<dim, RangeNumberType>
- *      my_distance_object (std::bind (&Point<dim>::distance,
- *                                           q,
- *                                           std::placeholders::_1));
+ * ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_distance_object(
+ *   std::bind(&Point<dim>::distance, q, std::placeholders::_1));
  * @endcode
  * The savings in work to write this are apparent.
  *
@@ -741,9 +747,13 @@ private:
  *
  * To be more concrete, let us consider the following example:
  * @code
- *   RangeNumberType one (const Point<2> &p) { return 1; }
- *   VectorFunctionFromScalarFunctionObject<2>
- *      component_mask (&one, 1, 3);
+ * RangeNumberType
+ * one(const Point<2> &p)
+ * {
+ *   return 1.0;
+ * }
+ *
+ * VectorFunctionFromScalarFunctionObject<2> component_mask(&one, 1, 3);
  * @endcode
  * Here, <code>component_mask</code> then represents a Function object that
  * for every point returns the vector $(0, 1, 0)^T$, i.e. a mask function that
@@ -818,13 +828,13 @@ private:
  * components be 0.
  *
  * For example: Say you created a class called
- *  @code
- *    class RightHandSide : public TensorFunction<rank,dim, RangeNumberType>
- *  @endcode
+ * @code
+ * class RightHandSide : public TensorFunction<rank,dim, RangeNumberType>
+ * @endcode
  * which extends the TensorFunction class and you have an object
- *  @code
- *    RightHandSide<1,dim, RangeNumberType> rhs;
- *  @endcode
+ * @code
+ * RightHandSide<1,dim, RangeNumberType> rhs;
+ * @endcode
  * of that class which you want to interpolate onto your mesh using the
  * VectorTools::interpolate function, but the finite element you use for the
  * DoFHandler object has 3 copies of a finite element with <tt>dim</tt>
@@ -832,11 +842,11 @@ private:
  * DoFHandler, you need an object of type Function that has 3*dim vector
  * components. Creating such an object from the existing <code>rhs</code>
  * object is done using this piece of code:
- *  @code
- *      RighHandSide<1,dim, RangeNumberType> rhs;
- *      VectorFunctionFromTensorFunction<dim, RangeNumberType>
- * rhs_vector_function (rhs, 0, 3*dim);
- *  @endcode
+ * @code
+ * RightHandSide<1,dim, RangeNumberType> rhs;
+ * VectorFunctionFromTensorFunction<dim, RangeNumberType> rhs_vector_function(
+ *   rhs, 0, 3*dim);
+ * @endcode
  * where the <code>dim</code> components of the tensor function are placed
  * into the first <code>dim</code> components of the function object.
  *
