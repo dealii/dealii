@@ -60,21 +60,21 @@ class TriaActiveIterator;
  * In addition to the standard interface, an iterator of this class provides a
  * <tt>-@></tt> operator, i.e. you can write statements like
  * @code
- * i->set_refine_flag ();
+ * cell->set_refine_flag ();
  * @endcode
  *
- * Iterators are used whenever a loop over all lines, quads, cells etc.  is to
+ * Iterators are used whenever a loop over all lines, quads, cells etc. is to
  * be performed. These loops can then be coded like this:
  * @code
- *   cell_iterator i   = tria.begin();
- *   cell_iterator end = tria.end();
- *   for (; i!=end; ++i)
- *     if (cell->at_boundary())
- *       cell->set_refine_flag();
+ * cell_iterator cell = tria.begin();
+ * cell_iterator end  = tria.end();
+ * for (; cell!=end; ++cell)
+ *   if (cell->at_boundary())
+ *     cell->set_refine_flag();
  * @endcode
  *
- * Note the usage of <tt>++i</tt> instead of <tt>i++</tt> since this does not
- * involve temporaries and copying. It is recommended to use a fixed value
+ * Note the usage of <tt>++cell</tt> instead of <tt>cell++</tt> since this does
+ * not involve temporaries and copying. It is recommended to use a fixed value
  * <tt>end</tt> inside the loop instead of <tt>tria.end()</tt>, since the
  * creation and copying of these iterators is rather expensive compared to
  * normal pointers.
@@ -255,8 +255,7 @@ public:
    * derived iterators:
    * @code
    * DoFCellAccessor dof_accessor;
-   * Triangulation::active_cell_iterator cell
-   *   = accessor;
+   * Triangulation::active_cell_iterator cell = dof_accessor;
    * @endcode
    */
   explicit TriaRawIterator(const Accessor &a);

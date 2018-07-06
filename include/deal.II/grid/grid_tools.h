@@ -693,10 +693,11 @@ namespace GridTools
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
    * @code
-   *   std::tuple<
-   *   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator
-   * >, std::vector< std::vector< Point<dim> > >, std::vector<
-   * std::vector<unsigned int> > >
+   * std::tuple<
+   *   std::vector<
+   *     typename Triangulation<dim, spacedim>::active_cell_iterator>,
+   *   std::vector<std::vector<Point<dim>>>,
+   *   std::vector<std::vector<unsigned int>>>
    * @endcode
    * The type is abbreviated above to improve readability of this page.
    *
@@ -768,11 +769,12 @@ namespace GridTools
    * above as @p return_type, is
    * @code
    * std::tuple<
-   *   std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator
-   * >, std::vector< std::vector< Point<dim> > >, std::vector< std::vector<
-   * unsigned int > >, std::vector< std::vector< Point<spacedim> > >,
-   *       std::vector< std::vector< unsigned int > >
-   *       >
+   *   std::vector<
+   *     typename Triangulation<dim, spacedim>::active_cell_iterator>,
+   *   std::vector<std::vector<Point<dim>>>,
+   *   std::vector<std::vector<unsigned int>>,
+   *   std::vector<std::vector<Point<spacedim>>>,
+   *   std::vector<std::vector<unsigned int>>>
    * @endcode
    * The type is abbreviated above to improve readability of this page.
    *
@@ -812,11 +814,11 @@ namespace GridTools
    * equality:
    *
    * @code
-   * used_vertices = extract_used_vertices(tria);
-   * all_vertices = tria.get_vertices();
+   * const auto used_vertices = extract_used_vertices(tria);
+   * auto all_vertices = tria.get_vertices();
    *
-   * for(auto &id_and_v : used_vertices)
-   *    all_vertices[id_and_v.first] == id_and_v.second; // true
+   * for(const auto &id_and_v : used_vertices)
+   *   all_vertices[id_and_v.first] == id_and_v.second; // true
    * @endcode
    *
    * Notice that the above is not satisfied for mappings that change the
@@ -1265,16 +1267,14 @@ namespace GridTools
    * IteratorFilters. For example, it is possible to extract a layer
    * of cells around all of those cells with a given material id,
    * @code
-   * GridTools::compute_active_cell_halo_layer(tria,
-   *                                           IteratorFilters::MaterialIdEqualTo(1,
-   * true));
+   * GridTools::compute_active_cell_halo_layer(
+   *   tria, IteratorFilters::MaterialIdEqualTo(1, true));
    * @endcode
    * or around all cells with one of a set of active FE indices for an
    * hp::DoFHandler
    * @code
-   * GridTools::compute_active_cell_halo_layer(hp_dof_handler,
-   *                                           IteratorFilters::ActiveFEIndexEqualTo({1,2},
-   * true));
+   * GridTools::compute_active_cell_halo_layer(
+   *   hp_dof_handler, IteratorFilters::ActiveFEIndexEqualTo({1,2}, true));
    * @endcode
    * Note that in the last two examples we ensure that the predicate returns
    * true only for locally owned cells. This means that the halo layer will
@@ -1528,9 +1528,9 @@ namespace GridTools
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
    * @code
-   *   std::tuple< std::vector< std::vector< unsigned int > >,
-   *       std::map< unsigned int, unsigned int>,
-   *       std::map< unsigned int, std::vector< unsigned int > > >
+   * std::tuple<std::vector<std::vector<unsigned int>>,
+   *            std::map< unsigned int, unsigned int>,
+   *            std::map< unsigned int, std::vector<unsigned int>>>
    * @endcode
    * The type is abbreviated above to improve readability of this page.
    *
@@ -2588,24 +2588,23 @@ namespace GridTools
    * other processors to ensure that one can query the right value
    * also on those processors:
    * @code
-   *    auto pack
-   *    = [] (const typename
-   * dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell) ->
-   * unsigned int
-   *    {
-   *      return cell->active_fe_index();
-   *    };
+   * using active_cell_iterator =
+   *   typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator;
+   * auto pack = [] (const active_cell_iterator &cell) -> unsigned int
+   *             {
+   *               return cell->active_fe_index();
+   *             };
    *
-   *    auto unpack
-   *      = [] (const typename
-   * dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell, const
-   * unsigned int &active_fe_index) -> void
-   *    {
-   *      cell->set_active_fe_index(active_fe_index);
-   *    };
+   * auto unpack = [] (const active_cell_iterator &cell,
+   *                   const unsigned int &active_fe_index) -> void
+   *               {
+   *                 cell->set_active_fe_index(active_fe_index);
+   *               };
    *
-   *   GridTools::exchange_cell_data_to_ghosts<unsigned int,
-   * dealii::hp::DoFHandler<dim,spacedim>> (dof_handler, pack, unpack);
+   * GridTools::exchange_cell_data_to_ghosts<
+   *   unsigned int, dealii::hp::DoFHandler<dim,spacedim>> (dof_handler,
+   *                                                        pack,
+   *                                                        unpack);
    * @endcode
    *
    * You will notice that the @p pack lambda function returns an `unsigned int`,
