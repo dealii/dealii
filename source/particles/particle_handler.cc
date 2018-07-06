@@ -1047,7 +1047,7 @@ namespace Particles
                       std::placeholders::_2);
 
         handle = non_const_triangulation->register_data_attach(
-          callback_function, /*returns_variable_size_data=*/false);
+          callback_function, /*returns_variable_size_data=*/true);
       }
   }
 
@@ -1083,7 +1083,7 @@ namespace Particles
                       std::placeholders::_2);
 
         handle = non_const_triangulation->register_data_attach(
-          callback_function, /*returns_variable_size_data=*/false);
+          callback_function, /*returns_variable_size_data=*/true);
       }
 
     // Check if something was stored and load it
@@ -1118,101 +1118,90 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const typename Triangulation<dim, spacedim>::CellStatus     status) const
   {
-    // -------------------
-    // HOTFIX: resize memory and static_cast std::vector to void*
-    // TODO: Apply ParticleHandler to variable size transfer
+    std::vector<Particle<dim, spacedim>> stored_particles_on_cell;
 
-    // ----- Copied from the old register_store_callback_function -----
-    // Compute the size per serialized particle. This is simple if we own
-    // particles, simply ask one of them. Otherwise create a temporary
-    // particle, ask it for its size and add the size of its properties.
-    const std::size_t size_per_particle =
-      (particles.size() > 0) ?
-        begin()->serialized_size_in_bytes() :
-        Particle<dim, spacedim>().serialized_size_in_bytes() +
-          property_pool->n_properties_per_slot() * sizeof(double);
-
-    // We need to transfer the number of particles for this cell and
-    // the particle data itself. If we are in the process of refinement
-    // (i.e. not in serialization) we need to provide 2^dim times the
-    // space for the data in case a cell is coarsened and all particles
-    // of the children have to be stored in the parent cell.
-    // (Note: In this hotfix we always reserve sufficient memory)
-    const bool        serialization = false;
-    const std::size_t transfer_size_per_cell =
-      sizeof(unsigned int) +
-      (size_per_particle * global_max_particles_per_cell) *
-        (serialization ? 1 : std::pow(2, dim));
-
-    std::vector<char> data_vector(transfer_size_per_cell);
-    void *            data = static_cast<void *>(data_vector.data());
-    // --------------------
-
-    unsigned int n_particles(0);
-
-    // If the cell persist or is refined store all particles of the current
-    // cell.
-    if (status ==
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST ||
-        status ==
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE)
+    switch (status)
       {
-        const boost::iterator_range<particle_iterator> particle_range =
-          particles_in_cell(cell);
-        n_particles =
-          std::distance(particle_range.begin(), particle_range.end());
-
-        unsigned int *ndata = static_cast<unsigned int *>(data);
-        *ndata              = n_particles;
-        data                = static_cast<void *>(ndata + 1);
-
-        for (particle_iterator particle = particle_range.begin();
-             particle != particle_range.end();
-             ++particle)
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
+          // If the cell persist or is refined store all particles of the
+          // current cell.
           {
-            particle->write_data(data);
+            unsigned int n_particles = 0;
+
+            const internal::LevelInd level_index = {cell->level(),
+                                                    cell->index()};
+            const auto               particles_in_cell =
+              (cell->is_ghost() ? ghost_particles.equal_range(level_index) :
+                                  particles.equal_range(level_index));
+
+            n_particles = n_particles_in_cell(cell);
+            stored_particles_on_cell.reserve(n_particles);
+
+            std::for_each(
+              particles_in_cell.first,
+              particles_in_cell.second,
+              [&stored_particles_on_cell](
+                const std::pair<internal::LevelInd, Particle<dim, spacedim>>
+                  &particle) {
+                stored_particles_on_cell.push_back(particle.second);
+              });
+
+            AssertDimension(n_particles, stored_particles_on_cell.size());
           }
-      }
-    // If this cell is the parent of children that will be coarsened, collect
-    // the particles of all children.
-    else if (status ==
-             parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN)
-      {
-        for (unsigned int child_index = 0;
-             child_index < GeometryInfo<dim>::max_children_per_cell;
-             ++child_index)
+          break;
+
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
+          // If this cell is the parent of children that will be coarsened,
+          // collect the particles of all children.
           {
-            const typename Triangulation<dim, spacedim>::cell_iterator child =
-              cell->child(child_index);
-            n_particles += n_particles_in_cell(child);
-          }
+            unsigned int n_particles = 0;
 
-        unsigned int *ndata = static_cast<unsigned int *>(data);
-        *ndata              = n_particles;
-
-        data = static_cast<void *>(ndata + 1);
-
-        for (unsigned int child_index = 0;
-             child_index < GeometryInfo<dim>::max_children_per_cell;
-             ++child_index)
-          {
-            const typename Triangulation<dim, spacedim>::cell_iterator child =
-              cell->child(child_index);
-            const boost::iterator_range<particle_iterator> particle_range =
-              particles_in_cell(child);
-
-            for (particle_iterator particle = particle_range.begin();
-                 particle != particle_range.end();
-                 ++particle)
+            for (unsigned int child_index = 0;
+                 child_index < GeometryInfo<dim>::max_children_per_cell;
+                 ++child_index)
               {
-                particle->write_data(data);
+                const typename Triangulation<dim, spacedim>::cell_iterator
+                  child = cell->child(child_index);
+                n_particles += n_particles_in_cell(child);
               }
-          }
-      }
-    else
-      Assert(false, ExcInternalError());
 
-    return data_vector;
+            stored_particles_on_cell.reserve(n_particles);
+
+            for (unsigned int child_index = 0;
+                 child_index < GeometryInfo<dim>::max_children_per_cell;
+                 ++child_index)
+              {
+                const typename Triangulation<dim, spacedim>::cell_iterator
+                                         child       = cell->child(child_index);
+                const internal::LevelInd level_index = {child->level(),
+                                                        child->index()};
+                const auto               particles_in_cell =
+                  (child->is_ghost() ?
+                     ghost_particles.equal_range(level_index) :
+                     particles.equal_range(level_index));
+
+                std::for_each(
+                  particles_in_cell.first,
+                  particles_in_cell.second,
+                  [&stored_particles_on_cell](
+                    const std::pair<internal::LevelInd, Particle<dim, spacedim>>
+                      &particle) {
+                    stored_particles_on_cell.push_back(particle.second);
+                  });
+              }
+
+            AssertDimension(n_particles, stored_particles_on_cell.size());
+          }
+          break;
+
+        default:
+          Assert(false, ExcInternalError());
+          break;
+      }
+
+    return Utilities::pack(stored_particles_on_cell,
+                           /*allow_compression=*/true);
   }
 
   template <int dim, int spacedim>
@@ -1222,140 +1211,152 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::CellStatus         status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
   {
-    // -------------------
-    // HOTFIX: static_cast std::vector to void*
-    // TODO: Apply ParticleHandler to variable size transfer
-    //    const void *data = static_cast<const void *>(data_vector.data());
-    const void *data = static_cast<const void *>(&*(data_range.begin()));
-    // -------------------
+    // We leave this container non-const to be able to `std::move`
+    // its contents directly into the particles multimap later.
+    std::vector<Particle<dim, spacedim>> loaded_particles_on_cell =
+      Utilities::unpack<std::vector<Particle<dim, spacedim>>>(
+        data_range.begin(),
+        data_range.end(),
+        /*allow_compression=*/true);
 
-    const unsigned int *n_particles_in_cell_ptr =
-      static_cast<const unsigned int *>(data);
-    const void *pdata =
-      reinterpret_cast<const void *>(n_particles_in_cell_ptr + 1);
-
-    if (*n_particles_in_cell_ptr == 0)
-      return;
-
-    // Load all particles from the data stream and store them in the local
-    // particle map.
-    if (status ==
-        parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST)
+    switch (status)
       {
-        typename std::multimap<internal::LevelInd,
-                               Particle<dim, spacedim>>::iterator
-          position_hint = particles.end();
-        for (unsigned int i = 0; i < *n_particles_in_cell_ptr; ++i)
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
           {
-            // Use std::multimap::emplace_hint to speed up insertion of
-            // particles. This is a C++11 function, but not all compilers
-            // that report a -std=c++11 (like gcc 4.6) implement it, so
-            // require C++14 instead.
+            typename std::multimap<internal::LevelInd,
+                                   Particle<dim, spacedim>>::iterator
+              position_hint = particles.end();
+            for (auto &particle : loaded_particles_on_cell)
+              {
+                // Use std::multimap::emplace_hint to speed up insertion of
+                // particles. This is a C++11 function, but not all compilers
+                // that report a -std=c++11 (like gcc 4.6) implement it, so
+                // require C++14 instead.
 #  ifdef DEAL_II_WITH_CXX14
-            position_hint = particles.emplace_hint(
-              position_hint,
-              std::make_pair(cell->level(), cell->index()),
-              Particle<dim, spacedim>(pdata, property_pool.get()));
+                position_hint =
+                  particles.emplace_hint(position_hint,
+                                         std::make_pair(cell->level(),
+                                                        cell->index()),
+                                         std::move(particle));
 #  else
-            position_hint = particles.insert(
-              position_hint,
-              std::make_pair(std::make_pair(cell->level(), cell->index()),
-                             Particle<dim, spacedim>(pdata,
-                                                     property_pool.get())));
+                position_hint =
+                  particles.insert(position_hint,
+                                   std::make_pair(std::make_pair(cell->level(),
+                                                                 cell->index()),
+                                                  std::move(particle)));
 #  endif
-            ++position_hint;
+                // Move the hint position forward by one, i.e., for the next
+                // particle. The 'hint' position will thus be right after the
+                // one just inserted.
+                ++position_hint;
+              }
           }
-      }
+          break;
 
-    else if (status ==
-             parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN)
-      {
-        typename std::multimap<internal::LevelInd,
-                               Particle<dim, spacedim>>::iterator
-          position_hint = particles.end();
-        for (unsigned int i = 0; i < *n_particles_in_cell_ptr; ++i)
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN:
           {
-            // Use std::multimap::emplace_hint to speed up insertion of
-            // particles. This is a C++11 function, but not all compilers
-            // that report a -std=c++11 (like gcc 4.6) implement it, so
-            // require C++14 instead.
+            typename std::multimap<internal::LevelInd,
+                                   Particle<dim, spacedim>>::iterator
+              position_hint = particles.end();
+            for (auto &particle : loaded_particles_on_cell)
+              {
+                const Point<dim> p_unit =
+                  mapping->transform_real_to_unit_cell(cell,
+                                                       particle.get_location());
+                particle.set_reference_location(p_unit);
+                // Use std::multimap::emplace_hint to speed up insertion of
+                // particles. This is a C++11 function, but not all compilers
+                // that report a -std=c++11 (like gcc 4.6) implement it, so
+                // require C++14 instead.
 #  ifdef DEAL_II_WITH_CXX14
-            position_hint = particles.emplace_hint(
-              position_hint,
-              std::make_pair(cell->level(), cell->index()),
-              Particle<dim, spacedim>(pdata, property_pool.get()));
+                position_hint =
+                  particles.emplace_hint(position_hint,
+                                         std::make_pair(cell->level(),
+                                                        cell->index()),
+                                         std::move(particle));
 #  else
-            position_hint = particles.insert(
-              position_hint,
-              std::make_pair(std::make_pair(cell->level(), cell->index()),
-                             Particle<dim, spacedim>(pdata,
-                                                     property_pool.get())));
+                position_hint =
+                  particles.insert(position_hint,
+                                   std::make_pair(std::make_pair(cell->level(),
+                                                                 cell->index()),
+                                                  std::move(particle)));
 #  endif
-            const Point<dim> p_unit = mapping->transform_real_to_unit_cell(
-              cell, position_hint->second.get_location());
-            position_hint->second.set_reference_location(p_unit);
-            ++position_hint;
+                // Move the hint position forward by one, i.e., for the next
+                // particle. The 'hint' position will thus be right after the
+                // one just inserted.
+                ++position_hint;
+              }
           }
-      }
-    else if (status ==
-             parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE)
-      {
-        std::vector<typename std::multimap<internal::LevelInd,
-                                           Particle<dim, spacedim>>::iterator>
-          position_hints(GeometryInfo<dim>::max_children_per_cell);
-        for (unsigned int child_index = 0;
-             child_index < GeometryInfo<dim>::max_children_per_cell;
-             ++child_index)
-          {
-            const typename Triangulation<dim, spacedim>::cell_iterator child =
-              cell->child(child_index);
-            position_hints[child_index] = particles.upper_bound(
-              std::make_pair(child->level(), child->index()));
-          }
+          break;
 
-        for (unsigned int i = 0; i < *n_particles_in_cell_ptr; ++i)
+        case parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE:
           {
-            Particle<dim, spacedim> p(pdata, property_pool.get());
-
+            std::vector<
+              typename std::multimap<internal::LevelInd,
+                                     Particle<dim, spacedim>>::iterator>
+              position_hints(GeometryInfo<dim>::max_children_per_cell);
             for (unsigned int child_index = 0;
                  child_index < GeometryInfo<dim>::max_children_per_cell;
                  ++child_index)
               {
                 const typename Triangulation<dim, spacedim>::cell_iterator
-                  child = cell->child(child_index);
+                  child                     = cell->child(child_index);
+                position_hints[child_index] = particles.upper_bound(
+                  std::make_pair(child->level(), child->index()));
+              }
 
-                try
+            for (auto &particle : loaded_particles_on_cell)
+              {
+                for (unsigned int child_index = 0;
+                     child_index < GeometryInfo<dim>::max_children_per_cell;
+                     ++child_index)
                   {
-                    const Point<dim> p_unit =
-                      mapping->transform_real_to_unit_cell(child,
-                                                           p.get_location());
-                    if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+                    const typename Triangulation<dim, spacedim>::cell_iterator
+                      child = cell->child(child_index);
+
+                    try
                       {
-                        p.set_reference_location(p_unit);
-                        // Use std::multimap::emplace_hint to speed up insertion
-                        // of particles. This is a C++11 function, but not all
-                        // compilers that report a -std=c++11 (like gcc 4.6)
-                        // implement it, so require C++14 instead.
+                        const Point<dim> p_unit =
+                          mapping->transform_real_to_unit_cell(
+                            child, particle.get_location());
+                        if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+                          {
+                            particle.set_reference_location(p_unit);
+                            // Use std::multimap::emplace_hint to speed up
+                            // insertion of particles. This is a C++11 function,
+                            // but not all compilers that report a -std=c++11
+                            // (like gcc 4.6) implement it, so require C++14
+                            // instead.
 #  ifdef DEAL_II_WITH_CXX14
-                        position_hints[child_index] =
-                          particles.emplace_hint(position_hints[child_index],
-                                                 std::make_pair(child->level(),
-                                                                child->index()),
-                                                 std::move(p));
+                            position_hints[child_index] =
+                              particles.emplace_hint(
+                                position_hints[child_index],
+                                std::make_pair(child->level(), child->index()),
+                                std::move(particle));
 #  else
-                        position_hints[child_index] = particles.insert(
-                          position_hints[child_index],
-                          std::make_pair(
-                            std::make_pair(child->level(), child->index()), p));
+                            position_hints[child_index] = particles.insert(
+                              position_hints[child_index],
+                              std::make_pair(std::make_pair(child->level(),
+                                                            child->index()),
+                                             std::move(particle)));
 #  endif
-                        ++position_hints[child_index];
-                        break;
+                            // Move the hint position forward by one, i.e., for
+                            // the next particle. The 'hint' position will thus
+                            // be right after the one just inserted.
+                            ++position_hints[child_index];
+                            break;
+                          }
                       }
+                    catch (typename Mapping<dim>::ExcTransformationFailed &)
+                      {}
                   }
-                catch (typename Mapping<dim>::ExcTransformationFailed &)
-                  {}
               }
           }
+          break;
+
+        default:
+          Assert(false, ExcInternalError());
+          break;
       }
   }
 } // namespace Particles
