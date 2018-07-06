@@ -571,13 +571,11 @@ namespace internal
  * <ul>
  * <li> <em>Counting the number of cells on a specific level</em>
  *    @code
- *     template <int dim, int spacedim>
- *     int Triangulation<dim, spacedim>::n_cells (const int level) const
- *     {
- *        cell_iterator cell = begin (level),
- *                      endc = end (level);
+ *      template <int dim, int spacedim>
+ *      int Triangulation<dim, spacedim>::n_cells (const int level) const
+ *      {
  *        int n=0;
- *        for (; cell!=endc; ++cell)
+ *        for (const auto &cell : cell_iterators_on_level(level))
  *          ++n;
  *        return n;
  *      }
@@ -602,10 +600,7 @@ namespace internal
  *      template <int dim>
  *      void Triangulation<dim>::refine_global ()
  *      {
- *        active_cell_iterator cell = begin_active(),
- *                             endc = end();
- *
- *        for (; cell != endc; ++cell)
+ *        for (const auto &cell : active_cell_iterators())
  *          cell->set_refine_flag ();
  *        execute_coarsening_and_refinement ();
  *      }
@@ -617,7 +612,7 @@ namespace internal
  *
  * Usage of a Triangulation is mainly done through the use of iterators. An
  * example probably shows best how to use it:
- *  @code
+ * @code
  * int main ()
  * {
  *   Triangulation<2> tria;
@@ -651,7 +646,7 @@ namespace internal
  *   ofstream out("grid.1");
  *   GridOut::write_gnuplot (tria, out);
  * }
- *  @endcode
+ * @endcode
  *
  *
  * <h3>Creating a triangulation</h3>
@@ -976,31 +971,33 @@ namespace internal
  * int main ()
  * {
  *   Triangulation<2> triangulation;
- *   const Point<2> vertices[8] = {Point<2>(-1,-1),
- *                                 Point<2>(+1,-1),
- *                                 Point<2>(-1,-1)*0.5,
- *                                 Point<2>(+1,-1)*0.5,
- *                                 Point<2>(-1,+1)*0.5,
- *                                 Point<2>(+1,+1)*0.5,
- *                                 Point<2>(-1,+1),
- *                                 Point<2>(+1,+1)};
- *   const int cell_vertices[5][4] = {{0, 1, 2, 3},
- *                                    {0, 2, 6, 4},
- *                                    {2, 3, 4, 5},
- *                                    {1, 7, 3, 5},
- *                                    {6, 4, 7, 5}};
+ *   const std::vector<Point<2>> vertices = {{-1.0,-1.0},
+ *                                           {+1.0,-1.0},
+ *                                           {-0.5,-0.5},
+ *                                           {+0.5,-0.5},
+ *                                           {-0.5,+0.5},
+ *                                           {+1.0,+1.0},
+ *                                           {-1.0,+1.0},
+ *                                           {+1.0,+1.0}};
+ *   const std::vector<std::array<int,GeometryInfo<2>::vertices_per_cell>>
+ *     cell_vertices = {{0, 1, 2, 3},
+ *                      {0, 2, 6, 4},
+ *                      {2, 3, 4, 5},
+ *                      {1, 7, 3, 5},
+ *                      {6, 4, 7, 5}};
  *
- *   std::vector<CellData<2>> cells(5, CellData<2>());
- *   for (unsigned int i=0; i<5; ++i)
- *     for (unsigned int j=0; j<4; ++j)
+ *   std::vector<CellData<2>> cells(cell_vertices.size(), CellData<2>());
+ *   for (unsigned int i=0; i<cell_vertices.size(); ++i)
+ *     for (unsigned int j=0; j<GeometryInfo<2>::vertices_per_cell; ++j)
  *       cells[i].vertices[j] = cell_vertices[i][j];
  *
- *   triangulation.create_triangulation ({std::begin(vertices),
- * std::end(vertices)}, cells, SubCellData());
+ *   triangulation.create_triangulation (vertices, cells, SubCellData());
  *   triangulation.set_all_manifold_ids_on_boundary(42);
- *   // set_manifold stores a copy of its second argument, so a temporary is
- * okay triangulation.set_manifold(42, PolarManifold<2>()); for (unsigned int i
- * = 0; i < 4; ++i)
+ *
+ *   // set_manifold stores a copy of its second argument,
+ *   // so a temporary is ookay
+ *   triangulation.set_manifold(42, PolarManifold<2>());
+ *   for (unsigned int i = 0; i < 4; ++i)
  *     {
  *       // refine all boundary cells
  *       for (const auto &cell : triangulation.active_cell_iterators())
@@ -1081,45 +1078,43 @@ namespace internal
  * has some more error checking and has to handle the case that subsequent
  * cells might actually belong to different triangulation, but that is of no
  * concern to us here):
- *   @code
- *     template <int dim>
- *     class FEValues
- *     {
- *       Triangulation<dim>::active_cell_iterator current_cell, previous_cell;
- *     public:
- *       void reinit (Triangulation<dim>::active_cell_iterator &cell);
- *       void invalidate_previous_cell ();
- *     };
+ * @code
+ * template <int dim>
+ * class FEValues
+ * {
+ *   Triangulation<dim>::active_cell_iterator current_cell, previous_cell;
+ * public:
+ *   void reinit (Triangulation<dim>::active_cell_iterator &cell);
+ *   void invalidate_previous_cell ();
+ * };
  *
- *     template <int dim>
- *     void
- *     FEValues<dim>::reinit (Triangulation<dim>::active_cell_iterator &cell)
+ * template <int dim>
+ * void
+ * FEValues<dim>::reinit (Triangulation<dim>::active_cell_iterator &cell)
+ * {
+ *   if (previous_cell.status() != valid)
  *     {
- *       if (previous_cell.status() != valid)
- *         {
- *           // previous_cell has not been set. set it now, and register
- *           // with the triangulation that we want to be informed about
- *           // mesh refinement
- *           previous_cell = current_cell;
- *           previous_cell->get_triangulation().signals.post_refinement
- *             .connect (std::bind (&FEValues<dim>::invalidate_previous_cell,
- *                                  std::ref (*this)));
- *         }
- *       else
- *         previous_cell = current_cell;
- *
- *       current_cell = cell;
- *       // ... do something with the cell...
+ *       // previous_cell has not been set. set it now, and register with the
+ *       // triangulation that we want to be informed about mesh refinement
+ *       previous_cell = current_cell;
+ *       previous_cell->get_triangulation().signals.post_refinement.connect(
+ *         std::bind (&FEValues<dim>::invalidate_previous_cell,
+ *                    std::ref (*this)));
  *     }
+ *   else
+ *    previous_cell = current_cell;
  *
+ *   current_cell = cell;
+ *   // ... do something with the cell...
+ * }
  *
- *     template <int dim>
- *     void
- *     FEValues<dim>::invalidate_previous_cell ()
- *     {
- *       previous_cell = Triangulation<dim>::active_cell_iterator();
- *     }
- *   @endcode
+ * template <int dim>
+ * void
+ * FEValues<dim>::invalidate_previous_cell ()
+ * {
+ *   previous_cell = Triangulation<dim>::active_cell_iterator();
+ * }
+ * @endcode
  * Here, whenever the triangulation is refined, it triggers the post-
  * refinement signal which calls the function object attached to it. This
  * function object is the member function
@@ -2656,10 +2651,13 @@ public:
    * does not contain any active cells (i.e., all cells on this level are
    * further refined, then this function returns
    * <code>end_active(level)</code> so that loops of the kind
-   *  @code
-   *    for (cell=tria.begin_active(level); cell!=tria.end_active(level);
-   * ++cell)
-   *      ...
+   * @code
+   *   for (const auto cell=tria.begin_active(level);
+   *        cell!=tria.end_active(level);
+   *        ++cell)
+   *     {
+   *       ...
+   *     }
    *  @endcode
    * have zero iterations, as may be expected if there are no active cells on
    * this level.
@@ -2745,7 +2743,7 @@ public:
    * @code
    *   Triangulation<dim> triangulation;
    *   ...
-   *   for (auto cell : triangulation.active_cell_iterators())
+   *   for (const auto &cell : triangulation.active_cell_iterators())
    *     cell->set_user_flag();
    * @endcode
    *

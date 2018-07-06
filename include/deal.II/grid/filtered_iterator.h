@@ -398,11 +398,12 @@ namespace IteratorFilters
  * @code
  *   class Active
  *   {
- *     public:
- *       template <class Iterator>
- *       bool operator () (const Iterator &i) const {
- *         return (i->active());
- *       }
+ *   public:
+ *     template <class Iterator>
+ *     bool operator () (const Iterator &i) const
+ *     {
+ *       return (i->active());
+ *     }
  *   };
  * @endcode
  * and objects of this type can be used as predicates. Likewise, this more
@@ -410,17 +411,19 @@ namespace IteratorFilters
  * @code
  *   class SubdomainEqualTo
  *   {
- *     public:
- *       SubdomainEqualTo (const types::subdomain_id subdomain_id)
- *                   : subdomain_id (subdomain_id) {};
+ *   public:
+ *     SubdomainEqualTo (const types::subdomain_id subdomain_id)
+ *       : subdomain_id (subdomain_id)
+ *     {};
  *
- *       template <class Iterator>
- *       bool operator () (const Iterator &i) const {
- *         return (i->subdomain_id() == subdomain_id);
- *       }
+ *     template <class Iterator>
+ *     bool operator () (const Iterator &i) const
+ *     {
+ *       return (i->subdomain_id() == subdomain_id);
+ *     }
  *
- *     private:
- *       const types::subdomain_id subdomain_id;
+ *   private:
+ *     const types::subdomain_id subdomain_id;
  *   };
  * @endcode
  * Objects like <code>SubdomainEqualTo(3)</code> can then be used as
@@ -473,8 +476,8 @@ namespace IteratorFilters
  * flag:
  * @code
  *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
- *      begin (IteratorFilters::UserFlagSet()),
- *      end (IteratorFilters::UserFlagSet());
+ *     begin (IteratorFilters::UserFlagSet()),
+ *     end (IteratorFilters::UserFlagSet());
  *   begin.set_to_next_positive(tria.begin_active());
  *   end = tria.end();
  *   n_flagged_cells = std::distance (begin, end);
@@ -546,9 +549,9 @@ public:
    * advanced until we either hit the past-the-end iterator, or the
    * predicate is satisfied. This allows, for example, to write code like
    * @code
-   *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
-   *     cell (IteratorFilters::SubdomainEqualTo(13),
-   *           triangulation.begin_active());
+   * FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
+   *   cell (IteratorFilters::SubdomainEqualTo(13),
+   *         triangulation.begin_active());
    * @endcode
    *
    * If the cell <code>triangulation.begin_active()</code> does not have a
@@ -836,7 +839,7 @@ namespace internal
  * @code
  *   DoFHandler<dim> dof_handler;
  *   ...
- *   for (auto cell : dof_handler.active_cell_iterators())
+ *   for (const auto &cell : dof_handler.active_cell_iterators())
  *     {
  *       if (cell->is_locally_owned())
  *         {
@@ -849,8 +852,10 @@ namespace internal
  * @code
  *   DoFHandler<dim> dof_handler;
  *   ...
- *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
- *                                    IteratorFilters::LocallyOwnedCell())
+ *   const auto filtered_iterators_range =
+ *     filter_iterators(dof_handler.active_cell_iterators(),
+ *                      IteratorFilters::LocallyOwned());
+ *   for (const auto &cell : filtered_iterators_range)
  *     {
  *       fe_values.reinit (cell);
  *       ...do the local integration on 'cell'...;
@@ -879,7 +884,7 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  * @code
  *   DoFHandler<dim> dof_handler;
  *   ...
- *   for (auto cell : dof_handler.active_cell_iterators())
+ *   for (const auto &cell : dof_handler.active_cell_iterators())
  *     {
  *       if (cell->is_locally_owned())
  *         {
@@ -895,9 +900,11 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  * @code
  *   DoFHandler<dim> dof_handler;
  *   ...
- *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
- *                                    IteratorFilters::LocallyOwnedCell(),
- *                                    IteratorFilters::AtBoundary())
+ *   const auto filtered_iterators_range =
+ *     filter_iterators(dof_handler.active_cell_iterators(),
+ *                      IteratorFilters::LocallyOwnedCell(),
+ *                      IteratorFilters::AtBoundary());
+ *   for (const auto &cell : filter_iterators_range)
  *     {
  *       fe_values.reinit (cell);
  *       ...do the local integration on 'cell'...;

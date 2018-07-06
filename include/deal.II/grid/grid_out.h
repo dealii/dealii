@@ -843,10 +843,10 @@ namespace GridOutFlags
  * a runtime parameter, you can write
  * @code
  *   GridOut::OutputFormat grid_format =
- *                   GridOut::parse_output_format(get_format_name_from_somewhere());
- *   ofstream output_file("some_filename" +
- * GridOut::default_suffix(output_format)); GridOut().write (tria, output_file,
- * output_format);
+ *     GridOut::parse_output_format(get_format_name_from_somewhere());
+ *   ofstream output_file("some_filename"
+ *                        + GridOut::default_suffix(output_format));
+ *   GridOut().write (tria, output_file, output_format);
  * @endcode
  * The function <tt>get_output_format_names()</tt> provides a list of possible
  * names of output formats in a string that is understandable by the
