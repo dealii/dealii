@@ -94,7 +94,10 @@ namespace MeshWorker
 
     /**
      * Compute cell and face contributions of one or several functionals,
-     * typically for error estimates.
+     * typically for error estimates. The information in which component the
+     * result is stored for a given cell or face is transmitted by its
+     * user_index variable. Hence, you need to make sure to set these variables
+     * appropriately before using this class.
      *
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009

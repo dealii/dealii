@@ -1,0 +1,11 @@
+set logscale
+set style data linespoints
+set xrange [200:6000]
+set xtics (200,400,800,1600,3200)
+set xlabel "#dofs"
+set yrange [.004:2]
+set terminal svg
+set output "step-39-convergence.svg"
+plot "output.dat" using 2:3               title "error",    \
+     ""           using 2:4               title "estimate", \
+     ""           using 2:(5000*$2**-1.5) title "3rd order"
