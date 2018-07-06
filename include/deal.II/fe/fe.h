@@ -174,12 +174,16 @@ class FESystem;
  * FiniteElement::system_to_base_index() one can get the
  * following information for each degree-of-freedom "i":
  * @code
- * const unsigned int component     =
- * fe_basis.system_to_component_index(i).first; const unsigned int within_base
- * = fe_basis.system_to_component_index(i).second; const unsigned int base =
- * fe_basis.system_to_base_index(i).first.first; const unsigned int multiplicity
- * = fe_basis.system_to_base_index(i).first.second; const unsigned int
- * within_base_  = fe_basis.system_to_base_index(i).second; // same as above
+ * const unsigned int component =
+ *   fe_basis.system_to_component_index(i).first;
+ * const unsigned int within_base =
+ *   fe_basis.system_to_component_index(i).second;
+ * const unsigned int base =
+ *   fe_basis.system_to_base_index(i).first.first;
+ * const unsigned int multiplicity =
+ *   fe_basis.system_to_base_index(i).first.second;
+ * const unsigned int within_base_  =
+ *   fe_basis.system_to_base_index(i).second; // same as above
  * @endcode
  * which will result in:
  *
@@ -247,10 +251,10 @@ class FESystem;
  * Alternatively, the points can be transformed one-by-one:
  * @code
  * const vector<Point<dim> > &unit_points =
- *    fe.get_unit_support_points();
+ *   fe.get_unit_support_points();
  *
  * Point<dim> mapped_point =
- *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
+ *   mapping.transform_unit_to_real_cell (cell, unit_points[i]);
  * @endcode
  *
  * @note Finite elements' implementation of the get_unit_support_points()
@@ -822,8 +826,8 @@ public:
    * helpful in writing code that works with both ::DoFHandler and the hp
    * version hp::DoFHandler, since one can then write code like this:
    * @code
-   *   dofs_per_cell
-   *     = dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
+   * dofs_per_cell =
+   *   dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
    * @endcode
    *
    * This code doesn't work in both situations without the present operator

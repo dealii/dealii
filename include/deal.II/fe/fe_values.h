@@ -367,8 +367,9 @@ namespace FEValuesViews
      * or, for a generic @p Number type,
      * @code
      * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values.begin(),
-     * local_dof_values.end());
+     * cell->get_dof_values(solution,
+     *                      local_dof_values.begin(),
+     *                      local_dof_values.end());
      * @endcode
      */
     template <class InputVector>
@@ -934,8 +935,9 @@ namespace FEValuesViews
      * or, for a generic @p Number type,
      * @code
      * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values.begin(),
-     * local_dof_values.end());
+     * cell->get_dof_values(solution,
+     *                      local_dof_values.begin(),
+     *                      local_dof_values.end());
      * @endcode
      */
     template <class InputVector>
@@ -1446,8 +1448,9 @@ namespace FEValuesViews
      * or, for a generic @p Number type,
      * @code
      * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values.begin(),
-     * local_dof_values.end());
+     * cell->get_dof_values(solution,
+     *                      local_dof_values.begin(),
+     *                      local_dof_values.end());
      * @endcode
      */
     template <class InputVector>
@@ -1757,8 +1760,9 @@ namespace FEValuesViews
      * or, for a generic @p Number type,
      * @code
      * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
-     * cell->get_dof_values(solution, local_dof_values.begin(),
-     * local_dof_values.end());
+     * cell->get_dof_values(solution,
+     *                      local_dof_values.begin(),
+     *                      local_dof_values.end());
      * @endcode
      */
     template <class InputVector>
@@ -1948,9 +1952,9 @@ namespace internal
  *     for (unsigned int q=0; q<quadrature.size(); ++q)
  *       for (unsigned int i=0; i<finite_element.dofs_per_cell; ++i)
  *         for (unsigned int j=0; j<finite_element.dofs_per_cell; ++j)
- *         A(i,j) += fe_values.shape_value(i,q) *
- *                   fe_values.shape_value(j,q) *
- *                   fe_values.JxW(q);
+ *           A(i,j) += fe_values.shape_value(i,q) *
+ *                     fe_values.shape_value(j,q) *
+ *                     fe_values.JxW(q);
  *     ...
  *   }
  * @endcode

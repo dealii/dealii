@@ -48,10 +48,11 @@ DEAL_II_NAMESPACE_OPEN
  * block of a Stokes element (see
  * @ref vector_valued):
  * @code
- *   FESystem<dim> stokes_fe (FESystem<dim>(FE_Q<dim>(2), dim), 1,    // Q2
- * element for the velocities FE_Q<dim>(1),                     1);     // Q1
- * element for the pressure FEValuesExtractors::Scalar pressure(dim); BlockMask
- * pressure_mask = stokes_fe.block_mask (pressure);
+ *   // Q2 element for the velocities, Q1 element for the pressure
+ *   FESystem<dim> stokes_fe (FESystem<dim>(FE_Q<dim>(2), dim), 1,
+ *                            FE_Q<dim>(1),                     1);
+ *   FEValuesExtractors::Scalar pressure(dim);
+ *   BlockMask pressure_mask = stokes_fe.block_mask (pressure);
  * @endcode
  * Note that by wrapping the velocity elements into a single FESystem object
  * we make sure that the overall element has only 2 blocks. The result is a
