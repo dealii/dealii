@@ -1032,9 +1032,10 @@ namespace parallel
          *
          * The data will be written in a separate file, whose name
          * consists of the stem @p filename and an attached identifier
-         * <tt>-fixed.data</tt>.
+         * <tt>-fixed.data</tt> for fixed size data and <tt>-variable.data</tt>
+         * for variable size data.
          *
-         * All processors write into that file simultaneously via MPIIO.
+         * All processors write into these files simultaneously via MPIIO.
          * Each processor's position to write to will be determined
          * from the provided @p parallel_forest.
          *
@@ -1050,10 +1051,13 @@ namespace parallel
          *
          * The data will be read from separate file, whose name
          * consists of the stem @p filename and an attached identifier
-         * <tt>-fixed.data</tt>. The @p n_attached_deserialize parameter
-         * is required to gather the memory offsets for each callback.
+         * <tt>-fixed.data</tt> for fixed size data and <tt>-variable.data</tt>
+         * for variable size data.
+         * The @p n_attached_deserialize_fixed and @p n_attached_deserialize_variable
+         * parameters are required to gather the memory offsets for each
+         * callback.
          *
-         * All processors read from that file simultaneously via MPIIO.
+         * All processors read from these files simultaneously via MPIIO.
          * Each processor's position to read from will be determined
          * from the provided @p parallel_forest.
          *
@@ -1064,7 +1068,8 @@ namespace parallel
         load(const typename dealii::internal::p4est::types<dim>::forest
                *                parallel_forest,
              const char *       filename,
-             const unsigned int n_attached_deserialize);
+             const unsigned int n_attached_deserialize_fixed,
+             const unsigned int n_attached_deserialize_variable);
 
         /**
          * Clears all containers and associated data, and resets member

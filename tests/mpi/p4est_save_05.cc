@@ -15,8 +15,9 @@
 
 
 
-// check register_data_attach and notify_ready_to_unpack
-// for variable size transfer
+// save and load a triangulation with a different number of cpus
+// with variable size data attach
+// this is a combination of tests p4est_save_04 and attach_data_02
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
@@ -41,7 +42,7 @@ pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
     status)
 {
-  static unsigned int       some_number = 1;
+  static int                some_number = 1;
   std::vector<unsigned int> some_vector(some_number);
   for (unsigned int i = 0; i < some_number; ++i)
     some_vector[i] = i;
@@ -55,31 +56,19 @@ pack_function(
     }
 
   deallog << "packing cell " << cell->id()
-          << " with data size =" << buffer.size() << " accumulated data="
+          << " with data size=" << buffer.size() << " accumulated data="
           << std::accumulate(some_vector.begin(), some_vector.end(), 0)
-          << " status=";
-  if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
-    deallog << "PERSIST";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
-    deallog << "REFINE";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
-    deallog << "COARSEN";
-  deallog << std::endl;
+          << std::endl;
 
-  if (status == parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
-    {
-      Assert(cell->has_children(), ExcInternalError());
-    }
-  else
-    {
-      Assert(!cell->has_children(), ExcInternalError());
-    }
+  Assert((status ==
+          parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST),
+         ExcInternalError());
 
   ++some_number;
   return buffer;
 }
+
+
 
 template <int dim>
 void
@@ -110,45 +99,37 @@ unpack_function(
           << std::distance(data_range.begin(), data_range.end())
           << " accumulated data="
           << std::accumulate(intdatavector.begin(), intdatavector.end(), 0)
-          << " status=";
-  if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
-    deallog << "PERSIST";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
-    deallog << "REFINE";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
-    deallog << "COARSEN";
-  deallog << std::endl;
+          << std::endl;
 
-  if (status == parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
-    {
-      Assert(cell->has_children(), ExcInternalError());
-    }
-  else
-    {
-      Assert(!cell->has_children(), ExcInternalError());
-    }
+  Assert((status ==
+          parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST),
+         ExcInternalError());
 }
+
 
 
 template <int dim>
 void
 test()
 {
-  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  MPI_Comm     com_all = MPI_COMM_WORLD;
+  MPI_Comm     com_small;
 
-  if (true)
+  // split the communicator in proc 0,1,2 and 3,4
+  MPI_Comm_split(com_all, (myid < 3) ? 0 : 1, myid, &com_small);
+
+  // write with small com
+  if (myid < 3)
     {
-      parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+      deallog << "writing with " << Utilities::MPI::n_mpi_processes(com_small)
+              << std::endl;
 
+      parallel::distributed::Triangulation<dim> tr(com_small);
       GridGenerator::subdivided_hyper_cube(tr, 2);
       tr.refine_global(1);
-      deallog << "cells before: " << tr.n_global_active_cells() << std::endl;
 
       typename Triangulation<dim, dim>::active_cell_iterator cell;
-
       for (cell = tr.begin_active(); cell != tr.end(); ++cell)
         {
           if (cell->is_locally_owned())
@@ -157,42 +138,42 @@ test()
                 cell->set_refine_flag();
               else if (cell->parent()->id().to_string() == "3_0:")
                 cell->set_coarsen_flag();
-
-              deallog << "myid=" << myid << " cellid=" << cell->id();
-              if (cell->coarsen_flag_set())
-                deallog << " coarsening" << std::endl;
-              else if (cell->refine_flag_set())
-                deallog << " refining" << std::endl;
-              else
-                deallog << std::endl;
             }
         }
+      tr.execute_coarsening_and_refinement();
 
       unsigned int handle =
         tr.register_data_attach(pack_function<dim>,
                                 /*returns_variable_size_data=*/true);
 
-      deallog << "handle=" << handle << std::endl;
-      tr.execute_coarsening_and_refinement();
-
-      deallog << "cells after: " << tr.n_global_active_cells() << std::endl;
-
-      /*
-      for (cell = tr.begin_active();
-           cell != tr.end();
-           ++cell)
-        {
-      if (cell->is_locally_owned())
-      deallog << "myid=" << myid << " cellid=" << cell->id() << std::endl;
-      }*/
-
-      tr.notify_ready_to_unpack(handle, unpack_function<dim>);
-
-      const unsigned int checksum = tr.get_checksum();
-      deallog << "Checksum: " << checksum << std::endl;
+      tr.save("file");
+      deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+      deallog << "Checksum: " << tr.get_checksum() << std::endl;
     }
 
-  deallog << "OK" << std::endl;
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  deallog << "reading with " << Utilities::MPI::n_mpi_processes(com_all)
+          << std::endl;
+
+  {
+    parallel::distributed::Triangulation<dim> tr(com_all);
+
+    GridGenerator::subdivided_hyper_cube(tr, 2);
+    tr.load("file");
+
+    unsigned int handle =
+      tr.register_data_attach(pack_function<dim>,
+                              /*returns_variable_size_data=*/true);
+
+    tr.notify_ready_to_unpack(handle, unpack_function<dim>);
+
+    deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+    deallog << "Checksum: " << tr.get_checksum() << std::endl;
+  }
+
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    deallog << "OK" << std::endl;
 }
 
 
