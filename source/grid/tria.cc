@@ -3106,28 +3106,25 @@ namespace internal
                               ExcLineInexistant(line_vertices.first,
                                                 line_vertices.second));
               }
-            // Assert that only exterior
-            // lines are given a boundary
-            // indicator
-            AssertThrow(
-              line->at_boundary(),
-              ExcInteriorLineCantBeBoundary(line->vertex_index(0),
-                                            line->vertex_index(1),
-                                            boundary_line->boundary_id));
+            // Only exterior lines can be given a boundary indicator
+            if (line->at_boundary())
+              {
+                // make sure that we don't attempt to reset the boundary
+                // indicator to a different than the previously set value
+                if (line->boundary_id() != 0)
+                  AssertThrow(line->boundary_id() == boundary_line->boundary_id,
+                              ExcMessage(
+                                "Duplicate boundary lines are only allowed "
+                                "if they carry the same boundary indicator."));
 
-            // and make sure that we don't
-            // attempt to reset the
-            // boundary indicator to a
-            // different than the
-            // previously set value
-            if (line->boundary_id() != 0)
-              AssertThrow(line->boundary_id() == boundary_line->boundary_id,
+                line->set_boundary_id_internal(boundary_line->boundary_id);
+              }
+            // Set manifold id if given
+            if (line->manifold_id() != numbers::flat_manifold_id)
+              AssertThrow(line->manifold_id() == boundary_line->manifold_id,
                           ExcMessage(
                             "Duplicate boundary lines are only allowed "
-                            "if they carry the same boundary indicator."));
-
-            line->set_boundary_id_internal(boundary_line->boundary_id);
-            // Set manifold id if given
+                            "if they carry the same manifold indicator."));
             line->set_manifold_id(boundary_line->manifold_id);
           }
 
@@ -3262,26 +3259,25 @@ namespace internal
 
             // check whether this face is
             // really an exterior one
-            AssertThrow(
-              quad->at_boundary(),
-              ExcInteriorQuadCantBeBoundary(quad->vertex_index(0),
-                                            quad->vertex_index(1),
-                                            quad->vertex_index(2),
-                                            quad->vertex_index(3),
-                                            boundary_quad->boundary_id));
+            if (quad->at_boundary())
+              {
+                // and make sure that we don't attempt to reset the boundary
+                // indicator to a different than the previously set value
+                if (quad->boundary_id() != 0)
+                  AssertThrow(quad->boundary_id() == boundary_quad->boundary_id,
+                              ExcMessage(
+                                "Duplicate boundary quads are only allowed "
+                                "if they carry the same boundary indicator."));
 
-            // and make sure that we don't
-            // attempt to reset the
-            // boundary indicator to a
-            // different than the
-            // previously set value
-            if (quad->boundary_id() != 0)
-              AssertThrow(quad->boundary_id() == boundary_quad->boundary_id,
+                quad->set_boundary_id_internal(boundary_quad->boundary_id);
+              }
+            // Set manifold id if given
+            if (quad->manifold_id() != numbers::flat_manifold_id)
+              AssertThrow(quad->manifold_id() == boundary_quad->manifold_id,
                           ExcMessage(
                             "Duplicate boundary quads are only allowed "
-                            "if they carry the same boundary indicator."));
+                            "if they carry the same manifold indicator."));
 
-            quad->set_boundary_id_internal(boundary_quad->boundary_id);
             quad->set_manifold_id(boundary_quad->manifold_id);
           }
 

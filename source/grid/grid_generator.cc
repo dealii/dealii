@@ -3793,7 +3793,8 @@ namespace GridGenerator
   merge_triangulations(const Triangulation<dim, spacedim> &triangulation_1,
                        const Triangulation<dim, spacedim> &triangulation_2,
                        Triangulation<dim, spacedim> &      result,
-                       const double duplicated_vertex_tolerance)
+                       const double duplicated_vertex_tolerance,
+                       const bool   copy_manifold_ids)
   {
     Assert(triangulation_1.n_levels() == 1,
            ExcMessage("The input triangulations must be coarse meshes."));
@@ -3809,36 +3810,121 @@ namespace GridGenerator
     // now form the union of the set of cells
     std::vector<CellData<dim>> cells;
     cells.reserve(triangulation_1.n_cells() + triangulation_2.n_cells());
-    for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-           triangulation_1.begin();
-         cell != triangulation_1.end();
-         ++cell)
+    for (const auto &cell : triangulation_1.cell_iterators())
       {
         CellData<dim> this_cell;
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           this_cell.vertices[v] = cell->vertex_index(v);
         this_cell.material_id = cell->material_id();
-        cells.push_back(this_cell);
+        this_cell.manifold_id = cell->manifold_id();
+        cells.push_back(std::move(this_cell));
       }
 
     // now do the same for the other other mesh. note that we have to
     // translate the vertex indices
-    for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-           triangulation_2.begin();
-         cell != triangulation_2.end();
-         ++cell)
+    for (const auto &cell : triangulation_2.cell_iterators())
       {
         CellData<dim> this_cell;
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           this_cell.vertices[v] =
             cell->vertex_index(v) + triangulation_1.n_vertices();
         this_cell.material_id = cell->material_id();
-        cells.push_back(this_cell);
+        this_cell.manifold_id = cell->manifold_id();
+        cells.push_back(std::move(this_cell));
+      }
+
+    // Now for the SubCellData
+    SubCellData subcell_data;
+    if (copy_manifold_ids)
+      {
+        if (dim == 2)
+          {
+            subcell_data.boundary_lines.reserve(triangulation_1.n_lines() +
+                                                triangulation_2.n_lines());
+
+            auto copy_line_manifold_ids =
+              [&](const Triangulation<dim, spacedim> &tria,
+                  const unsigned int                  offset) {
+                for (typename Triangulation<dim, spacedim>::line_iterator line =
+                       tria.begin_face();
+                     line != tria.end_face();
+                     ++line)
+                  if (line->manifold_id() != numbers::flat_manifold_id)
+                    {
+                      CellData<1> boundary_line;
+                      boundary_line.vertices[0] =
+                        line->vertex_index(0) + offset;
+                      boundary_line.vertices[1] =
+                        line->vertex_index(1) + offset;
+                      boundary_line.manifold_id = line->manifold_id();
+                      subcell_data.boundary_lines.push_back(
+                        std::move(boundary_line));
+                    }
+              };
+
+            copy_line_manifold_ids(triangulation_1, 0);
+            copy_line_manifold_ids(triangulation_2,
+                                   triangulation_1.n_vertices());
+          }
+
+        if (dim == 3)
+          {
+            subcell_data.boundary_quads.reserve(triangulation_1.n_quads() +
+                                                triangulation_2.n_quads());
+            // we can't do better here than to loop over all the lines bounding
+            // a face. For regular meshes an (interior) line in 3D is part of
+            // four cells. So this should be an appropriate guess.
+            subcell_data.boundary_lines.reserve(triangulation_1.n_cells() * 4 +
+                                                triangulation_2.n_cells() * 4);
+
+            auto copy_face_and_line_manifold_ids =
+              [&](const Triangulation<dim, spacedim> &tria,
+                  const unsigned int                  offset) {
+                for (typename Triangulation<dim, spacedim>::face_iterator face =
+                       tria.begin_face();
+                     face != tria.end_face();
+                     ++face)
+                  if (face->manifold_id() != numbers::flat_manifold_id)
+                    {
+                      CellData<2> boundary_quad;
+                      boundary_quad.vertices[0] =
+                        face->vertex_index(0) + offset;
+                      boundary_quad.vertices[1] =
+                        face->vertex_index(1) + offset;
+                      boundary_quad.vertices[2] =
+                        face->vertex_index(2) + offset;
+                      boundary_quad.vertices[3] =
+                        face->vertex_index(3) + offset;
+
+                      boundary_quad.manifold_id = face->manifold_id();
+                      subcell_data.boundary_quads.push_back(
+                        std::move(boundary_quad));
+                    }
+                for (const auto &cell : tria.cell_iterators())
+                  for (unsigned int l = 0; l < 12; ++l)
+                    if (cell->line(l)->manifold_id() !=
+                        numbers::flat_manifold_id)
+                      {
+                        CellData<1> boundary_line;
+                        boundary_line.vertices[0] =
+                          cell->line(l)->vertex_index(0) + offset;
+                        boundary_line.vertices[1] =
+                          cell->line(l)->vertex_index(1) + offset;
+                        boundary_line.manifold_id =
+                          cell->line(l)->manifold_id();
+                        subcell_data.boundary_lines.push_back(
+                          std::move(boundary_line));
+                      }
+              };
+
+            copy_face_and_line_manifold_ids(triangulation_1, 0);
+            copy_face_and_line_manifold_ids(triangulation_2,
+                                            triangulation_1.n_vertices());
+          }
       }
 
     // throw out duplicated vertices from the two meshes, reorder vertices as
     // necessary and create the triangulation
-    SubCellData               subcell_data;
     std::vector<unsigned int> considered_vertices;
     GridTools::delete_duplicated_vertices(vertices,
                                           cells,
