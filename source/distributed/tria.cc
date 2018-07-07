@@ -1124,10 +1124,544 @@ namespace
 } // namespace
 
 
+
 namespace parallel
 {
   namespace distributed
   {
+    /* ------------------ class DataTransfer<dim,spacedim> ----------------- */
+
+
+    template <int dim, int spacedim>
+    Triangulation<dim, spacedim>::DataTransfer::DataTransfer(
+      MPI_Comm mpi_communicator)
+      : mpi_communicator(mpi_communicator)
+    {}
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::pack_data(
+      const std::vector<quadrant_cell_relation_t> &quad_cell_relations,
+      const std::vector<typename CellAttachedData::pack_callback_t>
+        &pack_callbacks)
+    {
+      Assert(src_data_fixed.size() == 0,
+             ExcMessage("Previously packed data has not been released yet!"));
+
+      // Prepare the buffer structure, in which each callback function will
+      // store its data for each active cell.
+      // The outmost shell in this container construct corresponds to the
+      // data packed per cell. The next layer resembles the data that
+      // each callback function packs on the corresponding cell. These
+      // buffers are chains of chars stored in an std::vector<char>.
+      // A visualisation of the data structure:
+      /* clang-format off */
+      // |             cell_1                | |             cell_2                | ...
+      // ||  callback_1  ||  callback_2  |...| ||  callback_1  ||  callback_2  |...| ...
+      // |||char|char|...|||char|char|...|...| |||char|char|...|||char|char|...|...| ...
+      /* clang-format on */
+      std::vector<std::vector<std::vector<char>>> packed_data(
+        quad_cell_relations.size());
+
+      // Iterate over all cells, call all callback functions on each cell,
+      // and store their data in the corresponding buffer scope.
+      {
+        auto quad_cell_rel_it = quad_cell_relations.cbegin();
+        auto data_cell_it     = packed_data.begin();
+        for (; quad_cell_rel_it != quad_cell_relations.cend();
+             ++quad_cell_rel_it, ++data_cell_it)
+          {
+            const auto &cell_status = std::get<1>(*quad_cell_rel_it);
+            const auto &dealii_cell = std::get<2>(*quad_cell_rel_it);
+
+            // Assertions about the tree structure.
+            switch (cell_status)
+              {
+                case parallel::distributed::Triangulation<dim, spacedim>::
+                  CELL_PERSIST:
+                case parallel::distributed::Triangulation<dim, spacedim>::
+                  CELL_REFINE:
+                  // double check the condition that we will only ever attach
+                  // data to active cells when we get here
+                  Assert(dealii_cell->active(), ExcInternalError());
+                  break;
+
+                case parallel::distributed::Triangulation<dim, spacedim>::
+                  CELL_COARSEN:
+                  // double check the condition that we will only ever attach
+                  // data to cells with children when we get here. however, we
+                  // can only tolerate one level of coarsening at a time, so
+                  // check that the children are all active
+                  Assert(dealii_cell->active() == false, ExcInternalError());
+                  for (unsigned int c = 0;
+                       c < GeometryInfo<dim>::max_children_per_cell;
+                       ++c)
+                    Assert(dealii_cell->child(c)->active(), ExcInternalError());
+                  break;
+
+                case parallel::distributed::Triangulation<dim, spacedim>::
+                  CELL_INVALID:
+                  // do nothing on invalid cells
+                  break;
+
+                default:
+                  Assert(false, ExcInternalError());
+                  break;
+              }
+
+            // Reserve memory corresponding to the number of callback
+            // functions that will be called.
+            // On cells flagged with CELL_INVALID, only its CellStatus
+            // will be stored.
+            const unsigned int n_callbacks_on_cell =
+              1 +
+              ((cell_status ==
+                parallel::distributed::Triangulation<dim,
+                                                     spacedim>::CELL_INVALID) ?
+                 0 :
+                 pack_callbacks.size());
+            data_cell_it->resize(n_callbacks_on_cell);
+
+            // We continue with packing all data on this specific cell.
+            // First, we pack the CellStatus information.
+            auto data_it = data_cell_it->begin();
+            // to get consistent data sizes on each cell for the fixed size
+            // transfer, we won't allow compression
+            *data_it =
+              Utilities::pack(cell_status, /*allow_compression=*/false);
+            ++data_it;
+
+            // Proceed with all registered callback functions.
+            // Skip cells with the CELL_INVALID flag.
+            if (cell_status !=
+                parallel::distributed::Triangulation<dim,
+                                                     spacedim>::CELL_INVALID)
+              {
+                for (auto callback_it = pack_callbacks.cbegin();
+                     callback_it != pack_callbacks.cend();
+                     ++callback_it, ++data_it)
+                  {
+                    (*callback_it)(dealii_cell, cell_status, *data_it);
+                  }
+              }
+          } // loop over quad_cell_relations
+      }
+
+      // Generate a vector which stores the sizes of each callback function,
+      // including the packed CellStatus transfer.
+      // Find the very first cell that we wrote to with all callback
+      // functions (i.e. a cell that was not flagged with CELL_INVALID)
+      // and store the sizes of each buffer.
+      //
+      // To deal with the case that at least one of the processors does not own
+      // any cell at all, we will exchange the information about the data sizes
+      // among them later. The code inbetween is still well-defined, since the
+      // following loops will be skipped.
+      std::vector<unsigned int> local_sizes_fixed(1 + pack_callbacks.size());
+      for (auto data_cell_it = packed_data.cbegin();
+           data_cell_it != packed_data.cend();
+           ++data_cell_it)
+        {
+          if (data_cell_it->size() == local_sizes_fixed.size())
+            {
+              auto sizes_fixed_it = local_sizes_fixed.begin();
+              auto data_it        = data_cell_it->cbegin();
+              for (; data_it != data_cell_it->cend();
+                   ++data_it, ++sizes_fixed_it)
+                {
+                  *sizes_fixed_it = data_it->size();
+                }
+
+              break;
+            }
+        }
+
+      // Check if all cells have valid sizes.
+      for (auto data_cell_it = packed_data.cbegin();
+           data_cell_it != packed_data.cend();
+           ++data_cell_it)
+        {
+          Assert(data_cell_it->size() == 1 ||
+                   data_cell_it->size() == local_sizes_fixed.size(),
+                 ExcInternalError());
+        }
+
+      // Share information about the packed data sizes
+      // of all callback functions across all processors, in case one
+      // of them does not own any cells at all.
+      std::vector<unsigned int> global_sizes_fixed(local_sizes_fixed.size());
+      Utilities::MPI::max(local_sizes_fixed,
+                          this->mpi_communicator,
+                          global_sizes_fixed);
+
+      // Construct cumulative sizes, since this is the only information
+      // we need from now on.
+      cumulative_sizes_fixed.resize(global_sizes_fixed.size());
+      std::partial_sum(global_sizes_fixed.begin(),
+                       global_sizes_fixed.end(),
+                       cumulative_sizes_fixed.begin());
+
+      // Move every piece of packed data into the consecutive buffer.
+      src_data_fixed.reserve(quad_cell_relations.size() *
+                             cumulative_sizes_fixed.back());
+      for (auto data_cell_it = packed_data.begin();
+           data_cell_it != packed_data.end();
+           ++data_cell_it)
+        {
+          // Move every fraction of packed data into the buffer
+          // reserved for this particular cell.
+          for (auto data_it = data_cell_it->begin();
+               data_it != data_cell_it->end();
+               ++data_it)
+            std::move(data_it->begin(),
+                      data_it->end(),
+                      std::back_inserter(src_data_fixed));
+
+          // If we only packed the CellStatus information
+          // (i.e. encountered a cell flagged CELL_INVALID),
+          // fill the remaining space with invalid entries.
+          if (data_cell_it->size() == 1)
+            {
+              const std::size_t bytes_skipped =
+                cumulative_sizes_fixed.back() - cumulative_sizes_fixed.front();
+
+              src_data_fixed.insert(src_data_fixed.end(),
+                                    bytes_skipped,
+                                    static_cast<char>(-1)); // invalid_char
+            }
+        }
+
+      // Double check that we packed everything correctly.
+      Assert(src_data_fixed.size() == src_data_fixed.capacity(),
+             ExcInternalError());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::execute_transfer(
+      const typename dealii::internal::p4est::types<dim>::forest
+        *parallel_forest,
+      const typename dealii::internal::p4est::types<dim>::gloidx
+        *previous_global_first_quadrant)
+    {
+      Assert(cumulative_sizes_fixed.size() > 0,
+             ExcMessage("No data has been packed!"));
+
+      // Resize memory according to the data that we will receive.
+      dest_data_fixed.resize(parallel_forest->local_num_quadrants *
+                             cumulative_sizes_fixed.back());
+
+      // Execute fixed size transfer.
+      dealii::internal::p4est::functions<dim>::transfer_fixed(
+        parallel_forest->global_first_quadrant,
+        previous_global_first_quadrant,
+        parallel_forest->mpicomm,
+        0,
+        dest_data_fixed.data(),
+        src_data_fixed.data(),
+        cumulative_sizes_fixed.back());
+
+      // Release memory of previously packed data.
+      src_data_fixed.clear();
+      src_data_fixed.shrink_to_fit();
+
+      // TODO: for variable transfer
+      // allocate memory for transfer
+      // p4est transfer fixed_begin for transfer of var data sizes
+      // p4est transfer custom for transfer of var data
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::unpack_cell_status(
+      std::vector<quadrant_cell_relation_t> &quad_cell_relations) const
+    {
+      Assert(cumulative_sizes_fixed.size() > 0,
+             ExcMessage("No data has been packed!"));
+      Assert((quad_cell_relations.size() == 0) || (dest_data_fixed.size() > 0),
+             ExcMessage("No data has been received!"));
+
+      // Size of CellStatus object that will be unpacked on each cell.
+      const std::size_t size = sizeof(
+        typename parallel::distributed::Triangulation<dim,
+                                                      spacedim>::CellStatus);
+
+      // Iterate over all cells and overwrite the CellStatus
+      // information from the transferred data.
+      // Proceed buffer iterator position to next cell after
+      // each iteration.
+      auto quad_cell_rel_it = quad_cell_relations.begin();
+      auto dest_fixed_it    = dest_data_fixed.cbegin();
+      for (; quad_cell_rel_it != quad_cell_relations.end();
+           ++quad_cell_rel_it, dest_fixed_it += cumulative_sizes_fixed.back())
+        {
+          std::get<1>(*quad_cell_rel_it) = // cell_status
+            Utilities::unpack<typename parallel::distributed::
+                                Triangulation<dim, spacedim>::CellStatus>(
+              dest_fixed_it,
+              dest_fixed_it + size,
+              /*allow_compression=*/false);
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::unpack_data(
+      const std::vector<quadrant_cell_relation_t> &quad_cell_relations,
+      const unsigned int                           handle,
+      const std::function<void(
+        const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+        const typename dealii::Triangulation<dim, spacedim>::CellStatus &,
+        const boost::iterator_range<std::vector<char>::const_iterator>)>
+        &unpack_callback) const
+    {
+      Assert(cumulative_sizes_fixed.size() > 0,
+             ExcMessage("No data has been packed!"));
+      Assert((quad_cell_relations.size() == 0) || (dest_data_fixed.size() > 0),
+             ExcMessage("No data has been received!"));
+
+      // Calculate offset and size from cumulated sizes.
+      const unsigned int offset = cumulative_sizes_fixed[handle];
+      const unsigned int size   = cumulative_sizes_fixed[handle + 1] - offset;
+
+      // Iterate over all cells and unpack the transferred data.
+      // Adjust buffer iterator to the offset of the callback
+      // function and advance its position to the next cell
+      // after each iteration.
+      auto quad_cell_rel_it = quad_cell_relations.begin();
+      auto dest_fixed_it    = dest_data_fixed.cbegin() + offset;
+      for (; quad_cell_rel_it != quad_cell_relations.end();
+           ++quad_cell_rel_it, dest_fixed_it += cumulative_sizes_fixed.back())
+        {
+          const auto &cell_status = std::get<1>(*quad_cell_rel_it);
+          const auto &dealii_cell = std::get<2>(*quad_cell_rel_it);
+
+          switch (cell_status)
+            {
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_PERSIST:
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_COARSEN:
+                unpack_callback(dealii_cell,
+                                cell_status,
+                                boost::make_iterator_range(dest_fixed_it,
+                                                           dest_fixed_it +
+                                                             size));
+                break;
+
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_REFINE:
+                unpack_callback(dealii_cell->parent(),
+                                cell_status,
+                                boost::make_iterator_range(dest_fixed_it,
+                                                           dest_fixed_it +
+                                                             size));
+                break;
+
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_INVALID:
+                // Skip this cell.
+                break;
+
+              default:
+                Assert(false, ExcInternalError());
+                break;
+            }
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::save(
+      const typename dealii::internal::p4est::types<dim>::forest
+        *         parallel_forest,
+      const char *filename) const
+    {
+      Assert(cumulative_sizes_fixed.size() > 0,
+             ExcMessage("No data has been packed!"));
+
+      const std::string fname_fixed = std::string(filename) + "_fixed.data";
+
+      // ----- copied -----
+      // from DataOutInterface::write_vtu_parallel
+      // TODO: write general MPIIO interface
+      int myrank, nproc;
+      int ierr = MPI_Comm_rank(mpi_communicator, &myrank);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Comm_size(mpi_communicator, &nproc);
+      AssertThrowMPI(ierr);
+
+      MPI_Info info;
+      ierr = MPI_Info_create(&info);
+      AssertThrowMPI(ierr);
+      MPI_File fh;
+      ierr = MPI_File_open(mpi_communicator,
+                           const_cast<char *>(fname_fixed.c_str()),
+                           MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                           info,
+                           &fh);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_File_set_size(fh, 0); // delete the file contents
+      AssertThrowMPI(ierr);
+      // this barrier is necessary, because otherwise others might already
+      // write while one core is still setting the size to zero.
+      ierr = MPI_Barrier(mpi_communicator);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Info_free(&info);
+      AssertThrowMPI(ierr);
+      // ------------------
+
+      // Check if number of processors is lined up with p4est partitioning.
+      Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+
+      // Write cumulative sizes to file.
+      // Since each processor owns the same information about the data sizes,
+      // it is sufficient to let only the first processor perform this task.
+      if (myrank == 0)
+        {
+          ierr = MPI_File_write_at(fh,
+                                   0,
+                                   cumulative_sizes_fixed.data(),
+                                   cumulative_sizes_fixed.size(),
+                                   MPI_UNSIGNED,
+                                   MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+        }
+
+      // Write packed data to file simultaneously.
+      const unsigned int offset =
+        cumulative_sizes_fixed.size() * sizeof(unsigned int);
+
+      ierr = MPI_File_write_at(
+        fh,
+        offset + parallel_forest->global_first_quadrant[myrank] *
+                   cumulative_sizes_fixed.back(), // global position in file
+        src_data_fixed.data(),
+        src_data_fixed.size(), // local buffer
+        MPI_CHAR,
+        MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_File_close(&fh);
+      AssertThrowMPI(ierr);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::load(
+      const typename dealii::internal::p4est::types<dim>::forest
+        *                parallel_forest,
+      const char *       filename,
+      const unsigned int n_attached_deserialize)
+    {
+      Assert(dest_data_fixed.size() == 0,
+             ExcMessage("Previously loaded data has not been released yet!"));
+
+      const std::string fname_fixed = std::string(filename) + "_fixed.data";
+
+      // ----- copied -----
+      // from DataOutInterface::write_vtu_parallel
+      // TODO: write general MPIIO interface
+      int myrank, nproc;
+      int ierr = MPI_Comm_rank(mpi_communicator, &myrank);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Comm_size(mpi_communicator, &nproc);
+      AssertThrowMPI(ierr);
+
+      MPI_Info info;
+      ierr = MPI_Info_create(&info);
+      AssertThrowMPI(ierr);
+      MPI_File fh;
+      ierr = MPI_File_open(mpi_communicator,
+                           const_cast<char *>(fname_fixed.c_str()),
+                           MPI_MODE_RDONLY,
+                           info,
+                           &fh);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_Info_free(&info);
+      AssertThrowMPI(ierr);
+      // ------------------
+
+      // Check if number of processors is lined up with p4est partitioning.
+      Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+
+      // Read cumulative sizes from file.
+      // Since all processors need the same information about the data sizes,
+      // let each of them gain it by reading from the same location in the file.
+      cumulative_sizes_fixed.resize(1 + n_attached_deserialize);
+      ierr = MPI_File_read_at(fh,
+                              0,
+                              cumulative_sizes_fixed.data(),
+                              cumulative_sizes_fixed.size(),
+                              MPI_UNSIGNED,
+                              MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+
+      // Allocate sufficient memory.
+      dest_data_fixed.resize(parallel_forest->local_num_quadrants *
+                             cumulative_sizes_fixed.back());
+
+      // Read packed data from file simultaneously.
+      const unsigned int offset =
+        cumulative_sizes_fixed.size() * sizeof(unsigned int);
+
+      ierr = MPI_File_read_at(
+        fh,
+        offset + parallel_forest->global_first_quadrant[myrank] *
+                   cumulative_sizes_fixed.back(), // global position in file
+        dest_data_fixed.data(),
+        dest_data_fixed.size(), // local buffer
+        MPI_CHAR,
+        MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_File_close(&fh);
+      AssertThrowMPI(ierr);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::DataTransfer::clear()
+    {
+      cumulative_sizes_fixed.clear();
+      cumulative_sizes_fixed.shrink_to_fit();
+
+      src_data_fixed.clear();
+      src_data_fixed.shrink_to_fit();
+
+      dest_data_fixed.clear();
+      dest_data_fixed.shrink_to_fit();
+
+      // TODO: for variable transfer
+      //      src_sizes_var.clear();
+      //      src_sizes_var.shrink_to_fit();
+      //      src_data_var.clear();
+      //      src_data_var.shrink_to_fit();
+      //
+      //      dest_sizes_var.clear();
+      //      dest_sizes_var.shrink_to_fit();
+      //      dest_data_var.clear();
+      //      dest_data_var.shrink_to_fit();
+    }
+
+
+
     /* ----------------- class Triangulation<dim,spacedim> ----------------- */
 
 
@@ -1153,7 +1687,8 @@ namespace parallel
       , triangulation_has_content(false)
       , connectivity(nullptr)
       , parallel_forest(nullptr)
-      , cell_attached_data({0, 0, 0, {}})
+      , cell_attached_data({0, 0, {}})
+      , data_transfer(mpi_communicator)
     {
       parallel_ghost = nullptr;
     }
@@ -1689,34 +2224,46 @@ namespace parallel
 
       if (this->my_subdomain == 0)
         {
-          const unsigned int buffer_size_per_cell =
-            (cell_attached_data.cumulative_fixed_data_size > 0 ?
-               cell_attached_data.cumulative_fixed_data_size +
-                 sizeof(CellStatus) :
-               0);
-
           std::string   fname = std::string(filename) + ".info";
           std::ofstream f(fname.c_str());
-          f << "version nproc attached_bytes n_attached_objs n_coarse_cells"
-            << std::endl
-            << 2 << " "
+          f << "version nproc n_attached_objs n_coarse_cells" << std::endl
+            << 3 << " "
             << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
-            << buffer_size_per_cell << " "
             << cell_attached_data.pack_callbacks.size() << " "
             << this->n_cells(0) << std::endl;
         }
 
-      if (cell_attached_data.cumulative_fixed_data_size > 0)
+      // each cell should have been flagged `CELL_PERSIST`
+      for (const auto &quad_cell_rel : local_quadrant_cell_relations)
         {
-          const_cast<
-            dealii::parallel::distributed::Triangulation<dim, spacedim> *>(this)
-            ->attach_mesh_data();
+          (void)quad_cell_rel;
+          Assert(
+            (std::get<1>(quad_cell_rel) == // cell_status
+             parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST),
+            ExcInternalError());
         }
 
-      dealii::internal::p4est::functions<dim>::save(
-        filename,
-        parallel_forest,
-        cell_attached_data.cumulative_fixed_data_size > 0);
+      if (cell_attached_data.n_attached_data_sets > 0)
+        {
+          // cast away constness
+          auto tria = const_cast<
+            dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+            this);
+
+          // pack attached data first
+          tria->data_transfer.pack_data(local_quadrant_cell_relations,
+                                        cell_attached_data.pack_callbacks);
+
+          // then store buffers in file
+          tria->data_transfer.save(parallel_forest, filename);
+
+          // and release the memory afterwards
+          tria->data_transfer.clear();
+        }
+
+      dealii::internal::p4est::functions<dim>::save(filename,
+                                                    parallel_forest,
+                                                    false);
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
@@ -1726,18 +2273,9 @@ namespace parallel
             dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
             this);
 
-        tria->cell_attached_data.n_attached_datas           = 0;
-        tria->cell_attached_data.cumulative_fixed_data_size = 0;
+        tria->cell_attached_data.n_attached_data_sets = 0;
         tria->cell_attached_data.pack_callbacks.clear();
       }
-
-      // and release the data
-      void *userptr = parallel_forest->user_pointer;
-      dealii::internal::p4est::functions<dim>::reset_data(parallel_forest,
-                                                          0,
-                                                          nullptr,
-                                                          nullptr);
-      parallel_forest->user_pointer = userptr;
     }
 
 
@@ -1769,34 +2307,31 @@ namespace parallel
         connectivity);
       connectivity = nullptr;
 
-      unsigned int version, numcpus, attached_size, attached_count,
-        n_coarse_cells;
+      unsigned int version, numcpus, attached_count, n_coarse_cells;
       {
         std::string   fname = std::string(filename) + ".info";
         std::ifstream f(fname.c_str());
         AssertThrow(f, ExcIO());
         std::string firstline;
         getline(f, firstline); // skip first line
-        f >> version >> numcpus >> attached_size >> attached_count >>
-          n_coarse_cells;
+        f >> version >> numcpus >> attached_count >> n_coarse_cells;
       }
 
-      Assert(version == 2,
+      Assert(version == 3,
              ExcMessage("Incompatible version found in .info file."));
       Assert(this->n_cells(0) == n_coarse_cells,
              ExcMessage("Number of coarse cells differ!"));
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
-      cell_attached_data.cumulative_fixed_data_size = 0;
-      cell_attached_data.n_attached_datas           = 0;
-      cell_attached_data.n_attached_deserialize     = attached_count;
+      cell_attached_data.n_attached_data_sets   = 0;
+      cell_attached_data.n_attached_deserialize = attached_count;
 
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext(
         filename,
         this->mpi_communicator,
-        attached_size,
-        attached_size > 0,
+        0,
+        false,
         autopartition,
         0,
         this,
@@ -1821,6 +2356,25 @@ namespace parallel
           // be checking for
           // distorted cells
           Assert(false, ExcInternalError());
+        }
+
+      // load saved data, if any was stored
+      if (attached_count > 0)
+        {
+          data_transfer.load(parallel_forest, filename, attached_count);
+
+          data_transfer.unpack_cell_status(local_quadrant_cell_relations);
+
+          // the CellStatus of all stored cells should always be CELL_PERSIST.
+          for (const auto &quad_cell_rel : local_quadrant_cell_relations)
+            {
+              (void)quad_cell_rel;
+              Assert(
+                (std::get<1>(quad_cell_rel) == // cell_status
+                 parallel::distributed::Triangulation<dim,
+                                                      spacedim>::CELL_PERSIST),
+                ExcInternalError());
+            }
         }
 
       this->update_number_cache();
@@ -2866,9 +3420,27 @@ namespace parallel
       // has happened, we need to update the quadrant cell relations
       update_quadrant_cell_relations();
 
-      // before repartitioning the mesh let others attach mesh related info
-      // (such as SolutionTransfer data) to the p4est
-      attach_mesh_data();
+      // before repartitioning the mesh, store the current distribution
+      // of the p4est quadrants and let others attach mesh related info
+      // (such as SolutionTransfer data)
+      std::vector<typename dealii::internal::p4est::types<dim>::gloidx>
+        previous_global_first_quadrant;
+
+      // pack data only if anything has been attached
+      if (cell_attached_data.n_attached_data_sets > 0)
+        {
+          data_transfer.pack_data(local_quadrant_cell_relations,
+                                  cell_attached_data.pack_callbacks);
+
+          // before repartitioning the p4est object, save a copy of the
+          // positions of the global first quadrants for data transfer later
+          previous_global_first_quadrant.resize(parallel_forest->mpisize + 1);
+          std::memcpy(previous_global_first_quadrant.data(),
+                      parallel_forest->global_first_quadrant,
+                      sizeof(
+                        typename dealii::internal::p4est::types<dim>::gloidx) *
+                        (parallel_forest->mpisize + 1));
+        }
 
       if (!(settings & no_automatic_repartitioning))
         {
@@ -2897,6 +3469,9 @@ namespace parallel
                 /* weight_callback */
                 &PartitionWeights<dim, spacedim>::cell_weight);
 
+              // release data
+              dealii::internal::p4est::functions<dim>::reset_data(
+                parallel_forest, 0, nullptr, nullptr);
               // reset the user pointer to its previous state
               parallel_forest->user_pointer = this;
             }
@@ -2923,6 +3498,18 @@ namespace parallel
           // the underlying triangulation should not be checking for distorted
           // cells
           Assert(false, ExcInternalError());
+        }
+
+      // transfer data
+      // only if anything has been attached
+      if (cell_attached_data.n_attached_data_sets > 0)
+        {
+          // execute transfer after triangulation got updated
+          data_transfer.execute_transfer(parallel_forest,
+                                         previous_global_first_quadrant.data());
+
+          // also update the CellStatus information on the new mesh
+          data_transfer.unpack_cell_status(local_quadrant_cell_relations);
         }
 
 #  ifdef DEBUG
@@ -3010,7 +3597,24 @@ namespace parallel
 
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
-      attach_mesh_data();
+      std::vector<typename dealii::internal::p4est::types<dim>::gloidx>
+        previous_global_first_quadrant;
+
+      // pack data only if anything has been attached
+      if (cell_attached_data.n_attached_data_sets > 0)
+        {
+          data_transfer.pack_data(local_quadrant_cell_relations,
+                                  cell_attached_data.pack_callbacks);
+
+          // before repartitioning the p4est object, save a copy of the
+          // positions of quadrant for data transfer later
+          previous_global_first_quadrant.resize(parallel_forest->mpisize + 1);
+          std::memcpy(previous_global_first_quadrant.data(),
+                      parallel_forest->global_first_quadrant,
+                      sizeof(
+                        typename dealii::internal::p4est::types<dim>::gloidx) *
+                        (parallel_forest->mpisize + 1));
+        }
 
       if (this->signals.cell_weight.num_slots() == 0)
         {
@@ -3052,6 +3656,15 @@ namespace parallel
           // the underlying triangulation should not be checking for distorted
           // cells
           Assert(false, ExcInternalError());
+        }
+
+      // transfer data
+      // only if anything has been attached
+      if (cell_attached_data.n_attached_data_sets > 0)
+        {
+          // execute transfer after triangulation got updated
+          data_transfer.execute_transfer(parallel_forest,
+                                         previous_global_first_quadrant.data());
         }
 
       // update how many cells, edges, etc, we store locally
@@ -3235,32 +3848,13 @@ namespace parallel
     template <int dim, int spacedim>
     unsigned int
     Triangulation<dim, spacedim>::register_data_attach(
-      const std::size_t size,
-      const std::function<void(const cell_iterator &, const CellStatus, void *)>
-        &pack_callback)
+      const std::function<void(const cell_iterator &,
+                               const CellStatus,
+                               std::vector<char> &)> &pack_callback)
     {
-#  ifdef DEBUG
-      Assert(size > 0, ExcMessage("register_data_attach(), size==0"));
-
-      unsigned int remaining_callback_counter = 0;
-      for (auto it : cell_attached_data.pack_callbacks)
-        if (std::get<0>(it) != numbers::invalid_unsigned_int)
-          ++remaining_callback_counter;
-
-      Assert(
-        remaining_callback_counter == cell_attached_data.n_attached_datas,
-        ExcMessage(
-          "register_data_attach(), not all data has been unpacked last time?"));
-#  endif
-
-      // add new pair with offset and pack_callback
-      cell_attached_data.pack_callbacks.push_back(
-        {cell_attached_data.cumulative_fixed_data_size + sizeof(CellStatus),
-         pack_callback});
-
-      // increase counters
-      ++cell_attached_data.n_attached_datas;
-      cell_attached_data.cumulative_fixed_data_size += size;
+      // add new callback_set
+      cell_attached_data.pack_callbacks.push_back(pack_callback);
+      ++cell_attached_data.n_attached_data_sets;
 
       // return the position of the callback in the register vector as a handle
       return cell_attached_data.pack_callbacks.size() - 1;
@@ -3271,14 +3865,17 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::notify_ready_to_unpack(
-      const unsigned int                       handle,
-      const std::function<void(const cell_iterator &,
-                               const CellStatus,
-                               const void *)> &unpack_callback)
+      const unsigned int handle,
+      const std::function<
+        void(const cell_iterator &,
+             const CellStatus,
+             const boost::iterator_range<std::vector<char>::const_iterator>)>
+        &unpack_callback)
     {
+#  ifdef DEBUG
       Assert(handle < cell_attached_data.pack_callbacks.size(),
              ExcMessage("Invalid handle."));
-      Assert(cell_attached_data.n_attached_datas > 0,
+      Assert(cell_attached_data.n_attached_data_sets > 0,
              ExcMessage("The notify_ready_to_unpack() has already been called "
                         "once for each registered callback."));
 
@@ -3288,82 +3885,42 @@ namespace parallel
                static_cast<unsigned int>(parallel_forest->local_num_quadrants),
              ExcInternalError());
 
-      const unsigned int offset =
-        std::get<0>(cell_attached_data.pack_callbacks[handle]);
-      // check if unpack function has been previously called
-      Assert(offset != dealii::numbers::invalid_unsigned_int,
+      // deregister pack_callback function
+      // first reset with invalid entries to preserve ambiguity of
+      // handles, then free memory when all were unpacked (see below)
+      // consider_cell_invalid is irrelevant in this context
+      Assert(cell_attached_data.pack_callbacks[handle] != nullptr,
              ExcInternalError());
+      cell_attached_data.pack_callbacks[handle] = nullptr;
+#  endif
 
-      for (const auto &it_rel : local_quadrant_cell_relations)
-        {
-          const auto &q       = std::get<0>(it_rel);
-          const auto &cell_it = std::get<2>(it_rel);
+      // perform unpacking
+      data_transfer.unpack_data(local_quadrant_cell_relations,
+                                handle,
+                                unpack_callback);
 
-          const auto cell_status =
-            *static_cast<typename parallel::distributed::
-                           Triangulation<dim, spacedim>::CellStatus *>(
-              q->p.user_data);
-
-          void *ptr = static_cast<char *>(q->p.user_data) + offset;
-
-          switch (cell_status)
-            {
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_PERSIST:
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_COARSEN:
-                unpack_callback(cell_it, cell_status, ptr);
-                break;
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_REFINE:
-                unpack_callback(cell_it->parent(), cell_status, ptr);
-                break;
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_INVALID:
-                // do nothing on these cells
-                break;
-
-              default:
-                Assert(false, ExcInternalError());
-                break;
-            }
-        }
-
-      --cell_attached_data.n_attached_datas;
+      // decrease counters
+      --cell_attached_data.n_attached_data_sets;
       if (cell_attached_data.n_attached_deserialize > 0)
         --cell_attached_data.n_attached_deserialize;
 
-      // deregister corresponding pack_callback function
-      // first reset with invalid entries to preserve ambiguity of handles,
-      // then free memory when all were unpacked (see below)
-      std::get<0>(cell_attached_data.pack_callbacks[handle]) // offset value
-        = dealii::numbers::invalid_unsigned_int;
-      std::get<1>(
-        cell_attached_data.pack_callbacks[handle]) // pack_callback function
-        = typename CellAttachedData::pack_callback_t();
-
       // important: only remove data if we are not in the deserialization
       // process. There, each SolutionTransfer registers and unpacks before
-      // the next one does this, so n_attached_datas is only 1 here.  This
+      // the next one does this, so n_attached_data_sets is only 1 here.  This
       // would destroy the saved data before the second SolutionTransfer can
       // get it. This created a bug that is documented in
       // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
-      if (cell_attached_data.n_attached_datas == 0 &&
+      if (cell_attached_data.n_attached_data_sets == 0 &&
           cell_attached_data.n_attached_deserialize == 0)
         {
           // everybody got their data, time for cleanup!
-          cell_attached_data.cumulative_fixed_data_size = 0;
           cell_attached_data.pack_callbacks.clear();
+          data_transfer.clear();
 
-          // and release the data
-          void *userptr = parallel_forest->user_pointer;
-          dealii::internal::p4est::functions<dim>::reset_data(parallel_forest,
-                                                              0,
-                                                              nullptr,
-                                                              nullptr);
-          parallel_forest->user_pointer = userptr;
+          // reset all cell_status entries after coarsening/refinement
+          for (auto &quad_cell_rel : local_quadrant_cell_relations)
+            std::get<1>(quad_cell_rel) =
+              parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST;
         }
     }
 
@@ -3658,13 +4215,12 @@ namespace parallel
         MemoryConsumption::memory_consumption(connectivity) +
         MemoryConsumption::memory_consumption(parallel_forest) +
         MemoryConsumption::memory_consumption(
-          cell_attached_data.cumulative_fixed_data_size) +
+          cell_attached_data.n_attached_data_sets) +
+        // MemoryConsumption::memory_consumption(cell_attached_data.pack_callbacks)
+        // +
+        // TODO[TH]: how?
         MemoryConsumption::memory_consumption(
-          cell_attached_data.n_attached_datas)
-        //      + MemoryConsumption::memory_consumption(pack_callbacks)
-        //      //TODO[TH]: how?
-        + MemoryConsumption::memory_consumption(
-            coarse_cell_to_p4est_tree_permutation) +
+          coarse_cell_to_p4est_tree_permutation) +
         MemoryConsumption::memory_consumption(
           p4est_tree_to_coarse_cell_permutation) +
         memory_consumption_p4est();
@@ -3724,10 +4280,8 @@ namespace parallel
             other_tria_x->coarse_cell_to_p4est_tree_permutation;
           p4est_tree_to_coarse_cell_permutation =
             other_tria_x->p4est_tree_to_coarse_cell_permutation;
-          cell_attached_data.cumulative_fixed_data_size =
-            other_tria_x->cell_attached_data.cumulative_fixed_data_size;
-          cell_attached_data.n_attached_datas =
-            other_tria_x->cell_attached_data.n_attached_datas;
+          cell_attached_data = other_tria_x->cell_attached_data;
+          data_transfer      = other_tria_x->data_transfer;
 
           settings = other_tria_x->settings;
         }
@@ -3793,94 +4347,6 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::attach_mesh_data()
-    {
-      // check if there is anything at all to do here
-      if (cell_attached_data.cumulative_fixed_data_size == 0)
-        {
-          Assert(cell_attached_data.n_attached_datas == 0, ExcInternalError());
-          return;
-        }
-
-      // check if local_quadrant_cell_relations have been previously gathered
-      // correctly
-      Assert(local_quadrant_cell_relations.size() ==
-               static_cast<unsigned int>(parallel_forest->local_num_quadrants),
-             ExcInternalError());
-
-      // reallocate user_data in p4est
-      void *userptr = parallel_forest->user_pointer;
-      dealii::internal::p4est::functions<dim>::reset_data(
-        parallel_forest,
-        cell_attached_data.cumulative_fixed_data_size + sizeof(CellStatus),
-        nullptr,
-        nullptr);
-      parallel_forest->user_pointer = userptr;
-
-      for (const auto &it_rel : local_quadrant_cell_relations)
-        {
-          const auto &q           = std::get<0>(it_rel);
-          const auto &cell_status = std::get<1>(it_rel);
-          const auto &cell_it     = std::get<2>(it_rel);
-
-          *static_cast<typename parallel::distributed::
-                         Triangulation<dim, spacedim>::CellStatus *>(
-            q->p.user_data) = cell_status;
-
-          switch (cell_status)
-            {
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_PERSIST:
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_COARSEN:
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_REFINE:
-#  ifdef DEBUG
-                if (cell_status == parallel::distributed::
-                                     Triangulation<dim, spacedim>::CELL_COARSEN)
-                  {
-                    // double check the condition that we will only ever attach
-                    // data to cells with children when we get here. however, we
-                    // can only tolerate one level of coarsening at a time, so
-                    // check that the children are all active
-                    Assert(cell_it->active() == false, ExcInternalError());
-                    for (unsigned int c = 0;
-                         c < GeometryInfo<dim>::max_children_per_cell;
-                         ++c)
-                      Assert(cell_it->child(c)->active(), ExcInternalError());
-                  }
-                else
-                  {
-                    // double check the condition that we will only ever attach
-                    // data to active cells when we get here
-                    Assert(cell_it->active(), ExcInternalError());
-                  }
-#  endif
-                // call all callbacks
-                for (const auto &it_pack : cell_attached_data.pack_callbacks)
-                  {
-                    void *ptr = static_cast<char *>(q->p.user_data) +
-                                it_pack.first; // add offset
-                    (it_pack.second)(cell_it, cell_status, ptr);
-                  }
-                break;
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_INVALID:
-                // do nothing on these cells
-                break;
-
-              default:
-                Assert(false, ExcInternalError());
-                break;
-            }
-        }
-    }
-
-
-
-    template <int dim, int spacedim>
     std::vector<unsigned int>
     Triangulation<dim, spacedim>::get_cell_weights() const
     {
@@ -3904,10 +4370,10 @@ namespace parallel
       // Note that we need to follow the p4est ordering
       // instead of the deal.II ordering to get the cell_weights
       // in the same order p4est will encounter them during repartitioning.
-      for (const auto &it_rel : local_quadrant_cell_relations)
+      for (const auto &quad_cell_rel : local_quadrant_cell_relations)
         {
-          const auto &cell_status = std::get<1>(it_rel);
-          const auto &cell_it     = std::get<2>(it_rel);
+          const auto &cell_status = std::get<1>(quad_cell_rel);
+          const auto &cell_it     = std::get<2>(quad_cell_rel);
 
           switch (cell_status)
             {
@@ -3992,11 +4458,10 @@ namespace parallel
     template <int spacedim>
     unsigned int
     Triangulation<1, spacedim>::register_data_attach(
-      const std::size_t /*size*/,
       const std::function<
         void(const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
              const typename dealii::Triangulation<1, spacedim>::CellStatus,
-             void *)> & /*pack_callback*/)
+             std::vector<char> &)> & /*pack_callback*/)
     {
       Assert(false, ExcNotImplemented());
       return 0;
@@ -4007,11 +4472,12 @@ namespace parallel
     template <int spacedim>
     void
     Triangulation<1, spacedim>::notify_ready_to_unpack(
-      const unsigned int /*offset*/,
+      const unsigned int /*handle*/,
       const std::function<
         void(const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
              const typename dealii::Triangulation<1, spacedim>::CellStatus,
-             const void *)> & /*unpack_callback*/)
+             const boost::iterator_range<std::vector<char>::const_iterator>)>
+        & /*unpack_callback*/)
     {
       Assert(false, ExcNotImplemented());
     }

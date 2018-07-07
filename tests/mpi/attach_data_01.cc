@@ -38,8 +38,8 @@ pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
     &cell,
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-        status,
-  void *data)
+                     status,
+  std::vector<char> &data)
 {
   static int some_number = 0;
   deallog << "packing cell " << cell->id() << " with data=" << some_number
@@ -63,8 +63,7 @@ pack_function(
       Assert(!cell->has_children(), ExcInternalError());
     }
 
-  int *intdata = reinterpret_cast<int *>(data);
-  *intdata     = some_number;
+  Utilities::pack(some_number, data, /*allow_compression=*/false);
 
   ++some_number;
 }
@@ -75,12 +74,14 @@ unpack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
     &cell,
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-              status,
-  const void *data)
+                                                                 status,
+  const boost::iterator_range<std::vector<char>::const_iterator> data_range)
 {
-  const int *intdata = reinterpret_cast<const int *>(data);
+  const int intdata = Utilities::unpack<int>(data_range.begin(),
+                                             data_range.end(),
+                                             /*allow_compression=*/false);
 
-  deallog << "unpacking cell " << cell->id() << " with data=" << (*intdata)
+  deallog << "unpacking cell " << cell->id() << " with data=" << intdata
           << " status=";
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
     deallog << "PERSIST";
@@ -139,8 +140,7 @@ test()
             }
         }
 
-      unsigned int handle =
-        tr.register_data_attach(sizeof(int), pack_function<dim>);
+      unsigned int handle = tr.register_data_attach(pack_function<dim>);
 
       deallog << "handle=" << handle << std::endl;
       tr.execute_coarsening_and_refinement();

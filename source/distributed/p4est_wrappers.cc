@@ -509,6 +509,50 @@ namespace internal
 
     constexpr unsigned int functions<2>::max_level;
 
+    void (&functions<2>::transfer_fixed)(const types<2>::gloidx *dest_gfq,
+                                         const types<2>::gloidx *src_gfq,
+                                         MPI_Comm                mpicomm,
+                                         int                     tag,
+                                         void *                  dest_data,
+                                         const void *            src_data,
+                                         size_t                  data_size) =
+      p4est_transfer_fixed;
+
+    types<2>::transfer_context *(&functions<2>::transfer_fixed_begin)(
+      const types<2>::gloidx *dest_gfq,
+      const types<2>::gloidx *src_gfq,
+      MPI_Comm                mpicomm,
+      int                     tag,
+      void *                  dest_data,
+      const void *            src_data,
+      size_t                  data_size) = p4est_transfer_fixed_begin;
+
+    void (&functions<2>::transfer_fixed_end)(types<2>::transfer_context *tc) =
+      p4est_transfer_fixed_end;
+
+    void (&functions<2>::transfer_custom)(const types<2>::gloidx *dest_gfq,
+                                          const types<2>::gloidx *src_gfq,
+                                          MPI_Comm                mpicomm,
+                                          int                     tag,
+                                          void *                  dest_data,
+                                          const int *             dest_sizes,
+                                          const void *            src_data,
+                                          const int *             src_sizes) =
+      p4est_transfer_custom;
+
+    types<2>::transfer_context *(&functions<2>::transfer_custom_begin)(
+      const types<2>::gloidx *dest_gfq,
+      const types<2>::gloidx *src_gfq,
+      MPI_Comm                mpicomm,
+      int                     tag,
+      void *                  dest_data,
+      const int *             dest_sizes,
+      const void *            src_data,
+      const int *             src_sizes) = p4est_transfer_custom_begin;
+
+    void (&functions<2>::transfer_custom_end)(types<2>::transfer_context *tc) =
+      p4est_transfer_custom_end;
+
 
 
     int (&functions<3>::quadrant_compare)(const void *v1, const void *v2) =
@@ -651,6 +695,50 @@ namespace internal
       types<3>::connectivity *p4est) = p8est_connectivity_memory_used;
 
     constexpr unsigned int functions<3>::max_level;
+
+    void (&functions<3>::transfer_fixed)(const types<3>::gloidx *dest_gfq,
+                                         const types<3>::gloidx *src_gfq,
+                                         MPI_Comm                mpicomm,
+                                         int                     tag,
+                                         void *                  dest_data,
+                                         const void *            src_data,
+                                         size_t                  data_size) =
+      p8est_transfer_fixed;
+
+    types<3>::transfer_context *(&functions<3>::transfer_fixed_begin)(
+      const types<3>::gloidx *dest_gfq,
+      const types<3>::gloidx *src_gfq,
+      MPI_Comm                mpicomm,
+      int                     tag,
+      void *                  dest_data,
+      const void *            src_data,
+      size_t                  data_size) = p8est_transfer_fixed_begin;
+
+    void (&functions<3>::transfer_fixed_end)(types<3>::transfer_context *tc) =
+      p8est_transfer_fixed_end;
+
+    void (&functions<3>::transfer_custom)(const types<3>::gloidx *dest_gfq,
+                                          const types<3>::gloidx *src_gfq,
+                                          MPI_Comm                mpicomm,
+                                          int                     tag,
+                                          void *                  dest_data,
+                                          const int *             dest_sizes,
+                                          const void *            src_data,
+                                          const int *             src_sizes) =
+      p8est_transfer_custom;
+
+    types<3>::transfer_context *(&functions<3>::transfer_custom_begin)(
+      const types<3>::gloidx *dest_gfq,
+      const types<3>::gloidx *src_gfq,
+      MPI_Comm                mpicomm,
+      int                     tag,
+      void *                  dest_data,
+      const int *             dest_sizes,
+      const void *            src_data,
+      const int *             src_sizes) = p8est_transfer_custom_begin;
+
+    void (&functions<3>::transfer_custom_end)(types<3>::transfer_context *tc) =
+      p8est_transfer_custom_end;
 
 
 

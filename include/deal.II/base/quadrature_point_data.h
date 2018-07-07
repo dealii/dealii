@@ -410,11 +410,12 @@ namespace parallel
        * repartitioning.
        */
       void
-      pack_function(const typename parallel::distributed::
-                      Triangulation<dim, dim>::cell_iterator &cell,
-                    const typename parallel::distributed::
-                      Triangulation<dim, dim>::CellStatus status,
-                    void *                                data);
+      pack_function(
+        const typename parallel::distributed::Triangulation<dim>::cell_iterator
+          &cell,
+        const typename parallel::distributed::Triangulation<dim>::CellStatus
+                           status,
+        std::vector<char> &data);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -422,11 +423,13 @@ namespace parallel
        * coarsening and repartitioning.
        */
       void
-      unpack_function(const typename parallel::distributed::
-                        Triangulation<dim, dim>::cell_iterator &cell,
-                      const typename parallel::distributed::
-                        Triangulation<dim, dim>::CellStatus status,
-                      const void *                          data);
+      unpack_function(
+        const typename parallel::distributed::Triangulation<dim>::cell_iterator
+          &cell,
+        const typename parallel::distributed::Triangulation<dim>::CellStatus
+          status,
+        const boost::iterator_range<std::vector<char>::const_iterator>
+          data_range);
 
       /**
        * FiniteElement used to project data from and to quadrature points.
@@ -790,16 +793,13 @@ namespace parallel
       matrix_dofs.reinit(dofs_per_cell, number_of_values);
       matrix_dofs_child.reinit(dofs_per_cell, number_of_values);
       matrix_quadrature.reinit(n_q_points, number_of_values);
-      data_size_in_bytes = sizeof(double) * dofs_per_cell * number_of_values;
 
-      handle = triangulation->register_data_attach(
-        data_size_in_bytes,
-        std::bind(
-          &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3));
+      handle = triangulation->register_data_attach(std::bind(
+        &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3));
     }
 
 
@@ -827,21 +827,20 @@ namespace parallel
     template <int dim, typename DataType>
     void
     ContinuousQuadratureDataTransfer<dim, DataType>::pack_function(
-      const typename parallel::distributed::Triangulation<dim,
-                                                          dim>::cell_iterator
+      const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
-      const typename parallel::distributed::Triangulation<dim, dim>::
-        CellStatus /*status*/,
-      void *data)
+      const typename parallel::distributed::Triangulation<
+        dim>::CellStatus /*status*/,
+      std::vector<char> &data)
     {
-      double *data_store = reinterpret_cast<double *>(data);
-
       pack_cell_data(cell, data_storage, matrix_quadrature);
 
       // project to FE
       project_to_fe_matrix.mmult(matrix_dofs, matrix_quadrature);
 
-      std::memcpy(data_store, &matrix_dofs(0, 0), data_size_in_bytes);
+      // to get consistent data sizes on each cell for the fixed size transfer,
+      // we won't allow compression
+      Utilities::pack(matrix_dofs, data, /*allow_compression=*/false);
     }
 
 
@@ -849,21 +848,21 @@ namespace parallel
     template <int dim, typename DataType>
     void
     ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function(
-      const typename parallel::distributed::Triangulation<dim,
-                                                          dim>::cell_iterator
+      const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
-      const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-                  status,
-      const void *data)
+      const typename parallel::distributed::Triangulation<dim>::CellStatus
+                                                                     status,
+      const boost::iterator_range<std::vector<char>::const_iterator> data_range)
     {
       Assert((status !=
               parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN),
              ExcNotImplemented());
       (void)status;
 
-      const double *data_store = reinterpret_cast<const double *>(data);
-
-      std::memcpy(&matrix_dofs(0, 0), data_store, data_size_in_bytes);
+      matrix_dofs =
+        Utilities::unpack<FullMatrix<double>>(data_range.begin(),
+                                              data_range.end(),
+                                              /*allow_compression=*/false);
 
       if (cell->has_children())
         {

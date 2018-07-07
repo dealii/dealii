@@ -67,18 +67,15 @@ namespace parallel
         const std::vector<const VectorType *> &all_in)
     {
       input_vectors = all_in;
-      register_data_attach(get_data_size() * input_vectors.size());
+      register_data_attach();
     }
 
 
 
     template <int dim, typename VectorType, typename DoFHandlerType>
     void
-    SolutionTransfer<dim, VectorType, DoFHandlerType>::register_data_attach(
-      const std::size_t size)
+    SolutionTransfer<dim, VectorType, DoFHandlerType>::register_data_attach()
     {
-      Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
-
       // TODO: casting away constness is bad
       parallel::distributed::Triangulation<dim, DoFHandlerType::space_dimension>
         *tria = (dynamic_cast<parallel::distributed::Triangulation<
@@ -88,14 +85,12 @@ namespace parallel
                        *>(&dof_handler->get_triangulation())));
       Assert(tria != nullptr, ExcInternalError());
 
-      handle = tria->register_data_attach(
-        size,
-        std::bind(
-          &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3));
+      handle = tria->register_data_attach(std::bind(
+        &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3));
     }
 
 
@@ -148,7 +143,7 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::deserialize(
       std::vector<VectorType *> &all_in)
     {
-      register_data_attach(get_data_size() * all_in.size());
+      register_data_attach();
 
       // this makes interpolate() happy
       input_vectors.resize(all_in.size());
@@ -207,43 +202,35 @@ namespace parallel
 
 
     template <int dim, typename VectorType, typename DoFHandlerType>
-    unsigned int
-    SolutionTransfer<dim, VectorType, DoFHandlerType>::get_data_size() const
-    {
-      return sizeof(typename VectorType::value_type) *
-             DoFTools::max_dofs_per_cell(*dof_handler);
-    }
-
-
-    template <int dim, typename VectorType, typename DoFHandlerType>
     void
     SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback(
       const typename Triangulation<dim, DoFHandlerType::space_dimension>::
         cell_iterator &cell_,
       const typename Triangulation<dim, DoFHandlerType::space_dimension>::
         CellStatus /*status*/,
-      void *data)
+      std::vector<char> &data)
     {
-      typename VectorType::value_type *data_store =
-        reinterpret_cast<typename VectorType::value_type *>(data);
-
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-      ::dealii::Vector<typename VectorType::value_type> dofvalues(
-        dofs_per_cell);
-      for (typename std::vector<const VectorType *>::iterator it =
-             input_vectors.begin();
-           it != input_vectors.end();
-           ++it)
+
+      // create buffer for each individual object
+      std::vector<::dealii::Vector<typename VectorType::value_type>> dofvalues(
+        input_vectors.size());
+
+      auto cit_input = input_vectors.cbegin();
+      auto it_output = dofvalues.begin();
+      for (; cit_input != input_vectors.cend(); ++cit_input, ++it_output)
         {
-          cell->get_interpolated_dof_values(*(*it), dofvalues);
-          std::memcpy(data_store,
-                      &dofvalues(0),
-                      sizeof(typename VectorType::value_type) * dofs_per_cell);
-          data_store += dofs_per_cell;
+          it_output->reinit(dofs_per_cell);
+          cell->get_interpolated_dof_values(*(*cit_input), *it_output);
         }
+
+      // to get consistent data sizes on each cell for the fixed size transfer,
+      // we won't allow compression
+      Utilities::pack(dofvalues, data, /*allow_compression=*/false);
     }
+
 
 
     template <int dim, typename VectorType, typename DoFHandlerType>
@@ -253,26 +240,44 @@ namespace parallel
         cell_iterator &cell_,
       const typename Triangulation<dim, DoFHandlerType::space_dimension>::
         CellStatus /*status*/,
-      const void *               data,
-      std::vector<VectorType *> &all_out)
+      const boost::iterator_range<std::vector<char>::const_iterator> data_range,
+      std::vector<VectorType *> &                                    all_out)
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-      ::dealii::Vector<typename VectorType::value_type> dofvalues(
-        dofs_per_cell);
-      const typename VectorType::value_type *data_store =
-        reinterpret_cast<const typename VectorType::value_type *>(data);
 
-      for (typename std::vector<VectorType *>::iterator it = all_out.begin();
-           it != all_out.end();
-           ++it)
+      std::vector<::dealii::Vector<typename VectorType::value_type>> dofvalues =
+        Utilities::unpack<
+          std::vector<::dealii::Vector<typename VectorType::value_type>>>(
+          data_range.begin(), data_range.end(), /*allow_compression=*/false);
+
+      // check if sizes match
+      Assert(dofvalues.size() == all_out.size(), ExcInternalError());
+
+      // check if we have enough dofs provided by the FE object
+      // to interpolate the transferred data correctly
+      for (auto it_dofvalues = dofvalues.begin();
+           it_dofvalues != dofvalues.end();
+           ++it_dofvalues)
+        Assert(dofs_per_cell <= it_dofvalues->size(),
+               ExcMessage(
+                 "The transferred data was packed on fewer dofs than the"
+                 "currently registered FE object assigned to the DoFHandler."));
+
+      // distribute data for each registered vector on mesh
+      auto it_input  = dofvalues.begin();
+      auto it_output = all_out.begin();
+      for (; it_input != dofvalues.end(); ++it_input, ++it_output)
         {
-          std::memcpy(&dofvalues(0),
-                      data_store,
-                      sizeof(typename VectorType::value_type) * dofs_per_cell);
-          cell->set_dof_values_by_interpolation(dofvalues, *(*it));
-          data_store += dofs_per_cell;
+          // Adjust size of vector to the order of current FE object
+          // associated with the registered DofHandler.
+          // Fixes the following tests:
+          //  - p4est_2d_constraintmatrix_04.*.debug
+          //  - p4est_3d_constraintmatrix_03.*.debug
+          it_input->reinit(dofs_per_cell, /*omit_zeroing_entries=*/true);
+
+          cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
         }
     }
 
