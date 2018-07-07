@@ -35,13 +35,18 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @code
  * class UserFunction: public AutoDerivativeFunction
- * {               // access to one component at one point
- *   double value (const Point<dim> &p, const
- *                 unsigned int component = 0) const
- *          { // Implementation ....  };
- * } user_function;
+ * {
+ *   // access to one component at one point
+ *   double value (const Point<dim>   &p,
+ *                 const unsigned int component = 0) const override
+ *   {
+ *     // Implementation ....
+ *   };
+ * };
  *
- *            // gradient by employing difference quotients.
+ * UserFunction user_function;
+ *
+ * // gradient by employing difference quotients.
  * Tensor<1,dim> grad=user_function.gradient(some_point);
  * @endcode
  *

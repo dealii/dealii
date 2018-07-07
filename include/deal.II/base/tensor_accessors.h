@@ -201,7 +201,8 @@ namespace TensorAccessors
   /**
    * Return a reference (const or non-const) to a subobject of a tensorial
    * object @p t of type @p T, as described by an array type @p ArrayType
-   * object @p indices. For example: @code
+   * object @p indices. For example:
+   * @code
    *   Tensor<5, dim> tensor;
    *   TableIndices<5> indices (0, 1, 2, 3, 4);
    *   TensorAccessors::extract(tensor, indices) = 42;
@@ -256,7 +257,8 @@ namespace TensorAccessors
    *                   ...
    *                     for(unsigned int k_ = 0; k_ < dim; ++k_)
    *                       result[i_0]..[i_][j_0]..[j_] +=
-   * left[i_0]..[i_][k_0]..[k_] * right[j_0]..[j_][k_0]..[k_];
+   *                         left[i_0]..[i_][k_0]..[k_]
+   *                           * right[j_0]..[j_][k_0]..[k_];
    *               }
    * @endcode
    * with r = rank_1 + rank_2 - 2 * no_contr, l = rank_1 - no_contr, l1 =
@@ -312,8 +314,9 @@ namespace TensorAccessors
    *         for(unsigned int j_0 = 0; j_0 < dim; ++j_0)
    *           ...
    *             for(unsigned int j_ = 0; j_ < dim; ++j_)
-   *               result += left[i_0]..[i_] * middle[i_0]..[i_][j_0]..[j_] *
-   * right[j_0]..[j_];
+   *               result += left[i_0]..[i_]
+   *                           * middle[i_0]..[i_][j_0]..[j_]
+   *                           * right[j_0]..[j_];
    * @endcode
    *
    * @note The Types @p T2, @p T3, and @p T4 must have rank rank_1, rank_1 +

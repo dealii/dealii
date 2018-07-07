@@ -49,13 +49,11 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * ConditionalOStream pout(std::cout, this_mpi_process==0);
  *
- *                                  // all processes print following
- *                                  // information to standard output
+ * // all processes print the following information to standard output
  * std::cout << "Reading parameter file on process "
  *           << this_mpi_process << std::endl;
  *
- *                                  // following is printed by
- *                                  // process 0 only
+ * // following is printed by process 0 only
  * pout << "Solving ..." << std::endl;
  * solve();
  * pout << "done" << std::endl;

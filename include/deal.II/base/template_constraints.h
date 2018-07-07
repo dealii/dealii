@@ -109,7 +109,10 @@ struct constraint_and_return_value;
  * particular call. Example:
  * @code
  *   template <typename T>
- *   typename T::type  foo(T) {...};
+ *   typename T::type  foo(T)
+ *   {
+ *     ...
+ *   };
  *   ...
  *   foo(1);
  * @endcode
@@ -122,25 +125,40 @@ struct constraint_and_return_value;
  * The idea is then to make the return type un-instantiatable if certain
  * constraints on the template types are not satisfied:
  * @code
- *   template <bool, typename> struct constraint_and_return_value;
- *   template <typename T> struct constraint_and_return_value<true,T> {
+ *   template <bool, typename>
+ *   struct constraint_and_return_value;
+ *
+ *   template <typename T>
+ *   struct constraint_and_return_value<true,T>
+ *   {
  *     using type = T;
  *   };
  * @endcode
  * constraint_and_return_value<false,T> is not defined. Given something like
  * @code
  *   template <typename>
- *   struct int_or_double         { static const bool value = false;};
+ *   struct int_or_double
+ *   {
+ *     static const bool value = false;
+ *   };
+ *
  *   template <>
- *   struct int_or_double<int>    { static const bool value = true; };
+ *   struct int_or_double<int>
+ *   {
+ *     static const bool value = true;
+ *   };
+ *
  *   template <>
- *   struct int_or_double<double> { static const bool value = true; };
+ *   struct int_or_double<double>
+ *   {
+ *     static const bool value = true;
+ *   };
  * @endcode
  * we can write a template
  * @code
  *   template <typename T>
  *   typename constraint_and_return_value<int_or_double<T>::value,void>::type
- *   f (T);
+ *     f (T);
  * @endcode
  * which can only be instantiated if T=int or T=double. A call to f('c') will
  * just fail with a compiler error: "no instance of f(char) found". On the
@@ -165,14 +183,16 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
  * alias. This class, while at first appearing useless, makes sense in the
  * following context: if you have a function template as follows:
  * @code
- *   template <typename T> void f(T, T);
+ * template <typename T>
+ * void f(T, T);
  * @endcode
  * then it can't be called in an expression like <code>f(1, 3.141)</code>
  * because the type <code>T</code> of the template can not be deduced in a
  * unique way from the types of the arguments. However, if the template is
  * written as
  * @code
- *   template <typename T> void f(T, typename identity<T>::type);
+ * template <typename T>
+ * void f(T, typename identity<T>::type);
  * @endcode
  * then the call becomes valid: the type <code>T</code> is not deducible from
  * the second argument to the function, so only the first argument
@@ -181,7 +201,10 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
  * The context for this feature is as follows: consider
  * @code
  * template <typename RT, typename A>
- * void forward_call(RT (*p) (A), A a)  { p(a); }
+ * void forward_call(RT (*p) (A), A a)
+ * {
+ *   p(a);
+ * }
  *
  * void h (double);
  *
@@ -199,7 +222,10 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
  * this by writing the code as follows:
  * @code
  * template <typename RT, typename A>
- * void forward_call(RT (*p) (A), typename identity<A>::type a)  { p(a); }
+ * void forward_call(RT (*p) (A), typename identity<A>::type a)
+ * {
+ *   p(a);
+ * }
  *
  * void h (double);
  *
@@ -275,7 +301,8 @@ namespace internal
    *
    * @code
    *   template <int dim>
-   *   class X {
+   *   class X
+   *   {
    *     // do something on subdim-dimensional sub-objects of the big
    *     // dim-dimensional thing (for example on vertices/lines/quads of
    *     // cells):
@@ -284,9 +311,13 @@ namespace internal
    *
    *   template <int dim>
    *   template <>
-   *   void X<dim>::f<0> () { ...operate on the vertices of a cell... }
+   *   void X<dim>::f<0> ()
+   *   {
+   *     ...operate on the vertices of a cell...
+   *   }
    *
-   *   template <int dim, int subdim> void g(X<dim> &x) {
+   *   template <int dim, int subdim> void g(X<dim> &x)
+   *   {
    *     x.f<subdim> ();
    *   }
    * @endcode
@@ -296,10 +327,13 @@ namespace internal
    * the common tricks is therefore to use something like this:
    *
    * @code
-   *   template <int N> struct int2type {};
+   *   template <int N>
+   *   struct int2type
+   *   {};
    *
    *   template <int dim>
-   *   class X {
+   *   class X
+   *   {
    *     // do something on subdim-dimensional sub-objects of the big
    *     // dim-dimensional thing (for example on vertices/lines/quads of
    *     // cells):
@@ -310,12 +344,20 @@ namespace internal
    *   };
    *
    *   template <int dim>
-   *   void X<dim>::f (int2type<0>) { ...operate on the vertices of a cell... }
+   *   void X<dim>::f (int2type<0>)
+   *   {
+   *     ...operate on the vertices of a cell...
+   *   }
    *
    *   template <int dim>
-   *   void X<dim>::f (int2type<1>) { ...operate on the lines of a cell... }
+   *   void X<dim>::f (int2type<1>)
+   *   {
+   *     ...operate on the lines of a cell...
+   *   }
    *
-   *   template <int dim, int subdim> void g(X<dim> &x) {
+   *   template <int dim, int subdim>
+   *   void g(X<dim> &x)
+   *   {
    *     x.f (int2type<subdim>());
    *   }
    * @endcode
@@ -353,7 +395,8 @@ namespace internal
  * to write code like
  * @code
  *   template <typename T>
- *   void Vector<T>::some_operation () {
+ *   void Vector<T>::some_operation ()
+ *   {
  *     if (std::is_same<T,double>::value == true)
  *       call_some_blas_function_for_doubles;
  *     else
@@ -513,7 +556,10 @@ namespace internal
  * consider the following function:
  * @code
  *   template <typename T>
- *   T multiply (const T t1, const T t2) { return t1*t2; }
+ *   T multiply (const T t1, const T t2)
+ *   {
+ *     return t1*t2;
+ *   }
  * @endcode
  * This function can be called with any two arguments of the same type @p T.
  * This includes arguments for which this clearly makes no sense.
@@ -522,7 +568,10 @@ namespace internal
  * @code
  *   template <typename T>
  *   typename EnableIfScalar<T>::type
- *   multiply (const T t1, const T t2) { return t1*t2; }
+ *   multiply (const T t1, const T t2)
+ *   {
+ *     return t1*t2;
+ *   }
  * @endcode
  * At a place where you call the function, the compiler will deduce the type
  * @p T from the arguments. For example, in

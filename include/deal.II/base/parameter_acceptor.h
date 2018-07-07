@@ -78,31 +78,31 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @code
  * // This is your own class, derived from ParameterAcceptor
- * class MyClass : public ParameterAcceptor {
- *
- * // The constructor of ParameterAcceptor requires a std::string,
- * // which defines the section name where the parameters of MyClass
- * // will be stored.
- *
- * MyClass() :
- *   ParameterAcceptor("Some class name")
+ * class MyClass : public ParameterAcceptor
  * {
- *    add_parameter("A param", member_var);
- * }
+ *   // The constructor of ParameterAcceptor requires a std::string,
+ *   // which defines the section name where the parameters of MyClass
+ *   // will be stored.
+ *   MyClass()
+ *     : ParameterAcceptor("Some class name")
+ *   {
+ *     add_parameter("A param", member_var);
+ *   }
  *
  * private:
  *   std::vector<unsigned int> member_var;
- * ...
+ *   ...
  * };
  *
- * int main() {
- *  // Make sure you create your object BEFORE calling
- *  // ParameterAcceptor::initialize()
- *  MyClass class;
+ * int main()
+ * {
+ *   // Make sure you create your object BEFORE calling
+ *   // ParameterAcceptor::initialize()
+ *   MyClass class;
  *
- *  // With this call, all derived classes will have their
- *  // parameters initialized
- *  ParameterAcceptor::initialize("file.prm");
+ *   // With this call, all derived classes will have their
+ *   // parameters initialized
+ *   ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  *
@@ -115,23 +115,26 @@ DEAL_II_NAMESPACE_OPEN
  * // If you don't pass anything to the constructor of
  * // ParameterAcceptor, then the class name is used, "MyClass"
  * // in this case
- * class MyClass : public ParameterAcceptor {
- *
- *   virtual void declare_parameters(ParameterHandler &prm) {
- *    ...
+ * class MyClass : public ParameterAcceptor
+ * {
+ *   virtual void declare_parameters(ParameterHandler &prm)
+ *   {
+ *     ...
  *   }
  *
- *   virtual void parse_parameters(ParameterHandler &prm) {
+ *   virtual void parse_parameters(ParameterHandler &prm)
+ *   {
  *     ...
  *   }
  * };
  *
- * int main() {
- *  // Make sure you create your object BEFORE calling
- *  // ParameterAcceptor::initialize()
- *  MyClass class;
- *  ParameterAcceptor::initialize("file.prm");
- *  class.run();
+ * int main()
+ * {
+ *   // Make sure you create your object BEFORE calling
+ *   // ParameterAcceptor::initialize()
+ *   MyClass class;
+ *   ParameterAcceptor::initialize("file.prm");
+ *   class.run();
  * }
  * @endcode
  *
@@ -162,17 +165,16 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * class MyClass : public ParameterAcceptor
  * {
- *    MyClass (std::string name);
- *    virtual void declare_parameters(ParameterHandler &prm);
- *  private:
- *    SomeParsedClass<dim> my_subclass;
- *    ...
+ *   MyClass (std::string name);
+ *   virtual void declare_parameters(ParameterHandler &prm);
+ * private:
+ *   SomeParsedClass<dim> my_subclass;
+ *   ...
  * };
  *
  * MyClass::MyClass(std::string name)
- *  :
- * ParameterAcceptor(name),
- * my_subclass("Forcing term")
+ *   : ParameterAcceptor(name)
+ *   , my_subclass("Forcing term")
  * {}
  *
  * void MyClass::declare_parmeters(ParameterHandler &prm)
@@ -184,8 +186,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * int main()
  * {
- *    MyClass mc("My Class");
- *    ParameterAcceptor::initialize("file.prm");
+ *   MyClass mc("My Class");
+ *   ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  *
@@ -229,9 +231,8 @@ DEAL_II_NAMESPACE_OPEN
  * the constructor of MyClass:
  * @code
  * MyClass::MyClass(std::string name)
- *  :
- * ParameterAcceptor(name),
- * my_subclass(name+" --- forcing term")
+ *  : ParameterAcceptor(name)
+ *  , my_subclass(name+" --- forcing term")
  * {}
  * @endcode
  *
