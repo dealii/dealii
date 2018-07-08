@@ -36,7 +36,8 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * DiagonalMatrix<LinearAlgebra::distributed::Vector<double> > diagonal_matrix;
  * LinearAlgebra::distributed::Vector<double> &diagonal_vector =
- * diagonal_matrix.get_vector(); diagonal_vector.reinit(locally_owned_dofs,
+ *   diagonal_matrix.get_vector();
+ * diagonal_vector.reinit(locally_owned_dofs,
  *                        locally_relevant_dofs,
  *                        mpi_communicator);
  * @endcode

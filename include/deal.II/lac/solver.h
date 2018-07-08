@@ -247,23 +247,24 @@ class Vector;
  * An example may illuminate these issues. In the step-3 tutorial program, let
  * us add a member function as follows to the main class:
  * @code
- *  SolverControl::State
- *  Step3::write_intermediate_solution (const unsigned int    iteration,
- *                                      const double          , //check_value
- *                                      const Vector<double> &current_iterate)
- * const
- *    {
- *      DataOut<2> data_out;
- *      data_out.attach_dof_handler (dof_handler);
- *      data_out.add_data_vector (current_iterate, "solution");
- *      data_out.build_patches ();
+ * SolverControl::State
+ * Step3::write_intermediate_solution (
+ *   const unsigned int    iteration,
+ *   const double          , //check_value
+ *   const Vector<double> &current_iterate) const
+ * {
+ *   DataOut<2> data_out;
+ *   data_out.attach_dof_handler (dof_handler);
+ *   data_out.add_data_vector (current_iterate, "solution");
+ *   data_out.build_patches ();
  *
- *      std::ofstream output ((std::string("solution-")
- *                             + Utilities::int_to_string(iteration,4) +
- * ".vtu").c_str()); data_out.write_vtu (output);
+ *   std::ofstream output ("solution-"
+ *                         + Utilities::int_to_string(iteration,4)
+ *                         + ".vtu");
+ *   data_out.write_vtu (output);
  *
- *      return SolverControl::success;
- *    }
+ *   return SolverControl::success;
+ * }
  * @endcode
  * The function satisfies the signature necessary to be a slot for the signal
  * discussed above, with the exception that it is a member function and

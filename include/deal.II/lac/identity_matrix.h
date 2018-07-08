@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  * SolverControl           solver_control (1000, 1e-12);
  * SolverCG<>              cg (solver_control);
  * cg.solve (system_matrix, solution, system_rhs,
- *          IdentityMatrix(solution.size()));
+ *           IdentityMatrix(solution.size()));
  * @endcode
  *
  *

@@ -234,26 +234,26 @@ public:
    *
    * As an example, consider the following code:
    * @code
-   *   FullMatrix<double> A1(4,4);
-   *  FullMatrix<double> A2(4,4);
-   *  FullMatrix<double> B(4,3);
-   *  FullMatrix<double> C(3,3);
+   * FullMatrix<double> A1(4,4);
+   * FullMatrix<double> A2(4,4);
+   * FullMatrix<double> B(4,3);
+   * FullMatrix<double> C(3,3);
    *
-   *  BlockMatrixArray<double> block(2,2);
+   * BlockMatrixArray<double> block(2,2);
    *
-   *  block.enter(A1,0,0);
-   *  block.enter(A2,0,0,2,true);
-   *  block.enter(B,0,1,-3.);
-   *  block.enter(B,0,1,-3.,true);
-   *  block.enter(C,1,1,1.,true);
+   * block.enter(A1,0,0);
+   * block.enter(A2,0,0,2,true);
+   * block.enter(B,0,1,-3.);
+   * block.enter(B,0,1,-3.,true);
+   * block.enter(C,1,1,1.,true);
    *
-   *  block.print_latex(std::cout);
+   * block.print_latex(std::cout);
    * @endcode
    * The current function will then produce output of the following kind:
    * @code
    * \begin{array}{cc}
    *    M0+2xM1^T &     -3xM2-3xM3^T\\
-   *    &      M4^T
+   *              &      M4^T
    * \end{array}
    * @endcode
    * Note how the individual blocks here are just numbered successively as

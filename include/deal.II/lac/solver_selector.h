@@ -47,22 +47,21 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Usage</h3> The simplest use of this class is the following:
  * @code
- *                                  // generate a @p SolverControl and
- *                                  // a @p VectorMemory
+ * // generate a @p SolverControl and a @p VectorMemory
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
- *                                  // Line 3:
- *                                  //
- *                                  // generate a @p SolverSelector that
- *                                  // calls the @p SolverCG
+ *
+ * // Line 3:
+ * // generate a @p SolverSelector that calls the @p SolverCG
  * SolverSelector<Vector<double> >
  *   solver_selector("cg", control, memory);
- *                                  // generate e.g. a @p PreconditionRelaxation
+ *
+ * // generate e.g. a @p PreconditionRelaxation
  * PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
- *   preconditioning(A, &SparseMatrix<double>
- *                   ::template precondition_SSOR<double>,0.8);
- *                                  // call the @p solve function with this
- *                                  // preconditioning as last argument
+ *   preconditioning(
+ *     A, &SparseMatrix<double>::template precondition_SSOR<double>,0.8);
+ *
+ * // call the @p solve function with this preconditioning as last argument
  * solver_selector.solve(A,x,b,preconditioning);
  * @endcode
  * But the full usefulness of the @p SolverSelector class is not clear until
@@ -71,7 +70,8 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * Parameter_Handler prm;
  * prm.declare_entry ("solver", "none",
- *                    Patterns::Selection(SolverSelector<>::get_solver_names()));
+ *                    Patterns::Selection(
+ *                      SolverSelector<>::get_solver_names()));
  * ...
  * @endcode
  * Assuming that in the users parameter file there exists the line

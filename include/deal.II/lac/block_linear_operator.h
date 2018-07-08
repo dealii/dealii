@@ -171,7 +171,8 @@ block_back_substitution(
  * auto top_left_op = linear_operator(top_left);
  * auto bottom_right_op = linear_operator(bottom_right);
  * std::array<decltype(top_left_op), 2> operators {{top_left_op,
- * bottom_right_op}}; auto block_op = block_diagonal_operator (operators);
+ *                                                  bottom_right_op}};
+ * auto block_op = block_diagonal_operator (operators);
  *
  * std::vector<BlockVector<double>::size_type> block_sizes {2, 4};
  * BlockVector<double> src(block_sizes);

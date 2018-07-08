@@ -69,28 +69,28 @@ class FilteredMatrixBlock;
  *
  * A typical code snippet showing the above steps is as follows:
  * @code
- *   ... // set up sparse matrix A and right hand side b somehow
+ *   // set up sparse matrix A and right hand side b somehow
+ *   ...
  *
- *                     // initialize filtered matrix with
- *                     // matrix and boundary value constraints
+ *   // initialize filtered matrix with matrix and boundary value constraints
  *   FilteredMatrix<Vector<double> > filtered_A (A);
  *   filtered_A.add_constraints (boundary_values);
  *
- *                     // set up a linear solver
+ *   // set up a linear solver
  *   SolverControl control (1000, 1.e-10, false, false);
  *   GrowingVectorMemory<Vector<double> > mem;
  *   SolverCG<Vector<double> > solver (control, mem);
  *
- *                     // set up a preconditioner object
+ *   // set up a preconditioner object
  *   PreconditionJacobi<SparseMatrix<double> > prec;
  *   prec.initialize (A, 1.2);
  *   FilteredMatrix<Vector<double> > filtered_prec (prec);
  *   filtered_prec.add_constraints (boundary_values);
  *
- *                     // compute modification of right hand side
+ *   // compute modification of right hand side
  *   filtered_A.apply_constraints (b, true);
  *
- *                     // solve for solution vector x
+ *   // solve for solution vector x
  *   solver.solve (filtered_A, x, b, filtered_prec);
  * @endcode
  *
