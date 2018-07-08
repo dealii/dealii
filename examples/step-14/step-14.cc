@@ -1277,18 +1277,18 @@ namespace Step14
 
       // Next, we have to define the cells and the vertices they contain.
       const std::vector<std::array<int, GeometryInfo<dim>::vertices_per_cell>>
-        cell_vertices = {{0, 1, 5, 6},
-                         {1, 2, 6, 7},
-                         {2, 3, 7, 8},
-                         {3, 4, 8, 9},
-                         {5, 6, 10, 11},
-                         {8, 9, 12, 13},
-                         {10, 11, 14, 15},
-                         {12, 13, 17, 18},
-                         {14, 15, 19, 20},
-                         {15, 16, 20, 21},
-                         {16, 17, 21, 22},
-                         {17, 18, 22, 23}};
+        cell_vertices = {{{0, 1, 5, 6}},
+                         {{1, 2, 6, 7}},
+                         {{2, 3, 7, 8}},
+                         {{3, 4, 8, 9}},
+                         {{5, 6, 10, 11}},
+                         {{8, 9, 12, 13}},
+                         {{10, 11, 14, 15}},
+                         {{12, 13, 17, 18}},
+                         {{14, 15, 19, 20}},
+                         {{15, 16, 20, 21}},
+                         {{16, 17, 21, 22}},
+                         {{17, 18, 22, 23}}};
 
       const unsigned int n_cells = cell_vertices.size();
 
