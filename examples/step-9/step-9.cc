@@ -158,7 +158,7 @@ namespace Step9
 
     FE_Q<dim> fe;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -907,7 +907,7 @@ namespace Step9
     WorkStream::run(dof_handler.begin_active(),
                     dof_handler.end(),
                     &GradientEstimation::template estimate_cell<dim>,
-                    std::function<void(const EstimateCopyData &)>(),
+                    [](const EstimateCopyData &) {},
                     EstimateScratchData<dim>(dof_handler.get_fe(),
                                              solution,
                                              error_per_cell),
@@ -935,8 +935,8 @@ namespace Step9
   // arguments, we declare this function with three arguments, but simply
   // ignore the last one.
   //
-  // (This is unsatisfactory from an aesthetic perspective. It can be avoided,
-  // at the cost of some other trickery. If you allow, let us here show
+  // (This is unsatisfactory from an aesthetic perspective. It can be avoided
+  // by using an anonymous (lambda) function. If you allow, let us here show
   // how. First, assume that we had declared this function to only take two
   // arguments by omitting the unused last one. Now, WorkStream::run still
   // wants to call this function with three arguments, so we need to find a
@@ -944,22 +944,19 @@ namespace Step9
   // WorkStream::run the pointer to the function as we do above will not do
   // this -- the compiler will complain that a function declared to have two
   // arguments is called with three arguments. However, we can do this by
-  // passing the following as the third argument when calling WorkStream::run()
-  // above:
+  // passing the following as the third argument to WorkStream::run():
   // @code
-  //    std::function<void (const typename DoFHandler<dim>::active_cell_iterator
-  //    &,
-  //                        EstimateScratchData<dim>                  &,
-  //                        EstimateCopyData                          &)>
-  //      (std::bind (&GradientEstimation::template estimate_cell<dim>,
-  //                  std::placeholders::_1,
-  //                  std::placeholders::_2))
+  // [](const typename DoFHandler<dim>::active_cell_iterator &cell,
+  //    EstimateScratchData<dim> &                            scratch_data,
+  //    EstimateCopyData &)
+  // {
+  //   GradientEstimation::estimate_cell<dim>(cell, scratch_data);
+  // }
   // @endcode
-  // This creates a function object taking three arguments, but when it calls
-  // the underlying function object, it simply only uses the first and second
-  // argument -- we simply "forget" to use the third argument :-)
-  // In the end, this isn't completely obvious either, and so we didn't
-  // implement it, but hey -- it can be done!)
+  // This is not much better than the solution implemented below: either the
+  // routine itself must take three arguments or it must be wrapped by
+  // something that takes three arguments. We don't use this since adding the
+  // unused argument at the beginning is simpler.
   //
   // Now for the details:
   template <int dim>
@@ -1015,10 +1012,8 @@ namespace Step9
         {
           // First define an abbreviation for the iterator to the face and
           // the neighbor
-          const typename DoFHandler<dim>::face_iterator face =
-            cell->face(face_n);
-          const typename DoFHandler<dim>::cell_iterator neighbor =
-            cell->neighbor(face_n);
+          const auto face     = cell->face(face_n);
+          const auto neighbor = cell->neighbor(face_n);
 
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
@@ -1035,8 +1030,7 @@ namespace Step9
                   // we are left of the present cell (n==0), or go to the
                   // left child if we are on the right (n==1), until we
                   // find an active cell.
-                  typename DoFHandler<dim>::cell_iterator neighbor_child =
-                    neighbor;
+                  auto neighbor_child = neighbor;
                   while (neighbor_child->has_children())
                     neighbor_child = neighbor_child->child(face_n == 0 ? 1 : 0);
 
@@ -1100,15 +1094,8 @@ namespace Step9
     // expensive operation):
     std::vector<double> neighbor_midpoint_value(1);
     Tensor<1, dim> projected_gradient;
-    typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::
-      const_iterator neighbor_ptr = active_neighbors.begin();
-    for (; neighbor_ptr != active_neighbors.end(); ++neighbor_ptr)
+    for (const auto &neighbor : active_neighbors)
       {
-        // First define an abbreviation for the iterator to the active
-        // neighbor cell:
-        const typename DoFHandler<dim>::active_cell_iterator neighbor =
-          *neighbor_ptr;
-
         // Then get the center of the neighbor cell and the value of the
         // finite element function at that point. Note that for this
         // information we have to reinitialize the <code>FEValues</code>
