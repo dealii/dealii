@@ -82,7 +82,6 @@ namespace Step9
   {
   public:
     AdvectionProblem();
-    ~AdvectionProblem();
     void run();
 
   private:
@@ -196,14 +195,7 @@ namespace Step9
   class AdvectionField : public TensorFunction<1, dim>
   {
   public:
-    AdvectionField()
-      : TensorFunction<1, dim>()
-    {}
-
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<Tensor<1, dim>> &values) const override;
 
     // In previous examples, we have used assertions that throw exceptions in
     // several places. However, we have never seen how such exceptions are
@@ -259,22 +251,6 @@ namespace Step9
     return value;
   }
 
-
-
-  template <int dim>
-  void
-  AdvectionField<dim>::value_list(const std::vector<Point<dim>> &points,
-                                  std::vector<Tensor<1, dim>> &  values) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < points.size(); ++i)
-      values[i] = AdvectionField<dim>::value(points[i]);
-  }
-
-
-
   // Besides the advection field, we need two functions describing the source
   // terms (<code>right hand side</code>) and the boundary values. First for
   // the right hand side, which follows the same pattern as in previous
@@ -282,23 +258,13 @@ namespace Step9
   // function in the vicinity of a source point, which we denote by the
   // constant static variable <code>center_point</code>. We set the values of
   // this center using the same template tricks as we have shown in the step-7
-  // example program. The rest is simple and has been shown previously,
-  // including the way to avoid virtual function calls in the
-  // <code>value_list</code> function.
+  // example program. The rest is simple and has been shown previously.
   template <int dim>
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
 
   private:
     static const Point<dim> center_point;
@@ -340,36 +306,14 @@ namespace Step9
 
 
 
-  template <int dim>
-  void RightHandSide<dim>::value_list(const std::vector<Point<dim>> &points,
-                                      std::vector<double> &          values,
-                                      const unsigned int component) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < points.size(); ++i)
-      values[i] = RightHandSide<dim>::value(points[i], component);
-  }
-
-
-
   // Finally for the boundary values, which is just another class derived from
   // the <code>Function</code> base class:
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
   };
 
 
@@ -386,22 +330,6 @@ namespace Step9
     const double weight = std::exp(-5 * p.norm_square()) / std::exp(-5.);
     return sine_term * weight;
   }
-
-
-
-  template <int dim>
-  void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<double> &          values,
-                                       const unsigned int component) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < points.size(); ++i)
-      values[i] = BoundaryValues<dim>::value(points[i], component);
-  }
-
-
 
   // @sect3{GradientEstimation class declaration}
 
@@ -523,14 +451,6 @@ namespace Step9
     : dof_handler(triangulation)
     , fe(1)
   {}
-
-
-
-  template <int dim>
-  AdvectionProblem<dim>::~AdvectionProblem()
-  {
-    dof_handler.clear();
-  }
 
 
 
