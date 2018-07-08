@@ -3797,9 +3797,11 @@ namespace GridGenerator
                        const bool   copy_manifold_ids)
   {
     Assert(triangulation_1.n_levels() == 1,
-           ExcMessage("The input triangulations must be coarse meshes."));
+           ExcMessage("The input triangulations must be non-empty "
+                      "and must not be refined."));
     Assert(triangulation_2.n_levels() == 1,
-           ExcMessage("The input triangulations must be coarse meshes."));
+           ExcMessage("The input triangulations must be non-empty "
+                      "and must not be refined."));
 
     // get the union of the set of vertices
     std::vector<Point<spacedim>> vertices = triangulation_1.get_vertices();

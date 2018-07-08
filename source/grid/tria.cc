@@ -2104,7 +2104,7 @@ namespace internal
                 AssertThrow(
                   (n_adj_cells >= 1) && (n_adj_cells <= 2),
                   ExcMessage("You have a line in your triangulation at which "
-                             "more than two cells come together. "
+                             "more than two cells come together."
                              "\n\n"
                              "This is not currently supported because the "
                              "Triangulation class makes the assumption that "
