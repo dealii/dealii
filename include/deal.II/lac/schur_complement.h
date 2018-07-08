@@ -167,7 +167,7 @@ DEAL_II_NAMESPACE_OPEN
  * y = S_inv * rhs;
  *
  * // Compute x using resolved solution y
- * postprocess_schur_solution (A_inv,B,y,f);
+ * x = postprocess_schur_solution (A_inv,B,y,f);
  * @endcode
  *
  * In the above example, the preconditioner for $ S $ was defined as the
