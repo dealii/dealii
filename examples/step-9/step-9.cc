@@ -72,121 +72,6 @@ namespace Step9
 {
   using namespace dealii;
 
-  // @sect3{AdvectionProblem class declaration}
-
-  // Here comes the main class of this program. It is very much like the main
-  // classes of previous examples, so we again only comment on the
-  // differences.
-  template <int dim>
-  class AdvectionProblem
-  {
-  public:
-    AdvectionProblem();
-    void run();
-
-  private:
-    void setup_system();
-
-    // The next set of functions will be used to assemble the
-    // matrix. However, unlike in the previous examples, the
-    // <code>assemble_system()</code> function will not do the work
-    // itself, but rather will delegate the actual assembly to helper
-    // functions <code>assemble_local_system()</code> and
-    // <code>copy_local_to_global()</code>. The rationale is that
-    // matrix assembly can be parallelized quite well, as the
-    // computation of the local contributions on each cell is entirely
-    // independent of other cells, and we only have to synchronize
-    // when we add the contribution of a cell to the global
-    // matrix.
-    //
-    // The strategy for parallelization we choose here is one of the
-    // possibilities mentioned in detail in the @ref threads module in
-    // the documentation. Specifically, we will use the WorkStream
-    // approach discussed there. Since there is so much documentation
-    // in this module, we will not repeat the rationale for the design
-    // choices here (for example, if you read through the module
-    // mentioned above, you will understand what the purpose of the
-    // <code>AssemblyScratchData</code> and
-    // <code>AssemblyCopyData</code> structures is). Rather, we will
-    // only discuss the specific implementation.
-    //
-    // If you read the page mentioned above, you will find that in
-    // order to parallelize assembly, we need two data structures --
-    // one that corresponds to data that we need during local
-    // integration ("scratch data", i.e., things we only need as
-    // temporary storage), and one that carries information from the
-    // local integration to the function that then adds the local
-    // contributions to the corresponding elements of the global
-    // matrix. The former of these typically contains the FEValues and
-    // FEFaceValues objects, whereas the latter has the local matrix,
-    // local right hand side, and information about which degrees of
-    // freedom live on the cell for which we are assembling a local
-    // contribution. With this information, the following should be
-    // relatively self-explanatory:
-    struct AssemblyScratchData
-    {
-      AssemblyScratchData(const FiniteElement<dim> &fe);
-      AssemblyScratchData(const AssemblyScratchData &scratch_data);
-
-      // FEValues and FEFaceValues are expensive objects to set up, so we
-      // include them in the scratch object so that as much data is reused
-      // between cells as possible.
-      FEValues<dim>     fe_values;
-      FEFaceValues<dim> fe_face_values;
-
-      // We also store a few vectors that we will populate with values on each
-      // cell. Setting these objects up is, in the usual case, cheap; however,
-      // they require memory allocations, which can be expensive in
-      // multithreaded applications. Hence we keep them here so that
-      // computations on a cell do not require new allocations.
-      std::vector<double>         rhs_values;
-      std::vector<Tensor<1, dim>> advection_directions;
-      std::vector<double>         face_boundary_values;
-      std::vector<Tensor<1, dim>> face_advection_directions;
-
-      // Finally, we need objects that describe the problem's data:
-      AdvectionField<dim> advection_field;
-      RightHandSide<dim>  right_hand_side;
-      BoundaryValues<dim> boundary_values;
-    };
-
-    struct AssemblyCopyData
-    {
-      FullMatrix<double>                   cell_matrix;
-      Vector<double>                       cell_rhs;
-      std::vector<types::global_dof_index> local_dof_indices;
-    };
-
-    void assemble_system();
-    void local_assemble_system(
-      const typename DoFHandler<dim>::active_cell_iterator &cell,
-      AssemblyScratchData &                                 scratch,
-      AssemblyCopyData &                                    copy_data);
-    void copy_local_to_global(const AssemblyCopyData &copy_data);
-
-
-    // The following functions again are the same as they were in previous
-    // examples, as are the subsequent variables:
-    void solve();
-    void refine_grid();
-    void output_results(const unsigned int cycle) const;
-
-    Triangulation<dim> triangulation;
-    DoFHandler<dim>    dof_handler;
-
-    FE_Q<dim> fe;
-
-    AffineConstraints<double> hanging_node_constraints;
-
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
-
-    Vector<double> solution;
-    Vector<double> system_rhs;
-  };
-
-
-
   // @sect3{Equation data declaration}
 
   // Next we declare a class that describes the advection field. This, of
@@ -334,6 +219,121 @@ namespace Step9
     const double weight    = std::exp(5. * (1. - p.norm_square()));
     return weight * sine_term;
   }
+
+  // @sect3{AdvectionProblem class declaration}
+
+  // Here comes the main class of this program. It is very much like the main
+  // classes of previous examples, so we again only comment on the
+  // differences.
+  template <int dim>
+  class AdvectionProblem
+  {
+  public:
+    AdvectionProblem();
+    void run();
+
+  private:
+    void setup_system();
+
+    // The next set of functions will be used to assemble the
+    // matrix. However, unlike in the previous examples, the
+    // <code>assemble_system()</code> function will not do the work
+    // itself, but rather will delegate the actual assembly to helper
+    // functions <code>assemble_local_system()</code> and
+    // <code>copy_local_to_global()</code>. The rationale is that
+    // matrix assembly can be parallelized quite well, as the
+    // computation of the local contributions on each cell is entirely
+    // independent of other cells, and we only have to synchronize
+    // when we add the contribution of a cell to the global
+    // matrix.
+    //
+    // The strategy for parallelization we choose here is one of the
+    // possibilities mentioned in detail in the @ref threads module in
+    // the documentation. Specifically, we will use the WorkStream
+    // approach discussed there. Since there is so much documentation
+    // in this module, we will not repeat the rationale for the design
+    // choices here (for example, if you read through the module
+    // mentioned above, you will understand what the purpose of the
+    // <code>AssemblyScratchData</code> and
+    // <code>AssemblyCopyData</code> structures is). Rather, we will
+    // only discuss the specific implementation.
+    //
+    // If you read the page mentioned above, you will find that in
+    // order to parallelize assembly, we need two data structures --
+    // one that corresponds to data that we need during local
+    // integration ("scratch data", i.e., things we only need as
+    // temporary storage), and one that carries information from the
+    // local integration to the function that then adds the local
+    // contributions to the corresponding elements of the global
+    // matrix. The former of these typically contains the FEValues and
+    // FEFaceValues objects, whereas the latter has the local matrix,
+    // local right hand side, and information about which degrees of
+    // freedom live on the cell for which we are assembling a local
+    // contribution. With this information, the following should be
+    // relatively self-explanatory:
+    struct AssemblyScratchData
+    {
+      AssemblyScratchData(const FiniteElement<dim> &fe);
+      AssemblyScratchData(const AssemblyScratchData &scratch_data);
+
+      // FEValues and FEFaceValues are expensive objects to set up, so we
+      // include them in the scratch object so that as much data is reused
+      // between cells as possible.
+      FEValues<dim>     fe_values;
+      FEFaceValues<dim> fe_face_values;
+
+      // We also store a few vectors that we will populate with values on each
+      // cell. Setting these objects up is, in the usual case, cheap; however,
+      // they require memory allocations, which can be expensive in
+      // multithreaded applications. Hence we keep them here so that
+      // computations on a cell do not require new allocations.
+      std::vector<double>         rhs_values;
+      std::vector<Tensor<1, dim>> advection_directions;
+      std::vector<double>         face_boundary_values;
+      std::vector<Tensor<1, dim>> face_advection_directions;
+
+      // Finally, we need objects that describe the problem's data:
+      AdvectionField<dim> advection_field;
+      RightHandSide<dim>  right_hand_side;
+      BoundaryValues<dim> boundary_values;
+    };
+
+    struct AssemblyCopyData
+    {
+      FullMatrix<double>                   cell_matrix;
+      Vector<double>                       cell_rhs;
+      std::vector<types::global_dof_index> local_dof_indices;
+    };
+
+    void assemble_system();
+    void local_assemble_system(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
+      AssemblyScratchData &                                 scratch,
+      AssemblyCopyData &                                    copy_data);
+    void copy_local_to_global(const AssemblyCopyData &copy_data);
+
+
+    // The following functions again are the same as they were in previous
+    // examples, as are the subsequent variables:
+    void solve();
+    void refine_grid();
+    void output_results(const unsigned int cycle) const;
+
+    Triangulation<dim> triangulation;
+    DoFHandler<dim>    dof_handler;
+
+    FE_Q<dim> fe;
+
+    AffineConstraints<double> hanging_node_constraints;
+
+    SparsityPattern      sparsity_pattern;
+    SparseMatrix<double> system_matrix;
+
+    Vector<double> solution;
+    Vector<double> system_rhs;
+  };
+
+
 
   // @sect3{GradientEstimation class declaration}
 
