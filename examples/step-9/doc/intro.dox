@@ -197,6 +197,10 @@ the following domain and functions (in $d=2$ space dimensions):
     \begin{array}{c}2 \\ 1+\frac 45 \sin(8\pi x)\end{array}
   \right),
   \\
+  s
+  &=&
+  0.1,
+  \\
   f({\mathbf x})
   &=&
   \left\{
@@ -215,7 +219,7 @@ the following domain and functions (in $d=2$ space dimensions):
   \\
   g
   &=&
-  e^{5(1-|{\mathbf x}|^2)} \sin(16\pi|{\mathbf x}|^2).
+  e^{5 (1 - |\mathbf x|^2)} \sin(16\pi|\mathbf x|^2).
 @f}
 For $d>2$, we extend $\beta$ and ${\mathbf x}_0$ by simply duplicating
 the last of the components shown above one more time.
@@ -242,7 +246,7 @@ cell $K$ the following indicator:
 @f[
   \eta_K =
   \left(
-    \frac {h_K}{12}
+    \frac {h_K}{24}
     \int_{\partial K}
       [\partial_n u_h]^2 \; d\sigma
   \right)^{1/2},

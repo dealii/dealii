@@ -312,9 +312,9 @@ namespace Step9
     (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    const double sine_term = std::sin(16. * numbers::PI * p.norm());
-    const double weight    = std::exp(-5. * p.norm_square()) / std::exp(-5.);
-    return sine_term * weight;
+    const double sine_term = std::sin(16. * numbers::PI * p.norm_square());
+    const double weight    = std::exp(5. * (1. - p.norm_square()));
+    return weight * sine_term;
   }
 
   // @sect3{GradientEstimation class declaration}
