@@ -128,8 +128,26 @@ namespace Step9
       AssemblyScratchData(const FiniteElement<dim> &fe);
       AssemblyScratchData(const AssemblyScratchData &scratch_data);
 
+      // FEValues and FEFaceValues are expensive objects to set up, so we
+      // include them in the scratch object so that as much data is reused
+      // between cells as possible.
       FEValues<dim>     fe_values;
       FEFaceValues<dim> fe_face_values;
+
+      // We also store a few vectors that we will populate with values on each
+      // cell. Setting these objects up is, in the usual case, cheap; however,
+      // they require memory allocations, which can be expensive in
+      // multithreaded applications. Hence we keep them here so that
+      // computations on a cell do not require new allocations.
+      std::vector<double>         rhs_values;
+      std::vector<Tensor<1, dim>> advection_directions;
+      std::vector<double>         face_boundary_values;
+      std::vector<Tensor<1, dim>> face_advection_directions;
+
+      // Finally, we need objects that describe the problem's data:
+      AdvectionField<dim> advection_field;
+      RightHandSide<dim>  right_hand_side;
+      BoundaryValues<dim> boundary_values;
     };
 
     struct AssemblyCopyData
@@ -412,9 +430,15 @@ namespace Step9
                           Vector<float> &           error_per_cell);
       EstimateScratchData(const EstimateScratchData &data);
 
-      FEValues<dim>         fe_midpoint_value;
+      FEValues<dim> fe_midpoint_value;
+      std::vector<typename DoFHandler<dim>::active_cell_iterator>
+        active_neighbors;
+
       const Vector<double> &solution;
       Vector<float> &       error_per_cell;
+
+      std::vector<double> cell_midpoint_value;
+      std::vector<double> neighbor_midpoint_value;
     };
 
     struct EstimateCopyData
@@ -456,7 +480,7 @@ namespace Step9
     DoFTools::make_sparsity_pattern(dof_handler,
                                     dsp,
                                     hanging_node_constraints,
-                                    /*keep_constrained_dofs = */ true);
+                                    /*keep_constrained_dofs =*/false);
     sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit(sparsity_pattern);
@@ -490,26 +514,15 @@ namespace Step9
                     &AdvectionProblem::copy_local_to_global,
                     AssemblyScratchData(fe),
                     AssemblyCopyData());
-
-
-    // After the matrix has been assembled in parallel, we still have to
-    // eliminate hanging node constraints. This is something that can't be
-    // done on each of the threads separately, so we have to do it now.
-    // Note also, that unlike in previous examples, there are no boundary
-    // conditions to be applied to the system of equations. This, of course,
-    // is due to the fact that we have included them into the weak formulation
-    // of the problem.
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
   }
 
 
 
   // As already mentioned above, we need to have scratch objects for
   // the parallel computation of local contributions. These objects
-  // contain FEValues and FEFaceValues objects, and so we will need to
-  // have constructors and copy constructors that allow us to create
-  // them. In initializing them, note first that we use bilinear
+  // contain FEValues and FEFaceValues objects (as well as some arrays), and so
+  // we will need to have constructors and copy constructors that allow us to
+  // create them. In initializing them, note first that we use bilinear
   // elements, so Gauss formulae with two points in each space
   // direction are sufficient. For the cell terms we need the values
   // and gradients of the shape functions, the quadrature points in
@@ -531,6 +544,10 @@ namespace Step9
                      QGauss<dim - 1>(2),
                      update_values | update_quadrature_points |
                        update_JxW_values | update_normal_vectors)
+    , rhs_values(fe_values.get_quadrature().size())
+    , advection_directions(fe_values.get_quadrature().size())
+    , face_boundary_values(fe_face_values.get_quadrature().size())
+    , face_advection_directions(fe_face_values.get_quadrature().size())
   {}
 
 
@@ -546,6 +563,10 @@ namespace Step9
                      scratch_data.fe_face_values.get_quadrature(),
                      update_values | update_quadrature_points |
                        update_JxW_values | update_normal_vectors)
+    , rhs_values(scratch_data.rhs_values.size())
+    , advection_directions(scratch_data.advection_directions.size())
+    , face_boundary_values(scratch_data.face_boundary_values.size())
+    , face_advection_directions(scratch_data.face_advection_directions.size())
   {}
 
 
@@ -589,16 +610,7 @@ namespace Step9
     AssemblyScratchData &                                 scratch_data,
     AssemblyCopyData &                                    copy_data)
   {
-    // First of all, we will need some objects that describe boundary values,
-    // right hand side function and the advection field. As we will only
-    // perform actions on these objects that do not change them, we declare
-    // them as constant, which can enable the compiler in some cases to
-    // perform additional optimizations.
-    const AdvectionField<dim> advection_field;
-    const RightHandSide<dim>  right_hand_side;
-    const BoundaryValues<dim> boundary_values;
-
-    // Then we define some abbreviations to avoid unnecessarily long lines:
+    // We define some abbreviations to avoid unnecessarily long lines:
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points =
       scratch_data.fe_values.get_quadrature().size();
@@ -613,24 +625,16 @@ namespace Step9
     // the cell on which we are presently working...
     copy_data.local_dof_indices.resize(dofs_per_cell);
 
-    // ... and array in which the values of right hand side, advection
-    // direction, and boundary values will be stored, for cell and face
-    // integrals respectively:
-    std::vector<double>         rhs_values(n_q_points);
-    std::vector<Tensor<1, dim>> advection_directions(n_q_points);
-    std::vector<double>         face_boundary_values(n_face_q_points);
-    std::vector<Tensor<1, dim>> face_advection_directions(n_face_q_points);
-
-
     // ... then initialize the <code>FEValues</code> object...
     scratch_data.fe_values.reinit(cell);
 
     // ... obtain the values of right hand side and advection directions
     // at the quadrature points...
-    advection_field.value_list(scratch_data.fe_values.get_quadrature_points(),
-                               advection_directions);
-    right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
-                               rhs_values);
+    scratch_data.advection_field.value_list(
+      scratch_data.fe_values.get_quadrature_points(),
+      scratch_data.advection_directions);
+    scratch_data.right_hand_side.value_list(
+      scratch_data.fe_values.get_quadrature_points(), scratch_data.rhs_values);
 
     // ... set the value of the streamline diffusion parameter as
     // described in the introduction...
@@ -643,18 +647,19 @@ namespace Step9
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             copy_data.cell_matrix(i, j) +=
-              ((advection_directions[q_point] *
+              ((scratch_data.advection_directions[q_point] *
                 scratch_data.fe_values.shape_grad(j, q_point) *
                 (scratch_data.fe_values.shape_value(i, q_point) +
-                 delta * (advection_directions[q_point] *
+                 delta * (scratch_data.advection_directions[q_point] *
                           scratch_data.fe_values.shape_grad(i, q_point)))) *
                scratch_data.fe_values.JxW(q_point));
 
           copy_data.cell_rhs(i) +=
             ((scratch_data.fe_values.shape_value(i, q_point) +
-              delta * (advection_directions[q_point] *
+              delta * (scratch_data.advection_directions[q_point] *
                        scratch_data.fe_values.shape_grad(i, q_point))) *
-             rhs_values[q_point] * scratch_data.fe_values.JxW(q_point));
+             scratch_data.rhs_values[q_point] *
+             scratch_data.fe_values.JxW(q_point));
         }
 
     // Besides the cell terms which we have built up now, the bilinear
@@ -681,12 +686,12 @@ namespace Step9
 
           // For the quadrature points at hand, we ask for the values of
           // the inflow function and for the direction of flow:
-          boundary_values.value_list(
+          scratch_data.boundary_values.value_list(
             scratch_data.fe_face_values.get_quadrature_points(),
-            face_boundary_values);
-          advection_field.value_list(
+            scratch_data.face_boundary_values);
+          scratch_data.advection_field.value_list(
             scratch_data.fe_face_values.get_quadrature_points(),
-            face_advection_directions);
+            scratch_data.face_advection_directions);
 
           // Now loop over all quadrature points and see whether this face is on
           // the inflow or outflow part of the boundary. The normal
@@ -698,7 +703,7 @@ namespace Step9
           // cosine):
           for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
             if (scratch_data.fe_face_values.normal_vector(q_point) *
-                  face_advection_directions[q_point] <
+                  scratch_data.face_advection_directions[q_point] <
                 0.)
               // If the face is part of the inflow boundary, then compute the
               // contributions of this face to the global matrix and right
@@ -709,16 +714,16 @@ namespace Step9
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     copy_data.cell_matrix(i, j) -=
-                      (face_advection_directions[q_point] *
+                      (scratch_data.face_advection_directions[q_point] *
                        scratch_data.fe_face_values.normal_vector(q_point) *
                        scratch_data.fe_face_values.shape_value(i, q_point) *
                        scratch_data.fe_face_values.shape_value(j, q_point) *
                        scratch_data.fe_face_values.JxW(q_point));
 
                   copy_data.cell_rhs(i) -=
-                    (face_advection_directions[q_point] *
+                    (scratch_data.face_advection_directions[q_point] *
                      scratch_data.fe_face_values.normal_vector(q_point) *
-                     face_boundary_values[q_point] *
+                     scratch_data.face_boundary_values[q_point] *
                      scratch_data.fe_face_values.shape_value(i, q_point) *
                      scratch_data.fe_face_values.JxW(q_point));
                 }
@@ -742,15 +747,12 @@ namespace Step9
   void
   AdvectionProblem<dim>::copy_local_to_global(const AssemblyCopyData &copy_data)
   {
-    for (unsigned int i = 0; i < copy_data.local_dof_indices.size(); ++i)
-      {
-        for (unsigned int j = 0; j < copy_data.local_dof_indices.size(); ++j)
-          system_matrix.add(copy_data.local_dof_indices[i],
-                            copy_data.local_dof_indices[j],
-                            copy_data.cell_matrix(i, j));
-
-        system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
-      }
+    hanging_node_constraints.distribute_local_to_global(
+      copy_data.cell_matrix,
+      copy_data.cell_rhs,
+      copy_data.local_dof_indices,
+      system_matrix,
+      system_rhs);
   }
 
   // Here comes the linear solver routine. As the system is no longer
@@ -869,7 +871,16 @@ namespace Step9
                         update_values | update_quadrature_points)
     , solution(solution)
     , error_per_cell(error_per_cell)
-  {}
+    , cell_midpoint_value(1)
+    , neighbor_midpoint_value(1)
+  {
+    // We allocate a vector to hold iterators to all active neighbors of
+    // a cell. We reserve the maximal number of active neighbors in order to
+    // avoid later reallocations. Note how this maximal number of active
+    // neighbors is computed here.
+    active_neighbors.reserve(GeometryInfo<dim>::faces_per_cell *
+                             GeometryInfo<dim>::max_children_per_face);
+  }
 
 
   template <int dim>
@@ -880,6 +891,8 @@ namespace Step9
                         update_values | update_quadrature_points)
     , solution(scratch_data.solution)
     , error_per_cell(scratch_data.error_per_cell)
+    , cell_midpoint_value(1)
+    , neighbor_midpoint_value(1)
   {}
 
 
@@ -969,16 +982,6 @@ namespace Step9
     // outer products of the y-vectors.
     Tensor<2, dim> Y;
 
-
-    // Then we allocate a vector to hold iterators to all active neighbors of
-    // a cell. We reserve the maximal number of active neighbors in order to
-    // avoid later reallocations. Note how this maximal number of active
-    // neighbors is computed here.
-    std::vector<typename DoFHandler<dim>::active_cell_iterator>
-      active_neighbors;
-    active_neighbors.reserve(GeometryInfo<dim>::faces_per_cell *
-                             GeometryInfo<dim>::max_children_per_face);
-
     // First initialize the <code>FEValues</code> object, as well as the
     // <code>Y</code> tensor:
     scratch_data.fe_midpoint_value.reinit(cell);
@@ -1005,7 +1008,7 @@ namespace Step9
     // Before starting the loop over all neighbors of the present cell, we
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
-    active_neighbors.clear();
+    scratch_data.active_neighbors.clear();
     for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
          ++face_n)
       if (!cell->at_boundary(face_n))
@@ -1019,7 +1022,7 @@ namespace Step9
           // is on the same level or one level coarser (if we are not in
           // 1D), and we are interested in it in any case.
           if (neighbor->active())
-            active_neighbors.push_back(neighbor);
+            scratch_data.active_neighbors.push_back(neighbor);
           else
             {
               // If the neighbor is not active, then check its children.
@@ -1059,14 +1062,14 @@ namespace Step9
 
                   // If the check succeeded, we push the active neighbor
                   // we just found to the stack we keep:
-                  active_neighbors.push_back(neighbor_child);
+                  scratch_data.active_neighbors.push_back(neighbor_child);
                 }
               else
                 // If we are not in 1d, we collect all neighbor children
                 // `behind' the subfaces of the current face and move on:
                 for (unsigned int subface_n = 0; subface_n < face->n_children();
                      ++subface_n)
-                  active_neighbors.push_back(
+                  scratch_data.active_neighbors.push_back(
                     cell->neighbor_child_on_subface(face_n, subface_n));
             }
         }
@@ -1081,20 +1084,13 @@ namespace Step9
     const Point<dim> this_center =
       scratch_data.fe_midpoint_value.quadrature_point(0);
 
-    std::vector<double> this_midpoint_value(1);
-    scratch_data.fe_midpoint_value.get_function_values(scratch_data.solution,
-                                                       this_midpoint_value);
+    scratch_data.fe_midpoint_value.get_function_values(
+      scratch_data.solution, scratch_data.cell_midpoint_value);
 
     // Now loop over all active neighbors and collect the data we
-    // need. Allocate a vector just like <code>this_midpoint_value</code>
-    // which we will use to store the value of the solution in the
-    // midpoint of the neighbor cell. We allocate it here already, since
-    // that way we don't have to allocate memory repeatedly in each
-    // iteration of this inner loop (memory allocation is a rather
-    // expensive operation):
-    std::vector<double> neighbor_midpoint_value(1);
+    // need.
     Tensor<1, dim> projected_gradient;
-    for (const auto &neighbor : active_neighbors)
+    for (const auto &neighbor : scratch_data.active_neighbors)
       {
         // Then get the center of the neighbor cell and the value of the
         // finite element function at that point. Note that for this
@@ -1105,7 +1101,7 @@ namespace Step9
           scratch_data.fe_midpoint_value.quadrature_point(0);
 
         scratch_data.fe_midpoint_value.get_function_values(
-          scratch_data.solution, neighbor_midpoint_value);
+          scratch_data.solution, scratch_data.neighbor_midpoint_value);
 
         // Compute the vector <code>y</code> connecting the centers of the
         // two cells. Note that as opposed to the introduction, we denote
@@ -1121,8 +1117,9 @@ namespace Step9
             Y[i][j] += y[i] * y[j];
 
         // ... and update the sum of difference quotients:
-        projected_gradient +=
-          (neighbor_midpoint_value[0] - this_midpoint_value[0]) / distance * y;
+        projected_gradient += (scratch_data.neighbor_midpoint_value[0] -
+                               scratch_data.cell_midpoint_value[0]) /
+                              distance * y;
       }
 
     // If now, after collecting all the information from the neighbors, we
