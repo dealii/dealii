@@ -33,13 +33,12 @@
 
 
 template <int dim>
-void
+std::vector<char>
 pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
     &cell,
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-                     status,
-  std::vector<char> &data)
+    status)
 {
   static int some_number = 0;
   deallog << "packing cell " << cell->id() << " with data=" << some_number
@@ -63,9 +62,7 @@ pack_function(
       Assert(!cell->has_children(), ExcInternalError());
     }
 
-  Utilities::pack(some_number, data, /*allow_compression=*/false);
-
-  ++some_number;
+  return Utilities::pack(some_number++, /*allow_compression=*/false);
 }
 
 template <int dim>
@@ -74,8 +71,8 @@ unpack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
     &cell,
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-                                                                 status,
-  const boost::iterator_range<std::vector<char>::const_iterator> data_range)
+                                                                  status,
+  const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
 {
   const int intdata = Utilities::unpack<int>(data_range.begin(),
                                              data_range.end(),

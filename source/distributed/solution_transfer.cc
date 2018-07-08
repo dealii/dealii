@@ -89,8 +89,7 @@ namespace parallel
         &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
         this,
         std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3));
+        std::placeholders::_2));
     }
 
 
@@ -202,13 +201,12 @@ namespace parallel
 
 
     template <int dim, typename VectorType, typename DoFHandlerType>
-    void
+    std::vector<char>
     SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback(
       const typename Triangulation<dim, DoFHandlerType::space_dimension>::
         cell_iterator &cell_,
       const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-        CellStatus /*status*/,
-      std::vector<char> &data)
+        CellStatus /*status*/)
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
@@ -228,7 +226,7 @@ namespace parallel
 
       // to get consistent data sizes on each cell for the fixed size transfer,
       // we won't allow compression
-      Utilities::pack(dofvalues, data, /*allow_compression=*/false);
+      return Utilities::pack(dofvalues, /*allow_compression=*/false);
     }
 
 
@@ -240,8 +238,9 @@ namespace parallel
         cell_iterator &cell_,
       const typename Triangulation<dim, DoFHandlerType::space_dimension>::
         CellStatus /*status*/,
-      const boost::iterator_range<std::vector<char>::const_iterator> data_range,
-      std::vector<VectorType *> &                                    all_out)
+      const boost::iterator_range<std::vector<char>::const_iterator>
+        &                        data_range,
+      std::vector<VectorType *> &all_out)
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 

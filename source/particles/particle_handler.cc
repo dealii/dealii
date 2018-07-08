@@ -1037,16 +1037,14 @@ namespace Particles
 
     if (global_max_particles_per_cell > 0)
       {
-        const std::function<
-          void(const typename Triangulation<dim, spacedim>::cell_iterator &,
-               const typename Triangulation<dim, spacedim>::CellStatus,
-               std::vector<char> &)>
+        const std::function<std::vector<char>(
+          const typename Triangulation<dim, spacedim>::cell_iterator &,
+          const typename Triangulation<dim, spacedim>::CellStatus)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::store_particles,
                       std::cref(*this),
                       std::placeholders::_1,
-                      std::placeholders::_2,
-                      std::placeholders::_3);
+                      std::placeholders::_2);
 
         handle =
           non_const_triangulation->register_data_attach(callback_function);
@@ -1075,16 +1073,14 @@ namespace Particles
     // data correctly. Only do this if something was actually stored.
     if (serialization && (global_max_particles_per_cell > 0))
       {
-        const std::function<
-          void(const typename Triangulation<dim, spacedim>::cell_iterator &,
-               const typename Triangulation<dim, spacedim>::CellStatus,
-               std::vector<char> &)>
+        const std::function<std::vector<char>(
+          const typename Triangulation<dim, spacedim>::cell_iterator &,
+          const typename Triangulation<dim, spacedim>::CellStatus)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::store_particles,
                       std::cref(*this),
                       std::placeholders::_1,
-                      std::placeholders::_2,
-                      std::placeholders::_3);
+                      std::placeholders::_2);
 
         handle =
           non_const_triangulation->register_data_attach(callback_function);
@@ -1093,10 +1089,10 @@ namespace Particles
     // Check if something was stored and load it
     if (handle != numbers::invalid_unsigned_int)
       {
-        const std::function<
-          void(const typename Triangulation<dim, spacedim>::cell_iterator &,
-               const typename Triangulation<dim, spacedim>::CellStatus,
-               const boost::iterator_range<std::vector<char>::const_iterator>)>
+        const std::function<void(
+          const typename Triangulation<dim, spacedim>::cell_iterator &,
+          const typename Triangulation<dim, spacedim>::CellStatus,
+          const boost::iterator_range<std::vector<char>::const_iterator> &)>
           callback_function =
             std::bind(&ParticleHandler<dim, spacedim>::load_particles,
                       std::ref(*this),
@@ -1117,11 +1113,10 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  std::vector<char>
   ParticleHandler<dim, spacedim>::store_particles(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename Triangulation<dim, spacedim>::CellStatus     status,
-    std::vector<char> &data_vector) const
+    const typename Triangulation<dim, spacedim>::CellStatus     status) const
   {
     // -------------------
     // HOTFIX: resize memory and static_cast std::vector to void*
@@ -1149,9 +1144,8 @@ namespace Particles
       (size_per_particle * global_max_particles_per_cell) *
         (serialization ? 1 : std::pow(2, dim));
 
-    const size_t previous_size = data_vector.size();
-    data_vector.resize(previous_size + transfer_size_per_cell);
-    void *data = static_cast<void *>(data_vector.data() + previous_size);
+    std::vector<char> data_vector(transfer_size_per_cell);
+    void *            data = static_cast<void *>(data_vector.data());
     // --------------------
 
     unsigned int n_particles(0);
@@ -1217,14 +1211,16 @@ namespace Particles
       }
     else
       Assert(false, ExcInternalError());
+
+    return data_vector;
   }
 
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::load_particles(
-    const typename Triangulation<dim, spacedim>::cell_iterator &   cell,
-    const typename Triangulation<dim, spacedim>::CellStatus        status,
-    const boost::iterator_range<std::vector<char>::const_iterator> data_range)
+    const typename Triangulation<dim, spacedim>::cell_iterator &    cell,
+    const typename Triangulation<dim, spacedim>::CellStatus         status,
+    const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
   {
     // -------------------
     // HOTFIX: static_cast std::vector to void*

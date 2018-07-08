@@ -645,7 +645,7 @@ namespace parallel
        * of classes that do this is parallel::distributed::SolutionTransfer
        * where each parallel::distributed::SolutionTransfer object that works
        * on the current Triangulation object then needs to register its intent.
-       * Each of these parties registers a call-back function (the second
+       * Each of these parties registers a callback function (the second
        * argument here, @p pack_callback) that will be called whenever the
        * triangulation's execute_coarsening_and_refinement() or save()
        * functions are called.
@@ -715,8 +715,9 @@ namespace parallel
        *   using save() and load(), then the cell status argument with which
        *   the callback is called will always be `CELL_PERSIST`.
        *
-       * The third argument given to the callback is a reference to the
-       * buffer on which the packed data will be appended at the back.
+       * The callback function is expected to return a memory chunk of the
+       * format `std::vector<char>`, representing the packed data on a
+       * certain cell.
        *
        * @note The purpose of this function is to register intent to
        *   attach data for a single, subsequent call to
@@ -729,9 +730,9 @@ namespace parallel
        */
       unsigned int
       register_data_attach(
-        const std::function<void(const cell_iterator &,
-                                 const CellStatus,
-                                 std::vector<char> &)> &pack_callback);
+        const std::function<std::vector<char>(const cell_iterator &,
+                                              const CellStatus)>
+          &pack_callback);
 
       /**
        * This function is the opposite of register_data_attach(). It is called
@@ -784,10 +785,10 @@ namespace parallel
       void
       notify_ready_to_unpack(
         const unsigned int handle,
-        const std::function<
-          void(const cell_iterator &,
-               const CellStatus,
-               const boost::iterator_range<std::vector<char>::const_iterator>)>
+        const std::function<void(
+          const cell_iterator &,
+          const CellStatus,
+          const boost::iterator_range<std::vector<char>::const_iterator> &)>
           &unpack_callback);
 
       /**
@@ -888,10 +889,9 @@ namespace parallel
          */
         unsigned int n_attached_deserialize;
 
-        using pack_callback_t = std::function<
-          void(typename Triangulation<dim, spacedim>::cell_iterator,
-               CellStatus,
-               std::vector<char> &)>;
+        using pack_callback_t = std::function<std::vector<char>(
+          typename Triangulation<dim, spacedim>::cell_iterator,
+          CellStatus)>;
 
         /**
          * These callback functions will be stored in the order on how they have
@@ -1010,7 +1010,7 @@ namespace parallel
             const typename dealii::Triangulation<dim, spacedim>::cell_iterator
               &,
             const typename dealii::Triangulation<dim, spacedim>::CellStatus &,
-            const boost::iterator_range<std::vector<char>::const_iterator>)>
+            const boost::iterator_range<std::vector<char>::const_iterator> &)>
             &unpack_callback) const;
 
         /**
@@ -1289,10 +1289,10 @@ namespace parallel
        */
       unsigned int
       register_data_attach(
-        const std::function<void(
+        const std::function<std::vector<char>(
           const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
-          const typename dealii::Triangulation<1, spacedim>::CellStatus,
-          std::vector<char> &)> &pack_callback);
+          const typename dealii::Triangulation<1, spacedim>::CellStatus)>
+          &pack_callback);
 
       /**
        * This function is not implemented, but needs to be present for the
@@ -1304,7 +1304,7 @@ namespace parallel
         const std::function<void(
           const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
           const typename dealii::Triangulation<1, spacedim>::CellStatus,
-          const boost::iterator_range<std::vector<char>::const_iterator>)>
+          const boost::iterator_range<std::vector<char>::const_iterator> &)>
           &unpack_callback);
 
       /**
