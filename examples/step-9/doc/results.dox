@@ -24,27 +24,56 @@ Cycle 5:
    Number of active cells:       27004
    Number of degrees of freedom: 29810
 @endcode
-As can be seen, quite a number of cells is used on the finest level to
-resolve the features of the solution. The final grid showing this is
-displayed in the following picture:
 
+Quite a number of cells are used on the finest level to resolve the features of
+the solution. Here are the fourth and tenth grids:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-3.png"
+         alt="Fourth grid in the refinement cycle, showing some adaptivity to features."
+         width="400" height="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-9.png"
+         alt="Tenth grid in the refinement cycle, showing that the waves are fully captured."
+         width="400" height="400">
+  </div>
+</div>
+and the fourth and tenth solutions:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3.png"
+         alt="Fourth solution, showing that we resolve most features but some
+         are sill unresolved and appear blury."
+         width="400" height="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9.png"
+         alt="Tenth solution, showing a fully resolved flow."
+         width="400" height="400">
+  </div>
+</div>
+and both the grid and solution zoomed in:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3-zoom.png"
+         alt="Detail of the fourth solution, showing that we resolve most
+         features but some are sill unresolved and appear blury. In particular,
+         the larger cells need to be refined."
+         width="400" height="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9-zoom.png"
+         alt="Detail of the tenth solution, showing that we needed a lot more
+         cells than were present in the fourth solution."
+         width="400" height="400">
+  </div>
+</div>
 
-<img src="https://www.dealii.org/images/steps/developer/step-9.grid.png" alt="">
-
-
-
-The structure of the grid will be understandable by looking at the
-final solution itself:
-
-
-<img src="https://www.dealii.org/images/steps/developer/step-9.solution.png" alt="">
-
-(This image was generated using an earlier version of the program that
-still generated gmv instead of VTK output, and so is visualized
-using gmv.)
-Note that the solution is created by that part that is transported
-along the wiggly advection field from the left and lower boundaries
-to the top right, and the part that is created by the source in the
-lower left corner, and the results of which are also transported
-along. The grid shown above is well-adapted to resolve these
-features. 
+The solution is created by that part that is transported along the wiggly
+advection field from the left and lower boundaries to the top right, and the
+part that is created by the source in the lower left corner, and the results of
+which are also transported along. The grid shown above is well-adapted to
+resolve these features. The comparison between plots shows that, even though we
+are using a high-order approximation, we still need adaptive mesh refinement to
+fully resolve the wiggles.
