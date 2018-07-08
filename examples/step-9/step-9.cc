@@ -462,7 +462,7 @@ namespace Step9
   template <int dim>
   AdvectionProblem<dim>::AdvectionProblem()
     : dof_handler(triangulation)
-    , fe(1)
+    , fe(5)
   {}
 
 
@@ -522,9 +522,7 @@ namespace Step9
   // the parallel computation of local contributions. These objects
   // contain FEValues and FEFaceValues objects (as well as some arrays), and so
   // we will need to have constructors and copy constructors that allow us to
-  // create them. In initializing them, note first that we use bilinear
-  // elements, so Gauss formulae with two points in each space
-  // direction are sufficient. For the cell terms we need the values
+  // create them. For the cell terms we need the values
   // and gradients of the shape functions, the quadrature points in
   // order to determine the source density and the advection field at
   // a given point, and the weights of the quadrature points times the
@@ -537,11 +535,11 @@ namespace Step9
   AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
     const FiniteElement<dim> &fe)
     : fe_values(fe,
-                QGauss<dim>(2),
+                QGauss<dim>(fe.degree + 1),
                 update_values | update_gradients | update_quadrature_points |
                   update_JxW_values)
     , fe_face_values(fe,
-                     QGauss<dim - 1>(2),
+                     QGauss<dim - 1>(fe.degree + 1),
                      update_values | update_quadrature_points |
                        update_JxW_values | update_normal_vectors)
     , rhs_values(fe_values.get_quadrature().size())
@@ -796,25 +794,50 @@ namespace Step9
     triangulation.execute_coarsening_and_refinement();
   }
 
-  // Writing output to disk is done in the same way as in the previous
-  // examples. Indeed, the function is identical to the one in step-6.
+  // This function is similar to the one in step 6, but since we use a higher
+  // degree finite element we save the solution in a different
+  // way. Visualization programs like VisIt and Paraview typically only
+  // understand data that is associated with nodes: they cannot plot
+  // fifth-degree basis functions, which results in a very inaccurate picture
+  // of the solution we computed. To get around this we save multiple
+  // <em>patches</em> per cell: in 2D we save 64 bilinear `cells' to the VTU
+  // file for each cell, and in 3D we save 512. The end result is that the
+  // visualization program will use a piecewise linear interpolation of the
+  // cubic basis functions: this captures the solution detail and, with most
+  // screen resolutions, looks smooth. We save the grid in a separate step
+  // with no extra patches so that we have a visual representation of the cell
+  // faces.
+  //
+  // Version 9.1 of deal.II gained the ability to write higher degree
+  // polynomials (i.e., write piecewise bicubic visualization data for our
+  // piecewise bicubic solution) VTK and VTU output: however, not all recent
+  // versions of ParaView and VisIt (as of 2018) can read this format, so we
+  // use the older, more general (but less efficient) approach here.
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     {
       GridOut       grid_out;
-      std::ofstream output("grid-" + std::to_string(cycle) + ".eps");
-      grid_out.write_eps(triangulation, output);
+      std::ofstream output("grid-" + std::to_string(cycle) + ".vtu");
+      grid_out.write_vtu(triangulation, output);
     }
 
     {
       DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(solution, "solution");
-      data_out.build_patches();
+      data_out.build_patches(8);
 
-      std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
-      data_out.write_vtk(output);
+      // VTU output can be expensive, both to compute and to write to
+      // disk. Here we ask ZLib, a compression library, to compress the data
+      // in a way that maximizes throughput.
+      DataOutBase::VtkFlags vtk_flags;
+      vtk_flags.compression_level =
+        DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+      data_out.set_flags(vtk_flags);
+
+      std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+      data_out.write_vtu(output);
     }
   }
 
