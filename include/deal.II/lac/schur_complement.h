@@ -158,9 +158,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * // Solve reduced block system
  * // PackagedOperation that represents the condensed form of g
- * y = S_inv * rhs;
- *
- * // PackagedOperation that represents the condensed form of g
  * auto rhs = condense_schur_rhs (A_inv,C,f,g);
  *
  * // Solve for y
@@ -194,8 +191,8 @@ DEAL_II_NAMESPACE_OPEN
  * // D and S_approx operate on same space
  * const auto S_approx_prec = PreconditionSelector<...>(D);
  *
- * // Inner solver:
- * // Typically limited to few iterations using IterationNumberControl
+ * // Inner solver: Typically limited to few iterations
+ * //               using IterationNumberControl
  * auto S_inv_approx = inverse_operator(S_approx,...,S_approx_prec);
  *
  * // Construction of exact inverse of Schur complement
