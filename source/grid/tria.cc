@@ -2132,16 +2132,12 @@ namespace internal
           }
 
         // set boundary indicators where given
-        std::vector<CellData<1>>::const_iterator boundary_line =
-          subcelldata.boundary_lines.begin();
-        std::vector<CellData<1>>::const_iterator end_boundary_line =
-          subcelldata.boundary_lines.end();
-        for (; boundary_line != end_boundary_line; ++boundary_line)
+        for (const auto &subcell_line : subcelldata.boundary_lines)
           {
             typename Triangulation<dim, spacedim>::line_iterator line;
             std::pair<int, int>                                  line_vertices(
-              std::make_pair(boundary_line->vertices[0],
-                             boundary_line->vertices[1]));
+              std::make_pair(subcell_line.vertices[0],
+                             subcell_line.vertices[1]));
             if (needed_lines.find(line_vertices) != needed_lines.end())
               // line found in this direction
               line = needed_lines[line_vertices];
@@ -2170,8 +2166,7 @@ namespace internal
             // want to give an interior line a manifold id (and thus
             // lists this line in the subcell_data structure), and we
             // need to allow that
-            if (boundary_line->boundary_id !=
-                numbers::internal_face_boundary_id)
+            if (subcell_line.boundary_id != numbers::internal_face_boundary_id)
               {
                 if (line->boundary_id() == numbers::internal_face_boundary_id)
                   {
@@ -2186,7 +2181,7 @@ namespace internal
                     // Otherwise, we really tried to specify a boundary_id (and
                     // not a manifold_id) to an internal face. The exception
                     // must be thrown.
-                    if (boundary_line->manifold_id == numbers::flat_manifold_id)
+                    if (subcell_line.manifold_id == numbers::flat_manifold_id)
                       {
                         // If we are here, this assertion will surely fail, for
                         // the aforementioned reasons
@@ -2195,17 +2190,17 @@ namespace internal
                                     ExcInteriorLineCantBeBoundary(
                                       line->vertex_index(0),
                                       line->vertex_index(1),
-                                      boundary_line->boundary_id));
+                                      subcell_line.boundary_id));
                       }
                     else
                       {
-                        line->set_manifold_id(boundary_line->manifold_id);
+                        line->set_manifold_id(subcell_line.manifold_id);
                       }
                   }
                 else
-                  line->set_boundary_id_internal(boundary_line->boundary_id);
+                  line->set_boundary_id_internal(subcell_line.boundary_id);
               }
-            line->set_manifold_id(boundary_line->manifold_id);
+            line->set_manifold_id(subcell_line.manifold_id);
           }
 
 
@@ -3078,16 +3073,12 @@ namespace internal
         // where given
         //
         // first do so for lines
-        std::vector<CellData<1>>::const_iterator boundary_line =
-          subcelldata.boundary_lines.begin();
-        std::vector<CellData<1>>::const_iterator end_boundary_line =
-          subcelldata.boundary_lines.end();
-        for (; boundary_line != end_boundary_line; ++boundary_line)
+        for (const auto &subcell_line : subcelldata.boundary_lines)
           {
             typename Triangulation<dim, spacedim>::line_iterator line;
             std::pair<int, int>                                  line_vertices(
-              std::make_pair(boundary_line->vertices[0],
-                             boundary_line->vertices[1]));
+              std::make_pair(subcell_line.vertices[0],
+                             subcell_line.vertices[1]));
             if (needed_lines.find(line_vertices) != needed_lines.end())
               // line found in this
               // direction
@@ -3112,29 +3103,25 @@ namespace internal
                 // make sure that we don't attempt to reset the boundary
                 // indicator to a different than the previously set value
                 if (line->boundary_id() != 0)
-                  AssertThrow(line->boundary_id() == boundary_line->boundary_id,
+                  AssertThrow(line->boundary_id() == subcell_line.boundary_id,
                               ExcMessage(
                                 "Duplicate boundary lines are only allowed "
                                 "if they carry the same boundary indicator."));
 
-                line->set_boundary_id_internal(boundary_line->boundary_id);
+                line->set_boundary_id_internal(subcell_line.boundary_id);
               }
             // Set manifold id if given
             if (line->manifold_id() != numbers::flat_manifold_id)
-              AssertThrow(line->manifold_id() == boundary_line->manifold_id,
+              AssertThrow(line->manifold_id() == subcell_line.manifold_id,
                           ExcMessage(
-                            "Duplicate boundary lines are only allowed "
+                            "Duplicate lines are only allowed "
                             "if they carry the same manifold indicator."));
-            line->set_manifold_id(boundary_line->manifold_id);
+            line->set_manifold_id(subcell_line.manifold_id);
           }
 
 
-        // now go on with boundary faces
-        std::vector<CellData<2>>::const_iterator boundary_quad =
-          subcelldata.boundary_quads.begin();
-        std::vector<CellData<2>>::const_iterator end_boundary_quad =
-          subcelldata.boundary_quads.end();
-        for (; boundary_quad != end_boundary_quad; ++boundary_quad)
+        // now go on with the faces
+        for (const auto &subcell_quad : subcelldata.boundary_quads)
           {
             typename Triangulation<dim, spacedim>::quad_iterator quad;
             typename Triangulation<dim, spacedim>::line_iterator line[4];
@@ -3149,11 +3136,12 @@ namespace internal
             for (unsigned int i = 0; i < 4; ++i)
               {
                 std::pair<int, int> line_vertices(
-                  boundary_quad
-                    ->vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(i,
-                                                                            0)],
-                  boundary_quad->vertices
-                    [GeometryInfo<dim - 1>::line_to_cell_vertices(i, 1)]);
+                  subcell_quad
+                    .vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(i,
+                                                                           0)],
+                  subcell_quad
+                    .vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(i,
+                                                                           1)]);
 
                 // check whether line
                 // already exists
@@ -3264,21 +3252,21 @@ namespace internal
                 // and make sure that we don't attempt to reset the boundary
                 // indicator to a different than the previously set value
                 if (quad->boundary_id() != 0)
-                  AssertThrow(quad->boundary_id() == boundary_quad->boundary_id,
+                  AssertThrow(quad->boundary_id() == subcell_quad.boundary_id,
                               ExcMessage(
                                 "Duplicate boundary quads are only allowed "
                                 "if they carry the same boundary indicator."));
 
-                quad->set_boundary_id_internal(boundary_quad->boundary_id);
+                quad->set_boundary_id_internal(subcell_quad.boundary_id);
               }
             // Set manifold id if given
             if (quad->manifold_id() != numbers::flat_manifold_id)
-              AssertThrow(quad->manifold_id() == boundary_quad->manifold_id,
+              AssertThrow(quad->manifold_id() == subcell_quad.manifold_id,
                           ExcMessage(
                             "Duplicate boundary quads are only allowed "
                             "if they carry the same manifold indicator."));
 
-            quad->set_manifold_id(boundary_quad->manifold_id);
+            quad->set_manifold_id(subcell_quad.manifold_id);
           }
 
 
