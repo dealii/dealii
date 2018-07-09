@@ -985,10 +985,10 @@ namespace GridGenerator
    *
    * @note The function copies the material ids of the cells of the two input
    * triangulations into the output triangulation. If @p copy_manifold_ids is
-   * activated, manifold ids will be copied. Currently, boundary_ids are never
+   * set to @p true, manifold ids will be copied. Boundary indicators are never
    * copied. In other words, if the two coarse meshes have anything but the
-   * default boundary indicators, then you will currently have to set boundary
-   * indicators again by hand in the output triangulation.
+   * default boundary indicators, then you will have to set boundary indicators
+   * again by hand in the output triangulation.
    *
    * @note Unlike most GridGenerator functions, this function does not attach
    * any manifolds to @p result, nor does it set any manifold ids.

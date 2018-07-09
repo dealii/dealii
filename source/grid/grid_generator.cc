@@ -3839,89 +3839,101 @@ namespace GridGenerator
     SubCellData subcell_data;
     if (copy_manifold_ids)
       {
-        if (dim == 2)
+        switch (dim)
           {
-            subcell_data.boundary_lines.reserve(triangulation_1.n_lines() +
-                                                triangulation_2.n_lines());
+            case 1:
+              break;
 
-            auto copy_line_manifold_ids =
-              [&](const Triangulation<dim, spacedim> &tria,
-                  const unsigned int                  offset) {
-                for (typename Triangulation<dim, spacedim>::line_iterator line =
-                       tria.begin_face();
-                     line != tria.end_face();
-                     ++line)
-                  if (line->manifold_id() != numbers::flat_manifold_id)
-                    {
-                      CellData<1> boundary_line;
-                      boundary_line.vertices[0] =
-                        line->vertex_index(0) + offset;
-                      boundary_line.vertices[1] =
-                        line->vertex_index(1) + offset;
-                      boundary_line.manifold_id = line->manifold_id();
-                      subcell_data.boundary_lines.push_back(
-                        std::move(boundary_line));
-                    }
-              };
+            case 2:
+              {
+                subcell_data.boundary_lines.reserve(triangulation_1.n_lines() +
+                                                    triangulation_2.n_lines());
 
-            copy_line_manifold_ids(triangulation_1, 0);
-            copy_line_manifold_ids(triangulation_2,
-                                   triangulation_1.n_vertices());
-          }
+                auto copy_line_manifold_ids =
+                  [&](const Triangulation<dim, spacedim> &tria,
+                      const unsigned int                  offset) {
+                    for (typename Triangulation<dim, spacedim>::line_iterator
+                           line = tria.begin_face();
+                         line != tria.end_face();
+                         ++line)
+                      if (line->manifold_id() != numbers::flat_manifold_id)
+                        {
+                          CellData<1> boundary_line;
+                          boundary_line.vertices[0] =
+                            line->vertex_index(0) + offset;
+                          boundary_line.vertices[1] =
+                            line->vertex_index(1) + offset;
+                          boundary_line.manifold_id = line->manifold_id();
+                          subcell_data.boundary_lines.push_back(
+                            std::move(boundary_line));
+                        }
+                  };
 
-        if (dim == 3)
-          {
-            subcell_data.boundary_quads.reserve(triangulation_1.n_quads() +
-                                                triangulation_2.n_quads());
-            // we can't do better here than to loop over all the lines bounding
-            // a face. For regular meshes an (interior) line in 3D is part of
-            // four cells. So this should be an appropriate guess.
-            subcell_data.boundary_lines.reserve(triangulation_1.n_cells() * 4 +
-                                                triangulation_2.n_cells() * 4);
+                copy_line_manifold_ids(triangulation_1, 0);
+                copy_line_manifold_ids(triangulation_2,
+                                       triangulation_1.n_vertices());
+                break;
+              }
 
-            auto copy_face_and_line_manifold_ids =
-              [&](const Triangulation<dim, spacedim> &tria,
-                  const unsigned int                  offset) {
-                for (typename Triangulation<dim, spacedim>::face_iterator face =
-                       tria.begin_face();
-                     face != tria.end_face();
-                     ++face)
-                  if (face->manifold_id() != numbers::flat_manifold_id)
-                    {
-                      CellData<2> boundary_quad;
-                      boundary_quad.vertices[0] =
-                        face->vertex_index(0) + offset;
-                      boundary_quad.vertices[1] =
-                        face->vertex_index(1) + offset;
-                      boundary_quad.vertices[2] =
-                        face->vertex_index(2) + offset;
-                      boundary_quad.vertices[3] =
-                        face->vertex_index(3) + offset;
+            case 3:
+              {
+                subcell_data.boundary_quads.reserve(triangulation_1.n_quads() +
+                                                    triangulation_2.n_quads());
+                // we can't do better here than to loop over all the lines
+                // bounding a face. For regular meshes an (interior) line in 3D
+                // is part of four cells. So this should be an appropriate
+                // guess.
+                subcell_data.boundary_lines.reserve(
+                  triangulation_1.n_cells() * 4 +
+                  triangulation_2.n_cells() * 4);
 
-                      boundary_quad.manifold_id = face->manifold_id();
-                      subcell_data.boundary_quads.push_back(
-                        std::move(boundary_quad));
-                    }
-                for (const auto &cell : tria.cell_iterators())
-                  for (unsigned int l = 0; l < 12; ++l)
-                    if (cell->line(l)->manifold_id() !=
-                        numbers::flat_manifold_id)
-                      {
-                        CellData<1> boundary_line;
-                        boundary_line.vertices[0] =
-                          cell->line(l)->vertex_index(0) + offset;
-                        boundary_line.vertices[1] =
-                          cell->line(l)->vertex_index(1) + offset;
-                        boundary_line.manifold_id =
-                          cell->line(l)->manifold_id();
-                        subcell_data.boundary_lines.push_back(
-                          std::move(boundary_line));
-                      }
-              };
+                auto copy_face_and_line_manifold_ids =
+                  [&](const Triangulation<dim, spacedim> &tria,
+                      const unsigned int                  offset) {
+                    for (typename Triangulation<dim, spacedim>::face_iterator
+                           face = tria.begin_face();
+                         face != tria.end_face();
+                         ++face)
+                      if (face->manifold_id() != numbers::flat_manifold_id)
+                        {
+                          CellData<2> boundary_quad;
+                          boundary_quad.vertices[0] =
+                            face->vertex_index(0) + offset;
+                          boundary_quad.vertices[1] =
+                            face->vertex_index(1) + offset;
+                          boundary_quad.vertices[2] =
+                            face->vertex_index(2) + offset;
+                          boundary_quad.vertices[3] =
+                            face->vertex_index(3) + offset;
 
-            copy_face_and_line_manifold_ids(triangulation_1, 0);
-            copy_face_and_line_manifold_ids(triangulation_2,
-                                            triangulation_1.n_vertices());
+                          boundary_quad.manifold_id = face->manifold_id();
+                          subcell_data.boundary_quads.push_back(
+                            std::move(boundary_quad));
+                        }
+                    for (const auto &cell : tria.cell_iterators())
+                      for (unsigned int l = 0; l < 12; ++l)
+                        if (cell->line(l)->manifold_id() !=
+                            numbers::flat_manifold_id)
+                          {
+                            CellData<1> boundary_line;
+                            boundary_line.vertices[0] =
+                              cell->line(l)->vertex_index(0) + offset;
+                            boundary_line.vertices[1] =
+                              cell->line(l)->vertex_index(1) + offset;
+                            boundary_line.manifold_id =
+                              cell->line(l)->manifold_id();
+                            subcell_data.boundary_lines.push_back(
+                              std::move(boundary_line));
+                          }
+                  };
+
+                copy_face_and_line_manifold_ids(triangulation_1, 0);
+                copy_face_and_line_manifold_ids(triangulation_2,
+                                                triangulation_1.n_vertices());
+                break;
+              }
+            default:
+              Assert(false, ExcNotImplemented());
           }
       }
 
