@@ -97,7 +97,7 @@ PolynomialsBernardiRaugel<dim>::compute(
   std::vector<Tensor<4, dim>> bubble_fourth_derivatives;
 
   int n_bubbles = std::pow(3, dim); // size for create_polynomials_bubble
-  int n_q       = 1 << dim; // size for create_polynomials_q
+  int n_q       = 1 << dim;         // size for create_polynomials_q
 
   // don't resize if the provided vector has 0 length
   Q_values.resize((values.size() == 0) ? 0 : n_q);

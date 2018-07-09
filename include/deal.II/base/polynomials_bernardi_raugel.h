@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class implements the Bernardi-Raugel polynomials similarly to the
  * description in the <i>Mathematics of Computation</i> paper from 1985 by
- * Christine Bernardi and Geneviève Raugel. 
+ * Christine Bernardi and Geneviève Raugel.
  *
  * The Bernardi-Raugel polynomials are originally defined as an enrichment
  * of the $(P_1)^d$ elements on simplicial meshes for Stokes problems by the
@@ -71,10 +71,10 @@ DEAL_II_NAMESPACE_OPEN
  *        $z=1$ edge: $\mathbf{p}_6 = \mathbf{n}_6 (x)(1-x)(y)(1-y)(z)$
  *
  *</dl>
- * 
+ *
  * Then the $BR_1(E)$ polynomials are defined on quadrilaterals and hexahedra
  * by $BR_1(E) = Q_1(E) \oplus \mbox{span}\{\mathbf{p}_i, i=1,...,2d\}$.
- * 
+ *
  *
  * @ingroup Polynomials
  * @author Graham Harper
