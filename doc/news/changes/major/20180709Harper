@@ -1,0 +1,8 @@
+New: FE_BernardiRaugel is the implementation of an element developed by Christine Bernardi and
+Genevieve Raugel in the 1985 Mathematics of Computation paper. The Bernardi-Raugel element is an
+enrichment of the P1-P0 element for Stokes problems by the addition of edge-based quadratic
+bubble functions. The original description is for simplicial meshes, but this implementation is
+for quadrilateral and hexahedral meshes. The BR1-P0 pair is LBB stable for Stokes problems. Due
+to the edge-based bubble functions, features such as hanging nodes are not supported.
+<br>
+(Graham Harper 07/09/2018)
