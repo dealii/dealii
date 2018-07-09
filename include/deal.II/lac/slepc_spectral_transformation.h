@@ -50,16 +50,17 @@ namespace SLEPcWrappers
    * application codes in the following way for <code>XXX=INVERT</code> with
    * the solver object <code>eigensolver</code>:
    * @code
-   *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
-   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data
-   * (3.142); SLEPcWrappers::TransformationShift shift
-   * (mpi_communicator,additional_data); eigensolver.set_transformation (shift);
+   * // Set a transformation, this one shifts the eigenspectrum by 3.142..
+   * SLEPcWrappers::TransformationShift::AdditionalData
+   *   additional_data(3.142);
+   * SLEPcWrappers::TransformationShift shift(mpi_communicator,additional_data);
+   * eigensolver.set_transformation(shift);
    * @endcode
    * and later calling the <code>solve()</code> function as usual:
    * @code
-   *  SolverControl solver_control (1000, 1e-9);
-   *  SolverArnoldi system (solver_control, mpi_communicator);
-   *  eigensolver.solve (A, B, lambda, x, size_of_spectrum);
+   * SolverControl solver_control (1000, 1e-9);
+   * SolverArnoldi system (solver_control, mpi_communicator);
+   * eigensolver.solve (A, B, lambda, x, size_of_spectrum);
    * @endcode
    *
    * @note These options can also be set at the command line.

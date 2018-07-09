@@ -45,14 +45,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  * A typical usage of this class would be as follows:
  * @code
- *    FullMatrix<double> M;
- *    ...                // fill matrix M with some values
+ *   FullMatrix<double> M;
+ *   // fill matrix M with some values
+ *   ...
  *
- *                       // now write out M:
- *    MatrixOut matrix_out;
- *    std::ofstream out ("M.gnuplot");
- *    matrix_out.build_patches (M, "M");
- *    matrix_out.write_gnuplot (out);
+ *   // now write out M:
+ *   MatrixOut matrix_out;
+ *   std::ofstream out ("M.gnuplot");
+ *   matrix_out.build_patches (M, "M");
+ *   matrix_out.write_gnuplot (out);
  * @endcode
  * Of course, you can as well choose a different graphical output format.
  * Also, this class supports any matrix, not only of type FullMatrix, as long

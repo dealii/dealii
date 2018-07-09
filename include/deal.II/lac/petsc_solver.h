@@ -918,10 +918,10 @@ namespace PETScWrappers
    * is made possible by the set_symmetric_mode() function. If your matrix is
    * symmetric, you can use this class as follows:
    * @code
-   *    SolverControl cn;
-   *    PETScWrappers::SparseDirectMUMPS solver(cn, mpi_communicator);
-   *    solver.set_symmetric_mode(true);
-   *    solver.solve(system_matrix, solution, system_rhs);
+   *   SolverControl cn;
+   *   PETScWrappers::SparseDirectMUMPS solver(cn, mpi_communicator);
+   *   solver.set_symmetric_mode(true);
+   *   solver.solve(system_matrix, solution, system_rhs);
    * @endcode
    *
    * @note The class internally calls KSPSetFromOptions thus you are able to

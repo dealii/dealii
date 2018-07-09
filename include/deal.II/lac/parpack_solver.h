@@ -194,8 +194,8 @@ extern "C"
  *   SolverControl solver_control_lin (1000, 1e-10,false,false);
  *
  *   SolverCG<vector_t> cg(solver_control_lin);
- *   const auto op_shift_invert = inverse_operator(op_shift, cg,
- * PreconditionIdentity ());
+ *   const auto op_shift_invert =
+ *     inverse_operator(op_shift, cg, PreconditionIdentity ());
  * @endcode
  *
  * The class is intended to be used with MPI and can work on arbitrary vector

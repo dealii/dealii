@@ -50,9 +50,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * SLEPcWrappers can be implemented in application codes in the following way:
  * @code
- *  SolverControl solver_control (1000, 1e-9);
- *  SolverArnoldi system (solver_control, mpi_communicator);
- *  system.solve (A, B, lambda, x, size_of_spectrum);
+ * SolverControl solver_control (1000, 1e-9);
+ * SolverArnoldi system (solver_control, mpi_communicator);
+ * system.solve (A, B, lambda, x, size_of_spectrum);
  * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the variable
  * <code>const unsigned int size_of_spectrum</code> tells SLEPc the number of
@@ -63,8 +63,8 @@ DEAL_II_NAMESPACE_OPEN
  * wanted only, the following code can be implemented before calling
  * <code>solve()</code>:
  * @code
- *  system.set_problem_type (EPS_NHEP);
- *  system.set_which_eigenpairs (EPS_SMALLEST_REAL);
+ * system.set_problem_type (EPS_NHEP);
+ * system.set_which_eigenpairs (EPS_SMALLEST_REAL);
  * @endcode
  * These options can also be set at the command line.
  *
@@ -75,22 +75,22 @@ DEAL_II_NAMESPACE_OPEN
  * additionally specify which linear solver and preconditioner to use. This
  * can be achieved as follows
  * @code
- *   PETScWrappers::PreconditionBoomerAMG::AdditionalData data;
- *   data.symmetric_operator = true;
- *   PETScWrappers::PreconditionBoomerAMG preconditioner(mpi_communicator,
- * data); SolverControl linear_solver_control (dof_handler.n_dofs(),
- * 1e-12,false,false); PETScWrappers::SolverCG
- * linear_solver(linear_solver_control,mpi_communicator);
- *   linear_solver.initialize(preconditioner);
- *   SolverControl solver_control (100, 1e-9,false,false);
- *   SLEPcWrappers::SolverKrylovSchur
- * eigensolver(solver_control,mpi_communicator);
- *   SLEPcWrappers::TransformationShift
- * spectral_transformation(mpi_communicator);
- *   spectral_transformation.set_solver(linear_solver);
- *   eigensolver.set_transformation(spectral_transformation);
- *   eigensolver.solve
- * (stiffness_matrix,mass_matrix,eigenvalues,eigenfunctions,eigenfunctions.size());
+ * PETScWrappers::PreconditionBoomerAMG::AdditionalData data;
+ * data.symmetric_operator = true;
+ * PETScWrappers::PreconditionBoomerAMG preconditioner(mpi_communicator, data);
+ * SolverControl linear_solver_control (dof_handler.n_dofs(),
+ *                                      1e-12, false, false);
+ * PETScWrappers::SolverCG linear_solver(linear_solver_control,
+ *                                       mpi_communicator);
+ * linear_solver.initialize(preconditioner);
+ * SolverControl solver_control (100, 1e-9,false,false);
+ * SLEPcWrappers::SolverKrylovSchur eigensolver(solver_control,
+ *                                              mpi_communicator);
+ * SLEPcWrappers::TransformationShift spectral_transformation(mpi_communicator);
+ * spectral_transformation.set_solver(linear_solver);
+ * eigensolver.set_transformation(spectral_transformation);
+ * eigensolver.solve(stiffness_matrix, mass_matrix,
+ *                   eigenvalues, eigenfunctions, eigenfunctions.size());
  * @endcode
  *
  * In order to support this usage case, different from PETSc wrappers, the
@@ -110,11 +110,13 @@ DEAL_II_NAMESPACE_OPEN
  * template <typename OutputVector>
  * void
  * SolverBase::solve (const PETScWrappers::MatrixBase &A,
- *                   const PETScWrappers::MatrixBase &B,
- *                   std::vector<PetscScalar>        &eigenvalues,
- *                   std::vector<OutputVector>       &eigenvectors,
- *                   const unsigned int               n_eigenpairs)
- * { ... }
+ *                    const PETScWrappers::MatrixBase &B,
+ *                    std::vector<PetscScalar>        &eigenvalues,
+ *                    std::vector<OutputVector>       &eigenvectors,
+ *                    const unsigned int               n_eigenpairs)
+ * {
+ *   ...
+ * }
  * @endcode
  * as an example on how to do this.
  *

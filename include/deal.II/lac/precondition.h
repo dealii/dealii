@@ -63,8 +63,7 @@ namespace LinearAlgebra
  * @code
  * SolverControl           solver_control (1000, 1e-12);
  * SolverCG<>              cg (solver_control);
- * cg.solve (system_matrix, solution, system_rhs,
- *          PreconditionIdentity());
+ * cg.solve (system_matrix, solution, system_rhs, PreconditionIdentity());
  * @endcode
  *
  * See the step-3 tutorial program for an example and additional explanations.
@@ -331,13 +330,12 @@ private:
  * You will usually not want to create a named object of this type, although
  * possible. The most common use is like this:
  * @code
- *    SolverGMRES<SparseMatrix<double>,
- *                Vector<double> >      gmres(control,memory,500);
+ * SolverGMRES<SparseMatrix<double> Vector<double>> gmres(control,memory,500);
  *
- *    gmres.solve (matrix, solution, right_hand_side,
- *                 PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
- *                 (matrix,&SparseMatrix<double>::template
- * precondition_Jacobi<double>));
+ * gmres.solve(
+ *   matrix, solution, right_hand_side,
+ *   PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >(
+ *     matrix, &SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  * This creates an unnamed object to be passed as the fourth parameter to the
  * solver function of the SolverGMRES class. It assumes that the SparseMatrix
@@ -350,11 +348,11 @@ private:
  * Note that due to the default template parameters, the above example could
  * be written shorter as follows:
  * @code
- *    ...
- *    gmres.solve (matrix, solution, right_hand_side,
- *                 PreconditionUseMatrix<>
- *                   (matrix,&SparseMatrix<double>::template
- * precondition_Jacobi<double>));
+ * ...
+ * gmres.solve(
+ *   matrix, solution, right_hand_side,
+ *   PreconditionUseMatrix<>(
+ *     matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
@@ -495,8 +493,8 @@ protected:
  * // Define and initialize preconditioner:
  *
  * PreconditionJacobi<SparseMatrix<double> > precondition;
- * precondition.initialize (A, PreconditionJacobi<SparseMatrix<double>
- * >::AdditionalData(.6));
+ * precondition.initialize(
+ *   A, PreconditionJacobi<SparseMatrix<double>>::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -583,8 +581,8 @@ public:
  * // Define and initialize preconditioner
  *
  * PreconditionSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, PreconditionSOR<SparseMatrix<double>
- * >::AdditionalData(.6));
+ * precondition.initialize(
+ *   A, PreconditionSOR<SparseMatrix<double>>::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -640,7 +638,7 @@ public:
  * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
- *     // Declare related objects
+ * // Declare related objects
  *
  * SparseMatrix<double> A;
  * Vector<double> x;
@@ -652,8 +650,8 @@ public:
  * // Define and initialize preconditioner
  *
  * PreconditionSSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, PreconditionSSOR<SparseMatrix<double>
- * >::AdditionalData(.6));
+ * precondition.initialize(
+ *   A, PreconditionSSOR<SparseMatrix<double>>::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -737,7 +735,7 @@ private:
  * <tt>TPSOR(VectorType&, const VectorType&, double)</tt>.
  *
  * @code
- *     // Declare related objects
+ * // Declare related objects
  *
  * SparseMatrix<double> A;
  * Vector<double> x;
@@ -751,7 +749,7 @@ private:
  *
  * //...fill permutation and its inverse with reasonable values
  *
- *     // Define and initialize preconditioner
+ * // Define and initialize preconditioner
  *
  * PreconditionPSOR<SparseMatrix<double> > precondition;
  * precondition.initialize (A, permutation, inverse_permutation, .6);

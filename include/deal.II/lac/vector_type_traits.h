@@ -31,12 +31,14 @@ DEAL_II_NAMESPACE_OPEN
  * The specialization
  * @code
  *   template <>
- *   struct is_serial_vector< VectorType > : std::true_type {};
+ *   struct is_serial_vector<VectorType> : std::true_type
+ *   {};
  * @endcode
  * for a serial vector type, respectively,
  * @code
  *   template <>
- *   struct is_serial_vector< VectorType > : std::false_type {};
+ *   struct is_serial_vector<VectorType> : std::false_type
+ *   {};
  * @endcode
  * for a vector type with support of distributed storage,
  * must be done in a header file of a vector declaration.

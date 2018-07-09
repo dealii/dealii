@@ -236,7 +236,7 @@ namespace LinearAlgebra
      * @code
      * struct Functor
      * {
-     *    void operator() (Number &value);
+     *   void operator() (Number &value);
      * };
      * @endcode
      *

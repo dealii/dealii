@@ -49,35 +49,35 @@ class SparseMatrix;
  *
  * <h3>Usage</h3> The simplest use of this class is the following:
  * @code
- *                                  // generate a @p SolverControl and
- *                                  // a @p VectorMemory
+ * // generate a @p SolverControl and a @p VectorMemory
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
- *                                  // generate a solver
+ *
+ * // generate a solver
  * SolverCG<SparseMatrix<double>, Vector<double> > solver(control, memory);
- *                                  // generate a @p PreconditionSelector
+ *
+ * // generate a @p PreconditionSelector
  * PreconditionSelector<SparseMatrix<double>, Vector<double> >
  *   preconditioning("jacobi", 1.);
- *                                  // give a matrix whose diagonal entries
- *                                  // are to be used for the preconditioning.
- *                                  // Generally the matrix of the linear
- *                                  // equation system Ax=b.
+ *
+ * // give a matrix whose diagonal entries are to be used for the
+ * // preconditioning. Generally the matrix of the linear equation system Ax=b.
  * preconditioning.use_matrix(A);
- *                                  // call the @p solve function with this
- *                                  // preconditioning as last argument
+ *
+ * // call the @p solve function with this preconditioning as last argument
  * solver.solve(A,x,b,preconditioning);
  * @endcode
  * The same example where also the @p SolverSelector class is used reads
  * @code
- *                                  // generate a @p SolverControl and
- *                                  // a @p VectorMemory
+ * // generate a @p SolverControl and a @p VectorMemory
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
- *                                  // generate a @p SolverSelector that
- *                                  // calls the @p SolverCG
+ *
+ * // generate a @p SolverSelector that calls the @p SolverCG
  * SolverSelector<SparseMatrix<double>, Vector<double> >
  *   solver_selector("cg", control, memory);
- *                                  // generate a @p PreconditionSelector
+ *
+ * // generate a @p PreconditionSelector
  * PreconditionSelector<SparseMatrix<double>, Vector<double> >
  *   preconditioning("jacobi", 1.);
  *
