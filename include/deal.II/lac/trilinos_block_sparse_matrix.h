@@ -640,8 +640,9 @@ namespace TrilinosWrappers
         TrilinosBlockPayload(const Args &...)
         {
           static_assert(
-            typeid(PayloadBlockType) ==
-              typeid(internal::LinearOperatorImplementation::TrilinosPayload),
+            std::is_same<
+              PayloadBlockType,
+              internal::LinearOperatorImplementation::TrilinosPayload>::value,
             "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
         }
       };
