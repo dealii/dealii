@@ -36,15 +36,18 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Degrees of freedom</h3>
  * The BR1 element has <i>dim</i> degrees of freedom on each node and 1 on each
- * face. The shape functions are ordered by the $(Q_1)^d$ shape functions supported on each
- * vertex, increasing according to vertex ordering on the element in GeometryInfo, then the
- * bubble functions follow in the ordering given in PolynomialsBernardiRaugel.
- * 
- * This element only has 1 degree (degree $p=1$) because it yields an LBB stable pair BR1-P0
- * for Stokes problems which is lower degree than the Taylor-Hood element. The pair is
- * sometimes referred to as an enriched P1-P0 element or a reduced P2-P0 element.
+ * face. The shape functions are ordered by the $(Q_1)^d$ shape functions
+ * supported on each vertex, increasing according to vertex ordering on the
+ * element in GeometryInfo, then the bubble functions follow in the ordering
+ * given in PolynomialsBernardiRaugel.
  *
- * This element does not support hanging nodes or multigrid in the current implementation.
+ * This element only has 1 degree (degree $p=1$) because it yields an LBB stable
+ * pair BR1-P0 for Stokes problems which is lower degree than the Taylor-Hood
+ * element. The pair is sometimes referred to as an enriched P1-P0 element or a
+ * reduced P2-P0 element.
+ *
+ * This element does not support hanging nodes or multigrid in the current
+ * implementation.
  *
  */
 template <int dim>
@@ -55,7 +58,7 @@ public:
   /**
    * Constructor for the Bernardi-Raugel element of degree @p p. The only
    * supported degree is 1.
-   * 
+   *
    * @arg p: The degree of the element $p=1$ for $BR_1$.
    */
   FE_BernardiRaugel(const unsigned int p = 1);
