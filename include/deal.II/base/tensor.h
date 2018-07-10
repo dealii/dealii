@@ -1079,18 +1079,15 @@ namespace internal
 
 
     template <typename ArrayElementType>
-    DEAL_II_CUDA_HOST_DEV ArrayElementType &
-                          subscript(ArrayElementType *,
-                                    const unsigned int,
-                                    std::integral_constant<int, 0>)
+    ArrayElementType &
+    subscript(ArrayElementType *,
+              const unsigned int,
+              std::integral_constant<int, 0>)
     {
-      // We cannot use Assert in a CUDA kernel
-#ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
-#endif
       static ArrayElementType t;
       return t;
     }
