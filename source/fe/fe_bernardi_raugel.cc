@@ -70,7 +70,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
 
 template <int dim>
 std::string
-FE_BernardiRaugel<dim>::get_name() const
+FE_BernardiRaugel<dim>::get_name() const override
 {
   std::ostringstream namebuf;
   namebuf << "FE_BR<" << dim << ">(" << 1 << ")";
@@ -81,7 +81,7 @@ FE_BernardiRaugel<dim>::get_name() const
 
 template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
-FE_BernardiRaugel<dim>::clone() const
+FE_BernardiRaugel<dim>::clone() const override
 {
   return std_cxx14::make_unique<FE_BernardiRaugel<dim>>(*this);
 }
@@ -92,7 +92,7 @@ template <int dim>
 void
 FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
-  std::vector<double> &              nodal_values) const
+  std::vector<double> &              nodal_values) const override
 {
   Assert(support_point_values.size() == this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
