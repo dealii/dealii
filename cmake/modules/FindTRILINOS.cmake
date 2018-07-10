@@ -25,11 +25,7 @@
 #   TRILINOS_VERSION_MAJOR
 #   TRILINOS_VERSION_MINOR
 #   TRILINOS_VERSION_SUBMINOR
-#   TRILINOS_WITH_MANDATORY_CXX11
 #   TRILINOS_WITH_MPI
-#   TRILINOS_SUPPORTS_CPP11
-#   TRILINOS_HAS_C99_TR1_WORKAROUND
-#   TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
 #
 
 SET(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
@@ -114,99 +110,6 @@ IF(EXISTS ${EPETRA_CONFIG_H})
   ENDIF()
 ENDIF()
 
-#
-# Look for Sacado_config.h - we'll query it to determine C++11 support:
-#
-DEAL_II_FIND_FILE(SACADO_CONFIG_H Sacado_config.h
-  HINTS ${Trilinos_INCLUDE_DIRS}
-  NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
-  NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
-  )
-
-SET(TRILINOS_WITH_MANDATORY_CXX11 FALSE)
-IF(EXISTS ${SACADO_CONFIG_H})
-  #
-  # Determine whether Trilinos was configured with C++11 support and
-  # enabling C++11 in deal.II is mandatory.
-  #
-  FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
-    REGEX "#define HAVE_SACADO_CXX11")
-  IF(NOT "${SACADO_CXX11_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_MANDATORY_CXX11 TRUE)
-  ENDIF()
-ENDIF()
-
-#
-# Some versions of Sacado_cmath.hpp do things that aren't compatible
-# with the -std=c++0x flag of GCC, see deal.II FAQ.
-# Test whether that is indeed the case:
-#
-
-DEAL_II_FIND_FILE(SACADO_CMATH_HPP Sacado_cmath.hpp
-  HINTS ${Trilinos_INCLUDE_DIRS}
-  NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
-  NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
-  )
-
-IF(EXISTS ${SACADO_CMATH_HPP})
-  LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <Sacado_cmath.hpp>
-    int main(){ return 0; }
-    "
-    TRILINOS_SUPPORTS_CPP11
-    )
-
-  #
-  # Try whether exporting HAS_C99_TR1_CMATH helps:
-  #
-  PUSH_CMAKE_REQUIRED("-DHAS_C99_TR1_CMATH")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <Sacado_cmath.hpp>
-    int main(){ return 0; }
-    "
-    TRILINOS_HAS_C99_TR1_WORKAROUND
-    )
-  RESET_CMAKE_REQUIRED()
-ENDIF()
-
-#
-# GCC 6.3.0 has a bug that prevents the creation of complex
-# numbers templated on Sacado::Rad::ADvar types:
-#
-# include/c++/6.3.0/complex: In instantiation of ‘struct std::complex<Sacado::Rad::ADvar<double> >’:
-# include/c++/6.3.0/complex:206:16: error: ‘std::complex<_Tp>& std::complex<_Tp>::operator=(const std::complex<_Tp>&) [with _Tp = Sacado::Rad::ADvar<double>]’ declared to take const reference, but implicit declaration would take non-const
-#
-# Test whether the compiler hits this issue
-#
-DEAL_II_FIND_FILE(SACADO_TRAD_HPP Sacado_trad.hpp
-  HINTS ${Trilinos_INCLUDE_DIRS}
-  NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
-  NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
-  )
-
-IF(EXISTS ${SACADO_TRAD_HPP})
-  LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <Sacado_trad.hpp>
-    int main ()
-    {
-      Sacado::Rad::ADvar<double> sacado_rad_double; // Works
-      std::complex<Sacado::Rad::ADvar<double> > complex_sacado_rad_double; // Doesn't work
-      return 0;
-    }
-    "
-    TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-    )
-  RESET_CMAKE_REQUIRED()
-ENDIF()
 
 #
 # *Boy* Sanitize variables that are exported by TrilinosConfig.cmake...
@@ -257,6 +160,6 @@ DEAL_II_PACKAGE_HANDLE(TRILINOS
     OPTIONAL Trilinos_TPL_INCLUDE_DIRS
   CLEAR
     TRILINOS_CONFIG_DIR EPETRA_CONFIG_H SACADO_CMATH_HPP ${_libraries}
-    TRILINOS_SUPPORTS_CPP11 TRILINOS_HAS_C99_TR1_WORKAROUND SACADO_CONFIG_H
+    SACADO_CONFIG_H
     TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
   )

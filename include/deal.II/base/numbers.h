@@ -53,7 +53,7 @@ DEAL_II_NAMESPACE_CLOSE
 // but header indirectly references numbers.h. We therefore simply
 // import the whole Sacado header at this point to get the math
 // functions imported into the standard namespace.
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
 #  include <Sacado.hpp>
 #endif
 
