@@ -139,7 +139,7 @@ public:
    * required by the FiniteElement classes.
    */
   static unsigned int
-  compute_n_pols(unsigned int degree);
+  compute_n_pols(const unsigned int k);
 
 
 private:

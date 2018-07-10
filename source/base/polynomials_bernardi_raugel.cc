@@ -233,7 +233,7 @@ PolynomialsBernardiRaugel<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsBernardiRaugel<dim>::compute_n_pols(unsigned int k)
+PolynomialsBernardiRaugel<dim>::compute_n_pols(const unsigned int k)
 {
   (void)k;
   Assert(k == 1, ExcNotImplemented());
