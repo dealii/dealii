@@ -90,6 +90,36 @@ namespace parallel
      * interpolated_solution.update_ghost_values();
      * @endcode
      *
+     * As the grid is distributed, it is important to note that the old
+     * solution(s) must be copied to one that also provides access to the
+     * locally relevant DoF values (these values required for the interpolation
+     * process):
+     * @code
+     * // Create initial indexsets pertaining to the grid before refinement
+     * IndexSet locally_owned_dofs, locally_relevant_dofs;
+     * locally_owned_dofs = dof_handler.locally_owned_dofs();
+     * DoFTools::extract_locally_relevant_dofs(dof_handler,
+     * locally_relevant_dofs);
+     *
+     * // The solution vector only knows about locally owned DoFs
+     * TrilinosWrappers::MPI::Vector solution;
+     * solution.reinit(locally_owned_dofs,
+     *                 mpi_communicator);
+     * ...
+     * // Transfer solution to vector that provides access to locally relevant
+     * DoFs TrilinosWrappers::MPI::Vector old_solution;
+     * old_solution.reinit(locally_owned_dofs,
+     *                     locally_relevant_dofs,
+     *                     mpi_communicator);
+     * old_solution = solution;
+     * ...
+     * // Refine grid
+     * // Recreate locally_owned_dofs and locally_relevant_dofs index sets
+     * ...
+     * solution.reinit(locally_owned_dofs, mpi_communicator);
+     * soltrans.refine_interpolate(old_solution, solution);
+     * @endcode
+     *
      * <h3>Use for Serialization</h3>
      *
      * This class can be used to serialize and later deserialize a distributed
