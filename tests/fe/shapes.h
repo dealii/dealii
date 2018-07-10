@@ -78,28 +78,24 @@ plot_shape_functions(Mapping<dim> &      mapping,
                   for (unsigned int c = 0; c < fe.get_fe().n_components(); ++c)
                     {
                       if (fe.get_fe().system_to_component_index(i).first == c)
-                        AssertThrow(
-                          (fe.shape_value(i, k) ==
-                           fe.shape_value_component(i, k, c)) &&
-                            (fe.shape_grad(i, k) ==
-                             fe.shape_grad_component(i, k, c)) &&
-                            (fe.shape_hessian(i, k) ==
-                             fe.shape_hessian_component(i, k, c)),
-                          ExcInternalError()) else AssertThrow((fe
-                                                                  .shape_value_component(
-                                                                    i, k, c) ==
-                                                                0) &&
-                                                                 (fe.shape_grad_component(
-                                                                    i, k, c) ==
-                                                                  Tensor<
-                                                                    1,
-                                                                    dim>()) &&
-                                                                 (fe.shape_hessian_component(
-                                                                    i, k, c) ==
-                                                                  Tensor<
-                                                                    2,
-                                                                    dim>()),
-                                                               ExcInternalError());
+                        {
+                          AssertThrow((fe.shape_value(i, k) ==
+                                         fe.shape_value_component(i, k, c) &&
+                                       fe.shape_grad(i, k) ==
+                                         fe.shape_grad_component(i, k, c) &&
+                                       fe.shape_hessian(i, k) ==
+                                         fe.shape_hessian_component(i, k, c)),
+                                      ExcInternalError());
+                        }
+                      else
+                        {
+                          AssertThrow((fe.shape_value_component(i, k, c) == 0 &&
+                                       fe.shape_grad_component(i, k, c) ==
+                                         Tensor<1, dim>() &&
+                                       fe.shape_hessian_component(i, k, c) ==
+                                         Tensor<2, dim>()),
+                                      ExcInternalError());
+                        }
                     };
                 }
               deallog << std::endl;

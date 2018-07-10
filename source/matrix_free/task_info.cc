@@ -952,10 +952,13 @@ namespace internal
             cell_partition_data.push_back(n_cells);
         }
       if (cell_vectorization_categories_strict == true)
-        Assert(n_cells >= n_macro_cells + n_ghost_slots,
-               ExcInternalError()) else AssertDimension(n_cells,
-                                                        n_macro_cells +
-                                                          n_ghost_slots);
+        {
+          Assert(n_cells >= n_macro_cells + n_ghost_slots, ExcInternalError());
+        }
+      else
+        {
+          AssertDimension(n_cells, n_macro_cells + n_ghost_slots);
+        }
       AssertDimension(cell_partition_data.back(), n_cells);
       AssertDimension(counter, n_active_cells + n_ghost_cells);
 
