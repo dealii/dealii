@@ -584,10 +584,13 @@ namespace Step33
            ExcInternalError());
 
     if (do_schlieren_plot == true)
-      Assert(computed_quantities[0].size() == dim + 2,
-             ExcInternalError()) else Assert(computed_quantities[0].size() ==
-                                               dim + 1,
-                                             ExcInternalError());
+      {
+        Assert(computed_quantities[0].size() == dim + 2, ExcInternalError());
+      }
+    else
+      {
+        Assert(computed_quantities[0].size() == dim + 1, ExcInternalError());
+      }
 
     // Then loop over all quadrature points and do our work there. The code
     // should be pretty self-explanatory. The order of output variables is

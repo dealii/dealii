@@ -53,18 +53,25 @@ check1()
 
       for (unsigned int c = 0; c < dim + 2; ++c)
         if (c == 0 || c == dim + 1)
-          AssertThrow(object.value(p, c) == 0,
-                      ExcInternalError()) else AssertThrow(object.value(p, c) ==
-                                                             p[c - 1],
-                                                           ExcInternalError());
+          {
+            AssertThrow(object.value(p, c) == 0, ExcInternalError());
+          }
+        else
+          {
+            AssertThrow(object.value(p, c) == p[c - 1], ExcInternalError());
+          }
 
       Vector<double> v(dim + 2);
       object.vector_value(p, v);
       for (unsigned int c = 0; c < dim + 2; ++c)
         if (c == 0 || c == dim + 1)
-          AssertThrow(v(c) == 0,
-                      ExcInternalError()) else AssertThrow(v(c) == p[c - 1],
-                                                           ExcInternalError());
+          {
+            AssertThrow(v(c) == 0, ExcInternalError());
+          }
+        else
+          {
+            AssertThrow(v(c) == p[c - 1], ExcInternalError());
+          }
     }
 
   deallog << "OK" << std::endl;

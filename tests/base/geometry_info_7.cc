@@ -85,11 +85,15 @@ test()
             // other faces are
             // squashed
             if (f < 2)
-              AssertThrow(
-                alternating_forms[v].norm() == 1,
-                ExcInternalError()) else AssertThrow(alternating_forms[v]
-                                                         .norm() == 0.1,
-                                                     ExcInternalError());
+              {
+                AssertThrow(alternating_forms[v].norm() == 1,
+                            ExcInternalError());
+              }
+            else
+              {
+                AssertThrow(alternating_forms[v].norm() == 0.1,
+                            ExcInternalError());
+              }
           }
       }
   }
@@ -127,23 +131,20 @@ test()
             deallog << "Squashed+rotated cell: face " << f << ": "
                     << alternating_forms[v] << std::endl;
 
-            // in 2d and 3d, faces
-            // 0,1 should be
-            // unaffected (just like
-            // for the squashed cell,
-            // the rotation has
-            // nothing to do with
-            // face numbers though
-            // the direction of the
-            // alternating form
-            // vector would have
+            // in 2d and 3d, faces 0,1 should be unaffected (just like for the
+            // squashed cell, the rotation has nothing to do with face numbers
+            // though the direction of the alternating form vector would have
             // rotated along)
             if (f < 2)
-              AssertThrow(
-                alternating_forms[v].norm() == 1,
-                ExcInternalError()) else AssertThrow(alternating_forms[v]
-                                                         .norm() == 0.1,
-                                                     ExcInternalError());
+              {
+                AssertThrow(alternating_forms[v].norm() == 1,
+                            ExcInternalError());
+              }
+            else
+              {
+                AssertThrow(alternating_forms[v].norm() == 0.1,
+                            ExcInternalError());
+              }
           }
       }
   }

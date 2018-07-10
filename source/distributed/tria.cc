@@ -3272,13 +3272,17 @@ namespace parallel
         (void)total_local_cells;
 
         if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
-          Assert(
-            static_cast<unsigned int>(parallel_forest->local_num_quadrants) ==
-              total_local_cells,
-            ExcInternalError()) else Assert(static_cast<unsigned int>(parallel_forest
-                                                                        ->local_num_quadrants) <=
-                                              total_local_cells,
-                                            ExcInternalError());
+          {
+            Assert(static_cast<unsigned int>(
+                     parallel_forest->local_num_quadrants) == total_local_cells,
+                   ExcInternalError());
+          }
+        else
+          {
+            Assert(static_cast<unsigned int>(
+                     parallel_forest->local_num_quadrants) <= total_local_cells,
+                   ExcInternalError());
+          }
 
         // count the number of owned, active cells and compare with p4est.
         unsigned int n_owned = 0;
