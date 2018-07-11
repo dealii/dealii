@@ -66,19 +66,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
     ENDIF()
 
-    IF (${var})
-      FOREACH(_optional_module ROL Sacado Zoltan)
-      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
-      IF(_module_found)
-          MESSAGE(STATUS "Found ${_optional_module}")
-          STRING(TOUPPER "${_optional_module}" _optional_module_upper)
-          SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
-      ELSE()
-          MESSAGE(STATUS "Module ${_optional_module} not found!")
-      ENDIF()
-      ENDFOREACH()
-    ENDIF()
-
     #
     # We require at least Trilinos 12.4
     #
@@ -156,6 +143,21 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
+    CHECK_MPI_INTERFACE(TRILINOS ${var})
+
+    IF (${var})
+      FOREACH(_optional_module ROL Sacado Zoltan)
+      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
+      IF(_module_found)
+          MESSAGE(STATUS "Found ${_optional_module}")
+          STRING(TOUPPER "${_optional_module}" _optional_module_upper)
+          SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
+      ELSE()
+          MESSAGE(STATUS "Module ${_optional_module} not found!")
+      ENDIF()
+      ENDFOREACH()
+    ENDIF()
+
     IF(${DEAL_II_TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
@@ -211,8 +213,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
 
     ENDIF()
-
-    CHECK_MPI_INTERFACE(TRILINOS ${var})
   ENDIF()
 ENDMACRO()
 
