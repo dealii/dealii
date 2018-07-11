@@ -51,8 +51,8 @@ struct copy_data
 
 void
 assemble(const std::vector<int>::iterator &it,
-         scratch_data &                    scratch,
-         copy_data &                       data)
+         scratch_data & /*scratch*/,
+         copy_data &data)
 {
   data.value = (*it);
 }

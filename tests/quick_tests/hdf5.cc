@@ -16,10 +16,11 @@
 // Test HDF5. Copy-paste from
 // https://support.hdfgroup.org/HDF5/Tutor/crtfile.html
 
+#include <deal.II/base/exceptions.h>
+
 #include <hdf5.h>
 
 #include <cstdio>
-
 int
 main()
 {
@@ -31,5 +32,6 @@ main()
 
   /* Terminate access to the file. */
   status = H5Fclose(file_id);
+  AssertThrow(status >= 0, dealii::ExcInternalError());
   std::remove("file.h5");
 }

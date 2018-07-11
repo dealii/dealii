@@ -66,9 +66,9 @@ private:
   FE_Q<2>          fe;
   DoFHandler<2>    dof_handler;
 
-  PETScWrappers::SparseMatrix A;
-  PETScWrappers::MPI::Vector  b, x;
-  AffineConstraints<double>   constraints;
+  PETScWrappers::SparseMatrix    A;
+  PETScWrappers::MPI::Vector     b, x;
+  AffineConstraints<PetscScalar> constraints;
 
   TableHandler output_table;
 };
@@ -111,8 +111,8 @@ LaplaceProblem::assemble_system()
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double> cell_A(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_b(dofs_per_cell);
+  FullMatrix<PetscScalar> cell_A(dofs_per_cell, dofs_per_cell);
+  Vector<PetscScalar>     cell_b(dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
