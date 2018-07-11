@@ -81,7 +81,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     DH : DOFHANDLER_TEMPLATES)
+     DH : DOFHANDLER_TEMPLATES;
+     number : REAL_AND_COMPLEX_SCALARS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace VectorTools
@@ -92,8 +93,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const std::map<types::boundary_id,
-                       const Function<deal_II_space_dimension, double> *> &,
-        AffineConstraints<double> &,
+                       const Function<deal_II_space_dimension, number> *> &,
+        AffineConstraints<number> &,
         const ComponentMask &);
 
       template void
@@ -101,49 +102,24 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const types::boundary_id,
-        const Function<deal_II_space_dimension> &,
-        AffineConstraints<double> &,
-        const ComponentMask &);
-
-      template void
-      interpolate_boundary_values(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const types::boundary_id,
-        const Function<deal_II_space_dimension, float> &,
-        AffineConstraints<float> &,
+        const Function<deal_II_space_dimension, number> &,
+        AffineConstraints<number> &,
         const ComponentMask &);
 
       template void
       interpolate_boundary_values(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const types::boundary_id,
-        const Function<deal_II_space_dimension> &,
-        AffineConstraints<double> &,
-        const ComponentMask &);
-
-      template void
-      interpolate_boundary_values(
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const types::boundary_id,
-        const Function<deal_II_space_dimension, float> &,
-        AffineConstraints<float> &,
+        const Function<deal_II_space_dimension, number> &,
+        AffineConstraints<number> &,
         const ComponentMask &);
 
       template void
       interpolate_boundary_values(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const std::map<types::boundary_id,
-                       const Function<deal_II_space_dimension, double> *> &,
-        AffineConstraints<double> &,
-        const ComponentMask &);
-
-      template void
-      interpolate_boundary_values(
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const std::map<types::boundary_id,
-                       const Function<deal_II_space_dimension, float> *> &,
-        AffineConstraints<float> &,
+                       const Function<deal_II_space_dimension, number> *> &,
+        AffineConstraints<number> &,
         const ComponentMask &);
 
     \}
