@@ -74,7 +74,7 @@ public:
 
     typedef Vector<double> VectorType;
 
-    time_stepper.residual = [&](const double      t,
+    time_stepper.residual = [&](const double /*t*/,
                                 const VectorType &y,
                                 const VectorType &y_dot,
                                 VectorType &      res) -> int {
@@ -105,10 +105,10 @@ public:
       return 0;
     };
 
-    time_stepper.output_step = [&](const double       t,
-                                   const VectorType & sol,
-                                   const VectorType & sol_dot,
-                                   const unsigned int step_number) -> int {
+    time_stepper.output_step = [&](const double /*t*/,
+                                   const VectorType & /*sol*/,
+                                   const VectorType & /*sol_dot*/,
+                                   const unsigned int /*step_number*/) -> int {
       // In this test, don't output anything.
       return 0;
     };

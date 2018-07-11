@@ -67,8 +67,8 @@ private:
 
   PETScWrappers::SparseMatrix             A, B;
   std::vector<PETScWrappers::MPI::Vector> x;
-  std::vector<double>                     lambda;
-  AffineConstraints<double>               constraints;
+  std::vector<PetscScalar>                lambda;
+  AffineConstraints<PetscScalar>          constraints;
 
   TableHandler output_table;
 };
@@ -117,8 +117,8 @@ LaplaceEigenspectrumProblem::assemble_system()
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double> cell_A(dofs_per_cell, dofs_per_cell);
-  FullMatrix<double> cell_B(dofs_per_cell, dofs_per_cell);
+  FullMatrix<PetscScalar> cell_A(dofs_per_cell, dofs_per_cell);
+  FullMatrix<PetscScalar> cell_B(dofs_per_cell, dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -187,8 +187,8 @@ LaplaceEigenspectrumProblem::solve()
 
 
   // some output
-  output_table.add_value("lambda", lambda[0]);
-  output_table.add_value("error", std::fabs(2. - lambda[0]));
+  output_table.add_value("lambda", std::abs(lambda[0]));
+  output_table.add_value("error", std::fabs(2. - std::abs(lambda[0])));
 }
 
 void
@@ -209,9 +209,9 @@ LaplaceEigenspectrumProblem::run()
       solve();
 
       // check energy convergence with previous result
-      AssertThrow(lambda[0] < old_lambda,
+      AssertThrow(std::abs(lambda[0]) < old_lambda,
                   ExcMessage("solution is not converging"));
-      old_lambda = lambda[0];
+      old_lambda = std::abs(lambda[0]);
     }
 
   // push back analytic result
