@@ -29,8 +29,6 @@
 
 std::ofstream logfile("output");
 
-char buf[1000];
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
