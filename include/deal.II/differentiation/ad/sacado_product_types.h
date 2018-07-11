@@ -20,7 +20,7 @@
 
 #include <deal.II/base/template_constraints.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
 
 #  include <Sacado.hpp>
 // It appears that some versions of Trilinos do not directly or indirectly

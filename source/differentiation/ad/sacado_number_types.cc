@@ -16,7 +16,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
 
 #  include <deal.II/differentiation/ad/sacado_number_types.h>
 
