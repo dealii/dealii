@@ -310,7 +310,7 @@ namespace GridGenerator
    * Generate a rectangular plate with an (offset) cylindrical hole. The
    * geometry consists of 2 regions:
    * The first is a square region with length @p outer_radius and a hole of radius @p inner_radius .
-   * Cells in this regions will have TransfiniteInterpolationManifold with
+   * Cells in this region will have TransfiniteInterpolationManifold with
    * manifold id @p tfi_manifold_id attached to them. Additionally, the boundary
    * faces of the hole will be associated with a PolarManifold (in 2D) or
    * CylindricalManifold (in 3D). The center of this
@@ -319,7 +319,7 @@ namespace GridGenerator
    * The second region describes the remainder of the bulk material. It is
    * specified via padding
    * parameters @p pad_bottom, @p padding_top, @p padding_left and @p padding_right.
-   * All cells in this regions will have a FlatManifold attached to them.
+   * All cells in this region will have a FlatManifold attached to them.
    * The final width of the plate will be <code>padding_left + 2*outer_radius +
    * padding_right</code>, while its length is <code>padding_top +
    * 2*outer_radius + padding_bottom</code>. Three out of four paddings are
