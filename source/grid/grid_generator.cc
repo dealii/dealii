@@ -1934,21 +1934,23 @@ namespace GridGenerator
   namespace internal
   {
     // helper function to check if point is in 2D box
-    bool inline point_in_box(const Point<2> &p,
-                             const Point<2> &c,
-                             const double    radius)
+    bool inline point_in_2d_box(const Point<2> &p,
+                                const Point<2> &c,
+                                const double    radius)
     {
       return (std::abs(p[0] - c[0]) < radius) &&
              (std::abs(p[1] - c[1]) < radius);
     }
 
-    bool inline point_in_box(const Point<3> &p,
-                             const Point<3> &center,
-                             const double    radius)
+    // same as above but will ingore the third component
+    // of both points
+    bool inline point_in_2d_box(const Point<3> &p,
+                                const Point<3> &center,
+                                const double    radius)
     {
-      return point_in_box(Point<2>(p[0], p[1]),
-                          Point<2>(center[0], center[1]),
-                          radius);
+      return point_in_2d_box(Point<2>(p[0], p[1]),
+                             Point<2>(center[0], center[1]),
+                             radius);
     }
 
     /**
@@ -2045,7 +2047,7 @@ namespace GridGenerator
       // now remove cells reserved from the cylindrical hole
       std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
       for (const auto &cell : bulk_tria.active_cell_iterators())
-        if (point_in_box(cell->center(), center, outer_radius))
+        if (point_in_2d_box(cell->center(), center, outer_radius))
           cells_to_remove.insert(cell);
 
       Triangulation<2> tria_without_cylinder;
@@ -2079,7 +2081,7 @@ namespace GridGenerator
                 {
                   const auto &face = cell->face(face_n);
                   if (face->at_boundary() &&
-                      point_in_box(face->center(), center, outer_radius))
+                      point_in_2d_box(face->center(), center, outer_radius))
                     face->set_manifold_id(polar_manifold_id);
                   else
                     face->set_manifold_id(tfi_manifold_id);
@@ -2224,9 +2226,9 @@ namespace GridGenerator
               // similar check to 2D version
               const auto face = cell->face(face_n);
               if (face->at_boundary() &&
-                  internal::point_in_box(face->center(),
-                                         new_center,
-                                         outer_radius) &&
+                  internal::point_in_2d_box(face->center(),
+                                            new_center,
+                                            outer_radius) &&
                   std::abs(
                     flat_manifold.normal_vector(face, face->center())[2]) <
                     1.0e-10)
