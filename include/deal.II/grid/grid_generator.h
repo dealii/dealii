@@ -311,19 +311,19 @@ namespace GridGenerator
    * geometry consists of 2 regions:
    * The first is a square region with length @p outer_radius and a hole of radius @p inner_radius .
    * Cells in this regions will have TransfiniteInterpolationManifold with
-   * manifold id
-   * @p tfi_manifold_id attached to them. Additionally, the boundary faces of
-   * the hole will be associated with a PolarManifold (in 2D) or
+   * manifold id @p tfi_manifold_id attached to them. Additionally, the boundary
+   * faces of the hole will be associated with a PolarManifold (in 2D) or
    * CylindricalManifold (in 3D). The center of this
-   * regions can be prescribed via @p center , namely the axis of the hole will
+   * region can be prescribed via @p center , namely the axis of the hole will
    * be located at @p center .
    * The second region describes the remainder of the bulk material. It is
    * specified via padding
-   * parameters @p pad_bottom, @p padding_top, @p padding_left and @padding_right.
+   * parameters @p pad_bottom, @p padding_top, @p padding_left and @p padding_right.
    * All cells in this regions will have a FlatManifold attached to them.
    * The final width of the plate will be <code>padding_left + 2*outer_radius +
-   * padding_right</code>, where it length is <code>padding_top + 2*outer_radius
-   * + padding_bottom</code>. Three out of four paddings is allowed to be zero.
+   * padding_right</code>, while its length is <code>padding_top +
+   * 2*outer_radius + padding_bottom</code>. Three out of four paddings are
+   * allowed to be zero.
    *
    * Here is the non-symmetric grid (after one global refinement, colored
    * according to manifold id) in 2D:
@@ -335,8 +335,7 @@ namespace GridGenerator
    * @image html plate_with_a_hole_3D.png
    *
    * In 3D, triangulation will be extruded in the z-direction by the total
-   * height of
-   * @p L using @p n_slices slices (minimum is 2).
+   * height of @p L using @p n_slices slices (minimum is 2).
    * If the @p colorize flag is <code>true</code>, the boundary_ids of the boundary
    * faces are assigned, such that the lower one in the x-direction is 0, the
    * upper one is 1. The indicators for the surfaces in the y-direction are 2

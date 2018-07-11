@@ -90,7 +90,7 @@ test()
     }
 
   // write in vtk for visual inspection
-  if (true)
+  if (false)
     {
       DoFHandler<dim> dof_handler(triangulation);
       FE_Q<dim>       fe(1);
