@@ -643,21 +643,24 @@ namespace Step9
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
+          // Alias the AssemblyScratchData object to keep the lines from
+          // getting too long:
+          const auto &sd = scratch_data;
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             copy_data.cell_matrix(i, j) +=
-              ((scratch_data.advection_directions[q_point] *
-                scratch_data.fe_values.shape_grad(j, q_point) *
-                (scratch_data.fe_values.shape_value(i, q_point) +
-                 delta * (scratch_data.advection_directions[q_point] *
-                          scratch_data.fe_values.shape_grad(i, q_point)))) *
-               scratch_data.fe_values.JxW(q_point));
+              ((sd.fe_values.shape_value(i, q_point) +           // (phi_i +
+                delta * (sd.advection_directions[q_point] *      // delta beta
+                         sd.fe_values.shape_grad(i, q_point))) * // grad phi_i)
+               sd.advection_directions[q_point] *                // beta
+               sd.fe_values.shape_grad(j, q_point)) *            // grad phi_j
+              sd.fe_values.JxW(q_point);                         // dx
 
           copy_data.cell_rhs(i) +=
-            ((scratch_data.fe_values.shape_value(i, q_point) +
-              delta * (scratch_data.advection_directions[q_point] *
-                       scratch_data.fe_values.shape_grad(i, q_point))) *
-             scratch_data.rhs_values[q_point] *
-             scratch_data.fe_values.JxW(q_point));
+            (sd.fe_values.shape_value(i, q_point) +           // (phi_i +
+             delta * (sd.advection_directions[q_point] *      // delta beta
+                      sd.fe_values.shape_grad(i, q_point))) * // grad phi_i)
+            sd.rhs_values[q_point] *                          // f
+            sd.fe_values.JxW(q_point);                        // dx
         }
 
     // Besides the cell terms which we have built up now, the bilinear
