@@ -1020,19 +1020,17 @@ namespace TrilinosWrappers
   {
     Assert(row < n_rows(), ExcInternalError());
 
-    // get a representation of the
-    // present row
-    TrilinosWrappers::types::int_type ncols = -1;
+    // Get a representation of the where the present row is located on
+    // the current processor
     TrilinosWrappers::types::int_type local_row =
       graph->LRID(static_cast<TrilinosWrappers::types::int_type>(row));
 
-    // on the processor who owns this
-    // row, we'll have a non-negative
-    // value.
+    // On the processor who owns this row, we'll have a non-negative
+    // value for `local_row` and can ask for the length of the row.
     if (local_row >= 0)
-      ncols = graph->NumMyIndices(local_row);
-
-    return static_cast<size_type>(ncols);
+      return graph->NumMyIndices(local_row);
+    else
+      return static_cast<size_type>(-1);
   }
 
 

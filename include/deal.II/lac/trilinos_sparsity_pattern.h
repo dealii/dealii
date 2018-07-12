@@ -910,7 +910,12 @@ namespace TrilinosWrappers
     n_nonzero_elements() const;
 
     /**
-     * Number of entries in a specific row.
+     * Return the number of entries in the given row.
+     *
+     * In a parallel context, the row in question may of course not be
+     * stored on the current processor, and in that case it is not
+     * possible to query the number of entries in it. In that case,
+     * the returned value is `static_cast<size_type>(-1)`.
      */
     size_type
     row_length(const size_type row) const;
