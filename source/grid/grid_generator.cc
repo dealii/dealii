@@ -1999,7 +1999,7 @@ namespace GridGenerator
                                                       colorize);
 
       // Mark the cylinder material ids as 2 to distinguish them from the bulk
-      // cells (these are read again about 40 lines down)
+      // cells (these are read again in the loop that sets manifold ids)
       for (const auto &cell : cylinder_tria.active_cell_iterators())
         cell->set_material_id(2);
 
