@@ -197,7 +197,54 @@ namespace Utilities
                    "There is no point in communicating with ourselves."));
         }
 
+#  if DEAL_II_MPI_VERSION_GTE(2, 2)
+      // Get a binary vector from the `destinations`
+      std::vector<unsigned int> dest_vector(n_procs);
+      for (const auto &el : destinations)
+        dest_vector[el] = 1;
 
+      // Find how many processes will send to this one
+      // by reducing with sum and then scattering the
+      // results over all processes
+      unsigned int n_recv_from;
+      const int    ierr = MPI_Reduce_scatter_block(
+        &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
+
+      AssertThrowMPI(ierr);
+
+      // Send myid to every process in `destinations` vector...
+      std::vector<MPI_Request> send_requests(destinations.size());
+      for (const auto &el : destinations)
+        MPI_Isend(&myid,
+                  1,
+                  MPI_UNSIGNED,
+                  el,
+                  32766,
+                  mpi_comm,
+                  &send_requests[&el - &destinations[0]]);
+
+      // if no one to receive from, return an empty vector
+      if (n_recv_from == 0)
+        return std::vector<unsigned int>();
+
+      // ...otherwise receive `n_recv_from` times from the processes
+      // who communicate with this one. Store the obtained id's
+      // in the resulting vector
+      std::vector<unsigned int> origins(n_recv_from);
+      for (auto &el : origins)
+        MPI_Recv(&el,
+                 1,
+                 MPI_UNSIGNED,
+                 MPI_ANY_SOURCE,
+                 32766,
+                 mpi_comm,
+                 MPI_STATUS_IGNORE);
+
+      MPI_Waitall(destinations.size(),
+                  send_requests.data(),
+                  MPI_STATUSES_IGNORE);
+      return origins;
+#  else
       // let all processors communicate the maximal number of destinations
       // they have
       const unsigned int max_n_destinations =
@@ -242,6 +289,7 @@ namespace Utilities
             break;
 
       return origins;
+#  endif
     }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2017 by the deal.II authors
+// Copyright (C) 2009 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,13 +15,15 @@
 
 
 
-// check if mpi is working
+// Check if point-to-point communication
+// works correctly with MPI_Reduce_scatter_block
+// implementation
 
 #include <deal.II/base/utilities.h>
 
-#include "../tests.h"
+#include <algorithm>
 
-//#include <mpi.h>
+#include "../tests.h"
 
 
 void
@@ -74,6 +76,7 @@ test_mpi()
   std::vector<unsigned int> origins =
     Utilities::MPI::compute_point_to_point_communication_pattern(MPI_COMM_WORLD,
                                                                  destinations);
+  std::sort(origins.begin(), origins.end());
 
   if (myid == 0)
     {
