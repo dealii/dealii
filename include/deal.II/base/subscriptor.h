@@ -27,7 +27,7 @@
 #include <typeinfo>
 
 #ifdef DEAL_II_WITH_THREADS
-#include <mutex>
+#  include <mutex>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -133,7 +133,8 @@ public:
    * List the subscribers to the input @p stream.
    */
   template <typename StreamType>
-  void list_subscribers (StreamType &stream) const;
+  void
+  list_subscribers(StreamType &stream) const;
 
   /**
    * List the subscribers to @p deallog.
@@ -271,21 +272,16 @@ Subscriptor::serialize(Archive &, const unsigned int)
 }
 
 template <typename StreamType>
-inline
-void
+inline void
 Subscriptor::list_subscribers(StreamType &stream) const
 {
 #ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
 #endif
 
-  for (map_iterator it = counter_map.begin();
-       it != counter_map.end(); ++it)
-    stream
-        << it->second << '/'
-        << counter << " subscriptions from \""
-        << it->first << '\"'
-        << std::endl;
+  for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
+    stream << it->second << '/' << counter << " subscriptions from \""
+           << it->first << '\"' << std::endl;
 }
 
 DEAL_II_NAMESPACE_CLOSE
