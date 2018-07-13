@@ -305,6 +305,62 @@ namespace GridGenerator
          const std::vector<unsigned int> &holes);
 
   /**
+   * \brief Rectangular plate with an (offset) cylindrical hole.
+   *
+   * Generate a rectangular plate with an (offset) cylindrical hole. The
+   * geometry consists of 2 regions:
+   * The first is a square region with length @p outer_radius and a hole of radius @p inner_radius .
+   * Cells in this region will have TransfiniteInterpolationManifold with
+   * manifold id @p tfi_manifold_id attached to them. Additionally, the boundary
+   * faces of the hole will be associated with a PolarManifold (in 2D) or
+   * CylindricalManifold (in 3D). The center of this
+   * region can be prescribed via @p center , namely the axis of the hole will
+   * be located at @p center .
+   * The second region describes the remainder of the bulk material. It is
+   * specified via padding
+   * parameters @p pad_bottom, @p padding_top, @p padding_left and @p padding_right.
+   * All cells in this region will have a FlatManifold attached to them.
+   * The final width of the plate will be <code>padding_left + 2*outer_radius +
+   * padding_right</code>, while its length is <code>padding_top +
+   * 2*outer_radius + padding_bottom</code>. Three out of four paddings are
+   * allowed to be zero.
+   *
+   * Here is the non-symmetric grid (after one global refinement, colored
+   * according to manifold id) in 2D:
+   *
+   * @image html plate_with_a_hole.png
+   *
+   * and in 3D:
+   *
+   * @image html plate_with_a_hole_3D.png
+   *
+   * In 3D, triangulation will be extruded in the z-direction by the total
+   * height of @p L using @p n_slices slices (minimum is 2).
+   * If the @p colorize flag is <code>true</code>, the boundary_ids of the boundary
+   * faces are assigned, such that the lower one in the x-direction is 0, the
+   * upper one is 1. The indicators for the surfaces in the y-direction are 2
+   * and 3, and the ones for the z-direction are 5 and 6. The hole boundary has
+   * indicator 4.
+   *
+   * @author Denis Davydov, 2018
+   */
+  template <int dim>
+  void
+  plate_with_a_hole(Triangulation<dim> &     tria,
+                    const double             inner_radius      = 0.4,
+                    const double             outer_radius      = 1.,
+                    const double             pad_bottom        = 2.,
+                    const double             pad_top           = 2.,
+                    const double             pad_left          = 1.,
+                    const double             pad_right         = 1.,
+                    const Point<dim>         center            = Point<dim>(),
+                    const types::manifold_id polar_manifold_id = 0,
+                    const types::manifold_id tfi_manifold_id   = 1,
+                    const double             L                 = 1.,
+                    const unsigned int       n_slices          = 2,
+                    const bool               colorize          = false);
+
+  /**
    * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
    * responsibility of the user to provide the vertices in the right order (see
    * the documentation of the GeometryInfo class) because the vertices are
@@ -1310,6 +1366,35 @@ namespace GridGenerator
                    "The input to this function is oriented in a way that will"
                    " cause all cells to have negative measure.");
   ///@}
+
+#ifndef DOXYGEN
+  // These functions are only implemented with specializations; declare them
+  // here
+  template <>
+  void hyper_cube_with_cylindrical_hole(Triangulation<1> &,
+                                        const double,
+                                        const double,
+                                        const double,
+                                        const unsigned int,
+                                        const bool);
+
+  template <>
+  void hyper_cube_with_cylindrical_hole(Triangulation<2> &,
+                                        const double,
+                                        const double,
+                                        const double,
+                                        const unsigned int,
+                                        const bool);
+
+  template <>
+  void hyper_cube_with_cylindrical_hole(Triangulation<3> &,
+                                        const double,
+                                        const double,
+                                        const double,
+                                        const unsigned int,
+                                        const bool);
+#endif
+
 } // namespace GridGenerator
 
 
