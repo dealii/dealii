@@ -41,12 +41,12 @@ namespace TrilinosWrappers
       if (this->a_row == sparsity_pattern->n_rows())
         {
           colnum_cache.reset();
-
           return;
         }
 
-      // otherwise first flush Trilinos caches
-      sparsity_pattern->compress();
+      // otherwise first flush Trilinos caches if necessary
+      if (!sparsity_pattern->is_compressed())
+        sparsity_pattern->compress();
 
       colnum_cache = std::make_shared<std::vector<size_type>>(
         sparsity_pattern->row_length(this->a_row));
@@ -815,14 +815,16 @@ namespace TrilinosWrappers
         ierr = graph->FillComplete(*column_space_map,
                                    static_cast<const Epetra_Map &>(
                                      graph->RangeMap()));
+        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
     else
-      ierr = graph->GlobalAssemble(*column_space_map,
-                                   static_cast<const Epetra_Map &>(
-                                     graph->RangeMap()),
-                                   true);
-
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      {
+        ierr = graph->GlobalAssemble(*column_space_map,
+                                     static_cast<const Epetra_Map &>(
+                                       graph->RangeMap()),
+                                     true);
+        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      }
 
     ierr = graph->OptimizeStorage();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));

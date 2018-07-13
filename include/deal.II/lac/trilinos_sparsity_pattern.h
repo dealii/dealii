@@ -1293,6 +1293,7 @@ namespace TrilinosWrappers
     {}
 
 
+
     inline Iterator::Iterator(const Iterator &) = default;
 
 
@@ -1305,18 +1306,23 @@ namespace TrilinosWrappers
 
       ++accessor.a_index;
 
-      // If at end of line: do one
-      // step, then cycle until we
-      // find a row with a nonzero
-      // number of entries.
+      // If at end of line: do one step, then cycle until we find a row with a
+      // nonzero number of entries that is stored locally.
       if (accessor.a_index >= accessor.colnum_cache->size())
         {
           accessor.a_index = 0;
           ++accessor.a_row;
 
-          while ((accessor.a_row < accessor.sparsity_pattern->n_rows()) &&
-                 (accessor.sparsity_pattern->row_length(accessor.a_row) == 0))
-            ++accessor.a_row;
+          while (accessor.a_row < accessor.sparsity_pattern->n_rows())
+            {
+              const auto row_length =
+                accessor.sparsity_pattern->row_length(accessor.a_row);
+              if (row_length == 0 ||
+                  row_length == static_cast<SparsityPattern::size_type>(-1))
+                ++accessor.a_row;
+              else
+                break;
+            }
 
           accessor.visit_present_row();
         }
@@ -1381,7 +1387,8 @@ namespace TrilinosWrappers
   inline SparsityPattern::const_iterator
   SparsityPattern::begin() const
   {
-    return const_iterator(this, 0, 0);
+    const size_type first_valid_row = this->local_range().first;
+    return const_iterator(this, first_valid_row, 0);
   }
 
 
