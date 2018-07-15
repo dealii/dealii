@@ -4,14 +4,14 @@
 
 In this example, our aims are the following:
 <ol>
-  <li> solve the advection equation $\beta \cdot \nabla u = f$;
-  <li> show how we can use multiple threads to get quicker to
-    the desired results if we have a multi-processor machine;
-  <li> develop a simple refinement criterion.
+  <li>solve the advection equation $\beta \cdot \nabla u = f$;
+  <li>show how we can use multiple threads to get results quicker if we have a
+    multi-processor machine;
+  <li>develop a simple refinement criterion.
 </ol>
 While the second aim is difficult to describe in general terms without
 reference to the code, we will discuss the other two aims in the
-following. The use of multiple threads will then be detailed at the
+following text. The use of multiple threads will then be detailed at the
 relevant places within the program. We will, however, follow the
 general discussion of the WorkStream approach detailed in the
 @ref threads "Parallel computing with multiple processors accessing shared memory"
@@ -25,7 +25,7 @@ solution of the advection equation
 @f[
   \beta \cdot \nabla u = f,
 @f]
-where $\beta$ is a vector field that describes advection direction and
+where $\beta$ is a vector field that describes the advection direction and
 speed (which may be dependent on the space variables), $f$ is a source
 function, and $u$ is the solution. The physical process that this
 equation describes is that of a given flow field $\beta$, with which
@@ -55,7 +55,7 @@ pose any boundary condition on the outflow part of the boundary.
 
 As stated, the transport equation cannot be solved in a stable way using
 the standard finite element method, however. The problem is that
-solutions to this equation possess only insufficient regularity
+solutions to this equation possess insufficient regularity
 perpendicular to the transport direction: while they are smooth along
 the streamlines defined by the "wind field"
 $\beta$, they may be discontinuous perpendicular to this
@@ -68,16 +68,17 @@ discontinuity will simply be transported along the streamline of the
 wind field that starts at this boundary point.
 
 These discontinuities lead to numerical instabilities that
-make a stable solution by a straight-forward discretization
+make a stable solution by a standard continuous finite element discretization
 impossible. We will thus use the streamline diffusion stabilized
 formulation, in which we test the equation with test functions $v +
 \delta \beta\cdot\nabla v$ instead of $v$, where $\delta$ is a
 parameter that is chosen in the range of the (local) mesh width $h$;
-good results are usually obtained by setting $\delta=0.1h$. Note that
-the modification in the test function vanishes as the mesh size tends
-to zero. The modification in the test function can be thought as
+good results are usually obtained by setting $\delta=0.1h$.
+The modification in the test function can be thought as
 adding a small amount of diffusion along the direction $\beta$ of the
-wind field, i.e., along "stream lines".
+wind field, i.e., along "stream lines". The value added here is small enough
+that we do not introduce excessive diffusion and also large enough that the
+linear system can be solved in a reasonable amount of time.
 We will not discuss reasons, pros, and cons of the streamline
 diffusion method, but rather use it "as is", and refer the
 interested reader to the sufficiently available literature; every
@@ -177,11 +178,10 @@ as system matrix. We will assemble this matrix in the program.
 
 <h3>Solving the linear system that corresponds to the advection equation</h3>
 
-As the
-resulting matrix is no longer symmetric positive definite, we can't
-employ the usual Conjugate Gradient method (implemented in the
-SolverCG class) any more. Instead, we use the BiCGStab (bi-conjugate gradients
-stabilized) method (implemented in SolverBicgstab) that is suitable
+As the resulting matrix is no longer symmetric positive definite, we cannot
+use the usual Conjugate Gradient method (implemented in the
+SolverCG class) to solve the system. Instead, we use the BiCGStab (bi-conjugate
+gradient stabilized) method (implemented in SolverBicgstab) that is suitable
 for problems of the kind we have here.
 
 
