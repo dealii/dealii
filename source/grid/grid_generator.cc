@@ -4145,6 +4145,18 @@ namespace GridGenerator
                        const double duplicated_vertex_tolerance,
                        const bool   copy_manifold_ids)
   {
+    // if either Triangulation is empty then merging is just a copy.
+    if (triangulation_1.n_cells() == 0)
+      {
+        result.copy_triangulation(triangulation_2);
+        return;
+      }
+    if (triangulation_2.n_cells() == 0)
+      {
+        result.copy_triangulation(triangulation_1);
+        return;
+      }
+
     Assert(triangulation_1.n_levels() == 1,
            ExcMessage("The input triangulations must be non-empty "
                       "and must not be refined."));
