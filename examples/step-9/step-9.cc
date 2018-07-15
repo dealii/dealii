@@ -27,7 +27,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
@@ -759,27 +759,36 @@ namespace Step9
   // Here comes the linear solver routine. As the system is no longer
   // symmetric positive definite as in all the previous examples, we cannot
   // use the Conjugate Gradient method anymore. Rather, we use a solver that
-  // is tailored to nonsymmetric systems like the one at hand, the BiCGStab
-  // method. As preconditioner, we use the Jacobi method.
+  // is more general and does not rely on any special properties of the
+  // matrix: the GMRES method. GMRES, like the conjugate gradient method,
+  // requires a decent preconditioner: we use a Jacobi preconditioner here,
+  // which works well enough for this problem.
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl    solver_control(1000, 1e-12);
-    SolverBicgstab<> bicgstab(solver_control);
-
+    SolverControl        solver_control(std::max<std::size_t>(1000,
+                                                       system_rhs.size() / 10),
+                                 1e-10 * system_rhs.l2_norm());
+    SolverGMRES<>        solver(solver_control);
     PreconditionJacobi<> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
+    solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    bicgstab.solve(system_matrix, solution, system_rhs, preconditioner);
+    Vector<double> residual(dof_handler.n_dofs());
+
+    system_matrix.vmult(residual, solution);
+    residual -= system_rhs;
+    std::cout << "   Iterations required for convergence: "
+              << solver_control.last_step() << '\n'
+              << "   Max norm of residual:                "
+              << residual.linfty_norm() << '\n';
 
     hanging_node_constraints.distribute(solution);
   }
 
   // The following function refines the grid according to the quantity
   // described in the introduction. The respective computations are made in
-  // the class <code>GradientEstimation</code>. The only difference to
-  // previous examples is that we refine a little more aggressively (0.5
-  // instead of 0.3 of the number of cells).
+  // the class <code>GradientEstimation</code>.
   template <int dim>
   void AdvectionProblem<dim>::refine_grid()
   {
@@ -791,7 +800,7 @@ namespace Step9
 
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                     estimated_error_per_cell,
-                                                    0.5,
+                                                    0.3,
                                                     0.03);
 
     triangulation.execute_coarsening_and_refinement();
@@ -850,14 +859,14 @@ namespace Step9
   template <int dim>
   void AdvectionProblem<dim>::run()
   {
-    for (unsigned int cycle = 0; cycle < 6; ++cycle)
+    for (unsigned int cycle = 0; cycle < 10; ++cycle)
       {
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           {
             GridGenerator::hyper_cube(triangulation, -1, 1);
-            triangulation.refine_global(4);
+            triangulation.refine_global(3);
           }
         else
           {
@@ -865,13 +874,13 @@ namespace Step9
           }
 
 
-        std::cout << "   Number of active cells:       "
+        std::cout << "   Number of active cells:              "
                   << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-                  << std::endl;
+        std::cout << "   Number of degrees of freedom:        "
+                  << dof_handler.n_dofs() << std::endl;
 
         assemble_system();
         solve();

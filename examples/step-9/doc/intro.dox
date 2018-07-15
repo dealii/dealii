@@ -180,8 +180,8 @@ as system matrix. We will assemble this matrix in the program.
 
 As the resulting matrix is no longer symmetric positive definite, we cannot
 use the usual Conjugate Gradient method (implemented in the
-SolverCG class) to solve the system. Instead, we use the BiCGStab (bi-conjugate
-gradient stabilized) method (implemented in SolverBicgstab) that is suitable
+SolverCG class) to solve the system. Instead, we use the GMRES (Generalized
+Minimum RESidual) method (implemented in SolverGMRES) that is suitable
 for problems of the kind we have here.
 
 
