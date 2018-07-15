@@ -254,6 +254,6 @@ struct EnableIfScalar<Sacado::Rad::ADvari<T>>
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_TRILINOS
+#endif // DEAL_II_TRILINOS_WITH_SACADO
 
 #endif
