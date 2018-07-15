@@ -130,18 +130,15 @@ AffineConstraints<number>::is_consistent_in_parallel(
   const MPI_Comm               mpi_communicator,
   const bool                   verbose) const
 {
-  ConstraintLine empty;
-  empty.inhomogeneity = 0.0;
-
-  // Helper to return a reference to the ConstraintLine object that belongs to row @p row.
-  // We don't want to make copies but to return a reference, we need an empty
-  // object that we store above.
-  auto get_line = [&](const size_type row) -> const ConstraintLine & {
+  // Helper to return a ConstraintLine object that belongs to row @p row.
+  // If @p row is not constrained or not stored locally, return an empty
+  // constraint object that would correspond to a zero constraints
+  auto get_line = [&](const size_type row) -> ConstraintLine {
     const size_type line_index = calculate_line_index(row);
     if (line_index >= lines_cache.size() ||
         lines_cache[line_index] == numbers::invalid_size_type)
       {
-        empty.index = row;
+        const ConstraintLine empty = {row, {}, 0.0};
         return empty;
       }
     else
@@ -167,7 +164,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
       IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
       for (const auto row_idx : indices_to_send)
         {
-          to_send[owner].push_back(get_line(row_idx));
+          to_send[owner].emplace_back(get_line(row_idx));
         }
     }
 
@@ -182,7 +179,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
       // for each incoming line:
       for (auto &lineit : kv.second)
         {
-          const ConstraintLine &reference = get_line(lineit.index);
+          const ConstraintLine reference = get_line(lineit.index);
 
           if (lineit.inhomogeneity != reference.inhomogeneity)
             {
