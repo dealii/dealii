@@ -992,6 +992,88 @@ namespace GridGenerator
                                    const bool          colorize     = false);
 
   /**
+   * Produce a grid consisting of concentric shells. The primary difference
+   * between this function and GridGenerator::hyper_shell is that this
+   * function permits unevenly spaced (in the radial direction) coarse level
+   * cells.
+   *
+   * The parameters @p center, @p inner_radius, and @p outer_radius behave in
+   * the same way as the first three arguments to
+   * GridGenerator::hyper_shell. @p n_shells gives the total number of shells
+   * to use (i.e., the number of cells in the radial direction). The outer
+   * radius of the $k$th shell is given by
+   *
+   * @f[
+   *     r = r_{\text{inner}} + (r_\text{outer} - r_\text{inner})
+   *     \frac{1 - \tanh(\text{skewness}(1 - k/\text{n_shells}))}
+   *          {\tanh(\text{skewness})}
+   * @f]
+   *
+   * where @p skewness is a parameter controlling the shell spacing in the
+   * radial direction: values of @p skewness close to zero correspond to even
+   * spacing, while larger values of @p skewness (such as $2$ or $3$)
+   * correspond to shells biased to the inner radius.
+   *
+   * @p n_cells_per_shell is the same as in GridGenerator::hyper_shell: in 2d
+   * the default choice of zero will result in 8 cells per shell (and 12 in
+   * 3d). The only valid values in 3d are 6 (the default), 12, and 96 cells:
+   * see the documentation of GridGenerator::hyper_shell for more information.
+   *
+   * If @p colorize is <code>true</code> then the outer boundary of the merged
+   * shells has a boundary id of $1$ and the inner boundary has a boundary id
+   * of $0$.
+   *
+   * Example: The following code (see, e.g., step-10 for instructions on how
+   * to visualize GNUPLOT output)
+   *
+   * @code
+   * #include <deal.II/fe/mapping_q_generic.h>
+   *
+   * #include <deal.II/grid/grid_generator.h>
+   * #include <deal.II/grid/grid_out.h>
+   * #include <deal.II/grid/tria.h>
+   *
+   * #include <fstream>
+   *
+   * int main()
+   * {
+   *   using namespace dealii;
+   *
+   *   Triangulation<2> triangulation;
+   *   GridGenerator::concentric_hyper_shells(triangulation,
+   *                                          Point<2>(),
+   *                                          1.0,
+   *                                          2.0,
+   *                                          5u,
+   *                                          2.0);
+   *
+   *   GridOut grid_out;
+   *   GridOutFlags::Gnuplot gnuplot_flags(false, 10, true);
+   *   grid_out.set_flags(gnuplot_flags);
+   *
+   *   const MappingQGeneric<2> mapping(3);
+   *   std::ofstream out("out.gpl");
+   *   grid_out.write_gnuplot(triangulation, out, &mapping);
+   * }
+   * @endcode
+   *
+   * generates the following output:
+   *
+   * @image html concentric_hyper_shells_2d.svg
+   *
+   */
+  template <int dim>
+  void
+  concentric_hyper_shells(Triangulation<dim> &triangulation,
+                          const Point<dim> &  center,
+                          const double        inner_radius      = 0.125,
+                          const double        outer_radius      = 0.25,
+                          const unsigned int  n_shells          = 1,
+                          const double        skewness          = 0.1,
+                          const unsigned int  n_cells_per_shell = 0,
+                          const bool          colorize          = false);
+
+  /**
    * Produce a ring of cells in 3d that is cut open, twisted and glued
    * together again. This results in a kind of moebius-loop.
    *
