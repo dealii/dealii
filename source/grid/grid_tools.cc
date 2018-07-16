@@ -586,16 +586,19 @@ namespace GridTools
           }
       }
 
-    // now we got a renumbering list. simply
-    // renumber all vertices (non-duplicate
-    // vertices get renumbered to themselves, so
-    // nothing bad happens). after that, the
-    // duplicate vertices will be unused, so call
-    // delete_unused_vertices() to do that part
-    // of the job.
-    for (unsigned int c = 0; c < cells.size(); ++c)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-        cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
+    // now we got a renumbering list. simply renumber all vertices
+    // (non-duplicate vertices get renumbered to themselves, so nothing bad
+    // happens). after that, the duplicate vertices will be unused, so call
+    // delete_unused_vertices() to do that part of the job.
+    for (auto &cell : cells)
+      for (auto &vertex_index : cell.vertices)
+        vertex_index = new_vertex_numbers[vertex_index];
+    for (auto &quad : subcelldata.boundary_quads)
+      for (auto &vertex_index : quad.vertices)
+        vertex_index = new_vertex_numbers[vertex_index];
+    for (auto &line : subcelldata.boundary_lines)
+      for (auto &vertex_index : line.vertices)
+        vertex_index = new_vertex_numbers[vertex_index];
 
     delete_unused_vertices(vertices, cells, subcelldata);
   }
