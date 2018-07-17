@@ -1086,15 +1086,19 @@ namespace Threads
      * the returned object, instead of the returned object. This
      * allows writing code such as
      * @code
-     *   Threads::Thread<int> t = Threads::new_thread (...function returning an
-     * int...); t.return_value() = 42;      // overwrite returned value int i =
-     * t.return_value();   // i is now 42
+     *   Threads::Thread<int> t = Threads::new_thread (
+     *     ...function returning an int...);
+     *   t.return_value() = 42;      // overwrite returned value
+     *   int i = t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
      * the function needs to return a writable (non-@p const) reference to
      * support code such as this:
      * @code
-     *   std::unique_ptr<int> create_int (const std::string &s) { ... }
+     *   std::unique_ptr<int> create_int (const std::string &s)
+     *   {
+     *     ...
+     *   }
      *
      *   void f()
      *   {

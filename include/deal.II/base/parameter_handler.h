@@ -66,12 +66,12 @@ class MultipleParameterLoop;
  *     ...
  *     ParameterHandler prm;
  *     prm.declare_entry ("Time step size",
- *                       "0.2",
- *                       Patterns::Double(),
- *                       "Some documentation");
+ *                        "0.2",
+ *                        Patterns::Double(),
+ *                        "Some documentation");
  *     prm.declare_entry ("Geometry",
- *                       "[0,1]x[0,1]",
- *                       Patterns::Anything());
+ *                        "[0,1]x[0,1]",
+ *                        Patterns::Anything());
  *     ...
  *   @endcode
  * Each entry is declared using the function declare_entry(). The first
@@ -91,43 +91,45 @@ class MultipleParameterLoop;
  * example input parameters for linear solver routines should be classified in
  * a subsection named <tt>Linear solver</tt> or any other suitable name. This
  * is accomplished in the following way:
- *   @code
- *     ...
- *       LinEq eq;
- *       eq.declare_parameters (prm);
- *     ...
+ * @code
+ * ...
+ * LinEq eq;
+ * eq.declare_parameters (prm);
+ * ...
  *
- *     void LinEq::declare_parameters (ParameterHandler &prm) {
- *       prm.enter_subsection("Linear solver");
- *       {
- *         prm.declare_entry ("Solver",
- *                            "CG",
- *                            Patterns::Selection("CG|GMRES|GaussElim"),
- *                            "Name of a linear solver for the inner
- * iteration"); prm.declare_entry ("Maximum number of iterations", "20",
- *                            ParameterHandler::RegularExpressions::Integer());
- *         ...
- *       }
- *       prm.leave_subsection ();
- *     }
- *   @endcode
+ * void LinEq::declare_parameters (ParameterHandler &prm)
+ * {
+ *   prm.enter_subsection("Linear solver");
+ *   {
+ *     prm.declare_entry ("Solver",
+ *                        "CG",
+ *                        Patterns::Selection("CG|GMRES|GaussElim"),
+ *                        "Name of a linear solver for the inner iteration");
+ *     prm.declare_entry ("Maximum number of iterations", "20",
+ *                        ParameterHandler::RegularExpressions::Integer());
+ *     ...
+ *   }
+ *   prm.leave_subsection ();
+ * }
+ * @endcode
  *
  * Subsections may be nested. For example a nonlinear solver may have a linear
  * solver as member object. Then the function call tree would be something
  * like (if the class <tt>NonLinEq</tt> has a member variables <tt>eq</tt> of
  * type <tt>LinEq</tt>):
- *   @code
- *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
- *       prm.enter_subsection ("Nonlinear solver");
- *       {
- *         prm.declare_entry ("Nonlinear method",
- *                            "Newton-Raphson",
- *                            ParameterHandler::RegularExpressions::Anything());
- *         eq.declare_parameters (prm);
- *       }
- *       prm.leave_subsection ();
- *     }
- *   @endcode
+ * @code
+ * void NonLinEq::declare_parameters (ParameterHandler &prm)
+ * {
+ *   prm.enter_subsection ("Nonlinear solver");
+ *   {
+ *     prm.declare_entry ("Nonlinear method",
+ *                        "Newton-Raphson",
+ *                        ParameterHandler::RegularExpressions::Anything());
+ *     eq.declare_parameters (prm);
+ *   }
+ *   prm.leave_subsection ();
+ * }
+ * @endcode
  *
  * For class member functions which declare the different entries we propose
  * to use the common name <tt>declare_parameters</tt>. In normal cases this
@@ -137,25 +139,26 @@ class MultipleParameterLoop;
  * has two or more member variables of the same type both of which should have
  * their own parameters, this parent class' method <tt>declare_parameters</tt>
  * is responsible to group them into different subsections:
- *   @code
- *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
- *       prm.enter_subsection ("Nonlinear solver");
- *       {
- *         prm.enter_subsection ("Linear solver 1");
- *         {
- *           eq1.declare_parameters (prm);
- *         }
- *         prm.leave_subsection ();
- *
- *         prm.enter_subsection ("Linear solver 2");
- *         {
- *           eq2.declare_parameters (prm);
- *         }
- *         prm.leave_subsection ();
- *       }
- *       prm.leave_subsection ();
+ * @code
+ * void NonLinEq::declare_parameters (ParameterHandler &prm)
+ * {
+ *   prm.enter_subsection ("Nonlinear solver");
+ *   {
+ *     prm.enter_subsection ("Linear solver 1");
+ *     {
+ *       eq1.declare_parameters (prm);
  *     }
- *   @endcode
+ *     prm.leave_subsection ();
+ *
+ *     prm.enter_subsection ("Linear solver 2");
+ *     {
+ *       eq2.declare_parameters (prm);
+ *     }
+ *     prm.leave_subsection ();
+ *   }
+ *   prm.leave_subsection ();
+ * }
+ * @endcode
  *
  *
  * <h3>Input files and special characters</h3>
@@ -257,7 +260,8 @@ class MultipleParameterLoop;
  * Each class gets its data out of a ParameterHandler object by calling the
  * get()  member functions like this:
  *   @code
- *      void NonLinEq::get_parameters (ParameterHandler &prm) {
+ *     void NonLinEq::get_parameters (ParameterHandler &prm)
+ *     {
  *       prm.enter_subsection ("Nonlinear solver");
  *       std::string method = prm.get ("Nonlinear method");
  *       eq.get_parameters (prm);
@@ -343,8 +347,7 @@ class MultipleParameterLoop;
  *     prm.declare_entry ("Number of iterations",  // name of parameter
  *                        "10",                    // default value
  *                        Patterns::Integer(1,100),// allowed values: 1...100
- *                        "The number of ...");    // some documentation, to be
- * completed
+ *                        "The number of ...");    // some documentation
  *
  *     // next read the parameter from an input file...
  *     prm.parse_input ("my_algorithm.prm");
@@ -371,9 +374,10 @@ class MultipleParameterLoop;
  *     prm.declare_entry ("Number of iterations",  // name of parameter
  *                        "10",                    // default value
  *                        Patterns::Integer(1,100),// allowed values: 1...100
- *                        "The number of ...");    // some documentation, to be
- * completed prm.add_action ("Number of iterations",
- *                     [&](const std::string &value) {
+ *                        "The number of ...");    // some documentation
+ *     prm.add_action ("Number of iterations",
+ *                     [&](const std::string &value)
+ *                     {
  *                       this->n_iterations = Utilities::string_to_int(value);
  *                     });
  *
@@ -495,11 +499,12 @@ class MultipleParameterLoop;
  *   void Problem::declare_parameters (ParameterHandler &prm)
  *   {
  *     // first some global parameter entries
- *     prm.declare_entry ("Output file",
- *                        "out",
- *                        Patterns::Anything(),
- *                        "Name of the output file, either relative to the
- * present " "path or absolute"); prm.declare_entry ("Equation 1", "Laplace",
+ *     prm.declare_entry (
+ *       "Output file",
+ *       "out",
+ *       Patterns::Anything(),
+ *       "Name of the output file, either relative or absolute");
+ *     prm.declare_entry ("Equation 1", "Laplace",
  *                        Patterns::Anything(),
  *                        "String identifying the equation we want to solve");
  *     prm.declare_entry ("Equation 2",
@@ -553,11 +558,11 @@ class MultipleParameterLoop;
  *       eq2.get_parameters (prm); // for eq2
  *     }
  *     prm.leave_subsection ();
- *     std::cout << "  Problem: outfile=" << outfile << '\n'
- *               << "           eq1="     << equation1 << ", eq2=" << equation2
- * << '\n'
- *               << "           matrix1=" << matrix1 << ", matrix2=" << matrix2
- *               << std::endl;
+ *     std::cout
+ *       << "  Problem: outfile=" << outfile << '\n'
+ *       << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
+ *       << "           matrix1=" << matrix1 << ", matrix2=" << matrix2
+ *       << std::endl;
  *   }
  *
  *
@@ -693,13 +698,17 @@ class MultipleParameterLoop;
  *                        "up on a matrix.");
  *     prm.enter_subsection ("Preconditioner");
  *     {
- *       prm.declare_entry ("Kind",
- *                          "SSOR",
- *                          Patterns::Selection ("SSOR|Jacobi"),
- *                          "A string that describes the kind of preconditioner
- * " "to use."); prm.declare_entry ("Relaxation factor", "1.0", Patterns::Double
- * (0, 1), "The numerical value (between zero and one) for the " "relaxation
- * factor to use in the preconditioner.");
+ *       prm.declare_entry(
+ *         "Kind",
+ *         "SSOR",
+ *         Patterns::Selection ("SSOR|Jacobi"),
+ *         "A string that describes the kind of preconditioner to use.");
+ *       prm.declare_entry(
+ *         "Relaxation factor",
+ *         "1.0",
+ *         Patterns::Double (0, 1),
+ *         "The numerical value (between zero and one) for the "
+ *         "relaxation factor to use in the preconditioner.");
  *     }
  *     prm.leave_subsection ();
  *   @endcode
@@ -751,26 +760,35 @@ class MultipleParameterLoop;
  *     <Maximal_20number_20of_20iterations>
  *       <value>10</value>
  *       <default_value>10</default_value>
- *       <documentation>A parameter that describes the maximal number of
- * iterations the CG method is to take before giving up on a
- * matrix.</documentation> <pattern>0</pattern> <pattern_description>[Integer
- * range 1...1000 (inclusive)]</pattern_description>
+ *       <documentation>
+ *         A parameter that describes the maximal number of iterations the CG
+ *         method is to take before giving up on a matrix.
+ *       </documentation>
+ *       <pattern>0</pattern>
+ *       <pattern_description>
+ *         [Integer range 1...1000 (inclusive)]
+ *       </pattern_description>
  *     </Maximal_20number_20of_20iterations>
  *     <Preconditioner>
  *       <Kind><value>SSOR</value>
  *         <default_value>SSOR</default_value>
- *         <documentation>A string that describes the kind of preconditioner to
- * use.</documentation> <pattern>1</pattern>
+ *         <documentation>
+ *           A string that describes the kind of preconditioner to use.
+ *         </documentation>
+ *         <pattern>1</pattern>
  *         <pattern_description>SSOR|Jacobi</pattern_description>
  *       </Kind>
  *       <Relaxation_20factor>
  *         <value>1.0</value>
  *         <default_value>1.0</default_value>
- *         <documentation>The numerical value (between zero and one) for the
- * relaxation factor to use in the preconditioner.</documentation>
+ *         <documentation>
+ *           The numerical value (between zero and one) for the relaxation
+ *           factor to use in the preconditioner.
+ *         </documentation>
  *         <pattern>2</pattern>
- *         <pattern_description>[Floating point range 0...1
- * (inclusive)]</pattern_description>
+ *         <pattern_description>
+ *           [Floating point range 0...1 (inclusive)]
+ *         </pattern_description>
  *       </Relaxation_20factor>
  *     </Preconditioner>
  *   <ParameterHandler>
@@ -937,8 +955,8 @@ public:
    *                   << "> with default values for you."
    *                   << std::endl;
    *         std::ofstream output (filename);
-   *         parameter_handler.print_parameters (output,
-   *                                             ParameterHandler::OutputStyle::Text);
+   *         parameter_handler.print_parameters(
+   *           output, ParameterHandler::OutputStyle::Text);
    *       }
    *   }
    * @endcode
@@ -1279,8 +1297,8 @@ public:
    * @code
    * \usepackage{imakeidx}
    * \makeindex[name=prmindex, title=Index of run-time parameter entries]
-   * \makeindex[name=prmindexfull, title=Index of run-time parameters with
-   * section names]
+   * \makeindex[name=prmindexfull,
+   *            title=Index of run-time parameters with section names]
    * @endcode
    * and at the end of the file this:
    * @code

@@ -584,12 +584,24 @@ namespace Utilities
    *
    * An example of how this function works is as follows:
    * @code
-   *   class B { ... };            // A base class. Assume that it has virtual
-   *                               // functions so that dynamic_cast can work.
-   *   class D : public B { ... }; // A derived class
+   *   // A base class. Assume that it has virtual
+   *   // functions so that dynamic_cast can work.
+   *   class B
+   *   {
+   *     ...
+   *   };
    *
+   *   // A derived class
+   *   class D : public B
+   *   {
+   *     ...
+   *   };
    *
-   *   std::unique_ptr<B> create_object (...) {...}  // A factory function
+   *   // A factory function
+   *   std::unique_ptr<B> create_object (...)
+   *   {
+   *     ...
+   *   }
    *
    *   void foo (...)
    *   {

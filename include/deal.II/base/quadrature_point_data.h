@@ -299,7 +299,7 @@ namespace parallel
      * This class can then be use with CellDataStorage in the following way:
      * @code
      * CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,MyQData>
-     * data_storage;
+     *   data_storage;
      * parallel::distributed::ContinuousQuadratureDataTransfer<dim,MyQData>
      * data_transfer(FE_Q<dim>(2),QGauss<dim>(3),QGauss<dim>(4));
      * //...populate data for all active cells in data_storage
@@ -307,7 +307,8 @@ namespace parallel
      * data_transfer.prepare_for_coarsening_and_refinement(triangulation,data_storage);
      * triangulation.execute_coarsening_and_refinement();
      * //...initialize quadrature point data on new cells by calling
-     * CellDataStorage::reinit() data_transfer.interpolate();
+     * // CellDataStorage::initialize()
+     * data_transfer.interpolate();
      * @endcode
      * This approach can be extended to quadrature point data with Tensors of
      * arbitrary order, although with a little bit more work in packing and

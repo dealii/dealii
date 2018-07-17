@@ -1268,8 +1268,8 @@ namespace Patterns
    * ... // Build compare class
    * std::map<std::vector<unsigned int>, std::vector<double>, compare> map;
    *
-   * map = convert<decltype(map)>::to_value("1,2,3 : 5.0,6.0,7.0  ; 8,9,10 :
-   * 11.0,12.0,13.0");
+   * map = convert<decltype(map)>::to_value(
+   *   "1,2,3 : 5.0,6.0,7.0  ; 8,9,10 : 11.0,12.0,13.0");
    *
    * @endcode
    *
