@@ -67,9 +67,9 @@ namespace GridGenerator
    * of dimensions, where the limits are given as arguments. They default to
    * zero and unity, then producing the unit hypercube.
    *
-   * If the argument @p colorize is false, all boundary indicators are set to
-   * zero (the default boundary indicator) for 2d and 3d. If it is true, the
-   * boundary is
+   * If the argument @p colorize is false, then all boundary indicators are
+   * set to zero (the default boundary indicator) for 2d and 3d. If it is
+   * true, the boundary is
    * @ref GlossColorization "colorized" as in hyper_rectangle(). In 1d the
    * indicators are always colorized, see hyper_rectangle().
    *
@@ -146,17 +146,15 @@ namespace GridGenerator
    * Create a coordinate-parallel brick from the two diagonally opposite
    * corner points @p p1 and @p p2.
    *
-   * If the @p colorize (see
-   * @ref GlossColorization "the glossary entry on colorization")
-   * flag is <code>true</code>, then the @p boundary_ids of the boundary
-   * faces are assigned, such that the lower one in @p x-direction is 0, the
-   * upper one is 1. The indicators for the surfaces in @p y-direction are 2
-   * and 3, the ones for @p z are 4 and 5. This corresponds to the numbers of
-   * faces of the unit square of cube as laid out in the documentation of the
-   * GeometryInfo class. Importantly, however, in 3d
-   * @ref GlossColorization "colorization"
-   * does not set
-   * @p boundary_ids of <i>edges</i>, but only of <i>faces</i>, because each
+   * If the @p colorize flag is <code>true</code>, then the @p boundary_ids of
+   * the boundary faces are assigned, such that the lower one in @p
+   * x-direction is 0, the upper one is 1. The indicators for the surfaces in
+   * @p y-direction are 2 and 3, the ones for @p z are 4 and 5. This
+   * corresponds to the numbers of faces of the unit square of cube as laid
+   * out in the documentation of the GeometryInfo class; see also
+   * @ref GlossColorization "the glossary entry on colorization". Importantly,
+   * however, in 3d @ref GlossColorization "colorization" does not set @p
+   * boundary_ids of <i>edges</i>, but only of <i>faces</i>, because each
    * boundary edge is shared between two faces and it is not clear how the
    * boundary id of an edge should be set in that case.
    *
@@ -192,15 +190,14 @@ namespace GridGenerator
    * coordinate directions. The minimum number of subdivisions in each
    * direction is 1.
    *
-   * If the @p colorize (see
-   * @ref GlossColorization "the glossary entry on colorization")
-   * flag is <code>true</code>, then the @p boundary_ids of the surfaces are
-   * assigned, such that the lower one in @p x-direction is 0, the upper one is
-   * 1 (the left and the right vertical face). The indicators for the surfaces
-   * in @p y-direction are 2 and 3, the ones for @p z are 4 and 5.
-   * Additionally, material ids are assigned to the cells according to the
-   * octant their center is in: being in the right half plane for any
-   * coordinate direction <i>x<sub>i</sub></i> adds 2<sup>i</sup>. For
+   * If the @p colorize flag is <code>true</code>, then the @p boundary_ids of
+   * the surfaces are assigned, such that the lower one in @p x-direction is
+   * 0, the upper one is 1 (the left and the right vertical face). The
+   * indicators for the surfaces in @p y-direction are 2 and 3, the ones for
+   * @p z are 4 and 5.  Additionally, material ids are assigned to the cells
+   * according to the octant their center is in: being in the right half plane
+   * for any coordinate direction <i>x<sub>i</sub></i> adds 2<sup>i</sup> (see
+   * @ref GlossColorization "the glossary entry on colorization"). For
    * instance, the center point (1,-1,1) yields a material id 5 (this means
    * that in 2d only material ids 0,1,2,3 are assigned independent from the
    * number of repetitions).
@@ -345,13 +342,12 @@ namespace GridGenerator
    * In 3D, triangulation will be extruded in the z-direction by the total
    * height of @p L using @p n_slices slices (minimum is 2).
 
-   * If the @p colorize (see
-   * @ref GlossColorization "the glossary entry on colorization")
-   * flag is <code>true</code>, the boundary_ids of the boundary
-   * faces are assigned, such that the lower one in the x-direction is 0, the
-   * upper one is 1. The indicators for the surfaces in the y-direction are 2
-   * and 3, and the ones for the z-direction are 5 and 6. The hole boundary has
-   * indicator 4.
+   * If the @p colorize flag is <code>true</code>, the boundary_ids of the
+   * boundary faces are assigned such that the lower one in the x-direction is
+   * 0, and the upper one is 1 (see
+   * @ref GlossColorization "the glossary entry on colorization"). The
+   * indicators for the surfaces in the y-direction are 2 and 3, and the ones
+   * for the z-direction are 5 and 6. The hole boundary has indicator 4.
    *
    * @author Denis Davydov, 2018
    */
@@ -378,12 +374,11 @@ namespace GridGenerator
    * stored in the same order as they are given. It is also important to make
    * sure that the volume of the cell is positive.
    *
-   * If the argument @p colorize (see
-   * @ref GlossColorization "the glossary entry on colorization")
-   * is false, all boundary indicators are set to
-   * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
-   * colorized as in hyper_rectangle(). In 1d the indicators are always
-   * colorized, see hyper_rectangle().
+   * If the argument @p colorize is false, then all boundary indicators are
+   * set to zero for 2d and 3d. If it is true, the boundary is colorized as in
+   * hyper_rectangle() (see
+   * @ref GlossColorization "the glossary entry on colorization"). In 1d the
+   * indicators are always colorized, see hyper_rectangle().
    *
    * @author Bruno Turcksin
    */
@@ -479,9 +474,8 @@ namespace GridGenerator
    * Each entry must be positive. An empty vector is equivalent to one
    * subdivision in each direction.
    *
-   * @param colorize
-   * (see @ref GlossColorization "the glossary entry on colorization")
-   * Assign different boundary ids if set to true.
+   * @param colorize Assign different boundary ids if set to true (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * @note Implemented for all combinations of @p dim and @p spacedim.
    *
@@ -502,12 +496,11 @@ namespace GridGenerator
    * give the lower and upper bound of the inner hypercube in all coordinate
    * directions.  @p thickness marks the size of the layer cells.
    *
-   * If the flag @p colorize (see
-   * @ref GlossColorization "the glossary entry on colorization")
-   * is set, the outer cells get material id's
+   * If the flag @p colorize is set, the outer cells get material ids
    * according to the following scheme: extending over the inner cube in (+/-)
    * x-direction: 1/2. In y-direction 4/8, in z-direction 16/32. The cells at
-   * corners and edges (3d) get these values bitwise or'd.
+   * corners and edges (3d) get these values bitwise or'd (see also @ref
+   * GlossColorization "the glossary entry on colorization").
    *
    * Presently only available in 2d and 3d.
    *
@@ -637,7 +630,8 @@ namespace GridGenerator
    *
    * The boundaries are colored according to the following scheme: 0 for the
    * hull of the cylinder, 1 for the left hand face and 2 for the right hand
-   * face.
+   * face (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * If you want the cylinder to revolve around a different axis than the
    * $x$-axis, then simply rotate the mesh generated by this function using
@@ -669,7 +663,9 @@ namespace GridGenerator
    * In between the range of <tt>y</tt> is linearly decreasing.
    *
    * The boundaries are colored according to the following scheme: 0 for the
-   * hull of the cone, 1 for the left hand face and 2 for the right hand face.
+   * hull of the cone, 1 for the left hand face, and 2 for the right hand face
+   * (see
+   * @ref GlossColorization "the glossary entry on colorization").
    * Both the boundary indicators and the manifold indicators are set.
    *
    * In three dimensions, the manifold id of the hull is set to zero, and a
@@ -702,11 +698,10 @@ namespace GridGenerator
    * stacked on this face. All numbers may be zero, thus L- and T-shaped
    * domains are specializations of this domain.
    *
-   * @param colorize_cells If colorization (see
-   * @ref GlossColorization "the glossary entry on colorization")
-   * is enabled, then the material id of
+   * @param colorize_cells If colorization is enabled, then the material id of
    * a cells corresponds to the leg it is in. The id of the center cell is
-   * zero, and then the legs are numbered starting at one.
+   * zero, and then the legs are numbered starting at one (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * Examples in two and three dimensions are
    *
@@ -735,12 +730,11 @@ namespace GridGenerator
    * remain bounded. As a consequence, this domain is often used to
    * test convergence of schemes when the solution lacks regularity.
    *
-   * If the @p colorize flag
-   * (see @ref GlossColorization "the glossary entry on colorization")
-   * is <code>true</code>, the @p boundary_ids of the
-   * surfaces are assigned such that the left boundary is 0 and the
-   * others are assigned counterclockwise in ascending order.
-   * The @p colorize option only works in two dimensions.
+   * If the @p colorize flag is <code>true</code>, the @p boundary_ids of the
+   * surfaces are assigned such that the left boundary is 0 and the others are
+   * assigned counterclockwise in ascending order (see
+   * @ref GlossColorization "the glossary entry on colorization"). The @p
+   * colorize option only works in two dimensions.
    *
    * This function will create the classical L-shape in 2d
    * and it will look like the following in 3d:
@@ -776,10 +770,9 @@ namespace GridGenerator
    * declared to exist for triangulations of all space dimensions, but throws
    * an error if called in 1d.
    *
-   * If @p colorize
-   * (see @ref GlossColorization "the glossary entry on colorization")
-   * is set to @p true, the faces forming the slit are marked
-   * with boundary id 1 and 2, respectively.
+   * If @p colorize is set to @p true, the faces forming the slit are marked
+   * with boundary id 1 and 2, respectively (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
@@ -797,12 +790,11 @@ namespace GridGenerator
    * of cells of the resulting triangulation, i.e., how many cells form the
    * ring (in 2d) or the shell (in 3d).
    *
-   * If the flag @p colorize
-   * (see @ref GlossColorization "the glossary entry on colorization")
-   * is <code>true</code>, then the outer boundary will have the
-   * indicator 1, while the inner boundary has id zero. In 3d, this applies to
-   * both the faces and the edges of these boundaries. If the flag is @p
-   * false, both have indicator zero.
+   * If the flag @p colorize is <code>true</code>, then the outer boundary
+   * will have the indicator 1 while the inner boundary has id zero. In 3d,
+   * this applies to both the faces and the edges of these boundaries. If the
+   * flag is @p false, both have indicator zero (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * All manifold ids are set to zero, and a SphericalManifold is attached to
    * every cell and face of the triangulation.
@@ -853,11 +845,10 @@ namespace GridGenerator
    * computed adaptively such that the resulting elements have the least
    * aspect ratio.
    *
-   * If colorize
-   * (see @ref GlossColorization "the glossary entry on colorization")
-   * is set to <code>true</code>, the inner, outer, and the part of the
-   * boundary where $x=0$, get indicator 0, 1, and 2, respectively. Otherwise
-   * all indicators are set to 0.
+   * If colorize is set to <code>true</code>, the inner, outer, and the part
+   * of the boundary where $x=0$, get indicator 0, 1, and 2,
+   * respectively. Otherwise all indicators are set to 0 (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * All manifold ids are set to zero, and a SphericalManifold is attached
    * to the triangulation.
@@ -887,12 +878,11 @@ namespace GridGenerator
    * computed adaptively such that the resulting elements have the least
    * aspect ratio in 2d.
    *
-   * If @p colorize
-   * (see @ref GlossColorization "the glossary entry on colorization")
-   * is set to <code>true</code>, the inner, outer, left, and right boundary
-   * get indicator 0, 1, 2, and 3 in 2d, respectively. Otherwise all
-   * indicators are set to 0. In 3d indicator 2 is at the face x=0, 3 at y=0,
-   * 4 at z=0.
+   * If @p colorize is set to <code>true</code>, the inner, outer, left, and
+   * right boundary get indicator 0, 1, 2, and 3 in 2d,
+   * respectively. Otherwise all indicators are set to 0. In 3d indicator 2 is
+   * at the face $x=0$, 3 at $y=0$, 4 at $z=0$ (see
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * All manifold ids are set to zero, and a SphericalManifold is attached
    * to the triangulation.
