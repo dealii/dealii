@@ -1389,7 +1389,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               }
 
           // finally add a corresponding range
-          ranges.push_back(std::make_tuple(
+          ranges.emplace_back(std::forward_as_tuple(
             output_component,
             output_component + patch_space_dim - 1,
             name,
@@ -1428,7 +1428,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               }
 
           // finally add a corresponding range
-          ranges.push_back(std::make_tuple(
+          ranges.emplace_back(std::forward_as_tuple(
             output_component,
             output_component + size - 1,
             name,

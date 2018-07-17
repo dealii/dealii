@@ -1983,7 +1983,7 @@ namespace GridGenerator
 
       auto min_line_length = [](const Triangulation<2> &tria) -> double {
         double length = std::numeric_limits<double>::max();
-        for (const auto cell : tria.active_cell_iterators())
+        for (const auto &cell : tria.active_cell_iterators())
           for (unsigned int n = 0; n < GeometryInfo<2>::lines_per_cell; ++n)
             length = std::min(length, cell->line(n)->diameter());
         return length;
@@ -4214,7 +4214,7 @@ namespace GridGenerator
                             line->vertex_index(1) + offset;
                           boundary_line.manifold_id = line->manifold_id();
                           subcell_data.boundary_lines.push_back(
-                            std::move(boundary_line));
+                            boundary_line); // trivially-copyable
                         }
                   };
 
@@ -4257,7 +4257,7 @@ namespace GridGenerator
 
                           boundary_quad.manifold_id = face->manifold_id();
                           subcell_data.boundary_quads.push_back(
-                            std::move(boundary_quad));
+                            boundary_quad); // trivially-copyable
                         }
                     for (const auto &cell : tria.cell_iterators())
                       for (unsigned int l = 0; l < 12; ++l)
@@ -4272,7 +4272,7 @@ namespace GridGenerator
                             boundary_line.manifold_id =
                               cell->line(l)->manifold_id();
                             subcell_data.boundary_lines.push_back(
-                              std::move(boundary_line));
+                              boundary_line); // trivially_copyable
                           }
                   };
 
