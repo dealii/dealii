@@ -237,7 +237,7 @@ test()
 
       tr.execute_coarsening_and_refinement();
 
-      static FE_Q<dim> fe(1);
+      static FE_Q<dim> fe(2);
 
       dofh.distribute_dofs(fe);
 

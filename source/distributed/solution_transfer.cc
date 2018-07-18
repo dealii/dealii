@@ -246,8 +246,8 @@ namespace parallel
 
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 
-      std::vector<::dealii::Vector<typename VectorType::value_type>> dofvalues =
-        Utilities::unpack<
+      const std::vector<::dealii::Vector<typename VectorType::value_type>>
+        dofvalues = Utilities::unpack<
           std::vector<::dealii::Vector<typename VectorType::value_type>>>(
           data_range.begin(), data_range.end(), /*allow_compression=*/false);
 
@@ -259,23 +259,17 @@ namespace parallel
       for (auto it_dofvalues = dofvalues.begin();
            it_dofvalues != dofvalues.end();
            ++it_dofvalues)
-        Assert(dofs_per_cell <= it_dofvalues->size(),
-               ExcMessage(
-                 "The transferred data was packed on fewer dofs than the"
-                 "currently registered FE object assigned to the DoFHandler."));
+        Assert(
+          dofs_per_cell == it_dofvalues->size(),
+          ExcMessage(
+            "The transferred data was packed with a different number of dofs than the"
+            "currently registered FE object assigned to the DoFHandler has."));
 
       // distribute data for each registered vector on mesh
-      auto it_input  = dofvalues.begin();
+      auto it_input  = dofvalues.cbegin();
       auto it_output = all_out.begin();
-      for (; it_input != dofvalues.end(); ++it_input, ++it_output)
+      for (; it_input != dofvalues.cend(); ++it_input, ++it_output)
         {
-          // Adjust size of vector to the order of current FE object
-          // associated with the registered DofHandler.
-          // Fixes the following tests:
-          //  - p4est_2d_constraintmatrix_04.*.debug
-          //  - p4est_3d_constraintmatrix_03.*.debug
-          it_input->reinit(dofs_per_cell, /*omit_zeroing_entries=*/true);
-
           cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
         }
     }
