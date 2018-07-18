@@ -319,7 +319,9 @@
  * By default, all boundary indicators of a mesh are zero, unless you are
  * reading from a mesh file that specifically sets them to something different,
  * or unless you use one of the mesh generation functions in namespace GridGenerator
- * that have a 'colorize' option. A typical piece of code that sets the boundary
+ * that have a
+ * @ref GlossColorization "colorize"
+ * option. A typical piece of code that sets the boundary
  * indicator on part of the boundary to something else would look like
  * this, here setting the boundary indicator to 42 for all faces located at
  * $x=-1$:
@@ -378,6 +380,28 @@
  * @see @ref boundary "The module on boundaries"
  *
  *
+ * <dt class="glossary">@anchor GlossColorization <b>Colorization</b></dt>
+ * <dd><em>Colorization</em> is the process of marking certain parts of a
+ * Triangulation with different labels. The use of the word <em>color</em>
+ * comes from cartography, where countries on a map are made visually distinct
+ * from each other by assigning them different colors. Using the same term
+ * <em>coloring</em> is common in mathematics, even though we assign integers
+ * and not hues to different regions. deal.II refers to two processes as
+ * coloring:
+ *
+ * <ol>
+ *   <li> Most of the functions in the GridGenerator namespace take an optional
+ *   argument <code>colorize</code>. This argument controls whether or not the
+ *   different parts of the boundary will be assigned different
+ *   @ref GlossBoundaryIndicator "boundary indicators". Some functions also assign
+ *   different
+ *   @ref GlossMaterialId "material indicators" as well.</li>
+ *   <li> The function GraphColoring::make_graph_coloring() computes a
+ *   decomposition of a Triangulation (more exactly, a range of iterators). No
+ *   two adjacent cells are given the same color.</li>
+ * </ol>
+ * </dd>
+ *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
  * <dd> When considering systems of equations in which the solution is not
@@ -424,7 +448,7 @@
  * FEValues::shape_value_component() and FEValues::shape_grad_component()
  * functions do the same on a real cell. See also the documentation of the
  * FiniteElement and FEValues classes.
-  *
+ *
  * <i>Selecting components:</i>
  * Many functions allow you to restrict their operation to certain
  * vector components or blocks. For example, this is the case for
