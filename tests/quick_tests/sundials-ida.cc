@@ -72,7 +72,7 @@ public:
     time_stepper.reinit_vector = [&](Vector<double> &v) { v.reinit(2); };
 
 
-    typedef Vector<double> VectorType;
+    using VectorType = Vector<double>;
 
     time_stepper.residual = [&](const double /*t*/,
                                 const VectorType &y,
