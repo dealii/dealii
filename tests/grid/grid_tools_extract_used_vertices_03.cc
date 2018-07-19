@@ -41,7 +41,7 @@ test(const Point<spacedim> &p)
   tria.refine_global(1);
 
   // Vector fe
-  FESystem<dim, spacedim>   fe({FE_Q<dim, spacedim>(1) ^ spacedim});
+  FESystem<dim, spacedim>   fe{FE_Q<dim, spacedim>(1), spacedim};
   DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe);
 
