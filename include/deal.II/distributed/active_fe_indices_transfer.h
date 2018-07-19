@@ -38,6 +38,12 @@ namespace parallel
      * cell what parallel::distributed::SolutionTransfer does for the values
      * of degrees of freedom defined on a parallel::distributed::Triangulation.
      *
+     * If refinement is involved in the data transfer process, the children of
+     * a refined cell inherit the `active_fe_index` from their parent. If
+     * cells get coarsened into one, the latter will get the least dominating
+     * `active_fe_index` amongst its children, as determined by the function
+     * hp::FECollection::find_least_face_dominating_fe().
+     *
      * @note If you use more than one object to attach data to a
      * parallel::distributed::Triangulation at the same time (e.g. a
      * parallel::distributed::SolutionTransfer object), the calls to

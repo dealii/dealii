@@ -316,6 +316,11 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
+   * Make the type of this DoFHandler available in function templates.
+   */
+  static const bool is_hp_dof_handler = false;
+
+  /**
    * When the arrays holding the DoF indices are set up, but before they are
    * filled with actual values, they are set to an invalid value, in order to
    * monitor possible problems. This invalid value is the constant defined
