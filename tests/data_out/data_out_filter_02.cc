@@ -13,7 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// This test checks that writing empty vectors does not access unallocated memory.
+// This test checks that writing empty vectors does not access unallocated
+// memory.
 
 #include <deal.II/dofs/dof_handler.h>
 

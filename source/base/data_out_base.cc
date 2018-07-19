@@ -7600,7 +7600,7 @@ DataOutBase::write_filtered_data(
   Assert(patches.size() > 0, ExcNoPatches());
 #else
   if (patches.size() == 0)
-	  return;
+    return;
 #endif
 
   compute_sizes<dim, spacedim>(patches, n_node, n_cell);
