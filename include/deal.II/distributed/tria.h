@@ -28,6 +28,8 @@
 
 #include <deal.II/grid/tria.h>
 
+#include <boost/range/iterator_range.hpp>
+
 #include <functional>
 #include <list>
 #include <set>
