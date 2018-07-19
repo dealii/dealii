@@ -156,8 +156,8 @@ test(const unsigned int size,
           &info);
 
     AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syevr", info));
-    for (int i = 0; i < max_n_eigenvalues; ++i)
-      for (int j = 0; j < size; ++j)
+    for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
+      for (unsigned int j = 0; j < size; ++j)
         s_eigenvectors_[i][j] = eigenvectors[(size - 1 - i) * size + j];
   }
 
