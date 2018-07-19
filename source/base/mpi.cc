@@ -198,10 +198,10 @@ namespace Utilities
         }
 
 #  if DEAL_II_MPI_VERSION_GTE(2, 2)
-      // Get a binary vector from the `destinations`
+      // Calculate the number of messages to send to each process
       std::vector<unsigned int> dest_vector(n_procs);
       for (const auto &el : destinations)
-        dest_vector[el] = 1;
+        ++dest_vector[el];
 
       // Find how many processes will send to this one
       // by reducing with sum and then scattering the
