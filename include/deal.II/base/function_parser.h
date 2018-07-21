@@ -212,6 +212,18 @@ public:
                  const double       h            = 1e-8);
 
   /**
+   * Constructor for Parsed functions. Take directly a semi-colon separated
+   * list of expressions (one for each component of the function), an optional
+   * comma-separated list of constants, variable names and step for the
+   * computation of first order derviatives by finite difference.
+   */
+  FunctionParser(const std::string &expression,
+                 const std::string &constants      = "",
+                 const std::string &variable_names = default_variable_names() +
+                                                     ",t",
+                 const double h = 1e-8);
+
+  /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one
    * for each component of the function).
    */
