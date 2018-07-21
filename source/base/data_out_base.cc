@@ -401,6 +401,10 @@ namespace DataOutBase
       const std::vector<Patch<dim, spacedim>> &patches,
       Table<2, Number> &                       data_vectors)
     {
+      // If there is nothing to write, just return
+      if (patches.size() == 0)
+        return;
+
       // unlike in the main function, we don't have here the data_names field,
       // so we initialize it with the number of data sets in the first patch.
       // the equivalence of these two definitions is checked in the main
@@ -7585,6 +7589,9 @@ DataOutBase::write_filtered_data(
   // no cells it actually owns, and in that case it is legit if there are no
   // patches
   Assert(patches.size() > 0, ExcNoPatches());
+#else
+  if (patches.size() == 0)
+    return;
 #endif
 
   compute_sizes<dim, spacedim>(patches, n_node, n_cell);
