@@ -78,6 +78,18 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   ENDIF()
 
   #
+  # Check whether ADOL-C is configured with tapeless number reference counting
+  #
+  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_WITH_TAPELESS_REFCOUNTING_STRING
+    REGEX "#define USE_ADTL_REFCOUNTING 1"
+    )
+  IF(NOT "${ADOLC_WITH_TAPELESS_REFCOUNTING_STRING}" STREQUAL "")
+    SET(ADOLC_WITH_TAPELESS_REFCOUNTING TRUE)
+  ELSE()
+    SET(ADOLC_WITH_TAPELESS_REFCOUNTING FALSE)
+  ENDIF()
+
+  #
   # Check whether ADOL-C is configured to use the Boost pool allocator
   #
   FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_BOOST_POOL_STRING
