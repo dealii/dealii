@@ -388,9 +388,9 @@ _Pragma("GCC diagnostic pop")
  * http://goodliffe.blogspot.com/2009/07/c-how-to-say-warning-to-visual-studio-c.html
  */
 
-#define STRINGIZE_HELPER(x) #x
-#define STRINGIZE(x) STRINGIZE_HELPER(x)
-#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : Warning: " #desc)
+#define DEAL_II_STRINGIZE_HELPER(x) #x
+#define DEAL_II_STRINGIZE(x) DEAL_II_STRINGIZE_HELPER(x)
+#define DEAL_II_WARNING(desc) message(__FILE__ "(" DEAL_II_STRINGIZE(__LINE__) ") : Warning: " #desc)
 
 /***********************************************************************
  * Final inclusions:

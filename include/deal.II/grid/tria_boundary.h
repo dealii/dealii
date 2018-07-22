@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#pragma WARNING("This file is deprecated. Use the Manifold classes instead.")
+#pragma DEAL_II_WARNING( \
+  "This file is deprecated. Use the Manifold classes instead.")
 
 #endif

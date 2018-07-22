@@ -3,7 +3,7 @@
 
 #include <deal.II/base/config.h>
 
-#pragma WARNING( \
+#pragma DEAL_II_WARNING( \
   "This file is deprecated. Use <deal.II/differentiation/ad/sacado_product_types.h> instead.")
 
 #include <deal.II/differentiation/ad/sacado_product_types.h>
