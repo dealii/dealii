@@ -699,7 +699,8 @@ namespace GridTools
    *   std::vector<std::vector<Point<dim>>>,
    *   std::vector<std::vector<unsigned int>>>
    * @endcode
-   * The type is abbreviated above to improve readability of this page.
+   * The type is abbreviated in the online documentation to improve readability
+   * of this page.
    *
    * @author Giovanni Alzetta, 2017
    */
@@ -776,7 +777,8 @@ namespace GridTools
    *   std::vector<std::vector<Point<spacedim>>>,
    *   std::vector<std::vector<unsigned int>>>
    * @endcode
-   * The type is abbreviated above to improve readability of this page.
+   * The type is abbreviated in the online documentation to improve readability
+   * of this page.
    *
    * @author Giovanni Alzetta, 2017-2018
    */
@@ -1532,7 +1534,8 @@ namespace GridTools
    *            std::map< unsigned int, unsigned int>,
    *            std::map< unsigned int, std::vector<unsigned int>>>
    * @endcode
-   * The type is abbreviated above to improve readability of this page.
+   * The type is abbreviated in the online documentation to improve readability
+   * of this page.
    *
    * @author Giovanni Alzetta, 2017
    */
