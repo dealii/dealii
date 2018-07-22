@@ -336,199 +336,191 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::assemble_system2()
   {
+    typedef decltype(dof_handler.begin_active()) Iterator;
+    const BoundaryValues<dim>                    boundary_function;
 
-        typedef decltype(dof_handler.begin_active()) Iterator;
-        const BoundaryValues<dim> boundary_function;
+    auto cell_worker = [&](const Iterator &  cell,
+                           ScratchData<dim> &scratch_data,
+                           CopyData &        copy_data) {
+      const unsigned int n_dofs = scratch_data.fe_values.get_fe().dofs_per_cell;
+      copy_data.reinit(cell, n_dofs);
+      scratch_data.fe_values.reinit(cell);
 
-        auto cell_worker = [&] (const Iterator &cell, ScratchData<dim> &scratch_data, CopyData &copy_data)
+      const auto &q_points = scratch_data.fe_values.get_quadrature_points();
+
+      const FEValues<dim> &      fe_v = scratch_data.fe_values;
+      const std::vector<double> &JxW  = fe_v.get_JxW_values();
+
+      for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
         {
-          const unsigned int dofs_per_cell   = scratch_data.fe_values.get_fe().dofs_per_cell;
-          copy_data.reinit(cell, dofs_per_cell);
-          scratch_data.fe_values.reinit (cell);
-
-          const auto &q_points = scratch_data.fe_values.get_quadrature_points();
-
-          const FEValues<dim> &fe_v = scratch_data.fe_values;
-          const std::vector<double> &JxW = fe_v.get_JxW_values ();
-
-          std::vector<double> g(q_points.size());
-          boundary_function.value_list(q_points, g);
-
-          for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
-            for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+          auto beta_q = beta(q_points[point]);
+          for (unsigned int i = 0; i < n_dofs; ++i)
+            for (unsigned int j = 0; j < n_dofs; ++j)
               {
-                for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-                copy_data.cell_matrix(i,j) += -beta(q_points[point])*
-                                              fe_v.shape_grad(i,point)*
-                                              fe_v.shape_value(j,point) *
-                                              JxW[point];
-
-                //copy_data.cell_rhs(i) += g[point] * fe_v.shape_value(i,point) * JxW[point];
+                copy_data.cell_matrix(i, j) +=
+                  -beta_q * fe_v.shape_grad(i, point) *
+                  fe_v.shape_value(j, point) * JxW[point];
               }
-        };
+        }
+    };
 
 
-        auto boundary_worker1 = [&] (const Iterator &cell, const unsigned int &face_no, ScratchData<dim> &scratch_data, CopyData &copy_data)
+    auto boundary_worker1 = [&](const Iterator &    cell,
+                                const unsigned int &face_no,
+                                ScratchData<dim> &  scratch_data,
+                                CopyData &          copy_data) {
+      FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
+      fe_facet.reinit(cell, face_no);
+
+      const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
+
+      const unsigned int         n_facet_dofs = fe_facet.n_facet_dofs();
+      const std::vector<double> &JxW =
+        fe_facet.get_fe_values().get_JxW_values();
+      const std::vector<Tensor<1, dim>> &normals =
+        fe_facet.get_fe_values().get_normal_vectors();
+
+      std::vector<double> g(q_points.size());
+      boundary_function.value_list(q_points, g);
+
+      for (unsigned int point = 0; point < q_points.size(); ++point)
         {
-          FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
-          fe_facet.reinit(cell, face_no);
+          const double beta_n = beta(q_points[point]) * normals[point];
 
-          const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
 
-          const unsigned int n_facet_dofs = fe_facet.n_facet_dofs();
-          const std::vector<double> &JxW = fe_facet.get_fe_values().get_JxW_values ();
-          const std::vector<Tensor<1,dim> > &normals = fe_facet.get_fe_values().get_normal_vectors ();
-
-          std::vector<double> g(q_points.size());
-          boundary_function.value_list(q_points, g);
-
-          for (unsigned int point=0; point<q_points.size(); ++point)
+          if (beta_n > 0)
             {
-              const double beta_n = beta(q_points[point]) * normals[point];
-
-
-              if (beta_n>0)
-                {
-                  for (unsigned int i=0; i<n_facet_dofs/2; ++i) // TODO: ugly!
-                    for (unsigned int j=0; j<n_facet_dofs/2; ++j)
-                      copy_data.cell_matrix(i,j) += beta_n *
-                          fe_facet.scalar().jump(j, point) *
-                          fe_facet.scalar().choose(true, i,point) *
-                          JxW[point];
-                }
-              else
-                if (0)
-                for (unsigned int i=0; i<n_facet_dofs/2; ++i) // TODO: ugly
-                  copy_data.cell_rhs(i) -= beta_n *
-                      g[point] *
-                      fe_facet.scalar().jump(i,point) *
-                      JxW[point];
-
+              for (unsigned int i = 0; i < n_facet_dofs / 2; ++i) // TODO: ugly!
+                for (unsigned int j = 0; j < n_facet_dofs / 2; ++j)
+                  copy_data.cell_matrix(i, j) +=
+                    beta_n * fe_facet.scalar().jump(j, point) *
+                    fe_facet.scalar().choose(true, i, point) * JxW[point];
             }
-        };
-        auto boundary_worker = [&] (const Iterator &cell, const unsigned int &face_no, ScratchData<dim> &scratch_data, CopyData &copy_data)
+          else if (0)
+            for (unsigned int i = 0; i < n_facet_dofs / 2; ++i) // TODO: ugly
+              copy_data.cell_rhs(i) -= beta_n * g[point] *
+                                       fe_facet.scalar().jump(i, point) *
+                                       JxW[point];
+        }
+    };
+    auto boundary_worker = [&](const Iterator &    cell,
+                               const unsigned int &face_no,
+                               ScratchData<dim> &  scratch_data,
+                               CopyData &          copy_data) {
+      scratch_data.fe_facet_values.reinit(cell, face_no);
+      const FEFaceValuesBase<dim> &fe_face =
+        scratch_data.fe_facet_values.get_fe_values();
+
+      const auto &q_points = fe_face.get_quadrature_points();
+
+      const unsigned int n_facet_dofs = fe_face.get_fe().n_dofs_per_cell();
+      const std::vector<double> &        JxW     = fe_face.get_JxW_values();
+      const std::vector<Tensor<1, dim>> &normals = fe_face.get_normal_vectors();
+
+      std::vector<double> g(q_points.size());
+      boundary_function.value_list(q_points, g);
+
+      for (unsigned int point = 0; point < q_points.size(); ++point)
         {
-            scratch_data.fe_facet_values.reinit(cell, face_no);
-          const FEFaceValuesBase<dim> &fe_face = scratch_data.fe_facet_values.get_fe_values();
+          const double beta_n = beta(q_points[point]) * normals[point];
 
-
-          const auto &q_points = fe_face.get_quadrature_points();
-
-          const unsigned int n_facet_dofs = fe_face.get_fe().n_dofs_per_cell();
-          const std::vector<double> &JxW = fe_face.get_JxW_values ();
-          const std::vector<Tensor<1,dim> > &normals = fe_face.get_normal_vectors ();
-
-          std::vector<double> g(q_points.size());
-          boundary_function.value_list(q_points, g);
-
-          for (unsigned int point=0; point<q_points.size(); ++point)
+          if (beta_n > 0)
             {
-              const double beta_n = beta(q_points[point]) * normals[point];
-
-
-              if (beta_n>0)
-                {
-                  for (unsigned int i=0; i<n_facet_dofs; ++i) // TODO: ugly!
-                    for (unsigned int j=0; j<n_facet_dofs; ++j)
-                      copy_data.cell_matrix(i,j) += beta_n *
-                          fe_face.shape_value(j, point)*
-                          fe_face.shape_value(i, point)*
-                          JxW[point];
-                }
-              else
-                for (unsigned int i=0; i<n_facet_dofs; ++i) // TODO: ugly
-                  copy_data.cell_rhs(i) -= beta_n *
-                      g[point] *
-                      fe_face.shape_value(i,point)*
-                      JxW[point];
-
+              for (unsigned int i = 0; i < n_facet_dofs; ++i)
+                for (unsigned int j = 0; j < n_facet_dofs; ++j)
+                  copy_data.cell_matrix(i, j) +=
+                    beta_n * fe_face.shape_value(j, point) *
+                    fe_face.shape_value(i, point) * JxW[point];
             }
-        };
+          else
+            for (unsigned int i = 0; i < n_facet_dofs; ++i)
+              copy_data.cell_rhs(i) -=
+                beta_n * g[point] * fe_face.shape_value(i, point) * JxW[point];
+        }
+    };
 
-        auto face_worker = [&]
-                           (const Iterator &cell, const unsigned int &f, const unsigned int &sf,
-                            const Iterator &ncell, const unsigned int &nf, const unsigned int &nsf,
-                            ScratchData<dim> &scratch_data, CopyData &copy_data)
+    auto face_worker = [&](const Iterator &    cell,
+                           const unsigned int &f,
+                           const unsigned int &sf,
+                           const Iterator &    ncell,
+                           const unsigned int &nf,
+                           const unsigned int &nsf,
+                           ScratchData<dim> &  scratch_data,
+                           CopyData &          copy_data) {
+      FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
+      fe_facet.reinit(cell, f, sf, ncell, nf, nsf);
+      const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
+
+      copy_data.face_data.emplace_back();
+      CopyDataFace &copy_data_face = copy_data.face_data.back();
+
+      const unsigned int n_dofs        = fe_facet.n_facet_dofs();
+      copy_data_face.joint_dof_indices = fe_facet.get_facet_dof_indices();
+
+      copy_data_face.cell_matrix.reinit(n_dofs, n_dofs);
+
+      const std::vector<double> &        JxW = fe_facet.get_JxW_values();
+      const std::vector<Tensor<1, dim>> &normals =
+        fe_facet.get_normal_vectors();
+
+      // u- * (beta*n)[v]
+      for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
-          FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
-          fe_facet.reinit(cell, f, sf, ncell, nf, nsf);
-          const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
+          const double beta_n = beta(q_points[qpoint]) * normals[qpoint];
+          for (unsigned int i = 0; i < n_dofs; ++i)
+            for (unsigned int j = 0; j < n_dofs; ++j)
+              copy_data_face.cell_matrix(i, j) +=
+                fe_facet.scalar().choose(beta_n > 0, j, qpoint) * beta_n *
+                fe_facet.scalar().jump(i, qpoint) * JxW[qpoint];
+        }
 
-          copy_data.face_data.emplace_back();
-          CopyDataFace &copy_data_face = copy_data.face_data.back();
+      // - (beta*n)[u]{v} + 1/2 |beta*n| [u][v]
+      //      for (unsigned int point=0; point<fe_v.n_quadrature_points;
+      //      ++point)
+      //        {
+      //          const double beta_n=beta[point] * normals[point];
+      //          for (unsigned int i=0; i<2*fe_v.dofs_per_cell; ++i)
+      //            for (unsigned int j=0; j<2*fe_v.dofs_per_cell; ++j)
+      //              copy_data_face.cell_matrix(i,j)
+      //                  += (- beta_n * jump(j, point) * avg(i, point)
+      //                  + 0.5 * abs(beta_n) * jump(j, point) * jump(i, point))
+      //                  * JxW[point];
+      //        }
+    };
 
-          const unsigned int n_facet_dofs = fe_facet.n_facet_dofs();
-          copy_data_face.joint_dof_indices = fe_facet.get_facet_dof_indices();
+    auto copier = [&](const CopyData &c) {
+      constraints.distribute_local_to_global(c.cell_matrix,
+                                             c.cell_rhs,
+                                             c.local_dof_indices,
+                                             system_matrix,
+                                             right_hand_side);
 
-
-          copy_data_face.cell_matrix.reinit(n_facet_dofs, n_facet_dofs);
-
-          // TODO: check JxW(i) == array
-
-          // TODO: make available in fe_facet?
-          const std::vector<double> &JxW = fe_facet.get_fe_values().get_JxW_values ();
-          const std::vector<Tensor<1,dim> > &normals = fe_facet.get_fe_values().get_normal_vectors ();
-
-          // u- * (beta*n)[v]
-          for (unsigned int qpoint=0; qpoint<q_points.size(); ++qpoint)
-            {
-              const double beta_n=beta(q_points[qpoint]) * normals[qpoint];
-              for (unsigned int i=0; i<n_facet_dofs; ++i)
-                for (unsigned int j=0; j<n_facet_dofs; ++j)
-                  copy_data_face.cell_matrix(i,j) +=
-                      fe_facet.scalar().choose(beta_n>0, j, qpoint)
-                      * beta_n
-                      * fe_facet.scalar().jump(i, qpoint)
-                      * JxW[qpoint];
-            }
-
-          // - (beta*n)[u]{v} + 1/2 |beta*n| [u][v]
-    //      for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
-    //        {
-    //          const double beta_n=beta[point] * normals[point];
-    //          for (unsigned int i=0; i<2*fe_v.dofs_per_cell; ++i)
-    //            for (unsigned int j=0; j<2*fe_v.dofs_per_cell; ++j)
-    //              copy_data_face.cell_matrix(i,j)
-    //                  += (- beta_n * jump(j, point) * avg(i, point)
-    //                  + 0.5 * abs(beta_n) * jump(j, point) * jump(i, point)) * JxW[point];
-    //        }
-        };
-
-        auto copier = [&](const CopyData &c)
+      for (auto &cdf : c.face_data) // TODO: use constraints?
         {
+          const unsigned int dofs_per_cell = cdf.joint_dof_indices.size();
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int k = 0; k < dofs_per_cell; ++k)
+              system_matrix.add(cdf.joint_dof_indices[i],
+                                cdf.joint_dof_indices[k],
+                                cdf.cell_matrix(i, k));
+        }
+    };
 
-          constraints.distribute_local_to_global(c.cell_matrix,
-                                                 c.cell_rhs,
-                                                 c.local_dof_indices,
-                                                 system_matrix,
-                                                 right_hand_side
-                                                );
+    const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
 
-          // TODO: use constraints?
-          for (auto &cdf : c.face_data)
-            {
-              const unsigned int dofs_per_cell   = cdf.joint_dof_indices.size();
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                for (unsigned int k=0; k<dofs_per_cell; ++k)
-                  system_matrix.add(cdf.joint_dof_indices[i], cdf.joint_dof_indices[k],
-                                    cdf.cell_matrix(i,k));
-
-            }
-        };
-
-        const unsigned int n_gauss_points = dof_handler.get_fe().degree+1;
-
-        ScratchData<dim> scratch_data(mapping, fe, n_gauss_points);
-        CopyData copy_data;
-        MeshWorker::mesh_loop(dof_handler.begin_active(),
-                              dof_handler.end(),
-                              cell_worker,
-                              copier,
-                              scratch_data,
-                              copy_data,
-                              MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces | MeshWorker::assemble_own_interior_faces_once,
-                              boundary_worker,
-                              face_worker);
+    ScratchData<dim> scratch_data(mapping, fe, n_gauss_points);
+    CopyData         copy_data;
+    MeshWorker::mesh_loop(dof_handler.begin_active(),
+                          dof_handler.end(),
+                          cell_worker,
+                          copier,
+                          scratch_data,
+                          copy_data,
+                          MeshWorker::assemble_own_cells |
+                            MeshWorker::assemble_boundary_faces |
+                            MeshWorker::assemble_own_interior_faces_once,
+                          boundary_worker,
+                          face_worker);
   }
 
   // @sect4{The local integrators}
