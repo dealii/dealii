@@ -474,19 +474,6 @@ namespace Step12
                 fe_facet.scalar().choose(beta_n > 0, j, qpoint) * beta_n *
                 fe_facet.scalar().jump(i, qpoint) * JxW[qpoint];
         }
-
-      // - (beta*n)[u]{v} + 1/2 |beta*n| [u][v]
-      //      for (unsigned int point=0; point<fe_v.n_quadrature_points;
-      //      ++point)
-      //        {
-      //          const double beta_n=beta[point] * normals[point];
-      //          for (unsigned int i=0; i<2*fe_v.dofs_per_cell; ++i)
-      //            for (unsigned int j=0; j<2*fe_v.dofs_per_cell; ++j)
-      //              copy_data_face.cell_matrix(i,j)
-      //                  += (- beta_n * jump(j, point) * avg(i, point)
-      //                  + 0.5 * abs(beta_n) * jump(j, point) * jump(i, point))
-      //                  * JxW[point];
-      //        }
     };
 
     auto copier = [&](const CopyData &c) {
