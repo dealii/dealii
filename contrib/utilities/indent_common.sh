@@ -235,6 +235,7 @@ process()
 process_changed()
 {
   LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 master)"
+  COMMON_ANCESTOR_WITH_MASTER="$(git merge-base ${LAST_MERGE_COMMIT} HEAD)"
 
   case "${OSTYPE}" in
     darwin*)
@@ -246,7 +247,7 @@ process_changed()
   esac
 
   ( git ls-files --others --exclude-standard -- ${1};
-    git diff --name-only $LAST_MERGE_COMMIT -- ${1} )|
+    git diff --name-only $COMMON_ANCESTOR_WITH_MASTER -- ${1} )|
       sort -u |
       grep -E "^${2}$" |
       ${XARGS} '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
