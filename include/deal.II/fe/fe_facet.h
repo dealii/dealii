@@ -23,7 +23,7 @@ namespace {
             {}
 
         protected:
-            const SmartPointer<const FEFacetValues<dim,spacedim> > fe_facet;
+            const FEFacetValues<dim,spacedim> * fe_facet;
         };
 
         template <int dim, int spacedim=dim>
@@ -48,11 +48,16 @@ namespace {
 
             value_type jump (const unsigned int idx, const unsigned int q_point) const
             {
-                const unsigned int shape_fct = this->fe_facet->facet_to_fe_dof_idx(idx);
+                const unsigned int shape_fct = this->fe_facet->facet_dof_idx_to_fe_dof_idx(idx);
                 if (shape_fct == idx)
                     return this->fe_facet->get_fe_values().shape_value_component(shape_fct, q_point, component);
                 else
-                    return -this->fe_facet->get_fe_values_neighbor().shape_value_component(shape_fct, q_point, component);
+                    {
+                        if (this->fe_facet->is_boundary_facet())
+                                                return 0.0;
+                        else
+                            return -this->fe_facet->get_fe_values_neighbor().shape_value_component(shape_fct, q_point, component);
+                    }
             }
 
             value_type avg (const unsigned int idx, const unsigned int q_point) const
@@ -71,7 +76,7 @@ namespace {
 
             value_type choose (const bool left, const unsigned int idx, const unsigned int q_point) const
             {
-                const unsigned int shape_fct = this->fe_facet->facet_to_fe_dof_idx(idx);
+                const unsigned int shape_fct = this->fe_facet->facet_dof_idx_to_fe_dof_idx(idx);
                 if (left && shape_fct == idx)
                     return this->fe_facet->get_fe_values().shape_value_component(shape_fct, q_point, component);
                 if (!left && shape_fct != idx)
@@ -151,9 +156,20 @@ namespace {
               fe_face_values_neighbor (nullptr)
         {
             update_view_cache();
-            n_dofs_fe = fe.get_fe().n_dofs_per_cell();
-            n_dofs_fe_neighbor = fe.get_fe().n_dofs_per_cell();
+            n_dofs_fe = fe.n_dofs_per_cell();
+            n_dofs_fe_neighbor = fe.n_dofs_per_cell();
         }
+
+        const Quadrature<dim-1>& get_quadrature() const
+        {
+            return internal_fe_face_values.get_quadrature();
+        }
+
+        const UpdateFlags get_update_flags() const
+        {
+            return internal_fe_face_values.get_update_flags();
+        }
+
 
         /**
          * Re-initialize this object to be used on a new facet given by two faces of two neighboring cells.
@@ -183,6 +199,18 @@ namespace {
                 internal_fe_subface_values_neighbor.reinit(cell_neighbor, face_no_neighbor, sub_face_no_neighbor);
                 fe_face_values_neighbor = &internal_fe_subface_values_neighbor;
               }
+
+
+            std::vector<types::global_dof_index> v(n_dofs_fe);
+            cell->get_dof_indices(v);
+            std::vector<types::global_dof_index> v2(n_dofs_fe_neighbor);
+            cell_neighbor->get_dof_indices(v2);
+
+            //face_dof_indices.resize(n_dofs_fe + n_dofs_fe_neighbor);
+            facet_dof_indices.clear();
+            facet_dof_indices.insert(facet_dof_indices.end(), v.begin(), v.end());
+            facet_dof_indices.insert(facet_dof_indices.end(), v2.begin(), v2.end());
+
         }
 
         /**
@@ -196,6 +224,9 @@ namespace {
             internal_fe_face_values.reinit(cell, face_no);
             fe_face_values = &internal_fe_face_values;
             fe_face_values_neighbor = nullptr;
+
+            facet_dof_indices.resize(n_dofs_fe);
+            cell->get_dof_indices(facet_dof_indices);
         }
 
         /**
@@ -217,7 +248,10 @@ namespace {
         /**
          * Return the set of joint DoF indices (includes indices from both cells)
          */
-        std::vector<types::global_dof_index> get_facet_dof_indices() const;
+        std::vector<types::global_dof_index> get_facet_dof_indices() const
+        {
+            return facet_dof_indices;
+        }
 
         unsigned int facet_dof_idx_to_fe_dof_idx(unsigned int facet_dof_idx) const
         {
@@ -261,7 +295,7 @@ namespace {
         const FEFacetViews::Scalar<dim,spacedim> &
         operator[] (const FEValuesExtractors::Scalar &scalar) const
         {
-            Assert(scalar.component < fe_face_values->get_fe()->n_components(),
+            Assert(scalar.component < fe_face_values->get_fe().n_components(),
                    ExcMessage("Invalid FEValuesExtractors::Scalar!"));
 
             return cached_views_scalar[scalar.component];
@@ -275,7 +309,7 @@ namespace {
         const FEFacetViews::Scalar<dim,spacedim> &
         scalar () const
         {
-            Assert(fe_face_values->get_fe()->n_components()==1,
+            Assert(fe_face_values->get_fe().n_components()==1,
                    ExcMessage("FEFacet::scalar() is only valid if the FE has exactly one component!"));
             return cached_views_scalar[0];
         }
@@ -349,6 +383,7 @@ namespace {
                 cached_views_vector.emplace_back(*this, c);
         }
 
+        std::vector<types::global_dof_index> facet_dof_indices;
         unsigned int n_dofs_fe;
         unsigned int n_dofs_fe_neighbor;
 
@@ -368,199 +403,46 @@ namespace {
 
 
 // example scratch/copydata
+    template <int dim>
+     struct ScratchData
+     {
+       ScratchData (const Mapping<dim> &mapping,
+                    const FiniteElement<dim> &fe,
+                    const unsigned int quadrature_degree,
+                    const UpdateFlags update_flags = update_values   | update_gradients |
+           update_quadrature_points | update_JxW_values,
+                    const UpdateFlags facet_update_flags = update_values   | update_gradients |
+           update_quadrature_points | update_JxW_values | update_normal_vectors)
+         :
 
-template <int dim>
-struct ScratchData
-{
-  ScratchData (const Mapping<dim> &mapping,
-               const FiniteElement<dim> &fe,
-               const unsigned int quadrature_degree,
-               const UpdateFlags cell_flags =
-      update_values | update_gradients | update_quadrature_points | update_JxW_values,
-      const UpdateFlags face_flags =
-      update_values | update_gradients | update_quadrature_points | update_JxW_values | update_normal_vectors)
-    :
-    fe_values (mapping,
-               fe,
-               QGauss<dim>(quadrature_degree),
-               cell_flags),
-    internal_fe_face_values (mapping,
-                             fe,
-                             QGauss<dim-1>(quadrature_degree),
-                             face_flags),
-    internal_fe_subface_values (mapping,
-                                fe,
-                                QGauss<dim-1>(quadrature_degree),
-                                face_flags),
-    internal_fe_face_values_neighbor (mapping,
-                                      fe,
-                                      QGauss<dim-1>(quadrature_degree),
-                                      face_flags),
-    internal_fe_subface_values_neighbor (mapping,
-                                         fe,
-                                         QGauss<dim-1>(quadrature_degree),
-                                         face_flags)
-
-  {}
-
-  ScratchData (const ScratchData<dim> &scratch_data)
-    :
-    fe_values (scratch_data.fe_values.get_mapping(),
-               scratch_data.fe_values.get_fe(),
-               scratch_data.fe_values.get_quadrature(),
-               scratch_data.fe_values.get_update_flags()),
-    internal_fe_face_values (scratch_data.internal_fe_face_values.get_mapping(),
-                             scratch_data.internal_fe_face_values.get_fe(),
-                             scratch_data.internal_fe_face_values.get_quadrature(),
-                             scratch_data.internal_fe_face_values.get_update_flags()),
-    internal_fe_subface_values (scratch_data.internal_fe_face_values.get_mapping(),
-                                scratch_data.internal_fe_face_values.get_fe(),
-                                scratch_data.internal_fe_face_values.get_quadrature(),
-                                scratch_data.internal_fe_face_values.get_update_flags()),
-    internal_fe_face_values_neighbor (scratch_data.internal_fe_face_values.get_mapping(),
-                                      scratch_data.internal_fe_face_values.get_fe(),
-                                      scratch_data.internal_fe_face_values.get_quadrature(),
-                                      scratch_data.internal_fe_face_values.get_update_flags()),
-    internal_fe_subface_values_neighbor (scratch_data.internal_fe_face_values.get_mapping(),
-                                         scratch_data.internal_fe_face_values.get_fe(),
-                                         scratch_data.internal_fe_face_values.get_quadrature(),
-                                         scratch_data.internal_fe_face_values.get_update_flags())
-  {}
-
-  template <class Iterator>
-  void reinit(const Iterator &cell, const unsigned int &face_no, const unsigned int &sub_face_no,
-              const Iterator &cell_neighbor, const unsigned int &face_no_neighbor, const unsigned int &sub_face_no_neighbor)
-  {
-    if (sub_face_no == numbers::invalid_unsigned_int)
-      {
-        internal_fe_face_values.reinit(cell, face_no);
-        fe_face_values = &internal_fe_face_values;
-      }
-    else
-      {
-        internal_fe_subface_values.reinit(cell, face_no, sub_face_no);
-        fe_face_values = &internal_fe_subface_values;
-      }
-    if (sub_face_no_neighbor == numbers::invalid_unsigned_int)
-      {
-        internal_fe_face_values_neighbor.reinit(cell_neighbor, face_no_neighbor);
-        fe_face_values_neighbor = &internal_fe_face_values_neighbor;
-      }
-    else
-      {
-        internal_fe_subface_values_neighbor.reinit(cell_neighbor, face_no_neighbor, sub_face_no_neighbor);
-        fe_face_values_neighbor = &internal_fe_subface_values_neighbor;
-      }
-  }
-
-  template <class Iterator>
-  void reinit(const Iterator &cell)
-  {
-      fe_values.reinit (cell);
-      fe_face_values = nullptr;
-      fe_face_values_neighbor = nullptr;
-  }
-
-  double jump (const unsigned int idx, const unsigned int q_point) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
-
-      if (idx<fe_v.dofs_per_cell)
-        return fe_v.shape_value(idx, q_point);
-      else
-        return -fe_v_neighbor.shape_value(idx-fe_v.dofs_per_cell, q_point);
-    }
-
-  Tensor<1,dim> jump (const unsigned int idx, const unsigned int q_point,
-               const FEValuesExtractors::Vector &extractor) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
-
-      if (idx<fe_v.dofs_per_cell)
-        return fe_v[extractor].value(idx, q_point);
-      else
-        return -fe_v_neighbor[extractor].value(idx-fe_v.dofs_per_cell, q_point);
-    }
+         fe_values (mapping,
+                    fe,
+                    QGauss<dim>(quadrature_degree),
+                    update_flags),
+         fe_facet_values (mapping,
+                    fe,
+                    QGauss<dim-1>(quadrature_degree),
+                    facet_update_flags)
+       {}
 
 
-  double avg (const unsigned int idx, const unsigned int q_point) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
+       ScratchData (const ScratchData<dim> &scratch_data)
+         :
+         fe_values (scratch_data.fe_values.get_mapping(),
+                    scratch_data.fe_values.get_fe(),
+                    scratch_data.fe_values.get_quadrature(),
+                    scratch_data.fe_values.get_update_flags()),
+         fe_facet_values (scratch_data.fe_values.get_mapping(), // TODO: implement for fe_facet_values
+                    scratch_data.fe_values.get_fe(),
+                    scratch_data.fe_facet_values.get_quadrature(),
+                    scratch_data.fe_facet_values.get_update_flags())
+       {}
 
-      if (idx<fe_v.dofs_per_cell)
-        return 0.5*fe_v.shape_value(idx, q_point);
-      else
-        return 0.5*fe_v_neighbor.shape_value(idx-fe_v.dofs_per_cell, q_point);
-    }
+       FEValues<dim> fe_values;
+       FEFacetValues<dim> fe_facet_values;
+     };
 
-  double avg (const unsigned int idx, const unsigned int q_point,
-              const FEValuesExtractors::Scalar &extractor) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
 
-      if (idx<fe_v.dofs_per_cell)
-        return 0.5*fe_v[extractor].value(idx, q_point);
-      else
-        return 0.5*fe_v_neighbor[extractor].value(idx-fe_v.dofs_per_cell, q_point);
-    }
-
-  Tensor<1,dim> gradient_avg (const unsigned int idx, const unsigned int q_point) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
-
-      if (idx<fe_v.dofs_per_cell)
-        return 0.5*fe_v.shape_grad(idx, q_point);
-      else
-        return 0.5*fe_v_neighbor.shape_grad(idx-fe_v.dofs_per_cell, q_point);
-    }
-
-  Tensor<1,dim> gradient_n_avg (const unsigned int idx,
-                                const unsigned int q_point,
-                                const FEValuesExtractors::Vector &extractor
-                                ) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
-
-      if (idx<fe_v.dofs_per_cell)
-        return 0.5
-                *fe_v[extractor].gradient(idx, q_point)
-                *fe_v.normal_vector(q_point);
-      else
-        return 0.5
-                *fe_v_neighbor[extractor].gradient(idx-fe_v.dofs_per_cell, q_point)
-                *fe_v.normal_vector(q_point);
-    }
-
-  double choose (const bool left, const unsigned int idx, const unsigned int q_point) const
-  {
-      const FEFaceValuesBase<dim> &fe_v = *fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *fe_face_values_neighbor;
-
-      if (left && idx<fe_v.dofs_per_cell)
-        return fe_v.shape_value(idx, q_point);
-      if (!left && idx>=fe_v.dofs_per_cell)
-        return fe_v_neighbor.shape_value(idx-fe_v.dofs_per_cell, q_point);
-      return 0.0;
-    };
-
-  FEValues<dim>     fe_values;
-
-  FEFaceValuesBase<dim> *fe_face_values;
-  FEFaceValuesBase<dim> *fe_face_values_neighbor;
-
-//  protected:
-  FEFaceValues<dim> internal_fe_face_values;
-  FESubfaceValues<dim> internal_fe_subface_values;
-  FEFaceValues<dim> internal_fe_face_values_neighbor;
-  FESubfaceValues<dim> internal_fe_subface_values_neighbor;
-
-};
 
 struct CopyDataFace
 {
@@ -575,6 +457,16 @@ struct CopyData
   std::vector<types::global_dof_index> local_dof_indices;
   std::vector<CopyDataFace> face_data;
 
+  template <class Iterator>
+  void reinit(const Iterator &cell, unsigned int dofs_per_cell)
+  {
+      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+      cell_rhs.reinit (dofs_per_cell);
+
+      local_dof_indices.resize(dofs_per_cell);
+      cell->get_dof_indices (local_dof_indices);
+  }
+  //CopyDataFace &reinit_face();
 };
 
 template <class MatrixType, class VectorType>
