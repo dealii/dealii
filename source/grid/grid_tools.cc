@@ -1860,9 +1860,13 @@ namespace GridTools
 
 
   template <int spacedim>
+#ifndef DOXYGEN
   std::tuple<std::vector<std::vector<unsigned int>>,
              std::map<unsigned int, unsigned int>,
              std::map<unsigned int, std::vector<unsigned int>>>
+#else
+  return_type
+#endif
   guess_point_owner(
     const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
     const std::vector<Point<spacedim>> &                   points)
@@ -3987,10 +3991,14 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
+#ifndef DOXYGEN
   std::tuple<
     std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>,
     std::vector<std::vector<Point<dim>>>,
     std::vector<std::vector<unsigned int>>>
+#else
+  return_type
+#endif
   compute_point_locations(
     const Cache<dim, spacedim> &        cache,
     const std::vector<Point<spacedim>> &points,
@@ -4488,12 +4496,16 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
+#ifndef DOXYGEN
   std::tuple<
     std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>,
     std::vector<std::vector<Point<dim>>>,
     std::vector<std::vector<unsigned int>>,
     std::vector<std::vector<Point<spacedim>>>,
     std::vector<std::vector<unsigned int>>>
+#else
+  return_type
+#endif
   distributed_compute_point_locations(
     const GridTools::Cache<dim, spacedim> &                cache,
     const std::vector<Point<spacedim>> &                   local_points,
