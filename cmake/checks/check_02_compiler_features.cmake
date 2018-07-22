@@ -290,10 +290,11 @@ ENDIF()
 # - Wolfgang Bangerth, 2012
 #
 
-# some compilers compile the attributes but they do not work
-# so we treat errors as warnings:
+# Some compilers swallow the deprecation attribute, but emit a warning saying
+# that it is actually not supported such as:
 # "warning: use of the 'deprecated' attribute is a C++14 extension" (clang in c++11 mode)
 # "warning #1292: unknown attribute "deprecated"" (icc)
+# Hence, we treat warnings as errors:
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS}")
 PUSH_CMAKE_REQUIRED("-Werror")
 PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
