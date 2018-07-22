@@ -247,7 +247,7 @@ process_changed()
   esac
 
   ( git ls-files --others --exclude-standard -- ${1};
-    git diff --name-only $COMMON_ANCESTOR_WITH_MASTER -- ${1} )|
+    git diff --name-only --diff-filter=d $COMMON_ANCESTOR_WITH_MASTER -- ${1} )|
       sort -u |
       grep -E "^${2}$" |
       ${XARGS} '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
