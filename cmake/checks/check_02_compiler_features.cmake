@@ -290,13 +290,13 @@ ENDIF()
 # - Wolfgang Bangerth, 2012
 #
 
-# some compilers compile the attributes but they do not work:
+# Some compilers swallow the deprecation attribute, but emit a warning saying
+# that it is actually not supported such as:
 # "warning: use of the 'deprecated' attribute is a C++14 extension" (clang in c++11 mode)
 # "warning #1292: unknown attribute "deprecated"" (icc)
+# Hence, we treat warnings as errors:
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS}")
 PUSH_CMAKE_REQUIRED("-Werror")
-PUSH_CMAKE_REQUIRED("-Wno-deprecated-declarations")
-PUSH_CMAKE_REQUIRED("-Wno-deprecated")
 PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
 
 # first see if the compiler accepts the attribute
@@ -304,7 +304,6 @@ CHECK_CXX_SOURCE_COMPILES(
   "
           [[deprecated]] int old_fn ();
           int old_fn () { return 0; }
-          int (*fn_ptr)() = old_fn;
 
           struct [[deprecated]] bob
           {
@@ -321,7 +320,6 @@ CHECK_CXX_SOURCE_COMPILES(
   "
           __attribute__((deprecated)) int old_fn ();
           int old_fn () { return 0; }
-          int (*fn_ptr)() = old_fn;
 
           struct __attribute__((deprecated)) bob
           {

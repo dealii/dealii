@@ -104,6 +104,8 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 #   -w2259  non-pointer conversion from "double" to "float" may
 #           lose significant bits
 #   -w2536  type qualifiers are meaningless here
+#   -w2651  attribute does not apply to any entity
+#           spurious for [[deprecated]]
 #   -w3415  the "always_inline" attribute is ignored on non-inline functions
 #           incorrectly triggered by inline functions in tensor.h
 #   -w15531 A portion of SIMD loop is serialized
@@ -124,6 +126,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2651")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd3415")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
 
