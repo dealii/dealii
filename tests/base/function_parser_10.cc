@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test rand function
+// test rand function and expression only constructor
 
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/point.h>
