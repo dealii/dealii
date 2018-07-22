@@ -705,10 +705,12 @@ namespace internal
                      cell = dof_handler.begin_active();
                    cell != dof_handler.end();
                    ++cell)
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
-                  line_fe_association[cell->active_fe_index()]
-                                     [cell->line_index(l)] = true;
+                if (!cell->is_artificial())
+                  for (unsigned int l = 0;
+                       l < GeometryInfo<dim>::lines_per_cell;
+                       ++l)
+                    line_fe_association[cell->active_fe_index()]
+                                       [cell->line_index(l)] = true;
 
               // first check which of the lines is used at all,
               // i.e. is associated with a finite element. we do this
