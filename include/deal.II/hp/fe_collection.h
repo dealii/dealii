@@ -243,26 +243,31 @@ namespace hp
 
     /**
      * Try to find a least dominant finite element inside this FECollection
-     * which dominates other finite elements provided as fe_indices in @p fes
-     * . For example, if FECollection consists of {Q1,Q2,Q3,Q4} and we are
-     * looking for the least dominant FE for Q3 and Q4 (@p fes is {2,3}), then
-     * the answer is Q3 and therefore this function will return its index in
-     * FECollection, namely 2.
+     * which dominates all of those finite elements in the current collection
+     * indexed by the numbers provided through @p fes . For example, if
+     * an FECollection consists of `{FE_Q(1),FE_Q(2),FE_Q(3),FE_Q(4)}` elements
+     * and we are looking for the least dominant finite element among the
+     * last two elements of this collection (i.e., @p fes is `{2,3}`), then
+     * the answer is FE_Q(3) and therefore this function will return its index
+     * in the FECollection, namely `2`.
      *
      * For the purpose of this function by domination we consider either
-     * this_element_dominate or either_element_can_dominate; therefore the
-     * element can dominate itself. Thus if FECollection contains
-     * {Q1,Q2,Q4,Q3} and @p fes = {3}, the function returns 3.
+     * FiniteElementDomination::Domination::this_element_dominates or
+     * FiniteElementDomination::Domination::either_element_can_dominate;
+     * therefore the element can dominate itself. Thus, if an FECollection
+     * contains `{FE_Q(1),FE_Q(2),FE_Q(3),FE_Q(4)}` and @p fes only has
+     * a single element `{3}`, then the function returns 3.
      *
-     * If we were not able to find a finite element, the function returns
-     * numbers::invalid_unsigned_int .
+     * If the function is not able to find a finite element, the function
+     * returns numbers::invalid_unsigned_int .
      *
-     * Note that for the cases like when FECollection consists of {FE_Nothing
-     * x FE_Nothing, Q1xQ2, Q2xQ1} with @p fes = {1}, the function will not
-     * find the most dominating element as the default behavior of FE_Nothing
-     * is to return FiniteElementDomination::no_requirements when comparing
-     * for face domination. This, therefore, can't be considered as a
-     * dominating element in the sense described above .
+     * Note that for the cases like when FECollection consists of `{FE_Nothing
+     * x FE_Nothing, FE_Q(1)xFE_Q(2), FE_Q(2)xFE_Q(1)}` with @p fes as `{1}`,
+     * the function will not find a most dominating element as the default
+     * behavior of FE_Nothing is to return
+     * FiniteElementDomination::no_requirements when comparing for face
+     * domination with any other element. This, therefore, can't be considered
+     * as a dominating element in the sense described above.
      */
     unsigned int
     find_least_face_dominating_fe(const std::set<unsigned int> &fes) const;
