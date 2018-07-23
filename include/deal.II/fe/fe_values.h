@@ -2050,7 +2050,7 @@ public:
   /**
    * Destructor.
    */
-  ~FEValuesBase() override;
+  virtual ~FEValuesBase() override;
 
 
   /// @name ShapeAccess Access to shape function values. These fields are filled
