@@ -244,8 +244,6 @@ namespace parallel
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-
       const std::vector<::dealii::Vector<typename VectorType::value_type>>
         dofvalues = Utilities::unpack<
           std::vector<::dealii::Vector<typename VectorType::value_type>>>(
@@ -260,7 +258,7 @@ namespace parallel
            it_dofvalues != dofvalues.end();
            ++it_dofvalues)
         Assert(
-          dofs_per_cell == it_dofvalues->size(),
+          cell->get_fe().dofs_per_cell == it_dofvalues->size(),
           ExcMessage(
             "The transferred data was packed with a different number of dofs than the"
             "currently registered FE object assigned to the DoFHandler has."));
