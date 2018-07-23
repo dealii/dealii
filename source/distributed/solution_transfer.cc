@@ -210,8 +210,6 @@ namespace parallel
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-
       // create buffer for each individual object
       std::vector<::dealii::Vector<typename VectorType::value_type>> dofvalues(
         input_vectors.size());
@@ -220,7 +218,7 @@ namespace parallel
       auto it_output = dofvalues.begin();
       for (; cit_input != input_vectors.cend(); ++cit_input, ++it_output)
         {
-          it_output->reinit(dofs_per_cell);
+          it_output->reinit(cell->get_fe().dofs_per_cell);
           cell->get_interpolated_dof_values(*(*cit_input), *it_output);
         }
 
@@ -244,8 +242,6 @@ namespace parallel
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-
       const std::vector<::dealii::Vector<typename VectorType::value_type>>
         dofvalues = Utilities::unpack<
           std::vector<::dealii::Vector<typename VectorType::value_type>>>(
@@ -260,7 +256,7 @@ namespace parallel
            it_dofvalues != dofvalues.end();
            ++it_dofvalues)
         Assert(
-          dofs_per_cell == it_dofvalues->size(),
+          cell->get_fe().dofs_per_cell == it_dofvalues->size(),
           ExcMessage(
             "The transferred data was packed with a different number of dofs than the"
             "currently registered FE object assigned to the DoFHandler has."));
@@ -269,9 +265,7 @@ namespace parallel
       auto it_input  = dofvalues.cbegin();
       auto it_output = all_out.begin();
       for (; it_input != dofvalues.cend(); ++it_input, ++it_output)
-        {
-          cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
-        }
+        cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
     }
 
 
