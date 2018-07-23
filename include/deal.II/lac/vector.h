@@ -24,6 +24,8 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/differentiation/ad/ad_number_traits.h>
+
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -108,6 +110,12 @@ template <typename Number>
 class Vector : public Subscriptor
 {
 public:
+  // The assertion in vector.templates.h for whether or not a number is
+  // finite is not compatible for AD number types.
+  static_assert(
+    !Differentiation::AD::is_ad_number<Number>::value,
+    "The Vector class does not support auto-differentiable numbers.");
+
   /**
    * Declare standard types used in all containers. These types parallel those
    * in the <tt>C++</tt> standard libraries <tt>vector<...></tt> class.
