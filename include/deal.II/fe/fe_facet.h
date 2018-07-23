@@ -538,7 +538,7 @@ struct CopyData
   // CopyDataFace &reinit_face();
 };
 
-/*
+
 template <class MatrixType, class VectorType>
 inline void
 copy(const CopyData &        c,
@@ -561,7 +561,7 @@ copy(const CopyData &        c,
                             cdf.joint_dof_indices[k],
                             cdf.cell_matrix(i, k));
     }
-}*/
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
