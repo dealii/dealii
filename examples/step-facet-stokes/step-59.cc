@@ -39,7 +39,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -138,7 +137,7 @@ namespace Step59
   Solution<2>::value (const Point<2> &p,
                       const unsigned int component) const
   {
-    Assert (component <= 2+1, ExcIndexRange(component,0,2+1));
+    //Assert (component <= 2+1, ExcIndexRange(component,0,2+1));
 
     // smooth corner
 
@@ -1050,7 +1049,7 @@ namespace Step59
     DoFHandler<dim>               dof_handler;
     DoFHandler<dim>               velocity_dof_handler;
 
-    ConstraintMatrix              constraints;
+    AffineConstraints<>           constraints;
 
     BlockSparsityPattern          sparsity_pattern;
     BlockSparseMatrix<double>     system_matrix;
@@ -1088,13 +1087,9 @@ namespace Step59
     pressure_degree (pressure_degree),
     solver_type (solver_type),
 	geo_type(geo_type),
-//    triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
     triangulation (Triangulation<dim>::maximum_smoothing),
     // Finite element for the velocity only:
 //    velocity_fe (FE_RaviartThomas<dim>(pressure_degree), 1),
-////    velocity_fe (FE_BDM<dim>(pressure_degree+1), 1),
-//    // Finite element for the whole system:
-//    fe (velocity_fe, 1, FE_DGQ<dim> (pressure_degree), 1),
 	fe(fe),
     dof_handler (triangulation),
     velocity_dof_handler (triangulation),
@@ -1317,6 +1312,8 @@ namespace Step59
     const FEValuesExtractors::Vector velocities (0);
     const FEValuesExtractors::Scalar pressure (dim);
 
+    const double nu = 1.0;
+
     auto penalty_parameter = [] (const double degree,
         const double extent1,
         const double extent2) -> double
@@ -1377,16 +1374,13 @@ namespace Step59
 
     auto boundary_worker = [&] (const Iterator &cell, const unsigned int &face_no, ScratchData<dim> &scratch_data, CopyData &copy_data)
     {
-        /*
-      FEFaceValues<dim> &fe_fv = scratch_data.internal_fe_face_values;
-      fe_fv.reinit(cell, face_no);
+      scratch_data.fe_facet_values.reinit(cell, face_no);
+      const FEFaceValuesBase<dim> &fe_fv = scratch_data.fe_facet_values.get_fe_values();
 
       const auto &q_points = fe_fv.get_quadrature_points();
 
       const std::vector<double> &JxW = fe_fv.get_JxW_values ();
       const std::vector<Tensor<1,dim> > &normals = fe_fv.get_normal_vectors ();
-
-      const double nu = 1.0;
 
       std::vector<Vector<double> >      g_values (q_points.size(),
                                                     Vector<double>(dim+1));
@@ -1451,7 +1445,7 @@ namespace Step59
                   * scalar_product(g, normals[point])
                   ) * JxW[point];
 
-        }*/
+        }
     };
 
     auto face_worker = [&]
@@ -1464,59 +1458,56 @@ namespace Step59
 
       copy_data.face_data.emplace_back();
       CopyDataFace &copy_data_face = copy_data.face_data.back();
-      const unsigned int dofs_per_cell   = scratch_data.fe_values.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell   = fe_fv.n_facet_dofs();
 
-      copy_data_face.joint_dof_indices = scratch_data.fe_facet_values.get_joint_dof_indices();
+      copy_data_face.joint_dof_indices = fe_fv.get_facet_dof_indices();
+      copy_data_face.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-
-      copy_data_face.cell_matrix.reinit(2*dofs_per_cell, 2*dofs_per_cell);
-
-      const FEFaceValuesBase<dim> &fe_v = *scratch_data.fe_face_values;
-      const FEFaceValuesBase<dim> &fe_v_neighbor = *scratch_data.fe_face_values_neighbor;
-
-      const std::vector<double> &JxW = fe_v.get_JxW_values ();
-      const std::vector<Tensor<1,dim> > &normals = fe_v.get_normal_vectors ();
+      const std::vector<double> &JxW = fe_fv.get_JxW_values ();
+      const std::vector<Tensor<1,dim> > &normals = fe_fv.get_normal_vectors ();
+      const auto &q_points = fe_fv.get_fe_values().get_quadrature_points();
 
       double nu = 1.0;
 
-      const double degree = std::max(1.0, static_cast<double>(fe_v.get_fe().degree));
+      const double degree = std::max(1.0, static_cast<double>(fe_fv.get_fe_values().get_fe().degree));
       const double extent1 = cell->extent_in_direction(GeometryInfo<dim>::unit_normal_direction[f])
           * (cell->has_children() ? 2.0 : 1.0);
       const double extent2 = ncell->extent_in_direction(GeometryInfo<dim>::unit_normal_direction[nf])
           * (ncell->has_children() ? 2.0 : 1.0);
       const double penalty = penalty_parameter(degree, extent1, extent2);
 
-      for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+      for (unsigned int point=0; point<q_points.size(); ++point)
         {
-          for (unsigned int i=0; i<2*fe_v.dofs_per_cell; ++i)
-            for (unsigned int j=0; j<2*fe_v.dofs_per_cell; ++j)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
               copy_data_face.cell_matrix(i,j) +=
                   (
                   // - nu {\nabla u}n . [v] (consistency)
                   - nu
-                  * (scratch_data.gradient_n_avg(j, point, velocities)
-                  * scratch_data.jump(i, point, velocities))
+                    * fe_fv[velocities].gradient_dot_n_avg(j, point)
+                    * fe_fv[velocities].jump(i, point)
 
                     // - nu [u] . {\nabla v}n  (symmetry) // NIPG: use +
                     - nu
-                    * (scratch_data.jump(j, point, velocities)
-                    * scratch_data.gradient_n_avg(i, point, velocities))
+                    * fe_fv[velocities].jump(j, point)
+                    * fe_fv[velocities].gradient_dot_n_avg(i, point)
+                    //* fe_fv[velocities].gradient_avg(i, point)
+                    //* normals[point]
 
                     // nu sigma [u].[v] (penalty)
                     + nu * penalty
-                    * scalar_product(scratch_data.jump(j, point, velocities),
-                    scratch_data.jump(i, point, velocities))
+                    * scalar_product(fe_fv[velocities].jump(j, point),
+                      fe_fv[velocities].jump(i, point))
 
                     // {p} ([v].n)
-                    + scratch_data.avg(j, point, pressure)
-                    * scalar_product(scratch_data.jump(i, point, velocities),
+                    + fe_fv[pressure].avg(j, point)
+                    * scalar_product(fe_fv[velocities].jump(i, point),
                                      normals[point])
 
                     // {q} ([u].n)
-                    + scratch_data.avg(i, point, pressure)
-                    * scalar_product(scratch_data.jump(j, point, velocities),
+                    + fe_fv[pressure].avg(i, point)
+                    * scalar_product(fe_fv[velocities].jump(j, point),
                                      normals[point])
-
                   ) * JxW[point];
         }
 
@@ -2156,6 +2147,8 @@ int main ()
 
       const int dim = 2;
 
+      if (0)
+        {
       for (unsigned int d=0;d<3;++d)
       {
           FE_RaviartThomas<dim> test(d);
@@ -2178,20 +2171,20 @@ int main ()
                 << test.dofs_per_cell
                 << std::endl;
         }
+}
+      const int degree = 0;
 
-      const int degree = 2;
-
-      //FESystem<dim> fe(FESystem<dim>(FE_Q<dim>(degree), dim), 1, FE_Q<dim>(degree-1), 1);
+      //FESystem<dim> fe(FESystem<dim>(FE_Q<dim>(degree), dim), 1, FE_Q<dim>(degree-1), 1); // min=2
       //FESystem<dim> fe(FESystem<dim>(FE_DGQ<dim>(degree), dim), 1, FE_DGQ<dim>(degree-1), 1);
-      FESystem<dim> fe(FE_RaviartThomas<dim>(degree), 1, FE_DGQ<dim>(degree), 1);
-      //FESystem<dim> fe(FE_BDM<dim>(degree), 1, FE_DGP<dim>(degree-1), 1);
-            std::cout << fe.degree
-                      << " " << fe.tensor_degree()
+      FESystem<dim> fe(FE_RaviartThomas<dim>(degree), 1, FE_DGQ<dim>(degree), 1); //min=1
+      //FESystem<dim> fe(FE_BDM<dim>(degree), 1, FE_DGP<dim>(degree-1), 1); //min=
+      std::cout << fe.get_name() << ": degree=" << fe.degree
+                      << " tensor_degree=" << fe.tensor_degree()
                       << std::endl;
       StokesProblem<dim> flow_problem(fe,
-    		                          degree,
+                                  degree,
 									  SolverType::FGMRES_ILU,
-                    GeoType::Circle);
+                    GeoType::Cube);
 
       flow_problem.run ();
     }

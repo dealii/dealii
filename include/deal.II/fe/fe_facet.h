@@ -3,6 +3,13 @@
 
 #include <deal.II/meshworker/mesh_loop.h>
 
+/*
+ * TODO:
+ * - test hp
+ * - use fefacet for boundaries?
+ * - test GMG
+ * - example with error estimator
+ */
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -67,7 +74,7 @@ namespace FEFacetViews
     value_type
     avg(const unsigned int idx, const unsigned int q_point) const
     {
-      const unsigned int shape_fct = this->fe_facet->facet_to_fe_dof_idx(idx);
+      const unsigned int shape_fct = this->fe_facet->facet_dof_idx_to_fe_dof_idx(idx);
       if (shape_fct == idx)
         return 0.5 * this->fe_facet->get_fe_values().shape_value_component(
                        shape_fct, q_point, component);
@@ -118,10 +125,24 @@ namespace FEFacetViews
            const unsigned int                  first_vector_component)
       : Base<dim, spacedim>(fefacet)
       , first_vector_component(first_vector_component)
+      , extractor(first_vector_component)
     {}
 
     value_type
-    jump(const unsigned int idx, const unsigned int q_point) const;
+    jump(const unsigned int idx, const unsigned int q_point) const
+    {
+        const unsigned int shape_fct =
+          this->fe_facet->facet_dof_idx_to_fe_dof_idx(idx);
+        if (shape_fct == idx)
+            return this->fe_facet->get_fe_values()[extractor].value(shape_fct, q_point);
+        else
+          {
+            if (this->fe_facet->is_boundary_facet())
+              return value_type(); // 0 tensor
+            else
+              return -this->fe_facet->get_fe_values_neighbor()[extractor].value(shape_fct, q_point);
+          }
+    }
 
     value_type
     avg(const unsigned int idx, const unsigned int q_point) const;
@@ -130,12 +151,23 @@ namespace FEFacetViews
     gradient_avg(const unsigned int idx, const unsigned int q_point) const;
 
     value_type
+    gradient_dot_n_avg(const unsigned int idx, const unsigned int q_point) const
+    {
+        const unsigned int shape_fct =
+          this->fe_facet->facet_dof_idx_to_fe_dof_idx(idx);
+        const unsigned int fe_idx = this->fe_facet->facet_dof_idx_fe(idx);
+        return 0.5 * this->fe_facet->get_fe_values(fe_idx)[extractor].gradient(shape_fct, q_point)
+                    * this->fe_facet->get_fe_values().normal_vector(q_point);
+    }
+
+    value_type
     choose(const bool         left,
            const unsigned int idx,
            const unsigned int q_point) const;
 
   private:
     const unsigned int first_vector_component;
+    FEValuesExtractors::Vector extractor;
   };
 
 } // namespace FEFacetViews
@@ -391,7 +423,7 @@ public:
   operator[](const FEValuesExtractors::Vector &vector) const
   {
     Assert(vector.first_vector_component + spacedim <=
-             fe_face_values->get_fe()->n_components(),
+             fe_face_values->get_fe().n_components(),
            ExcMessage("Invalid FEValuesExtractors::Vector!"));
 
     return cached_views_vector[vector.first_vector_component];
