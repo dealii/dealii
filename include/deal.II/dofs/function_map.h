@@ -20,6 +20,6 @@
 
 #include <deal.II/dofs/deprecated_function_map.h>
 
-#warning "This file is deprecated."
+#pragma DEAL_II_WARNING("This file is deprecated.")
 
 #endif

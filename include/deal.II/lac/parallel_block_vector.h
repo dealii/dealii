@@ -20,7 +20,8 @@
 
 #include <deal.II/lac/la_parallel_block_vector.h>
 
-#warning This file is deprecated. Use <deal.II/lac/la_block_vector.h> and LinearAlgebra::distributed::BlockVector instead.
+#pragma DEAL_II_WARNING( \
+  "This file is deprecated. Use <deal.II/lac/la_block_vector.h> and LinearAlgebra::distributed::BlockVector instead.")
 
 #include <cstring>
 #include <iomanip>

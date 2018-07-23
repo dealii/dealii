@@ -382,6 +382,15 @@ _Pragma("GCC diagnostic pop")
 
 #endif
 
+/***********************************************************************
+ * Define a portable preprocessor macro that generates custom warnings
+ * reporting the line and the file where the warning appears. Taken from:
+ * http://goodliffe.blogspot.com/2009/07/c-how-to-say-warning-to-visual-studio-c.html
+ */
+
+#define DEAL_II_STRINGIZE_HELPER(x) #x
+#define DEAL_II_STRINGIZE(x) DEAL_II_STRINGIZE_HELPER(x)
+#define DEAL_II_WARNING(desc) message(__FILE__ "(" DEAL_II_STRINGIZE(__LINE__) ") : Warning: " #desc)
 
 /***********************************************************************
  * Final inclusions:
