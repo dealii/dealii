@@ -33,7 +33,7 @@ namespace boost
       template <int dim, class Number>
       struct tag<dealii::Point<dim, Number>>
       {
-        typedef point_tag type;
+        using type = point_tag;
       };
 
       /**
@@ -42,7 +42,7 @@ namespace boost
       template <int dim, class Number>
       struct coordinate_type<dealii::Point<dim, Number>>
       {
-        typedef Number type;
+        using type = Number;
       };
 
       /**
@@ -52,7 +52,7 @@ namespace boost
       template <int dim, class Number>
       struct coordinate_system<dealii::Point<dim, Number>>
       {
-        typedef cs::cartesian type;
+        using type = cs::cartesian;
       };
 
       /**
