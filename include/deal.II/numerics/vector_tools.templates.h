@@ -265,6 +265,7 @@ namespace VectorTools
     }
 
 
+
     // Internal implementation of interpolate that takes a generic functor
     // function such that function(cell) is of type
     // Function<spacedim, typename VectorType::value_type>*
@@ -520,13 +521,13 @@ namespace VectorTools
                                                                i);
           const auto weight =
             ::dealii::internal::ElementAccess<VectorType>::get(weights, i);
-          ::dealii::internal::ElementAccess<VectorType>::set(value / weight,
-                                                             i,
-                                                             vec);
+          if (std::abs(weight) > 0)
+            ::dealii::internal::ElementAccess<VectorType>::set(value / weight,
+                                                               i,
+                                                               vec);
         }
       vec.compress(VectorOperation::insert);
     }
-
   } // namespace internal
 
 
