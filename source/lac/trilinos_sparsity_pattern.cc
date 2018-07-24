@@ -154,7 +154,9 @@ namespace TrilinosWrappers
     , column_space_map(std::move(other.column_space_map))
     , graph(std::move(other.graph))
     , nonlocal_graph(std::move(other.nonlocal_graph))
+    , locally_owned_rows(std::move(other.locally_owned_rows))
   {}
+
 
 
   // Copy function only works if the
@@ -484,6 +486,9 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    locally_owned_rows.clear();
+    const auto range = this->local_range();
+    locally_owned_rows.add_range(range.first, range.second);
   }
 
 
@@ -499,6 +504,8 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    const auto range = this->local_range();
+    locally_owned_rows.add_range(range.first, range.second);
   }
 
 
@@ -513,6 +520,8 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    const auto range = this->local_range();
+    locally_owned_rows.add_range(range.first, range.second);
   }
 
 
@@ -528,6 +537,8 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    const auto range = this->local_range();
+    locally_owned_rows.add_range(range.first, range.second);
   }
 
 
@@ -541,6 +552,7 @@ namespace TrilinosWrappers
       parallel_partitioning.make_trilinos_map(communicator, false);
     reinit_sp(
       map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
+    locally_owned_rows = parallel_partitioning;
   }
 
 
@@ -554,6 +566,7 @@ namespace TrilinosWrappers
       parallel_partitioning.make_trilinos_map(communicator, false);
     reinit_sp(
       map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
+    locally_owned_rows = parallel_partitioning;
   }
 
 
@@ -574,6 +587,7 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    locally_owned_rows = row_parallel_partitioning;
   }
 
 
@@ -594,6 +608,7 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    locally_owned_rows = row_parallel_partitioning;
   }
 
 
@@ -615,6 +630,7 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    locally_owned_rows = row_parallel_partitioning;
 
     IndexSet nonlocal_partitioner = writable_rows;
     AssertDimension(nonlocal_partitioner.size(),
@@ -662,6 +678,7 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    locally_owned_rows = row_parallel_partitioning;
   }
 
 
@@ -683,6 +700,7 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    locally_owned_rows = parallel_partitioning;
   }
 
 
@@ -700,6 +718,8 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+    const auto range = this->local_range();
+    locally_owned_rows.add_range(range.first, range.second);
   }
 
 
@@ -718,7 +738,8 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
-
+    const auto range = this->local_range();
+    locally_owned_rows.add_range(range.first, range.second);
     compress();
   }
 
@@ -738,6 +759,7 @@ namespace TrilinosWrappers
   {
     column_space_map = std_cxx14::make_unique<Epetra_Map>(*sp.column_space_map);
     graph            = std_cxx14::make_unique<Epetra_FECrsGraph>(*sp.graph);
+    locally_owned_rows = sp.locally_owned_rows;
 
     if (sp.nonlocal_graph.get() != nullptr)
       nonlocal_graph =
@@ -761,6 +783,7 @@ namespace TrilinosWrappers
 
     reinit_sp(
       rows, columns, sp, false, column_space_map, graph, nonlocal_graph);
+    locally_owned_rows = complete_index_set(sp.n_rows());
   }
 
 
@@ -835,25 +858,19 @@ namespace TrilinosWrappers
   bool
   SparsityPattern::exists(const size_type i, const size_type j) const
   {
-    // Extract local indices in
-    // the matrix.
-    int trilinos_i =
-          graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-        trilinos_j =
-          graph->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
-
-    // If the data is not on the
-    // present processor, we throw
-    // an exception. This is on of
-    // the two tiny differences to
-    // the el(i,j) call, which does
-    // not throw any assertions.
-    if (trilinos_i == -1)
+    if (!locally_owned_rows.is_element(i))
       {
         return false;
       }
     else
       {
+        // Extract local indices in
+        // the matrix.
+        int trilinos_i =
+              graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+            trilinos_j =
+              graph->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+
         // Check whether the matrix
         // already is transformed to
         // local indices.

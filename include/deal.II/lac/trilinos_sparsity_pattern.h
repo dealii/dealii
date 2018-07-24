@@ -1230,6 +1230,11 @@ namespace TrilinosWrappers
      */
     std::unique_ptr<Epetra_CrsGraph> nonlocal_graph;
 
+    /**
+     * The set of locally owned rows.
+     */
+    IndexSet locally_owned_rows;
+
     friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
     friend class SparsityPatternIterators::Iterator;
@@ -1318,7 +1323,8 @@ namespace TrilinosWrappers
               const auto row_length =
                 accessor.sparsity_pattern->row_length(accessor.a_row);
               if (row_length == 0 ||
-                  row_length == static_cast<SparsityPattern::size_type>(-1))
+                  !accessor.sparsity_pattern->locally_owned_rows.is_element(
+                    accessor.a_row))
                 ++accessor.a_row;
               else
                 break;
@@ -1500,8 +1506,7 @@ namespace TrilinosWrappers
     const int n_cols = static_cast<int>(end - begin);
 
     int ierr;
-    if (graph->RowMap().LID(
-          static_cast<TrilinosWrappers::types::int_type>(row)) != -1)
+    if (locally_owned_rows.is_element(row))
       ierr = graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
     else if (nonlocal_graph.get() != nullptr)
       {
