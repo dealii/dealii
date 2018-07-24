@@ -484,7 +484,14 @@ def main():
     """Determine the subroutines and then print needed declarations and definitions
     to the header.
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=("Automatically generate deal.II-compatible template BLAS "
+                     + "and LAPACK wrappers by parsing the documentation provided "
+                     + " by each library. The best way to get this documentation "
+                     + "is to clone the LAPACK development sources available at "
+                     + "https://github.com/Reference-LAPACK and then pass the "
+                     + "root directory location to this program with the "
+                     + "--lapack-root-directory option."))
     lapack_subroutines = list()
     blas_subroutines = list()
     fp_guarded_subroutines = list()
