@@ -287,15 +287,6 @@ class FortranRoutine:
 
             assert found_type
 
-        # for line in self.lines:
-        #     print(line)
-
-        # print("const arguments: ", end='')
-        # print(self.const_arguments)
-        # print(self.general_name)
-        # print(self.arguments)
-        # print([(key, value) for (key, value) in self.arguments_by_type.items()])
-
     def is_subroutine(self):
         """Return whether or not the routine is a SUBROUTINE. It might also be a
         FUNCTION, which is not yet implemented.
@@ -529,7 +520,6 @@ def main():
         args["fp_guarded_subroutines"] = "lapack_templates_data/fp_subroutines"
     if args["output_file"] is None:
         args["output_file"] = "lapack_templates.h"
-    print(args)
 
     with open(args["lapack_subroutines"]) as lapack_handle:
         for line in lapack_handle:
@@ -648,3 +638,7 @@ def main():
         print("DEAL_II_NAMESPACE_CLOSE", file=output)
         print("", file=output)
         print("#endif", file=output)
+
+
+if __name__ == '__main__':
+    main()
