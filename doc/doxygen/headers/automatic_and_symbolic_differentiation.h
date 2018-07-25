@@ -411,6 +411,8 @@
  * - ad_drivers.h: Provides classes that act as drivers to the interface of internally supported 
  *   automatic differentiation libraries. These are used internally as an intermediary to the
  *   helper classes that we provide.
+ * - ad_helpers.h: Provides a set of classes to help perform automatic differentiation in a
+ *   number of different contexts. These are detailed in @ref auto_diff_1_3.
  * - ad_number_types.h: Introduces an enumeration (called a type code) for the
  *   auto-differentiable number combinations that will be supported by the driver classes.
  *   The rationale behind the use of this somewhat restrictive mechanism is discussed below.
