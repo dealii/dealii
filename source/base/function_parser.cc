@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/patterns.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
@@ -52,6 +53,33 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
   , n_vars(0)
 {}
 
+
+template <int dim>
+FunctionParser<dim>::FunctionParser(const std::string &expression,
+                                    const std::string &constants,
+                                    const std::string &variable_names,
+                                    const double       h)
+  : AutoDerivativeFunction<dim>(
+      h,
+      Utilities::split_string_list(expression, ';').size())
+  , initialized(false)
+  , n_vars(0)
+{
+  auto constants_map = Patterns::Tools::Convert<ConstMap>::to_value(
+    constants,
+    Patterns::Map(Patterns::Anything(),
+                  Patterns::Double(),
+                  0,
+                  Patterns::Map::max_int_value,
+                  ",",
+                  "=")
+      .clone());
+  initialize(variable_names,
+             expression,
+             constants_map,
+             Utilities::split_string_list(variable_names, ",").size() ==
+               dim + 1);
+}
 
 
 // We deliberately delay the definition of the default destructor

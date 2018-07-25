@@ -199,7 +199,7 @@ class FunctionParser : public AutoDerivativeFunction<dim>
 {
 public:
   /**
-   * Constructor for Parsed functions. Its arguments are the same of
+   * Constructor for parsed functions. Its arguments are the same of
    * the base class Function, with the additional parameter @p h, used
    * for the computation of gradients using finite differences. This
    * object needs to be initialized with the initialize() method
@@ -210,6 +210,18 @@ public:
   FunctionParser(const unsigned int n_components = 1,
                  const double       initial_time = 0.0,
                  const double       h            = 1e-8);
+
+  /**
+   * Constructor for parsed functions. Takes directly a semi-colon separated
+   * list of expressions (one for each component of the function), an optional
+   * comma-separated list of constants, variable names and step size for the
+   * computation of first order derivatives by finite difference.
+   */
+  FunctionParser(const std::string &expression,
+                 const std::string &constants      = "",
+                 const std::string &variable_names = default_variable_names() +
+                                                     ",t",
+                 const double h = 1e-8);
 
   /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one
