@@ -63,6 +63,20 @@ for (number : REAL_SCALARS)
     template
     class ADHelperEnergyFunctional<NumberTypes::sacado_rad_dfad,number>;
 
+    // -------------------------- ADHelperResidualLinearisation ----------------------
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_dfad_dfad,number>;
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_dfad,number>;
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_rad,number>;
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_rad_dfad,number>;
+
     \}
     \}
 }
@@ -116,6 +130,20 @@ for ()
 
     template
     class ADHelperEnergyFunctional<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+
+    // -------------------------- ADHelperResidualLinearisation ----------------------
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+
+    template
+    class ADHelperResidualLinearisation<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
 
 
     \}
