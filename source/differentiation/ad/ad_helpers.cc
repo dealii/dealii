@@ -830,6 +830,208 @@ namespace Differentiation
     }
 
 
+
+    /* ------------------ ADHelperEnergyFunctional ------------------ */
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::
+      ADHelperEnergyFunctional(const unsigned int n_independent_variables)
+      : ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>(
+          n_independent_variables,
+          1)
+    {}
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::
+      register_energy_functional(const ad_type &energy)
+    {
+      Assert(this->n_dependent_variables() == 1, ExcInternalError());
+      ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+        0, energy);
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    typename ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::scalar_type
+    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::compute_energy()
+      const
+    {
+      if (this->keep_values == false ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      Assert(
+        this->n_dependent_variables() == 1,
+        ExcMessage(
+          "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape() != numbers::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute value while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          return TapedDrivers<ad_type, scalar_type>::value(
+            this->active_tape(), this->independent_variable_values);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcInternalError());
+
+          return TapelessDrivers<ad_type, scalar_type>::value(
+            this->dependent_variables);
+        }
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::compute_residual(
+      Vector<scalar_type> &gradient) const
+    {
+      if (this->keep_values == false ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      Assert(
+        this->n_dependent_variables() == 1,
+        ExcMessage(
+          "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately.
+      if (gradient.size() != this->n_independent_variables())
+        gradient.reinit(this->n_independent_variables(),
+                        true /*omit_zeroing_entries*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape() != numbers::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute gradient while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          TapedDrivers<ad_type, scalar_type>::gradient(
+            this->active_tape(), this->independent_variable_values, gradient);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcInternalError());
+
+          TapelessDrivers<ad_type, scalar_type>::gradient(
+            this->independent_variables, this->dependent_variables, gradient);
+        }
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::
+      compute_linearization(FullMatrix<scalar_type> &hessian) const
+    {
+      Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
+             ExcMessage(
+               "Cannot computed function Hessian: AD number type does"
+               "not support the calculation of second order derivatives."));
+
+      if (this->keep_values == false)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      Assert(
+        this->n_dependent_variables() == 1,
+        ExcMessage(
+          "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately.
+      if (hessian.m() != this->n_independent_variables() &&
+          hessian.n() != this->n_independent_variables())
+        hessian.reinit({this->n_independent_variables(),
+                        this->n_independent_variables()},
+                       true /*omit_default_initialization*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape() != numbers::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute hessian while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          TapedDrivers<ad_type, scalar_type>::hessian(
+            this->active_tape(), this->independent_variable_values, hessian);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcInternalError());
+          TapelessDrivers<ad_type, scalar_type>::hessian(
+            this->independent_variables, this->dependent_variables, hessian);
+        }
+    }
+
+
   } // namespace AD
 } // namespace Differentiation
 

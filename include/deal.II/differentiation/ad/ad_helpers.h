@@ -1031,6 +1031,299 @@ namespace Differentiation
     }; // class ADHelperCellLevelBase
 
 
+
+    /**
+     * A helper class that facilitates the implementation of a generic
+     * (incremental) variational formulation from which the computation of the
+     * residual vector, as well as its linearization, is automated. This class
+     * would typically be used to derive the residual vector and tangent matrix
+     * (defined on the level of a cell), or a linearized system of
+     * equations, starting from a scalar energy functional.
+     *
+     * An example of its usage in the case of a residual and tangent
+     * computations might be as follows (in this case we'll compute the
+     * linearization of a finite-strain hyperelastic solid from a stored/strain
+     * energy density function):
+     *
+     * @code
+     *   // Existing data structures:
+     *   Vector<double> solution (...); // Or another vector type
+     *   std::vector<types::global_dof_index> local_dof_indices (...);
+     *   const FEValuesExtractors::Vector u_fe (...);
+     *   FEValues<dim> fe_values (...);
+     *   const unsigned int n_q_points (...);
+     *   FullMatrix<double> cell_matrix (...);
+     *   Vector<double> cell_rhs (...);
+     *
+     *   // Assembly loop:
+     *   for (auto cell & : ...)
+     *   {
+     *     cell->get_dof_indices(local_dof_indices);
+     *     const unsigned int n_independent_variables =
+     *       local_dof_indices.size();
+     *
+     *     // Create some aliases for the AD helper.
+     *     // In the example, the AD_typecode used for the template argument can
+     *     // be refer to either a taped or tapeless type.
+     *     using ADHelper = AD::ADHelperEnergyFunctional<...>;
+     *     using ADNumberType = typename ADHelper::ad_type;
+     *
+     *     // Create and initialize an instance of the helper class.
+     *     ADHelper ad_helper(n_independent_variables);
+     *
+     *     // Initialize the local data structures for assembly.
+     *     // This is also taken care of by the ADHelper, so this step could
+     *     // be skipped.
+     *     cell_rhs.reinit(n_independent_variables);
+     *     cell_matrix.reinit(n_independent_variables,n_independent_variables);
+     *
+     *     // An optional call to set the amount of memory to be allocated to
+     *     // storing taped data.
+     *     // If using a taped AD number then we would likely want to increase
+     *     // the buffer size from the default values as the expression for each
+     *     // residual component will likely be lengthy, and therefore memory
+     *     // intensive.
+     *     ad_helper.set_tape_buffer_sizes(...);
+     *
+     *     // If using a taped AD number, then at this point we would initiate
+     *     // taping of the expression for the energy for this FE type and
+     *     // material combination:
+     *
+     *     // Select a tape number to record to
+     *     const types::tape_index tape_index = ...;
+     *
+     *     // Indicate that we are about to start tracing the operations for
+     *     // function evaluation on the tape. If this tape has already been
+     *     // used (i.e. the operations are already recorded) then we
+     *     // (optionally) load the tape and reuse this data.
+     *     const bool is_recording
+     *       = ad_helper.start_recording_operations(tape_index);
+     *
+     *     // The steps that follow in the recording phase are required for
+     *     // tapeless methods as well.
+     *     if (is_recording == true)
+     *     {
+     *       // This is the "recording" phase of the operations.
+     *       // First, we set the values for all DoFs.
+     *       ad_helper.register_dof_values(solution, local_dof_indices);
+     *
+     *       // Then we get the complete set of degree-of-freedom values as
+     *       // represented by auto-differentiable numbers. The operations
+     *       // performed with these variables are tracked by the AD library
+     *       // from this point until stop_recording_operations() is called.
+     *       const std::vector<ADNumberType> dof_values_ad
+     *         = ad_helper.get_sensitive_dof_values();
+     *
+     *       // Then we do some problem specific tasks, the first being to
+     *       // compute all values, gradients etc. based on sensitive AD DoF
+     *       // values. Here we are fetching the displacement gradients at each
+     *       // quadrature point.
+     *       std::vector<Tensor<2, dim, ADNumberType>> Grad_u(
+     *         n_q_points, Tensor<2, dim, ADNumberType>());
+     *       fe_values[u_fe].get_function_gradients_from_local_dof_values(
+     *         dof_values_ad, Grad_u);
+     *
+     *       // This variable stores the cell total energy.
+     *       // IMPORTANT: Note that it is hand-initialized with a value of
+     *       // zero. This is a highly recommended practise, as some AD numbers
+     *       // appear not to safely initialize their internal data structures.
+     *       ADNumberType energy_ad = ADNumberType(0.0);
+     *
+     *       // Compute the cell total energy = (internal + external) energies
+     *       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+     *       {
+     *         // Calculate the deformation gradient at this quadrature point
+     *         const Tensor<2, dim, ADNumberType> F =
+     *           unit_symmetric_tensor<dim>() + Grad_u[q_point];
+     *         Assert(numbers::value_is_greater_than(determinant(F), 0.0),
+     *                ExcMessage("Negative jacobian detected!"));
+     *
+     *         // Add contribution of the internal energy:
+     *         // Integrate the stored energy density function with the current
+     *         // solution.
+     *         energy_ad += get_Psi(F) * fe_values.JxW(q_point);
+     *       }
+     *
+     *       // Add contribution from external energy:
+     *       // Loop over faces and accumulate external energy into cell
+     *       // total energy
+     *       // energy_ad += ...
+     *
+     *       // Register the definition of the total cell energy
+     *       ad_helper.register_energy_functional(energy_ad);
+     *
+     *       // Indicate that we have completed tracing the operations onto
+     *       // the tape.
+     *       ad_helper.stop_recording_operations(false); // write_tapes_to_file
+     *     }
+     *     else
+     *     {
+     *       // This is the "tape reuse" phase of the operations.
+     *       // Here we will leverage the already traced operations that reside
+     *       // on a tape, and simply re-evaluate the tape at a different point
+     *       // to get the function values and their derivatives.
+     *
+     *       // Load the existing tape to be reused
+     *       ad_helper.activate_recorded_tape(tape_index);
+     *
+     *       // Set the new values of the independent variables where the
+     *       // recorded dependent functions are to be evaluated (and
+     *       // differentiated around).
+     *       ad_helper.set_dof_values(solution, local_dof_indices);
+     *     }
+     *
+     *     // Compute the residual values and their Jacobian at the
+     *     // evaluation point
+     *     ad_helper.compute_residual(cell_rhs);
+     *     cell_rhs *= -1.0; // RHS = - residual
+     *     ad_helper.compute_linearization(cell_matrix);
+     *   }
+     * @endcode
+     *
+     * @warning ADOL-C does not support the standard threading models used by
+     * deal.II, so this class should @b not be embedded within a multithreaded
+     * function when using ADOL-C number types. It is, however, suitable for use
+     * in both serial and MPI routines.
+     *
+     * @author Jean-Paul Pelteret, 2016, 2017, 2018
+     */
+    template <enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType = double>
+    class ADHelperEnergyFunctional
+      : public ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>
+    {
+    public:
+      /**
+       * Type definition for the floating point number type that is used in,
+       * and results from, all computations.
+       */
+      using scalar_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+
+      /**
+       * Type definition for the auto-differentiation number type that is used
+       * in all computations.
+       */
+      using ad_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+
+      /**
+       * @name Constructor / destructor
+       */
+      //@{
+
+      /**
+       * The constructor for the class.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\Psi(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       *
+       * @note There is only one dependent variable associated with the total
+       * energy attributed to the local finite element. That is to say, this
+       * class assumes that the (local) right hand side and matrix contribution
+       * is computed from the first and second derivatives of a scalar
+       * function $\Psi(\mathbf{X})$.
+       */
+      ADHelperEnergyFunctional(const unsigned int n_independent_variables);
+
+      /**
+       * Destructor
+       */
+      virtual ~ADHelperEnergyFunctional() = default;
+
+      //@}
+
+      /**
+       * @name Dependent variables
+       */
+      //@{
+
+      /**
+       * Register the definition of the total cell energy
+       * $\Psi(\mathbf{X})$.
+       *
+       * @param[in] energy A recorded function that defines the total cell
+       * energy. This represents the single dependent variable from which both
+       * the residual and its linearization are to be computed.
+       *
+       * @note For this class that expects only a single scalar dependent
+       * variable, this function must only be called once per tape.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      void
+      register_energy_functional(const ad_type &energy);
+
+      /**
+       * Evaluation of the total scalar energy functional for a chosen set of
+       * degree-of-freedom values, i.e.
+       * @f[
+       *   \Psi(\mathbf{X}) \vert_{\mathbf{X}}
+       * @f]
+       *
+       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * ADHelperCellLevelBase::set_dof_values().
+       *
+       * @return The value of the energy functional at the evaluation point
+       * corresponding to a chosen set of local degree-of freedom values.
+       */
+      scalar_type
+      compute_energy() const;
+
+      /**
+       * Evaluation of the residual for a chosen set of degree-of-freedom
+       * values. Underlying this is the computation of the gradient (first
+       * derivative) of the scalar function $\Psi$ with respect to all
+       * independent variables, i.e.
+       * @f[
+       *   \mathbf{r}(\mathbf{X}) =
+       * \frac{\partial\Psi(\mathbf{X})}{\partial\mathbf{X}}
+       * \Big\vert_{\mathbf{X}}
+       * @f]
+       *
+       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * ADHelperCellLevelBase::set_dof_values().
+       *
+       * @param[out] residual A Vector object, for which the value for each
+       * entry represents the residual value for the corresponding local
+       * degree-of freedom. The output @p residual vector has a length
+       * corresponding to @p n_independent_variables.
+       */
+      void
+      compute_residual(Vector<scalar_type> &residual) const override;
+
+      /**
+       * Computes the linearization of the residual vector around a chosen set
+       * of degree-of-freedom values. Underlying this is the computation of the
+       * Hessian (second derivative) of the scalar function $\Psi$ with respect
+       * to all independent variables, i.e.
+       * @f[
+       *   \frac{\partial\mathbf{r}(\mathbf{X})}{\partial\mathbf{X}}
+       *     =
+       * \frac{\partial^{2}\Psi(\mathbf{X})}{\partial\mathbf{X}
+       * \otimes \partial\mathbf{X}} \Big\vert_{\mathbf{X}}
+       * @f]
+       *
+       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * ADHelperCellLevelBase::set_dof_values().
+       *
+       * @param[out] linearization A FullMatrix representing the linearization
+       * of the residual vector. The output @p linearization matrix has
+       * dimensions corresponding to
+       * <code>n_independent_variables</code>$\times$<code>n_independent_variables</code>.
+       */
+      virtual void
+      compute_linearization(
+        FullMatrix<scalar_type> &linearization) const override;
+
+      //@}
+
+    }; // class ADHelperEnergyFunctional
+
+
   } // namespace AD
 } // namespace Differentiation
 

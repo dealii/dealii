@@ -37,6 +37,14 @@ for (number : REAL_SCALARS)
     template
     class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,number>;
 
+    // -------------------------- ADHelperEnergyFunctional ----------------------
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,number>;
+
     \}
     \}
 }
@@ -64,6 +72,14 @@ for ()
 
     template
     class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperEnergyFunctional ----------------------
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
 
     \}
