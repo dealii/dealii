@@ -16,6 +16,7 @@
 
 
 // check register_data_attach and notify_ready_to_unpack
+// for variable size transfer
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
@@ -40,8 +41,22 @@ pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
     status)
 {
-  static int some_number = 0;
-  deallog << "packing cell " << cell->id() << " with data=" << some_number
+  static int                some_number = 1;
+  std::vector<unsigned int> some_vector(some_number);
+  for (unsigned int i = 0; i < some_number; ++i)
+    some_vector[i] = i;
+
+  std::vector<char> buffer;
+  buffer.reserve(some_number * sizeof(unsigned int));
+  for (auto vector_it = some_vector.cbegin(); vector_it != some_vector.cend();
+       ++vector_it)
+    {
+      Utilities::pack(*vector_it, buffer, /*allow_compression=*/false);
+    }
+
+  deallog << "packing cell " << cell->id()
+          << " with data size =" << buffer.size() << " accumulated data="
+          << std::accumulate(some_vector.begin(), some_vector.end(), 0)
           << " status=";
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
     deallog << "PERSIST";
@@ -62,7 +77,8 @@ pack_function(
       Assert(!cell->has_children(), ExcInternalError());
     }
 
-  return Utilities::pack(some_number++, /*allow_compression=*/false);
+  ++some_number;
+  return buffer;
 }
 
 template <int dim>
@@ -74,11 +90,26 @@ unpack_function(
                                                                   status,
   const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
 {
-  const int intdata = Utilities::unpack<int>(data_range.begin(),
-                                             data_range.end(),
-                                             /*allow_compression=*/false);
+  const unsigned int data_in_bytes =
+    std::distance(data_range.begin(), data_range.end());
 
-  deallog << "unpacking cell " << cell->id() << " with data=" << intdata
+  std::vector<unsigned int> intdatavector(data_in_bytes / sizeof(unsigned int));
+
+  auto vector_it = intdatavector.begin();
+  auto data_it   = data_range.begin();
+  for (; data_it != data_range.end();
+       ++vector_it, data_it += sizeof(unsigned int))
+    {
+      *vector_it =
+        Utilities::unpack<unsigned int>(data_it,
+                                        data_it + sizeof(unsigned int),
+                                        /*allow_compression=*/false);
+    }
+
+  deallog << "unpacking cell " << cell->id() << " with data size="
+          << std::distance(data_range.begin(), data_range.end())
+          << " accumulated data="
+          << std::accumulate(intdatavector.begin(), intdatavector.end(), 0)
           << " status=";
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
     deallog << "PERSIST";
@@ -139,7 +170,7 @@ test()
 
       unsigned int handle =
         tr.register_data_attach(pack_function<dim>,
-                                /*returns_variable_size_data=*/false);
+                                /*packs_variable_size_data=*/true);
 
       deallog << "handle=" << handle << std::endl;
       tr.execute_coarsening_and_refinement();

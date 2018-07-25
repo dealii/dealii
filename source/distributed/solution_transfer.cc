@@ -85,11 +85,13 @@ namespace parallel
                        *>(&dof_handler->get_triangulation())));
       Assert(tria != nullptr, ExcInternalError());
 
-      handle = tria->register_data_attach(std::bind(
-        &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2));
+      handle = tria->register_data_attach(
+        std::bind(
+          &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
+          this,
+          std::placeholders::_1,
+          std::placeholders::_2),
+        /*returns_variable_size_data=*/false);
     }
 
 

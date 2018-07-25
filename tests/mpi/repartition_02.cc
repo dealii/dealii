@@ -121,7 +121,9 @@ test()
 
       deallog << "* global refine:" << std::endl;
 
-      unsigned int handle = tr.register_data_attach(pack_function<dim>);
+      unsigned int handle =
+        tr.register_data_attach(pack_function<dim>,
+                                /*returns_variable_size_data=*/false);
 
       tr.refine_global(1);
 
@@ -136,7 +138,8 @@ test()
 
       deallog << "* repartition:" << std::endl;
 
-      handle = tr.register_data_attach(pack_function<dim>);
+      handle = tr.register_data_attach(pack_function<dim>,
+                                       /*returns_variable_size_data=*/false);
 
       tr.repartition();
 

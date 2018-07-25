@@ -1136,6 +1136,7 @@ namespace parallel
     Triangulation<dim, spacedim>::DataTransfer::DataTransfer(
       MPI_Comm mpi_communicator)
       : mpi_communicator(mpi_communicator)
+      , variable_size_data_stored(false)
     {}
 
 
@@ -1145,10 +1146,27 @@ namespace parallel
     Triangulation<dim, spacedim>::DataTransfer::pack_data(
       const std::vector<quadrant_cell_relation_t> &quad_cell_relations,
       const std::vector<typename CellAttachedData::pack_callback_t>
-        &pack_callbacks)
+        &pack_callbacks_fixed,
+      const std::vector<typename CellAttachedData::pack_callback_t>
+        &pack_callbacks_variable)
     {
       Assert(src_data_fixed.size() == 0,
              ExcMessage("Previously packed data has not been released yet!"));
+      Assert(src_sizes_variable.size() == 0, ExcInternalError());
+
+      const unsigned int n_callbacks_fixed    = pack_callbacks_fixed.size();
+      const unsigned int n_callbacks_variable = pack_callbacks_variable.size();
+
+      // Store information that we packed variable size data in
+      // a member variable for later.
+      variable_size_data_stored = (n_callbacks_variable > 0);
+
+      // If variable transfer is scheduled, we will store the data size that
+      // each variable size callback function writes in this auxiliary
+      // container. The information will be stored by each cell in this vector
+      // temporarily.
+      std::vector<unsigned int> cell_sizes_variable_cumulative(
+        n_callbacks_variable);
 
       // Prepare the buffer structure, in which each callback function will
       // store its data for each active cell.
@@ -1162,16 +1180,22 @@ namespace parallel
       // ||  callback_1  ||  callback_2  |...| ||  callback_1  ||  callback_2  |...| ...
       // |||char|char|...|||char|char|...|...| |||char|char|...|||char|char|...|...| ...
       /* clang-format on */
-      std::vector<std::vector<std::vector<char>>> packed_data(
+      std::vector<std::vector<std::vector<char>>> packed_fixed_size_data(
         quad_cell_relations.size());
+      std::vector<std::vector<std::vector<char>>> packed_variable_size_data(
+        variable_size_data_stored ? quad_cell_relations.size() : 0);
 
+      //
+      // --------- Pack data for fixed and variable size transfer ---------
+      //
       // Iterate over all cells, call all callback functions on each cell,
       // and store their data in the corresponding buffer scope.
       {
-        auto quad_cell_rel_it = quad_cell_relations.cbegin();
-        auto data_cell_it     = packed_data.begin();
+        auto quad_cell_rel_it      = quad_cell_relations.cbegin();
+        auto data_cell_fixed_it    = packed_fixed_size_data.begin();
+        auto data_cell_variable_it = packed_variable_size_data.begin();
         for (; quad_cell_rel_it != quad_cell_relations.cend();
-             ++quad_cell_rel_it, ++data_cell_it)
+             ++quad_cell_rel_it, ++data_cell_fixed_it)
           {
             const auto &cell_status = std::get<1>(*quad_cell_rel_it);
             const auto &dealii_cell = std::get<2>(*quad_cell_rel_it);
@@ -1213,25 +1237,30 @@ namespace parallel
 
             // Reserve memory corresponding to the number of callback
             // functions that will be called.
+            // If variable size transfer is scheduled, we need to leave
+            // room for an array that holds information about how many
+            // bytes each of the variable size callback functions will
+            // write.
             // On cells flagged with CELL_INVALID, only its CellStatus
             // will be stored.
-            const unsigned int n_callbacks_on_cell =
+            const unsigned int n_fixed_size_data_sets_on_cell =
               1 +
               ((cell_status ==
                 parallel::distributed::Triangulation<dim,
                                                      spacedim>::CELL_INVALID) ?
                  0 :
-                 pack_callbacks.size());
-            data_cell_it->resize(n_callbacks_on_cell);
+                 ((variable_size_data_stored ? 1 : 0) + n_callbacks_fixed));
+            data_cell_fixed_it->resize(n_fixed_size_data_sets_on_cell);
 
             // We continue with packing all data on this specific cell.
+            auto data_fixed_it = data_cell_fixed_it->begin();
+
             // First, we pack the CellStatus information.
-            auto data_it = data_cell_it->begin();
             // to get consistent data sizes on each cell for the fixed size
             // transfer, we won't allow compression
-            *data_it =
+            *data_fixed_it =
               Utilities::pack(cell_status, /*allow_compression=*/false);
-            ++data_it;
+            ++data_fixed_it;
 
             // Proceed with all registered callback functions.
             // Skip cells with the CELL_INVALID flag.
@@ -1239,16 +1268,81 @@ namespace parallel
                 parallel::distributed::Triangulation<dim,
                                                      spacedim>::CELL_INVALID)
               {
-                for (auto callback_it = pack_callbacks.cbegin();
-                     callback_it != pack_callbacks.cend();
-                     ++callback_it, ++data_it)
+                // Pack fixed size data.
+                for (auto callback_it = pack_callbacks_fixed.cbegin();
+                     callback_it != pack_callbacks_fixed.cend();
+                     ++callback_it, ++data_fixed_it)
                   {
-                    *data_it = (*callback_it)(dealii_cell, cell_status);
+                    *data_fixed_it = (*callback_it)(dealii_cell, cell_status);
                   }
+
+                // Pack variable size data.
+                // If we store variable size data, we need to transfer
+                // the sizes of each corresponding callback function
+                // via fixed size transfer as well.
+                if (variable_size_data_stored)
+                  {
+                    const unsigned int n_variable_size_data_sets_on_cell =
+                      ((cell_status ==
+                        parallel::distributed::Triangulation<dim, spacedim>::
+                          CELL_INVALID) ?
+                         0 :
+                         n_callbacks_variable);
+                    data_cell_variable_it->resize(
+                      n_variable_size_data_sets_on_cell);
+
+                    auto callback_it      = pack_callbacks_variable.cbegin();
+                    auto data_variable_it = data_cell_variable_it->begin();
+                    auto sizes_variable_it =
+                      cell_sizes_variable_cumulative.begin();
+                    for (; callback_it != pack_callbacks_variable.cend();
+                         ++callback_it, ++data_variable_it, ++sizes_variable_it)
+                      {
+                        *data_variable_it =
+                          (*callback_it)(dealii_cell, cell_status);
+
+                        // Store data sizes for each callback function first.
+                        // Make it cumulative below.
+                        *sizes_variable_it = data_variable_it->size();
+                      }
+
+                    // Turn size vector into its cumulative representation.
+                    std::partial_sum(cell_sizes_variable_cumulative.begin(),
+                                     cell_sizes_variable_cumulative.end(),
+                                     cell_sizes_variable_cumulative.begin());
+
+                    // Serialize cumulative variable size vector value-by-value.
+                    // This way we can circumvent the overhead of storing the
+                    // container object as a whole, since we know its size by
+                    // the number of registered callback functions.
+                    data_fixed_it->resize(n_callbacks_variable *
+                                          sizeof(unsigned int));
+                    for (unsigned int i = 0; i < n_callbacks_variable; ++i)
+                      std::memcpy(&(data_fixed_it->at(i *
+                                                      sizeof(unsigned int))),
+                                  &(cell_sizes_variable_cumulative.at(i)),
+                                  sizeof(unsigned int));
+
+                    ++data_fixed_it;
+                  }
+
+                // Double check that we packed everything we wanted
+                // in the fixed size buffers.
+                Assert(data_fixed_it == data_cell_fixed_it->end(),
+                       ExcInternalError());
               }
+
+            // Increment the variable size data iterator
+            // only if we actually pack this kind of data
+            // to avoid getting out of bounds.
+            if (variable_size_data_stored)
+              ++data_cell_variable_it;
           } // loop over quad_cell_relations
       }
 
+      //
+      // ----------- Gather data sizes for fixed size transfer ------------
+      //
       // Generate a vector which stores the sizes of each callback function,
       // including the packed CellStatus transfer.
       // Find the very first cell that we wrote to with all callback
@@ -1259,19 +1353,20 @@ namespace parallel
       // any cell at all, we will exchange the information about the data sizes
       // among them later. The code inbetween is still well-defined, since the
       // following loops will be skipped.
-      std::vector<unsigned int> local_sizes_fixed(1 + pack_callbacks.size());
-      for (auto data_cell_it = packed_data.cbegin();
-           data_cell_it != packed_data.cend();
-           ++data_cell_it)
+      std::vector<unsigned int> local_sizes_fixed(
+        1 + n_callbacks_fixed + (variable_size_data_stored ? 1 : 0));
+      for (auto data_cell_fixed_it = packed_fixed_size_data.cbegin();
+           data_cell_fixed_it != packed_fixed_size_data.cend();
+           ++data_cell_fixed_it)
         {
-          if (data_cell_it->size() == local_sizes_fixed.size())
+          if (data_cell_fixed_it->size() == local_sizes_fixed.size())
             {
               auto sizes_fixed_it = local_sizes_fixed.begin();
-              auto data_it        = data_cell_it->cbegin();
-              for (; data_it != data_cell_it->cend();
-                   ++data_it, ++sizes_fixed_it)
+              auto data_fixed_it  = data_cell_fixed_it->cbegin();
+              for (; data_fixed_it != data_cell_fixed_it->cend();
+                   ++data_fixed_it, ++sizes_fixed_it)
                 {
-                  *sizes_fixed_it = data_it->size();
+                  *sizes_fixed_it = data_fixed_it->size();
                 }
 
               break;
@@ -1279,12 +1374,12 @@ namespace parallel
         }
 
       // Check if all cells have valid sizes.
-      for (auto data_cell_it = packed_data.cbegin();
-           data_cell_it != packed_data.cend();
-           ++data_cell_it)
+      for (auto data_cell_fixed_it = packed_fixed_size_data.cbegin();
+           data_cell_fixed_it != packed_fixed_size_data.cend();
+           ++data_cell_fixed_it)
         {
-          Assert(data_cell_it->size() == 1 ||
-                   data_cell_it->size() == local_sizes_fixed.size(),
+          Assert((data_cell_fixed_it->size() == 1) ||
+                   (data_cell_fixed_it->size() == local_sizes_fixed.size()),
                  ExcInternalError());
         }
 
@@ -1298,34 +1393,66 @@ namespace parallel
 
       // Construct cumulative sizes, since this is the only information
       // we need from now on.
-      cumulative_sizes_fixed.resize(global_sizes_fixed.size());
+      sizes_fixed_cumulative.resize(global_sizes_fixed.size());
       std::partial_sum(global_sizes_fixed.begin(),
                        global_sizes_fixed.end(),
-                       cumulative_sizes_fixed.begin());
+                       sizes_fixed_cumulative.begin());
 
-      // Move every piece of packed data into the consecutive buffer.
-      src_data_fixed.reserve(quad_cell_relations.size() *
-                             cumulative_sizes_fixed.back());
-      for (auto data_cell_it = packed_data.begin();
-           data_cell_it != packed_data.end();
-           ++data_cell_it)
+      //
+      // ---------- Gather data sizes for variable size transfer ----------
+      //
+      if (variable_size_data_stored)
+        {
+          src_sizes_variable.reserve(packed_variable_size_data.size());
+          for (auto data_cell_variable_it = packed_variable_size_data.cbegin();
+               data_cell_variable_it != packed_variable_size_data.cend();
+               ++data_cell_variable_it)
+            {
+              int variable_data_size_on_cell = 0;
+
+              for (auto data_variable_it = data_cell_variable_it->cbegin();
+                   data_variable_it != data_cell_variable_it->cend();
+                   ++data_variable_it)
+                variable_data_size_on_cell += data_variable_it->size();
+
+              src_sizes_variable.push_back(variable_data_size_on_cell);
+            }
+        }
+
+      //
+      // ------------------------ Build buffers ---------------------------
+      //
+      const unsigned int expected_size_fixed =
+        quad_cell_relations.size() * sizes_fixed_cumulative.back();
+      const unsigned int expected_size_variable =
+        std::accumulate(src_sizes_variable.begin(),
+                        src_sizes_variable.end(),
+                        std::vector<int>::size_type(0));
+
+      // Move every piece of packed fixed size data into the consecutive buffer.
+      src_data_fixed.reserve(expected_size_fixed);
+      for (auto data_cell_fixed_it = packed_fixed_size_data.begin();
+           data_cell_fixed_it != packed_fixed_size_data.end();
+           ++data_cell_fixed_it)
         {
           // Move every fraction of packed data into the buffer
           // reserved for this particular cell.
-          for (auto data_it = data_cell_it->begin();
-               data_it != data_cell_it->end();
-               ++data_it)
-            std::move(data_it->begin(),
-                      data_it->end(),
+          for (auto data_fixed_it = data_cell_fixed_it->begin();
+               data_fixed_it != data_cell_fixed_it->end();
+               ++data_fixed_it)
+            std::move(data_fixed_it->begin(),
+                      data_fixed_it->end(),
                       std::back_inserter(src_data_fixed));
 
           // If we only packed the CellStatus information
           // (i.e. encountered a cell flagged CELL_INVALID),
           // fill the remaining space with invalid entries.
-          if (data_cell_it->size() == 1)
+          // We can skip this if there is nothing else to pack.
+          if ((data_cell_fixed_it->size() == 1) &&
+              (sizes_fixed_cumulative.size() > 1))
             {
               const std::size_t bytes_skipped =
-                cumulative_sizes_fixed.back() - cumulative_sizes_fixed.front();
+                sizes_fixed_cumulative.back() - sizes_fixed_cumulative.front();
 
               src_data_fixed.insert(src_data_fixed.end(),
                                     bytes_skipped,
@@ -1333,8 +1460,29 @@ namespace parallel
             }
         }
 
+      // Move every piece of packed variable size data into the consecutive
+      // buffer.
+      if (variable_size_data_stored)
+        {
+          src_data_variable.reserve(expected_size_variable);
+          for (auto data_cell_variable_it = packed_variable_size_data.begin();
+               data_cell_variable_it != packed_variable_size_data.end();
+               ++data_cell_variable_it)
+            {
+              // Move every fraction of packed data into the buffer
+              // reserved for this particular cell.
+              for (auto data_variable_it = data_cell_variable_it->begin();
+                   data_variable_it != data_cell_variable_it->end();
+                   ++data_variable_it)
+                std::move(data_variable_it->begin(),
+                          data_variable_it->end(),
+                          std::back_inserter(src_data_variable));
+            }
+        }
+
       // Double check that we packed everything correctly.
-      Assert(src_data_fixed.size() == src_data_fixed.capacity(),
+      Assert(src_data_fixed.size() == expected_size_fixed, ExcInternalError());
+      Assert(src_data_variable.size() == expected_size_variable,
              ExcInternalError());
     }
 
@@ -1348,31 +1496,84 @@ namespace parallel
       const typename dealii::internal::p4est::types<dim>::gloidx
         *previous_global_first_quadrant)
     {
-      Assert(cumulative_sizes_fixed.size() > 0,
+      Assert(sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
 
       // Resize memory according to the data that we will receive.
       dest_data_fixed.resize(parallel_forest->local_num_quadrants *
-                             cumulative_sizes_fixed.back());
+                             sizes_fixed_cumulative.back());
 
-      // Execute fixed size transfer.
-      dealii::internal::p4est::functions<dim>::transfer_fixed(
-        parallel_forest->global_first_quadrant,
-        previous_global_first_quadrant,
-        parallel_forest->mpicomm,
-        0,
-        dest_data_fixed.data(),
-        src_data_fixed.data(),
-        cumulative_sizes_fixed.back());
+      // Execute non-blocking fixed size transfer.
+      typename dealii::internal::p4est::types<dim>::transfer_context
+        *tf_context;
+      tf_context =
+        dealii::internal::p4est::functions<dim>::transfer_fixed_begin(
+          parallel_forest->global_first_quadrant,
+          previous_global_first_quadrant,
+          parallel_forest->mpicomm,
+          0,
+          dest_data_fixed.data(),
+          src_data_fixed.data(),
+          sizes_fixed_cumulative.back());
+
+      if (variable_size_data_stored)
+        {
+          // Resize memory according to the data that we will receive.
+          dest_sizes_variable.resize(parallel_forest->local_num_quadrants);
+
+          // Execute fixed size transfer of data sizes for variable size
+          // transfer.
+          dealii::internal::p4est::functions<dim>::transfer_fixed(
+            parallel_forest->global_first_quadrant,
+            previous_global_first_quadrant,
+            parallel_forest->mpicomm,
+            1,
+            dest_sizes_variable.data(),
+            src_sizes_variable.data(),
+            sizeof(int));
+        }
+
+      dealii::internal::p4est::functions<dim>::transfer_fixed_end(tf_context);
 
       // Release memory of previously packed data.
       src_data_fixed.clear();
       src_data_fixed.shrink_to_fit();
 
-      // TODO: for variable transfer
-      // allocate memory for transfer
-      // p4est transfer fixed_begin for transfer of var data sizes
-      // p4est transfer custom for transfer of var data
+      if (variable_size_data_stored)
+        {
+          // Resize memory according to the data that we will receive.
+          dest_data_variable.resize(
+            std::accumulate(dest_sizes_variable.begin(),
+                            dest_sizes_variable.end(),
+                            std::vector<int>::size_type(0)));
+
+          // ----- WORKAROUND -----
+          // An assertion in p4est prevents us from sending/receiving no data
+          // at all, which is mandatory if one of our processes does not own
+          // any quadrant. This bypasses the assertion from being triggered.
+          //   - see: https://github.com/cburstedde/p4est/issues/48
+          if (src_sizes_variable.size() == 0)
+            src_sizes_variable.resize(1);
+          if (dest_sizes_variable.size() == 0)
+            dest_sizes_variable.resize(1);
+
+          // Execute variable size transfer.
+          dealii::internal::p4est::functions<dim>::transfer_custom(
+            parallel_forest->global_first_quadrant,
+            previous_global_first_quadrant,
+            parallel_forest->mpicomm,
+            1,
+            dest_data_variable.data(),
+            dest_sizes_variable.data(),
+            src_data_variable.data(),
+            src_sizes_variable.data());
+
+          // Release memory of previously packed data.
+          src_sizes_variable.clear();
+          src_sizes_variable.shrink_to_fit();
+          src_data_variable.clear();
+          src_data_variable.shrink_to_fit();
+        }
     }
 
 
@@ -1382,15 +1583,16 @@ namespace parallel
     Triangulation<dim, spacedim>::DataTransfer::unpack_cell_status(
       std::vector<quadrant_cell_relation_t> &quad_cell_relations) const
     {
-      Assert(cumulative_sizes_fixed.size() > 0,
+      Assert(sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
-      Assert((quad_cell_relations.size() == 0) || (dest_data_fixed.size() > 0),
-             ExcMessage("No data has been received!"));
+      if (quad_cell_relations.size() > 0)
+        {
+          Assert(dest_data_fixed.size() > 0,
+                 ExcMessage("No data has been received!"));
+        }
 
       // Size of CellStatus object that will be unpacked on each cell.
-      const std::size_t size = sizeof(
-        typename parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CellStatus);
+      const unsigned int size = sizes_fixed_cumulative.front();
 
       // Iterate over all cells and overwrite the CellStatus
       // information from the transferred data.
@@ -1399,7 +1601,7 @@ namespace parallel
       auto quad_cell_rel_it = quad_cell_relations.begin();
       auto dest_fixed_it    = dest_data_fixed.cbegin();
       for (; quad_cell_rel_it != quad_cell_relations.end();
-           ++quad_cell_rel_it, dest_fixed_it += cumulative_sizes_fixed.back())
+           ++quad_cell_rel_it, dest_fixed_it += sizes_fixed_cumulative.back())
         {
           std::get<1>(*quad_cell_rel_it) = // cell_status
             Utilities::unpack<typename parallel::distributed::
@@ -1423,26 +1625,125 @@ namespace parallel
         const boost::iterator_range<std::vector<char>::const_iterator> &)>
         &unpack_callback) const
     {
-      Assert(cumulative_sizes_fixed.size() > 0,
-             ExcMessage("No data has been packed!"));
-      Assert((quad_cell_relations.size() == 0) || (dest_data_fixed.size() > 0),
-             ExcMessage("No data has been received!"));
+      // We decode the handle returned by register_data_attach() back into
+      // a format we can use. All even handles belong to those callback
+      // functions which write/read variable size data, all odd handles interact
+      // with fixed size buffers.
+      const bool         callback_variable_transfer = (handle % 2 == 0);
+      const unsigned int callback_index             = handle / 2;
 
-      // Calculate offset and size from cumulated sizes.
-      const unsigned int offset = cumulative_sizes_fixed[handle];
-      const unsigned int size   = cumulative_sizes_fixed[handle + 1] - offset;
+      Assert(sizes_fixed_cumulative.size() > 0,
+             ExcMessage("No data has been packed!"));
+      if (quad_cell_relations.size() > 0)
+        {
+          Assert(dest_data_fixed.size() > 0,
+                 ExcMessage("No data has been received!"));
+
+          if (callback_variable_transfer)
+            Assert(dest_data_variable.size() > 0,
+                   ExcMessage("No data has been received!"));
+        }
+
+      std::vector<char>::const_iterator dest_data_it;
+      std::vector<char>::const_iterator dest_sizes_cell_it;
+
+      // Depending on whether our callback function unpacks fixed or
+      // variable size data, we have to pursue different approaches
+      // to localize the correct fraction of the buffer from which
+      // we are allowed to read.
+      unsigned int offset         = numbers::invalid_unsigned_int;
+      unsigned int size           = numbers::invalid_unsigned_int;
+      unsigned int data_increment = numbers::invalid_unsigned_int;
+
+      if (callback_variable_transfer)
+        {
+          // For the variable size data, we need to extract the
+          // data size from the fixed size buffer on each cell.
+          //
+          // We packed this information last, so the last packed
+          // object in the fixed size buffer corresponds to the
+          // variable data sizes.
+          //
+          // The last entry of sizes_fixed_cumulative corresponds
+          // to the size of all fixed size data packed on the cell.
+          // To get the offset for the last packed object, we need
+          // to get the next-to-last entry.
+          const unsigned int offset_variable_data_sizes =
+            sizes_fixed_cumulative[sizes_fixed_cumulative.size() - 2];
+
+          // This iterator points to the data size that the
+          // callback_function packed for each specific cell.
+          // Adjust buffer iterator to the offset of the callback
+          // function so that we only have to advance its position
+          // to the next cell after each iteration.
+          dest_sizes_cell_it = dest_data_fixed.cbegin() +
+                               offset_variable_data_sizes +
+                               callback_index * sizeof(unsigned int);
+
+          // Let the data iterator point to the correct buffer.
+          dest_data_it = dest_data_variable.cbegin();
+        }
+      else
+        {
+          // For the fixed size data, we can get the information about
+          // the buffer location on each cell directly from the
+          // sizes_fixed_cumulative vector.
+          offset         = sizes_fixed_cumulative[callback_index];
+          size           = sizes_fixed_cumulative[callback_index + 1] - offset;
+          data_increment = sizes_fixed_cumulative.back();
+
+          // Let the data iterator point to the correct buffer.
+          // Adjust buffer iterator to the offset of the callback
+          // function so that we only have to advance its position
+          // to the next cell after each iteration.
+          dest_data_it = dest_data_fixed.cbegin() + offset;
+        }
 
       // Iterate over all cells and unpack the transferred data.
-      // Adjust buffer iterator to the offset of the callback
-      // function and advance its position to the next cell
-      // after each iteration.
       auto quad_cell_rel_it = quad_cell_relations.begin();
-      auto dest_fixed_it    = dest_data_fixed.cbegin() + offset;
+      auto dest_sizes_it    = dest_sizes_variable.cbegin();
       for (; quad_cell_rel_it != quad_cell_relations.end();
-           ++quad_cell_rel_it, dest_fixed_it += cumulative_sizes_fixed.back())
+           ++quad_cell_rel_it, dest_data_it += data_increment)
         {
           const auto &cell_status = std::get<1>(*quad_cell_rel_it);
           const auto &dealii_cell = std::get<2>(*quad_cell_rel_it);
+
+          if (callback_variable_transfer)
+            {
+              // Update the increment according to the whole data size
+              // of the current cell.
+              data_increment = *dest_sizes_it;
+
+              if (cell_status !=
+                  parallel::distributed::Triangulation<dim,
+                                                       spacedim>::CELL_INVALID)
+                {
+                  // Extract the corresponding values for offset and size from
+                  // the cumulative sizes array stored in the fixed size buffer.
+                  if (callback_index == 0)
+                    offset = 0;
+                  else
+                    std::memcpy(&offset,
+                                &(*(dest_sizes_cell_it - sizeof(unsigned int))),
+                                sizeof(unsigned int));
+
+                  std::memcpy(&size,
+                              &(*dest_sizes_cell_it),
+                              sizeof(unsigned int));
+
+                  size -= offset;
+
+                  // Move the data iterator to the corresponding position
+                  // of the callback function and adjust the increment
+                  // accordingly.
+                  dest_data_it += offset;
+                  data_increment -= offset;
+                }
+
+              // Advance data size iterators to the next cell.
+              dest_sizes_cell_it += sizes_fixed_cumulative.back();
+              ++dest_sizes_it;
+            }
 
           switch (cell_status)
             {
@@ -1452,8 +1753,8 @@ namespace parallel
                                                         spacedim>::CELL_COARSEN:
                 unpack_callback(dealii_cell,
                                 cell_status,
-                                boost::make_iterator_range(dest_fixed_it,
-                                                           dest_fixed_it +
+                                boost::make_iterator_range(dest_data_it,
+                                                           dest_data_it +
                                                              size));
                 break;
 
@@ -1461,8 +1762,8 @@ namespace parallel
                                                         spacedim>::CELL_REFINE:
                 unpack_callback(dealii_cell->parent(),
                                 cell_status,
-                                boost::make_iterator_range(dest_fixed_it,
-                                                           dest_fixed_it +
+                                boost::make_iterator_range(dest_data_it,
+                                                           dest_data_it +
                                                              size));
                 break;
 
@@ -1487,7 +1788,9 @@ namespace parallel
         *         parallel_forest,
       const char *filename) const
     {
-      Assert(cumulative_sizes_fixed.size() > 0,
+      Assert(variable_size_data_stored == false, ExcNotImplemented());
+
+      Assert(sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
 
       const std::string fname_fixed = std::string(filename) + "_fixed.data";
@@ -1528,8 +1831,8 @@ namespace parallel
         {
           ierr = MPI_File_write_at(fh,
                                    0,
-                                   cumulative_sizes_fixed.data(),
-                                   cumulative_sizes_fixed.size(),
+                                   sizes_fixed_cumulative.data(),
+                                   sizes_fixed_cumulative.size(),
                                    MPI_UNSIGNED,
                                    MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
@@ -1537,12 +1840,12 @@ namespace parallel
 
       // Write packed data to file simultaneously.
       const unsigned int offset =
-        cumulative_sizes_fixed.size() * sizeof(unsigned int);
+        sizes_fixed_cumulative.size() * sizeof(unsigned int);
 
       ierr = MPI_File_write_at(
         fh,
         offset + parallel_forest->global_first_quadrant[myrank] *
-                   cumulative_sizes_fixed.back(), // global position in file
+                   sizes_fixed_cumulative.back(), // global position in file
         src_data_fixed.data(),
         src_data_fixed.size(), // local buffer
         MPI_CHAR,
@@ -1594,27 +1897,27 @@ namespace parallel
       // Read cumulative sizes from file.
       // Since all processors need the same information about the data sizes,
       // let each of them gain it by reading from the same location in the file.
-      cumulative_sizes_fixed.resize(1 + n_attached_deserialize);
+      sizes_fixed_cumulative.resize(1 + n_attached_deserialize);
       ierr = MPI_File_read_at(fh,
                               0,
-                              cumulative_sizes_fixed.data(),
-                              cumulative_sizes_fixed.size(),
+                              sizes_fixed_cumulative.data(),
+                              sizes_fixed_cumulative.size(),
                               MPI_UNSIGNED,
                               MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
       // Allocate sufficient memory.
       dest_data_fixed.resize(parallel_forest->local_num_quadrants *
-                             cumulative_sizes_fixed.back());
+                             sizes_fixed_cumulative.back());
 
       // Read packed data from file simultaneously.
       const unsigned int offset =
-        cumulative_sizes_fixed.size() * sizeof(unsigned int);
+        sizes_fixed_cumulative.size() * sizeof(unsigned int);
 
       ierr = MPI_File_read_at(
         fh,
         offset + parallel_forest->global_first_quadrant[myrank] *
-                   cumulative_sizes_fixed.back(), // global position in file
+                   sizes_fixed_cumulative.back(), // global position in file
         dest_data_fixed.data(),
         dest_data_fixed.size(), // local buffer
         MPI_CHAR,
@@ -1631,25 +1934,31 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::DataTransfer::clear()
     {
-      cumulative_sizes_fixed.clear();
-      cumulative_sizes_fixed.shrink_to_fit();
+      variable_size_data_stored = false;
 
+      // free information about data sizes
+      sizes_fixed_cumulative.clear();
+      sizes_fixed_cumulative.shrink_to_fit();
+
+      // free fixed size transfer data
       src_data_fixed.clear();
       src_data_fixed.shrink_to_fit();
 
       dest_data_fixed.clear();
       dest_data_fixed.shrink_to_fit();
 
-      // TODO: for variable transfer
-      //      src_sizes_var.clear();
-      //      src_sizes_var.shrink_to_fit();
-      //      src_data_var.clear();
-      //      src_data_var.shrink_to_fit();
-      //
-      //      dest_sizes_var.clear();
-      //      dest_sizes_var.shrink_to_fit();
-      //      dest_data_var.clear();
-      //      dest_data_var.shrink_to_fit();
+      // free variable size transfer data
+      src_sizes_variable.clear();
+      src_sizes_variable.shrink_to_fit();
+
+      src_data_variable.clear();
+      src_data_variable.shrink_to_fit();
+
+      dest_sizes_variable.clear();
+      dest_sizes_variable.shrink_to_fit();
+
+      dest_data_variable.clear();
+      dest_data_variable.shrink_to_fit();
     }
 
 
@@ -1679,7 +1988,7 @@ namespace parallel
       , triangulation_has_content(false)
       , connectivity(nullptr)
       , parallel_forest(nullptr)
-      , cell_attached_data({0, 0, {}})
+      , cell_attached_data({0, 0, {}, {}})
       , data_transfer(mpi_communicator)
     {
       parallel_ghost = nullptr;
@@ -2108,6 +2417,9 @@ namespace parallel
     {
       triangulation_has_content = false;
 
+      cell_attached_data = {0, 0, {}, {}};
+      data_transfer.clear();
+
       if (parallel_ghost != nullptr)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy(
@@ -2221,7 +2533,7 @@ namespace parallel
           f << "version nproc n_attached_objs n_coarse_cells" << std::endl
             << 3 << " "
             << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
-            << cell_attached_data.pack_callbacks.size() << " "
+            << cell_attached_data.pack_callbacks_fixed.size() << " "
             << this->n_cells(0) << std::endl;
         }
 
@@ -2243,8 +2555,10 @@ namespace parallel
             this);
 
           // pack attached data first
-          tria->data_transfer.pack_data(local_quadrant_cell_relations,
-                                        cell_attached_data.pack_callbacks);
+          tria->data_transfer.pack_data(
+            local_quadrant_cell_relations,
+            cell_attached_data.pack_callbacks_fixed,
+            cell_attached_data.pack_callbacks_variable);
 
           // then store buffers in file
           tria->data_transfer.save(parallel_forest, filename);
@@ -2266,7 +2580,7 @@ namespace parallel
             this);
 
         tria->cell_attached_data.n_attached_data_sets = 0;
-        tria->cell_attached_data.pack_callbacks.clear();
+        tria->cell_attached_data.pack_callbacks_fixed.clear();
       }
     }
 
@@ -3426,7 +3740,8 @@ namespace parallel
       if (cell_attached_data.n_attached_data_sets > 0)
         {
           data_transfer.pack_data(local_quadrant_cell_relations,
-                                  cell_attached_data.pack_callbacks);
+                                  cell_attached_data.pack_callbacks_fixed,
+                                  cell_attached_data.pack_callbacks_variable);
 
           // before repartitioning the p4est object, save a copy of the
           // positions of the global first quadrants for data transfer later
@@ -3600,7 +3915,8 @@ namespace parallel
       if (cell_attached_data.n_attached_data_sets > 0)
         {
           data_transfer.pack_data(local_quadrant_cell_relations,
-                                  cell_attached_data.pack_callbacks);
+                                  cell_attached_data.pack_callbacks_fixed,
+                                  cell_attached_data.pack_callbacks_variable);
 
           // before repartitioning the p4est object, save a copy of the
           // positions of quadrant for data transfer later
@@ -3845,14 +4161,28 @@ namespace parallel
     unsigned int
     Triangulation<dim, spacedim>::register_data_attach(
       const std::function<std::vector<char>(const cell_iterator &,
-                                            const CellStatus)> &pack_callback)
+                                            const CellStatus)> &pack_callback,
+      const bool returns_variable_size_data)
     {
-      // add new callback_set
-      cell_attached_data.pack_callbacks.push_back(pack_callback);
+      unsigned int handle = numbers::invalid_unsigned_int;
+
+      // Add new callback function to the corresponding register.
+      // Encode handles according to returns_variable_size_data.
+      if (returns_variable_size_data)
+        {
+          handle = 2 * cell_attached_data.pack_callbacks_variable.size();
+          cell_attached_data.pack_callbacks_variable.push_back(pack_callback);
+        }
+      else
+        {
+          handle = 2 * cell_attached_data.pack_callbacks_fixed.size() + 1;
+          cell_attached_data.pack_callbacks_fixed.push_back(pack_callback);
+        }
+
+      // Increase overall counter.
       ++cell_attached_data.n_attached_data_sets;
 
-      // return the position of the callback in the register vector as a handle
-      return cell_attached_data.pack_callbacks.size() - 1;
+      return handle;
     }
 
 
@@ -3867,9 +4197,6 @@ namespace parallel
              const boost::iterator_range<std::vector<char>::const_iterator> &)>
         &unpack_callback)
     {
-#  ifdef DEBUG
-      Assert(handle < cell_attached_data.pack_callbacks.size(),
-             ExcMessage("Invalid handle."));
       Assert(cell_attached_data.n_attached_data_sets > 0,
              ExcMessage("The notify_ready_to_unpack() has already been called "
                         "once for each registered callback."));
@@ -3880,13 +4207,33 @@ namespace parallel
                static_cast<unsigned int>(parallel_forest->local_num_quadrants),
              ExcInternalError());
 
-      // deregister pack_callback function
+#  ifdef DEBUG
+      // check validity of handle and deregister pack_callback function.
       // first reset with invalid entries to preserve ambiguity of
-      // handles, then free memory when all were unpacked (see below)
-      // consider_cell_invalid is irrelevant in this context
-      Assert(cell_attached_data.pack_callbacks[handle] != nullptr,
-             ExcInternalError());
-      cell_attached_data.pack_callbacks[handle] = nullptr;
+      // handles, then free memory when all were unpacked (see below).
+      const unsigned int callback_index = handle / 2;
+      if (handle % 2 == 0)
+        {
+          Assert(callback_index <
+                   cell_attached_data.pack_callbacks_variable.size(),
+                 ExcMessage("Invalid handle."));
+
+          Assert(cell_attached_data.pack_callbacks_variable[callback_index] !=
+                   nullptr,
+                 ExcInternalError());
+          cell_attached_data.pack_callbacks_variable[callback_index] = nullptr;
+        }
+      else
+        {
+          Assert(callback_index <
+                   cell_attached_data.pack_callbacks_fixed.size(),
+                 ExcMessage("Invalid handle."));
+
+          Assert(cell_attached_data.pack_callbacks_fixed[callback_index] !=
+                   nullptr,
+                 ExcInternalError());
+          cell_attached_data.pack_callbacks_fixed[callback_index] = nullptr;
+        }
 #  endif
 
       // perform unpacking
@@ -3909,7 +4256,8 @@ namespace parallel
           cell_attached_data.n_attached_deserialize == 0)
         {
           // everybody got their data, time for cleanup!
-          cell_attached_data.pack_callbacks.clear();
+          cell_attached_data.pack_callbacks_fixed.clear();
+          cell_attached_data.pack_callbacks_variable.clear();
           data_transfer.clear();
 
           // reset all cell_status entries after coarsening/refinement
@@ -4211,7 +4559,9 @@ namespace parallel
         MemoryConsumption::memory_consumption(parallel_forest) +
         MemoryConsumption::memory_consumption(
           cell_attached_data.n_attached_data_sets) +
-        // MemoryConsumption::memory_consumption(cell_attached_data.pack_callbacks)
+        // MemoryConsumption::memory_consumption(cell_attached_data.pack_callbacks_fixed)
+        // +
+        // MemoryConsumption::memory_consumption(cell_attached_data.pack_callbacks_variable)
         // +
         // TODO[TH]: how?
         MemoryConsumption::memory_consumption(
@@ -4456,7 +4806,8 @@ namespace parallel
       const std::function<std::vector<char>(
         const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
         const typename dealii::Triangulation<1, spacedim>::CellStatus)>
-        & /*pack_callback*/)
+        & /*pack_callback*/,
+      const bool /*returns_variable_size_data*/)
     {
       Assert(false, ExcNotImplemented());
       return 0;

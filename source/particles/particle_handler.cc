@@ -1046,8 +1046,8 @@ namespace Particles
                       std::placeholders::_1,
                       std::placeholders::_2);
 
-        handle =
-          non_const_triangulation->register_data_attach(callback_function);
+        handle = non_const_triangulation->register_data_attach(
+          callback_function, /*returns_variable_size_data=*/false);
       }
   }
 
@@ -1082,8 +1082,8 @@ namespace Particles
                       std::placeholders::_1,
                       std::placeholders::_2);
 
-        handle =
-          non_const_triangulation->register_data_attach(callback_function);
+        handle = non_const_triangulation->register_data_attach(
+          callback_function, /*returns_variable_size_data=*/false);
       }
 
     // Check if something was stored and load it

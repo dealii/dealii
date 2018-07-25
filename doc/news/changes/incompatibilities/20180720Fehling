@@ -8,4 +8,9 @@ const boost::iterator_range<std::vector<char>::const_iterator &>`, where
 the last argument describes an iterator range, from which the callback
 function is allowed to read.
 <br>
-(Marc Fehling, 2018/07/07)
+Further, the `register_data_attach()` function now requires a boolean
+argument `returns_variable_size_data`, which denotes if the registered 
+pack_callback function interacts with the fixed size (`=false`) or
+variable size (`=true`) buffer for data transfer.
+<br>
+(Marc Fehling, 2018/07/20)
