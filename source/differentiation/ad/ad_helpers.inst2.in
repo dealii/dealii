@@ -35,6 +35,20 @@ for (number : REAL_SCALARS)
     template
     class ADHelperBase<NumberTypes::sacado_rad_dfad,number>;
 
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_dfad_dfad,number>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_dfad,number>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_rad,number>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_rad_dfad,number>;
+
     \}
     \}
 }
@@ -60,6 +74,20 @@ for ()
 
     template
     class ADHelperBase<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
 
 
     \}

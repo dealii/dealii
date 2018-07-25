@@ -29,6 +29,14 @@ for (number : REAL_SCALARS)
     template
     class ADHelperBase<NumberTypes::adolc_tapeless,number>;
 
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,number>;
+
     \}
     \}
 }
@@ -48,6 +56,14 @@ for ()
 
     template
     class ADHelperBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
 
     \}
