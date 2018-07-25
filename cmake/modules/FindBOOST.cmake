@@ -52,11 +52,11 @@ ENDIF()
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 IF(DEAL_II_WITH_ZLIB)
   FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
-    iostreams serialization system thread geometry
+    iostreams serialization system thread
     )
 ELSE()
   FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
-    serialization system thread geometry
+    serialization system thread
     )
 ENDIF()
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
@@ -70,9 +70,9 @@ IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
   LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
   IF(DEAL_II_WITH_ZLIB)
-    FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS iostreams serialization system thread geometry)
+    FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS iostreams serialization system thread)
   ELSE()
-    FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS serialization system thread geometry)
+    FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS serialization system thread)
   ENDIF()
   LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 ENDIF()
@@ -104,7 +104,6 @@ DEAL_II_PACKAGE_HANDLE(BOOST
     Boost_SERIALIZATION_LIBRARY_DEBUG Boost_SERIALIZATION_LIBRARY_RELEASE
     Boost_SYSTEM_LIBRARY_DEBUG Boost_SYSTEM_LIBRARY_RELEASE
     Boost_THREAD_LIBRARY_DEBUG Boost_THREAD_LIBRARY_RELEASE
-    Boost_GEOMETRY_LIBRARY_DEBUG Boost_GEOMETRY_LIBRARY_RELEASE
     Boost_LIBRARY_DIR_DEBUG Boost_LIBRARY_DIR_RELEASE
     _Boost_COMPONENTS_SEARCHED _Boost_INCLUDE_DIR_LAST
     _Boost_LIBRARY_DIR_LAST _Boost_USE_MULTITHREADED_LAST
