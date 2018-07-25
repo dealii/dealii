@@ -79,12 +79,11 @@ namespace Step15
   // - There are two solution vectors, one for the Newton update
   //   $\delta u^n$, and one for the current iterate $u^n$.
   // - The <code>setup_system</code> function takes an argument that denotes
-  // whether
-  //   this is the first time it is called or not. The difference is that the
-  //   first time around we need to distribute the degrees of freedom and set
-  //   the solution vector for $u^n$ to the correct size. The following times,
-  //   the function is called after we have already done these steps as part of
-  //   refining the mesh in <code>refine_mesh</code>.
+  //   whether this is the first time it is called or not. The difference is
+  //   that the first time around we need to distribute the degrees of freedom
+  //   and set the solution vector for $u^n$ to the correct size. The following
+  //   times, the function is called after we have already done these steps as
+  //   part of refining the mesh in <code>refine_mesh</code>.
   // - We then also need new functions: <code>set_boundary_values()</code>
   //   takes care of setting the boundary values on the solution vector
   //   correctly, as discussed at the end of the
@@ -122,7 +121,7 @@ namespace Step15
     DoFHandler<dim> dof_handler;
     FE_Q<dim>       fe;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -255,10 +254,7 @@ namespace Step15
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_matrix = 0;
         cell_rhs    = 0;
@@ -284,30 +280,31 @@ namespace Step15
         // system itself then looks similar to what we always do with the
         // exception of the nonlinear terms, as does copying the results from
         // the local objects into the global ones:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
             const double coeff =
-              1.0 / std::sqrt(1 + old_solution_gradients[q_point] *
-                                    old_solution_gradients[q_point]);
+              1.0 / std::sqrt(1 + old_solution_gradients[q] *
+                                    old_solution_gradients[q]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  {
-                    cell_matrix(i, j) +=
-                      (((fe_values.shape_grad(i, q_point) * coeff *
-                         fe_values.shape_grad(j, q_point)) -
-                        (fe_values.shape_grad(i, q_point) * coeff * coeff *
-                         coeff *
-                         (fe_values.shape_grad(j, q_point) *
-                          old_solution_gradients[q_point]) *
-                         old_solution_gradients[q_point])) *
-                       fe_values.JxW(q_point));
-                  }
+                  cell_matrix(i, j) +=
+                    (((fe_values.shape_grad(i, q)      // ((\nabla \phi_i
+                       * coeff                         //   * a_n
+                       * fe_values.shape_grad(j, q))   //   * \nabla \phi_j)
+                      -                                //  -
+                      (fe_values.shape_grad(i, q)      //  (\nabla \phi_i
+                       * coeff * coeff * coeff         //   * a_n^3
+                       * (fe_values.shape_grad(j, q)   //   * (\nabla \phi_j
+                          * old_solution_gradients[q]) //      * \nabla u_n)
+                       * old_solution_gradients[q]))   //   * \nabla u_n)))
+                     * fe_values.JxW(q));              // * dx
 
-                cell_rhs(i) -=
-                  (fe_values.shape_grad(i, q_point) * coeff *
-                   old_solution_gradients[q_point] * fe_values.JxW(q_point));
+                cell_rhs(i) -= (fe_values.shape_grad(i, q)  // \nabla \phi_i
+                                * coeff                     // * a_n
+                                * old_solution_gradients[q] // * u_n
+                                * fe_values.JxW(q));        // * dx
               }
           }
 
@@ -476,11 +473,8 @@ namespace Step15
                                              0,
                                              BoundaryValues<dim>(),
                                              boundary_values);
-    for (std::map<types::global_dof_index, double>::const_iterator p =
-           boundary_values.begin();
-         p != boundary_values.end();
-         ++p)
-      present_solution(p->first) = p->second;
+    for (auto &boundary_value : boundary_values)
+      present_solution(boundary_value.first) = boundary_value.second;
   }
 
 
@@ -524,10 +518,7 @@ namespace Step15
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_residual = 0;
         fe_values.reinit(cell);
@@ -540,14 +531,15 @@ namespace Step15
         fe_values.get_function_gradients(evaluation_point, gradients);
 
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            const double coeff =
-              1 / std::sqrt(1 + gradients[q_point] * gradients[q_point]);
+            const double coeff = 1 / std::sqrt(1 + gradients[q] * gradients[q]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_residual(i) -= (fe_values.shape_grad(i, q_point) * coeff *
-                                   gradients[q_point] * fe_values.JxW(q_point));
+              cell_residual(i) -= (fe_values.shape_grad(i, q) // \nabla \phi_i
+                                   * coeff                    // * a_n
+                                   * gradients[q]             // * u_n
+                                   * fe_values.JxW(q));       // * dx
           }
 
         cell->get_dof_indices(local_dof_indices);
