@@ -63,26 +63,26 @@
 
 git checkout -q master
 
-commits=`git log | \
-         egrep '^commit ' | \
-         perl -p -e 's/^commit //g;' | \
-         perl -e '$i=0; while (<>) { ++$i; if ($i % 200 == 0) { print; } }'`
+commits=$(git log | \
+          grep -E '^commit ' | \
+          perl -p -e 's/^commit //g;' | \
+          perl -e '$i=0; while (<>) { ++$i; if ($i % 200 == 0) { print; } }')
 
 for commit in $commits ; do
-  git checkout -q $commit
+  git checkout -q "$commit"
   
-  date=`git log --date=short --format="%ad" -n 1`
+  date=$(git log --date=short --format="%ad" -n 1)
 
-  files_source=`find . -name '*.h' -or -name '*.cc' -or -name '*.cu' -or -name '*.cuh' -type f | \
-                egrep -i -v '(tests|boost|umfpack|bundled)/'`
-  lines_source=`cat $files_source | wc -l`
+  files_source=$(find . -name '*.h' -or -name '*.cc' -or -name '*.cu' -or -name '*.cuh' -type f | \
+                 grep -E -i -v '(tests|boost|umfpack|bundled)/')
+  lines_source=$(cat $files_source | wc -l)
 
-  files_tests=`find . -name '*.h' -or -name '*.cc' -type f | \
-               egrep -i -v '(boost|umfpack|bundled)/' | \
-               grep tests/`
-  lines_tests=`cat $files_tests | wc -l`
+  files_tests=$(find . -name '*.h' -or -name '*.cc' -type f | \
+                grep -E -i -v '(boost|umfpack|bundled)/' | \
+                grep tests/)
+  lines_tests=$(cat $files_tests | wc -l)
   
-  echo $date $lines_source $lines_tests
+  echo "$date" "$lines_source" "$lines_tests"
 done
 
 git checkout -q master
