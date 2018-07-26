@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * The Bernardi-Raugel element.
  *
  * <h3>Degrees of freedom</h3>
- * The BR1 element has <i>dim</i> degrees of freedom on each node and 1 on each
+ * The BR1 element has <i>dim</i> degrees of freedom on each vertex and 1 on each
  * face. The shape functions are ordered by the $(Q_1)^d$ shape functions
  * supported on each vertex, increasing according to vertex ordering on the
  * element in GeometryInfo, then the bubble functions follow in the ordering

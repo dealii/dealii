@@ -133,7 +133,7 @@ FE_BernardiRaugel<dim>::get_dpo_vector()
 {
   // compute the number of unknowns per cell interior/face/edge
   //
-  // there are <tt>dim</tt> degrees of freedom per node and there
+  // there are <tt>dim</tt> degrees of freedom per vertex and there
   // is 1 degree of freedom per edge in 2D (face in 3D)
   std::vector<unsigned int> dpo(dim + 1, 0u);
   dpo[0]       = dim;
@@ -147,7 +147,7 @@ template <int dim>
 void
 FE_BernardiRaugel<dim>::initialize_support_points()
 {
-  // The support points for our shape functions are the nodes and
+  // The support points for our shape functions are the vertices and
   // the face midpoints, for a total of #vertices + #faces points
   this->generalized_support_points.resize(this->dofs_per_cell);
 
