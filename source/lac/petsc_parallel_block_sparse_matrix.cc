@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
+#include <deal.II/lac/petsc_block_sparse_matrix.h>
 
 #ifdef DEAL_II_WITH_PETSC
 

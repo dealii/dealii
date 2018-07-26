@@ -28,8 +28,8 @@
 // matrix in a consecutive fashion, but rather according to the order of
 // degrees of freedom in the sequence of cells that we traverse
 
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 
 #include <iostream>

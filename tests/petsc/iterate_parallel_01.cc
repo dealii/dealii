@@ -26,8 +26,8 @@
 #include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 
 #include <iostream>
 #include <vector>

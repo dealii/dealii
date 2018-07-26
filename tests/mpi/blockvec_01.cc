@@ -19,7 +19,7 @@
 
 #include <deal.II/base/index_set.h>
 
-#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 #include <iostream>

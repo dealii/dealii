@@ -18,7 +18,7 @@
 // check PETScWrappers::MPI::Vector::operator = (PetscScalar) with setting to a
 // nonzero value
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

@@ -33,7 +33,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>

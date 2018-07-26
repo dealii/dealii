@@ -34,7 +34,7 @@
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_faces.h>

@@ -17,7 +17,7 @@
 
 // check PETScWrappers::MPI::Vector::lp_norm(3)
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

@@ -20,7 +20,7 @@
 // like _01, but with an inhomogeneity
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <sstream>
 

@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 
 #ifdef DEAL_II_WITH_PETSC
 

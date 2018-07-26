@@ -18,7 +18,7 @@
 // check FullMatrix::matrix_scalar_product
 
 #include <deal.II/lac/petsc_full_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

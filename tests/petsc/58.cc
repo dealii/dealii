@@ -17,7 +17,7 @@
 
 // check ::Vector (const PETScWrappers::MPI::Vector &) copy constructor
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>

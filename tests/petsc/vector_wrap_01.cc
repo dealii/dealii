@@ -18,7 +18,7 @@
 // Test the constructor PETScWrappers::VectorBase(const Vec &) that takes an
 // existing PETSc vector.
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

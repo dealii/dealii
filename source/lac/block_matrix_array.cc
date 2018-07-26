@@ -16,7 +16,7 @@
 
 #include <deal.II/lac/block_matrix_array.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/vector.h>
 

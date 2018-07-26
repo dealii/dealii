@@ -20,10 +20,10 @@
 
 
 #include <deal.II/lac/petsc_compatibility.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/slepc_solver.h>
 #include <deal.II/lac/vector_memory.h>
 

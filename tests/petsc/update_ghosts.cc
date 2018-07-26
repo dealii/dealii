@@ -12,7 +12,7 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
-#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 
 #include "../tests.h"
 

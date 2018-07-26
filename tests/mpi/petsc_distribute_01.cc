@@ -28,7 +28,7 @@
 // x_j's so that we can verify the correctness analytically
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <sstream>
 

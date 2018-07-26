@@ -23,7 +23,7 @@
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>

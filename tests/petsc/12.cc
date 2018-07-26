@@ -17,7 +17,7 @@
 
 // check PETScWrappers::MPI::Vector::operator() in set-mode
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

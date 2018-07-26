@@ -19,8 +19,8 @@
 // 3.98974 > 3.95906 > 3.90828 > 3.83792
 
 #include <deal.II/lac/petsc_compatibility.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/utilities.h>

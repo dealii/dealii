@@ -45,7 +45,7 @@
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
