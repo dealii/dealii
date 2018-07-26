@@ -169,7 +169,7 @@ FE_BernardiRaugel<dim>::initialize_support_points()
             p[2] = 0.5;
           p[i] = j;
 
-          unsigned int k =
+          const unsigned int k =
             dim * GeometryInfo<dim>::vertices_per_cell + i * 2 + j;
           this->generalized_support_points[k] = p;
         }
