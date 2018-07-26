@@ -792,16 +792,16 @@ namespace
   }
 
   /**
-   * Given (i,j,k) coordinates within the Lagrange cell, return an
-   * offset into the local connectivity array
+   * Given (i,j,k) coordinates within the Lagrange quadrilateral, return an
+   * offset into the local connectivity array.
    *
    * Modified from
-   * https://github.com/Kitware/VTK/blob/265ca48a79a36538c95622c237da11133608bbe5/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
+   * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
    */
   int
-  vtk_point_index_from_ijk(int i,
-                           int j,
-                           int,
+  vtk_point_index_from_ijk(unsigned i,
+                           unsigned j,
+                           unsigned,
                            const std::array<unsigned, 2> &order)
   {
     bool ibdy = (i == 0 || i == order[0]);
@@ -810,7 +810,7 @@ namespace
     int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
 
     if (nbdy == 2) // Vertex DOF
-      { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
+      { // ijk is a corner node. Return the proper index (somewhere in [0,3]):
         return (i ? (j ? 2 : 1) : (j ? 3 : 0));
       }
 
@@ -836,15 +836,16 @@ namespace
   }
 
   /**
-   * Same as above, but for hexes.
+   * Given (i,j,k) coordinates within the Lagrange hexahedron, return an
+   * offset into the local connectivity array.
    *
    * Modified from
-   * https://github.com/Kitware/VTK/blob/265ca48a79a36538c95622c237da11133608bbe5/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
+   * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
    */
   int
-  vtk_point_index_from_ijk(int                            i,
-                           int                            j,
-                           int                            k,
+  vtk_point_index_from_ijk(unsigned                       i,
+                           unsigned                       j,
+                           unsigned                       k,
                            const std::array<unsigned, 3> &order)
   {
     bool ibdy = (i == 0 || i == order[0]);
@@ -907,16 +908,22 @@ namespace
   }
 
   int
-  vtk_point_index_from_ijk(int, int, int, const std::array<unsigned, 0> &)
+  vtk_point_index_from_ijk(unsigned,
+                           unsigned,
+                           unsigned,
+                           const std::array<unsigned, 0> &)
   {
-    ExcNotImplemented();
+    Assert(false, ExcNotImplemented());
     return 0;
   }
 
   int
-  vtk_point_index_from_ijk(int, int, int, const std::array<unsigned, 1> &)
+  vtk_point_index_from_ijk(unsigned,
+                           unsigned,
+                           unsigned,
+                           const std::array<unsigned, 1> &)
   {
-    ExcNotImplemented();
+    Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -2383,12 +2390,12 @@ namespace DataOutBase
                      const unsigned int                   cycle,
                      const bool                           print_date_and_time,
                      const VtkFlags::ZlibCompressionLevel compression_level,
-                     const bool                           write_lagrange_cells)
+                     const bool write_higher_order_cells)
     : time(time)
     , cycle(cycle)
     , print_date_and_time(print_date_and_time)
     , compression_level(compression_level)
-    , write_lagrange_cells(write_lagrange_cells)
+    , write_higher_order_cells(write_higher_order_cells)
   {}
 
 
@@ -2547,9 +2554,9 @@ namespace DataOutBase
         const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
         const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
         // Offsets of outer loops
-        unsigned int d1 = 1;
-        unsigned int d2 = n;
-        unsigned int d3 = n * n;
+        const unsigned int d1 = 1;
+        const unsigned int d2 = n;
+        const unsigned int d3 = n * n;
         for (unsigned int i3 = 0; i3 < n3; ++i3)
           for (unsigned int i2 = 0; i2 < n2; ++i2)
             for (unsigned int i1 = 0; i1 < n1; ++i1)
@@ -2596,17 +2603,17 @@ namespace DataOutBase
         const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
         const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
         // Offsets of outer loops
-        unsigned int d1 = 1;
-        unsigned int d2 = n;
-        unsigned int d3 = n * n;
+        const unsigned int d1 = 1;
+        const unsigned int d2 = n;
+        const unsigned int d3 = n * n;
         for (unsigned int i3 = 0; i3 <= n3; ++i3)
           for (unsigned int i2 = 0; i2 <= n2; ++i2)
             for (unsigned int i1 = 0; i1 <= n1; ++i1)
               {
-                const unsigned int local_offset = i3 * d3 + i2 * d2 + i1 * d1;
-                const unsigned int connectivity_idx =
+                const unsigned int local_index = i3 * d3 + i2 * d2 + i1 * d1;
+                const unsigned int connectivity_index =
                   vtk_point_index_from_ijk(i1, i2, i3, cell_order);
-                connectivity[connectivity_idx] = local_offset;
+                connectivity[connectivity_index] = local_index;
               }
 
         out.template write_lagrange_cell<dim>(count++,
@@ -5274,11 +5281,11 @@ namespace DataOutBase
     unsigned int n_cells;
     compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
 
-    // If a user set to out Lagrange cells, we treat n_subdivions
-    // as cell order and adjust variables accordingly, otherwise
+    // If a user set to output Lagrange cells, we treat n_subdivisions
+    // as a cell order and adjust variables accordingly, otherwise
     // each patch is written as a linear cell.
     unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
-    if (flags.write_lagrange_cells)
+    if (flags.write_higher_order_cells)
       {
         n_cells           = patches.size();
         n_points_per_cell = n_nodes / n_cells;
@@ -5315,7 +5322,7 @@ namespace DataOutBase
     // now for the cells
     out << "CELLS " << n_cells << ' ' << n_cells * (n_points_per_cell + 1)
         << '\n';
-    if (flags.write_lagrange_cells)
+    if (flags.write_higher_order_cells)
       write_lagrange_cells(patches, vtk_out);
     else
       write_cells(patches, vtk_out);
@@ -5325,7 +5332,7 @@ namespace DataOutBase
     out << "CELL_TYPES " << n_cells << '\n';
 
     // need to distinguish between linear and Lagrange cells
-    const unsigned int vtk_cell_id = flags.write_lagrange_cells ?
+    const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
                                        vtk_lagrange_cell_type[dim] :
                                        vtk_cell_type[dim];
     for (unsigned int i = 0; i < n_cells; ++i)
