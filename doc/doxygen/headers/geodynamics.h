@@ -31,7 +31,7 @@ Currently, the geodynamics testsuite contains the following
 programs:
 
 - step-8: Elasticity
-- step-16: A %parallel elasticity solver
+- step-18: A %parallel elasticity solver
 - step-20: Porous media flow
 - step-21: Multiphase flow through porous media
 - step-22: Stokes flow
