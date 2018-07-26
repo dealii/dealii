@@ -1,0 +1,66 @@
+Now running with Multigrid
+Refinement cycle 0
+   Set-up...
+	Number of active cells: 64
+	Number of degrees of freedom: 2312 (2187+125)
+   Assembling...
+   Assembling Multigrid...
+   Solving...
+	Number of FGMRES iterations: 22
+	Total number of iterations used for approximation of A inverse: 69
+	Total number of iterations used for approximation of S inverse: 23
+
+   Note: The mean value was adjusted by -3.36485e-15
+
+   Velocity L2 Error: 0.00539774
+   Pressure L2 Error: 0.019341
+   Velocity H1 Error: 0.165265
+Refinement cycle 1
+   Set-up...
+	Number of active cells: 512
+	Number of degrees of freedom: 15468 (14739+729)
+   Assembling...
+   Assembling Multigrid...
+   Solving...
+	Number of FGMRES iterations: 21
+	Total number of iterations used for approximation of A inverse: 67
+	Total number of iterations used for approximation of S inverse: 22
+
+   Note: The mean value was adjusted by -1.51964e-13
+
+   Velocity L2 Error: 0.000670888
+   Pressure L2 Error: 0.0036533
+   Velocity H1 Error: 0.0414704
+Now running with ILU
+Refinement cycle 0
+   Set-up...
+	Number of active cells: 64
+	Number of degrees of freedom: 2312 (2187+125)
+   Assembling...
+   Solving...   Computing preconditioner...
+
+	Number of FGMRES iterations: 22
+	Total number of iterations used for approximation of A inverse: 113
+	Total number of iterations used for approximation of S inverse: 23
+
+   Note: The mean value was adjusted by 1.55695e-14
+
+   Velocity L2 Error: 0.00539774
+   Pressure L2 Error: 0.019341
+   Velocity H1 Error: 0.165265
+Refinement cycle 1
+   Set-up...
+	Number of active cells: 512
+	Number of degrees of freedom: 15468 (14739+729)
+   Assembling...
+   Solving...   Computing preconditioner...
+
+	Number of FGMRES iterations: 21
+	Total number of iterations used for approximation of A inverse: 180
+	Total number of iterations used for approximation of S inverse: 22
+
+   Note: The mean value was adjusted by -1.52194e-13
+
+   Velocity L2 Error: 0.000670888
+   Pressure L2 Error: 0.0036533
+   Velocity H1 Error: 0.0414704
