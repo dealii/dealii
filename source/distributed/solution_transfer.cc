@@ -212,8 +212,6 @@ namespace parallel
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-
       // create buffer for each individual object
       std::vector<::dealii::Vector<typename VectorType::value_type>> dofvalues(
         input_vectors.size());
@@ -222,7 +220,7 @@ namespace parallel
       auto it_output = dofvalues.begin();
       for (; cit_input != input_vectors.cend(); ++cit_input, ++it_output)
         {
-          it_output->reinit(dofs_per_cell);
+          it_output->reinit(cell->get_fe().dofs_per_cell);
           cell->get_interpolated_dof_values(*(*cit_input), *it_output);
         }
 
@@ -269,9 +267,7 @@ namespace parallel
       auto it_input  = dofvalues.cbegin();
       auto it_output = all_out.begin();
       for (; it_input != dofvalues.cend(); ++it_input, ++it_output)
-        {
-          cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
-        }
+        cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
     }
 
 
