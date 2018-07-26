@@ -19,60 +19,58 @@
 
 // @sect3{Include files}
 
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_gmres.h>
-
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_refinement.h>
-
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/sparse_ilu.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
-
-#include <deal.II/lac/sparse_direct.h>
-
-#include <deal.II/lac/sparse_ilu.h>
-#include <deal.II/grid/grid_out.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // We need to include the following file to do timings:
 #include <deal.II/base/timer.h>
 
 // This includes the files necessary for us to use geometric Multigrid
-#include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
-#include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
+#include <deal.II/multigrid/mg_smoother.h>
+#include <deal.II/multigrid/mg_tools.h>
+#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/multigrid.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace Step56
 {
@@ -108,16 +106,16 @@ namespace Step56
     Solution()
       : Function<dim>(dim + 1)
     {}
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
     virtual Tensor<1, dim>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
   };
 
   template <>
-  double Solution<2>::value(const Point<2> &   p,
-                            const unsigned int component) const
+  double
+  Solution<2>::value(const Point<2> &p, const unsigned int component) const
   {
     Assert(component <= 2 + 1, ExcIndexRange(component, 0, 2 + 1));
 
@@ -136,8 +134,8 @@ namespace Step56
   }
 
   template <>
-  double Solution<3>::value(const Point<3> &   p,
-                            const unsigned int component) const
+  double
+  Solution<3>::value(const Point<3> &p, const unsigned int component) const
   {
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
@@ -160,8 +158,8 @@ namespace Step56
 
   // Note that for the gradient we need to return a Tensor<1,dim>
   template <>
-  Tensor<1, 2> Solution<2>::gradient(const Point<2> &   p,
-                                     const unsigned int component) const
+  Tensor<1, 2>
+  Solution<2>::gradient(const Point<2> &p, const unsigned int component) const
   {
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
@@ -190,8 +188,8 @@ namespace Step56
   }
 
   template <>
-  Tensor<1, 3> Solution<3>::gradient(const Point<3> &   p,
-                                     const unsigned int component) const
+  Tensor<1, 3>
+  Solution<3>::gradient(const Point<3> &p, const unsigned int component) const
   {
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
@@ -238,13 +236,13 @@ namespace Step56
       : Function<dim>(dim + 1)
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
   };
 
   template <>
-  double RightHandSide<2>::value(const Point<2> &   p,
-                                 const unsigned int component) const
+  double
+  RightHandSide<2>::value(const Point<2> &p, const unsigned int component) const
   {
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
@@ -262,8 +260,8 @@ namespace Step56
   }
 
   template <>
-  double RightHandSide<3>::value(const Point<3> &   p,
-                                 const unsigned int component) const
+  double
+  RightHandSide<3>::value(const Point<3> &p, const unsigned int component) const
   {
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
@@ -320,7 +318,8 @@ namespace Step56
       const PreconditionerSType &      preconditioner_S,
       const bool                       do_solve_A);
 
-    void vmult(BlockVector<double> &dst, const BlockVector<double> &src) const;
+    void
+    vmult(BlockVector<double> &dst, const BlockVector<double> &src) const;
 
     mutable unsigned int n_iterations_A;
     mutable unsigned int n_iterations_S;
@@ -414,15 +413,22 @@ namespace Step56
   public:
     StokesProblem(const unsigned int pressure_degree,
                   SolverType::type   solver_type);
-    void run();
+    void
+    run();
 
   private:
-    void setup_dofs();
-    void assemble_system();
-    void assemble_multigrid();
-    void solve();
-    void compute_errors();
-    void output_results(const unsigned int refinement_cycle) const;
+    void
+    setup_dofs();
+    void
+    assemble_system();
+    void
+    assemble_multigrid();
+    void
+    solve();
+    void
+    compute_errors();
+    void
+    output_results(const unsigned int refinement_cycle) const;
 
     const unsigned int pressure_degree;
     SolverType::type   solver_type;
@@ -476,7 +482,8 @@ namespace Step56
   // This function sets up the DoFHandler, matrices, vectors, and Multigrid
   // structures (if needed).
   template <int dim>
-  void StokesProblem<dim>::setup_dofs()
+  void
+  StokesProblem<dim>::setup_dofs()
   {
     TimerOutput::Scope scope(computing_timer, "Setup");
 
@@ -606,7 +613,8 @@ namespace Step56
   // mass matrix in the (1,1) block (if needed) and move it out of this location
   // at the end of this function.
   template <int dim>
-  void StokesProblem<dim>::assemble_system()
+  void
+  StokesProblem<dim>::assemble_system()
   {
     TimerOutput::Scope assemble(computing_timer, "Assemble");
     system_matrix = 0;
@@ -708,7 +716,8 @@ namespace Step56
   // Here, like in step-16, we have a function that assembles the level
   // and interface matrices necessary for the multigrid preconditioner.
   template <int dim>
-  void StokesProblem<dim>::assemble_multigrid()
+  void
+  StokesProblem<dim>::assemble_multigrid()
   {
     TimerOutput::Scope multigrid_specific(computing_timer,
                                           "(Multigrid specific)");
@@ -808,7 +817,8 @@ namespace Step56
   // only the entire solve function, but we separately time the setup of the
   // preconditioner as well as the solve itself.
   template <int dim>
-  void StokesProblem<dim>::solve()
+  void
+  StokesProblem<dim>::solve()
   {
     TimerOutput::Scope solve(computing_timer, "Solve");
     constraints.set_zero(solution);
@@ -963,7 +973,8 @@ namespace Step56
   // This function computes the L2 and H1 errors of the solution. For this,
   // we need to make sure the pressure has mean zero.
   template <int dim>
-  void StokesProblem<dim>::compute_errors()
+  void
+  StokesProblem<dim>::compute_errors()
   {
     // Compute the mean pressure $\frac{1}{\Omega} \int_{\Omega} p(x) dx $
     // and then subtract it from each pressure coefficient. This will result
@@ -1064,7 +1075,8 @@ namespace Step56
   // generates the initial grid and calls the other functions in the
   // respective order.
   template <int dim>
-  void StokesProblem<dim>::run()
+  void
+  StokesProblem<dim>::run()
   {
     GridGenerator::hyper_cube(triangulation);
     triangulation.refine_global(2);
@@ -1111,7 +1123,8 @@ namespace Step56
 } // namespace Step56
 
 // @sect3{The main function}
-int main()
+int
+main()
 {
   try
     {
@@ -1122,16 +1135,13 @@ int main()
       const int dim    = 3;
       // options for SolverType: UMFPACK FGMRES_ILU FGMRES_GMG
       {
-	
-      StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
-      flow_problem.run();
+        StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+        flow_problem.run();
       }
       {
-	StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
-	flow_problem.run();
+        StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
+        flow_problem.run();
       }
-      
-      
     }
   catch (std::exception &exc)
     {
@@ -1144,7 +1154,7 @@ int main()
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
 
-		<< std::endl;
+                << std::endl;
 
       return 1;
     }
