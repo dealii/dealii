@@ -101,7 +101,7 @@ FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
 
-  static std::vector<Tensor<1, dim>> normals;
+  std::vector<Tensor<1, dim>> normals;
   for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
       Tensor<1, dim> normal;
