@@ -41,7 +41,7 @@ pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
     status)
 {
-  static int                some_number = 1;
+  static unsigned int       some_number = 1;
   std::vector<unsigned int> some_vector(some_number);
   for (unsigned int i = 0; i < some_number; ++i)
     some_vector[i] = i;
