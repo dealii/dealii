@@ -199,6 +199,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-16b</td>
+ *       <td> A variant of step-16 but with MeshWorker for assembly: Multigrid
+ *       preconditioning of the Laplace equation on adaptive meshes.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-17</td>
  *       <td> Using PETSc for linear algebra; running
  *       in parallel on clusters of computers linked together by MPI.
@@ -742,6 +748,7 @@
  *     </td>
  *     <td>
  *       step-16,
+ *       step-16b
  *       step-31,
  *       step-32,
  *       step-37,
