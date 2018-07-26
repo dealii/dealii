@@ -1162,9 +1162,9 @@ namespace DataOutBase
     VtkFlags(
       const double       time  = std::numeric_limits<double>::min(),
       const unsigned int cycle = std::numeric_limits<unsigned int>::min(),
-      const bool         print_date_and_time       = true,
-      const ZlibCompressionLevel compression_level = best_compression,
-      const bool         write_lagrange_cells = false);
+      const bool         print_date_and_time          = true,
+      const ZlibCompressionLevel compression_level    = best_compression,
+      const bool                 write_lagrange_cells = false);
   };
 
 
