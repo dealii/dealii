@@ -766,6 +766,8 @@ namespace GridTools
    * In a serial execution the first three elements of the tuple are the same
    * as in GridTools::compute_point_locations .
    *
+   * Note: this function is a collective operation.
+   *
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
    * @code
