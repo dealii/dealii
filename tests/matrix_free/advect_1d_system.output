@@ -1,0 +1,22 @@
+
+DEAL::Testing FESystem<1>[FE_DGQ<1>(2)^3]
+DEAL::Norm of difference:          1.70093 
+DEAL::Norm of difference:          0.433302 
+DEAL::Norm of difference:          0.108836 
+DEAL::Norm of difference:          0.0272409 
+DEAL::Norm of difference:          0.00681224 
+DEAL::Norm of difference:          0.00170318 
+DEAL::Testing FESystem<1>[FE_DGQ<1>(4)^3]
+DEAL::Norm of difference:          0.0169469 
+DEAL::Norm of difference:          0.00107525 
+DEAL::Norm of difference:          6.74562e-05 
+DEAL::Norm of difference:          4.21998e-06 
+DEAL::Norm of difference:          2.63812e-07 
+DEAL::Norm of difference:          1.64905e-08 
+DEAL::Testing FESystem<1>[FE_DGQ<1>(5)^3]
+DEAL::Norm of difference:          0.00111004 
+DEAL::Norm of difference:          3.51943e-05 
+DEAL::Norm of difference:          1.10380e-06 
+DEAL::Norm of difference:          3.45206e-08 
+DEAL::Norm of difference:          1.07406e-09 
+DEAL::Norm of difference:          2.59508e-11 

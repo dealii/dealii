@@ -917,6 +917,14 @@ namespace internal
       constexpr int next_dim = dim > 1 ? dim - 1 : dim;
       Number *      my_scratch =
         basis_size_1 != basis_size_2 ? scratch_data : values_out;
+
+      const unsigned int size_per_component = Utilities::pow(basis_size_2, dim);
+      Assert(coefficients.size() == size_per_component ||
+               coefficients.size() == n_components * size_per_component,
+             ExcDimensionMismatch(coefficients.size(), size_per_component));
+      const unsigned int stride =
+        coefficients.size() == size_per_component ? 0 : 1;
+
       for (unsigned int q = basis_size_1; q != 0; --q)
         FEEvaluationImplBasisChange<
           variant,
@@ -950,7 +958,9 @@ namespace internal
                 my_scratch + i, my_scratch + i);
             for (unsigned int q = 0; q < basis_size_2; ++q)
               for (unsigned int i = ii; i < ii + n_inner_blocks; ++i)
-                my_scratch[i + q * n_blocks] *= coefficients[i + q * n_blocks];
+                my_scratch[i + q * n_blocks + c * size_per_component] *=
+                  coefficients[i + q * n_blocks +
+                               c * stride * size_per_component];
             for (unsigned int i = ii; i < ii + n_inner_blocks; ++i)
               eval_val.template values_one_line<dim - 1, false, false>(
                 my_scratch + i, my_scratch + i);
@@ -1407,7 +1417,7 @@ namespace internal
                                                         values_quad);
                   break;
                 case 1:
-                  values_quad[c] = values_dofs[2 * c];
+                  values_quad[0] = values_dofs[0];
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
@@ -1561,7 +1571,7 @@ namespace internal
                                                          values_dofs);
                   break;
                 case 1:
-                  values_dofs[2 * c] = values_quad[c][0];
+                  values_dofs[0] = values_quad[0];
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
