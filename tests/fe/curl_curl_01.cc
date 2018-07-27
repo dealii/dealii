@@ -309,7 +309,7 @@ MaxwellProblem<dim>::setup_system()
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   // FE_Nedelec boundary condition.
-  VectorTools::project_boundary_values_curl_conforming(
+  VectorTools::project_boundary_values_curl_conforming_l2(
     dof_handler, 0, ExactSolution<dim>(), 0, constraints);
 
   constraints.close();
