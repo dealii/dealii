@@ -17,7 +17,7 @@
 // this test is an adaptation of lac/block_vector_iterator for PETSc block
 // vectors
 
-#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 
 #include <algorithm>
 #include <iostream>

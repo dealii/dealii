@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 
 #ifdef DEAL_II_WITH_PETSC
 
@@ -22,7 +22,7 @@
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_compatibility.h>
-#  include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN

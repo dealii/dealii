@@ -20,7 +20,6 @@
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_full_matrix.h>
-#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_vector_base.h>
 

@@ -22,7 +22,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_compatibility.h>
-#  include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 
 #  include <cmath>
 

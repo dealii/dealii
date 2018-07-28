@@ -21,8 +21,8 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/generic_linear_algebra.h>
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

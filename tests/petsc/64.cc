@@ -20,7 +20,6 @@
 // PETScWrappers::MatrixBase::operator=
 
 
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 

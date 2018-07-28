@@ -22,7 +22,7 @@
 // argument to the user-defined operator+=. This is not exciting, but since I
 // wrote the test to make sure it works this way, let's keep it then...
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

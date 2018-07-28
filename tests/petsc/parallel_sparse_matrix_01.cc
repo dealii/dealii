@@ -27,7 +27,7 @@
 // malloc calls have been performed
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 
 #include "../tests.h"
 

@@ -17,8 +17,8 @@
 // test the QMRS solver using the PETSc matrix and vector classes
 
 
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/solver_cg.h>

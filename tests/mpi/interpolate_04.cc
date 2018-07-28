@@ -35,7 +35,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/numerics/vector_tools.h>

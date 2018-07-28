@@ -26,8 +26,8 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector_memory.h>

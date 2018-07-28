@@ -18,7 +18,7 @@
 // This test used to fail after upgrading to petsc 2.2.1
 
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

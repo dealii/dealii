@@ -17,7 +17,7 @@
 
 // make sure that block vector iterator allows reading and writing correctly
 
-#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 
 #include <iostream>
 

@@ -22,7 +22,7 @@
 #  ifdef DEAL_II_WITH_PETSC
 #    include <deal.II/lac/exceptions.h>
 #    include <deal.II/lac/petsc_matrix_base.h>
-#    include <deal.II/lac/petsc_parallel_vector.h>
+#    include <deal.II/lac/petsc_vector.h>
 DEAL_II_NAMESPACE_OPEN
 
 

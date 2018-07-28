@@ -28,8 +28,8 @@
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/parameter_handler.h>
 #  ifdef DEAL_II_WITH_PETSC
-#    include <deal.II/lac/petsc_parallel_block_vector.h>
-#    include <deal.II/lac/petsc_parallel_vector.h>
+#    include <deal.II/lac/petsc_block_vector.h>
+#    include <deal.II/lac/petsc_vector.h>
 #  endif
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_memory.h>

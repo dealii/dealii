@@ -32,8 +32,8 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/slepc_solver.h>
 
 #include <deal.II/numerics/data_out.h>

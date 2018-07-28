@@ -18,7 +18,7 @@
 // check PETScWrappers::MPI::Vector::operator = (Vector), except that we don't
 // resize the vector to be copied to beforehand
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

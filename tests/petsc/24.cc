@@ -19,7 +19,7 @@
 // this function has since been removed, so we test for v=0 instead, although
 // that may be covered by one of the other tests
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

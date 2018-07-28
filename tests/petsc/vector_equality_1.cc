@@ -18,7 +18,7 @@
 // check PETScWrappers::MPI::Vector::operator==(PETScWrappers::MPI::Vector)
 // for vectors that are not equal
 
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <iostream>
 #include <vector>

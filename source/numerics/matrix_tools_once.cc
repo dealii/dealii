@@ -40,9 +40,9 @@
 #include <deal.II/numerics/matrix_tools.h>
 
 #ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_block_vector.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
-#  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
-#  include <deal.II/lac/petsc_parallel_block_vector.h>
 #  include <deal.II/lac/petsc_vector_base.h>
 #endif
 

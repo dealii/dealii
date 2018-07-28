@@ -29,7 +29,7 @@
 #include <boost/io/ios_state.hpp>
 
 #ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS

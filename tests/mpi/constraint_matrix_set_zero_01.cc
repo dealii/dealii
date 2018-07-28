@@ -25,8 +25,8 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include "../tests.h"
 
