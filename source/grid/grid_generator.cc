@@ -4145,6 +4145,18 @@ namespace GridGenerator
                        const double duplicated_vertex_tolerance,
                        const bool   copy_manifold_ids)
   {
+    // if either Triangulation is empty then merging is just a copy.
+    if (triangulation_1.n_cells() == 0)
+      {
+        result.copy_triangulation(triangulation_2);
+        return;
+      }
+    if (triangulation_2.n_cells() == 0)
+      {
+        result.copy_triangulation(triangulation_1);
+        return;
+      }
+
     Assert(triangulation_1.n_levels() == 1,
            ExcMessage("The input triangulations must be non-empty "
                       "and must not be refined."));
@@ -4685,6 +4697,127 @@ namespace GridGenerator
             }
       }
     triangulation.set_manifold(0, PolarManifold<2>(center));
+  }
+
+
+
+  template <int dim>
+  void
+  concentric_hyper_shells(Triangulation<dim> &triangulation,
+                          const Point<dim> &  center,
+                          const double        inner_radius,
+                          const double        outer_radius,
+                          const unsigned int  n_shells,
+                          const double        skewness,
+                          const unsigned int  n_cells,
+                          const bool          colorize)
+  {
+    Assert(dim == 2 || dim == 3, ExcNotImplemented());
+    (void)colorize;
+    (void)n_cells;
+    Assert(inner_radius < outer_radius,
+           ExcMessage("outer_radius has to be bigger than inner_radius."));
+    if (n_shells == 0)
+      return; // empty Triangulation
+
+    std::vector<double> radii;
+    radii.push_back(inner_radius);
+    for (unsigned int shell_n = 1; shell_n < n_shells; ++shell_n)
+      if (skewness == 0.0)
+        // same as below, but works in the limiting case of zero skewness
+        radii.push_back(inner_radius +
+                        (outer_radius - inner_radius) *
+                          (1.0 - (1.0 - double(shell_n) / n_shells)));
+      else
+        radii.push_back(
+          inner_radius +
+          (outer_radius - inner_radius) *
+            (1.0 - std::tanh(skewness * (1.0 - double(shell_n) / n_shells)) /
+                     std::tanh(skewness)));
+    radii.push_back(outer_radius);
+
+    auto min_line_length = [](const Triangulation<dim> &tria) -> double {
+      double length = std::numeric_limits<double>::max();
+      for (const auto cell : tria.active_cell_iterators())
+        for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
+          length = std::min(length, cell->line(n)->diameter());
+      return length;
+    };
+
+    double grid_vertex_tolerance = 0.0;
+    for (unsigned int shell_n = 0; shell_n < radii.size() - 1; ++shell_n)
+      {
+        Triangulation<dim> current_shell;
+        GridGenerator::hyper_shell(current_shell,
+                                   center,
+                                   radii[shell_n],
+                                   radii[shell_n + 1],
+                                   n_cells == 0 ? (dim == 2 ? 8 : 12) :
+                                                  n_cells);
+
+        // The innermost shell has the smallest cells: use that to set the
+        // vertex merging tolerance
+        if (grid_vertex_tolerance == 0.0)
+          grid_vertex_tolerance = 0.5 * min_line_length(current_shell);
+
+        Triangulation<dim> temp(std::move(triangulation));
+        triangulation.clear();
+        GridGenerator::merge_triangulations(current_shell,
+                                            temp,
+                                            triangulation,
+                                            grid_vertex_tolerance);
+      }
+
+    const types::manifold_id manifold_id = 0;
+    triangulation.set_all_manifold_ids(manifold_id);
+    if (dim == 2)
+      triangulation.set_manifold(manifold_id, PolarManifold<dim>(center));
+    else if (dim == 3)
+      triangulation.set_manifold(manifold_id, SphericalManifold<dim>(center));
+
+    // We use boundary vertex positions to see if things are on the inner or
+    // outer boundary.
+    constexpr double radial_vertex_tolerance =
+      100.0 * std::numeric_limits<double>::epsilon();
+    auto assert_vertex_distance_within_tolerance =
+      [center, radial_vertex_tolerance](
+        const TriaIterator<TriaAccessor<dim - 1, dim, dim>> face,
+        const double                                        radius) {
+        (void)face;
+        (void)radius;
+        for (unsigned int vertex_n = 0;
+             vertex_n < GeometryInfo<dim>::vertices_per_face;
+             ++vertex_n)
+          {
+            Assert(std::abs((face->vertex(vertex_n) - center).norm() - radius) <
+                     (center.norm() + radius) * radial_vertex_tolerance,
+                   ExcInternalError());
+          }
+      };
+    if (colorize)
+      for (const auto &cell : triangulation.active_cell_iterators())
+        for (unsigned int face_n = 0;
+             face_n < GeometryInfo<dim>::faces_per_cell;
+             ++face_n)
+          {
+            auto face = cell->face(face_n);
+            if (face->at_boundary())
+              {
+                if (((face->vertex(0) - center).norm() - inner_radius) <
+                    (center.norm() + inner_radius) * radial_vertex_tolerance)
+                  {
+                    // we must be at an inner face, but check
+                    assert_vertex_distance_within_tolerance(face, inner_radius);
+                    face->set_all_boundary_ids(0);
+                  }
+                else
+                  {
+                    // we must be at an outer face, but check
+                    assert_vertex_distance_within_tolerance(face, outer_radius);
+                    face->set_all_boundary_ids(1);
+                  }
+              }
+          }
   }
 
 

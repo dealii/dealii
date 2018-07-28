@@ -183,6 +183,15 @@ for (deal_II_dimension : DIMENSIONS)
         const bool);
 #endif
 
+      template void
+      concentric_hyper_shells(Triangulation<deal_II_dimension> &,
+                              const Point<deal_II_dimension> &,
+                              const double,
+                              const double,
+                              const unsigned int,
+                              const double,
+                              const unsigned int,
+                              const bool);
 
     \}
   }
