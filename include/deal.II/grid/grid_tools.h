@@ -801,18 +801,22 @@ namespace GridTools
     const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes);
 
   /**
-   * Return a map of index:Point<spacedim>, containing the used vertices of the
-   * given `container`. The key of the returned map is the global index in the
-   * triangulation. The used vertices are obtained by looping over all cells,
+   * Return a map `vertex index -> Point<spacedim>` containing the used
+   * vertices of the given `container`. The key of the returned map (i.e.,
+   * the first element of the pair above) is the global index in the
+   * triangulation, whereas the value of each pair is the physical
+   * location of the corresponding vertex. The used vertices are obtained by
+   * looping over all cells,
    * and querying for each cell where its vertices are through the (optional)
    * `mapping` argument.
    *
-   * In serial and parallel::shared triangulations the size of the returned map
+   * In serial Triangulation objects and parallel::shared::Triangulation
+   * objects, the size of the returned map
    * equals Triangulation::n_used_vertices() (not Triangulation::n_vertices()).
-   * Note that in parallel::distributed triangulations only vertices in locally
-   * owned cells and ghost cells are returned, as for all other vertices their
-   * real location might not be known (e.g. for distributed computations using
-   * MappingQEulerian).
+   * Note that in parallel::distributed::Triangulation objects, only vertices in
+   * locally owned cells and ghost cells are returned, as for all other vertices
+   * their real location might not be known (e.g. for distributed computations
+   * using MappingQEulerian).
    *
    * If you use the default `mapping`, the returned map satisfies the following
    * equality:
