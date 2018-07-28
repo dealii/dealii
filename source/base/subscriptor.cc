@@ -156,13 +156,13 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 void
 Subscriptor::subscribe(const char *id) const
 {
-  if (object_info == nullptr)
-    object_info = &typeid(*this);
-  ++counter;
-
 #ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
 #endif
+
+  if (object_info == nullptr)
+    object_info = &typeid(*this);
+  ++counter;
 
   const char *const name = (id != 0) ? id : unknown_subscriber;
 
