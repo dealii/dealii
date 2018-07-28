@@ -1216,15 +1216,17 @@ namespace
                const unsigned int z_offset);
 
     /**
-     * Writes Lagrange type cell. The connectivity order of Lagrange
-     * points is given in the @p connectivity array, which are offset
+     * Write a high-order cell type, i.e., a Lagrange cell
+     * in the VTK terminology.
+     * The connectivity order of the points is given in the
+     * @p connectivity array, which are offset
      * by the global index @p start.
      */
     template <int dim>
     void
-    write_lagrange_cell(const unsigned int           index,
-                        const unsigned int           start,
-                        const std::vector<unsigned> &connectivity);
+    write_high_order_cell(const unsigned int           index,
+                          const unsigned int           start,
+                          const std::vector<unsigned> &connectivity);
   };
 
 
@@ -1594,9 +1596,9 @@ namespace
 
   template <int dim>
   void
-  VtkStream::write_lagrange_cell(const unsigned int,
-                                 const unsigned int           start,
-                                 const std::vector<unsigned> &connectivity)
+  VtkStream::write_high_order_cell(const unsigned int,
+                                   const unsigned int           start,
+                                   const std::vector<unsigned> &connectivity)
   {
     stream << connectivity.size();
     for (const auto &c : connectivity)
@@ -2576,8 +2578,8 @@ namespace DataOutBase
 
   template <int dim, int spacedim, typename StreamType>
   void
-  write_lagrange_cells(const std::vector<Patch<dim, spacedim>> &patches,
-                       StreamType &                             out)
+  write_high_order_cells(const std::vector<Patch<dim, spacedim>> &patches,
+                         StreamType &                             out)
   {
     Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
@@ -2616,9 +2618,9 @@ namespace DataOutBase
                 connectivity[connectivity_index] = local_index;
               }
 
-        out.template write_lagrange_cell<dim>(count++,
-                                              first_vertex_of_patch,
-                                              connectivity);
+        out.template write_high_order_cell<dim>(count++,
+                                                first_vertex_of_patch,
+                                                connectivity);
 
         // finally update the number of the first vertex of this patch
         first_vertex_of_patch += Utilities::fixed_power<dim>(n);
@@ -5323,7 +5325,7 @@ namespace DataOutBase
     out << "CELLS " << n_cells << ' ' << n_cells * (n_points_per_cell + 1)
         << '\n';
     if (flags.write_higher_order_cells)
-      write_lagrange_cells(patches, vtk_out);
+      write_high_order_cells(patches, vtk_out);
     else
       write_cells(patches, vtk_out);
     out << '\n';
