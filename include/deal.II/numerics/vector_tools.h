@@ -1515,13 +1515,16 @@ namespace VectorTools
    * project $(I-P_0-P_e)\vec{f}$ on the bubble shape functions defined on the
    * face.
    *
+   * @deprecated Use the project_boundary_values_curl_conforming_l2() function
+   * instead of this one.
+   *
    * @ingroup constraints
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
-  void
+  DEAL_II_DEPRECATED void
   project_boundary_values_curl_conforming(
     const DoFHandler<dim> &      dof_handler,
     const unsigned int           first_vector_component,
@@ -1533,13 +1536,16 @@ namespace VectorTools
   /**
    * Same as above for the hp-namespace.
    *
+   * @deprecated Use the project_boundary_values_curl_conforming_l2() function
+   * instead of this one.
+   *
    * @ingroup constraints
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
-  void
+  DEAL_II_DEPRECATED void
   project_boundary_values_curl_conforming(
     const hp::DoFHandler<dim> &            dof_handler,
     const unsigned int                     first_vector_component,

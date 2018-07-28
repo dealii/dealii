@@ -69,7 +69,7 @@ test_boundary_values(const FiniteElement<dim> &fe)
   AffineConstraints<double> constraints;
 
   constraints.clear();
-  VectorTools::project_boundary_values_curl_conforming(
+  VectorTools::project_boundary_values_curl_conforming_l2(
     dof_handler, 0, boundary_function, 0, constraints);
   constraints.close();
   constraints.print(logfile);
