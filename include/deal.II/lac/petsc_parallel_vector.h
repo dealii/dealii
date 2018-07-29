@@ -20,8 +20,8 @@
 
 #  include <deal.II/lac/petsc_vector.h>
 
-#  pragma DEAL_II_WARNING( \
-    "This file is deprecated. Use deal.II/lac/petsc_vector.h instead!")
+DEAL_II_WARNING(
+  "This file is deprecated. Use deal.II/lac/petsc_vector.h instead!")
 
 #endif
 /*------------------------- petsc_parallel_vector.h -------------------------*/
