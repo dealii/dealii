@@ -1788,72 +1788,160 @@ namespace parallel
         *         parallel_forest,
       const char *filename) const
     {
-      Assert(variable_size_data_stored == false, ExcNotImplemented());
+      // Large fractions of this function have been copied from
+      // DataOutInterface::write_vtu_in_parallel.
+      // TODO: Write general MPIIO interface.
 
       Assert(sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
 
-      const std::string fname_fixed = std::string(filename) + "_fixed.data";
-
-      // ----- copied -----
-      // from DataOutInterface::write_vtu_in_parallel
-      // TODO: write general MPIIO interface
       const int myrank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
-      MPI_Info info;
-      int      ierr = MPI_Info_create(&info);
-      AssertThrowMPI(ierr);
-      MPI_File fh;
-      ierr = MPI_File_open(mpi_communicator,
-                           const_cast<char *>(fname_fixed.c_str()),
-                           MPI_MODE_CREATE | MPI_MODE_WRONLY,
-                           info,
-                           &fh);
-      AssertThrowMPI(ierr);
+      //
+      // ---------- Fixed size data ----------
+      //
+      {
+        const std::string fname_fixed = std::string(filename) + "_fixed.data";
 
-      ierr = MPI_File_set_size(fh, 0); // delete the file contents
-      AssertThrowMPI(ierr);
-      // this barrier is necessary, because otherwise others might already
-      // write while one core is still setting the size to zero.
-      ierr = MPI_Barrier(mpi_communicator);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Info_free(&info);
-      AssertThrowMPI(ierr);
-      // ------------------
+        MPI_Info info;
+        int      ierr = MPI_Info_create(&info);
+        AssertThrowMPI(ierr);
 
-      // Check if number of processors is lined up with p4est partitioning.
-      Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+        MPI_File fh;
+        ierr = MPI_File_open(mpi_communicator,
+                             fname_fixed.c_str(),
+                             MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                             info,
+                             &fh);
+        AssertThrowMPI(ierr);
 
-      // Write cumulative sizes to file.
-      // Since each processor owns the same information about the data sizes,
-      // it is sufficient to let only the first processor perform this task.
-      if (myrank == 0)
+        ierr = MPI_File_set_size(fh, 0); // delete the file contents
+        AssertThrowMPI(ierr);
+        // this barrier is necessary, because otherwise others might already
+        // write while one core is still setting the size to zero.
+        ierr = MPI_Barrier(mpi_communicator);
+        AssertThrowMPI(ierr);
+        ierr = MPI_Info_free(&info);
+        AssertThrowMPI(ierr);
+        // ------------------
+
+        // Check if number of processors is lined up with p4est partitioning.
+        Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+
+        // Write cumulative sizes to file.
+        // Since each processor owns the same information about the data sizes,
+        // it is sufficient to let only the first processor perform this task.
+        if (myrank == 0)
+          {
+            ierr = MPI_File_write_at(fh,
+                                     0,
+                                     sizes_fixed_cumulative.data(),
+                                     sizes_fixed_cumulative.size(),
+                                     MPI_UNSIGNED,
+                                     MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+          }
+
+        // Write packed data to file simultaneously.
+        const unsigned int offset_fixed =
+          sizes_fixed_cumulative.size() * sizeof(unsigned int);
+
+        ierr = MPI_File_write_at(
+          fh,
+          offset_fixed +
+            parallel_forest->global_first_quadrant[myrank] *
+              sizes_fixed_cumulative.back(), // global position in file
+          src_data_fixed.data(),
+          src_data_fixed.size(), // local buffer
+          MPI_CHAR,
+          MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+      }
+
+      //
+      // ---------- Variable size data ----------
+      //
+      if (variable_size_data_stored)
         {
-          ierr = MPI_File_write_at(fh,
-                                   0,
-                                   sizes_fixed_cumulative.data(),
-                                   sizes_fixed_cumulative.size(),
-                                   MPI_UNSIGNED,
-                                   MPI_STATUS_IGNORE);
+          const std::string fname_variable =
+            std::string(filename) + "_variable.data";
+
+          const int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
+
+          MPI_Info info;
+          int      ierr = MPI_Info_create(&info);
+          AssertThrowMPI(ierr);
+
+          MPI_File fh;
+          ierr = MPI_File_open(mpi_communicator,
+                               fname_variable.c_str(),
+                               MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                               info,
+                               &fh);
+          AssertThrowMPI(ierr);
+
+          ierr = MPI_File_set_size(fh, 0); // delete the file contents
+          AssertThrowMPI(ierr);
+          // this barrier is necessary, because otherwise others might already
+          // write while one core is still setting the size to zero.
+          ierr = MPI_Barrier(mpi_communicator);
+          AssertThrowMPI(ierr);
+          ierr = MPI_Info_free(&info);
+          AssertThrowMPI(ierr);
+
+          // Write sizes of each cell into file simultaneously.
+          ierr =
+            MPI_File_write_at(fh,
+                              parallel_forest->global_first_quadrant[myrank] *
+                                sizeof(int), // global position in file
+                              src_sizes_variable.data(),
+                              src_sizes_variable.size(), // local buffer
+                              MPI_INT,
+                              MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+
+          const unsigned int offset_variable =
+            parallel_forest->global_num_quadrants * sizeof(int);
+
+          // Gather size of data in bytes we want to store from this processor.
+          const unsigned int size_on_proc = src_data_variable.size();
+
+          // Share information among all processors.
+          std::vector<unsigned int> sizes_on_all_procs(n_procs);
+          ierr = MPI_Allgather(&size_on_proc,
+                               1,
+                               MPI_UNSIGNED,
+                               sizes_on_all_procs.data(),
+                               1,
+                               MPI_UNSIGNED,
+                               mpi_communicator);
+          AssertThrowMPI(ierr);
+
+          // Generate accumulated sum to get an offset for writing variable
+          // size data.
+          std::partial_sum(sizes_on_all_procs.begin(),
+                           sizes_on_all_procs.end(),
+                           sizes_on_all_procs.begin());
+
+          // Write data consecutively into file.
+          ierr = MPI_File_write_at(
+            fh,
+            offset_variable +
+              ((myrank == 0) ?
+                 0 :
+                 sizes_on_all_procs[myrank - 1]), // global position in file
+            src_data_variable.data(),
+            src_data_variable.size(), // local buffer
+            MPI_CHAR,
+            MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+
+          ierr = MPI_File_close(&fh);
           AssertThrowMPI(ierr);
         }
-
-      // Write packed data to file simultaneously.
-      const unsigned int offset =
-        sizes_fixed_cumulative.size() * sizeof(unsigned int);
-
-      ierr = MPI_File_write_at(
-        fh,
-        offset + parallel_forest->global_first_quadrant[myrank] *
-                   sizes_fixed_cumulative.back(), // global position in file
-        src_data_fixed.data(),
-        src_data_fixed.size(), // local buffer
-        MPI_CHAR,
-        MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_File_close(&fh);
-      AssertThrowMPI(ierr);
     }
 
 
@@ -1864,68 +1952,152 @@ namespace parallel
       const typename dealii::internal::p4est::types<dim>::forest
         *                parallel_forest,
       const char *       filename,
-      const unsigned int n_attached_deserialize)
+      const unsigned int n_attached_deserialize_fixed,
+      const unsigned int n_attached_deserialize_variable)
     {
+      // Large fractions of this function have been copied from
+      // DataOutInterface::write_vtu_in_parallel.
+      // TODO: Write general MPIIO interface.
+
       Assert(dest_data_fixed.size() == 0,
              ExcMessage("Previously loaded data has not been released yet!"));
 
-      const std::string fname_fixed = std::string(filename) + "_fixed.data";
+      variable_size_data_stored = (n_attached_deserialize_variable > 0);
 
-      // ----- copied -----
-      // from DataOutInterface::write_vtu_in_parallel
-      // TODO: write general MPIIO interface
       const int myrank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
-      MPI_Info info;
-      int      ierr = MPI_Info_create(&info);
-      AssertThrowMPI(ierr);
-      MPI_File fh;
-      ierr = MPI_File_open(mpi_communicator,
-                           const_cast<char *>(fname_fixed.c_str()),
-                           MPI_MODE_RDONLY,
-                           info,
-                           &fh);
-      AssertThrowMPI(ierr);
+      //
+      // ---------- Fixed size data ----------
+      //
+      {
+        const std::string fname_fixed = std::string(filename) + "_fixed.data";
 
-      ierr = MPI_Info_free(&info);
-      AssertThrowMPI(ierr);
-      // ------------------
+        MPI_Info info;
+        int      ierr = MPI_Info_create(&info);
+        AssertThrowMPI(ierr);
 
-      // Check if number of processors is lined up with p4est partitioning.
-      Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+        MPI_File fh;
+        ierr = MPI_File_open(
+          mpi_communicator, fname_fixed.c_str(), MPI_MODE_RDONLY, info, &fh);
+        AssertThrowMPI(ierr);
 
-      // Read cumulative sizes from file.
-      // Since all processors need the same information about the data sizes,
-      // let each of them gain it by reading from the same location in the file.
-      sizes_fixed_cumulative.resize(1 + n_attached_deserialize);
-      ierr = MPI_File_read_at(fh,
-                              0,
-                              sizes_fixed_cumulative.data(),
-                              sizes_fixed_cumulative.size(),
-                              MPI_UNSIGNED,
-                              MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+        ierr = MPI_Info_free(&info);
+        AssertThrowMPI(ierr);
 
-      // Allocate sufficient memory.
-      dest_data_fixed.resize(parallel_forest->local_num_quadrants *
-                             sizes_fixed_cumulative.back());
+        // Check if number of processors is lined up with p4est partitioning.
+        Assert(myrank < parallel_forest->mpisize, ExcInternalError());
 
-      // Read packed data from file simultaneously.
-      const unsigned int offset =
-        sizes_fixed_cumulative.size() * sizeof(unsigned int);
+        // Read cumulative sizes from file.
+        // Since all processors need the same information about the data sizes,
+        // let each of them retrieve it by reading from the same location in
+        // the file.
+        sizes_fixed_cumulative.resize(1 + n_attached_deserialize_fixed +
+                                      (variable_size_data_stored ? 1 : 0));
+        ierr = MPI_File_read_at(fh,
+                                0,
+                                sizes_fixed_cumulative.data(),
+                                sizes_fixed_cumulative.size(),
+                                MPI_UNSIGNED,
+                                MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
 
-      ierr = MPI_File_read_at(
-        fh,
-        offset + parallel_forest->global_first_quadrant[myrank] *
-                   sizes_fixed_cumulative.back(), // global position in file
-        dest_data_fixed.data(),
-        dest_data_fixed.size(), // local buffer
-        MPI_CHAR,
-        MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+        // Allocate sufficient memory.
+        dest_data_fixed.resize(parallel_forest->local_num_quadrants *
+                               sizes_fixed_cumulative.back());
 
-      ierr = MPI_File_close(&fh);
-      AssertThrowMPI(ierr);
+        // Read packed data from file simultaneously.
+        const unsigned int offset =
+          sizes_fixed_cumulative.size() * sizeof(unsigned int);
+
+        ierr = MPI_File_read_at(
+          fh,
+          offset + parallel_forest->global_first_quadrant[myrank] *
+                     sizes_fixed_cumulative.back(), // global position in file
+          dest_data_fixed.data(),
+          dest_data_fixed.size(), // local buffer
+          MPI_CHAR,
+          MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+      }
+
+      //
+      // ---------- Variable size data ----------
+      //
+      if (variable_size_data_stored)
+        {
+          const std::string fname_variable =
+            std::string(filename) + "_variable.data";
+
+          const int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
+
+          MPI_Info info;
+          int      ierr = MPI_Info_create(&info);
+          AssertThrowMPI(ierr);
+
+          MPI_File fh;
+          ierr = MPI_File_open(mpi_communicator,
+                               fname_variable.c_str(),
+                               MPI_MODE_RDONLY,
+                               info,
+                               &fh);
+          AssertThrowMPI(ierr);
+
+          ierr = MPI_Info_free(&info);
+          AssertThrowMPI(ierr);
+
+          // Read sizes of all locally owned cells.
+          dest_sizes_variable.resize(parallel_forest->local_num_quadrants);
+          ierr =
+            MPI_File_read_at(fh,
+                             parallel_forest->global_first_quadrant[myrank] *
+                               sizeof(int),
+                             dest_sizes_variable.data(),
+                             dest_sizes_variable.size(),
+                             MPI_INT,
+                             MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+
+          const unsigned int offset =
+            parallel_forest->global_num_quadrants * sizeof(int);
+
+          const unsigned int size_on_proc =
+            std::accumulate(dest_sizes_variable.begin(),
+                            dest_sizes_variable.end(),
+                            0);
+
+          // share information among all processors
+          std::vector<unsigned int> sizes_on_all_procs(n_procs);
+          ierr = MPI_Allgather(&size_on_proc,
+                               1,
+                               MPI_UNSIGNED,
+                               sizes_on_all_procs.data(),
+                               1,
+                               MPI_UNSIGNED,
+                               mpi_communicator);
+          AssertThrowMPI(ierr);
+
+          // generate accumulated sum
+          std::partial_sum(sizes_on_all_procs.begin(),
+                           sizes_on_all_procs.end(),
+                           sizes_on_all_procs.begin());
+
+          dest_data_variable.resize(size_on_proc);
+          ierr = MPI_File_read_at(fh,
+                                  offset + ((myrank == 0) ?
+                                              0 :
+                                              sizes_on_all_procs[myrank - 1]),
+                                  dest_data_variable.data(),
+                                  dest_data_variable.size(),
+                                  MPI_CHAR,
+                                  MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+
+          ierr = MPI_File_close(&fh);
+          AssertThrowMPI(ierr);
+        }
     }
 
 
@@ -2530,10 +2702,12 @@ namespace parallel
         {
           std::string   fname = std::string(filename) + ".info";
           std::ofstream f(fname.c_str());
-          f << "version nproc n_attached_objs n_coarse_cells" << std::endl
-            << 3 << " "
+          f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_coarse_cells"
+            << std::endl
+            << 4 << " "
             << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
             << cell_attached_data.pack_callbacks_fixed.size() << " "
+            << cell_attached_data.pack_callbacks_variable.size() << " "
             << this->n_cells(0) << std::endl;
         }
 
@@ -2613,25 +2787,28 @@ namespace parallel
         connectivity);
       connectivity = nullptr;
 
-      unsigned int version, numcpus, attached_count, n_coarse_cells;
+      unsigned int version, numcpus, attached_count_fixed,
+        attached_count_variable, n_coarse_cells;
       {
         std::string   fname = std::string(filename) + ".info";
         std::ifstream f(fname.c_str());
         AssertThrow(f, ExcIO());
         std::string firstline;
         getline(f, firstline); // skip first line
-        f >> version >> numcpus >> attached_count >> n_coarse_cells;
+        f >> version >> numcpus >> attached_count_fixed >>
+          attached_count_variable >> n_coarse_cells;
       }
 
-      Assert(version == 3,
-             ExcMessage("Incompatible version found in .info file."));
+      AssertThrow(version == 4,
+                  ExcMessage("Incompatible version found in .info file."));
       Assert(this->n_cells(0) == n_coarse_cells,
              ExcMessage("Number of coarse cells differ!"));
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
-      cell_attached_data.n_attached_data_sets   = 0;
-      cell_attached_data.n_attached_deserialize = attached_count;
+      cell_attached_data.n_attached_data_sets = 0;
+      cell_attached_data.n_attached_deserialize =
+        attached_count_fixed + attached_count_variable;
 
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext(
         filename,
@@ -2665,9 +2842,12 @@ namespace parallel
         }
 
       // load saved data, if any was stored
-      if (attached_count > 0)
+      if (cell_attached_data.n_attached_deserialize > 0)
         {
-          data_transfer.load(parallel_forest, filename, attached_count);
+          data_transfer.load(parallel_forest,
+                             filename,
+                             attached_count_fixed,
+                             attached_count_variable);
 
           data_transfer.unpack_cell_status(local_quadrant_cell_relations);
 
