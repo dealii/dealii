@@ -1941,6 +1941,23 @@ namespace GridGenerator
       return (std::abs(p[0] - c[0]) < radius) &&
              (std::abs(p[1] - c[1]) < radius);
     }
+
+
+
+    // Find the minimal distance between two vertices. This is useful for
+    // computing a tolerance for merging vertices in
+    // GridTools::merge_triangulations.
+    template <int dim, int spacedim>
+    double
+    minimal_vertex_distance(const Triangulation<dim, spacedim> &triangulation)
+    {
+      double length = std::numeric_limits<double>::max();
+      for (const auto &cell : triangulation.active_cell_iterators())
+        for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
+          length = std::min(length, cell->line(n)->diameter());
+      return length;
+    }
+
   } // namespace internal
 
   template <>
@@ -4798,14 +4815,6 @@ namespace GridGenerator
                      std::tanh(skewness)));
     radii.push_back(outer_radius);
 
-    auto min_line_length = [](const Triangulation<dim> &tria) -> double {
-      double length = std::numeric_limits<double>::max();
-      for (const auto &cell : tria.active_cell_iterators())
-        for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
-          length = std::min(length, cell->line(n)->diameter());
-      return length;
-    };
-
     double grid_vertex_tolerance = 0.0;
     for (unsigned int shell_n = 0; shell_n < radii.size() - 1; ++shell_n)
       {
@@ -4820,7 +4829,8 @@ namespace GridGenerator
         // The innermost shell has the smallest cells: use that to set the
         // vertex merging tolerance
         if (grid_vertex_tolerance == 0.0)
-          grid_vertex_tolerance = 0.5 * min_line_length(current_shell);
+          grid_vertex_tolerance =
+            0.5 * internal::minimal_vertex_distance(current_shell);
 
         Triangulation<dim> temp(std::move(triangulation));
         triangulation.clear();
