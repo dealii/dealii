@@ -50,7 +50,7 @@
 
 // PETSc appears here because SLEPc depends on this library:
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 // And then we need to actually import the interfaces for solvers that SLEPc
 // provides:

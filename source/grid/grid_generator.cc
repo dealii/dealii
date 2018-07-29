@@ -4738,7 +4738,7 @@ namespace GridGenerator
 
     auto min_line_length = [](const Triangulation<dim> &tria) -> double {
       double length = std::numeric_limits<double>::max();
-      for (const auto cell : tria.active_cell_iterators())
+      for (const auto &cell : tria.active_cell_iterators())
         for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
           length = std::min(length, cell->line(n)->diameter());
       return length;
@@ -4783,6 +4783,8 @@ namespace GridGenerator
       [center, radial_vertex_tolerance](
         const TriaIterator<TriaAccessor<dim - 1, dim, dim>> face,
         const double                                        radius) {
+        (void)center;
+        (void)radial_vertex_tolerance;
         (void)face;
         (void)radius;
         for (unsigned int vertex_n = 0;
