@@ -41,7 +41,7 @@ namespace Functions
             const Point<dim>   center = Point<dim>());
     virtual double
     value(const Point<dim> & points,
-          const unsigned int component) const override;
+          const unsigned int component = 0) const override;
     virtual void
     value_list(const std::vector<Point<dim>> &points,
                std::vector<double> &          values,

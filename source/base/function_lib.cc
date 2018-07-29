@@ -17,6 +17,7 @@
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx17/cmath.h>
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/lac/vector.h>
@@ -2283,12 +2284,7 @@ namespace Functions
   {
     Assert(dim == 2, ExcNotImplemented());
     const double r = p.distance(center);
-#ifndef DEAL_II_HAVE_JN
-    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-    return r;
-#else
-    return jn(order, r * wave_number);
-#endif
+    return std_cxx17::cyl_bessel_j(order, r * wave_number);
   }
 
 
@@ -2300,17 +2296,11 @@ namespace Functions
   {
     Assert(dim == 2, ExcNotImplemented());
     AssertDimension(points.size(), values.size());
-#ifndef DEAL_II_HAVE_JN
-    (void)points;
-    (void)values;
-    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-#else
     for (unsigned int k = 0; k < points.size(); ++k)
       {
         const double r = points[k].distance(center);
-        values[k]      = jn(order, r * wave_number);
+        values[k]      = std_cxx17::cyl_bessel_j(order, r * wave_number);
       }
-#endif
   }
 
 
@@ -2319,23 +2309,19 @@ namespace Functions
   Bessel1<dim>::gradient(const Point<dim> &p, const unsigned int) const
   {
     Assert(dim == 2, ExcNotImplemented());
-#ifndef DEAL_II_HAVE_JN
-    (void)p;
-    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-    return Tensor<1, dim>();
-#else
     const double r  = p.distance(center);
     const double co = (r == 0.) ? 0. : (p(0) - center(0)) / r;
     const double si = (r == 0.) ? 0. : (p(1) - center(1)) / r;
 
-    const double dJn = (order == 0) ? (-jn(1, r * wave_number)) :
-                                      (.5 * (jn(order - 1, wave_number * r) -
-                                             jn(order + 1, wave_number * r)));
+    const double dJn =
+      (order == 0) ?
+        (-std_cxx17::cyl_bessel_j(1, r * wave_number)) :
+        (.5 * (std_cxx17::cyl_bessel_j(order - 1, wave_number * r) -
+               std_cxx17::cyl_bessel_j(order + 1, wave_number * r)));
     Tensor<1, dim> result;
     result[0] = wave_number * co * dJn;
     result[1] = wave_number * si * dJn;
     return result;
-#endif
   }
 
 
@@ -2348,9 +2334,6 @@ namespace Functions
   {
     Assert(dim == 2, ExcNotImplemented());
     AssertDimension(points.size(), gradients.size());
-#ifndef DEAL_II_HAVE_JN
-    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-#else
     for (unsigned int k = 0; k < points.size(); ++k)
       {
         const Point<dim> &p  = points[k];
@@ -2358,15 +2341,15 @@ namespace Functions
         const double      co = (r == 0.) ? 0. : (p(0) - center(0)) / r;
         const double      si = (r == 0.) ? 0. : (p(1) - center(1)) / r;
 
-        const double dJn = (order == 0) ?
-                             (-jn(1, r * wave_number)) :
-                             (.5 * (jn(order - 1, wave_number * r) -
-                                    jn(order + 1, wave_number * r)));
+        const double dJn =
+          (order == 0) ?
+            (-std_cxx17::cyl_bessel_j(1, r * wave_number)) :
+            (.5 * (std_cxx17::cyl_bessel_j(order - 1, wave_number * r) -
+                   std_cxx17::cyl_bessel_j(order + 1, wave_number * r)));
         Tensor<1, dim> &result = gradients[k];
         result[0]              = wave_number * co * dJn;
         result[1]              = wave_number * si * dJn;
       }
-#endif
   }
 
 
@@ -2837,6 +2820,7 @@ namespace Functions
   template class Monomial<1>;
   template class Monomial<2>;
   template class Monomial<3>;
+  template class Bessel1<1>;
   template class Bessel1<2>;
   template class Bessel1<3>;
   template class InterpolatedTensorProductGridData<1>;

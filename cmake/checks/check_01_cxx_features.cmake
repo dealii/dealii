@@ -177,6 +177,22 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
       DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
 
     #
+    # Not all compilers with C++17 support include the new special math functions:
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <cmath>
+
+      int main()
+      {
+        std::cyl_bessel_j(1.0, 1.0);
+        std::cyl_bessel_jf(1.0f, 1.0f);
+        std::cyl_bessel_jl(1.0, 1.0);
+      }
+      "
+      DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS)
+
+    #
     # Some compilers treat lambdas as constexpr functions when compiling
     # with C++17 support even if they don't fulfill all the constexpr
     # function requirements. Consequently, these compilers don't allow
@@ -211,6 +227,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
 
   IF( DEAL_II_HAVE_CXX17_ATTRIBUTES AND
       DEAL_II_HAVE_CXX17_IF_CONSTEXPR AND
+      DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS AND
       DEAL_II_NON_CONSTEXPR_LAMBDA)
     SET(DEAL_II_HAVE_CXX17 TRUE)
   ELSE()
