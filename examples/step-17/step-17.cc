@@ -68,8 +68,8 @@
 // simply map to sequential, local vectors and matrices if there is only a
 // single process, i.e. if you are running on only one machine, and without
 // MPI support):
-#include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 // Then we also need interfaces for solvers and preconditioners that PETSc
 // provides:
 #include <deal.II/lac/petsc_solver.h>
