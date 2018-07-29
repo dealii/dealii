@@ -26,6 +26,10 @@
 #include <string>
 #include <typeinfo>
 
+#ifdef DEAL_II_WITH_THREADS
+#  include <mutex>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -51,9 +55,6 @@ DEAL_II_NAMESPACE_OPEN
  * subscribe() and to unsubscribe() must be the same. Strings with equal
  * contents will not be recognized to be the same. The handling in
  * SmartPointer will take care of this.
- *
- * @note This feature is switched off if multithreading is used (i.e., if
- * <code>DEAL_II_WITH_THREADS</code> is on).
  *
  * @ingroup memory
  * @author Guido Kanschat, 1998 - 2005
@@ -127,6 +128,13 @@ public:
    */
   unsigned int
   n_subscriptions() const;
+
+  /**
+   * List the subscribers to the input @p stream.
+   */
+  template <typename StreamType>
+  void
+  list_subscribers(StreamType &stream) const;
 
   /**
    * List the subscribers to @p deallog.
@@ -241,6 +249,16 @@ private:
    */
   void
   check_no_subscribers() const noexcept;
+
+#ifdef DEAL_II_WITH_THREADS
+
+  /**
+   * A mutex used to ensure data consistency when printing out the list
+   * of subscribers.
+   */
+  static std::mutex mutex;
+
+#endif
 };
 
 //---------------------------------------------------------------------------
@@ -251,6 +269,19 @@ Subscriptor::serialize(Archive &, const unsigned int)
 {
   // do nothing, as explained in the
   // documentation of this function
+}
+
+template <typename StreamType>
+inline void
+Subscriptor::list_subscribers(StreamType &stream) const
+{
+#ifdef DEAL_II_WITH_THREADS
+  std::lock_guard<std::mutex> lock(mutex);
+#endif
+
+  for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
+    stream << it->second << '/' << counter << " subscriptions from \""
+           << it->first << '\"' << std::endl;
 }
 
 DEAL_II_NAMESPACE_CLOSE

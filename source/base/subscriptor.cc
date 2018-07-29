@@ -27,6 +27,11 @@ DEAL_II_NAMESPACE_OPEN
 static const char *unknown_subscriber = "unknown subscriber";
 
 
+#ifdef DEAL_II_WITH_THREADS
+std::mutex Subscriptor::mutex;
+#endif
+
+
 Subscriptor::Subscriptor()
   : counter(0)
   , object_info(nullptr)
@@ -151,14 +156,14 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 void
 Subscriptor::subscribe(const char *id) const
 {
-#ifdef DEBUG
+#ifdef DEAL_II_WITH_THREADS
+  std::lock_guard<std::mutex> lock(mutex);
+#endif
+
   if (object_info == nullptr)
     object_info = &typeid(*this);
   ++counter;
 
-  // This feature is disabled when we compile with threads: see the
-  // documentation of this class.
-#  ifndef DEAL_II_WITH_THREADS
   const char *const name = (id != 0) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
@@ -167,19 +172,12 @@ Subscriptor::subscribe(const char *id) const
 
   else
     it->second++;
-#  else
-  (void)id;
-#  endif
-#else
-  (void)id;
-#endif
 }
 
 
 void
 Subscriptor::unsubscribe(const char *id) const
 {
-#ifdef DEBUG
   const char *name = (id != nullptr) ? id : unknown_subscriber;
   AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
   // This is for the case that we do
@@ -189,19 +187,16 @@ Subscriptor::unsubscribe(const char *id) const
 
   --counter;
 
-  // This feature is disabled when we compile with threads: see the
-  // documentation of this class.
-#  ifndef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_THREADS
+  std::lock_guard<std::mutex> lock(mutex);
+#endif
+
   map_iterator it = counter_map.find(name);
   AssertNothrow(it != counter_map.end(),
                 ExcNoSubscriber(object_info->name(), name));
   AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
 
   it->second--;
-#  endif
-#else
-  (void)id;
-#endif
 }
 
 
@@ -217,13 +212,7 @@ Subscriptor::n_subscriptions() const
 void
 Subscriptor::list_subscribers() const
 {
-#ifndef DEAL_II_WITH_THREADS
-  for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
-    deallog << it->second << '/' << counter << " subscriptions from \""
-            << it->first << '\"' << std::endl;
-#else
-  deallog << "No subscriber listing with multithreading" << std::endl;
-#endif
+  list_subscribers(deallog);
 }
 
 DEAL_II_NAMESPACE_CLOSE
