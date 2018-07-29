@@ -1271,11 +1271,14 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &result);
 
   /**
-   * Take a 2d Triangulation that is being extruded in z direction by the
-   * total height of @p height using @p n_slices slices (minimum is 2). The
-   * boundary indicators of the faces of @p input are going to be assigned to
-   * the corresponding side walls in z direction. The bottom and top get the
-   * next two free boundary indicators.
+   * Extrude @p input in the $z$ direction from $z = 0$ to $z =
+   * \text{height}$. The number of <em>slices</em>, or layers of cells
+   * perpendicular to the $z = 0$ plane, will be @p n_slices slices (minimum is
+   * 2). The boundary indicators of the faces of @p input will be assigned to
+   * the corresponding side walls in $z$ direction. The bottom and top get the
+   * next two free boundary indicators: i.e., if @p input has boundary ids of
+   * $0$, $1$, and $42$, then the $z = 0$ boundary id of @p result will be $43$
+   * and the $z = \text{height}$ boundary id will be $44$.
    *
    * @note The 2d input triangulation @p input must be a coarse mesh that has
    * no refined cells.
