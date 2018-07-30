@@ -2276,7 +2276,9 @@ namespace Functions
     : order(order)
     , wave_number(wave_number)
     , center(center)
-  {}
+  {
+    Assert(wave_number >= 0., ExcMessage("wave_number must be nonnegative!"));
+  }
 
   template <int dim>
   double
