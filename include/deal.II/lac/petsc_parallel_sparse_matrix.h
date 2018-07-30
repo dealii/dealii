@@ -20,8 +20,8 @@
 
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 
-#  pragma DEAL_II_WARNING( \
-    "This file is deprecated. Use deal.II/lac/petsc_sparse_matrix.h instead.")
+DEAL_II_WARNING(
+  "This file is deprecated. Use deal.II/lac/petsc_sparse_matrix.h instead.")
 
 #endif
 /*---------------------- petsc_parallel_sparse_matrix.h ---------------------*/

@@ -389,9 +389,15 @@ _Pragma("GCC diagnostic pop")
  * http://goodliffe.blogspot.com/2009/07/c-how-to-say-warning-to-visual-studio-c.html
  */
 
-#define DEAL_II_STRINGIZE_HELPER(x) #x
-#define DEAL_II_STRINGIZE(x) DEAL_II_STRINGIZE_HELPER(x)
-#define DEAL_II_WARNING(desc) message(__FILE__ "(" DEAL_II_STRINGIZE(__LINE__) ") : Warning: " #desc)
+#ifdef _MSC_VER
+  #define DEAL_II_STRINGIZE_HELPER(x) #x
+  #define DEAL_II_STRINGIZE(x) DEAL_II_STRINGIZE_HELPER(x)
+  #define DEAL_II_DO_PRAGMA(x) __pragma(x)
+  #define DEAL_II_WARNING(desc) DEAL_II_DO_PRAGMA(message(__FILE__ "(" DEAL_II_STRINGIZE(__LINE__) ") : warning: " #desc))
+#else
+  #define DEAL_II_DO_PRAGMA(x) _Pragma(#x)
+  #define DEAL_II_WARNING(desc) DEAL_II_DO_PRAGMA(message(#desc))
+#endif
 
 /***********************************************************************
  * Final inclusions:
