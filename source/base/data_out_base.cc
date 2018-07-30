@@ -692,11 +692,20 @@ namespace
   // DataOutBase<deal_II_dimension,deal_II_dimension+1> in general Wolfgang
   // supposed that we don't need it in general, but however this choice avoids a
   // -Warray-bounds check warning
-  const unsigned int vtk_cell_type[5] = {1,
-                                         3,
-                                         9,
-                                         12,
+  const unsigned int vtk_cell_type[5] = {1,  // VTK_VERTEX
+                                         3,  // VTK_LINE
+                                         9,  // VTK_QUAD
+                                         12, // VTK_HEXAHEDRON
                                          static_cast<unsigned int>(-1)};
+
+  // VTK cell ids defined in vtk_cell_type are used for linear cells,
+  // the ones defined below are used when Lagrange cells are written.
+  const unsigned int vtk_lagrange_cell_type[5] = {
+    1,  // VTK_VERTEX
+    68, // VTK_LAGRANGE_CURVE
+    70, // VTK_LAGRANGE_QUADRILATERAL
+    72, // VTK_LAGRANGE_HEXAHEDRON
+    static_cast<unsigned int>(-1)};
 
   //----------------------------------------------------------------------//
   // Auxiliary functions
@@ -782,6 +791,141 @@ namespace
       }
   }
 
+  /**
+   * Given (i,j,k) coordinates within the Lagrange quadrilateral, return an
+   * offset into the local connectivity array.
+   *
+   * Modified from
+   * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
+   */
+  int
+  vtk_point_index_from_ijk(unsigned i,
+                           unsigned j,
+                           unsigned,
+                           const std::array<unsigned, 2> &order)
+  {
+    bool ibdy = (i == 0 || i == order[0]);
+    bool jbdy = (j == 0 || j == order[1]);
+    // How many boundaries do we lie on at once?
+    int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
+
+    if (nbdy == 2) // Vertex DOF
+      { // ijk is a corner node. Return the proper index (somewhere in [0,3]):
+        return (i ? (j ? 2 : 1) : (j ? 3 : 0));
+      }
+
+    int offset = 4;
+    if (nbdy == 1) // Edge DOF
+      {
+        if (!ibdy)
+          { // On i axis
+            return (i - 1) + (j ? order[0] - 1 + order[1] - 1 : 0) + offset;
+          }
+
+        if (!jbdy)
+          { // On j axis
+            return (j - 1) +
+                   (i ? order[0] - 1 : 2 * (order[0] - 1) + order[1] - 1) +
+                   offset;
+          }
+      }
+
+    offset += 2 * (order[0] - 1 + order[1] - 1);
+    // nbdy == 0: Face DOF
+    return offset + (i - 1) + (order[0] - 1) * ((j - 1));
+  }
+
+  /**
+   * Given (i,j,k) coordinates within the Lagrange hexahedron, return an
+   * offset into the local connectivity array.
+   *
+   * Modified from
+   * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
+   */
+  int
+  vtk_point_index_from_ijk(unsigned                       i,
+                           unsigned                       j,
+                           unsigned                       k,
+                           const std::array<unsigned, 3> &order)
+  {
+    bool ibdy = (i == 0 || i == order[0]);
+    bool jbdy = (j == 0 || j == order[1]);
+    bool kbdy = (k == 0 || k == order[2]);
+    // How many boundaries do we lie on at once?
+    int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
+
+    if (nbdy == 3) // Vertex DOF
+      { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
+        return (i ? (j ? 2 : 1) : (j ? 3 : 0)) + (k ? 4 : 0);
+      }
+
+    int offset = 8;
+    if (nbdy == 2) // Edge DOF
+      {
+        if (!ibdy)
+          { // On i axis
+            return (i - 1) + (j ? order[0] - 1 + order[1] - 1 : 0) +
+                   (k ? 2 * (order[0] - 1 + order[1] - 1) : 0) + offset;
+          }
+        if (!jbdy)
+          { // On j axis
+            return (j - 1) +
+                   (i ? order[0] - 1 : 2 * (order[0] - 1) + order[1] - 1) +
+                   (k ? 2 * (order[0] - 1 + order[1] - 1) : 0) + offset;
+          }
+        // !kbdy, On k axis
+        offset += 4 * (order[0] - 1) + 4 * (order[1] - 1);
+        return (k - 1) + (order[2] - 1) * (i ? (j ? 3 : 1) : (j ? 2 : 0)) +
+               offset;
+      }
+
+    offset += 4 * (order[0] - 1 + order[1] - 1 + order[2] - 1);
+    if (nbdy == 1) // Face DOF
+      {
+        if (ibdy) // On i-normal face
+          {
+            return (j - 1) + ((order[1] - 1) * (k - 1)) +
+                   (i ? (order[1] - 1) * (order[2] - 1) : 0) + offset;
+          }
+        offset += 2 * (order[1] - 1) * (order[2] - 1);
+        if (jbdy) // On j-normal face
+          {
+            return (i - 1) + ((order[0] - 1) * (k - 1)) +
+                   (j ? (order[2] - 1) * (order[0] - 1) : 0) + offset;
+          }
+        offset += 2 * (order[2] - 1) * (order[0] - 1);
+        // kbdy, On k-normal face
+        return (i - 1) + ((order[0] - 1) * (j - 1)) +
+               (k ? (order[0] - 1) * (order[1] - 1) : 0) + offset;
+      }
+
+    // nbdy == 0: Body DOF
+    offset +=
+      2 * ((order[1] - 1) * (order[2] - 1) + (order[2] - 1) * (order[0] - 1) +
+           (order[0] - 1) * (order[1] - 1));
+    return offset + (i - 1) +
+           (order[0] - 1) * ((j - 1) + (order[1] - 1) * ((k - 1)));
+  }
+
+  int
+  vtk_point_index_from_ijk(unsigned,
+                           unsigned,
+                           unsigned,
+                           const std::array<unsigned, 0> &)
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
+
+  int
+  vtk_point_index_from_ijk(unsigned,
+                           unsigned,
+                           unsigned,
+                           const std::array<unsigned, 1> &)
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
 
 
   template <int dim, int spacedim>
@@ -1070,6 +1214,19 @@ namespace
                const unsigned int x_offset,
                const unsigned int y_offset,
                const unsigned int z_offset);
+
+    /**
+     * Write a high-order cell type, i.e., a Lagrange cell
+     * in the VTK terminology.
+     * The connectivity order of the points is given in the
+     * @p connectivity array, which are offset
+     * by the global index @p start.
+     */
+    template <int dim>
+    void
+    write_high_order_cell(const unsigned int           index,
+                          const unsigned int           start,
+                          const std::vector<unsigned> &connectivity);
   };
 
 
@@ -1437,7 +1594,17 @@ namespace
     stream << '\n';
   }
 
-
+  template <int dim>
+  void
+  VtkStream::write_high_order_cell(const unsigned int,
+                                   const unsigned int           start,
+                                   const std::vector<unsigned> &connectivity)
+  {
+    stream << connectivity.size();
+    for (const auto &c : connectivity)
+      stream << '\t' << start + c;
+    stream << '\n';
+  }
 
   VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags &f)
     : StreamBase<DataOutBase::VtkFlags>(out, f)
@@ -2224,11 +2391,13 @@ namespace DataOutBase
   VtkFlags::VtkFlags(const double                         time,
                      const unsigned int                   cycle,
                      const bool                           print_date_and_time,
-                     const VtkFlags::ZlibCompressionLevel compression_level)
+                     const VtkFlags::ZlibCompressionLevel compression_level,
+                     const bool write_higher_order_cells)
     : time(time)
     , cycle(cycle)
     , print_date_and_time(print_date_and_time)
     , compression_level(compression_level)
+    , write_higher_order_cells(write_higher_order_cells)
   {}
 
 
@@ -2375,7 +2544,6 @@ namespace DataOutBase
     Assert(dim <= 3, ExcNotImplemented());
     unsigned int count                 = 0;
     unsigned int first_vertex_of_patch = 0;
-    // Array to hold all the node numbers of a cell. 8 is sufficient for 3D
     for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
            patches.begin();
          patch != patches.end();
@@ -2388,9 +2556,9 @@ namespace DataOutBase
         const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
         const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
         // Offsets of outer loops
-        unsigned int d1 = 1;
-        unsigned int d2 = n;
-        unsigned int d3 = n * n;
+        const unsigned int d1 = 1;
+        const unsigned int d2 = n;
+        const unsigned int d3 = n * n;
         for (unsigned int i3 = 0; i3 < n3; ++i3)
           for (unsigned int i2 = 0; i2 < n2; ++i2)
             for (unsigned int i1 = 0; i1 < n1; ++i1)
@@ -2403,6 +2571,59 @@ namespace DataOutBase
         // finally update the number of the first vertex of this patch
         first_vertex_of_patch +=
           Utilities::fixed_power<dim>(n_subdivisions + 1);
+      }
+
+    out.flush_cells();
+  }
+
+  template <int dim, int spacedim, typename StreamType>
+  void
+  write_high_order_cells(const std::vector<Patch<dim, spacedim>> &patches,
+                         StreamType &                             out)
+  {
+    Assert(dim <= 3 && dim > 1, ExcNotImplemented());
+    unsigned int first_vertex_of_patch = 0;
+    unsigned int count                 = 0;
+    // Array to hold all the node numbers of a cell
+    std::vector<unsigned> connectivity;
+    // Array to hold cell order in each dimension
+    std::array<unsigned, dim> cell_order;
+
+    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
+           patches.begin();
+         patch != patches.end();
+         ++patch)
+      {
+        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n              = n_subdivisions + 1;
+
+        cell_order.fill(n_subdivisions);
+        connectivity.resize(Utilities::fixed_power<dim>(n));
+
+        // Length of loops in all dimensons
+        const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
+        const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
+        const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
+        // Offsets of outer loops
+        const unsigned int d1 = 1;
+        const unsigned int d2 = n;
+        const unsigned int d3 = n * n;
+        for (unsigned int i3 = 0; i3 <= n3; ++i3)
+          for (unsigned int i2 = 0; i2 <= n2; ++i2)
+            for (unsigned int i1 = 0; i1 <= n1; ++i1)
+              {
+                const unsigned int local_index = i3 * d3 + i2 * d2 + i1 * d1;
+                const unsigned int connectivity_index =
+                  vtk_point_index_from_ijk(i1, i2, i3, cell_order);
+                connectivity[connectivity_index] = local_index;
+              }
+
+        out.template write_high_order_cell<dim>(count++,
+                                                first_vertex_of_patch,
+                                                connectivity);
+
+        // finally update the number of the first vertex of this patch
+        first_vertex_of_patch += Utilities::fixed_power<dim>(n);
       }
 
     out.flush_cells();
@@ -5061,6 +5282,17 @@ namespace DataOutBase
     unsigned int n_nodes;
     unsigned int n_cells;
     compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+
+    // If a user set to output Lagrange cells, we treat n_subdivisions
+    // as a cell order and adjust variables accordingly, otherwise
+    // each patch is written as a linear cell.
+    unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
+    if (flags.write_higher_order_cells)
+      {
+        n_cells           = patches.size();
+        n_points_per_cell = n_nodes / n_cells;
+      }
+
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
     // first all data of variable 1, then variable 2, etc), so we have to copy
@@ -5090,15 +5322,23 @@ namespace DataOutBase
     out << '\n';
     /////////////////////////////////
     // now for the cells
-    out << "CELLS " << n_cells << ' '
-        << n_cells * (GeometryInfo<dim>::vertices_per_cell + 1) << '\n';
-    write_cells(patches, vtk_out);
+    out << "CELLS " << n_cells << ' ' << n_cells * (n_points_per_cell + 1)
+        << '\n';
+    if (flags.write_higher_order_cells)
+      write_high_order_cells(patches, vtk_out);
+    else
+      write_cells(patches, vtk_out);
     out << '\n';
     // next output the types of the cells. since all cells are the same, this is
     // simple
     out << "CELL_TYPES " << n_cells << '\n';
+
+    // need to distinguish between linear and Lagrange cells
+    const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
+                                       vtk_lagrange_cell_type[dim] :
+                                       vtk_cell_type[dim];
     for (unsigned int i = 0; i < n_cells; ++i)
-      out << ' ' << vtk_cell_type[dim];
+      out << ' ' << vtk_cell_id;
     out << '\n';
     ///////////////////////////////////////
     // data output.

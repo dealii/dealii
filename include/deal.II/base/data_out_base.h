@@ -205,6 +205,8 @@ class XDMFEntry;
  *
  * <li>Tecplot output by Benjamin Shelton Kirk
  *
+ * <li>Lagrange VTK output by Alexander Grayver
+ *
  * </ul>
  *
  * @ingroup output
@@ -1147,13 +1149,22 @@ namespace DataOutBase
     ZlibCompressionLevel compression_level;
 
     /**
+     * Flag determining whether to write patches as linear cells
+     * or as a high-order Lagrange cell.
+     *
+     * Default is <tt>false</tt>.
+     */
+    bool write_higher_order_cells;
+
+    /**
      * Constructor.
      */
     VtkFlags(
       const double       time  = std::numeric_limits<double>::min(),
       const unsigned int cycle = std::numeric_limits<unsigned int>::min(),
-      const bool         print_date_and_time       = true,
-      const ZlibCompressionLevel compression_level = best_compression);
+      const bool         print_date_and_time              = true,
+      const ZlibCompressionLevel compression_level        = best_compression,
+      const bool                 write_higher_order_cells = false);
   };
 
 
