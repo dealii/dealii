@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,9 +45,9 @@ check(std::ostream &log, unsigned cell_order)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
 
   unsigned cell_order = 4;
-  check<2>(logfile, cell_order);
-  check<3>(logfile, cell_order);
+  check<2>(deallog.get_file_stream(), cell_order);
+  check<3>(deallog.get_file_stream(), cell_order);
 }
