@@ -799,15 +799,15 @@ namespace
    * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
    */
   int
-  vtk_point_index_from_ijk(unsigned i,
-                           unsigned j,
-                           unsigned,
+  vtk_point_index_from_ijk(const unsigned i,
+                           const unsigned j,
+                           const unsigned,
                            const std::array<unsigned, 2> &order)
   {
-    bool ibdy = (i == 0 || i == order[0]);
-    bool jbdy = (j == 0 || j == order[1]);
+    const bool ibdy = (i == 0 || i == order[0]);
+    const bool jbdy = (j == 0 || j == order[1]);
     // How many boundaries do we lie on at once?
-    int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
+    const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
 
     if (nbdy == 2) // Vertex DOF
       { // ijk is a corner node. Return the proper index (somewhere in [0,3]):
@@ -843,16 +843,16 @@ namespace
    * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
    */
   int
-  vtk_point_index_from_ijk(unsigned                       i,
-                           unsigned                       j,
-                           unsigned                       k,
+  vtk_point_index_from_ijk(const unsigned                 i,
+                           const unsigned                 j,
+                           const unsigned                 k,
                            const std::array<unsigned, 3> &order)
   {
-    bool ibdy = (i == 0 || i == order[0]);
-    bool jbdy = (j == 0 || j == order[1]);
-    bool kbdy = (k == 0 || k == order[2]);
+    const bool ibdy = (i == 0 || i == order[0]);
+    const bool jbdy = (j == 0 || j == order[1]);
+    const bool kbdy = (k == 0 || k == order[2]);
     // How many boundaries do we lie on at once?
-    int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
+    const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
 
     if (nbdy == 3) // Vertex DOF
       { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
@@ -908,9 +908,9 @@ namespace
   }
 
   int
-  vtk_point_index_from_ijk(unsigned,
-                           unsigned,
-                           unsigned,
+  vtk_point_index_from_ijk(const unsigned,
+                           const unsigned,
+                           const unsigned,
                            const std::array<unsigned, 0> &)
   {
     Assert(false, ExcNotImplemented());
@@ -918,9 +918,9 @@ namespace
   }
 
   int
-  vtk_point_index_from_ijk(unsigned,
-                           unsigned,
-                           unsigned,
+  vtk_point_index_from_ijk(const unsigned,
+                           const unsigned,
+                           const unsigned,
                            const std::array<unsigned, 1> &)
   {
     Assert(false, ExcNotImplemented());
