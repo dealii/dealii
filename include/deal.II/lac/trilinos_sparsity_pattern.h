@@ -944,6 +944,13 @@ namespace TrilinosWrappers
     exists(const size_type i, const size_type j) const;
 
     /**
+     * Return whether a given @p row is stored in the current object
+     * on this process.
+     */
+    bool
+    row_is_stored_locally(const size_type i) const;
+
+    /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object. Currently not implemented for this class.
      */
@@ -1318,7 +1325,8 @@ namespace TrilinosWrappers
               const auto row_length =
                 accessor.sparsity_pattern->row_length(accessor.a_row);
               if (row_length == 0 ||
-                  row_length == static_cast<SparsityPattern::size_type>(-1))
+                  !accessor.sparsity_pattern->row_is_stored_locally(
+                    accessor.a_row))
                 ++accessor.a_row;
               else
                 break;
@@ -1500,8 +1508,7 @@ namespace TrilinosWrappers
     const int n_cols = static_cast<int>(end - begin);
 
     int ierr;
-    if (graph->RowMap().LID(
-          static_cast<TrilinosWrappers::types::int_type>(row)) != -1)
+    if (row_is_stored_locally(row))
       ierr = graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
     else if (nonlocal_graph.get() != nullptr)
       {

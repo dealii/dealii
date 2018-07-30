@@ -157,6 +157,7 @@ namespace TrilinosWrappers
   {}
 
 
+
   // Copy function only works if the
   // sparsity pattern is empty.
   SparsityPattern::SparsityPattern(const SparsityPattern &input_sparsity)
@@ -718,7 +719,6 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
-
     compress();
   }
 
@@ -833,27 +833,30 @@ namespace TrilinosWrappers
 
 
   bool
+  SparsityPattern::row_is_stored_locally(const size_type i) const
+  {
+    return graph->RowMap().LID(
+             static_cast<TrilinosWrappers::types::int_type>(i)) != -1;
+  }
+
+
+
+  bool
   SparsityPattern::exists(const size_type i, const size_type j) const
   {
-    // Extract local indices in
-    // the matrix.
-    int trilinos_i =
-          graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-        trilinos_j =
-          graph->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
-
-    // If the data is not on the
-    // present processor, we throw
-    // an exception. This is on of
-    // the two tiny differences to
-    // the el(i,j) call, which does
-    // not throw any assertions.
-    if (trilinos_i == -1)
+    if (!row_is_stored_locally(i))
       {
         return false;
       }
     else
       {
+        // Extract local indices in
+        // the matrix.
+        int trilinos_i =
+              graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+            trilinos_j =
+              graph->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+
         // Check whether the matrix
         // already is transformed to
         // local indices.
