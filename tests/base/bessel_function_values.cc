@@ -28,7 +28,7 @@ main()
   initlog();
 
   for (unsigned int order = 0; order < 3; order += 1)
-    for (double wave_n = -4.0; wave_n < 4.0; wave_n += 1.5)
+    for (double wave_n = 0.; wave_n < 4.0; wave_n += 1.5)
       for (double x = 1.0; x < 2.0; x += 0.5)
         for (double y = 2.0; y < 3.0; y += 0.5)
           {
