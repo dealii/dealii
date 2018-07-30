@@ -149,6 +149,11 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     GridTools::guess_point_owner(
       const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
       const std::vector<Point<deal_II_space_dimension>> &);
+
+    template RTree<
+      std::pair<BoundingBox<deal_II_space_dimension>, unsigned int>>
+    GridTools::build_global_description_tree(
+      const std::vector<BoundingBox<deal_II_space_dimension>> &, MPI_Comm);
   }
 
 
@@ -157,7 +162,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     namespace GridTools
     \{
-
       template double
       diameter(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
@@ -331,9 +335,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &distorted_cells,
         Triangulation<deal_II_dimension, deal_II_space_dimension>
           &triangulation);
-
 #  endif
-
     \}
 #endif
   }
