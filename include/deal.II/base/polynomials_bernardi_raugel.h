@@ -133,6 +133,7 @@ public:
           std::vector<Tensor<3, dim>> &grad_grads,
           std::vector<Tensor<4, dim>> &third_derivatives,
           std::vector<Tensor<5, dim>> &fourth_derivatives) const;
+
   /**
    * Return the number of polynomials in the space <tt>BR(degree)</tt> without
    * requiring to build an object of PolynomialsBernardiRaugel. This is
@@ -140,7 +141,6 @@ public:
    */
   static unsigned int
   compute_n_pols(const unsigned int k);
-
 
 private:
   /**
@@ -160,6 +160,7 @@ private:
    * vectors.
    */
   const AnisotropicPolynomials<dim> polynomial_space_Q;
+
   /**
    * An object representing the polynomial space of bubble
    * functions which forms the <tt>BR</tt> polynomials through
@@ -190,12 +191,16 @@ PolynomialsBernardiRaugel<dim>::n() const
   return n_pols;
 }
 
+
+
 template <int dim>
 inline unsigned int
 PolynomialsBernardiRaugel<dim>::degree() const
 {
   return 2;
 }
+
+
 
 template <int dim>
 inline std::string

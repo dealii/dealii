@@ -49,6 +49,7 @@ PolynomialsBernardiRaugel<dim>::create_polynomials_bubble()
 }
 
 
+
 template <int dim>
 std::vector<std::vector<Polynomials::Polynomial<double>>>
 PolynomialsBernardiRaugel<dim>::create_polynomials_Q()
