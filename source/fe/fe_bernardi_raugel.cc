@@ -79,6 +79,7 @@ FE_BernardiRaugel<dim>::get_name() const
 }
 
 
+
 template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_BernardiRaugel<dim>::clone() const
@@ -127,6 +128,7 @@ FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
 }
 
 
+
 template <int dim>
 std::vector<unsigned int>
 FE_BernardiRaugel<dim>::get_dpo_vector()
@@ -141,6 +143,7 @@ FE_BernardiRaugel<dim>::get_dpo_vector()
 
   return dpo;
 }
+
 
 
 template <int dim>
