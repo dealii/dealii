@@ -49,6 +49,10 @@ DEAL_II_NAMESPACE_OPEN
  * This element does not support hanging nodes or multigrid in the current
  * implementation.
  *
+ * Some numerical experiments have shown that this element may converge with
+ * first-order when using the BR1-Q0 pair for the mixed Laplace equation in
+ * step-20.
+ *
  */
 template <int dim>
 class FE_BernardiRaugel
