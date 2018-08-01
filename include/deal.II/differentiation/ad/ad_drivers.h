@@ -599,11 +599,13 @@ namespace Differentiation
 
 #  ifdef DEAL_II_WITH_ADOLC
 
-    // Specialization for taped ADOL-C auto-differentiable numbers.
-    //
-    // Note: In the case of ADOL-C taped numbers, the associated scalar
-    // type is always expected to be a double. So we need to make a further
-    // specialization when ScalarType is a float.
+    /**
+     * Specialization for taped ADOL-C auto-differentiable numbers.
+     *
+     * Note: In the case of ADOL-C taped numbers, the associated scalar
+     * type is always expected to be a double. So we need to make a further
+     * specialization when ScalarType is a float.
+     */
     template <typename ADNumberType>
     struct TapedDrivers<
       ADNumberType,
@@ -643,11 +645,7 @@ namespace Differentiation
                      const bool              write_tapes_to_file)
       {
         if (write_tapes_to_file)
-          {
-            trace_off(active_tape_index); // Slow
-            std::vector<std::size_t> counts(STAT_SIZE);
-            ::tapestats(active_tape_index, counts.data());
-          }
+          trace_off(active_tape_index); // Slow
         else
           trace_off(); // Fast(er)
       }
@@ -812,12 +810,16 @@ namespace Differentiation
       }
     };
 
-#  else
+#  else // DEAL_II_WITH_ADOLC
 
-    // Although we could revert to the default definition for the
-    // unspecialized TapedDrivers class, we add this specialization
-    // to provide a more descriptive error message if any of its
-    // static member functions are called.
+    /**
+     * Specialization for taped ADOL-C auto-differentiable numbers.
+     *
+     * Although we could revert to the default definition for the
+     * unspecialized TapedDrivers class, we add this specialization
+     * to provide a more descriptive error message if any of its
+     * static member functions are called.
+     */
     template <typename ADNumberType>
     struct TapedDrivers<
       ADNumberType,
@@ -905,15 +907,17 @@ namespace Differentiation
       }
     };
 
-#  endif
+#  endif // DEAL_II_WITH_ADOLC
 
 
-    // Specialization for ADOL-C taped numbers. It is expected that the
-    // scalar return type for this class is a float.
-    //
-    // Note: ADOL-C only has drivers for doubles, and so floats are
-    // not intrinsically supported. This wrapper struct works around
-    // the issue when necessary.
+    /**
+     * Specialization for ADOL-C taped numbers. It is expected that the
+     * scalar return type for this class is a float.
+     *
+     * Note: ADOL-C only has drivers for doubles, and so floats are
+     * not intrinsically supported. This wrapper struct works around
+     * the issue when necessary.
+     */
     template <typename ADNumberType>
     struct TapedDrivers<
       ADNumberType,
@@ -923,20 +927,14 @@ namespace Differentiation
     {
       using scalar_type = float;
 
-      static std::vector<double>
-      vector_float_to_double(const std::vector<float> &in)
-      {
-        std::vector<double> out(in.size());
-        std::copy(in.begin(), in.end(), out.begin());
-        return out;
-      }
-
       // === Taping ===
 
       static void
       enable_taping(const types::tape_index tape_index,
                     const bool              keep_independent_values)
       {
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::enable_taping(
           tape_index, keep_independent_values);
       }
@@ -949,6 +947,8 @@ namespace Differentiation
                     const types::tape_buffer_sizes vbufsize,
                     const types::tape_buffer_sizes tbufsize)
       {
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::enable_taping(
           tape_index,
           keep_independent_values,
@@ -962,6 +962,8 @@ namespace Differentiation
       disable_taping(const types::tape_index active_tape_index,
                      const bool              write_tapes_to_file)
       {
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::disable_taping(active_tape_index,
                                                            write_tapes_to_file);
       }
@@ -969,6 +971,8 @@ namespace Differentiation
       static void
       print_tape_stats(std::ostream &stream, const types::tape_index tape_index)
       {
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::print_tape_stats(stream,
                                                              tape_index);
       }
@@ -979,6 +983,8 @@ namespace Differentiation
       value(const types::tape_index         active_tape_index,
             const std::vector<scalar_type> &independent_variables)
       {
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         return TapedDrivers<ADNumberType, double>::value(
           active_tape_index, vector_float_to_double(independent_variables));
       }
@@ -989,6 +995,8 @@ namespace Differentiation
                Vector<scalar_type> &           gradient)
       {
         Vector<double> gradient_double(gradient.size());
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::gradient(active_tape_index,
                                                      vector_float_to_double(
                                                        independent_variables),
@@ -1002,6 +1010,8 @@ namespace Differentiation
               FullMatrix<scalar_type> &       hessian)
       {
         FullMatrix<double> hessian_double(hessian.m(), hessian.n());
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::hessian(active_tape_index,
                                                     vector_float_to_double(
                                                       independent_variables),
@@ -1018,6 +1028,8 @@ namespace Differentiation
              Vector<scalar_type> &           values)
       {
         Vector<double> values_double(values.size());
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::values(active_tape_index,
                                                    n_dependent_variables,
                                                    vector_float_to_double(
@@ -1033,12 +1045,26 @@ namespace Differentiation
                FullMatrix<scalar_type> &       jacobian)
       {
         FullMatrix<double> jacobian_double(jacobian.m(), jacobian.n());
+        // ADOL-C only supports 'double', not 'float', so we can forward to
+        // the 'double' implementation of this function
         TapedDrivers<ADNumberType, double>::jacobian(active_tape_index,
                                                      n_dependent_variables,
                                                      vector_float_to_double(
                                                        independent_variables),
                                                      jacobian_double);
         jacobian = jacobian_double;
+      }
+
+    private:
+      /**
+       * Copy a vector of floats into a vector of doubles
+       */
+      static std::vector<double>
+      vector_float_to_double(const std::vector<float> &in)
+      {
+        std::vector<double> out(in.size());
+        std::copy(in.begin(), in.end(), out.begin());
+        return out;
       }
     };
 
@@ -1110,8 +1136,10 @@ namespace Differentiation
 
     namespace internal
     {
-      // A dummy function to define the active dependent variable when using
-      // reverse-mode AD.
+      /**
+       * A dummy function to define the active dependent variable when using
+       * reverse-mode AD.
+       */
       template <typename ADNumberType>
       static
         typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
@@ -1124,12 +1152,14 @@ namespace Differentiation
 #  ifdef DEAL_II_TRILINOS_WITH_SACADO
 
 
-      // Define the active dependent variable when using reverse-mode AD.
-      //
-      // If there are multiple dependent variables then it is necessary to
-      // inform the independent variables, from which the adjoints are computed,
-      // which dependent variable they are computing the gradients with respect
-      // to. This function broadcasts this information.
+      /**
+       * Define the active dependent variable when using reverse-mode AD.
+       *
+       * If there are multiple dependent variables then it is necessary to
+       * inform the independent variables, from which the adjoints are computed,
+       * which dependent variable they are computing the gradients with respect
+       * to. This function broadcasts this information.
+       */
       template <typename ADNumberType>
       static typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
                                        NumberTypes::sacado_rad ||
@@ -1142,7 +1172,7 @@ namespace Differentiation
         // reverse-mode Sacado dependent variable.
         // For reverse-mode Sacado numbers it is necessary to broadcast to
         // all independent variables that it is time to compute gradients.
-        // For one dependent variable one would just need to all
+        // For one dependent variable one would just need to call
         // ADNumberType::Gradcomp(), but since we have a more
         // generic implementation for vectors of dependent variables
         // (vector mode) we default to the complex case.
@@ -1152,8 +1182,10 @@ namespace Differentiation
 #  endif
 
 
-      // A dummy function to enable vector mode for tapeless
-      // auto-differentiable numbers.
+      /**
+       * A dummy function to enable vector mode for tapeless
+       * auto-differentiable numbers.
+       */
       template <typename ADNumberType>
       static
         typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
@@ -1164,11 +1196,14 @@ namespace Differentiation
 
 #  ifdef DEAL_II_WITH_ADOLC
 
-      // Enable vector mode for ADOL-C tapeless numbers.
-      //
-      // This function checks to see if its legal to increase the maximum
-      // number of directional derivatives to be considered during calculations.
-      // If not then it throws an error.
+
+      /**
+       * Enable vector mode for ADOL-C tapeless numbers.
+       *
+       * This function checks to see if its legal to increase the maximum
+       * number of directional derivatives to be considered during calculations.
+       * If not then it throws an error.
+       */
       template <typename ADNumberType>
       static typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
                                      NumberTypes::adolc_tapeless>::type
@@ -1197,8 +1232,8 @@ namespace Differentiation
         else
           {
             // So there are some live active variables floating around. Here we
-            // check if we ask to increase the number of number of computable
-            // directional derivatives. If this really is necessary then its
+            // check if we ask to increase the number of computable
+            // directional derivatives. If this really is necessary then it's
             // absolutely vital that there exist no live variables before doing
             // so.
             const std::size_t n_set_directional_derivatives = adtl::getNumDir();
@@ -1228,7 +1263,7 @@ namespace Differentiation
 #    endif
       }
 
-#  else
+#  else // DEAL_II_WITH_ADOLC
 
       template <typename ADNumberType>
       static typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
@@ -1243,9 +1278,11 @@ namespace Differentiation
     } // namespace internal
 
 
-    // Specialization for auto-differentiable numbers that use
-    // reverse mode to compute the first derivatives (and, if supported,
-    // forward mode for the second).
+    /**
+     * Specialization for auto-differentiable numbers that use
+     * reverse mode to compute the first derivatives (and, if supported,
+     * forward mode for the second).
+     */
     template <typename ADNumberType, typename ScalarType>
     struct TapelessDrivers<
       ADNumberType,
@@ -1421,9 +1458,11 @@ namespace Differentiation
     };
 
 
-    // Specialization for auto-differentiable numbers that use
-    // forward mode to compute the first (and, if supported, second)
-    // derivatives.
+    /**
+     * Specialization for auto-differentiable numbers that use
+     * forward mode to compute the first (and, if supported, second)
+     * derivatives.
+     */
     template <typename ADNumberType, typename ScalarType>
     struct TapelessDrivers<
       ADNumberType,
