@@ -1166,6 +1166,17 @@ namespace GridGenerator
 
   /**
    * Same as above but allows to merge more than two triangulations at once.
+   * The following gives an example of how to use this function:
+   * @code
+   *   Triangulation<2> tria_1, tria_2, tria_3;
+   *   // initialize tria_1, tria_2 and tria_3
+   *   ...
+   *   Triangulation<2> merged_triangulation;
+   *   GridGenerator::merge_triangulations({&tria_1, &tria_2, &tria_3},
+   *                                       merged_triangulation,
+   *                                       1.0e-10,
+   *                                       false);
+   * @endcode
    */
   template <int dim, int spacedim>
   void
