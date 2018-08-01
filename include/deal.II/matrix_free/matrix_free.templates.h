@@ -950,7 +950,7 @@ MatrixFree<dim, Number>::initialize_indices(
               if (cell_categorization_enabled)
                 {
                   AssertIndexRange(
-                    cell_it->active_cell_index(),
+                    cell_it->index(),
                     additional_data.cell_vectorization_category.size());
                   dof_info[no].cell_active_fe_index[counter] =
                     additional_data.cell_vectorization_category
