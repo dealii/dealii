@@ -1165,6 +1165,18 @@ namespace GridGenerator
                        const bool   copy_manifold_ids           = false);
 
   /**
+   * Same as above but allows to merge more than two triangulations at once.
+   */
+  template <int dim, int spacedim>
+  void
+  merge_triangulations(
+    const std::initializer_list<const Triangulation<dim, spacedim> *const>
+                                  triangulations,
+    Triangulation<dim, spacedim> &result,
+    const double                  duplicated_vertex_tolerance = 1.0e-12,
+    const bool                    copy_manifold_ids           = false);
+
+  /**
    * Given the two triangulations specified as the first two arguments, create
    * the triangulation that contains the finest cells of both triangulation
    * and store it in the third parameter. Previous content of @p result will

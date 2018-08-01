@@ -4139,61 +4139,55 @@ namespace GridGenerator
 
   template <int dim, int spacedim>
   void
-  merge_triangulations(const Triangulation<dim, spacedim> &triangulation_1,
-                       const Triangulation<dim, spacedim> &triangulation_2,
-                       Triangulation<dim, spacedim> &      result,
-                       const double duplicated_vertex_tolerance,
-                       const bool   copy_manifold_ids)
+  merge_triangulations(
+    const std::initializer_list<const Triangulation<dim, spacedim> *const>
+                                  triangulations,
+    Triangulation<dim, spacedim> &result,
+    const double                  duplicated_vertex_tolerance,
+    const bool                    copy_manifold_ids)
   {
-    // if either Triangulation is empty then merging is just a copy.
-    if (triangulation_1.n_cells() == 0)
+    for (const auto triangulation : triangulations)
       {
-        result.copy_triangulation(triangulation_2);
-        return;
+        (void)triangulation;
+        Assert(triangulation->n_levels() == 1,
+               ExcMessage("The input triangulations must be non-empty "
+                          "and must not be refined."));
       }
-    if (triangulation_2.n_cells() == 0)
-      {
-        result.copy_triangulation(triangulation_1);
-        return;
-      }
-
-    Assert(triangulation_1.n_levels() == 1,
-           ExcMessage("The input triangulations must be non-empty "
-                      "and must not be refined."));
-    Assert(triangulation_2.n_levels() == 1,
-           ExcMessage("The input triangulations must be non-empty "
-                      "and must not be refined."));
 
     // get the union of the set of vertices
-    std::vector<Point<spacedim>> vertices = triangulation_1.get_vertices();
-    vertices.insert(vertices.end(),
-                    triangulation_2.get_vertices().begin(),
-                    triangulation_2.get_vertices().end());
+    unsigned int n_vertices = 0;
+    for (const auto triangulation : triangulations)
+      n_vertices += triangulation->n_vertices();
+
+    std::vector<Point<spacedim>> vertices;
+    vertices.reserve(n_vertices);
+    for (const auto triangulation : triangulations)
+      vertices.insert(vertices.end(),
+                      triangulation->get_vertices().begin(),
+                      triangulation->get_vertices().end());
 
     // now form the union of the set of cells
     std::vector<CellData<dim>> cells;
-    cells.reserve(triangulation_1.n_cells() + triangulation_2.n_cells());
-    for (const auto &cell : triangulation_1.cell_iterators())
-      {
-        CellData<dim> this_cell;
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-          this_cell.vertices[v] = cell->vertex_index(v);
-        this_cell.material_id = cell->material_id();
-        this_cell.manifold_id = cell->manifold_id();
-        cells.push_back(std::move(this_cell));
-      }
+    unsigned int               n_cells = 0;
+    for (const auto triangulation : triangulations)
+      n_cells += triangulation->n_cells();
 
-    // now do the same for the other other mesh. note that we have to
-    // translate the vertex indices
-    for (const auto &cell : triangulation_2.cell_iterators())
+    cells.reserve(n_cells);
+    unsigned int n_accumulated_vertices = 0;
+    for (const auto triangulation : triangulations)
       {
-        CellData<dim> this_cell;
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-          this_cell.vertices[v] =
-            cell->vertex_index(v) + triangulation_1.n_vertices();
-        this_cell.material_id = cell->material_id();
-        this_cell.manifold_id = cell->manifold_id();
-        cells.push_back(std::move(this_cell));
+        for (const auto &cell : triangulation->cell_iterators())
+          {
+            CellData<dim> this_cell;
+            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
+                 ++v)
+              this_cell.vertices[v] =
+                cell->vertex_index(v) + n_accumulated_vertices;
+            this_cell.material_id = cell->material_id();
+            this_cell.manifold_id = cell->manifold_id();
+            cells.push_back(std::move(this_cell));
+          }
+        n_accumulated_vertices += triangulation->n_vertices();
       }
 
     // Now for the SubCellData
@@ -4207,8 +4201,11 @@ namespace GridGenerator
 
             case 2:
               {
-                subcell_data.boundary_lines.reserve(triangulation_1.n_lines() +
-                                                    triangulation_2.n_lines());
+                unsigned int n_boundary_lines = 0;
+                for (const auto triangulation : triangulations)
+                  n_boundary_lines += triangulation->n_lines();
+
+                subcell_data.boundary_lines.reserve(n_boundary_lines);
 
                 auto copy_line_manifold_ids =
                   [&](const Triangulation<dim, spacedim> &tria,
@@ -4230,23 +4227,28 @@ namespace GridGenerator
                         }
                   };
 
-                copy_line_manifold_ids(triangulation_1, 0);
-                copy_line_manifold_ids(triangulation_2,
-                                       triangulation_1.n_vertices());
+                unsigned int n_accumulated_vertices = 0;
+                for (const auto triangulation : triangulations)
+                  {
+                    copy_line_manifold_ids(*triangulation,
+                                           n_accumulated_vertices);
+                    n_accumulated_vertices += triangulation->n_vertices();
+                  }
                 break;
               }
 
             case 3:
               {
-                subcell_data.boundary_quads.reserve(triangulation_1.n_quads() +
-                                                    triangulation_2.n_quads());
+                unsigned int n_boundary_quads = 0;
+                for (const auto triangulation : triangulations)
+                  n_boundary_quads += triangulation->n_quads();
+
+                subcell_data.boundary_quads.reserve(n_boundary_quads);
                 // we can't do better here than to loop over all the lines
-                // bounding a face. For regular meshes an (interior) line in 3D
-                // is part of four cells. So this should be an appropriate
+                // bounding a face. For regular meshes an (interior) line in
+                // 3D is part of four cells. So this should be an appropriate
                 // guess.
-                subcell_data.boundary_lines.reserve(
-                  triangulation_1.n_cells() * 4 +
-                  triangulation_2.n_cells() * 4);
+                subcell_data.boundary_lines.reserve(4 * n_boundary_quads);
 
                 auto copy_face_and_line_manifold_ids =
                   [&](const Triangulation<dim, spacedim> &tria,
@@ -4287,10 +4289,13 @@ namespace GridGenerator
                               boundary_line); // trivially_copyable
                           }
                   };
-
-                copy_face_and_line_manifold_ids(triangulation_1, 0);
-                copy_face_and_line_manifold_ids(triangulation_2,
-                                                triangulation_1.n_vertices());
+                unsigned int n_accumulated_vertices = 0;
+                for (const auto triangulation : triangulations)
+                  {
+                    copy_face_and_line_manifold_ids(*triangulation,
+                                                    n_accumulated_vertices);
+                    n_accumulated_vertices += triangulation->n_vertices();
+                  }
                 break;
               }
             default:
@@ -4298,14 +4303,19 @@ namespace GridGenerator
           }
       }
 
-    // throw out duplicated vertices from the two meshes, reorder vertices as
-    // necessary and create the triangulation
-    std::vector<unsigned int> considered_vertices;
-    GridTools::delete_duplicated_vertices(vertices,
-                                          cells,
-                                          subcell_data,
-                                          considered_vertices,
-                                          duplicated_vertex_tolerance);
+    // throw out duplicated vertices
+    // since GridTools::delete_duplicated_vertices can only consider
+    // one duplications at once, we have to call the function one time less
+    // than the number of Triangulation objects to be merged.
+    for (unsigned int i = 0; i < triangulations.size(); ++i)
+      {
+        std::vector<unsigned int> considered_vertices;
+        GridTools::delete_duplicated_vertices(vertices,
+                                              cells,
+                                              subcell_data,
+                                              considered_vertices,
+                                              duplicated_vertex_tolerance);
+      }
 
     // reorder the cells to ensure that they satisfy the convention for
     // edge and face directions
@@ -4313,6 +4323,34 @@ namespace GridGenerator
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  merge_triangulations(const Triangulation<dim, spacedim> &triangulation_1,
+                       const Triangulation<dim, spacedim> &triangulation_2,
+                       Triangulation<dim, spacedim> &      result,
+                       const double duplicated_vertex_tolerance,
+                       const bool   copy_manifold_ids)
+  {
+    // if either Triangulation is empty then merging is just a copy.
+    if (triangulation_1.n_cells() == 0)
+      {
+        result.copy_triangulation(triangulation_2);
+        return;
+      }
+    if (triangulation_2.n_cells() == 0)
+      {
+        result.copy_triangulation(triangulation_1);
+        return;
+      }
+    merge_triangulations({&triangulation_1, &triangulation_2},
+                         result,
+                         duplicated_vertex_tolerance,
+                         copy_manifold_ids);
+  }
+
 
 
   template <int dim, int spacedim>
