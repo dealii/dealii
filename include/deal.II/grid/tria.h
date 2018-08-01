@@ -572,7 +572,8 @@ namespace internal
  * <li> <em>Counting the number of cells on a specific level</em>
  *    @code
  *      template <int dim, int spacedim>
- *      int Triangulation<dim, spacedim>::n_cells (const int level) const
+ *      unsigned int
+ *      Triangulation<dim, spacedim>::n_cells (const int level) const
  *      {
  *        int n=0;
  *        for (const auto &cell : cell_iterators_on_level(level))
@@ -583,7 +584,8 @@ namespace internal
  * Another way, which uses <tt>std::distance</tt>, would be to write
  *    @code
  *      template <int dim>
- *      int Triangulation<dim>::n_cells (const int level) const
+ *      unsigned int
+ *      Triangulation<dim>::n_cells (const int level) const
  *      {
  *        int n=0;
  *        distance (begin(level),
