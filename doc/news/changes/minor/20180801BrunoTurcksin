@@ -1,0 +1,6 @@
+New: LinearAlgebra::distributed::Vector has an extra template parameter
+MemorySpace. This new template parameter can be used if the data should be
+allocated on the host or on the device.
+<br>
+(Bruno Turcksin, 2018/08/01)
+
