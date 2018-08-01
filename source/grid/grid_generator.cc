@@ -4304,18 +4304,12 @@ namespace GridGenerator
       }
 
     // throw out duplicated vertices
-    // since GridTools::delete_duplicated_vertices can only consider
-    // one duplications at once, we have to call the function one time less
-    // than the number of Triangulation objects to be merged.
-    for (unsigned int i = 0; i < triangulations.size(); ++i)
-      {
-        std::vector<unsigned int> considered_vertices;
-        GridTools::delete_duplicated_vertices(vertices,
-                                              cells,
-                                              subcell_data,
-                                              considered_vertices,
-                                              duplicated_vertex_tolerance);
-      }
+    std::vector<unsigned int> considered_vertices;
+    GridTools::delete_duplicated_vertices(vertices,
+                                          cells,
+                                          subcell_data,
+                                          considered_vertices,
+                                          duplicated_vertex_tolerance);
 
     // reorder the cells to ensure that they satisfy the convention for
     // edge and face directions
