@@ -13,13 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-// Test high-order Lagrange VTK output on a unit cube.
-// Added by Alexander Grayver
+// Test high-order Lagrange VTK output on a 2D shell
+
+#include <deal.II/base/function_lib.h>
+
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <string>
 
@@ -30,15 +37,29 @@ void
 check(std::ostream &log, unsigned cell_order)
 {
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube(triangulation);
+  GridGenerator::hyper_shell(triangulation, Point<dim>(), 0.5, 1, 6);
+  triangulation.refine_global(1);
+
+  FE_Q<dim>       fe(cell_order);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe);
+
+  Vector<double>       vec(dof_handler.n_dofs());
+  MappingQGeneric<dim> mapping(cell_order);
+
+  VectorTools::interpolate(mapping,
+                           dof_handler,
+                           Functions::SquareFunction<dim>(),
+                           vec);
 
   DataOutBase::VtkFlags flags;
   flags.write_higher_order_cells = true;
 
   DataOut<dim> data_out;
   data_out.set_flags(flags);
-  data_out.attach_triangulation(triangulation);
-  data_out.build_patches(cell_order);
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(vec, "square_function");
+  data_out.build_patches(mapping, cell_order, DataOut<dim>::curved_inner_cells);
   data_out.write_vtk(log);
 }
 
@@ -47,7 +68,6 @@ main()
 {
   initlog();
 
-  unsigned cell_order = 4;
+  unsigned cell_order = 3;
   check<2>(deallog.get_file_stream(), cell_order);
-  check<3>(deallog.get_file_stream(), cell_order);
 }
