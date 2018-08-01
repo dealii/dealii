@@ -61,6 +61,7 @@
 #
 #
 
+current_branch=$(git rev-parse --abbrev-ref HEAD)
 git checkout -q master
 
 commits=$(git log | \
@@ -85,5 +86,5 @@ for commit in $commits ; do
   echo "$date" "$lines_source" "$lines_tests"
 done
 
-git checkout -q master
+git checkout -q ${current_branch}
 
