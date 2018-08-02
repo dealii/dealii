@@ -43,6 +43,7 @@ SET(_unity_include_src
   index_set.cc
   job_identifier.cc
   logstream.cc
+  hdf5.cc
   mpi.cc
   multithread_info.cc
   named_selection.cc
