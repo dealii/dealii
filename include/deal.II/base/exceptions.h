@@ -1402,11 +1402,16 @@ namespace internal
  * fails.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat 2007
+ * @author Guido Kanschat, Daniel Arndt, 2007, 2018
  */
 #define AssertIndexRange(index, range)                                         \
   Assert(                                                                      \
-    (index) < (range),                                                         \
+    static_cast<typename ::dealii::internal::argument_type<void(               \
+        typename std::common_type<decltype(index), decltype(range)>::type)>::  \
+                  type>(index) <                                               \
+      static_cast<typename ::dealii::internal::argument_type<void(             \
+        typename std::common_type<decltype(index), decltype(range)>::type)>::  \
+                    type>(range),                                              \
     dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( \
       typename std::common_type<decltype(index), decltype(range)>::type)>::    \
                                 type>((index), 0, (range)))
