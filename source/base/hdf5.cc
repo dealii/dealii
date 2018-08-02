@@ -28,9 +28,95 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace hdf5
+namespace HDF5
 
 {
+  namespace internal
+  {
+    template <typename T>
+    std::shared_ptr<hid_t>
+    get_hdf5_datatype()
+    {
+      std::shared_ptr<hid_t> t_type;
+      if (std::is_same<T, float>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t);
+          *t_type = H5T_NATIVE_FLOAT;
+        }
+      else if (std::is_same<T, double>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t);
+          *t_type = H5T_NATIVE_DOUBLE;
+        }
+      else if (std::is_same<T, long double>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t);
+          *t_type = H5T_NATIVE_LDOUBLE;
+        }
+      else if (std::is_same<T, int>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t);
+          *t_type = H5T_NATIVE_INT;
+        }
+      else if (std::is_same<T, unsigned int>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t);
+          *t_type = H5T_NATIVE_UINT;
+        }
+      else if (std::is_same<T, std::complex<float>>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+            // Relase the HDF5 resource
+            H5Tclose(*pointer);
+            delete pointer;
+          });
+          *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<float>));
+          //  The C++ standards committee agreed to mandate that the storage
+          //  format used for the std::complex type be binary-compatible with
+          //  the C99 type, i.e. an array T[2] with consecutive real [0] and
+          //  imaginary [1] parts.
+          H5Tinsert(*t_type, "r", 0, H5T_NATIVE_FLOAT);
+          H5Tinsert(*t_type, "i", sizeof(float), H5T_NATIVE_FLOAT);
+        }
+      else if (std::is_same<T, std::complex<double>>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+            // Relase the HDF5 resource
+            H5Tclose(*pointer);
+            delete pointer;
+          });
+          *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
+          //  The C++ standards committee agreed to mandate that the storage
+          //  format used for the std::complex type be binary-compatible with
+          //  the C99 type, i.e. an array T[2] with consecutive real [0] and
+          //  imaginary [1] parts.
+          H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
+          H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
+        }
+      else if (std::is_same<T, std::complex<long double>>::value)
+        {
+          t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+            // Relase the HDF5 resource
+            H5Tclose(*pointer);
+            delete pointer;
+          });
+          *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<long double>));
+          //  The C++ standards committee agreed to mandate that the storage
+          //  format used for the std::complex type be binary-compatible with
+          //  the C99 type, i.e. an array T[2] with consecutive real [0] and
+          //  imaginary [1] parts.
+          H5Tinsert(*t_type, "r", 0, H5T_NATIVE_LDOUBLE);
+          H5Tinsert(*t_type, "i", sizeof(long double), H5T_NATIVE_LDOUBLE);
+        }
+      else
+        {
+          Assert(false, ExcInternalError());
+        }
+      return t_type;
+    }
+  } // namespace internal
+
+
   HDF5Object::HDF5Object(const std::string name, bool mpi)
     : name(name)
     , mpi(mpi)
@@ -40,43 +126,10 @@ namespace hdf5
   T
   HDF5Object::attr(const std::string attr_name) const
   {
-    std::shared_ptr<hid_t> t_type;
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
     T                      value;
     hid_t                  attr;
-    if (std::is_same<T, double>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_DOUBLE;
-      }
-    else if (std::is_same<T, int>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_INT;
-      }
-    else if (std::is_same<T, unsigned int>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_UINT;
-      }
-    else if (std::is_same<T, std::complex<double>>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
-          // Relase the HDF5 resource
-          H5Tclose(*pointer);
-          delete pointer;
-        });
-        *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
-        //  The C++ standards committee agreed to mandate that the storage
-        //  format used for the std::complex type be binary-compatible with the
-        //  C99 type, i.e. an array T[2] with consecutive real [0] and imaginary
-        //  [1] parts.
-        H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
-        H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
-      }
-    else
-      {
-        Assert(false, ExcInternalError());
-      }
+
 
     attr = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
     H5Aread(attr, *t_type, &value);
@@ -151,7 +204,7 @@ namespace hdf5
   }
 
   template <>
-  std::vector<std::vector<double>>
+  FullMatrix<double>
   HDF5Object::attr(const std::string attr_name) const
   {
     hid_t attr;
@@ -162,8 +215,7 @@ namespace hdf5
     hsize_t dims[2];
     H5Sget_simple_extent_dims(attr_space, dims, NULL);
 
-    std::vector<std::vector<double>> matrix_value(dims[0],
-                                                  std::vector<double>(dims[1]));
+    FullMatrix<double> matrix_value(dims[0], dims[1]);
 
     double *hdf5_data = (double *)malloc(dims[0] * dims[1] * sizeof(double));
     H5Aread(attr, H5T_NATIVE_DOUBLE, hdf5_data);
@@ -190,42 +242,8 @@ namespace hdf5
   {
     hid_t                  attr;
     hid_t                  aid;
-    std::shared_ptr<hid_t> t_type;
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
 
-    if (std::is_same<T, double>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_DOUBLE;
-      }
-    else if (std::is_same<T, int>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_INT;
-      }
-    else if (std::is_same<T, unsigned int>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_UINT;
-      }
-    else if (std::is_same<T, std::complex<double>>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
-          // Relase the HDF5 resource
-          H5Tclose(*pointer);
-          delete pointer;
-        });
-        *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
-        //  The C++ standards committee agreed to mandate that the storage
-        //  format used for the std::complex type be binary-compatible with the
-        //  C99 type, i.e. an array T[2] with consecutive real [0] and imaginary
-        //  [1] parts.
-        H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
-        H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
-      }
-    else
-      {
-        Assert(false, ExcInternalError());
-      }
 
     /*
      * Create scalar attribute.
@@ -256,6 +274,7 @@ namespace hdf5
     : HDF5Object(name, mpi)
     , rank(dimensions.size())
     , dimensions(dimensions)
+    , t_type(internal::get_hdf5_datatype<T>())
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
       // Relase the HDF5 resource
@@ -268,40 +287,6 @@ namespace hdf5
       delete pointer;
     });
 
-    if (std::is_same<T, double>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_DOUBLE;
-      }
-    else if (std::is_same<T, int>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_INT;
-      }
-    else if (std::is_same<T, unsigned int>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t);
-        *t_type = H5T_NATIVE_UINT;
-      }
-    else if (std::is_same<T, std::complex<double>>::value)
-      {
-        t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
-          // Relase the HDF5 resource
-          H5Tclose(*pointer);
-          delete pointer;
-        });
-        *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
-        //  The C++ standards committee agreed to mandate that the storage
-        //  format used for the std::complex type be binary-compatible with the
-        //  C99 type, i.e. an array T[2] with consecutive real [0] and imaginary
-        //  [1] parts.
-        H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
-        H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
-      }
-    else
-      {
-        Assert(false, ExcInternalError());
-      }
 
     total_size = 1;
     for (auto &&dimension : dimensions)
@@ -368,7 +353,7 @@ namespace hdf5
 
   template <typename T>
   void
-  DataSet<T>::write_data(const dealii::FullMatrix<T> &data) const
+  DataSet<T>::write_data(const FullMatrix<T> &data) const
   {
     AssertDimension(total_size, data.m() * data.n());
     hid_t plist;
@@ -477,9 +462,9 @@ namespace hdf5
 
   template <typename T>
   void
-  DataSet<T>::write_data_hyperslab(const dealii::FullMatrix<T> &data,
-                                   const std::vector<hsize_t>   offset,
-                                   const std::vector<hsize_t>   count) const
+  DataSet<T>::write_data_hyperslab(const FullMatrix<T> &      data,
+                                   const std::vector<hsize_t> offset,
+                                   const std::vector<hsize_t> count) const
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
@@ -597,26 +582,6 @@ namespace hdf5
     return Group(name, *this, mpi, Mode::create);
   }
 
-  template <>
-  void
-  Group::write_dataset(const std::string          name,
-                       const std::vector<double> &data) const
-  {
-    std::vector<hsize_t> dimensions = {data.size()};
-    auto                 dataset    = create_dataset<double>(name, dimensions);
-    dataset.write_data(data);
-  }
-
-  template <>
-  void
-  Group::write_dataset(const std::string                 name,
-                       const dealii::FullMatrix<double> &data) const
-  {
-    std::vector<hsize_t> dimensions = {data.m(), data.n()};
-    auto                 dataset    = create_dataset<double>(name, dimensions);
-    dataset.write_data(data);
-  }
-
   template <typename T>
   DataSet<T>
   Group::create_dataset(const std::string          name,
@@ -625,6 +590,25 @@ namespace hdf5
     return DataSet<T>(
       name, *hdf5_reference, dimensions, mpi, DataSet<T>::Mode::create);
   }
+
+  template <typename T>
+  void
+  Group::write_dataset(const std::string name, const std::vector<T> &data) const
+  {
+    std::vector<hsize_t> dimensions = {data.size()};
+    auto                 dataset    = create_dataset<T>(name, dimensions);
+    dataset.write_data(data);
+  }
+
+  template <typename T>
+  void
+  Group::write_dataset(const std::string name, const FullMatrix<T> &data) const
+  {
+    std::vector<hsize_t> dimensions = {data.m(), data.n()};
+    auto                 dataset    = create_dataset<T>(name, dimensions);
+    dataset.write_data(data);
+  }
+
 
   File::File(const std::string name,
              const bool        mpi,
@@ -684,36 +668,84 @@ namespace hdf5
 
 
   // explicit instantiations of classes
+  template class DataSet<float>;
   template class DataSet<double>;
+  template class DataSet<long double>;
+  template class DataSet<std::complex<float>>;
   template class DataSet<std::complex<double>>;
+  template class DataSet<std::complex<long double>>;
+  template class DataSet<int>;
+  template class DataSet<unsigned int>;
+
 
   // explicit instantiations of functions
+  template float
+  HDF5Object::attr<float>(const std::string attr_name) const;
   template double
   HDF5Object::attr<double>(const std::string attr_name) const;
+  template long double
+  HDF5Object::attr<long double>(const std::string attr_name) const;
+  template std::complex<float>
+  HDF5Object::attr<std::complex<float>>(const std::string attr_name) const;
+  template std::complex<double>
+  HDF5Object::attr<std::complex<double>>(const std::string attr_name) const;
+  template std::complex<long double>
+  HDF5Object::attr<std::complex<long double>>(
+    const std::string attr_name) const;
   template int
   HDF5Object::attr<int>(const std::string attr_name) const;
   template unsigned int
   HDF5Object::attr<unsigned int>(const std::string attr_name) const;
-  template std::complex<double>
-  HDF5Object::attr<std::complex<double>>(const std::string attr_name) const;
   // The specialization of HDF5Object::attr<std::string> has been defined above
 
   template void
+  HDF5Object::write_attr<float>(const std::string attr_name, float value) const;
+  template void
   HDF5Object::write_attr<double>(const std::string attr_name,
                                  double            value) const;
+  template void
+  HDF5Object::write_attr<long double>(const std::string attr_name,
+                                      long double       value) const;
+  template void
+  HDF5Object::write_attr<std::complex<float>>(const std::string   attr_name,
+                                              std::complex<float> value) const;
+  template void
+  HDF5Object::write_attr<std::complex<double>>(
+    const std::string    attr_name,
+    std::complex<double> value) const;
+  template void
+  HDF5Object::write_attr<std::complex<long double>>(
+    const std::string         attr_name,
+    std::complex<long double> value) const;
   template void
   HDF5Object::write_attr<int>(const std::string attr_name, int value) const;
   template void
   HDF5Object::write_attr<unsigned int>(const std::string attr_name,
                                        unsigned int      value) const;
-  template void
-  HDF5Object::write_attr<std::complex<double>>(
-    const std::string    attr_name,
-    std::complex<double> value) const;
 
+
+  template DataSet<float>
+  Group::create_dataset<float>(const std::string          name,
+                               const std::vector<hsize_t> dimensions) const;
   template DataSet<double>
   Group::create_dataset<double>(const std::string          name,
                                 const std::vector<hsize_t> dimensions) const;
+  template DataSet<long double>
+  Group::create_dataset<long double>(
+    const std::string          name,
+    const std::vector<hsize_t> dimensions) const;
+  template DataSet<std::complex<float>>
+  Group::create_dataset<std::complex<float>>(
+    const std::string          name,
+    const std::vector<hsize_t> dimensions) const;
+  template DataSet<std::complex<double>>
+  Group::create_dataset<std::complex<double>>(
+    const std::string          name,
+    const std::vector<hsize_t> dimensions) const;
+  template DataSet<std::complex<long double>>
+  Group::create_dataset<std::complex<long double>>(
+    const std::string          name,
+    const std::vector<hsize_t> dimensions) const;
   template DataSet<int>
   Group::create_dataset<int>(const std::string          name,
                              const std::vector<hsize_t> dimensions) const;
@@ -721,12 +753,51 @@ namespace hdf5
   Group::create_dataset<unsigned int>(
     const std::string          name,
     const std::vector<hsize_t> dimensions) const;
-  template DataSet<std::complex<double>>
-  Group::create_dataset<std::complex<double>>(
-    const std::string          name,
-    const std::vector<hsize_t> dimensions) const;
 
+  template void
+  Group::write_dataset(const std::string         name,
+                       const std::vector<float> &data) const;
+  template void
+  Group::write_dataset(const std::string          name,
+                       const std::vector<double> &data) const;
+  template void
+  Group::write_dataset(const std::string               name,
+                       const std::vector<long double> &data) const;
+  template void
+  Group::write_dataset(const std::string                       name,
+                       const std::vector<std::complex<float>> &data) const;
+  template void
+  Group::write_dataset(const std::string                        name,
+                       const std::vector<std::complex<double>> &data) const;
+  template void
+  Group::write_dataset(
+    const std::string                             name,
+    const std::vector<std::complex<long double>> &data) const;
+  template void
+  Group::write_dataset(const std::string       name,
+                       const std::vector<int> &data) const;
+  template void
+  Group::write_dataset(const std::string                name,
+                       const std::vector<unsigned int> &data) const;
 
-} // namespace hdf5
+  template void
+  Group::write_dataset(const std::string        name,
+                       const FullMatrix<float> &data) const;
+  template void
+  Group::write_dataset(const std::string         name,
+                       const FullMatrix<double> &data) const;
+  template void
+  Group::write_dataset(const std::string              name,
+                       const FullMatrix<long double> &data) const;
+  template void
+  Group::write_dataset(const std::string                      name,
+                       const FullMatrix<std::complex<float>> &data) const;
+  template void
+  Group::write_dataset(const std::string                       name,
+                       const FullMatrix<std::complex<double>> &data) const;
+  template void
+  Group::write_dataset(const std::string                            name,
+                       const FullMatrix<std::complex<long double>> &data) const;
+} // namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
