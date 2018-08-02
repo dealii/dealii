@@ -258,6 +258,23 @@ public:
    * In other words, using this parameter can not help you plot the solution
    * exactly, but it can get you closer if you use finite elements of higher
    * polynomial degree.
+   *
+   * @note Specifying `n_subdivisions>1` is useful when using higher order
+   *   finite elements, but in general it does not actually result in the
+   *   visualization showing higher order polynomial surfaces -- rather, you
+   *   just get a (bi-, tri-)linear interpolation of that higher order
+   *   surface on a finer mesh. However, when outputting the solution in the
+   *   VTK and VTU file formats via DataOutInterface::write_vtk() or
+   *   DataOutInterface::write_vtu() (where DataOutInterface is a base
+   *   class of the current class) as we often do in the tutorials,
+   *   you can provide a set of flags via the DataOutBase::VtkFlags
+   *   structure that includes the
+   *   DataOutBase::VtkFlags::write_higher_order_cells flag. When set, the
+   *   subdivisions produced by this function will be interpreted as
+   *   support point for a higher order polynomial that will then actually
+   *   be visualized as such. On the other hand, this requires a
+   *   sufficiently new version of one of the VTK-based visualization
+   *   programs.
    */
   virtual void
   build_patches(const unsigned int n_subdivisions = 0);
