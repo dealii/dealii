@@ -437,11 +437,14 @@ namespace internal
                       unsigned int *data_ptr =
                         plain_dof_indices.data() +
                         row_starts_plain_indices[boundary_cells[i]];
+                      const unsigned int fe_index =
+                        (cell_active_fe_index.size() == 0 ||
+                         dofs_per_cell.size() == 1) ?
+                          0 :
+                          cell_active_fe_index[i];
+                      AssertIndexRange(fe_index, dofs_per_cell.size());
                       const unsigned int *row_end =
-                        data_ptr +
-                        dofs_per_cell[cell_active_fe_index.size() == 0 ?
-                                        0 :
-                                        cell_active_fe_index[i]];
+                        data_ptr + dofs_per_cell[fe_index];
                       for (; data_ptr != row_end; ++data_ptr)
                         *data_ptr =
                           ((*data_ptr < n_owned) ?
