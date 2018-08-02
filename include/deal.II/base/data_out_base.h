@@ -1154,18 +1154,16 @@ namespace DataOutBase
      *
      * Default is <tt>false</tt>.
      *
-     * @note The ability to write data that corresponds to higher
-     *   order polynomials rather than simply linear or bilinear is a
-     *   feature that was only introduced in VTK sometime in 2017 or
-     *   2018.  You will need at least Paraview version 5.5 (released
-     *   in the spring of 2018) or a similarly recent version of Visit
-     *   for this feature to work (for example, Visit 2.13.2, released
-     *   in May 2018, does not yet support this feature). Older
-     *   versions of these programs are likely going to result in
-     *   errors when trying to read files generated with this flag set
-     *   to @p true. Experience with these programs shows that these
-     *   error messages are likely going to be rather less descriptive
-     *   and more obscure.
+     * @note The ability to write data that corresponds to higher order
+     * polynomials rather than simply linear or bilinear is a feature that was
+     * only introduced in VTK sometime in 2017 or 2018. You will need at least
+     * Paraview version 5.5 (released in the spring of 2018) or a similarly
+     * recent version of Visit for this feature to work (for example,
+     * Visit 2.13.2, released in May 2018, does not yet support this feature).
+     * Older versions of these programs are likely going to result in errors
+     * when trying to read files generated with this flag set to @p true.
+     * Experience with these programs shows that these error messages are likely
+     * going to be rather less descriptive and more obscure.
      */
     bool write_higher_order_cells;
 
