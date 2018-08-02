@@ -18,29 +18,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "la_parallel_vector.inst"
-
-// do a few functions that currently don't fit the scheme because they have
-// two template arguments that need to be different (the case of same
-// arguments is covered by the default copy constructor and copy operator that
-// is declared separately)
 
 namespace LinearAlgebra
 {
   namespace distributed
   {
-#define TEMPL_COPY_CONSTRUCTOR(S1, S2)                  \
-  template Vector<S1, ::dealii::MemorySpace::Host>      \
-    &Vector<S1, ::dealii::MemorySpace::Host>::operator= \
-      <S2>(const Vector<S2, ::dealii::MemorySpace::Host> &)
-
-    TEMPL_COPY_CONSTRUCTOR(double, float);
-    TEMPL_COPY_CONSTRUCTOR(float, double);
-
-    TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
-    TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
-
-#undef TEMPL_COPY_CONSTRUCTOR
+    template class Vector<float, ::dealii::MemorySpace::CUDA>;
+    template class Vector<double, ::dealii::MemorySpace::CUDA>;
   } // namespace distributed
 } // namespace LinearAlgebra
 

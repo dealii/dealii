@@ -47,9 +47,9 @@ namespace LinearAlgebra
   class CommunicationPatternBase;
   namespace distributed
   {
-    template <typename>
+    template <typename, typename>
     class Vector;
-  }
+  } // namespace distributed
 } // namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_PETSC
@@ -290,9 +290,10 @@ namespace LinearAlgebra
      * be used if the same communication pattern is used multiple times. This
      * can be used to improve performance.
      */
+    template <typename MemorySpace>
     void
-    import(const distributed::Vector<Number> &vec,
-           VectorOperation::values            operation,
+    import(const distributed::Vector<Number, MemorySpace> &vec,
+           VectorOperation::values                         operation,
            const std::shared_ptr<const CommunicationPatternBase>
              &communication_pattern =
                std::shared_ptr<const CommunicationPatternBase>());

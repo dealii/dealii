@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/template_constraints.h>
@@ -42,9 +43,9 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-    template <typename number>
+    template <typename, typename>
     class Vector;
-  }
+  } // namespace distributed
 } // namespace LinearAlgebra
 
 
@@ -1915,18 +1916,19 @@ namespace internal
     }
 
     // selection for diagonal matrix around parallel deal.II vector
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline void
     vector_updates(
-      const LinearAlgebra::distributed::Vector<Number> &                src,
-      const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number>> &jacobi,
-      const bool                                  start_zero,
-      const double                                factor1,
-      const double                                factor2,
-      LinearAlgebra::distributed::Vector<Number> &update1,
-      LinearAlgebra::distributed::Vector<Number> &update2,
-      LinearAlgebra::distributed::Vector<Number> &,
-      LinearAlgebra::distributed::Vector<Number> &dst)
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace> &src,
+      const DiagonalMatrix<
+        LinearAlgebra::distributed::Vector<Number, MemorySpace>> &jacobi,
+      const bool                                                  start_zero,
+      const double                                                factor1,
+      const double                                                factor2,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &   update1,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &   update2,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &dst)
     {
       VectorUpdater<Number> upd(src.begin(),
                                 jacobi.get_vector().begin(),
@@ -2012,10 +2014,10 @@ namespace internal
       vector.add(-mean_value);
     }
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
     set_initial_guess(
-      ::dealii::LinearAlgebra::distributed::Vector<Number> &vector)
+      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace> &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
@@ -2222,9 +2224,16 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       (std::is_same<VectorType,
                     dealii::Vector<typename VectorType::value_type>>::value ==
          false &&
-       std::is_same<VectorType,
-                    LinearAlgebra::distributed::Vector<
-                      typename VectorType::value_type>>::value == false))
+       ((std::is_same<
+           VectorType,
+           LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                              MemorySpace::Host>>::value ==
+         false) ||
+        (std::is_same<
+           VectorType,
+           LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                              MemorySpace::CUDA>>::value ==
+         false))))
     update3.reinit(src, true);
 
   const_cast<

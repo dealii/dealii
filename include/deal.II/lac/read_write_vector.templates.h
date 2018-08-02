@@ -40,10 +40,8 @@
 #  include <Epetra_Import.h>
 #endif
 
-#if defined(DEAL_II_WITH_CUDA)
+#ifdef DEAL_II_WITH_CUDA
 #  include <deal.II/lac/cuda_vector.h>
-
-#  include <cuda_runtime_api.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -51,6 +49,163 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
+  namespace internal
+  {
+    // In the import_from_ghosted_array_finish we need to calculate the
+    // maximal and minimal value for the given number type, which is not
+    // straight forward for complex numbers. Therefore, comparison of complex
+    // numbers is prohibited and throws an assert.
+    template <typename Number>
+    Number
+    get_min(const Number a, const Number b)
+    {
+      return std::min(a, b);
+    }
+
+    template <typename Number>
+    std::complex<Number>
+    get_min(const std::complex<Number> a, const std::complex<Number>)
+    {
+      AssertThrow(false,
+                  ExcMessage("VectorOperation::min not "
+                             "implemented for complex numbers"));
+      return a;
+    }
+
+    template <typename Number>
+    Number
+    get_max(const Number a, const Number b)
+    {
+      return std::max(a, b);
+    }
+
+    template <typename Number>
+    std::complex<Number>
+    get_max(const std::complex<Number> a, const std::complex<Number>)
+    {
+      AssertThrow(false,
+                  ExcMessage("VectorOperation::max not "
+                             "implemented for complex numbers"));
+      return a;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    struct read_write_vector_functions
+    {
+      static void
+      import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+               &                                     communication_pattern,
+             const Number *                          values,
+             const ::dealii::VectorOperation::values operation,
+             ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+      {
+        (void)communication_pattern;
+        (void)values;
+        (void)operation;
+        (void)rw_vector;
+
+        static_assert(
+          std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
+            std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
+          "MemorySpace should be Host or CUDA");
+      }
+    };
+
+
+
+    template <typename Number>
+    struct read_write_vector_functions<Number, ::dealii::MemorySpace::Host>
+    {
+      using size_type = types::global_dof_index;
+
+
+      static void
+      import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+               &                                     communication_pattern,
+             const Number *                          values,
+             const ::dealii::VectorOperation::values operation,
+             ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+      {
+        distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
+          communication_pattern);
+
+        const unsigned int n_elements = communication_pattern->local_size();
+        std::copy(values, values + n_elements, tmp_vector.begin());
+        tmp_vector.update_ghost_values();
+
+        const IndexSet &stored = rw_vector.get_stored_elements();
+        if (operation == VectorOperation::add)
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) +=
+              tmp_vector(stored.nth_index_in_set(i));
+        else if (operation == VectorOperation::min)
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) =
+              get_min(tmp_vector(stored.nth_index_in_set(i)),
+                      rw_vector.local_element(i));
+        else if (operation == VectorOperation::max)
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) =
+              get_max(tmp_vector(stored.nth_index_in_set(i)),
+                      rw_vector.local_element(i));
+        else
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
+      }
+    };
+
+
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+    template <typename Number>
+    struct read_write_vector_functions<Number, ::dealii::MemorySpace::CUDA>
+    {
+      using size_type = types::global_dof_index;
+
+      static void
+      import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+               &                                     communication_pattern,
+             const Number *                          values,
+             const ::dealii::VectorOperation::values operation,
+             ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+      {
+        distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
+          communication_pattern);
+
+        const unsigned int n_elements = communication_pattern->local_size();
+        cudaError_t        cuda_error_code = cudaMemcpy(tmp_vector.begin(),
+                                                 values,
+                                                 n_elements * sizeof(Number),
+                                                 cudaMemcpyDeviceToHost);
+        AssertCuda(cuda_error_code);
+        tmp_vector.update_ghost_values();
+
+        const IndexSet &stored = rw_vector.get_stored_elements();
+        if (operation == VectorOperation::add)
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) +=
+              tmp_vector(stored.nth_index_in_set(i));
+        else if (operation == VectorOperation::min)
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) =
+              get_min(tmp_vector(stored.nth_index_in_set(i)),
+                      rw_vector.local_element(i));
+        else if (operation == VectorOperation::max)
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) =
+              get_max(tmp_vector(stored.nth_index_in_set(i)),
+                      rw_vector.local_element(i));
+        else
+          for (size_type i = 0; i < stored.n_elements(); ++i)
+            rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
+      }
+    };
+#endif
+  } // namespace internal
+
+
   template <typename Number>
   void
   ReadWriteVector<Number>::resize_val(const size_type new_alloc_size)
@@ -178,10 +333,10 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::apply(const Functor &func)
   {
     FunctorTemplate<Functor> functor(*this, func);
-    internal::VectorOperations::parallel_for(functor,
-                                             0,
-                                             n_elements(),
-                                             thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(functor,
+                                                     0,
+                                                     n_elements(),
+                                                     thread_loop_partitioner);
   }
 
 
@@ -250,52 +405,14 @@ namespace LinearAlgebra
     return *this;
   }
 
-  namespace internal
-  {
-    // In the import_from_ghosted_array_finish we need to calculate the maximal
-    // and minimal value for the given number type, which is not straight
-    // forward for complex numbers. Therefore, comparison of complex numbers is
-    // prohibited and throws an assert.
-    template <typename Number>
-    Number
-    get_min(const Number a, const Number b)
-    {
-      return std::min(a, b);
-    }
 
-    template <typename Number>
-    std::complex<Number>
-    get_min(const std::complex<Number> a, const std::complex<Number>)
-    {
-      AssertThrow(false,
-                  ExcMessage("VectorOperation::min not "
-                             "implemented for complex numbers"));
-      return a;
-    }
-
-    template <typename Number>
-    Number
-    get_max(const Number a, const Number b)
-    {
-      return std::max(a, b);
-    }
-
-    template <typename Number>
-    std::complex<Number>
-    get_max(const std::complex<Number> a, const std::complex<Number>)
-    {
-      AssertThrow(false,
-                  ExcMessage("VectorOperation::max not "
-                             "implemented for complex numbers"));
-      return a;
-    }
-  } // namespace internal
 
   template <typename Number>
+  template <typename MemorySpace>
   void
   ReadWriteVector<Number>::import(
-    const distributed::Vector<Number> &vec,
-    VectorOperation::values            operation,
+    const distributed::Vector<Number, MemorySpace> &vec,
+    VectorOperation::values                         operation,
     const std::shared_ptr<const CommunicationPatternBase>
       &communication_pattern)
   {
@@ -318,28 +435,10 @@ namespace LinearAlgebra
                     ExcMessage("The communication pattern is not of type "
                                "Utilities::MPI::Partitioner."));
       }
-    distributed::Vector<Number> tmp_vector(comm_pattern);
 
-    std::copy(vec.begin(), vec.end(), tmp_vector.begin());
-    tmp_vector.update_ghost_values();
 
-    const IndexSet &stored = get_stored_elements();
-    if (operation == VectorOperation::add)
-      for (size_type i = 0; i < stored.n_elements(); ++i)
-        local_element(i) += tmp_vector(stored.nth_index_in_set(i));
-    else if (operation == VectorOperation::min)
-      for (size_type i = 0; i < stored.n_elements(); ++i)
-        local_element(i) =
-          internal::get_min(tmp_vector(stored.nth_index_in_set(i)),
-                            local_element(i));
-    else if (operation == VectorOperation::max)
-      for (size_type i = 0; i < stored.n_elements(); ++i)
-        local_element(i) =
-          internal::get_max(tmp_vector(stored.nth_index_in_set(i)),
-                            local_element(i));
-    else
-      for (size_type i = 0; i < stored.n_elements(); ++i)
-        local_element(i) = tmp_vector(stored.nth_index_in_set(i));
+    internal::read_write_vector_functions<Number, MemorySpace>::import(
+      comm_pattern, vec.begin(), operation, *this);
   }
 
 
@@ -570,7 +669,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_CUDA)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
   template <typename Number>
   void
   ReadWriteVector<Number>::import(

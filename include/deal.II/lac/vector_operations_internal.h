@@ -17,10 +17,15 @@
 #ifndef dealii_vector_operations_internal_h
 #define dealii_vector_operations_internal_h
 
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/vectorization.h>
+
+#include <deal.II/lac/cuda_kernels.h>
+#include <deal.II/lac/cuda_kernels.templates.h>
 
 #include <cstdio>
 #include <cstring>
@@ -307,7 +312,7 @@ namespace internal
     template <typename Number>
     struct Vectorization_add_av
     {
-      Vectorization_add_av(Number *val, Number *v_val, Number factor)
+      Vectorization_add_av(Number *val, const Number *v_val, Number factor)
         : val(val)
         , v_val(v_val)
         , factor(factor)
@@ -329,15 +334,18 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
-      Number  factor;
+      Number *      val;
+      const Number *v_val;
+      Number        factor;
     };
 
     template <typename Number>
     struct Vectorization_sadd_xav
     {
-      Vectorization_sadd_xav(Number *val, Number *v_val, Number a, Number x)
+      Vectorization_sadd_xav(Number *      val,
+                             const Number *v_val,
+                             Number        a,
+                             Number        x)
         : val(val)
         , v_val(v_val)
         , a(a)
@@ -360,16 +368,16 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
-      Number  a;
-      Number  x;
+      Number *      val;
+      const Number *v_val;
+      Number        a;
+      Number        x;
     };
 
     template <typename Number>
     struct Vectorization_subtract_v
     {
-      Vectorization_subtract_v(Number *val, Number *v_val)
+      Vectorization_subtract_v(Number *val, const Number *v_val)
         : val(val)
         , v_val(v_val)
       {}
@@ -390,8 +398,8 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
+      Number *      val;
+      const Number *v_val;
     };
 
     template <typename Number>
@@ -425,7 +433,7 @@ namespace internal
     template <typename Number>
     struct Vectorization_add_v
     {
-      Vectorization_add_v(Number *val, Number *v_val)
+      Vectorization_add_v(Number *val, const Number *v_val)
         : val(val)
         , v_val(v_val)
       {}
@@ -446,18 +454,18 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
+      Number *      val;
+      const Number *v_val;
     };
 
     template <typename Number>
     struct Vectorization_add_avpbw
     {
-      Vectorization_add_avpbw(Number *val,
-                              Number *v_val,
-                              Number *w_val,
-                              Number  a,
-                              Number  b)
+      Vectorization_add_avpbw(Number *      val,
+                              const Number *v_val,
+                              const Number *w_val,
+                              Number        a,
+                              Number        b)
         : val(val)
         , v_val(v_val)
         , w_val(w_val)
@@ -481,17 +489,17 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
-      Number *w_val;
-      Number  a;
-      Number  b;
+      Number *      val;
+      const Number *v_val;
+      const Number *w_val;
+      Number        a;
+      Number        b;
     };
 
     template <typename Number>
     struct Vectorization_sadd_xv
     {
-      Vectorization_sadd_xv(Number *val, Number *v_val, Number x)
+      Vectorization_sadd_xv(Number *val, const Number *v_val, Number x)
         : val(val)
         , v_val(v_val)
         , x(x)
@@ -513,20 +521,20 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
-      Number  x;
+      Number *      val;
+      const Number *v_val;
+      Number        x;
     };
 
     template <typename Number>
     struct Vectorization_sadd_xavbw
     {
-      Vectorization_sadd_xavbw(Number *val,
-                               Number *v_val,
-                               Number *w_val,
-                               Number  x,
-                               Number  a,
-                               Number  b)
+      Vectorization_sadd_xavbw(Number *      val,
+                               const Number *v_val,
+                               const Number *w_val,
+                               Number        x,
+                               Number        a,
+                               Number        b)
         : val(val)
         , v_val(v_val)
         , w_val(w_val)
@@ -551,18 +559,18 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
-      Number *w_val;
-      Number  x;
-      Number  a;
-      Number  b;
+      Number *      val;
+      const Number *v_val;
+      const Number *w_val;
+      Number        x;
+      Number        a;
+      Number        b;
     };
 
     template <typename Number>
     struct Vectorization_scale
     {
-      Vectorization_scale(Number *val, Number *v_val)
+      Vectorization_scale(Number *val, const Number *v_val)
         : val(val)
         , v_val(v_val)
       {}
@@ -583,14 +591,14 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *v_val;
+      Number *      val;
+      const Number *v_val;
     };
 
     template <typename Number>
     struct Vectorization_equ_au
     {
-      Vectorization_equ_au(Number *val, Number *u_val, Number a)
+      Vectorization_equ_au(Number *val, const Number *u_val, Number a)
         : val(val)
         , u_val(u_val)
         , a(a)
@@ -612,19 +620,19 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *u_val;
-      Number  a;
+      Number *      val;
+      const Number *u_val;
+      Number        a;
     };
 
     template <typename Number>
     struct Vectorization_equ_aubv
     {
-      Vectorization_equ_aubv(Number *val,
-                             Number *u_val,
-                             Number *v_val,
-                             Number  a,
-                             Number  b)
+      Vectorization_equ_aubv(Number *      val,
+                             const Number *u_val,
+                             const Number *v_val,
+                             Number        a,
+                             Number        b)
         : val(val)
         , u_val(u_val)
         , v_val(v_val)
@@ -648,11 +656,11 @@ namespace internal
           }
       }
 
-      Number *val;
-      Number *u_val;
-      Number *v_val;
-      Number  a;
-      Number  b;
+      Number *      val;
+      const Number *u_val;
+      const Number *v_val;
+      Number        a;
+      Number        b;
     };
 
     template <typename Number>
@@ -1385,6 +1393,1060 @@ namespace internal
       (void)partitioner;
 #endif
     }
+
+
+    template <typename Number, typename Number2, typename MemorySpace>
+    struct functions
+    {
+      static void
+      copy(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {
+        static_assert(
+          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value &&
+            std::is_same<Number, Number2>::value,
+          "For the CUDA MemorySpace Number and Number2 should be the same type");
+      }
+
+      static void
+      set(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*s*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      add_vector(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      subtract_vector(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      add_factor(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        Number /*a*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      add_av(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*a*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      add_avpbw(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*a*/,
+        const Number /*b*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*w_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      sadd_xv(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*x*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      sadd_xav(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*x*/,
+        const Number /*a*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      sadd_xavbw(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*x*/,
+        const Number /*a*/,
+        const Number /*b*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*w_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      multiply_factor(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*factor*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      scale(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      equ_au(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*a*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static void
+      equ_aubv(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*a*/,
+        const Number /*b*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*w_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static Number
+      dot(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {
+        return Number();
+      }
+
+      template <typename real_type>
+      static void
+      norm_2(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        real_type & /*sum*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static Number
+      mean_value(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*data*/)
+      {
+        return Number();
+      }
+
+      template <typename real_type>
+      static void
+      norm_1(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+             /*thread_loop_partitioner*/,
+             const size_type /*size*/,
+             real_type & /*sum*/,
+             Number * /*values*/,
+             Number * /*values_dev*/)
+      {}
+
+      template <typename real_type>
+      static void
+      norm_p(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        real_type & /*sum*/,
+        real_type /*p*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
+
+      static Number
+      add_and_dot(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        const Number /*a*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*v_data*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          & /*w_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {
+        return Number();
+      }
+    };
+
+
+
+    template <typename Number, typename Number2>
+    struct functions<Number, Number2, ::dealii::MemorySpace::Host>
+    {
+      static void
+      copy(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                           thread_loop_partitioner,
+           const size_type size,
+           const ::dealii::MemorySpace::
+             MemorySpaceData<Number2, ::dealii::MemorySpace::Host> &v_data,
+           ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                  ::dealii::MemorySpace::Host>
+             &data)
+      {
+        Vector_copy<Number, Number2> copier(v_data.values.get(),
+                                            data.values.get());
+        parallel_for(copier, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      set(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                          thread_loop_partitioner,
+          const size_type size,
+          const Number    s,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::Host>
+            &data)
+      {
+        Vector_set<Number> setter(s, data.values.get());
+        parallel_for(setter, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      add_vector(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                                 thread_loop_partitioner,
+                 const size_type size,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+                 ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_add_v<Number> vector_add(data.values.get(),
+                                               v_data.values.get());
+        parallel_for(vector_add, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      subtract_vector(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                        thread_loop_partitioner,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
+      {
+        Vectorization_subtract_v<Number> vector_subtract(data.values.get(),
+                                                         v_data.values.get());
+        parallel_for(vector_subtract, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      add_factor(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                                 thread_loop_partitioner,
+                 const size_type size,
+                 Number          a,
+                 ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_add_factor<Number> vector_add(data.values.get(), a);
+        parallel_for(vector_add, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      add_av(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                             thread_loop_partitioner,
+             const size_type size,
+             const Number    a,
+             const ::dealii::MemorySpace::
+               MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data)
+      {
+        Vectorization_add_av<Number> vector_add(data.values.get(),
+                                                v_data.values.get(),
+                                                a);
+        parallel_for(vector_add, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      add_avpbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                                thread_loop_partitioner,
+                const size_type size,
+                const Number    a,
+                const Number    b,
+                const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+                const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+                ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_add_avpbw<Number> vector_add(
+          data.values.get(), v_data.values.get(), w_data.values.get(), a, b);
+        parallel_for(vector_add, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      sadd_xv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                              thread_loop_partitioner,
+              const size_type size,
+              const Number    x,
+              const ::dealii::MemorySpace::
+                MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+              ::dealii::MemorySpace::
+                MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_sadd_xv<Number> vector_sadd(data.values.get(),
+                                                  v_data.values.get(),
+                                                  x);
+        parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      sadd_xav(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                               thread_loop_partitioner,
+               const size_type size,
+               const Number    x,
+               const Number    a,
+               const ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+               ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_sadd_xav<Number> vector_sadd(data.values.get(),
+                                                   v_data.values.get(),
+                                                   a,
+                                                   x);
+        parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      sadd_xavbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                                 thread_loop_partitioner,
+                 const size_type size,
+                 const Number    x,
+                 const Number    a,
+                 const Number    b,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+                 ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_sadd_xavbw<Number> vector_sadd(
+          data.values.get(), v_data.values.get(), w_data.values.get(), x, a, b);
+        parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      multiply_factor(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                        thread_loop_partitioner,
+        const size_type size,
+        const Number    factor,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
+      {
+        Vectorization_multiply_factor<Number> vector_multiply(data.values.get(),
+                                                              factor);
+        parallel_for(vector_multiply, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      scale(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                            thread_loop_partitioner,
+            const size_type size,
+            const ::dealii::MemorySpace::
+              MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+            ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                   ::dealii::MemorySpace::Host>
+              &data)
+      {
+        Vectorization_scale<Number> vector_scale(data.values.get(),
+                                                 v_data.values.get());
+        parallel_for(vector_scale, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      equ_au(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                             thread_loop_partitioner,
+             const size_type size,
+             const Number    a,
+             const ::dealii::MemorySpace::
+               MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data)
+      {
+        Vectorization_equ_au<Number> vector_equ(data.values.get(),
+                                                v_data.values.get(),
+                                                a);
+        parallel_for(vector_equ, 0, size, thread_loop_partitioner);
+      }
+
+      static void
+      equ_aubv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                               thread_loop_partitioner,
+               const size_type size,
+               const Number    a,
+               const Number    b,
+               const ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+               const ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+               ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Vectorization_equ_aubv<Number> vector_equ(
+          data.values.get(), v_data.values.get(), w_data.values.get(), a, b);
+        parallel_for(vector_equ, 0, size, thread_loop_partitioner);
+      }
+
+      static Number
+      dot(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                          thread_loop_partitioner,
+          const size_type size,
+          const ::dealii::MemorySpace::
+            MemorySpaceData<Number2, ::dealii::MemorySpace::Host> &v_data,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::Host>
+            &data)
+      {
+        Number                                                   sum;
+        dealii::internal::VectorOperations::Dot<Number, Number2> dot(
+          data.values.get(), v_data.values.get());
+        dealii::internal::VectorOperations::parallel_reduce(
+          dot, 0, size, sum, thread_loop_partitioner);
+        AssertIsFinite(sum);
+
+        return sum;
+      }
+
+      template <typename real_type>
+      static void
+      norm_2(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                             thread_loop_partitioner,
+             const size_type size,
+             real_type &     sum,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data)
+      {
+        Norm2<Number, real_type> norm2(data.values.get());
+        parallel_reduce(norm2, 0, size, sum, thread_loop_partitioner);
+      }
+
+      static Number
+      mean_value(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                                 thread_loop_partitioner,
+                 const size_type size,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      {
+        Number            sum;
+        MeanValue<Number> mean(data.values.get());
+        parallel_reduce(mean, 0, size, sum, thread_loop_partitioner);
+
+        return sum;
+      }
+
+      template <typename real_type>
+      static void
+      norm_1(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                             thread_loop_partitioner,
+             const size_type size,
+             real_type &     sum,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data)
+      {
+        Norm1<Number, real_type> norm1(data.values.get());
+        parallel_reduce(norm1, 0, size, sum, thread_loop_partitioner);
+      }
+
+      template <typename real_type>
+      static void
+      norm_p(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                             thread_loop_partitioner,
+             const size_type size,
+             real_type &     sum,
+             real_type       p,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data)
+      {
+        NormP<Number, real_type> normp(data.values.get(), p);
+        parallel_reduce(normp, 0, size, sum, thread_loop_partitioner);
+      }
+
+      static Number
+      add_and_dot(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                        thread_loop_partitioner,
+        const size_type size,
+        const Number    a,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
+      {
+        Number            sum;
+        AddAndDot<Number> adder(data.values.get(),
+                                v_data.values.get(),
+                                w_data.values.get(),
+                                a);
+        parallel_reduce(adder, 0, size, sum, thread_loop_partitioner);
+
+        return sum;
+      }
+    };
+
+
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+    template <typename Number>
+    struct functions<Number, Number, ::dealii::MemorySpace::CUDA>
+    {
+      static const int block_size =
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::block_size;
+      static const int chunk_size =
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::chunk_size;
+
+      static void
+      copy(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+           const size_type size,
+           const ::dealii::MemorySpace::
+             MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+           ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                  ::dealii::MemorySpace::CUDA>
+             &data)
+      {
+        cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
+                                                 v_data.values_dev.get(),
+                                                 size * sizeof(Number),
+                                                 cudaMemcpyDeviceToDevice);
+        AssertCuda(cuda_error_code);
+      }
+
+      static void
+      set(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+          const size_type size,
+          const Number    s,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::CUDA>
+            &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
+          <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      add_vector(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+                 const size_type size,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+                 ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
+          <<<n_blocks, block_size>>>(data.values_dev.get(),
+                                     1.,
+                                     v_data.values_dev.get(),
+                                     size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      subtract_vector(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
+          <<<n_blocks, block_size>>>(data.values_dev.get(),
+                                     -1.,
+                                     v_data.values_dev.get(),
+                                     size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      add_factor(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+                 const size_type size,
+                 Number          a,
+                 ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
+          <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      add_av(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+             const size_type size,
+             const Number    a,
+             const ::dealii::MemorySpace::
+               MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::CUDA>
+               &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
+          <<<n_blocks, block_size>>>(data.values_dev.get(),
+                                     a,
+                                     v_data.values_dev.get(),
+                                     size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      add_avpbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+                const size_type size,
+                const Number    a,
+                const Number    b,
+                const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+                const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+                ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
+                                                    a,
+                                                    v_data.values_dev.get(),
+                                                    b,
+                                                    w_data.values_dev.get(),
+                                                    size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      sadd_xv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+              const size_type size,
+              const Number    x,
+              const ::dealii::MemorySpace::
+                MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+              ::dealii::MemorySpace::
+                MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(
+            x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      sadd_xav(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+               const size_type size,
+               const Number    x,
+               const Number    a,
+               const ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+               ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(
+            x, data.values_dev.get(), a, v_data.values_dev.get(), size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      sadd_xavbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+                 const size_type size,
+                 const Number    x,
+                 const Number    a,
+                 const Number    b,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+                 ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(x,
+                                                    data.values_dev.get(),
+                                                    a,
+                                                    v_data.values_dev.get(),
+                                                    b,
+                                                    w_data.values_dev.get(),
+                                                    size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      multiply_factor(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const size_type size,
+        const Number    factor,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
+          <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      scale(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+            const size_type size,
+            const ::dealii::MemorySpace::
+              MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+            ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                   ::dealii::MemorySpace::CUDA>
+              &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
+                                                    v_data.values_dev.get(),
+                                                    size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      equ_au(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+             const size_type size,
+             const Number    a,
+             const ::dealii::MemorySpace::
+               MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::CUDA>
+               &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
+                                                    a,
+                                                    v_data.values_dev.get(),
+                                                    size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static void
+      equ_aubv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+               const size_type size,
+               const Number    a,
+               const Number    b,
+               const ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+               const ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+               ::dealii::MemorySpace::
+                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
+                                                    a,
+                                                    v_data.values_dev.get(),
+                                                    b,
+                                                    w_data.values_dev.get(),
+                                                    size);
+
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+      }
+
+      static Number
+      dot(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+          const size_type size,
+          const ::dealii::MemorySpace::
+            MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::CUDA>
+            &data)
+      {
+        Number *    result_device;
+        cudaError_t error_code =
+          cudaMalloc(&result_device, size * sizeof(Number));
+        AssertCuda(error_code);
+        error_code = cudaMemset(result_device, Number(), sizeof(Number));
+
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
+          Number,
+          ::dealii::LinearAlgebra::CUDAWrappers::kernel::DotProduct<Number>>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
+                                                    data.values_dev.get(),
+                                                    v_data.values_dev.get(),
+                                                    static_cast<unsigned int>(
+                                                      size));
+
+        // Copy the result back to the host
+        Number result;
+        error_code = cudaMemcpy(&result,
+                                result_device,
+                                sizeof(Number),
+                                cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+        // Free the memory on the device
+        error_code = cudaFree(result_device);
+        AssertCuda(error_code);
+
+        AssertIsFinite(result);
+
+        return result;
+      }
+
+      template <typename real_type>
+      static void
+      norm_2(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+                             thread_loop_partitioner,
+             const size_type size,
+             real_type &     sum,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::CUDA>
+               &data)
+      {
+        sum = dot(thread_loop_partitioner, size, data, data);
+      }
+
+      static Number
+      mean_value(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+                 const size_type size,
+                 const ::dealii::MemorySpace::
+                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      {
+        Number *    result_device;
+        cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
+        AssertCuda(error_code);
+        error_code = cudaMemset(result_device, Number(), sizeof(Number));
+
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
+          Number,
+          ::dealii::LinearAlgebra::CUDAWrappers::kernel::ElemSum<Number>>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
+                                                    data.values_dev.get(),
+                                                    size);
+
+        // Copy the result back to the host
+        Number result;
+        error_code = cudaMemcpy(&result,
+                                result_device,
+                                sizeof(Number),
+                                cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+        // Free the memory on the device
+        error_code = cudaFree(result_device);
+        AssertCuda(error_code);
+
+        return result;
+      }
+
+      template <typename real_type>
+      static void
+      norm_1(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+             const size_type size,
+             real_type &     sum,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::CUDA>
+               &data)
+      {
+        Number *    result_device;
+        cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
+        AssertCuda(error_code);
+        error_code = cudaMemset(result_device, Number(), sizeof(Number));
+
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
+          Number,
+          ::dealii::LinearAlgebra::CUDAWrappers::kernel::L1Norm<Number>>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
+                                                    data.values_dev.get(),
+                                                    size);
+
+        // Copy the result back to the host
+        error_code = cudaMemcpy(&sum,
+                                result_device,
+                                sizeof(Number),
+                                cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+        // Free the memory on the device
+        error_code = cudaFree(result_device);
+        AssertCuda(error_code);
+      }
+
+      template <typename real_type>
+      static void
+      norm_p(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const size_type,
+        real_type &,
+        real_type,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA> &)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+      static Number
+      add_and_dot(
+        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const size_type size,
+        const Number    a,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
+      {
+        Number *    res_d;
+        cudaError_t error_code = cudaMalloc(&res_d, sizeof(Number));
+        AssertCuda(error_code);
+        error_code = cudaMemset(res_d, 0., sizeof(Number));
+        AssertCuda(error_code);
+
+        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(res_d,
+                                                    data.values_dev.get(),
+                                                    v_data.values_dev.get(),
+                                                    w_data.values_dev.get(),
+                                                    a,
+                                                    size);
+
+        Number res;
+        error_code =
+          cudaMemcpy(&res, res_d, sizeof(Number), cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+        error_code = cudaFree(res_d);
+
+        return res;
+      }
+    };
+#endif
   } // namespace VectorOperations
 } // namespace internal
 

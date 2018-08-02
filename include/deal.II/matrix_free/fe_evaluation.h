@@ -45,7 +45,7 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-    template <typename>
+    template <typename, typename>
     class Vector;
   }
 } // namespace LinearAlgebra
