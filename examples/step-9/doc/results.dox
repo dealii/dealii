@@ -6,45 +6,106 @@ consist of the console output, some grid files, and the solution on
 each of these grids. First for the console output:
 @code
 Cycle 0:
-   Number of active cells:       256
-   Number of degrees of freedom: 289
+   Number of active cells:              64
+   Number of degrees of freedom:        1681
+   Iterations required for convergence: 298
+   Max norm of residual:                3.60316e-12
 Cycle 1:
-   Number of active cells:       643
-   Number of degrees of freedom: 793
+   Number of active cells:              124
+   Number of degrees of freedom:        3537
+   Iterations required for convergence: 415
+   Max norm of residual:                3.70682e-12
 Cycle 2:
-   Number of active cells:       1669
-   Number of degrees of freedom: 1950
+   Number of active cells:              247
+   Number of degrees of freedom:        6734
+   Iterations required for convergence: 543
+   Max norm of residual:                7.19716e-13
 Cycle 3:
-   Number of active cells:       4231
-   Number of degrees of freedom: 4923
+   Number of active cells:              502
+   Number of degrees of freedom:        14105
+   Iterations required for convergence: 666
+   Max norm of residual:                3.45628e-13
 Cycle 4:
-   Number of active cells:       10753
-   Number of degrees of freedom: 12175
+   Number of active cells:              1003
+   Number of degrees of freedom:        27462
+   Iterations required for convergence: 1064
+   Max norm of residual:                1.86495e-13
 Cycle 5:
-   Number of active cells:       27004
-   Number of degrees of freedom: 29810
+   Number of active cells:              1993
+   Number of degrees of freedom:        55044
+   Iterations required for convergence: 1251
+   Max norm of residual:                1.28765e-13
+Cycle 6:
+   Number of active cells:              3985
+   Number of degrees of freedom:        108492
+   Iterations required for convergence: 2035
+   Max norm of residual:                6.78085e-14
+Cycle 7:
+   Number of active cells:              7747
+   Number of degrees of freedom:        210612
+   Iterations required for convergence: 2187
+   Max norm of residual:                2.61457e-14
+Cycle 8:
+   Number of active cells:              15067
+   Number of degrees of freedom:        406907
+   Iterations required for convergence: 3079
+   Max norm of residual:                2.9932e-14
+Cycle 9:
+   Number of active cells:              29341
+   Number of degrees of freedom:        780591
+   Iterations required for convergence: 3913
+   Max norm of residual:                8.15689e-15
 @endcode
-As can be seen, quite a number of cells is used on the finest level to
-resolve the features of the solution. The final grid showing this is
-displayed in the following picture:
 
+Quite a number of cells are used on the finest level to resolve the features of
+the solution. Here are the fourth and tenth grids:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-3.png"
+         alt="Fourth grid in the refinement cycle, showing some adaptivity to features."
+         width="400" height="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-grid-9.png"
+         alt="Tenth grid in the refinement cycle, showing that the waves are fully captured."
+         width="400" height="400">
+  </div>
+</div>
+and the fourth and tenth solutions:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3.png"
+         alt="Fourth solution, showing that we resolve most features but some
+         are sill unresolved and appear blury."
+         width="400" height="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9.png"
+         alt="Tenth solution, showing a fully resolved flow."
+         width="400" height="400">
+  </div>
+</div>
+and both the grid and solution zoomed in:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-3-zoom.png"
+         alt="Detail of the fourth solution, showing that we resolve most
+         features but some are sill unresolved and appear blury. In particular,
+         the larger cells need to be refined."
+         width="400" height="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-9-solution-9-zoom.png"
+         alt="Detail of the tenth solution, showing that we needed a lot more
+         cells than were present in the fourth solution."
+         width="400" height="400">
+  </div>
+</div>
 
-<img src="https://www.dealii.org/images/steps/developer/step-9.grid.png" alt="">
-
-
-
-The structure of the grid will be understandable by looking at the
-final solution itself:
-
-
-<img src="https://www.dealii.org/images/steps/developer/step-9.solution.png" alt="">
-
-(This image was generated using an earlier version of the program that
-still generated gmv instead of VTK output, and so is visualized
-using gmv.)
-Note that the solution is created by that part that is transported
-along the wiggly advection field from the left and lower boundaries
-to the top right, and the part that is created by the source in the
-lower left corner, and the results of which are also transported
-along. The grid shown above is well-adapted to resolve these
-features. 
+The solution is created by that part that is transported along the wiggly
+advection field from the left and lower boundaries to the top right, and the
+part that is created by the source in the lower left corner, and the results of
+which are also transported along. The grid shown above is well-adapted to
+resolve these features. The comparison between plots shows that, even though we
+are using a high-order approximation, we still need adaptive mesh refinement to
+fully resolve the wiggles.
