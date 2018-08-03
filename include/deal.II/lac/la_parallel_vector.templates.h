@@ -36,6 +36,49 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
+    namespace internal
+    {
+      // In the import_from_ghosted_array_finish we might need to calculate the
+      // maximal and minimal value for the given number type, which is not
+      // straight forward for complex numbers. Therefore, comparison of complex
+      // numbers is prohibited and throws an exception.
+      template <typename Number>
+      Number
+      get_min(const Number a, const Number b)
+      {
+        return std::min(a, b);
+      }
+
+      template <typename Number>
+      std::complex<Number>
+      get_min(const std::complex<Number> a, const std::complex<Number>)
+      {
+        AssertThrow(false,
+                    ExcMessage("VectorOperation::min not "
+                               "implemented for complex numbers"));
+        return a;
+      }
+
+      template <typename Number>
+      Number
+      get_max(const Number a, const Number b)
+      {
+        return std::max(a, b);
+      }
+
+      template <typename Number>
+      std::complex<Number>
+      get_max(const std::complex<Number> a, const std::complex<Number>)
+      {
+        AssertThrow(false,
+                    ExcMessage("VectorOperation::max not "
+                               "implemented for complex numbers"));
+        return a;
+      }
+    } // namespace internal
+
+
+
     template <typename Number>
     void
     Vector<Number>::clear_mpi_requests()
@@ -669,8 +712,7 @@ namespace LinearAlgebra
           // then create the communication pattern
           IndexSet ghost_indices(V.get_stored_elements());
           ghost_indices.subtract_set(locally_owned_elem);
-          IndexSet local_indices(V.get_stored_elements());
-          local_indices.subtract_set(ghost_indices);
+          IndexSet local_indices(locally_owned_elem);
           comm_pattern = std::make_shared<Utilities::MPI::Partitioner>(
             local_indices, ghost_indices, get_mpi_communicator());
         }
@@ -683,28 +725,61 @@ namespace LinearAlgebra
                       ExcMessage("The communication pattern is not of type "
                                  "Utilities::MPI::Partitioner."));
         }
+      IndexSet ghost_indices(V.get_stored_elements());
+      ghost_indices.subtract_set(locally_owned_elem);
+      IndexSet       local_indices(locally_owned_elem);
       Vector<Number> tmp_vector(comm_pattern);
+      std::copy(begin(), end(), tmp_vector.begin());
 
       // fill entries from ReadWriteVector into the distributed vector,
       // including ghost entries. this is not really efficient right now
       // because indices are translated twice, once by nth_index_in_set(i) and
       // once for operator() of tmp_vector
-      const IndexSet &v_stored = V.get_stored_elements();
-      for (size_type i = 0; i < v_stored.n_elements(); ++i)
-        tmp_vector(v_stored.nth_index_in_set(i)) = V.local_element(i);
+      const IndexSet &v_stored     = V.get_stored_elements();
+      const size_type v_n_elements = v_stored.n_elements();
+      switch (operation)
+        {
+          case VectorOperation::insert:
+            {
+              for (size_type i = 0; i < v_n_elements; ++i)
+                tmp_vector(v_stored.nth_index_in_set(i)) = V.local_element(i);
 
+              break;
+            }
+          case VectorOperation::add:
+            {
+              for (size_type i = 0; i < v_n_elements; ++i)
+                tmp_vector(v_stored.nth_index_in_set(i)) += V.local_element(i);
+
+              break;
+            }
+          case VectorOperation::min:
+            {
+              for (size_type i = 0; i < v_n_elements; ++i)
+                tmp_vector(v_stored.nth_index_in_set(i)) =
+                  internal::get_min(tmp_vector(v_stored.nth_index_in_set(i)),
+                                    V.local_element(i));
+
+              break;
+            }
+          case VectorOperation::max:
+            {
+              for (size_type i = 0; i < v_n_elements; ++i)
+                tmp_vector(v_stored.nth_index_in_set(i)) =
+                  internal::get_max(tmp_vector(v_stored.nth_index_in_set(i)),
+                                    V.local_element(i));
+
+              break;
+            }
+          default:
+            {
+              Assert(false, ExcMessage("This operation is not supported."));
+            }
+        }
       tmp_vector.compress(operation);
 
-      // Copy the local elements of tmp_vector to the right place in val
-      IndexSet tmp_index_set = tmp_vector.locally_owned_elements();
-      for (size_type i = 0; i < tmp_index_set.n_elements(); ++i)
-        {
-          values[locally_owned_elem.index_within_set(
-            tmp_index_set.nth_index_in_set(i))] = tmp_vector.local_element(i);
-        }
+      std::copy(tmp_vector.begin(), tmp_vector.end(), begin());
     }
-
-
 
     template <typename Number>
     void
