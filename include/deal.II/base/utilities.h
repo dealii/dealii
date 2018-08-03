@@ -1047,6 +1047,9 @@ namespace Utilities
        std::vector<char> &dest_buffer,
        const bool         allow_compression)
   {
+    // the data is never compressed when we can't use zlib.
+    (void)allow_compression;
+
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
@@ -1064,7 +1067,6 @@ namespace Utilities
 #  endif
 #endif
       {
-        (void)allow_compression;
         const size_t previous_size = dest_buffer.size();
         dest_buffer.resize(previous_size + sizeof(T));
 
@@ -1123,6 +1125,9 @@ namespace Utilities
          const std::vector<char>::const_iterator &cend,
          const bool                               allow_compression)
   {
+    // the data is never compressed when we can't use zlib.
+    (void)allow_compression;
+
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
@@ -1140,7 +1145,6 @@ namespace Utilities
 #  endif
 #endif
       {
-        (void)allow_compression;
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         T object;
         std::memcpy(&object, &*cbegin, sizeof(T));
