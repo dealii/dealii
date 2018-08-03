@@ -35,7 +35,7 @@ code is written, without having to look up the exact definition of something.
 <p>deal.II uses <code>clang-format</code> 6.0 to normalize indentation. A
 style file is provided at
 @code
-  ${SOURCE_DIR}/.clang-format
+  \${SOURCE_DIR}/.clang-format
 @endcode
 
 <p>Before a commit, you should run
@@ -53,8 +53,8 @@ in whatever directory you set up the library to be compiled in, to indent all
 source files that have been changed recently. If you want to make sure that
 the indenting is correct for all your commits, you might want to set up a
 pre-commit hook. One way to do so, is to copy
-<code>${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
-<code>${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
+<code>\${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
+<code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
 executable.
 </p>
 
@@ -369,7 +369,7 @@ we list here:
   the function even if they are only used further below. This leads to
   code like this that we may imagine in a 1d code:
   @code
-    template @<int dim@>
+    template <int dim>
     void foo ()
     {
       Point<dim> cell_center;
@@ -390,7 +390,7 @@ we list here:
   <p>
   A better way to do this would be as follows:
   @code
-    template @<int dim@>
+    template <int dim>
     void foo ()
     {
       ... // something lengthy and complicated
@@ -425,7 +425,7 @@ we list here:
   any more. In other words, if this is the case, we may as well write
   things as follows:
   @code
-    template @<int dim@>
+    template <int dim>
     void foo ()
     {
       ... // something lengthy and complicated
@@ -458,7 +458,7 @@ we list here:
   then mark it as constant. For example, the following function should take
   its argument as a constant value:
   @code
-     template @<int dim@>
+     template <int dim>
      typename Triangulation<dim>::cell_iterator
      CellAccessor<dim>::child (const unsigned int child_no)
      {
