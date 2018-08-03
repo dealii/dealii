@@ -579,9 +579,6 @@ namespace GridTools
               {
                 new_vertex_numbers[considered_vertices[j]] =
                   considered_vertices[i];
-                // we do not suppose, that there might be another duplicate
-                // vertex, so break here
-                break;
               }
           }
       }
