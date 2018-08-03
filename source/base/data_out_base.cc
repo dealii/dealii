@@ -1258,6 +1258,19 @@ namespace
                const unsigned int y_offset,
                const unsigned int z_offset);
 
+    /**
+     * Write a high-order cell type, i.e., a Lagrange cell
+     * in the VTK terminology.
+     * The connectivity order of the points is given in the
+     * @p connectivity array, which are offset
+     * by the global index @p start.
+     */
+    template <int dim>
+    void
+    write_high_order_cell(const unsigned int           index,
+                          const unsigned int           start,
+                          const std::vector<unsigned> &connectivity);
+
     void
     flush_cells();
 
@@ -1689,7 +1702,21 @@ namespace
 #endif
   }
 
-
+  template <int dim>
+  void
+  VtuStream::write_high_order_cell(const unsigned int,
+                                   const unsigned int           start,
+                                   const std::vector<unsigned> &connectivity)
+  {
+#if !defined(DEAL_II_WITH_ZLIB)
+    for (const auto &c : connectivity)
+      stream << '\t' << start + c;
+    stream << '\n';
+#else
+    for (const auto &c : connectivity)
+      cells.push_back(start + c);
+#endif
+  }
 
   void
   VtuStream::flush_cells()
@@ -5283,7 +5310,7 @@ namespace DataOutBase
     unsigned int n_cells;
     compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
 
-    // If a user set to output Lagrange cells, we treat n_subdivisions
+    // If a user set to output high order cells, we treat n_subdivisions
     // as a cell order and adjust variables accordingly, otherwise
     // each patch is written as a linear cell.
     unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
@@ -5333,7 +5360,7 @@ namespace DataOutBase
     // simple
     out << "CELL_TYPES " << n_cells << '\n';
 
-    // need to distinguish between linear and Lagrange cells
+    // need to distinguish between linear and high order cells
     const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
                                        vtk_lagrange_cell_type[dim] :
                                        vtk_cell_type[dim];
@@ -5722,6 +5749,17 @@ namespace DataOutBase
     unsigned int n_nodes;
     unsigned int n_cells;
     compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+
+    // If a user set to output high order cells, we treat n_subdivisions
+    // as a cell order and adjust variables accordingly, otherwise
+    // each patch is written as a linear cell.
+    unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
+    if (flags.write_higher_order_cells)
+      {
+        n_cells           = patches.size();
+        n_points_per_cell = n_nodes / n_cells;
+      }
+
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
     // first all data of variable 1, then variable 2, etc), so we have to copy
@@ -5760,7 +5798,10 @@ namespace DataOutBase
     out << "  <Cells>\n";
     out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
         << ascii_or_binary << "\">\n";
-    write_cells(patches, vtu_out);
+    if (flags.write_higher_order_cells)
+      write_high_order_cells(patches, vtu_out);
+    else
+      write_cells(patches, vtu_out);
     out << "    </DataArray>\n";
 
     // XML VTU format uses offsets; this is different than the VTK format, which
@@ -5770,7 +5811,7 @@ namespace DataOutBase
 
     std::vector<int32_t> offsets(n_cells);
     for (unsigned int i = 0; i < n_cells; ++i)
-      offsets[i] = (i + 1) * GeometryInfo<dim>::vertices_per_cell;
+      offsets[i] = (i + 1) * n_points_per_cell;
     vtu_out << offsets;
     out << "\n";
     out << "    </DataArray>\n";
@@ -5781,13 +5822,18 @@ namespace DataOutBase
         << ascii_or_binary << "\">\n";
 
     {
+      // need to distinguish between linear and high order cells
+      const unsigned int vtk_cell_id = flags.write_higher_order_cells ?
+                                         vtk_lagrange_cell_type[dim] :
+                                         vtk_cell_type[dim];
+
       // uint8_t might be an alias to unsigned char which is then not printed
       // as ascii integers
 #ifdef DEAL_II_WITH_ZLIB
       std::vector<uint8_t> cell_types(n_cells,
-                                      static_cast<uint8_t>(vtk_cell_type[dim]));
+                                      static_cast<uint8_t>(vtk_cell_id));
 #else
-      std::vector<unsigned int> cell_types(n_cells, vtk_cell_type[dim]);
+      std::vector<unsigned int> cell_types(n_cells, vtk_cell_id);
 #endif
       // this should compress well :-)
       vtu_out << cell_types;
