@@ -13,18 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/hdf5.h>
+#ifdef DEAL_II_WITH_HDF5
 
-#include <deal.II/lac/full_matrix.h>
+#  include <deal.II/base/hdf5.h>
 
-#include <hdf5.h>
+#  include <deal.II/lac/full_matrix.h>
 
-#include <memory>
-#include <numeric>
-#include <vector>
+#  include <hdf5.h>
+
+#  include <memory>
+#  include <numeric>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -627,6 +628,12 @@ namespace HDF5
 
     if (mpi)
       {
+#  ifndef DEAL_II_WITH_MPI
+        AssertThrow(false, ExcMessage("MPI support is disabled."));
+#  endif // DEAL_II_WITH_MPI
+#  ifndef H5_HAVE_PARALLEL
+        AssertThrow(false, ExcMessage("HDF5 parallel support is disabled."));
+#  endif // H5_HAVE_PARALLEL
         plist = H5Pcreate(H5P_FILE_ACCESS);
         H5Pset_fapl_mpio(plist, mpi_communicator, info);
       }
@@ -801,3 +808,5 @@ namespace HDF5
 } // namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif // DEAL_II_WITH_HDF5

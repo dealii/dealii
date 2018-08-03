@@ -18,11 +18,13 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/lac/full_matrix.h>
+#ifdef DEAL_II_WITH_HDF5
 
-#include <hdf5.h>
+#  include <deal.II/lac/full_matrix.h>
 
-#include <vector>
+#  include <hdf5.h>
+
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -391,4 +393,7 @@ namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
+
+#endif // DEAL_II_WITH_HDF5
+
+#endif // dealii_hdf5_h
