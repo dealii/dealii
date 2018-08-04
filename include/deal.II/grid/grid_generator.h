@@ -1182,7 +1182,7 @@ namespace GridGenerator
   void
   merge_triangulations(
     const std::initializer_list<const Triangulation<dim, spacedim> *const>
-                                  triangulations,
+      &                           triangulations,
     Triangulation<dim, spacedim> &result,
     const double                  duplicated_vertex_tolerance = 1.0e-12,
     const bool                    copy_manifold_ids           = false);
