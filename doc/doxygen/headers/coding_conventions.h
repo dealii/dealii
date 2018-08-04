@@ -34,31 +34,27 @@ code is written, without having to look up the exact definition of something.
 
 <p>deal.II uses <code>clang-format</code> 6.0 to normalize indentation. A
 style file is provided at
-<code>
-<pre>
-  ${SOURCE_DIR}/.clang-format
-</pre>
-</code>
+@code
+  \${SOURCE_DIR}/.clang-format
+@endcode
 
 <p>Before a commit, you should run
-<code>
-<pre>
-  clang-format -i &lt;file&gt;
-</pre>
-</code>
+@code
+  clang-format -i <file>
+@endcode
 on each of your files. This will make sure indentation is conforming to the
-style guidelines outlined in this page. Alternatively, you can run
-<code>
-<pre>
+style guidelines outlined in this page.
+
+This is cumbersome. Consequently, and more easily, you can just run
+@code
   make indent
-</pre>
-</code>
-in whatever directory you set up the library to be compiled in to indent all
+@endcode
+in whatever directory you set up the library to be compiled in, to indent all
 source files that have been changed recently. If you want to make sure that
 the indenting is correct for all your commits, you might want to set up a
 pre-commit hook. One way to do so, is to copy
-<code>${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
-<code>${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
+<code>\${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
+<code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
 executable.
 </p>
 
@@ -100,7 +96,7 @@ executable.
 <li> %Function and variable names may not consist of only one or two
   letters, unless the variable is a pure counting index.</li>
 
-<li> Type aliases (<code>using<code>-declarations) are preferred to
+<li> Type aliases (<code>using</code>-declarations) are preferred to
   <code>typedef</code>-declarations.</li>
 
 <li> Use the geometry information in GeometryInfo to get the
@@ -141,8 +137,7 @@ executable.
   non-member functions that are not part of the public interface and are only
   meant to be called in the current source file. Such free functions should be
   put in an internal namespace structured in the following way:
-  <code>
-  <pre>
+  @code
   namespace internal
   {
     namespace ClassNameImplementation
@@ -150,8 +145,7 @@ executable.
       // free functions go here
     }
   }
-  </pre>
-  </code>
+  @endcode
   where <code>ClassName</code> is the name of the calling class.
 
 <li> Classes and types generally are named using uppercase letters to denote
@@ -250,8 +244,7 @@ we list here:
 <li> <i>Assert preconditions on parameters:</i> People call functions with wrong
   or nonsensical parameters, all the time. As the prototypical example,
   consider a trivial implementation of vector addition:
-  <code>
-  <pre>
+  @code
     Vector &
     operator += (Vector       &lhs,
                  const Vector &rhs)
@@ -260,8 +253,7 @@ we list here:
         lhs(i) += rhs(i);
       return lhs;
     }
-  </pre>
-  </code>
+  @endcode
   While correct, this function will get into trouble if the two vectors
   do not have the same size. You think it is silly to call this function
   with vectors of different size? Yes, of course it is. But it happens
@@ -274,8 +266,7 @@ we list here:
   but you'll probably get random errors at a later time. It would be
   much easier if the program just stopped here right away. The following
   implementation will do exactly this:
-  <code>
-  <pre>
+  @code
     Vector &
     operator += (Vector       &lhs,
                  const Vector &rhs)
@@ -286,8 +277,7 @@ we list here:
         lhs(i) += rhs(i);
       return lhs;
     }
-  </pre>
-  </code>
+  @endcode
   The <code>Assert</code> macro ensures that the condition is true
   at run time, and otherwise prints a string containing information
   encoded by the second argument and aborts the program. This way,
@@ -321,8 +311,7 @@ we list here:
   return values to be. For example, a function that computes the norm of
   a vector would expect the norm to be positive. You can write this as
   follows:
-  <code>
-  <pre>
+  @code
     double norm (const Vector &v)
     {
       double s = 0;
@@ -332,8 +321,7 @@ we list here:
       Assert (s >= 0, ExcInternalError());
       return std::sqrt(s);
     }
-  </pre>
-  </code>
+  @endcode
   This function is too simple to really justify this assertion, but imagine
   the computation to be lengthier and you can see how the assertion helps
   you ensure (or <i>hedge</i>) yourself against mistakes. Note that one
@@ -351,8 +339,7 @@ we list here:
   of what is going on matches what is indeed true. For example, assume
   you are writing a function that ensures that mesh sizes do not change
   too much locally. You may end up with a code of the following kind:
-  <code>
-  <pre>
+  @code
     for (const auto &cell = triangulation.active_cell_iterators())
       for (unsigned int face=0; ...)
         {
@@ -364,8 +351,7 @@ we list here:
                 // be at the boundary if we got here
             }
         }
-  </pre>
-  </code>
+  @endcode
   The conditions that got us into the else-branch may be
   complicated, and while it may be true that we believed that the
   only possibility we got here is that the neighbor is at the boundary,
@@ -382,9 +368,8 @@ we list here:
   Traditional C required that variables are declared at the beginning of
   the function even if they are only used further below. This leads to
   code like this that we may imagine in a 1d code:
-  <code>
-  <pre>
-    template @<int dim@>
+  @code
+    template <int dim>
     void foo ()
     {
       Point<dim> cell_center;
@@ -396,8 +381,7 @@ we list here:
         }
       ...
     }
-  </pre>
-  </code>
+  @endcode
   The problem is that if the code between the declaration and initialization
   is long and complicated, you can't look up on one page what the type of
   a variable is and what it's value may be. In fact, it may not even be
@@ -405,9 +389,8 @@ we list here:
   is accidentally left uninitialized.
   <p>
   A better way to do this would be as follows:
-  <code>
-  <pre>
-    template @<int dim@>
+  @code
+    template <int dim>
     void foo ()
     {
       ... // something lengthy and complicated
@@ -418,8 +401,7 @@ we list here:
         }
       ...
     }
-  </pre>
-  </code>
+  @endcode
   This makes it much clearer what the type of the variable is
   and that it is in fact only ever used when initialized. Furthermore,
   if someone wants to read the code to see what the variable is in fact
@@ -442,9 +424,8 @@ we list here:
   that in most cases we will never change the variable so initialized
   any more. In other words, if this is the case, we may as well write
   things as follows:
-  <code>
-  <pre>
-    template @<int dim@>
+  @code
+    template <int dim>
     void foo ()
     {
       ... // something lengthy and complicated
@@ -456,16 +437,13 @@ we list here:
         }
       ...
     }
-  </pre>
-  </code>
+  @endcode
   By marking the variable as constant we make sure that we don't accidentally
   change it. For example, the compiler could catch code like this:
-  <code>
-  <pre>
+  @code
         if (cell_center[0] = 0)
           ...
-  </pre>
-  </code>
+  @endcode
   This was most likely meant to be a <code>==</code> rather than an
   assignment. By marking the variable as const, the compiler would have
   told us about this bug. Maybe equally importantly, human readers of the
@@ -479,17 +457,15 @@ we list here:
   of changing a variable (which is typically the case for input arguments),
   then mark it as constant. For example, the following function should take
   its argument as a constant value:
-  <code>
-  <pre>
-     template @<int dim@>
+  @code
+     template <int dim>
      typename Triangulation<dim>::cell_iterator
      CellAccessor<dim>::child (const unsigned int child_no)
      {
        ...
        return something;
      }
-  </pre>
-  </code>
+  @endcode
   Here, the user calls <code>cell-@>child(3)</code>, for example. There really
   is no reason why the function would ever want to change the value of
   the <code>child_no</code> argument &mdash; so mark it as constant:
