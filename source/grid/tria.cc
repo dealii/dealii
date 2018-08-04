@@ -1257,7 +1257,18 @@ namespace internal
       << "In SubCellData the line info of the line with vertex indices " << arg1
       << " and " << arg2 << " appears more than once. "
       << "This is not allowed.");
-
+    /**
+     * Exception
+     * @ingroup Exceptions
+     */
+    DeclException2(
+      ExcInconsistentManifoldIdLineInfoOfLine,
+      int,
+      int,
+      << "In SubCellData the line info of the line with vertex indices " << arg1
+      << " and " << arg2
+      << " appears mutiply with different (valid) manifold ids. "
+      << "This is not allowed.");
 
     /**
      * A class into which we put many of the functions that implement
@@ -2161,6 +2172,15 @@ namespace internal
                         ExcMultiplySetLineInfoOfLine(line_vertices.first,
                                                      line_vertices.second));
 
+            // assert that the manifold id is not yet set or consistent
+            // with the previous id
+            AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
+                          line->manifold_id() == subcell_line.manifold_id,
+                        ExcInconsistentManifoldIdLineInfoOfLine(
+                          line_vertices.first, line_vertices.second));
+            if (subcell_line.manifold_id != numbers::flat_manifold_id)
+              line->set_manifold_id(subcell_line.manifold_id);
+
             // Assert that only exterior lines are given a boundary
             // indicator; however, it is possible that someone may
             // want to give an interior line a manifold id (and thus
@@ -2192,15 +2212,10 @@ namespace internal
                                       line->vertex_index(1),
                                       subcell_line.boundary_id));
                       }
-                    else
-                      {
-                        line->set_manifold_id(subcell_line.manifold_id);
-                      }
                   }
                 else
                   line->set_boundary_id_internal(subcell_line.boundary_id);
               }
-            line->set_manifold_id(subcell_line.manifold_id);
           }
 
 
