@@ -3924,7 +3924,7 @@ namespace GridTools
       endf = tria.end_face();
     for (; face != endf; ++face)
       if ((face->at_boundary() ||
-           face->manifold_id() != numbers::invalid_manifold_id) &&
+           face->manifold_id() != numbers::flat_manifold_id) &&
           faces_to_remove[face->index()] == false)
         {
           for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_face; ++l)
@@ -3972,7 +3972,7 @@ namespace GridTools
       manifolds;
     // Set manifolds in new Triangulation
     for (auto manifold_id : manifold_ids)
-      if (manifold_id != numbers::invalid_manifold_id)
+      if (manifold_id != numbers::flat_manifold_id)
         manifolds[manifold_id] = tria.get_manifold(manifold_id).clone();
 
     tria.clear();
@@ -3981,7 +3981,7 @@ namespace GridTools
 
     // Restore manifolds
     for (auto manifold_id : manifold_ids)
-      if (manifold_id != numbers::invalid_manifold_id)
+      if (manifold_id != numbers::flat_manifold_id)
         tria.set_manifold(manifold_id, *manifolds[manifold_id]);
   }
 

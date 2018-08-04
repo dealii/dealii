@@ -124,7 +124,7 @@ void second_grid()
   // By default (i.e., for a Triangulation created by hand or without a
   // call to a GridGenerator function like GridGenerator::hyper_shell or
   // GridGenerator::hyper_ball), all cells and faces of the Triangulation
-  // have their manifold_id set to numbers::invalid_manifold_id, which is
+  // have their manifold_id set to numbers::flat_manifold_id, which is
   // the default if you want a manifold that produces straight edges, but
   // you can change this number for individual cells and faces. In that
   // case, the curved manifold thus associated with number zero will not

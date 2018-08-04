@@ -84,7 +84,7 @@ test()
        ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
-        cell->face(f)->set_all_manifold_ids(numbers::invalid_manifold_id);
+        cell->face(f)->set_all_manifold_ids(numbers::flat_manifold_id);
   //  static const SphericalManifold<dim> boundary_shell;
   //  tr.set_manifold (0, boundary_shell);
   //  tr.set_manifold (1, boundary_shell);

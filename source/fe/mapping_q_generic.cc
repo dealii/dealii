@@ -3885,7 +3885,7 @@ MappingQGeneric<dim, spacedim>::add_line_support_points(
                cell->line(line_no));
 
           const Manifold<dim, spacedim> &manifold =
-            ((line->manifold_id() == numbers::invalid_manifold_id) &&
+            ((line->manifold_id() == numbers::flat_manifold_id) &&
                  (dim < spacedim) ?
                cell->get_manifold() :
                line->get_manifold());
@@ -3908,7 +3908,7 @@ MappingQGeneric<dim, spacedim>::add_line_support_points(
                cell->line(line_no));
 
           const Manifold<dim, spacedim> &manifold =
-            ((line->manifold_id() == numbers::invalid_manifold_id) &&
+            ((line->manifold_id() == numbers::flat_manifold_id) &&
                  (dim < spacedim) ?
                cell->get_manifold() :
                line->get_manifold());

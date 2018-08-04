@@ -1854,7 +1854,7 @@ namespace internal
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             {
               (*triangulation.vertex_to_manifold_id_map_1d)
-                [cell->face(f)->vertex_index()] = numbers::invalid_manifold_id;
+                [cell->face(f)->vertex_index()] = numbers::flat_manifold_id;
 
               if (cell->at_boundary(f))
                 (*triangulation.vertex_to_boundary_id_map_1d)
@@ -5112,7 +5112,7 @@ namespace internal
                     // same object of the cell (which was stored in
                     // line->user_index() before) unless a manifold_id
                     // has been set on this very line.
-                    if (line->manifold_id() == numbers::invalid_manifold_id)
+                    if (line->manifold_id() == numbers::flat_manifold_id)
                     triangulation.vertices[next_unused_vertex] =
                       triangulation.get_manifold(line->user_index())
                         .get_new_point_on_line(line);
@@ -10269,8 +10269,8 @@ Triangulation<dim, spacedim>::set_manifold(
   const types::manifold_id       m_number,
   const Manifold<dim, spacedim> &manifold_object)
 {
-  Assert(m_number < numbers::invalid_manifold_id,
-         ExcIndexRange(m_number, 0, numbers::invalid_manifold_id));
+  Assert(m_number < numbers::flat_manifold_id,
+         ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
 
   manifold[m_number] = manifold_object.clone();
 }
@@ -10289,8 +10289,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
 {
-  Assert(m_number < numbers::invalid_manifold_id,
-         ExcIndexRange(m_number, 0, numbers::invalid_manifold_id));
+  Assert(m_number < numbers::flat_manifold_id,
+         ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
 
   // delete the entry located at number.
   manifold.erase(m_number);
