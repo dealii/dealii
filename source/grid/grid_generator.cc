@@ -4476,10 +4476,13 @@ namespace GridGenerator
 
 
   void
-  extrude_triangulation(const Triangulation<2, 2> &input,
-                        const unsigned int         n_slices,
-                        const double               height,
-                        Triangulation<3, 3> &      result)
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const unsigned int                     n_slices,
+    const double                           height,
+    Triangulation<3, 3> &                  result,
+    const bool                             copy_manifold_ids,
+    const std::vector<types::manifold_id> &manifold_priorities)
   {
     Assert(input.n_levels() == 1,
            ExcMessage(
@@ -4497,13 +4500,19 @@ namespace GridGenerator
     std::vector<double> slices_z_values;
     for (unsigned int i = 0; i < n_slices; ++i)
       slices_z_values.push_back(i * delta_h);
-    extrude_triangulation(input, slices_z_values, result);
+    extrude_triangulation(
+      input, slices_z_values, result, copy_manifold_ids, manifold_priorities);
   }
 
+
+
   void
-  extrude_triangulation(const Triangulation<2, 2> &input,
-                        const std::vector<double> &slice_coordinates,
-                        Triangulation<3, 3> &      result)
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const std::vector<double> &            slice_coordinates,
+    Triangulation<3, 3> &                  result,
+    const bool                             copy_manifold_ids,
+    const std::vector<types::manifold_id> &manifold_priorities)
   {
     Assert(input.n_levels() == 1,
            ExcMessage(
@@ -4516,6 +4525,66 @@ namespace GridGenerator
              "The number of slices for extrusion must be at least 2."));
     Assert(std::is_sorted(slice_coordinates.begin(), slice_coordinates.end()),
            ExcMessage("Slice z-coordinates should be in ascending order"));
+
+    const auto priorities = [&]() -> std::vector<types::manifold_id> {
+      // if a non-empty (i.e., not the default) vector is given for
+      // manifold_priorities then use it (but check its validity in debug
+      // mode)
+      if (0 < manifold_priorities.size())
+        {
+#ifdef DEBUG
+          // check that the provided manifold_priorities is valid
+          std::vector<types::manifold_id> sorted_manifold_priorities =
+            manifold_priorities;
+          std::sort(sorted_manifold_priorities.begin(),
+                    sorted_manifold_priorities.end());
+          Assert(std::unique(sorted_manifold_priorities.begin(),
+                             sorted_manifold_priorities.end()) ==
+                   sorted_manifold_priorities.end(),
+                 ExcMessage(
+                   "The given vector of manifold ids may not contain any "
+                   "duplicated entries."));
+          std::vector<types::manifold_id> sorted_manifold_ids =
+            input.get_manifold_ids();
+          std::sort(sorted_manifold_ids.begin(), sorted_manifold_ids.end());
+          if (sorted_manifold_priorities != sorted_manifold_ids)
+            {
+              std::ostringstream message;
+              message << "The given triangulation has manifold ids {";
+              for (const types::manifold_id manifold_id : sorted_manifold_ids)
+                if (manifold_id != sorted_manifold_ids.back())
+                  message << manifold_id << ", ";
+              message << sorted_manifold_ids.back() << "}, but \n"
+                      << "    the given vector of manifold ids is {";
+              for (const types::manifold_id manifold_id : manifold_priorities)
+                if (manifold_id != manifold_priorities.back())
+                  message << manifold_id << ", ";
+              message
+                << manifold_priorities.back() << "}.\n"
+                << "    These vectors should contain the same elements.\n";
+              const std::string m = message.str();
+              Assert(false, ExcMessage(m));
+            }
+#endif
+          return manifold_priorities;
+        }
+      // otherwise use the default ranking: ascending order, but TFI manifolds
+      // are at the end.
+      std::vector<types::manifold_id> default_priorities =
+        input.get_manifold_ids();
+      const auto first_tfi_it = std::partition(
+        default_priorities.begin(),
+        default_priorities.end(),
+        [&input](const types::manifold_id &id) {
+          return dynamic_cast<const TransfiniteInterpolationManifold<2, 2> *>(
+                   &input.get_manifold(id)) == nullptr;
+        });
+      std::sort(default_priorities.begin(), first_tfi_it);
+      std::sort(first_tfi_it, default_priorities.end());
+
+      return default_priorities;
+    }();
+
     const std::size_t        n_slices = slice_coordinates.size();
     std::vector<Point<3>>    points(n_slices * input.n_vertices());
     std::vector<CellData<3>> cells;
@@ -4523,9 +4592,9 @@ namespace GridGenerator
 
     // copy the array of points as many times as there will be slices,
     // one slice at a time. The z-axis value are defined in slices_coordinates
-    for (unsigned int slice_n = 0; slice_n < n_slices; ++slice_n)
+    for (std::size_t slice_n = 0; slice_n < n_slices; ++slice_n)
       {
-        for (unsigned int vertex_n = 0; vertex_n < input.n_vertices();
+        for (std::size_t vertex_n = 0; vertex_n < input.n_vertices();
              ++vertex_n)
           {
             const Point<2> vertex = input.get_vertices()[vertex_n];
@@ -4538,7 +4607,7 @@ namespace GridGenerator
     // time
     for (const auto &cell : input.active_cell_iterators())
       {
-        for (unsigned int slice_n = 0; slice_n < n_slices - 1; ++slice_n)
+        for (std::size_t slice_n = 0; slice_n < n_slices - 1; ++slice_n)
           {
             CellData<3> this_cell;
             for (unsigned int vertex_n = 0;
@@ -4554,14 +4623,14 @@ namespace GridGenerator
               }
 
             this_cell.material_id = cell->material_id();
+            if (copy_manifold_ids)
+              this_cell.manifold_id = cell->manifold_id();
             cells.push_back(this_cell);
           }
       }
 
-    // next, create face data for all of the outer faces for which the
-    // boundary indicator will not be equal to zero (where we would
-    // explicitly set it to something that is already the default --
-    // no need to do that)
+    // Next, create face data for all faces that are orthogonal to the x-y
+    // plane
     SubCellData               subcell_data;
     std::vector<CellData<2>> &quads           = subcell_data.boundary_quads;
     types::boundary_id        max_boundary_id = 0;
@@ -4573,19 +4642,43 @@ namespace GridGenerator
         quad.boundary_id = face->boundary_id();
         if (face->at_boundary())
           max_boundary_id = std::max(max_boundary_id, quad.boundary_id);
-        for (unsigned int slice = 0; slice < n_slices - 1; ++slice)
+        if (copy_manifold_ids)
+          quad.manifold_id = face->manifold_id();
+        for (std::size_t slice_n = 0; slice_n < n_slices - 1; ++slice_n)
           {
             quad.vertices[0] =
-              face->vertex_index(0) + slice * input.n_vertices();
+              face->vertex_index(0) + slice_n * input.n_vertices();
             quad.vertices[1] =
-              face->vertex_index(1) + slice * input.n_vertices();
+              face->vertex_index(1) + slice_n * input.n_vertices();
             quad.vertices[2] =
-              face->vertex_index(0) + (slice + 1) * input.n_vertices();
+              face->vertex_index(0) + (slice_n + 1) * input.n_vertices();
             quad.vertices[3] =
-              face->vertex_index(1) + (slice + 1) * input.n_vertices();
+              face->vertex_index(1) + (slice_n + 1) * input.n_vertices();
             quads.push_back(quad);
           }
       }
+
+    // if necessary, create face data for faces parallel to the x-y
+    // plane. This is only necessary if we need to set manifolds.
+    if (copy_manifold_ids)
+      for (const auto &cell : input.active_cell_iterators())
+        {
+          CellData<2> quad;
+          quad.boundary_id = numbers::internal_face_boundary_id;
+          quad.manifold_id = cell->manifold_id(); // check is outside loop
+          for (std::size_t slice_n = 1; slice_n < n_slices - 1; ++slice_n)
+            {
+              quad.vertices[0] =
+                cell->vertex_index(0) + slice_n * input.n_vertices();
+              quad.vertices[1] =
+                cell->vertex_index(1) + slice_n * input.n_vertices();
+              quad.vertices[2] =
+                cell->vertex_index(2) + slice_n * input.n_vertices();
+              quad.vertices[3] =
+                cell->vertex_index(3) + slice_n * input.n_vertices();
+              quads.push_back(quad);
+            }
+        }
 
     // then mark the bottom and top boundaries of the extruded mesh
     // with max_boundary_id+1 and max_boundary_id+2. check that this
@@ -4609,6 +4702,8 @@ namespace GridGenerator
         quad.vertices[1] = cell->vertex_index(1);
         quad.vertices[2] = cell->vertex_index(2);
         quad.vertices[3] = cell->vertex_index(3);
+        if (copy_manifold_ids)
+          quad.manifold_id = cell->manifold_id();
         quads.push_back(quad);
 
         quad.boundary_id = top_boundary_id;
@@ -4616,6 +4711,8 @@ namespace GridGenerator
              vertex_n < GeometryInfo<3>::vertices_per_face;
              ++vertex_n)
           quad.vertices[vertex_n] += (n_slices - 1) * input.n_vertices();
+        if (copy_manifold_ids)
+          quad.manifold_id = cell->manifold_id();
         quads.push_back(quad);
       }
 
@@ -4628,6 +4725,16 @@ namespace GridGenerator
     // as discussed in the edge orientation paper mentioned in the
     // introduction to the GridReordering class.
     result.create_triangulation(points, cells, subcell_data);
+
+    for (auto manifold_id_it = priorities.rbegin();
+         manifold_id_it != priorities.rend();
+         ++manifold_id_it)
+      for (auto &face : result.active_face_iterators())
+        if (face->manifold_id() == *manifold_id_it)
+          for (unsigned int line_n = 0;
+               line_n < GeometryInfo<3>::lines_per_face;
+               ++line_n)
+            face->line(line_n)->set_manifold_id(*manifold_id_it);
   }
 
 
