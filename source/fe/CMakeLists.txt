@@ -19,6 +19,7 @@ SET(_unity_include_src
   block_mask.cc
   component_mask.cc
   fe_abf.cc
+  fe_bernardi_raugel.cc
   fe_bdm.cc
   fe.cc
   fe_bernstein.cc

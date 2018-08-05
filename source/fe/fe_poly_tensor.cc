@@ -18,6 +18,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_abf.h>
 #include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_bernardi_raugel.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/polynomials_rt_bubbles.h>
