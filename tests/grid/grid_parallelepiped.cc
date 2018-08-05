@@ -28,9 +28,6 @@
 
 #include "../tests.h"
 
-// Output
-std::ofstream logfile("output");
-
 // The simplest test case is to create a parallelepiped grid, output
 // the result, and hope for the best.
 template <int dim>
@@ -69,7 +66,7 @@ check_parallelepiped(bool colorize, bool log)
   GridOut grid_out;
 
   if (log)
-    grid_out.write_gnuplot(triangulation, logfile);
+    grid_out.write_gnuplot(triangulation, deallog.get_file_stream());
 
   else
     grid_out.write_gnuplot(triangulation, std::cout);
@@ -80,6 +77,8 @@ check_parallelepiped(bool colorize, bool log)
 int
 main()
 {
+  initlog(false, std::ios_base::fmtflags());
+  deallog.get_file_stream() << std::setprecision(2);
   // Check parallelepiped
   check_parallelepiped<1>(false, true);
   check_parallelepiped<2>(false, true);

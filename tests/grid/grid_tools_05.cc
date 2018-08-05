@@ -26,11 +26,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-using namespace dealii;
-
-
 /*
  * Generate a grid consisting of two disjoint cells, colorize the two
  * outermost faces. They will be matched via collect_periodic_faces.
@@ -183,9 +178,8 @@ print_match(const FaceIterator &  face_1,
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile, false);
 
   deallog << "Test for 2D: Hypercube" << std::endl << std::endl;
 

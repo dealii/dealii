@@ -25,12 +25,9 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 // 1: continuous refinement of the unit square always in the middle
 // 2: refinement of the circle at the boundary
 // 2: refinement of a wiggled area at the boundary
-
 
 template <int dim>
 class Ball : public FlatManifold<dim>
@@ -250,7 +247,7 @@ test(const int test_case)
 
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(true));
-  go.write_ucd(tria, logfile);
+  go.write_ucd(tria, deallog.get_file_stream());
 
   deallog << "     Total number of cells        = " << tria.n_cells()
           << std::endl
@@ -264,9 +261,8 @@ test(const int test_case)
 int
 main()
 {
-  deallog << std::setprecision(8);
-  logfile << std::setprecision(8);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(8);
 
   for (unsigned int i = 1; i <= 3; ++i)
     test<2>(i);

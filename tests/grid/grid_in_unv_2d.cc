@@ -33,9 +33,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 check_file(const std::string name, typename GridIn<dim>::Format format)
@@ -63,9 +60,8 @@ filename_resolution()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   filename_resolution();
 }

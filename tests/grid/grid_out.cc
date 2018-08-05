@@ -26,9 +26,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test()
@@ -50,21 +47,20 @@ test()
   grid_out.set_flags(eps2);
 
   if (dim != 1)
-    grid_out.write_eps(tria, logfile);
-  grid_out.write_gnuplot(tria, logfile);
+    grid_out.write_eps(tria, deallog.get_file_stream());
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
   if (dim != 1)
-    grid_out.write_dx(tria, logfile);
+    grid_out.write_dx(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(2);
 
   test<1>();
   test<2>();

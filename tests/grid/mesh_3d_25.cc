@@ -115,9 +115,7 @@ test(Triangulation<dim> &triangulation)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-
+  initlog();
   Triangulation<3> triangulation;
 
   create_two_cubes_rotation(triangulation, 1);

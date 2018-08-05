@@ -29,11 +29,6 @@
 
 #include "../tests.h"
 
-
-
-std::ofstream logfile("output");
-
-
 void
 test()
 {
@@ -77,16 +72,15 @@ test()
   tria.refine_global(1);
 
   GridOut grid_out;
-  grid_out.write_gnuplot(tria, logfile);
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   test();
 }

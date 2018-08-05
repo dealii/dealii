@@ -35,11 +35,6 @@
 // #include <deal.II/fe/fe_q.h>
 // #include <deal.II/numerics/data_out.h>
 
-
-
-std::ofstream logfile("output");
-
-
 void
 test(const char *filename)
 {
@@ -88,8 +83,8 @@ test(const char *filename)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   test(SOURCE_DIR "/grid_in_3d_02/747.ucd");
 }

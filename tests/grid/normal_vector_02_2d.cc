@@ -30,10 +30,9 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   SphericalManifold<2> boundary(Point<2>(1, 0));
 

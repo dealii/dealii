@@ -35,9 +35,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 check(const unsigned int n)
@@ -74,8 +71,8 @@ check(const unsigned int n)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check<3>(6);
   check<3>(12);

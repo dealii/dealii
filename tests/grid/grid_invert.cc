@@ -24,8 +24,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 test(bool second_case = false)
@@ -62,6 +60,7 @@ test(bool second_case = false)
   Triangulation<dim> tria;
   tria.create_triangulation_compatibility(vertices, cells, subcelldata);
 
+  std::ostream &logfile = deallog.get_file_stream();
   logfile << "---------------------------------------------" << std::endl
           << "dim=" << dim << (second_case ? ", second case" : ", first case")
           << std::endl
@@ -75,6 +74,7 @@ test(bool second_case = false)
 int
 main()
 {
+  initlog(false, std::ios_base::fmtflags());
   test<2>();
   test<3>(false);
   test<3>(true);

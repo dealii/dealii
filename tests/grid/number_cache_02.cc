@@ -32,10 +32,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
-
 template <int dim>
 void
 output(const Triangulation<dim> &tria)
@@ -118,8 +114,8 @@ test(const char *filename)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<2>(SOURCE_DIR "/grid_in/2d.xda");
 

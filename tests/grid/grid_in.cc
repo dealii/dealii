@@ -29,9 +29,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test1()
@@ -44,7 +41,7 @@ test1()
 
   GridOut grid_out;
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 }
 
 
@@ -145,9 +142,8 @@ filename_resolution()
 int
 main()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(2);
 
   test1<2>();
   test2<2>();

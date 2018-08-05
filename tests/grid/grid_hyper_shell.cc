@@ -30,9 +30,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 check(double r1, double r2, unsigned int n)
@@ -85,15 +82,15 @@ check(double r1, double r2, unsigned int n)
   GridOutFlags::DX flags;
   flags.write_faces = true;
   grid_out.set_flags(flags);
-  grid_out.write_dx(tria, logfile);
+  grid_out.write_dx(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check<2>(4., 5., 10);
   check<3>(3., 5., 6);

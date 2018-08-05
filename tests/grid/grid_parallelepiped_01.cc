@@ -29,9 +29,6 @@
 
 #include "../tests.h"
 
-// Output
-std::ofstream logfile("output");
-
 // As sketched in the deal.II docs, the parallelepiped class is just a
 // hyper_rectangle in 1d and a parallelogram in 2d. That can checked
 // by simple comparison to a reference triangulation.
@@ -53,6 +50,7 @@ check_1d_parallelepiped_by_comparison(bool log)
 
   if (log)
     {
+      std::ostream &logfile = deallog.get_file_stream();
       logfile << "\ncheck 1d parallelepiped (hyper_cube): ";
       if (GridTools::have_same_coarse_mesh(triangulation_parallelepiped,
                                            triangulation_cube))
@@ -82,6 +80,7 @@ check_2d_parallelepiped_by_comparison(bool log)
 
   if (log)
     {
+      std::ostream &logfile = deallog.get_file_stream();
       logfile << "\ncheck 2d parallelepiped (parallelogram): ";
       if (GridTools::have_same_coarse_mesh(triangulation_parallelepiped,
                                            triangulation_parallelogram))
@@ -96,8 +95,9 @@ check_2d_parallelepiped_by_comparison(bool log)
 int
 main()
 {
+  initlog();
   // Check parallelepiped
   check_1d_parallelepiped_by_comparison(true);
   check_2d_parallelepiped_by_comparison(true);
-  logfile << "\n";
+  deallog.get_file_stream() << "\n";
 }

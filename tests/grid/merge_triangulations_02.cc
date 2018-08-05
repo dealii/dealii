@@ -29,8 +29,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 mesh_info(const Triangulation<dim> &tria)
@@ -99,9 +97,8 @@ make_grid()
 int
 main()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(2);
 
   make_grid();
 }

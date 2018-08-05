@@ -32,9 +32,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 void
 test(const char *filename)
 {
@@ -85,8 +82,8 @@ test1()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   test(SOURCE_DIR "/grid_in_3d/1.in");
   test(SOURCE_DIR "/grid_in_3d/2.in");

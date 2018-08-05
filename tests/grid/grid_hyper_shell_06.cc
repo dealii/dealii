@@ -31,9 +31,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 check(double r1, double r2, unsigned int n)
@@ -61,8 +58,8 @@ check(double r1, double r2, unsigned int n)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check<3>(.5, 1, 6);
   check<3>(.5, 1, 12);
