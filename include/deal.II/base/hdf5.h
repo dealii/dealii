@@ -62,9 +62,9 @@ DEAL_II_NAMESPACE_OPEN
  * // Create some distributed datasets.
  * // Note that the keyword template is used between data and create because
  * // the function create_dataset returns a dependent template.
- * auto frequency_dataset = data.template create_dataset<double>("frequency", std::vector<hsize_t>{nb_frequency_points});
+ * auto frequency_dataset = data.create_dataset<double>("frequency", std::vector<hsize_t>{nb_frequency_points});
  *
- * auto displacement = data.template create_dataset<std::complex<double>>("displacement",
+ * auto displacement = data.create_dataset<std::complex<double>>("displacement",
  *                                                           std::vector<hsize_t>{nb_slice_points, nb_frequency_points}));
  *
  * // ... do some calculations ...
@@ -180,17 +180,17 @@ namespace HDF5
    *
    * @author Daniel Garcia-Sanchez, 2018
    */
-  template <typename T>
   class DataSet : public HDF5Object
   {
     friend class Group;
 
   protected:
-    DataSet(const std::string    name,
-            const hid_t &        parent_group_id,
-            std::vector<hsize_t> dimensions,
-            bool                 mpi,
-            const Mode           mode);
+    DataSet(const std::string      name,
+            const hid_t &          parent_group_id,
+            std::vector<hsize_t>   dimensions,
+            std::shared_ptr<hid_t> t_type,
+            bool                   mpi,
+            const Mode             mode);
 
   public:
     ~DataSet();
@@ -205,6 +205,7 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
+    template <typename T>
     void
     write_data(const std::vector<T> &data) const;
 
@@ -218,6 +219,7 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
+    template <typename T>
     void
     write_data(const FullMatrix<T> &data) const;
 
@@ -243,6 +245,7 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
+    template <typename T>
     void
     write_data_selection(const std::vector<T> &     data,
                          const std::vector<hsize_t> coordinates) const;
@@ -259,6 +262,7 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
+    template <typename T>
     void
     write_data_hyperslab(const std::vector<T> &     data,
                          const std::vector<hsize_t> offset,
@@ -276,18 +280,32 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
+    template <typename T>
     void
     write_data_hyperslab(const FullMatrix<T> &      data,
                          const std::vector<hsize_t> offset,
                          const std::vector<hsize_t> count) const;
+
+    /**
+     * This function does not write any data, but can contribute to a collective
+     * write call. T can be double, int, unsigned int, bool or
+     * std::complex<double>.
+     *
+     * Datatype conversion takes place at the time of a read or write and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
+     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * User's Guide.
+     */
+    template <typename T>
     void
-                               write_data_none() const;
+    write_data_none() const;
+
     const unsigned int         rank;
     const std::vector<hsize_t> dimensions;
 
   private:
     std::shared_ptr<hid_t> dataspace;
-    std::shared_ptr<hid_t> t_type;
     unsigned int           total_size;
   };
 
@@ -319,10 +337,6 @@ namespace HDF5
      * Creates a dataset. T can be double, int, unsigned int, bool or
      * std::complex<double>.
      *
-     * The keyword template has to be used between create_dataset and the name
-     * of the object because the function create_dataset returns a dependent
-     * template. See the example in HDF5.
-     *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
@@ -330,7 +344,7 @@ namespace HDF5
      * User's Guide.
      */
     template <typename T>
-    DataSet<T>
+    DataSet
     create_dataset(const std::string          name,
                    const std::vector<hsize_t> dimensions) const;
 

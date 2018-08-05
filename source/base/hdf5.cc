@@ -266,16 +266,16 @@ namespace HDF5
     H5Aclose(attr);
   }
 
-  template <typename T>
-  DataSet<T>::DataSet(const std::string    name,
-                      const hid_t &        parent_group_id,
-                      std::vector<hsize_t> dimensions,
-                      const bool           mpi,
-                      const Mode           mode)
+
+  DataSet::DataSet(const std::string      name,
+                   const hid_t &          parent_group_id,
+                   std::vector<hsize_t>   dimensions,
+                   std::shared_ptr<hid_t> t_type,
+                   const bool             mpi,
+                   const Mode             mode)
     : HDF5Object(name, mpi)
     , rank(dimensions.size())
     , dimensions(dimensions)
-    , t_type(internal::get_hdf5_datatype<T>())
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
       // Relase the HDF5 resource
@@ -318,8 +318,8 @@ namespace HDF5
       }
   }
 
-  template <typename T>
-  DataSet<T>::~DataSet()
+
+  DataSet::~DataSet()
   {
     // Close first the dataset
     hdf5_reference.reset();
@@ -329,10 +329,11 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet<T>::write_data(const std::vector<T> &data) const
+  DataSet::write_data(const std::vector<T> &data) const
   {
     AssertDimension(total_size, data.size());
-    hid_t plist;
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    hid_t                  plist;
 
     if (mpi)
       {
@@ -354,10 +355,11 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet<T>::write_data(const FullMatrix<T> &data) const
+  DataSet::write_data(const FullMatrix<T> &data) const
   {
     AssertDimension(total_size, data.m() * data.n());
-    hid_t plist;
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    hid_t                  plist;
 
     if (mpi)
       {
@@ -381,13 +383,16 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet<T>::write_data_selection(const std::vector<T> &     data,
-                                   const std::vector<hsize_t> coordinates) const
+  DataSet::write_data_selection(const std::vector<T> &     data,
+                                const std::vector<hsize_t> coordinates) const
   {
     AssertDimension(coordinates.size(), data.size() * rank);
-    hid_t                memory_dataspace;
-    hid_t                plist;
-    std::vector<hsize_t> data_dimensions = {data.size()};
+    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
+    std::vector<hsize_t>   data_dimensions = {data.size()};
+
+    hid_t memory_dataspace;
+    hid_t plist;
+
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
     H5Sselect_elements(*dataspace,
@@ -421,18 +426,21 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet<T>::write_data_hyperslab(const std::vector<T> &     data,
-                                   const std::vector<hsize_t> offset,
-                                   const std::vector<hsize_t> count) const
+  DataSet::write_data_hyperslab(const std::vector<T> &     data,
+                                const std::vector<hsize_t> offset,
+                                const std::vector<hsize_t> count) const
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
                                     1,
                                     std::multiplies<unsigned int>()),
                     data.size());
-    hid_t                memory_dataspace;
-    hid_t                plist;
-    std::vector<hsize_t> data_dimensions = {data.size()};
+    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
+    std::vector<hsize_t>   data_dimensions = {data.size()};
+
+    hid_t memory_dataspace;
+    hid_t plist;
+
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
     H5Sselect_hyperslab(
@@ -463,18 +471,20 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet<T>::write_data_hyperslab(const FullMatrix<T> &      data,
-                                   const std::vector<hsize_t> offset,
-                                   const std::vector<hsize_t> count) const
+  DataSet::write_data_hyperslab(const FullMatrix<T> &      data,
+                                const std::vector<hsize_t> offset,
+                                const std::vector<hsize_t> count) const
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
                                     1,
                                     std::multiplies<unsigned int>()),
                     data.m() * data.n());
-    hid_t                memory_dataspace;
-    hid_t                plist;
-    std::vector<hsize_t> data_dimensions = {data.m(), data.n()};
+    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
+    std::vector<hsize_t>   data_dimensions = {data.m(), data.n()};
+
+    hid_t memory_dataspace;
+    hid_t plist;
 
     memory_dataspace = H5Screate_simple(2, data_dimensions.data(), NULL);
     H5Sselect_hyperslab(
@@ -505,11 +515,13 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet<T>::write_data_none() const
+  DataSet::write_data_none() const
   {
-    hid_t                memory_dataspace;
-    hid_t                plist;
-    std::vector<hsize_t> data_dimensions = {0};
+    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
+    std::vector<hsize_t>   data_dimensions = {0};
+
+    hid_t memory_dataspace;
+    hid_t plist;
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
     H5Sselect_none(*dataspace);
@@ -584,12 +596,13 @@ namespace HDF5
   }
 
   template <typename T>
-  DataSet<T>
+  DataSet
   Group::create_dataset(const std::string          name,
                         const std::vector<hsize_t> dimensions) const
   {
-    return DataSet<T>(
-      name, *hdf5_reference, dimensions, mpi, DataSet<T>::Mode::create);
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    return DataSet(
+      name, *hdf5_reference, dimensions, t_type, mpi, DataSet::Mode::create);
   }
 
   template <typename T>
@@ -674,17 +687,6 @@ namespace HDF5
   {}
 
 
-  // explicit instantiations of classes
-  template class DataSet<float>;
-  template class DataSet<double>;
-  template class DataSet<long double>;
-  template class DataSet<std::complex<float>>;
-  template class DataSet<std::complex<double>>;
-  template class DataSet<std::complex<long double>>;
-  template class DataSet<int>;
-  template class DataSet<unsigned int>;
-
-
   // explicit instantiations of functions
   template float
   HDF5Object::attr<float>(const std::string attr_name) const;
@@ -730,33 +732,82 @@ namespace HDF5
   HDF5Object::write_attr<unsigned int>(const std::string attr_name,
                                        unsigned int      value) const;
 
+  template void
+  DataSet::write_data_selection<float>(
+    const std::vector<float> & data,
+    const std::vector<hsize_t> coordinates) const;
+  template void
+  DataSet::write_data_selection<double>(
+    const std::vector<double> &data,
+    const std::vector<hsize_t> coordinates) const;
+  template void
+  DataSet::write_data_selection<long double>(
+    const std::vector<long double> &data,
+    const std::vector<hsize_t>      coordinates) const;
+  template void
+  DataSet::write_data_selection<std::complex<float>>(
+    const std::vector<std::complex<float>> &data,
+    const std::vector<hsize_t>              coordinates) const;
+  template void
+  DataSet::write_data_selection<std::complex<double>>(
+    const std::vector<std::complex<double>> &data,
+    const std::vector<hsize_t>               coordinates) const;
+  template void
+  DataSet::write_data_selection<std::complex<long double>>(
+    const std::vector<std::complex<long double>> &data,
+    const std::vector<hsize_t>                    coordinates) const;
+  template void
+  DataSet::write_data_selection<int>(
+    const std::vector<int> &   data,
+    const std::vector<hsize_t> coordinates) const;
+  template void
+  DataSet::write_data_selection<unsigned int>(
+    const std::vector<unsigned int> &data,
+    const std::vector<hsize_t>       coordinates) const;
 
-  template DataSet<float>
+  template void
+  DataSet::write_data_none<float>() const;
+  template void
+  DataSet::write_data_none<double>() const;
+  template void
+  DataSet::write_data_none<long double>() const;
+  template void
+  DataSet::write_data_none<std::complex<float>>() const;
+  template void
+  DataSet::write_data_none<std::complex<double>>() const;
+  template void
+  DataSet::write_data_none<std::complex<long double>>() const;
+  template void
+  DataSet::write_data_none<int>() const;
+  template void
+  DataSet::write_data_none<unsigned int>() const;
+
+  template DataSet
   Group::create_dataset<float>(const std::string          name,
                                const std::vector<hsize_t> dimensions) const;
-  template DataSet<double>
+  template DataSet
   Group::create_dataset<double>(const std::string          name,
                                 const std::vector<hsize_t> dimensions) const;
-  template DataSet<long double>
+  template DataSet
   Group::create_dataset<long double>(
     const std::string          name,
     const std::vector<hsize_t> dimensions) const;
-  template DataSet<std::complex<float>>
+  template DataSet
   Group::create_dataset<std::complex<float>>(
     const std::string          name,
     const std::vector<hsize_t> dimensions) const;
-  template DataSet<std::complex<double>>
+  template DataSet
   Group::create_dataset<std::complex<double>>(
     const std::string          name,
     const std::vector<hsize_t> dimensions) const;
-  template DataSet<std::complex<long double>>
+  template DataSet
   Group::create_dataset<std::complex<long double>>(
     const std::string          name,
     const std::vector<hsize_t> dimensions) const;
-  template DataSet<int>
+  template DataSet
   Group::create_dataset<int>(const std::string          name,
                              const std::vector<hsize_t> dimensions) const;
-  template DataSet<unsigned int>
+  template DataSet
   Group::create_dataset<unsigned int>(
     const std::string          name,
     const std::vector<hsize_t> dimensions) const;
