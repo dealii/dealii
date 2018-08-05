@@ -1261,14 +1261,29 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException2(
-      ExcInconsistentManifoldIdLineInfoOfLine,
+    DeclException3(
+      ExcInconsistentLineInfoOfLine,
       int,
       int,
+      std::string,
       << "In SubCellData the line info of the line with vertex indices " << arg1
-      << " and " << arg2
-      << " appears mutiply with different (valid) manifold ids. "
-      << "This is not allowed.");
+      << " and " << arg2 << " appears multiple times with different (valid) "
+      << arg3 << ". This is not allowed.");
+    /**
+     * Exception
+     * @ingroup Exceptions
+     */
+    DeclException5(
+      ExcInconsistentQuadInfoOfQuad,
+      int,
+      int,
+      int,
+      int,
+      std::string,
+      << "In SubCellData the quad info of the quad with line indices " << arg1
+      << ", " << arg2 << ", " << arg3 << " and " << arg4
+      << " appears multiple times with different (valid) " << arg5
+      << ". This is not allowed.");
 
     /**
      * A class into which we put many of the functions that implement
@@ -2176,10 +2191,10 @@ namespace internal
             // with the previous id
             AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
                           line->manifold_id() == subcell_line.manifold_id,
-                        ExcInconsistentManifoldIdLineInfoOfLine(
-                          line_vertices.first, line_vertices.second));
-            if (subcell_line.manifold_id != numbers::flat_manifold_id)
-              line->set_manifold_id(subcell_line.manifold_id);
+                        ExcInconsistentLineInfoOfLine(line_vertices.first,
+                                                      line_vertices.second,
+                                                      "manifold ids"));
+            line->set_manifold_id(subcell_line.manifold_id);
 
             // Assert that only exterior lines are given a boundary
             // indicator; however, it is possible that someone may
@@ -3117,20 +3132,20 @@ namespace internal
               {
                 // make sure that we don't attempt to reset the boundary
                 // indicator to a different than the previously set value
-                if (line->boundary_id() != 0)
-                  AssertThrow(line->boundary_id() == subcell_line.boundary_id,
-                              ExcMessage(
-                                "Duplicate boundary lines are only allowed "
-                                "if they carry the same boundary indicator."));
+                AssertThrow(line->boundary_id() == 0 ||
+                              line->boundary_id() == subcell_line.boundary_id,
+                            ExcInconsistentLineInfoOfLine(line_vertices.first,
+                                                          line_vertices.second,
+                                                          "boundary ids"));
 
                 line->set_boundary_id_internal(subcell_line.boundary_id);
               }
             // Set manifold id if given
-            if (line->manifold_id() != numbers::flat_manifold_id)
-              AssertThrow(line->manifold_id() == subcell_line.manifold_id,
-                          ExcMessage(
-                            "Duplicate lines are only allowed "
-                            "if they carry the same manifold indicator."));
+            AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
+                          line->manifold_id() == subcell_line.manifold_id,
+                        ExcInconsistentLineInfoOfLine(line_vertices.first,
+                                                      line_vertices.second,
+                                                      "manifold ids"));
             line->set_manifold_id(subcell_line.manifold_id);
           }
 
@@ -3266,20 +3281,24 @@ namespace internal
               {
                 // and make sure that we don't attempt to reset the boundary
                 // indicator to a different than the previously set value
-                if (quad->boundary_id() != 0)
-                  AssertThrow(quad->boundary_id() == subcell_quad.boundary_id,
-                              ExcMessage(
-                                "Duplicate boundary quads are only allowed "
-                                "if they carry the same boundary indicator."));
+                AssertThrow(quad->boundary_id() == 0 ||
+                              quad->boundary_id() == subcell_quad.boundary_id,
+                            ExcInconsistentQuadInfoOfQuad(line[0]->index(),
+                                                          line[1]->index(),
+                                                          line[2]->index(),
+                                                          line[3]->index(),
+                                                          "boundary ids"));
 
                 quad->set_boundary_id_internal(subcell_quad.boundary_id);
               }
             // Set manifold id if given
             if (quad->manifold_id() != numbers::flat_manifold_id)
               AssertThrow(quad->manifold_id() == subcell_quad.manifold_id,
-                          ExcMessage(
-                            "Duplicate boundary quads are only allowed "
-                            "if they carry the same manifold indicator."));
+                          ExcInconsistentQuadInfoOfQuad(line[0]->index(),
+                                                        line[1]->index(),
+                                                        line[2]->index(),
+                                                        line[3]->index(),
+                                                        "manifold ids"));
 
             quad->set_manifold_id(subcell_quad.manifold_id);
           }
