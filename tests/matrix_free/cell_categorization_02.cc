@@ -159,44 +159,33 @@ test()
                                 mg_additional_data[level]);
     }
 
-  deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
   for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
     {
-      deallog << i << ":";
       const unsigned int m_id = mf_data.get_cell_iterator(i, 0)->material_id();
       for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
         {
           const unsigned int c_id =
             mf_data.get_cell_iterator(i, c)->material_id();
-          deallog << mf_data.get_cell_iterator(i, c)->id() << " "
-                  << mf_data.get_cell_category(i) << " " << c_id << "; ";
           AssertThrow(c_id == m_id, ExcInternalError());
         }
-      deallog << std::endl;
     }
 
   for (unsigned int level = 0; level <= max_level; ++level)
     {
       const auto &level_data = mg_mf_data[level];
-      deallog << "Number of cell batches on level " << level << ": "
-              << level_data->n_macro_cells() << std::endl;
       for (unsigned int i = 0; i < level_data->n_macro_cells(); ++i)
         {
-          deallog << i << ":";
           const unsigned int m_id =
             level_data->get_cell_iterator(i, 0)->material_id();
           for (unsigned int c = 0; c < level_data->n_components_filled(i); ++c)
             {
               const unsigned int c_id =
                 level_data->get_cell_iterator(i, c)->material_id();
-              deallog << level_data->get_cell_iterator(i, c)->id() << " "
-                      << level_data->get_cell_category(i) << " " << c_id
-                      << "; ";
               AssertThrow(m_id == c_id, ExcInternalError());
             }
-          deallog << std::endl;
         }
     }
+  deallog << Utilities::int_to_string(dim) << "d OK" << std::endl;
 }
 
 
