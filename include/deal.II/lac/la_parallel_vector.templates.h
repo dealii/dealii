@@ -702,7 +702,6 @@ namespace LinearAlgebra
       VectorOperation::values                         operation,
       std::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
-      IndexSet locally_owned_elem = locally_owned_elements();
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
       std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
@@ -710,11 +709,11 @@ namespace LinearAlgebra
         {
           // Split the IndexSet of V in locally owned elements and ghost indices
           // then create the communication pattern
-          IndexSet ghost_indices(V.get_stored_elements());
+          IndexSet locally_owned_elem = locally_owned_elements();
+          IndexSet ghost_indices      = V.get_stored_elements();
           ghost_indices.subtract_set(locally_owned_elem);
-          IndexSet local_indices(locally_owned_elem);
           comm_pattern = std::make_shared<Utilities::MPI::Partitioner>(
-            local_indices, ghost_indices, get_mpi_communicator());
+            locally_owned_elem, ghost_indices, get_mpi_communicator());
         }
       else
         {
@@ -725,9 +724,6 @@ namespace LinearAlgebra
                       ExcMessage("The communication pattern is not of type "
                                  "Utilities::MPI::Partitioner."));
         }
-      IndexSet ghost_indices(V.get_stored_elements());
-      ghost_indices.subtract_set(locally_owned_elem);
-      IndexSet       local_indices(locally_owned_elem);
       Vector<Number> tmp_vector(comm_pattern);
       std::copy(begin(), end(), tmp_vector.begin());
 
