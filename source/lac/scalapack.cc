@@ -264,6 +264,138 @@ ScaLAPACKMatrix<NumberType>::operator=(const FullMatrix<NumberType> &matrix)
 
 
 template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
+                                       const unsigned int                  rank)
+{
+  if (n_rows * n_columns == 0)
+    return;
+
+  const unsigned int this_mpi_process(
+    Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
+
+#  ifdef DEBUG
+  Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
+         ExcMessage("All processes have to call routine with identical rank"));
+  Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator) == rank,
+         ExcMessage("All processes have to call routine with identical rank"));
+#  endif
+
+  // root process has to be active in the grid of A
+  if (this_mpi_process == rank)
+    {
+      Assert(grid->mpi_process_is_active, ExcInternalError());
+      Assert(n_rows == int(B.m()), ExcDimensionMismatch(n_rows, B.m()));
+      Assert(n_columns == int(B.n()), ExcDimensionMismatch(n_columns, B.n()));
+    }
+  // Create 1x1 grid for matrix B.
+  // The underlying grid for matrix B only contains the process #rank.
+  // This grid will be used to copy the serial matrix B to the distributed
+  // matrix using the ScaLAPACK routine pgemr2d.
+  MPI_Group group_A;
+  MPI_Comm_group(this->grid->mpi_communicator, &group_A);
+  const int              n = 1;
+  const std::vector<int> ranks(n, rank);
+  MPI_Group              group_B;
+  MPI_Group_incl(group_A, n, ranks.data(), &group_B);
+  MPI_Comm communicator_B;
+  MPI_Comm_create_group(this->grid->mpi_communicator,
+                        group_B,
+                        0,
+                        &communicator_B);
+  int n_proc_rows_B = 1, n_proc_cols_B = 1;
+  int this_process_row_B = -1, this_process_column_B = -1;
+  int blacs_context_B = -1;
+  if (MPI_COMM_NULL != communicator_B)
+    {
+      // Initialize Cblas context from the provided communicator
+      blacs_context_B   = Csys2blacs_handle(communicator_B);
+      const char *order = "Col";
+      Cblacs_gridinit(&blacs_context_B, order, n_proc_rows_B, n_proc_cols_B);
+      Cblacs_gridinfo(blacs_context_B,
+                      &n_proc_rows_B,
+                      &n_proc_cols_B,
+                      &this_process_row_B,
+                      &this_process_column_B);
+      Assert(n_proc_rows_B * n_proc_cols_B == 1, ExcInternalError());
+      // the active process of grid B has to be process #rank of the
+      // communicator attached to A
+      Assert(this_mpi_process == rank, ExcInternalError());
+    }
+  const bool mpi_process_is_active_B =
+    (this_process_row_B >= 0 && this_process_column_B >= 0);
+
+  // create descriptor for matrix B
+  std::vector<int> descriptor_B(9, -1);
+  const int        first_process_row_B = 0, first_process_col_B = 0;
+
+  if (mpi_process_is_active_B)
+    {
+      // Get local sizes:
+      int n_local_rows_B = numroc_(&n_rows,
+                                   &n_rows,
+                                   &this_process_row_B,
+                                   &first_process_row_B,
+                                   &n_proc_rows_B);
+      int n_local_cols_B = numroc_(&n_columns,
+                                   &n_columns,
+                                   &this_process_column_B,
+                                   &first_process_col_B,
+                                   &n_proc_cols_B);
+      Assert(n_local_rows_B == n_rows, ExcInternalError());
+      Assert(n_local_cols_B == n_columns, ExcInternalError());
+      (void)n_local_cols_B;
+
+      int lda  = std::max(1, n_local_rows_B);
+      int info = 0;
+      descinit_(descriptor_B.data(),
+                &n_rows,
+                &n_columns,
+                &n_rows,
+                &n_columns,
+                &first_process_row_B,
+                &first_process_col_B,
+                &blacs_context_B,
+                &lda,
+                &info);
+      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("descinit_", info));
+    }
+  if (this->grid->mpi_process_is_active)
+    {
+      const int   ii = 1;
+      NumberType *loc_vals_A =
+        this->values.size() > 0 ? &(this->values[0]) : nullptr;
+      const NumberType *loc_vals_B =
+        mpi_process_is_active_B ? &(B(0, 0)) : nullptr;
+
+      // pgemr2d has to be called only for processes active on grid attached to
+      // matrix A
+      pgemr2d(&n_rows,
+              &n_columns,
+              loc_vals_B,
+              &ii,
+              &ii,
+              descriptor_B.data(),
+              loc_vals_A,
+              &ii,
+              &ii,
+              this->descriptor,
+              &(this->grid->blacs_context));
+    }
+  if (mpi_process_is_active_B)
+    Cblacs_gridexit(blacs_context_B);
+
+  MPI_Group_free(&group_A);
+  MPI_Group_free(&group_B);
+  if (MPI_COMM_NULL != communicator_B)
+    MPI_Comm_free(&communicator_B);
+
+  state = LAPACKSupport::matrix;
+}
+
+
+
+template <typename NumberType>
 unsigned int
 ScaLAPACKMatrix<NumberType>::global_row(const unsigned int loc_row) const
 {
@@ -294,6 +426,137 @@ ScaLAPACKMatrix<NumberType>::global_column(const unsigned int loc_column) const
                   &first_process_column,
                   &(grid->n_process_columns)) -
          1;
+}
+
+
+
+template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
+                                     const unsigned int            rank) const
+{
+  if (n_rows * n_columns == 0)
+    return;
+
+  const unsigned int this_mpi_process(
+    Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
+
+#  ifdef DEBUG
+  Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
+         ExcMessage("All processes have to call routine with identical rank"));
+  Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator) == rank,
+         ExcMessage("All processes have to call routine with identical rank"));
+#  endif
+
+  if (this_mpi_process == rank)
+    {
+      // the process which gets the serial copy has to be in the process grid
+      Assert(this->grid->is_process_active(), ExcInternalError());
+      Assert(n_rows == int(B.m()), ExcDimensionMismatch(n_rows, B.m()));
+      Assert(n_columns == int(B.n()), ExcDimensionMismatch(n_columns, B.n()));
+    }
+
+  // Create 1x1 grid for matrix B.
+  // The underlying grid for matrix B only contains the process #rank.
+  // This grid will be used to copy to the distributed matrix to the serial
+  // matrix B using the ScaLAPACK routine pgemr2d.
+  MPI_Group group_A;
+  MPI_Comm_group(this->grid->mpi_communicator, &group_A);
+  const int              n = 1;
+  const std::vector<int> ranks(n, rank);
+  MPI_Group              group_B;
+  MPI_Group_incl(group_A, n, ranks.data(), &group_B);
+  MPI_Comm communicator_B;
+  MPI_Comm_create_group(this->grid->mpi_communicator,
+                        group_B,
+                        0,
+                        &communicator_B);
+  int n_proc_rows_B = 1, n_proc_cols_B = 1;
+  int this_process_row_B = -1, this_process_column_B = -1;
+  int blacs_context_B = -1;
+  if (MPI_COMM_NULL != communicator_B)
+    {
+      // Initialize Cblas context from the provided communicator
+      blacs_context_B   = Csys2blacs_handle(communicator_B);
+      const char *order = "Col";
+      Cblacs_gridinit(&blacs_context_B, order, n_proc_rows_B, n_proc_cols_B);
+      Cblacs_gridinfo(blacs_context_B,
+                      &n_proc_rows_B,
+                      &n_proc_cols_B,
+                      &this_process_row_B,
+                      &this_process_column_B);
+      Assert(n_proc_rows_B * n_proc_cols_B == 1, ExcInternalError());
+      // the active process of grid B has to be process #rank of the
+      // communicator attached to A
+      Assert(this_mpi_process == rank, ExcInternalError());
+    }
+  const bool mpi_process_is_active_B =
+    (this_process_row_B >= 0 && this_process_column_B >= 0);
+
+  // create descriptor for matrix B
+  std::vector<int> descriptor_B(9, -1);
+  const int        first_process_row_B = 0, first_process_col_B = 0;
+
+  if (mpi_process_is_active_B)
+    {
+      // Get local sizes:
+      int n_local_rows_B = numroc_(&n_rows,
+                                   &n_rows,
+                                   &this_process_row_B,
+                                   &first_process_row_B,
+                                   &n_proc_rows_B);
+      int n_local_cols_B = numroc_(&n_columns,
+                                   &n_columns,
+                                   &this_process_column_B,
+                                   &first_process_col_B,
+                                   &n_proc_cols_B);
+      Assert(n_local_rows_B == n_rows, ExcInternalError());
+      Assert(n_local_cols_B == n_columns, ExcInternalError());
+      (void)n_local_cols_B;
+
+      int lda  = std::max(1, n_local_rows_B);
+      int info = 0;
+      // fill descriptor for matrix B
+      descinit_(descriptor_B.data(),
+                &n_rows,
+                &n_columns,
+                &n_rows,
+                &n_columns,
+                &first_process_row_B,
+                &first_process_col_B,
+                &blacs_context_B,
+                &lda,
+                &info);
+      AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("descinit_", info));
+    }
+  // pgemr2d has to be called only for processes active on grid attached to
+  // matrix A
+  if (this->grid->mpi_process_is_active)
+    {
+      const int         ii = 1;
+      const NumberType *loc_vals_A =
+        this->values.size() > 0 ? &(this->values[0]) : nullptr;
+      NumberType *loc_vals_B = mpi_process_is_active_B ? &(B(0, 0)) : nullptr;
+
+      pgemr2d(&n_rows,
+              &n_columns,
+              loc_vals_A,
+              &ii,
+              &ii,
+              this->descriptor,
+              loc_vals_B,
+              &ii,
+              &ii,
+              descriptor_B.data(),
+              &(this->grid->blacs_context));
+    }
+  if (mpi_process_is_active_B)
+    Cblacs_gridexit(blacs_context_B);
+
+  MPI_Group_free(&group_A);
+  MPI_Group_free(&group_B);
+  if (MPI_COMM_NULL != communicator_B)
+    MPI_Comm_free(&communicator_B);
 }
 
 
@@ -418,7 +681,6 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   const bool in_context_A =
     (my_row_A >= 0 && my_row_A < n_grid_rows_A) &&
     (my_column_A >= 0 && my_column_A < n_grid_columns_A);
-
 
   int n_grid_rows_B, n_grid_columns_B, my_row_B, my_column_B;
   Cblacs_gridinfo(B.grid->blacs_context,
