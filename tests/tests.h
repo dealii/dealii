@@ -472,22 +472,26 @@ namespace
 //
 // This will open the correct output file, divert log output there and
 // switch off screen output. If screen output is desired, provide the
-// optional second argument as 'true'.
+// optional first argument as 'true'.
 std::string   deallogname;
 std::ofstream deallogfile;
 
 void
-initlog(bool console = false)
+initlog(bool                          console = false,
+        const std::ios_base::fmtflags flags   = std::ios::showpoint |
+                                              std::ios::left)
 {
   deallogname = "output";
   deallogfile.open(deallogname.c_str());
-  deallog.attach(deallogfile);
+  deallog.attach(deallogfile, true, flags);
   deallog.depth_console(console ? 10 : 0);
 }
 
 
 inline void
-mpi_initlog(const bool console = false)
+mpi_initlog(const bool                    console = false,
+            const std::ios_base::fmtflags flags   = std::ios::showpoint |
+                                                  std::ios::left)
 {
 #ifdef DEAL_II_WITH_MPI
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -495,11 +499,12 @@ mpi_initlog(const bool console = false)
     {
       deallogname = "output";
       deallogfile.open(deallogname.c_str());
-      deallog.attach(deallogfile);
+      deallog.attach(deallogfile, true, flags);
       deallog.depth_console(console ? 10 : 0);
     }
 #else
   (void)console;
+  (void)flags;
   // can't use this function if not using MPI
   Assert(false, ExcInternalError());
 #endif
@@ -515,7 +520,9 @@ mpi_initlog(const bool console = false)
  */
 struct MPILogInitAll
 {
-  MPILogInitAll(const bool console = false)
+  MPILogInitAll(const bool                    console = false,
+                const std::ios_base::fmtflags flags   = std::ios::showpoint |
+                                                      std::ios::left)
   {
 #ifdef DEAL_II_WITH_MPI
     const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -524,14 +531,14 @@ struct MPILogInitAll
         if (!deallog.has_file())
           {
             deallogfile.open("output");
-            deallog.attach(deallogfile);
+            deallog.attach(deallogfile, true, flags);
           }
       }
     else
       {
         deallogname = "output" + Utilities::int_to_string(myid);
         deallogfile.open(deallogname.c_str());
-        deallog.attach(deallogfile);
+        deallog.attach(deallogfile, true, flags);
       }
 
     deallog.depth_console(console ? 10 : 0);

@@ -214,11 +214,13 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
 
 
 void
-LogStream::attach(std::ostream &o, const bool print_job_id)
+LogStream::attach(std::ostream &                o,
+                  const bool                    print_job_id,
+                  const std::ios_base::fmtflags flags)
 {
   Threads::Mutex::ScopedLock lock(log_lock);
   file = &o;
-  o.setf(std::ios::showpoint | std::ios::left);
+  o.setf(flags);
   if (print_job_id)
     o << dealjobid();
 }
