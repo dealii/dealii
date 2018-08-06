@@ -12153,6 +12153,16 @@ Triangulation<dim, spacedim>::end_face() const
 }
 
 
+
+template <int dim, int spacedim>
+IteratorRange<typename Triangulation<dim, spacedim>::active_face_iterator>
+Triangulation<dim, spacedim>::active_face_iterators() const
+{
+  return IteratorRange<
+    typename Triangulation<dim, spacedim>::active_face_iterator>(
+    begin_active_face(), end_face());
+}
+
 /*------------------------ Vertex iterator functions ------------------------*/
 
 

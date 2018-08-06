@@ -2823,6 +2823,27 @@ public:
   face_iterator
   end_face() const;
 
+  /**
+   * Return an iterator range that contains all active faces that make up this
+   * triangulation. This function is the face version of
+   * Triangulation::active_cell_iterators(), and allows one to write code
+   * like, e.g.,
+   *
+   * @code
+   *   Triangulation<dim> triangulation;
+   *   ...
+   *   for (auto &face : triangulation.active_face_iterators())
+   *     face->set_manifold_id(42);
+   * @endcode
+   *
+   * @return The half open range <code>[this->begin_active_face(),
+   * this->end_face())</code>
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<active_face_iterator>
+  active_face_iterators() const;
+
   /*
    * @}
    */
