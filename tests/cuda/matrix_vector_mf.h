@@ -120,4 +120,5 @@ MatrixFreeTest<dim, fe_degree, Number, n_q_points_1d>::vmult(
   dst = static_cast<Number>(0.);
   HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d> helmholtz_operator;
   data.cell_loop(helmholtz_operator, src, dst);
+  data.copy_constrained_values(src, dst);
 }
