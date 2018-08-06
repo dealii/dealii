@@ -796,11 +796,19 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                numbers::internal_face_boundary_id));
 
           if (apply_all_indicators_to_manifolds)
-            subcelldata.boundary_lines.back().manifold_id =
-              static_cast<types::manifold_id>(material_id);
+            {
+              subcelldata.boundary_lines.back().boundary_id =
+                numbers::internal_face_boundary_id;
+              subcelldata.boundary_lines.back().manifold_id =
+                static_cast<types::manifold_id>(material_id);
+            }
           else
-            subcelldata.boundary_lines.back().boundary_id =
-              static_cast<types::boundary_id>(material_id);
+            {
+              subcelldata.boundary_lines.back().boundary_id =
+                static_cast<types::boundary_id>(material_id);
+              subcelldata.boundary_lines.back().manifold_id =
+                numbers::flat_manifold_id;
+            }
 
           // transform from ucd to
           // consecutive numbering
@@ -844,11 +852,19 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                numbers::internal_face_boundary_id));
 
           if (apply_all_indicators_to_manifolds)
-            subcelldata.boundary_quads.back().manifold_id =
-              static_cast<types::manifold_id>(material_id);
+            {
+              subcelldata.boundary_quads.back().boundary_id =
+                numbers::internal_face_boundary_id;
+              subcelldata.boundary_quads.back().manifold_id =
+                static_cast<types::manifold_id>(material_id);
+            }
           else
-            subcelldata.boundary_quads.back().boundary_id =
-              static_cast<types::boundary_id>(material_id);
+            {
+              subcelldata.boundary_quads.back().boundary_id =
+                static_cast<types::boundary_id>(material_id);
+              subcelldata.boundary_quads.back().manifold_id =
+                numbers::flat_manifold_id;
+            }
 
           // transform from ucd to
           // consecutive numbering

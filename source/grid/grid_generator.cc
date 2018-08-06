@@ -4217,11 +4217,16 @@ namespace GridGenerator
                       if (line->manifold_id() != numbers::flat_manifold_id)
                         {
                           CellData<1> boundary_line;
+
                           boundary_line.vertices[0] =
                             line->vertex_index(0) + offset;
                           boundary_line.vertices[1] =
                             line->vertex_index(1) + offset;
+
                           boundary_line.manifold_id = line->manifold_id();
+                          boundary_line.boundary_id =
+                            numbers::internal_face_boundary_id; // default
+
                           subcell_data.boundary_lines.push_back(
                             boundary_line); // trivially-copyable
                         }
@@ -4260,6 +4265,7 @@ namespace GridGenerator
                       if (face->manifold_id() != numbers::flat_manifold_id)
                         {
                           CellData<2> boundary_quad;
+
                           boundary_quad.vertices[0] =
                             face->vertex_index(0) + offset;
                           boundary_quad.vertices[1] =
@@ -4270,6 +4276,9 @@ namespace GridGenerator
                             face->vertex_index(3) + offset;
 
                           boundary_quad.manifold_id = face->manifold_id();
+                          boundary_quad.boundary_id =
+                            numbers::internal_face_boundary_id; // default
+
                           subcell_data.boundary_quads.push_back(
                             boundary_quad); // trivially-copyable
                         }
@@ -4279,12 +4288,17 @@ namespace GridGenerator
                             numbers::flat_manifold_id)
                           {
                             CellData<1> boundary_line;
+
                             boundary_line.vertices[0] =
                               cell->line(l)->vertex_index(0) + offset;
                             boundary_line.vertices[1] =
                               cell->line(l)->vertex_index(1) + offset;
+
                             boundary_line.manifold_id =
                               cell->line(l)->manifold_id();
+                            boundary_line.boundary_id =
+                              numbers::internal_face_boundary_id; // default
+
                             subcell_data.boundary_lines.push_back(
                               boundary_line); // trivially_copyable
                           }
@@ -5196,6 +5210,8 @@ namespace GridGenerator
                              (subcell_data.boundary_lines[i].vertices[1] ==
                               map_vert_index[face->line(e)->vertex_index(0)])))
                           {
+                            subcell_data.boundary_lines[i].boundary_id =
+                              numbers::internal_face_boundary_id;
                             edge_found = true;
                             break;
                           }
@@ -5208,7 +5224,7 @@ namespace GridGenerator
                       map_vert_index[face->line(e)->vertex_index(0)];
                     edge.vertices[1] =
                       map_vert_index[face->line(e)->vertex_index(1)];
-                    edge.boundary_id = numbers::internal_face_boundary_id;
+                    edge.boundary_id = 0;
                     edge.manifold_id = face->line(e)->manifold_id();
 
                     subcell_data.boundary_lines.push_back(edge);

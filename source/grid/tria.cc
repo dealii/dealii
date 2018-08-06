@@ -2196,40 +2196,16 @@ namespace internal
                                                       "manifold ids"));
             line->set_manifold_id(subcell_line.manifold_id);
 
-            // Assert that only exterior lines are given a boundary
-            // indicator; however, it is possible that someone may
-            // want to give an interior line a manifold id (and thus
-            // lists this line in the subcell_data structure), and we
-            // need to allow that
+            // assert that only exterior lines are given a boundary
+            // indicator
             if (subcell_line.boundary_id != numbers::internal_face_boundary_id)
               {
-                if (line->boundary_id() == numbers::internal_face_boundary_id)
-                  {
-                    // if we are here, it means that we want to assign a
-                    // boundary indicator different from
-                    // numbers::internal_face_boundary_id to an internal line.
-                    // As said, this would be not allowed, and an exception
-                    // should be immediately thrown. Still, there is the
-                    // possibility that one only wants to specify a manifold_id
-                    // here. If that is the case (manifold_id !=
-                    // numbers::flat_manifold_id) the operation is allowed.
-                    // Otherwise, we really tried to specify a boundary_id (and
-                    // not a manifold_id) to an internal face. The exception
-                    // must be thrown.
-                    if (subcell_line.manifold_id == numbers::flat_manifold_id)
-                      {
-                        // If we are here, this assertion will surely fail, for
-                        // the aforementioned reasons
-                        AssertThrow(!(line->boundary_id() ==
-                                      numbers::internal_face_boundary_id),
-                                    ExcInteriorLineCantBeBoundary(
-                                      line->vertex_index(0),
-                                      line->vertex_index(1),
-                                      subcell_line.boundary_id));
-                      }
-                  }
-                else
-                  line->set_boundary_id_internal(subcell_line.boundary_id);
+                AssertThrow(
+                  line->boundary_id() != numbers::internal_face_boundary_id,
+                  ExcInteriorLineCantBeBoundary(line->vertex_index(0),
+                                                line->vertex_index(1),
+                                                subcell_line.boundary_id));
+                line->set_boundary_id_internal(subcell_line.boundary_id);
               }
           }
 
