@@ -1542,8 +1542,9 @@ MatrixFree<dim, Number>::initialize_indices(
                         {
                           const unsigned int p =
                             face_info.faces[f].cells_exterior[v];
-                          const unsigned int stride = 1;
-                          unsigned int       i      = 0;
+                          const unsigned int stride =
+                            dof_info[no].dof_indices_interleave_strides[2][p];
+                          unsigned int i = 0;
                           for (unsigned int e = 0;
                                e < dof_info[no].n_base_elements;
                                ++e)
@@ -1657,8 +1658,9 @@ MatrixFree<dim, Number>::initialize_indices(
                         {
                           const unsigned int p =
                             face_info.faces[f].cells_exterior[v];
-                          const unsigned int stride = 1;
-                          unsigned int       i      = 0;
+                          const unsigned int stride =
+                            dof_info[no].dof_indices_interleave_strides[2][p];
+                          unsigned int i = 0;
                           for (unsigned int e = 0;
                                e < dof_info[no].n_base_elements;
                                ++e)

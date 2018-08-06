@@ -86,7 +86,8 @@ namespace internal
         Number *   gradients_quad,
         Number *   scratch_data,
         const bool integrate_values,
-        const bool integrate_gradients)
+        const bool integrate_gradients,
+        const bool sum_into_values_array = false)
       {
         internal::FEEvaluationImpl<
           internal::MatrixFreeFunctions::tensor_general,
@@ -101,7 +102,7 @@ namespace internal
                              scratch_data,
                              integrate_values,
                              integrate_gradients,
-                             false);
+                             sum_into_values_array);
       }
     };
 
@@ -205,7 +206,8 @@ namespace internal
         Number *   gradients_quad,
         Number *   scratch_data,
         const bool integrate_values,
-        const bool integrate_gradients)
+        const bool integrate_gradients,
+        const bool sum_into_values_array = false)
       {
         const int              runtime_degree   = shape_info.fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
@@ -217,7 +219,8 @@ namespace internal
                       gradients_quad,
                       scratch_data,
                       integrate_values,
-                      integrate_gradients);
+                      integrate_gradients,
+                      sum_into_values_array);
         else
           Factory<dim, n_components, Number, 0, degree + 1, n_q_points_1d>::
             integrate(shape_info,
@@ -226,7 +229,8 @@ namespace internal
                       gradients_quad,
                       scratch_data,
                       integrate_values,
-                      integrate_gradients);
+                      integrate_gradients,
+                      sum_into_values_array);
       }
     };
 
@@ -329,7 +333,8 @@ namespace internal
         Number *   gradients_quad,
         Number *   scratch_data,
         const bool integrate_values,
-        const bool integrate_gradients)
+        const bool integrate_gradients,
+        const bool sum_into_values_array)
       {
         const int runtime_n_q_points_1d = shape_info.n_q_points_1d;
         if (runtime_n_q_points_1d == n_q_points_1d)
@@ -346,7 +351,7 @@ namespace internal
                             scratch_data,
                             integrate_values,
                             integrate_gradients,
-                            false);
+                            sum_into_values_array);
             else if (degree < n_q_points_1d)
               internal::FEEvaluationImplTransformToCollocation<
                 dim,
@@ -360,7 +365,7 @@ namespace internal
                                    scratch_data,
                                    integrate_values,
                                    integrate_gradients,
-                                   false);
+                                   sum_into_values_array);
             else
               internal::FEEvaluationImpl<
                 internal::MatrixFreeFunctions::tensor_symmetric,
@@ -375,7 +380,7 @@ namespace internal
                                    scratch_data,
                                    integrate_values,
                                    integrate_gradients,
-                                   false);
+                                   sum_into_values_array);
           }
         else
           Factory<dim, n_components, Number, 1, degree, n_q_points_1d + 1>::
@@ -385,7 +390,8 @@ namespace internal
                       gradients_quad,
                       scratch_data,
                       integrate_values,
-                      integrate_gradients);
+                      integrate_gradients,
+                      sum_into_values_array);
       }
     };
 
@@ -437,7 +443,8 @@ namespace internal
       Number *   gradients_quad,
       Number *   scratch_data,
       const bool integrate_values,
-      const bool integrate_gradients)
+      const bool integrate_gradients,
+      const bool sum_into_values_array = false)
     {
       Assert(shape_info.element_type <=
                internal::MatrixFreeFunctions::tensor_symmetric,
@@ -448,7 +455,8 @@ namespace internal
                                                     gradients_quad,
                                                     scratch_data,
                                                     integrate_values,
-                                                    integrate_gradients);
+                                                    integrate_gradients,
+                                                    sum_into_values_array);
     }
   } // namespace EvaluationSelectorImplementation
 } // namespace internal
@@ -505,7 +513,8 @@ struct SelectEvaluator
             Number *   gradients_quad,
             Number *   scratch_data,
             const bool integrate_values,
-            const bool integrate_gradients);
+            const bool integrate_gradients,
+            const bool sum_into_values_array = false);
 };
 
 /**
@@ -555,7 +564,8 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
             Number *   gradients_quad,
             Number *   scratch_data,
             const bool integrate_values,
-            const bool integrate_gradients);
+            const bool integrate_gradients,
+            const bool sum_into_values_array = false);
 };
 
 //----------------------Implementation for SelectEvaluator---------------------
@@ -709,7 +719,8 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
   Number *                                                gradients_quad,
   Number *                                                scratch_data,
   const bool                                              integrate_values,
-  const bool                                              integrate_gradients)
+  const bool                                              integrate_gradients,
+  const bool                                              sum_into_values_array)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
@@ -726,7 +737,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                     scratch_data,
                     integrate_values,
                     integrate_gradients,
-                    false);
+                    sum_into_values_array);
     }
   else if (fe_degree < n_q_points_1d &&
            shape_info.element_type <=
@@ -744,7 +755,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                            scratch_data,
                            integrate_values,
                            integrate_gradients,
-                           false);
+                           sum_into_values_array);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_symmetric)
@@ -762,7 +773,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                            scratch_data,
                            integrate_values,
                            integrate_gradients,
-                           false);
+                           sum_into_values_array);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
@@ -780,7 +791,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                            scratch_data,
                            integrate_values,
                            integrate_gradients,
-                           false);
+                           sum_into_values_array);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::truncated_tensor)
@@ -798,7 +809,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                            scratch_data,
                            integrate_values,
                            integrate_gradients,
-                           false);
+                           sum_into_values_array);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_general)
@@ -815,7 +826,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                                                     scratch_data,
                                                     integrate_values,
                                                     integrate_gradients,
-                                                    false);
+                                                    sum_into_values_array);
     }
   else
     AssertThrow(false, ExcNotImplemented());
@@ -914,7 +925,8 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
   Number *                                                gradients_quad,
   Number *                                                scratch_data,
   const bool                                              integrate_values,
-  const bool                                              integrate_gradients)
+  const bool                                              integrate_gradients,
+  const bool                                              sum_into_values_array)
 {
   if (shape_info.element_type ==
       internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
@@ -932,7 +944,7 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
                            scratch_data,
                            integrate_values,
                            integrate_gradients,
-                           false);
+                           sum_into_values_array);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::truncated_tensor)
@@ -950,7 +962,7 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
                            scratch_data,
                            integrate_values,
                            integrate_gradients,
-                           false);
+                           sum_into_values_array);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_general)
@@ -966,7 +978,7 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
                                                   scratch_data,
                                                   integrate_values,
                                                   integrate_gradients,
-                                                  false);
+                                                  sum_into_values_array);
   else
     internal::EvaluationSelectorImplementation::
       symmetric_selector_integrate<dim, n_components, Number>(
@@ -976,7 +988,8 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
         gradients_quad,
         scratch_data,
         integrate_values,
-        integrate_gradients);
+        integrate_gradients,
+        sum_into_values_array);
 }
 #endif // DOXYGEN
 

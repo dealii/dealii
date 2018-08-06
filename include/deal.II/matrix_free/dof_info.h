@@ -265,7 +265,56 @@ namespace internal
          * is directed to the array `dof_indices_contiguous` with the index
          * `cell_index*n_vectorization*n_components`.
          */
-        contiguous
+        contiguous,
+        /**
+         * This value indicates that the indices with a cell are contiguous and
+         * interleaved for vectorization, i.e., the first DoF index on a cell
+         * to the four or eight cells in the vectorization batch come first,
+         * than the second DoF index, and so on. Furthermore, the interleaving
+         * between cells implies that only the batches for vectorization can be
+         * accessed efficiently, whereas there is a strided access for getting
+         * only some of the entries.
+         *
+         * The two additional categories `interleaved_contiguous_strided` and
+         * `interleaved_contiguous_mixed_strides` are a consequence of this
+         * storage type. The former is for faces where at least one of the two
+         * adjacent sides will break with the interleaved storage. We then have
+         * to make a strided access as described in the next category. The last
+         * category `interleaved_contiguous_mixed_strides` appears in the ghost
+         * layer, see the more detailed description of that category below.
+         * Again, this is something that cannot be avoided in general once we
+         * interleave the indices between cells.
+         *
+         * For a cell/face of this index type, the data access in
+         * FEEvaluationBase is directed to the array `dof_indices_contiguous`
+         * with the index `cell_index*n_vectorization*n_components`.
+         */
+        interleaved_contiguous,
+        /**
+         * Similar to interleaved_contiguous storage, but for the case when the
+         * interleaved indices are only contiguous within the degrees of
+         * freedom, but not also over the components of a vectorized array.
+         * This happens typically on faces with DG where the cells have
+         * `interleaved_contiguous` storage but the faces' numbering is not the
+         * same as the cell's numbering. For a
+         * cell/face of this index type, the data access in FEEvaluationBase
+         * is directed to the array `dof_indices_contiguous` with the index
+         * `cell_index*n_vectorization*n_components`.
+         */
+        interleaved_contiguous_strided,
+        /**
+         * Similar to interleaved_contiguous_separate storage, but for the case
+         * when the interleaved indices are not `n_vectorization apart`. This
+         * happens typically within the ghost layer of DG where the remote
+         * owner has applied an interleaved storage and the current processor
+         * only sees some of the cells. For a
+         * cell/face of this index type, the data access in FEEvaluationBase
+         * is directed to the array `dof_indices_contiguous` with the index
+         * `cell_index*n_vectorization*n_components`, including the array
+         * `dof_indices_interleave_strides` for the information about the
+         * actual stride.
+         */
+        interleaved_contiguous_mixed_strides
       };
 
       /**
@@ -365,6 +414,16 @@ namespace internal
        * cells (2) according to CellOrFaceAccess.
        */
       std::vector<unsigned int> dof_indices_contiguous[3];
+
+      /**
+       * Compressed index storage for faster access than through @p
+       * dof_indices used according to the description in IndexStorageVariants.
+       *
+       * The three arrays given here address the types for the faces decorated
+       * as minus (0), the faces decorated with as plus (1), and the cells
+       * (2).
+       */
+      std::vector<unsigned int> dof_indices_interleave_strides[3];
 
       /**
        * Caches the number of indices filled when vectorizing. This
