@@ -157,9 +157,9 @@ namespace HDF5
   std::string
   HDF5Object::attr(const std::string attr_name) const
   {
-    // Reads a UTF8 python string
+    // Reads a UTF8 variable string
     //
-    // code from
+    // code inspired from
     // https://support.hdfgroup.org/ftp/HDF5/examples/misc-examples/vlstratt.c
     //
     // In the case of a variable length string the user does not have to reserve
@@ -265,6 +265,58 @@ namespace HDF5
     H5Sclose(aid);
     H5Aclose(attr);
   }
+
+  template <>
+  void
+  HDF5Object::write_attr(const std::string attr_name, std::string value) const
+  {
+    // Writes a UTF8 variable string
+    //
+    // code inspired from
+    // https://support.hdfgroup.org/ftp/HDF5/examples/misc-examples/vlstratt.c
+    //
+    // In the case of a variable length string, H5Awrite needs the address of a
+    // (char *). For this reason the std::string value has been copied to a C
+    // string.
+
+    hid_t  attr;
+    hid_t  aid;
+    hid_t  t_type;
+    herr_t ret;
+
+    // Reserve space for the string and the null terminator
+    char *c_string_value = (char *)malloc(sizeof(char) * (value.size() + 1));
+    strcpy(c_string_value, value.data());
+
+    /* Create a datatype to refer to. */
+    t_type = H5Tcopy(H5T_C_S1);
+    Assert(t_type >= 0, ExcInternalError());
+
+    // Python strings are encoded in UTF8
+    ret = H5Tset_cset(t_type, H5T_CSET_UTF8);
+    Assert(t_type >= 0, ExcInternalError());
+
+    ret = H5Tset_size(t_type, H5T_VARIABLE);
+    Assert(ret >= 0, ExcInternalError());
+
+    /*
+     * Create scalar attribute.
+     */
+    aid  = H5Screate(H5S_SCALAR);
+    attr = H5Acreate2(
+      *hdf5_reference, attr_name.data(), t_type, aid, H5P_DEFAULT, H5P_DEFAULT);
+
+    /*
+     * Write scalar attribute.
+     */
+    ret = H5Awrite(attr, t_type, &c_string_value);
+    Assert(ret >= 0, ExcInternalError());
+
+    free(c_string_value);
+    H5Sclose(aid);
+    H5Aclose(attr);
+  }
+
 
 
   DataSet::DataSet(const std::string      name,
