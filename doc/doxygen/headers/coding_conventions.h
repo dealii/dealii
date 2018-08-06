@@ -148,8 +148,8 @@ executable.
   @endcode
   where <code>ClassName</code> is the name of the calling class.
 
-<li> Classes and types generally are named using uppercase letters to denote
-  word beginnings (e.g. TriaIterator) &mdash; sometimes called
+<li> Classes, namespaces and types generally are named using uppercase letters
+  to denote word beginnings (e.g. TriaIterator) &mdash; sometimes called
   <a href="http://en.wikipedia.org/wiki/Camel_case"><i>camel
   case</i></a> &mdash; while functions and variables
   use lowercase letters and underscores to separate words.
