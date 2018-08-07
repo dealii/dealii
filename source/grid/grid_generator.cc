@@ -5180,15 +5180,8 @@ namespace GridGenerator
               // indicators from the edges of the volume mesh to the
               // edges of the surface mesh
               //
-              // one might think that we we can also prescribe
-              // boundary indicators for edges, but this is only
-              // possible for edges that aren't just on the boundary
-              // of the domain (all of the edges we consider are!) but
-              // that would actually end up at the boundary of the
-              // surface mesh. there is no easy way to check this, so
-              // we simply don't do it and instead set it to an
-              // invalid value that makes sure
-              // Triangulation::create_triangulation doesn't copy it
+              // we set default boundary ids for boundary lines
+              // and numbers::internal_face_boundary_id for internal lines
               if (dim == 3)
                 for (unsigned int e = 0; e < 4; ++e)
                   {
