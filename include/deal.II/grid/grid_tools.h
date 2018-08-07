@@ -2454,7 +2454,7 @@ namespace GridTools
   /**
    * Copy boundary ids to manifold ids on faces and edges at the boundary. The
    * default manifold_id for new Triangulation objects is
-   * numbers::invalid_manifold_id. This function copies the boundary_ids of
+   * numbers::flat_manifold_id. This function copies the boundary_ids of
    * the boundary faces and edges to the manifold_ids of the same faces and
    * edges, allowing the user to change the boundary_ids and use them for
    * boundary conditions regardless of the geometry, which will use
@@ -2511,7 +2511,7 @@ namespace GridTools
 
   /**
    * Copy material ids to manifold ids. The default manifold_id for new
-   * Triangulation objects is numbers::invalid_manifold_id. When refinements
+   * Triangulation objects is numbers::flat_manifold_id. When refinements
    * occurs, the Triangulation asks where to locate new points to the
    * underlying manifold.
    *

@@ -623,7 +623,7 @@ public:
   has_children() const;
 
   /**
-   * Dummy function that always returns numbers::invalid_manifold_id.
+   * Dummy function that always returns numbers::flat_manifold_id.
    */
   types::manifold_id
   manifold_id() const;

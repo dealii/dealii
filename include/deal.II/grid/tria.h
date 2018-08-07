@@ -186,7 +186,7 @@ struct CellData
    *
    * - vertex indices to invalid values
    * - boundary or material id zero (the default for boundary or material ids)
-   * - manifold id to numbers::invalid_manifold_id
+   * - manifold id to numbers::flat_manifold_id
    */
   CellData();
 };
@@ -3776,7 +3776,7 @@ inline CellData<structdim>::CellData()
   material_id = 0;
 
   // And the manifold to be invalid
-  manifold_id = numbers::invalid_manifold_id;
+  manifold_id = numbers::flat_manifold_id;
 }
 
 

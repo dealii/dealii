@@ -228,9 +228,12 @@ namespace numbers
    * We assume that all valid manifold_ids lie in the range [0,
    * invalid_manifold_id).
    *
+   * @deprecated Use flat_manifold_id instead.
+   *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
+  DEAL_II_DEPRECATED
   const types::manifold_id invalid_manifold_id =
     static_cast<types::manifold_id>(-1);
 

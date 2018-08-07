@@ -1455,12 +1455,12 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
       bool cell_is_flat = true;
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
         if (cell->line(l)->manifold_id() != cell->manifold_id() &&
-            cell->line(l)->manifold_id() != numbers::invalid_manifold_id)
+            cell->line(l)->manifold_id() != numbers::flat_manifold_id)
           cell_is_flat = false;
       if (dim > 2)
         for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
           if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
-              cell->quad(q)->manifold_id() != numbers::invalid_manifold_id)
+              cell->quad(q)->manifold_id() != numbers::flat_manifold_id)
             cell_is_flat = false;
       AssertIndexRange(static_cast<unsigned int>(cell->index()),
                        coarse_cell_is_flat.size());
@@ -1547,7 +1547,7 @@ namespace
             const types::manifold_id line_manifold_id =
               cell.line(line)->manifold_id();
             if (line_manifold_id == my_manifold_id ||
-                line_manifold_id == numbers::invalid_manifold_id)
+                line_manifold_id == numbers::flat_manifold_id)
               {
                 weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,
                                                                         0)] -=
@@ -1678,7 +1678,7 @@ namespace
             const types::manifold_id face_manifold_id =
               cell.face(face)->manifold_id();
             if (face_manifold_id == my_manifold_id ||
-                face_manifold_id == numbers::invalid_manifold_id)
+                face_manifold_id == numbers::flat_manifold_id)
               {
                 for (unsigned int line = 0;
                      line < GeometryInfo<2>::lines_per_cell;
@@ -1752,7 +1752,7 @@ namespace
             const types::manifold_id line_manifold_id =
               cell.line(line)->manifold_id();
             if (line_manifold_id == my_manifold_id ||
-                line_manifold_id == numbers::invalid_manifold_id)
+                line_manifold_id == numbers::flat_manifold_id)
               {
                 weights_vertices[GeometryInfo<3>::line_to_cell_vertices(line,
                                                                         0)] -=

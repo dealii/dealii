@@ -1188,7 +1188,7 @@
  * is responsible to generate new points when the mesh is refined.
  *
  * By default, all manifold indicators of a mesh are set to
- * numbers::invalid_manifold_id. A typical piece of code that sets the
+ * numbers::flat_manifold_id. A typical piece of code that sets the
  * manifold indicator on a object to something else would look like
  * this, here setting the manifold indicator to 42 for all cells whose
  * center has an $x$ component less than zero:

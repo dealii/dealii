@@ -51,7 +51,7 @@ main()
   GridGenerator::hyper_cube(tria);
 
   tria.set_all_manifold_ids_on_boundary(1);
-  tria.begin_active()->face(2)->set_manifold_id(numbers::invalid_manifold_id);
+  tria.begin_active()->face(2)->set_manifold_id(numbers::flat_manifold_id);
   tria.set_manifold(1, manifold);
 
   tria.refine_global(3);
