@@ -637,6 +637,44 @@ namespace MatrixFreeOperators
           VectorizedArray<Number> *                     out_array) const;
 
     /**
+     * This operation performs a projection from the data given in quadrature
+     * points to the actual basis underlying this object. This projection can
+     * also be interpreted as a change of the basis from the Lagrange
+     * interpolation polynomials in the quadrature points to the
+     * basis underlying the current `fe_eval` object.
+     *
+     * Calling this function on an array as
+     * @code
+     * inverse_mass.transform_from_q_points_to_basis(1, array,
+     *                                               phi.begin_dof_values());
+     * @endcode
+     * is equivalent to
+     * @code
+     * for (unsigned int q=0; q<phi.n_q_points; ++q)
+     *   phi.submit_value(array[q], q);
+     * phi.integrate(true, false);
+     * inverse_mass.apply(coefficients, 1, phi.begin_dof_values(),
+     *                    phi.begin_dof_values());
+     * @endcode
+     * provided that @p coefficients holds the inverse of the quadrature
+     * weights and no additional coefficients. This setup highlights the
+     * underlying projection, testing a right hand side and applying an
+     * inverse mass matrix. This function works both for the scalar case as
+     * described in the example or for multiple components that are laid out
+     * component by component.
+     *
+     * Compared to the more verbose alternative, the given procedure is
+     * considerably faster because it can bypass the @p integrate() step
+     * and the first half of the transformation to the quadrature points,
+     * reducing the number of tensor product calls from 3*dim*n_components to
+     * dim*n_components.
+     */
+    void
+    transform_from_q_points_to_basis(const unsigned int n_actual_components,
+                                     const VectorizedArray<Number> *in_array,
+                                     VectorizedArray<Number> *out_array) const;
+
+    /**
      * Fills the given array with the inverse of the JxW values, i.e., a mass
      * matrix with coefficient 1. Non-unit coefficients must be multiplied (in
      * inverse form) to this array.
@@ -998,6 +1036,49 @@ namespace MatrixFreeOperators
         inv_coefficient += shift_coefficient;
       }
   }
+
+
+
+  template <int dim, int fe_degree, int n_components, typename Number>
+  inline void
+  CellwiseInverseMassMatrix<dim, fe_degree, n_components, Number>::
+    transform_from_q_points_to_basis(const unsigned int n_actual_components,
+                                     const VectorizedArray<Number> *in_array,
+                                     VectorizedArray<Number> *out_array) const
+  {
+    const unsigned int dofs_per_cell =
+      Utilities::fixed_int_power<fe_degree + 1, dim>::value;
+    internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
+                                     dim,
+                                     fe_degree + 1,
+                                     fe_degree + 1,
+                                     VectorizedArray<Number>>
+      evaluator(AlignedVector<VectorizedArray<Number>>(),
+                AlignedVector<VectorizedArray<Number>>(),
+                inverse_shape);
+
+    for (unsigned int d = 0; d < n_actual_components; ++d)
+      {
+        const VectorizedArray<Number> *in  = in_array + d * dofs_per_cell;
+        VectorizedArray<Number> *      out = out_array + d * dofs_per_cell;
+
+        if (dim == 3)
+          {
+            evaluator.template hessians<2, true, false>(in, out);
+            evaluator.template hessians<1, true, false>(out, out);
+            evaluator.template hessians<0, true, false>(out, out);
+          }
+        if (dim == 2)
+          {
+            evaluator.template hessians<1, true, false>(in, out);
+            evaluator.template hessians<0, true, false>(out, out);
+          }
+        if (dim == 1)
+          evaluator.template hessians<0, true, false>(in, out);
+      }
+  }
+
+
 
   //----------------- Base operator -----------------------------
   template <int dim, typename VectorType>
