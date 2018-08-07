@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2017 by the deal.II authors
+// Copyright (C) 2014 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,9 +39,6 @@
 #include <deal.II/matrix_free/operators.h>
 
 #include "../tests.h"
-
-
-std::ofstream logfile("output");
 
 
 
@@ -176,12 +173,9 @@ do_test(const DoFHandler<dim> &dof)
 
   mf.apply_inverse(inverse, in);
 
-  SolverControl      control(10000, 1e-12);
-  std::ostringstream stream;
-  deallog.attach(stream);
+  SolverControl            control(10000, 1e-12);
   SolverCG<Vector<number>> solver(control);
   solver.solve(mf, reference, in, PreconditionIdentity());
-  deallog.attach(logfile);
 
   inverse -= reference;
   const double diff_norm = inverse.linfty_norm() / reference.linfty_norm();
@@ -230,9 +224,13 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
+
+  // do not output CG iteration numbers to log file because these are too
+  // sensitive
+  deallog.depth_file(2);
 
   {
     deallog.push("2d");
