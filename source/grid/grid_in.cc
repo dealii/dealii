@@ -795,6 +795,10 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                0,
                                numbers::internal_face_boundary_id));
 
+          // Make sure to set both manifold id and boundary id appropriately in
+          // both cases:
+          // numbers::internal_face_boundary_id and numbers::flat_manifold_id
+          // are ignored in Triangulation::create_triangulation.
           if (apply_all_indicators_to_manifolds)
             {
               subcelldata.boundary_lines.back().boundary_id =
@@ -851,6 +855,10 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                0,
                                numbers::internal_face_boundary_id));
 
+          // Make sure to set both manifold id and boundary id appropriately in
+          // both cases:
+          // numbers::internal_face_boundary_id and numbers::flat_manifold_id
+          // are ignored in Triangulation::create_triangulation.
           if (apply_all_indicators_to_manifolds)
             {
               subcelldata.boundary_quads.back().boundary_id =
