@@ -166,7 +166,9 @@ namespace HDF5
      */
     template <typename T>
     void
-                      write_attr(const std::string attr_name, T value) const;
+    write_attr(const std::string attr_name, const T value) const;
+
+
     const std::string name;
 
   protected:
@@ -185,16 +187,17 @@ namespace HDF5
     friend class Group;
 
   protected:
+    // Open dataset
+    DataSet(const std::string name, const hid_t &parent_group_id, bool mpi);
+
+    // Create dataset
     DataSet(const std::string      name,
             const hid_t &          parent_group_id,
             std::vector<hsize_t>   dimensions,
             std::shared_ptr<hid_t> t_type,
-            bool                   mpi,
-            const Mode             mode);
+            bool                   mpi);
 
   public:
-    ~DataSet();
-
     /**
      * Writes data in the dataset. T can be double, int, unsigned int, bool
      * or std::complex<double>.
@@ -301,10 +304,9 @@ namespace HDF5
     void
     write_data_none() const;
 
-    const unsigned int         rank;
-    const std::vector<hsize_t> dimensions;
-
   private:
+    unsigned int           rank;
+    std::vector<hsize_t>   dimensions;
     std::shared_ptr<hid_t> dataspace;
     unsigned int           total_size;
   };
@@ -324,6 +326,9 @@ namespace HDF5
     Group(const std::string name, const bool mpi);
 
   public:
+    /**
+     * Opens a group.
+     */
     Group
     group(const std::string name);
 
@@ -332,6 +337,12 @@ namespace HDF5
      */
     Group
     create_group(const std::string name);
+
+    /**
+     * Opens a dataset.
+     */
+    DataSet
+    dataset(const std::string name);
 
     /**
      * Creates a dataset. T can be double, int, unsigned int, bool or

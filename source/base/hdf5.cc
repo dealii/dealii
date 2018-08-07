@@ -239,7 +239,7 @@ namespace HDF5
 
   template <typename T>
   void
-  HDF5Object::write_attr(const std::string attr_name, T value) const
+  HDF5Object::write_attr(const std::string attr_name, const T value) const
   {
     hid_t                  attr;
     hid_t                  aid;
@@ -268,7 +268,8 @@ namespace HDF5
 
   template <>
   void
-  HDF5Object::write_attr(const std::string attr_name, std::string value) const
+  HDF5Object::write_attr(const std::string attr_name,
+                         const std::string value) const
   {
     // Writes a UTF8 variable string
     //
@@ -317,14 +318,48 @@ namespace HDF5
     H5Aclose(attr);
   }
 
+  DataSet::DataSet(const std::string name,
+                   const hid_t &     parent_group_id,
+                   const bool        mpi)
+    : HDF5Object(name, mpi)
+  {
+    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+      // Relase the HDF5 resource
+      H5Dclose(*pointer);
+      delete pointer;
+    });
+    dataspace      = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+      // Relase the HDF5 resource
+      H5Sclose(*pointer);
+      delete pointer;
+    });
 
+    *hdf5_reference = H5Dopen2(parent_group_id, name.data(), H5P_DEFAULT);
+    *dataspace      = H5Dget_space(*hdf5_reference);
+    auto rank_ret   = H5Sget_simple_extent_ndims(*dataspace);
+    // rank_ret can take a negative value if the function fails. rank is
+    // unsigned int, that is way rank_ret is used to store the return
+    // value of H5Sget_simple_extent_ndims
+    Assert(rank_ret >= 0, ExcInternalError());
+    rank          = rank_ret;
+    hsize_t *dims = (hsize_t *)malloc(rank * sizeof(hsize_t));
+    rank_ret      = H5Sget_simple_extent_dims(*dataspace, dims, NULL);
+    Assert(rank_ret == static_cast<int>(rank), ExcInternalError());
+    dimensions.assign(dims, dims + rank);
+    free(dims);
+
+    total_size = 1;
+    for (auto &&dimension : dimensions)
+      {
+        total_size *= dimension;
+      }
+  }
 
   DataSet::DataSet(const std::string      name,
                    const hid_t &          parent_group_id,
                    std::vector<hsize_t>   dimensions,
                    std::shared_ptr<hid_t> t_type,
-                   const bool             mpi,
-                   const Mode             mode)
+                   const bool             mpi)
     : HDF5Object(name, mpi)
     , rank(dimensions.size())
     , dimensions(dimensions)
@@ -340,43 +375,21 @@ namespace HDF5
       delete pointer;
     });
 
+    *dataspace = H5Screate_simple(rank, dimensions.data(), NULL);
+
+    *hdf5_reference = H5Dcreate2(parent_group_id,
+                                 name.data(),
+                                 *t_type,
+                                 *dataspace,
+                                 H5P_DEFAULT,
+                                 H5P_DEFAULT,
+                                 H5P_DEFAULT);
 
     total_size = 1;
     for (auto &&dimension : dimensions)
       {
         total_size *= dimension;
       }
-
-    switch (mode)
-      {
-        case (Mode::create):
-          *dataspace = H5Screate_simple(rank, dimensions.data(), NULL);
-
-          *hdf5_reference = H5Dcreate2(parent_group_id,
-                                       name.data(),
-                                       *t_type,
-                                       *dataspace,
-                                       H5P_DEFAULT,
-                                       H5P_DEFAULT,
-                                       H5P_DEFAULT);
-          break;
-        case (Mode::open):
-          // Write the code for open
-          *hdf5_reference = H5Gopen2(parent_group_id, name.data(), H5P_DEFAULT);
-          break;
-        default:
-          Assert(false, ExcInternalError());
-          break;
-      }
-  }
-
-
-  DataSet::~DataSet()
-  {
-    // Close first the dataset
-    hdf5_reference.reset();
-    // Then close the dataspace
-    dataspace.reset();
   }
 
   template <typename T>
@@ -647,14 +660,19 @@ namespace HDF5
     return Group(name, *this, mpi, Mode::create);
   }
 
+  DataSet
+  Group::dataset(const std::string name)
+  {
+    return DataSet(name, *hdf5_reference, mpi);
+  }
+
   template <typename T>
   DataSet
   Group::create_dataset(const std::string          name,
                         const std::vector<hsize_t> dimensions) const
   {
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
-    return DataSet(
-      name, *hdf5_reference, dimensions, t_type, mpi, DataSet::Mode::create);
+    return DataSet(name, *hdf5_reference, dimensions, t_type, mpi);
   }
 
   template <typename T>
