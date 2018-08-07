@@ -17,16 +17,16 @@
 
 #include <deal.II/base/config.h>
 
-#ifndef DEAL_II_WITH_CXX17
+#ifndef DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 #  include <boost/math/special_functions/bessel.hpp>
-#endif // DEAL_II_WITH_CXX17
+#endif // DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
-#ifndef DEAL_II_WITH_CXX17
+#ifndef DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
   double (&cyl_bessel_j)(double,
                          double) = boost::math::cyl_bessel_j<double, double>;
   float (&cyl_bessel_jf)(float,
@@ -37,7 +37,7 @@ namespace std_cxx17
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
   using std::cyl_bessel_jl;
-#endif
+#endif // DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 

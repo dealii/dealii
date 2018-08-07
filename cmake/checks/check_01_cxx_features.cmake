@@ -21,7 +21,9 @@
 #   DEAL_II_WITH_CXX14
 #   DEAL_II_WITH_CXX17
 #
+#   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+#   DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #
@@ -177,22 +179,6 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
       DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
 
     #
-    # Not all compilers with C++17 support include the new special math functions:
-    #
-    CHECK_CXX_SOURCE_COMPILES(
-      "
-      #include <cmath>
-
-      int main()
-      {
-        std::cyl_bessel_j(1.0, 1.0);
-        std::cyl_bessel_jf(1.0f, 1.0f);
-        std::cyl_bessel_jl(1.0, 1.0);
-      }
-      "
-      DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS)
-
-    #
     # Some compilers treat lambdas as constexpr functions when compiling
     # with C++17 support even if they don't fulfill all the constexpr
     # function requirements. Consequently, these compilers don't allow
@@ -227,7 +213,6 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
 
   IF( DEAL_II_HAVE_CXX17_ATTRIBUTES AND
       DEAL_II_HAVE_CXX17_IF_CONSTEXPR AND
-      DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS AND
       DEAL_II_NON_CONSTEXPR_LAMBDA)
     SET(DEAL_II_HAVE_CXX17 TRUE)
   ELSE()
@@ -567,6 +552,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+  DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
   )
@@ -681,5 +667,23 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
+
+#
+# Not all compilers with C++17 support include the new special math
+# functions. Check this separately so that we can use C++17 compilers that don't
+# support it.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+
+  int main()
+  {
+    std::cyl_bessel_j(1.0, 1.0);
+    std::cyl_bessel_jf(1.0f, 1.0f);
+    std::cyl_bessel_jl(1.0, 1.0);
+  }
+  "
+  DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS)
 
 RESET_CMAKE_REQUIRED()
