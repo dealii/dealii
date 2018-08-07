@@ -144,10 +144,16 @@ public:
   /**
    * Enable output to a second stream <tt>o</tt>.
    *
-   * The optional argument @p print_job_id specifies whether
+   * @param[in] print_job_id Whether or not the JobIdentifier for the current
+   * process should be printed to the stream.
+   *
+   * @param[in] flags Format flags to set on the output stream @p o.
    */
   void
-  attach(std::ostream &o, const bool print_job_id = true);
+  attach(std::ostream &                o,
+         const bool                    print_job_id = true,
+         const std::ios_base::fmtflags flags        = std::ios::showpoint |
+                                               std::ios::left);
 
 
   /**

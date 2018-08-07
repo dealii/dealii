@@ -35,9 +35,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 flatten_triangulation(Triangulation<dim> &tria_in, Triangulation<dim> &tria_out)
@@ -163,9 +160,8 @@ test()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   test();
 

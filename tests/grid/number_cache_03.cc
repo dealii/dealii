@@ -37,10 +37,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
-
 template <int dim>
 void
 output(const Triangulation<dim> &tria)
@@ -106,8 +102,8 @@ test()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

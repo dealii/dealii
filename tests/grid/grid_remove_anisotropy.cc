@@ -29,8 +29,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 void
 check_remove_anisotropy()
 {
@@ -50,7 +48,7 @@ check_remove_anisotropy()
                                           /*max ratio =*/1.2);
 
   GridOut grid_out;
-  grid_out.write_vtk(triangulation, logfile);
+  grid_out.write_vtk(triangulation, deallog.get_file_stream());
 
   triangulation.clear();
 }
@@ -58,5 +56,6 @@ check_remove_anisotropy()
 int
 main()
 {
+  initlog();
   check_remove_anisotropy();
 }

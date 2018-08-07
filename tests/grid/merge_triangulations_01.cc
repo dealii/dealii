@@ -25,10 +25,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
-
 // testcase=0:
 // create two cubes; translate them so that no vertices overlap
 //
@@ -71,7 +67,7 @@ test(const int testcase)
   // now merge triangulations
   GridGenerator::merge_triangulations(tria_1, tria_2, tria_3);
 
-  GridOut().write_gnuplot(tria_3, logfile);
+  GridOut().write_gnuplot(tria_3, deallog.get_file_stream());
 
   deallog << "     Total number of cells        = " << tria_3.n_cells()
           << std::endl
@@ -83,9 +79,8 @@ test(const int testcase)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   for (unsigned int t = 0; t < 3; ++t)
     {

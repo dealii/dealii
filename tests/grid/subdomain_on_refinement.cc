@@ -33,9 +33,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 DeclException2(ExcNumberMismatch,
                int,
                int,
@@ -62,8 +59,8 @@ test()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

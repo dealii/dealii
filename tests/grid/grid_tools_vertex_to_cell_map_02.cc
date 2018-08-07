@@ -25,8 +25,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 void
 test()
 {
@@ -70,9 +68,8 @@ test()
 int
 main(int argc, char *argv[])
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
 
   test();
 

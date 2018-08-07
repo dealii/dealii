@@ -30,11 +30,6 @@
 
 #include "../tests.h"
 
-
-
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test()
@@ -48,16 +43,15 @@ test()
   GridOutFlags::Msh flags;
   flags.write_lines = flags.write_faces = true;
   grid_out.set_flags(flags);
-  grid_out.write_msh(tria, logfile);
+  grid_out.write_msh(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<2>();
   test<3>();

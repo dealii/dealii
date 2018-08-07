@@ -23,11 +23,6 @@
 
 #include "../tests.h"
 
-
-std::ofstream logfile("output");
-
-
-
 template <int dim, int spacedim>
 void
 pre_refinement_notification(const std::string &                 prefix,
@@ -150,9 +145,8 @@ test()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

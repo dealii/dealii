@@ -61,10 +61,9 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   FE_Q<1> linear_interpolator(1);
 

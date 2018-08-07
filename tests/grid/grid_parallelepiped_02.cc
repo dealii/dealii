@@ -29,9 +29,6 @@
 
 #include "../tests.h"
 
-// Output
-std::ofstream logfile("output");
-
 // This test creates a parallelepiped (one element) and the same
 // parallelepiped (one element); because the code that makes the two
 // one-element grids is not the same, but should result in the same
@@ -82,26 +79,26 @@ check_nd_parallelepiped_by_comparison(bool log)
 
   if (log)
     {
-      logfile << "\ncheck " << dim
-              << "d parallelepiped (subdivided_parallelepiped): ";
+      deallog << "check " << dim
+              << "d parallelepiped (subdivided_parallelepiped):";
       if (GridTools::have_same_coarse_mesh(
             triangulation_parallelepiped,
             triangulation_subdivided_parallelepiped))
-        logfile << "OK";
+        deallog << "OK" << std::endl;
 
       else
-        logfile
-          << "not OK... coarse grids are different but they should be the same";
+        deallog
+          << "not OK... coarse grids are different but they should be the same"
+          << std::endl;
     }
 }
 
 int
 main()
 {
+  initlog();
   // Check parallelepiped
   check_nd_parallelepiped_by_comparison<1>(true);
   check_nd_parallelepiped_by_comparison<2>(true);
   check_nd_parallelepiped_by_comparison<3>(true);
-
-  logfile << "\n";
 }

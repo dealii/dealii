@@ -38,9 +38,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 void
 check_file()
 {
@@ -68,9 +65,8 @@ check_file()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   check_file();
 }

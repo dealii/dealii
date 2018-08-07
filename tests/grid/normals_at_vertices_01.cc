@@ -58,10 +58,9 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   Triangulation<3>               tria;
   FlatManifold<3>                boundary;

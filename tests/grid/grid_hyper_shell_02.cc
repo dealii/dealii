@@ -29,9 +29,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 check(double r1, double r2, unsigned int n)
@@ -44,15 +41,15 @@ check(double r1, double r2, unsigned int n)
   tria.refine_global(1);
 
   GridOut grid_out;
-  grid_out.write_gnuplot(tria, logfile);
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check<3>(.5, 1, 6);
 }

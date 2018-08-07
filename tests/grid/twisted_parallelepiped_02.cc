@@ -34,7 +34,7 @@
 
 template <int dim>
 void
-check_parallelepiped(std::ofstream &logfile)
+check_parallelepiped()
 {
   // Data structure defining dim coordinates that make up a
   // parallelepiped.
@@ -73,7 +73,7 @@ check_parallelepiped(std::ofstream &logfile)
     }
   catch (ExceptionBase &exc)
     {
-      logfile << exc.get_exc_name() << std::endl;
+      deallog.get_file_stream() << exc.get_exc_name() << std::endl;
     }
 }
 
@@ -81,10 +81,10 @@ int
 main()
 {
   deal_II_exceptions::disable_abort_on_exception();
-  std::ofstream logfile("output");
+  initlog();
 
-  check_parallelepiped<1>(logfile);
-  check_parallelepiped<2>(logfile);
-  check_parallelepiped<3>(logfile);
-  logfile << "OK" << std::endl;
+  check_parallelepiped<1>();
+  check_parallelepiped<2>();
+  check_parallelepiped<3>();
+  deallog.get_file_stream() << "OK" << std::endl;
 }

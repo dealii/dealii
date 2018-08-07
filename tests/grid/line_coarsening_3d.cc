@@ -24,9 +24,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 // create a triangulation of a cylinder, where the line along the axis is common
 // to all cells, thus n_cells are neighboring at this line. in delete_children,
 // this is not accounted for (for n_cells>5) and the child lines are deleted,
@@ -90,7 +87,7 @@ check()
   // write grid to file
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(true));
-  go.write_ucd(tria, logfile);
+  go.write_ucd(tria, deallog.get_file_stream());
   // coarsen the first cell again
   cell = tria.begin_active(1);
   for (unsigned int c = 0; c < 8; ++c)
@@ -100,14 +97,14 @@ check()
     }
   tria.execute_coarsening_and_refinement();
 
-  go.write_ucd(tria, logfile);
+  go.write_ucd(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   check();
   return 0;
 }

@@ -51,8 +51,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Triangulation<3> triangulation;
   GridIn<3>        grid_in;

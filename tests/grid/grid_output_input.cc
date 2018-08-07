@@ -79,10 +79,9 @@ test(std::ostream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   deallog.push("3d");
-  test<3>(logfile);
+  test<3>(deallog.get_file_stream());
   deallog.pop();
 }

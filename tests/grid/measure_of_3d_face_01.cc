@@ -102,9 +102,8 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(5);
-  deallog.attach(logfile);
 
   // run the tests but continue when finding an exception: we will try
   // out a distorted cell for which TriaAccessor::measure() will error

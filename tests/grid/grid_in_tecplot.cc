@@ -24,9 +24,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test(const std::string &infilename)
@@ -36,16 +33,18 @@ test(const std::string &infilename)
   gi.attach_triangulation(tria);
   gi.read(infilename);
 
-  logfile << "------------------------------------------" << std::endl;
+  deallog.get_file_stream()
+    << "------------------------------------------" << std::endl;
 
   GridOut grid_out;
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 }
 
 int
 main()
 {
+  initlog();
   test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
   test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
   test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));

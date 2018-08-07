@@ -23,11 +23,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <iostream>
-
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 void
 check_remove_hanging_nodes()
@@ -52,7 +48,7 @@ check_remove_hanging_nodes()
   dealii::GridTools::remove_hanging_nodes(tria, /*isotropic=*/false);
 
   GridOut grid_out;
-  grid_out.write_vtk(tria, logfile);
+  grid_out.write_vtk(tria, deallog.get_file_stream());
 
   tria.clear();
 }
@@ -60,5 +56,6 @@ check_remove_hanging_nodes()
 int
 main()
 {
+  initlog();
   check_remove_hanging_nodes();
 }

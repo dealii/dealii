@@ -117,9 +117,7 @@ test(Triangulation<dim> &triangulation)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-
+  initlog();
   Triangulation<3> triangulation;
   GridGenerator::hyper_ball(triangulation);
   triangulation.reset_manifold(0);

@@ -23,10 +23,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
-
 // check GridTools::diameter
 template <int dim>
 void
@@ -68,6 +64,7 @@ test1()
 void
 test2()
 {
+  std::ostream &   logfile = deallog.get_file_stream();
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria);
 
@@ -88,9 +85,9 @@ test2()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(4);
 
   test1<1>();
   test1<2>();

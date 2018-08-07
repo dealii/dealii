@@ -33,9 +33,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test()
@@ -45,7 +42,7 @@ test()
   tria.refine_global(2);
 
   GridOut grid_out;
-  grid_out.write_dx(tria, logfile);
+  grid_out.write_dx(tria, deallog.get_file_stream());
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
@@ -54,16 +51,15 @@ test()
       ++cell;
     }
   tria.execute_coarsening_and_refinement();
-  grid_out.write_dx(tria, logfile);
+  grid_out.write_dx(tria, deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<2>();
   test<3>();
