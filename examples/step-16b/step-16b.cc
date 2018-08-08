@@ -278,10 +278,9 @@ namespace Step16
     const std::map<types::boundary_id, const Function<dim> *>
       dirichlet_boundary_functions = {
         {types::boundary_id(0), &homogeneous_dirichlet_bc}};
-    VectorTools::interpolate_boundary_values(
-      static_cast<const DoFHandler<dim> &>(dof_handler),
-      dirichlet_boundary_functions,
-      constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             dirichlet_boundary_functions,
+                                             constraints);
     constraints.close();
     constraints.condense(dsp);
     sparsity_pattern.copy_from(dsp);

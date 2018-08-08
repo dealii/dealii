@@ -84,10 +84,11 @@ namespace Step16
 {
   // @sect3{The Scratch and Copy objects}
   //
-  // We use MeshWorker::mesh_loop() to assemble our matrices. For this, we need
-  // a ScratchData object to store temporary data on each cell (this is just the
-  // FEValues object) and a CopyData object that will contain the output of each
-  // cell assembly.
+  // We use MeshWorker::mesh_loop() to assemble our matrices. For this, we
+  // need a ScratchData object to store temporary data on each cell (this is
+  // just the FEValues object) and a CopyData object that will contain the
+  // output of each cell assembly. For more details about the usage of scratch
+  // and copy objects, see the WorkStream namespace.
   template <int dim>
   struct ScratchData
   {
@@ -424,7 +425,9 @@ namespace Step16
   // us, and thus the difference between this function and the previous lies
   // only in the setup of the assembler and the different iterators in the loop.
   //
-  // We generate an AffineConstraints<> object
+  // We generate an AffineConstraints<> object for each level containing the
+  // boundary and interface dofs as constrained entries. The corresponding
+  // object is then used to generate the level matrices.
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
   {
@@ -587,7 +590,7 @@ namespace Step16
     solution = 0;
 
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
-    std::cout << "  Number of CG iterations: " << solver_control.last_step()
+    std::cout << "   Number of CG iterations: " << solver_control.last_step()
               << "\n"
               << std::endl;
     constraints.distribute(solution);

@@ -6,7 +6,8 @@ As in step-16, the solution looks like this on the finest mesh:
   <img src="https://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
 </p>
 
-The output is formatted in a slightly different way compared to step-16:
+The output is formatted in a slightly different way compared to step-16 but is
+functionally the same and shows the same convergence properties:
 <pre>
 DEAL::Cycle 0
 DEAL::   Number of active cells:       20
@@ -49,8 +50,3 @@ DEAL::   Number of degrees of freedom: 2359 (by level: 8, 25, 89, 308, 779, 1262
 DEAL:cg::Starting value 0.141519
 DEAL:cg::Convergence step 10 value 5.74965e-13
 </pre>
-
-
-<h3> Possible extensions </h3>
-
-See step-16.

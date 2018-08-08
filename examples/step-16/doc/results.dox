@@ -13,42 +13,42 @@ the solver performance. Therefore, here is the textual output:
 Cycle 0
    Number of active cells:       80
    Number of degrees of freedom: 89 (by level: 8, 25, 89)
-  Number of CG iterations: 8
+   Number of CG iterations: 8
 
 Cycle 1
    Number of active cells:       158
    Number of degrees of freedom: 183 (by level: 8, 25, 89, 138)
-  Number of CG iterations: 9
+   Number of CG iterations: 9
 
 Cycle 2
    Number of active cells:       302
    Number of degrees of freedom: 352 (by level: 8, 25, 89, 223, 160)
-  Number of CG iterations: 10
+   Number of CG iterations: 10
 
 Cycle 3
    Number of active cells:       578
    Number of degrees of freedom: 649 (by level: 8, 25, 89, 231, 494, 66)
-  Number of CG iterations: 10
+   Number of CG iterations: 10
 
 Cycle 4
    Number of active cells:       1100
    Number of degrees of freedom: 1218 (by level: 8, 25, 89, 274, 764, 417, 126)
-  Number of CG iterations: 10
+   Number of CG iterations: 10
 
 Cycle 5
    Number of active cells:       2096
    Number of degrees of freedom: 2317 (by level: 8, 25, 89, 304, 779, 1214, 817)
-  Number of CG iterations: 11
+   Number of CG iterations: 11
 
 Cycle 6
    Number of active cells:       3986
    Number of degrees of freedom: 4366 (by level: 8, 25, 89, 337, 836, 2270, 897, 1617)
-  Number of CG iterations: 10
+   Number of CG iterations: 10
 
 Cycle 7
    Number of active cells:       7574
    Number of degrees of freedom: 8350 (by level: 8, 25, 89, 337, 1086, 2835, 2268, 1789, 3217)
-  Number of CG iterations: 11
+   Number of CG iterations: 11
 </pre>
 
 That's almost perfect multigrid performance: the linear residual gets reduced by 12 orders of
@@ -60,7 +60,7 @@ it shows the power of multigrid methods.
 <h3> Possible extensions </h3>
 
 
-We encourage you to switch generate timings for the solve() call and compare to
+We encourage you to generate timings for the solve() call and compare to
 step 6. You will see that the multigrid method has quite an overhead
 on coarse meshes, but that it always beats other methods on fine
 meshes because of its optimal complexity.
@@ -78,8 +78,8 @@ preconditioner that uses some sort of multigrid hierarchy for good performance
 but can figure out level matrices and similar things by itself. Algebraic
 multigrid methods do exactly this, and we will use them in step-31 for the
 solution of a Stokes problem and in step-32 and step-40 for a parallel
-variation. That said, a parallel version of this example program with MPI is found
-as step-50.
+variation. That said, a parallel version of this example program with MPI can be
+found in step-50.
 
 Finally, one may want to think how to use geometric multigrid for other kinds of
 problems, specifically @ref vector_valued "vector valued problems". This is the
