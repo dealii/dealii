@@ -146,6 +146,7 @@ ENDIF()
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
+    cuda_kernels.cu
     cuda_solver_direct.cu
     cuda_sparse_matrix.cu
     cuda_vector.cu

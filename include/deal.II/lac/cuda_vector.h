@@ -165,7 +165,7 @@ namespace LinearAlgebra
       add(const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
-       * Multiple addition of scaled vectors, i.e. <tt>*this += a*V</tt>.
+       * Multiple additions of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
        */
       virtual void
       add(const Number                     a,
