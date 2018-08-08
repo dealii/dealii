@@ -1,5 +1,10 @@
 <br>
 
+<i> Note: A variant called step-16b of this tutorial exists, that uses
+MeshWorker and LocalIntegrators instead of assembling matrices manually as it
+is done in this tutorial.
+</i>
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
