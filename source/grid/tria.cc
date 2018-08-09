@@ -951,6 +951,8 @@ namespace
     Assert(face_1->at_boundary() && face_2->at_boundary(),
            ExcMessage("Periodic faces must be on the boundary"));
 
+    Assert(std::abs(cell_1->level() - cell_2->level()) < 2, ExcInternalError());
+
     // insert periodic face pair for both cells
     using CellFace =
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
