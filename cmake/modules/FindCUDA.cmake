@@ -43,10 +43,8 @@ IF(CUDA_FOUND)
   MESSAGE(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
 ENDIF()
 
-# cuSOLVER requires OpenMP
-FIND_PACKAGE(OpenMP)
 SET(_cuda_libraries ${CUDA_LIBRARIES} ${CUDA_cusparse_LIBRARY}
-  ${CUDA_cusolver_LIBRARY} ${OpenMP_CXX_FLAGS})
+  ${CUDA_cusolver_LIBRARY})
 SET(_cuda_include_dirs ${CUDA_INCLUDE_DIRS})
 DEAL_II_PACKAGE_HANDLE(CUDA
   LIBRARIES REQUIRED _cuda_libraries
