@@ -2739,7 +2739,7 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
                                                   1,
                                                   n_mpi_processes);
 
-  const int MB = n_rows, NB = std::ceil(n_columns / n_mpi_processes);
+  const int MB = n_rows, NB = std::ceil((double)n_columns / n_mpi_processes);
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
   copy_to(tmp);
 
@@ -3155,7 +3155,7 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
                                                   1,
                                                   n_mpi_processes);
 
-  const int MB = n_rows, NB = std::ceil(n_columns / n_mpi_processes);
+  const int MB = n_rows, NB = std::ceil((double)n_columns / n_mpi_processes);
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
 
   // get pointer to data held by the process
