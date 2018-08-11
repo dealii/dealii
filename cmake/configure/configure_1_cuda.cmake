@@ -24,6 +24,12 @@ SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
+  # We need to set CUDA_USE_STATIC_CUDA_RUNTIME before FIND_PACKAGE(CUDA) and to
+  # force the value otherwise it is overwritten by FIND_PACKAGE(CUDA)
+  IF(BUILD_SHARED_LIBS)
+    SET(CUDA_USE_STATIC_CUDA_RUNTIME OFF CACHE BOOL "" FORCE)
+  ENDIF()
+
   #
   # TODO: Ultimately, this find_package call is not needed any more. We
   # still use it because it is very convenient to (a) check that CUDA is
@@ -95,6 +101,10 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    # cuSOLVER requires OpenMP
+    FIND_PACKAGE(OpenMP)
+    SET(DEAL_II_LINKER_FLAGS "${DEAL_II_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 
     ADD_FLAGS(DEAL_II_CUDA_FLAGS_DEBUG "-G")
   ENDIF()
