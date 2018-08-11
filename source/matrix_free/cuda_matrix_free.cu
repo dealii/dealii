@@ -21,8 +21,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace CUDAWrappers
 {
-#  include "cuda_matrix_free.inst"
-}
+  // Do not instantiate for dim = 1
+  template class MatrixFree<2, float>;
+  template class MatrixFree<2, double>;
+  template class MatrixFree<3, float>;
+  template class MatrixFree<3, double>;
+} // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 

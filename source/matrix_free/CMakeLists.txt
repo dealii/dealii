@@ -38,12 +38,7 @@ IF(DEAL_II_WITH_CUDA)
     ${_src}
     )
   SET(_inst
-    cuda_matrix_free.inst.in
     ${_inst}
-    )
-  FILE(GLOB _header
-    ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.cuh
-    ${_header}
     )
 ENDIF()
 

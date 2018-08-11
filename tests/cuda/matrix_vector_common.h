@@ -46,7 +46,7 @@
 #include "matrix_vector_mf.h"
 
 
-// forward declare this function. will be implemented in .cc files
+// forward declare this function. will be implemented in .cu files
 template <int dim, int fe_degree>
 void
 test();
@@ -89,7 +89,6 @@ do_test(const DoFHandler<dim> &          dof,
   mf.vmult(out_device, in_device);
   cudaDeviceSynchronize();
   out.import(out_device, VectorOperation::insert);
-
 
   // assemble sparse matrix with (\nabla v, \nabla u) + (v, 10 * u)
   SparsityPattern sparsity;
@@ -142,14 +141,11 @@ do_test(const DoFHandler<dim> &          dof,
     in_host[i] = in[i];
   sparse_matrix.vmult(out_host, in_host);
 
-  Number out_dist_cpu_norm = 0.;
-  Number out_norm          = 0.;
+  Number out_norm = 0.;
   for (unsigned i = 0; i < n_dofs; ++i)
-    {
-      out_norm += std::pow(out[i] - out_host[i], 2);
-      out_dist_cpu_norm += std::pow(out_host[i], 2);
-    }
-  const double diff_norm = out_norm / out_dist_cpu_norm;
+    out_norm += std::pow(out[i] - out_host[i], 2);
+  const double diff_norm = std::sqrt(out_norm) / out_host.linfty_norm();
+
   deallog << "Norm of difference: " << diff_norm << std::endl << std::endl;
 }
 
@@ -166,7 +162,7 @@ main()
   {
     deallog.push("2d");
     test<2, 1>();
-    test<2, 2>();
+    //  test<2, 2>();
     test<2, 3>();
     deallog.pop();
     deallog.push("3d");

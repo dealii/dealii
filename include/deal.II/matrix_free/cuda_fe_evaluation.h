@@ -16,14 +16,19 @@
 #ifndef dealii_cuda_fe_evaluation_h
 #define dealii_cuda_fe_evaluation_h
 
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/config.h>
 
-#include <deal.II/lac/cuda_vector.h>
+#ifdef DEAL_II_WITH_CUDA
 
-#include <deal.II/matrix_free/cuda_matrix_free.h>
-#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
-#include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
+#  include <deal.II/base/tensor.h>
+#  include <deal.II/base/utilities.h>
+
+#  include <deal.II/lac/cuda_vector.h>
+
+#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#  include <deal.II/matrix_free/cuda_matrix_free.h>
+#  include <deal.II/matrix_free/cuda_matrix_free.templates.h>
+#  include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -32,18 +37,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace CUDAWrappers
 {
-  namespace internal
-  {
-    template <int dim, int fe_degree, bool transpose, typename Number>
-    __device__ void
-    resolve_hanging_nodes_shmem(Number *values, const unsigned int constr)
-    {
-      // TODO
-    }
-  } // namespace internal
-
-
-
   /**
    * This class provides all the functions necessary to evaluate functions at
    * quadrature points and cell integrations. In functionality, this class is
@@ -237,8 +230,8 @@ namespace CUDAWrappers
     values[idx] = __ldg(&src[src_idx]);
 
     if (constraint_mask)
-      internal::resolve_hanging_nodes_shmem<dim, fe_degree, false>(
-        values, constraint_mask);
+      internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_mask,
+                                                             values);
 
     __syncthreads();
   }
@@ -257,9 +250,8 @@ namespace CUDAWrappers
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
     if (constraint_mask)
-      internal::resolve_hanging_nodes_shmem<dim, fe_degree, true>(
-        values, constraint_mask);
-
+      internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_mask,
+                                                            values);
 
     const unsigned int idx =
       (threadIdx.x % n_q_points_1d) +
@@ -454,5 +446,7 @@ namespace CUDAWrappers
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

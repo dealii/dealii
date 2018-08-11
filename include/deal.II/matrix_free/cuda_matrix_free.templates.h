@@ -28,6 +28,7 @@
 
 #  include <deal.II/grid/filtered_iterator.h>
 
+#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <cuda_runtime_api.h>
@@ -114,7 +115,6 @@ namespace CUDAWrappers
     /**
      * Helper class to (re)initialize MatrixFree object.
      */
-    // TODO for now does not support hanging_nodes
     template <int dim, typename Number>
     class ReinitHelper
     {
@@ -125,8 +125,9 @@ namespace CUDAWrappers
         const FiniteElement<dim, dim> &fe,
         const Quadrature<1> &          quad,
         const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-          &                shape_info,
-        const UpdateFlags &update_flags);
+          &                    shape_info,
+        const DoFHandler<dim> &dof_handler,
+        const UpdateFlags &    update_flags);
 
       void
       setup_color_arrays(const unsigned int n_colors);
@@ -160,6 +161,7 @@ namespace CUDAWrappers
       const unsigned int               q_points_per_cell;
       const UpdateFlags &              update_flags;
       const unsigned int               padding_length;
+      HangingNodes<dim>                hanging_nodes;
     };
 
 
@@ -171,8 +173,9 @@ namespace CUDAWrappers
       const FiniteElement<dim> &fe,
       const Quadrature<1> &     quad,
       const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-        &                shape_info,
-      const UpdateFlags &update_flags)
+        &                    shape_info,
+      const DoFHandler<dim> &dof_handler,
+      const UpdateFlags &    update_flags)
       : data(data)
       , fe_degree(data->fe_degree)
       , dofs_per_cell(data->dofs_per_cell)
@@ -185,6 +188,7 @@ namespace CUDAWrappers
       , lexicographic_inv(shape_info.lexicographic_numbering)
       , update_flags(update_flags)
       , padding_length(data->get_padding_length())
+      , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
     {
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
@@ -275,8 +279,13 @@ namespace CUDAWrappers
     {
       cell->get_dof_indices(local_dof_indices);
 
+
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
+
+      hanging_nodes.setup_constraints(lexicographic_dof_indices,
+                                      cell,
+                                      constraint_mask_host[cell_id]);
 
       memcpy(&local_to_global_host[cell_id * padding_length],
              lexicographic_dof_indices.data(),
@@ -323,9 +332,7 @@ namespace CUDAWrappers
       // Local-to-global mapping
       if (data->parallelization_scheme ==
           MatrixFree<dim, Number>::parallel_over_elem)
-        internal::transpose_in_place(local_to_global_host,
-                                     n_cells,
-                                     padding_length);
+        transpose_in_place(local_to_global_host, n_cells, padding_length);
 
       alloc_and_copy(&data->local_to_global[color],
                      local_to_global_host,
@@ -336,9 +343,7 @@ namespace CUDAWrappers
         {
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(q_points_host,
-                                         n_cells,
-                                         padding_length);
+            transpose_in_place(q_points_host, n_cells, padding_length);
 
           alloc_and_copy(&data->q_points[color],
                          q_points_host,
@@ -350,7 +355,7 @@ namespace CUDAWrappers
         {
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(JxW_host, n_cells, padding_length);
+            transpose_in_place(JxW_host, n_cells, padding_length);
 
           alloc_and_copy(&data->JxW[color], JxW_host, n_cells * padding_length);
         }
@@ -362,18 +367,18 @@ namespace CUDAWrappers
           // are together, etc., i.e., reorder indices from
           // cell_id*q_points_per_cell*dim*dim + q*dim*dim +i to
           // i*q_points_per_cell*n_cells + cell_id*q_points_per_cell+q
-          internal::transpose_in_place(inv_jacobian_host,
-                                       padding_length * n_cells,
-                                       dim * dim);
+          transpose_in_place(inv_jacobian_host,
+                             padding_length * n_cells,
+                             dim * dim);
 
           // Transpose second time means we get the following index order:
           // q*n_cells*dim*dim + i*n_cells + cell_id which is good for an
           // element-level parallelization
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(inv_jacobian_host,
-                                         n_cells * dim * dim,
-                                         padding_length);
+            transpose_in_place(inv_jacobian_host,
+                               n_cells * dim * dim,
+                               padding_length);
 
           alloc_and_copy(&data->inv_jacobian[color],
                          inv_jacobian_host,
@@ -546,7 +551,7 @@ namespace CUDAWrappers
     cells_per_block = cells_per_block_shmem(dim, fe_degree);
 
     internal::ReinitHelper<dim, Number> helper(
-      this, mapping, fe, quad, shape_info, update_flags);
+      this, mapping, fe, quad, shape_info, dof_handler, update_flags);
 
     // Create a graph coloring
     using CellFilter =
@@ -554,8 +559,6 @@ namespace CUDAWrappers
     CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                      dof_handler.begin_active());
     CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    using fun_type =
-      std::function<std::vector<types::global_dof_index>(CellFilter const &)>;
     const auto fun = [&](const CellFilter &filter) {
       return internal::get_conflict_indices<dim, Number>(filter, constraints);
     };
