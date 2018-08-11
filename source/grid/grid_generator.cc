@@ -1954,9 +1954,8 @@ namespace GridGenerator
     }
 
     /**
-     * Keep the main 2D implementation internal as we will use
-     * material id in 3D case, whereas the actual 2D function
-     * will reset material id in addition to this one.
+     * Now that we don't need the material id technique we can remove this in
+     * the next commit
      */
     void plate_with_a_hole(Triangulation<2> &       tria,
                            const double             inner_radius,
@@ -1998,10 +1997,9 @@ namespace GridGenerator
                                                       /*repetitions*/ 1,
                                                       colorize);
 
-      // Mark the cylinder material ids as 2 to distinguish them from the bulk
-      // cells (these are read again in the loop that sets manifold ids)
+      // we will deal with face manifold ids after we merge triangulations
       for (const auto &cell : cylinder_tria.active_cell_iterators())
-        cell->set_material_id(2);
+        cell->set_manifold_id(tfi_manifold_id);
 
       // hyper_cube_with_cylindrical_hole will have 2 cells along
       // each face, so he element size is outer_radius
@@ -2058,10 +2056,6 @@ namespace GridGenerator
                                         min_line_length(cylinder_tria)) /
                                2.0;
 
-      // set material ID in bulk part to something other than 2
-      for (const auto &cell : tria_without_cylinder.active_cell_iterators())
-        cell->set_material_id(1);
-
       GridGenerator::merge_triangulations(tria_without_cylinder,
                                           cylinder_tria,
                                           tria,
@@ -2072,9 +2066,8 @@ namespace GridGenerator
         {
           // set all non-boundary manifold ids on the cells that came from the
           // grid around the cylinder to the new TFI manifold id.
-          if (cell->material_id() == 2)
+          if (cell->manifold_id() == tfi_manifold_id)
             {
-              cell->set_manifold_id(tfi_manifold_id);
               for (unsigned int face_n = 0;
                    face_n < GeometryInfo<2>::faces_per_cell;
                    ++face_n)
@@ -2122,7 +2115,8 @@ namespace GridGenerator
                   // cylinder boundary
                   else
                     {
-                      Assert(cell->material_id() == 2, ExcInternalError());
+                      Assert(cell->manifold_id() == tfi_manifold_id,
+                             ExcInternalError());
                       face->set_boundary_id(4);
                     }
                 }
@@ -2168,10 +2162,6 @@ namespace GridGenerator
                                 L,
                                 n_slices,
                                 colorize);
-
-    // reset material id
-    for (auto &cell : tria.active_cell_iterators())
-      cell->set_material_id(0);
   }
 
 
@@ -2207,41 +2197,10 @@ namespace GridGenerator
                                 colorize);
 
     // extrude to 3D
-    extrude_triangulation(tria_2, n_slices, L, tria);
+    extrude_triangulation(tria_2, n_slices, L, tria, true);
 
     // shift in Z direction to match specified center
     GridTools::shift(Point<3>(0, 0, new_center[2] - L / 2.), tria);
-
-    // extrude will keep boundary IDs but can not keep manifolds, set them
-    // below:
-    const FlatManifold<3> flat_manifold;
-    for (const auto &cell : tria.active_cell_iterators())
-      if (cell->material_id() == 2)
-        {
-          cell->set_all_manifold_ids(tfi_manifold_id);
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<3>::faces_per_cell;
-               ++face_n)
-            {
-              // similar check to 2D version
-              const auto face = cell->face(face_n);
-              if (face->at_boundary() &&
-                  internal::point_in_2d_box(face->center(),
-                                            new_center,
-                                            outer_radius) &&
-                  std::abs(
-                    flat_manifold.normal_vector(face, face->center())[2]) <
-                    1.0e-10)
-                face->set_manifold_id(polar_manifold_id);
-              else
-                face->set_manifold_id(tfi_manifold_id);
-            }
-        }
-      else
-        {
-          // otherwise set everything to flat manifold
-          cell->set_all_manifold_ids(numbers::flat_manifold_id);
-        }
 
     // set up the new manifolds
     const Tensor<1, 3>           direction{{0.0, 0.0, 1.0}};
@@ -2251,10 +2210,6 @@ namespace GridGenerator
     inner_manifold.initialize(tria);
     tria.set_manifold(polar_manifold_id, cylindrical_manifold);
     tria.set_manifold(tfi_manifold_id, inner_manifold);
-
-    // finally reset material ids
-    for (auto &cell : tria.active_cell_iterators())
-      cell->set_material_id(0);
   }
 
 
