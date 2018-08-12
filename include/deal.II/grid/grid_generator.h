@@ -368,6 +368,99 @@ namespace GridGenerator
                     const bool               colorize          = false);
 
   /**
+   * Generate a grid consisting of a channel with a cylinder. This is a common
+   * benchmark for Navier-Stokes solvers. The geometry consists of a channel
+   * of size $[0, 2.2] \times [0, 0.41] \times [0, 0.41] $ (where the $z$
+   * dimension is omitted in 2D) with a cylinder, parallel to the $z$ axis
+   * with diameter $0.1$, centered at $(0.2, 0.2, 0)$. The channel has three
+   * distinct regions:
+   * <ol>
+   *   <li>If @p n_shells is greater than zero, then there are that many shells
+   *   centered around the cylinder,</li>
+   *   <li>a blending region between the shells and the rest of the
+   *   triangulation, and</li>
+   *   <li>a bulk region consisting of Cartesian cells.</li>
+   * </ol>
+   * Since the cylinder is slightly offset from the center of the channel,
+   * this geometry results in vortex shedding at moderate Reynolds
+   * numbers. Here is the grid (after one global refinement) in 2D:
+   *
+   * @image html channel_with_cylinder_2d.png
+   *
+   * and in 3D:
+   *
+   * @image html channel_with_cylinder_3d.png
+   *
+   * The resulting Triangulation uses three manifolds: a PolarManifold (in 2D)
+   * or CylindricalManifold (in 3D) with manifold id $0$, a
+   * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
+   * everywhere else. For more information on this topic see @ref
+   * GlossManifoldIndicator "the glossary entry on manifold indicators".  The
+   * cell faces on the cylinder and surrounding shells have manifold ids of
+   * $0$, while the cell volumes adjacent to the shells (or, if they do not
+   * exist, the cylinder) have a manifold id of $1$. Put another way: this
+   * grid uses TransfiniteInterpolationManifold to smoothly transition from
+   * the shells (generated with GridGenerator::concentric_hyper_shells) to the
+   * bulk region. All other cell volumes and faces have manifold id
+   * numbers::flat_manifold_id and use FlatManifold. All cells with id
+   * numbers::flat_manifold_id are rectangular prisms aligned with the
+   * coordinate axes.
+   *
+   * The picture below shows part of the 2D grid (using all default arguments
+   * to this function) after two global refinements. The cells with manifold
+   * id $0$ are orange (the polar manifold id), cells with manifold id $1$ are
+   * yellow (the transfinite interpolation manifold id), and the ones with
+   * manifold id numbers::flat_manifold_id are cyan:
+   *
+   * @image html channel_with_cylinder_2d_manifolds.png
+   *
+   * @param tria Triangulation to create. Must be empty upon calling this
+   * function.
+   *
+   * @param shell_region_width Width of the layer of shells around the cylinder.
+   * This value should be between $0$ and $0.05$; the default value is $0.03$.
+   *
+   * @param n_shells Number of shells to use in the shell layer.
+   *
+   * @param skewness Parameter controlling how close the shells are
+   * to the cylinder: see the mathematical definition given in
+   * GridGenerator::concentric_hyper_shells.
+   *
+   * @param colorize Assign different boundary ids if set to true. For more
+   * information on boundary indicators see
+   * @ref GlossBoundaryIndicator "this glossary entry".
+   * The left boundary (at $x = 0$) is assigned an id of $0$, the right
+   * boundary (at $x = 2.2$) is assigned an id of $1$, the cylinder boundary
+   * is assigned an id of $2$, and the channel walls are assigned an id of
+   * $3$.
+   *
+   * See the original paper for more information:
+   * @code{.bib}
+   * @inbook{schafer1996,
+   * author    = {Sch{\"a}fer, M. and Turek, S. and Durst, F. and Krause, E.
+   *              and Rannacher, R.},
+   * title     = {Benchmark Computations of Laminar Flow Around a Cylinder},
+   * bookTitle = {Flow Simulation with High-Performance Computers II: DFG
+   *              Priority Research Programme Results 1993--1995},
+   * year      = {1996},
+   * publisher = {Vieweg+Teubner Verlag},
+   * address   = {Wiesbaden},
+   * pages     = {547--566},
+   * isbn      = {978-3-322-89849-4},
+   * doi       = {10.1007/978-3-322-89849-4_39},
+   * url       = {https://doi.org/10.1007/978-3-322-89849-4_39}
+   * }
+   * @endcode
+   */
+  template <int dim>
+  void
+  channel_with_cylinder(Triangulation<dim> &tria,
+                        const double        shell_region_width = 0.03,
+                        const unsigned int  n_shells           = 2,
+                        const double        skewness           = 2.0,
+                        const bool          colorize           = false);
+
+  /**
    * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
    * responsibility of the user to provide the vertices in the right order (see
    * the documentation of the GeometryInfo class) because the vertices are
@@ -954,7 +1047,7 @@ namespace GridGenerator
   torus(Triangulation<dim, spacedim> &tria, const double R, const double r);
 
   /**
-   * This class produces a square in the <i>xy</i>-plane with a cylindrical
+   * This function produces a square in the <i>xy</i>-plane with a cylindrical
    * hole in the middle. The square and the circle are centered at the
    * origin. In 3d, this geometry is extruded in $z$ direction to the interval
    * $[0,L]$.
@@ -1564,8 +1657,28 @@ namespace GridGenerator
                                         const double,
                                         const unsigned int,
                                         const bool);
-#endif
 
+  template <>
+  void channel_with_cylinder(Triangulation<1> &,
+                             const double,
+                             const unsigned int,
+                             const double,
+                             const bool);
+
+  template <>
+  void channel_with_cylinder(Triangulation<2> &,
+                             const double,
+                             const unsigned int,
+                             const double,
+                             const bool);
+
+  template <>
+  void channel_with_cylinder(Triangulation<3> &,
+                             const double,
+                             const unsigned int,
+                             const double,
+                             const bool);
+#endif
 } // namespace GridGenerator
 
 
