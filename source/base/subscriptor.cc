@@ -185,18 +185,22 @@ Subscriptor::unsubscribe(const char *id) const
   if (counter == 0)
     return;
 
-  --counter;
-
 #ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
 #endif
 
   map_iterator it = counter_map.find(name);
-  AssertNothrow(it != counter_map.end(),
-                ExcNoSubscriber(object_info->name(), name));
-  AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
-
-  it->second--;
+  if (it == counter_map.end() || it->second == 0)
+    {
+      AssertNothrow(it != counter_map.end(),
+                    ExcNoSubscriber(object_info->name(), name));
+      AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
+    }
+  else
+    {
+      --counter;
+      it->second--;
+    }
 }
 
 
