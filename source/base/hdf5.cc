@@ -34,6 +34,9 @@ namespace HDF5
 {
   namespace internal
   {
+    // This function gives the HDF5 datatype corresponding to the C++ type. In
+    // the case of std::complex types the HDF5 handlers are automatically freed
+    // using the destructor of std::shared_ptr.
     template <typename T>
     std::shared_ptr<hid_t>
     get_hdf5_datatype()
@@ -115,6 +118,46 @@ namespace HDF5
         }
       return t_type;
     }
+
+    // This function returns the pointer to the raw data of a container
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, std::vector<T>>::value,
+                            void *>::type
+    get_container_pointer(Container<T> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong
+      return data.data();
+    }
+
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, FullMatrix<T>>::value,
+                            void *>::type
+    get_container_pointer(FullMatrix<T> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong
+      return &data[0][0];
+    }
+
+    // This function initializes a container of T type
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, std::vector<T>>::value,
+                            Container<T>>::type
+    initialize_container(std::vector<hsize_t> dimensions)
+    {
+      return std::vector<T>(std::accumulate(
+        dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
+    }
+
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, FullMatrix<T>>::value,
+                            Container<T>>::type
+    initialize_container(std::vector<hsize_t> dimensions)
+    {
+      return FullMatrix<T>(dimensions[0], dimensions[1]);
+    }
+
   } // namespace internal
 
 
@@ -204,39 +247,6 @@ namespace HDF5
     return string_value;
   }
 
-  template <>
-  FullMatrix<double>
-  HDF5Object::attr(const std::string attr_name) const
-  {
-    hid_t attr;
-    hid_t attr_space;
-    attr       = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
-    attr_space = H5Aget_space(attr);
-    AssertDimension(H5Sget_simple_extent_ndims(attr_space), 2);
-    hsize_t dims[2];
-    H5Sget_simple_extent_dims(attr_space, dims, NULL);
-
-    FullMatrix<double> matrix_value(dims[0], dims[1]);
-
-    double *hdf5_data = (double *)malloc(dims[0] * dims[1] * sizeof(double));
-    H5Aread(attr, H5T_NATIVE_DOUBLE, hdf5_data);
-    for (unsigned int dim0_idx = 0; dim0_idx < dims[0]; ++dim0_idx)
-      {
-        for (unsigned int dim1_idx = 0; dim1_idx < dims[1]; ++dim1_idx)
-          {
-            matrix_value[dim0_idx][dim1_idx] =
-              hdf5_data[dim0_idx * dims[1] + dim1_idx];
-          }
-      }
-
-    H5Sclose(attr_space);
-    H5Aclose(attr);
-
-    free(hdf5_data);
-
-    return matrix_value;
-  }
-
   template <typename T>
   void
   HDF5Object::write_attr(const std::string attr_name, const T value) const
@@ -322,6 +332,10 @@ namespace HDF5
                    const hid_t &     parent_group_id,
                    const bool        mpi)
     : HDF5Object(name, mpi)
+    , _check_io_mode(false)
+    , _io_mode(H5D_MPIO_NO_COLLECTIVE)
+    , _local_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
+    , _global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
       // Relase the HDF5 resource
@@ -341,17 +355,17 @@ namespace HDF5
     // unsigned int, that is way rank_ret is used to store the return
     // value of H5Sget_simple_extent_ndims
     Assert(rank_ret >= 0, ExcInternalError());
-    rank          = rank_ret;
-    hsize_t *dims = (hsize_t *)malloc(rank * sizeof(hsize_t));
+    _rank         = rank_ret;
+    hsize_t *dims = (hsize_t *)malloc(_rank * sizeof(hsize_t));
     rank_ret      = H5Sget_simple_extent_dims(*dataspace, dims, NULL);
-    Assert(rank_ret == static_cast<int>(rank), ExcInternalError());
-    dimensions.assign(dims, dims + rank);
+    Assert(rank_ret == static_cast<int>(_rank), ExcInternalError());
+    _dimensions.assign(dims, dims + _rank);
     free(dims);
 
-    total_size = 1;
-    for (auto &&dimension : dimensions)
+    _size = 1;
+    for (auto &&dimension : _dimensions)
       {
-        total_size *= dimension;
+        _size *= dimension;
       }
   }
 
@@ -361,8 +375,12 @@ namespace HDF5
                    std::shared_ptr<hid_t> t_type,
                    const bool             mpi)
     : HDF5Object(name, mpi)
-    , rank(dimensions.size())
-    , dimensions(dimensions)
+    , _rank(dimensions.size())
+    , _dimensions(dimensions)
+    , _check_io_mode(false)
+    , _io_mode(H5D_MPIO_NO_COLLECTIVE)
+    , _local_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
+    , _global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
       // Relase the HDF5 resource
@@ -375,7 +393,7 @@ namespace HDF5
       delete pointer;
     });
 
-    *dataspace = H5Screate_simple(rank, dimensions.data(), NULL);
+    *dataspace = H5Screate_simple(_rank, dimensions.data(), NULL);
 
     *hdf5_reference = H5Dcreate2(parent_group_id,
                                  name.data(),
@@ -385,20 +403,70 @@ namespace HDF5
                                  H5P_DEFAULT,
                                  H5P_DEFAULT);
 
-    total_size = 1;
+    _size = 1;
     for (auto &&dimension : dimensions)
       {
-        total_size *= dimension;
+        _size *= dimension;
       }
+  }
+
+  template <template <class...> class Container, typename T>
+  Container<T>
+  DataSet::read_data()
+  {
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    hid_t                  plist;
+    herr_t                 ret;
+
+    Container<T> data =
+      internal::initialize_container<Container, T>(_dimensions);
+
+    if (mpi)
+      {
+        plist = H5Pcreate(H5P_DATASET_XFER);
+        Assert(plist >= 0, ExcInternalError());
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcInternalError());
+      }
+    else
+      {
+        plist = H5P_DEFAULT;
+      }
+
+    ret = H5Dread(*hdf5_reference,
+                  *t_type,
+                  H5S_ALL,
+                  H5S_ALL,
+                  plist,
+                  internal::get_container_pointer<Container, T>(data));
+    Assert(ret >= 0, ExcInternalError());
+
+    if (mpi)
+      {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcInternalError());
+      }
+
+    return data;
   }
 
   template <typename T>
   void
-  DataSet::write_data(const std::vector<T> &data) const
+  DataSet::write_data(const std::vector<T> &data)
   {
-    AssertDimension(total_size, data.size());
+    AssertDimension(_size, data.size());
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
     hid_t                  plist;
+    herr_t                 ret;
 
     if (mpi)
       {
@@ -414,17 +482,27 @@ namespace HDF5
 
     if (mpi)
       {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
         H5Pclose(plist);
       }
   }
 
   template <typename T>
   void
-  DataSet::write_data(const FullMatrix<T> &data) const
+  DataSet::write_data(const FullMatrix<T> &data)
   {
-    AssertDimension(total_size, data.m() * data.n());
+    AssertDimension(_size, data.m() * data.n());
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
     hid_t                  plist;
+    herr_t                 ret;
 
     if (mpi)
       {
@@ -442,6 +520,15 @@ namespace HDF5
 
     if (mpi)
       {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
         H5Pclose(plist);
       }
   }
@@ -449,14 +536,15 @@ namespace HDF5
   template <typename T>
   void
   DataSet::write_data_selection(const std::vector<T> &     data,
-                                const std::vector<hsize_t> coordinates) const
+                                const std::vector<hsize_t> coordinates)
   {
-    AssertDimension(coordinates.size(), data.size() * rank);
+    AssertDimension(coordinates.size(), data.size() * _rank);
     std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
     std::vector<hsize_t>   data_dimensions = {data.size()};
 
-    hid_t memory_dataspace;
-    hid_t plist;
+    hid_t  memory_dataspace;
+    hid_t  plist;
+    herr_t ret;
 
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
@@ -484,6 +572,15 @@ namespace HDF5
 
     if (mpi)
       {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
         H5Pclose(plist);
       }
     H5Sclose(memory_dataspace);
@@ -493,7 +590,7 @@ namespace HDF5
   void
   DataSet::write_data_hyperslab(const std::vector<T> &     data,
                                 const std::vector<hsize_t> offset,
-                                const std::vector<hsize_t> count) const
+                                const std::vector<hsize_t> count)
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
@@ -503,8 +600,9 @@ namespace HDF5
     std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
     std::vector<hsize_t>   data_dimensions = {data.size()};
 
-    hid_t memory_dataspace;
-    hid_t plist;
+    hid_t  memory_dataspace;
+    hid_t  plist;
+    herr_t ret;
 
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
@@ -529,6 +627,15 @@ namespace HDF5
 
     if (mpi)
       {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
         H5Pclose(plist);
       }
     H5Sclose(memory_dataspace);
@@ -538,7 +645,7 @@ namespace HDF5
   void
   DataSet::write_data_hyperslab(const FullMatrix<T> &      data,
                                 const std::vector<hsize_t> offset,
-                                const std::vector<hsize_t> count) const
+                                const std::vector<hsize_t> count)
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
@@ -548,8 +655,9 @@ namespace HDF5
     std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
     std::vector<hsize_t>   data_dimensions = {data.m(), data.n()};
 
-    hid_t memory_dataspace;
-    hid_t plist;
+    hid_t  memory_dataspace;
+    hid_t  plist;
+    herr_t ret;
 
     memory_dataspace = H5Screate_simple(2, data_dimensions.data(), NULL);
     H5Sselect_hyperslab(
@@ -573,6 +681,15 @@ namespace HDF5
 
     if (mpi)
       {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
         H5Pclose(plist);
       }
     H5Sclose(memory_dataspace);
@@ -580,13 +697,14 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet::write_data_none() const
+  DataSet::write_data_none()
   {
     std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
     std::vector<hsize_t>   data_dimensions = {0};
 
-    hid_t memory_dataspace;
-    hid_t plist;
+    hid_t  memory_dataspace;
+    hid_t  plist;
+    herr_t ret;
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
     H5Sselect_none(*dataspace);
@@ -609,9 +727,254 @@ namespace HDF5
 
     if (mpi)
       {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcInternalError());
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0, ExcInternalError());
+          }
         H5Pclose(plist);
       }
     H5Sclose(memory_dataspace);
+  }
+
+  template <>
+  H5D_mpio_actual_io_mode_t
+  DataSet::io_mode()
+  {
+    Assert(_check_io_mode,
+           ExcMessage(
+             "check_io_mode() should be true in order to use io_mode()"));
+    return _io_mode;
+  }
+
+
+
+  template <>
+  std::string
+  DataSet::io_mode()
+  {
+    Assert(_check_io_mode,
+           ExcMessage(
+             "check_io_mode() should be true in order to use io_mode()"));
+    switch (_io_mode)
+      {
+        case (H5D_MPIO_NO_COLLECTIVE):
+          return std::string("H5D_MPIO_NO_COLLECTIVE");
+          break;
+        case (H5D_MPIO_CHUNK_INDEPENDENT):
+          return std::string("H5D_MPIO_CHUNK_INDEPENDENT");
+          break;
+        case (H5D_MPIO_CHUNK_COLLECTIVE):
+          return std::string("H5D_MPIO_CHUNK_COLLECTIVE");
+          break;
+        case (H5D_MPIO_CHUNK_MIXED):
+          return std::string("H5D_MPIO_CHUNK_MIXED");
+          break;
+        case (H5D_MPIO_CONTIGUOUS_COLLECTIVE):
+          return std::string("H5D_MPIO_CONTIGUOUS_COLLECTIVE");
+          break;
+        default:
+          Assert(false, ExcInternalError());
+          break;
+      }
+  }
+
+  template <>
+  uint32_t
+  DataSet::local_no_collective_cause()
+  {
+    Assert(
+      _check_io_mode,
+      ExcMessage(
+        "check_io_mode() should be true in order to use local_no_collective_cause()"));
+    return _local_no_collective_cause;
+  }
+
+
+
+  template <>
+  std::string
+  DataSet::local_no_collective_cause()
+  {
+    Assert(
+      _check_io_mode,
+      ExcMessage(
+        "check_io_mode() should be true in order to use local_no_collective_cause()"));
+    std::string message;
+    // Normal if comparison is used with H5D_MPIO_COLLECTIVE, the rest are
+    // bitmask comparisons.
+    // https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause
+    if (_local_no_collective_cause == H5D_MPIO_COLLECTIVE)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_COLLECTIVE";
+      }
+    if ((_local_no_collective_cause & H5D_MPIO_DATATYPE_CONVERSION) ==
+        H5D_MPIO_DATATYPE_CONVERSION)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_DATATYPE_CONVERSION";
+      }
+    if ((_local_no_collective_cause & H5D_MPIO_DATA_TRANSFORMS) ==
+        H5D_MPIO_DATA_TRANSFORMS)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_DATA_TRANSFORMS";
+      }
+    if ((_local_no_collective_cause &
+         H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES) ==
+        H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES";
+      }
+    if ((_local_no_collective_cause &
+         H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET) ==
+        H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET";
+      }
+    if ((_local_no_collective_cause & H5D_MPIO_FILTERS) == H5D_MPIO_FILTERS)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_FILTERS";
+      }
+    return message;
+  }
+
+  template <>
+  uint32_t
+  DataSet::global_no_collective_cause()
+  {
+    Assert(
+      _check_io_mode,
+      ExcMessage(
+        "check_io_mode() should be true in order to use global_no_collective_cause()"));
+    return _global_no_collective_cause;
+  }
+
+
+
+  template <>
+  std::string
+  DataSet::global_no_collective_cause()
+  {
+    Assert(
+      _check_io_mode,
+      ExcMessage(
+        "check_io_mode() should be true in order to use global_no_collective_cause()"));
+    std::string message;
+    // Normal if comparison is used with H5D_MPIO_COLLECTIVE, the rest are
+    // bitmask comparisons.
+    // https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause
+    if (_global_no_collective_cause == H5D_MPIO_COLLECTIVE)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_COLLECTIVE";
+      }
+    if ((_global_no_collective_cause & H5D_MPIO_DATATYPE_CONVERSION) ==
+        H5D_MPIO_DATATYPE_CONVERSION)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_DATATYPE_CONVERSION";
+      }
+    if ((_global_no_collective_cause & H5D_MPIO_DATA_TRANSFORMS) ==
+        H5D_MPIO_DATA_TRANSFORMS)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_DATA_TRANSFORMS";
+      }
+    if ((_global_no_collective_cause &
+         H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES) ==
+        H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES";
+      }
+    if ((_global_no_collective_cause &
+         H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET) ==
+        H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET";
+      }
+    if ((_global_no_collective_cause & H5D_MPIO_FILTERS) == H5D_MPIO_FILTERS)
+      {
+        if (message.length() > 0)
+          {
+            message += ", ";
+          }
+        message += "H5D_MPIO_FILTERS";
+      }
+    return message;
+  }
+
+  bool
+  DataSet::check_io_mode() const
+  {
+    return _check_io_mode;
+  }
+
+  void
+  DataSet::check_io_mode(bool check_io_mode)
+  {
+    _check_io_mode = check_io_mode;
+  }
+
+  std::vector<hsize_t>
+  DataSet::dimensions() const
+  {
+    return _dimensions;
+  }
+
+  unsigned int
+  DataSet::size() const
+  {
+    return _size;
+  }
+
+  unsigned int
+  DataSet::rank() const
+  {
+    return _rank;
   }
 
   Group::Group(const std::string name,
@@ -802,55 +1165,79 @@ namespace HDF5
   HDF5Object::write_attr<unsigned int>(const std::string attr_name,
                                        unsigned int      value) const;
 
+  template std::vector<float>
+  DataSet::read_data<std::vector, float>();
+  template std::vector<double>
+  DataSet::read_data<std::vector, double>();
+  template std::vector<long double>
+  DataSet::read_data<std::vector, long double>();
+  template std::vector<std::complex<float>>
+  DataSet::read_data<std::vector, std::complex<float>>();
+  template std::vector<std::complex<double>>
+  DataSet::read_data<std::vector, std::complex<double>>();
+  template std::vector<std::complex<long double>>
+  DataSet::read_data<std::vector, std::complex<long double>>();
+  template std::vector<int>
+  DataSet::read_data<std::vector, int>();
+  template std::vector<unsigned int>
+  DataSet::read_data<std::vector, unsigned int>();
+  template FullMatrix<float>
+  DataSet::read_data<FullMatrix, float>();
+  template FullMatrix<double>
+  DataSet::read_data<FullMatrix, double>();
+  template FullMatrix<long double>
+  DataSet::read_data<FullMatrix, long double>();
+  template FullMatrix<std::complex<float>>
+  DataSet::read_data<FullMatrix, std::complex<float>>();
+  template FullMatrix<std::complex<double>>
+  DataSet::read_data<FullMatrix, std::complex<double>>();
+
   template void
-  DataSet::write_data_selection<float>(
-    const std::vector<float> & data,
-    const std::vector<hsize_t> coordinates) const;
+  DataSet::write_data_selection<float>(const std::vector<float> & data,
+                                       const std::vector<hsize_t> coordinates);
   template void
-  DataSet::write_data_selection<double>(
-    const std::vector<double> &data,
-    const std::vector<hsize_t> coordinates) const;
+  DataSet::write_data_selection<double>(const std::vector<double> &data,
+                                        const std::vector<hsize_t> coordinates);
   template void
   DataSet::write_data_selection<long double>(
     const std::vector<long double> &data,
-    const std::vector<hsize_t>      coordinates) const;
+    const std::vector<hsize_t>      coordinates);
   template void
   DataSet::write_data_selection<std::complex<float>>(
     const std::vector<std::complex<float>> &data,
-    const std::vector<hsize_t>              coordinates) const;
+    const std::vector<hsize_t>              coordinates);
   template void
   DataSet::write_data_selection<std::complex<double>>(
     const std::vector<std::complex<double>> &data,
-    const std::vector<hsize_t>               coordinates) const;
+    const std::vector<hsize_t>               coordinates);
   template void
   DataSet::write_data_selection<std::complex<long double>>(
     const std::vector<std::complex<long double>> &data,
-    const std::vector<hsize_t>                    coordinates) const;
+    const std::vector<hsize_t>                    coordinates);
   template void
-  DataSet::write_data_selection<int>(
-    const std::vector<int> &   data,
-    const std::vector<hsize_t> coordinates) const;
+  DataSet::write_data_selection<int>(const std::vector<int> &   data,
+                                     const std::vector<hsize_t> coordinates);
   template void
   DataSet::write_data_selection<unsigned int>(
     const std::vector<unsigned int> &data,
-    const std::vector<hsize_t>       coordinates) const;
+    const std::vector<hsize_t>       coordinates);
 
   template void
-  DataSet::write_data_none<float>() const;
+  DataSet::write_data_none<float>();
   template void
-  DataSet::write_data_none<double>() const;
+  DataSet::write_data_none<double>();
   template void
-  DataSet::write_data_none<long double>() const;
+  DataSet::write_data_none<long double>();
   template void
-  DataSet::write_data_none<std::complex<float>>() const;
+  DataSet::write_data_none<std::complex<float>>();
   template void
-  DataSet::write_data_none<std::complex<double>>() const;
+  DataSet::write_data_none<std::complex<double>>();
   template void
-  DataSet::write_data_none<std::complex<long double>>() const;
+  DataSet::write_data_none<std::complex<long double>>();
   template void
-  DataSet::write_data_none<int>() const;
+  DataSet::write_data_none<int>();
   template void
-  DataSet::write_data_none<unsigned int>() const;
+  DataSet::write_data_none<unsigned int>();
 
   template DataSet
   Group::create_dataset<float>(const std::string          name,

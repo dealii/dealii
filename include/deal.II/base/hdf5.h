@@ -110,17 +110,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace HDF5
 
 {
-  namespace internal
-  {
-    // This function gives the HDF5 datatype corresponding to the C++ type. In
-    // the case of std::complex types the HDF5 handlers are automatically freed
-    // using the destructor of std::shared_ptr.
-    template <typename T>
-    std::shared_ptr<hid_t>
-    get_hdf5_datatype();
-  } // namespace internal
-
-
   /**
    * General class for the HDF5 objects.
    *
@@ -199,7 +188,7 @@ namespace HDF5
 
   public:
     /**
-     * Writes data in the dataset. T can be double, int, unsigned int, bool
+     * Reads data of the dataset. T can be double, int, unsigned int, bool
      * or std::complex<double>.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -208,12 +197,12 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
-    void
-    write_data(const std::vector<T> &data) const;
+    template <template <class...> class Container, typename T>
+    Container<T>
+    read_data();
 
     /**
-     * Writes data in the dataset. T can be double, int, unsigned int, bool
+     * Writes data in the dataset. T can be double, int, unsigned int,
      * or std::complex<double>.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -224,7 +213,21 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_data(const FullMatrix<T> &data) const;
+    write_data(const std::vector<T> &data);
+
+    /**
+     * Writes data in the dataset. T can be double, int, unsigned int,
+     * or std::complex<double>.
+     *
+     * Datatype conversion takes place at the time of a read or write and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
+     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * User's Guide.
+     */
+    template <typename T>
+    void
+    write_data(const FullMatrix<T> &data);
 
     /**
      * Writes data to a subset of the dataset. T can be double, int, unsigned
@@ -242,6 +245,10 @@ namespace HDF5
      *
      *    7 21 29 21
      *
+     * <a
+     * href="https://support.hdfgroup.org/newsletters/newsletter140.html">Parallel
+     * HDF5 supports collective I/O on point selections.</a>
+     *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
@@ -251,7 +258,7 @@ namespace HDF5
     template <typename T>
     void
     write_data_selection(const std::vector<T> &     data,
-                         const std::vector<hsize_t> coordinates) const;
+                         const std::vector<hsize_t> coordinates);
 
     /**
      * Writes data to a subset of the dataset. T can be double, int, unsigned
@@ -269,7 +276,7 @@ namespace HDF5
     void
     write_data_hyperslab(const std::vector<T> &     data,
                          const std::vector<hsize_t> offset,
-                         const std::vector<hsize_t> count) const;
+                         const std::vector<hsize_t> count);
 
     /**
      * Writes data to a subset of the dataset. T can be double, int, unsigned
@@ -287,7 +294,7 @@ namespace HDF5
     void
     write_data_hyperslab(const FullMatrix<T> &      data,
                          const std::vector<hsize_t> offset,
-                         const std::vector<hsize_t> count) const;
+                         const std::vector<hsize_t> count);
 
     /**
      * This function does not write any data, but can contribute to a collective
@@ -302,13 +309,90 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_data_none() const;
+    write_data_none();
+
+    /**
+     * This funcion retrieves the type of I/O that was performed on the last
+     * parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">"H5Pget_mpio_actual_io_mode"</a>.
+     * The return type T can be H5D_mpio_actual_io_mode_t or std::string. The
+     * type H5D_mpio_actual_io_mode_t corresponds to the value returned by
+     * H5Pget_mpio_actual_io_mode and std::string is a human readable
+     * conversion.
+     */
+    template <typename T>
+    T
+    io_mode();
+
+    /**
+     * This funcion retrieves the local causes that broke collective I/O on the
+     * last parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">"H5Pget_mpio_no_collective_cause"</a>.
+     * The return type T can be uint32_t or std::string. The type uint32_t
+     * corresponds to the value returned by H5Pget_mpio_no_collective_cause and
+     * std::string is a human readable conversion.
+     */
+    template <typename T>
+    T
+    local_no_collective_cause();
+
+    /**
+     * This funcion retrieves the global causes that broke collective I/O on the
+     * last parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">"H5Pget_mpio_no_collective_cause"</a>.
+     * The return type T can be uint32_t or std::string. The type uint32_t
+     * corresponds to the value returned by H5Pget_mpio_no_collective_cause and
+     * std::string is a human readable conversion.
+     */
+    template <typename T>
+    T
+    global_no_collective_cause();
+
+    /**
+     * This function retrieves the IO mode checking. If check_io_mode is true,
+     * then after every read and write operation in the dataset, it will be
+     * retrieved the type of I/O that was performed on the last parallel I/O
+     * call If check_io_mode is false then no checking will be performed.
+     */
+    bool
+    check_io_mode() const;
+
+    /**
+     * This funcion sets the IO mode checking. If check_io_mode is true, then
+     * after every read and write operation in the dataset, it will be retrieved
+     * the type of I/O that was performed on the last parallel I/O call If
+     * check_io_mode is false then no checking will be performed.
+     */
+    void
+    check_io_mode(bool check_io_mode);
+
+    /**
+     * This funcion returns the dimensions of the dataset.
+     */
+    std::vector<hsize_t>
+    dimensions() const;
+
+    /**
+     * This funcion returns the total size of the dataset.
+     */
+    unsigned int
+    size() const;
+
+    /**
+     * This funcion returns the rank of the dataset.
+     */
+    unsigned int
+    rank() const;
 
   private:
-    unsigned int           rank;
-    std::vector<hsize_t>   dimensions;
-    std::shared_ptr<hid_t> dataspace;
-    unsigned int           total_size;
+    unsigned int              _rank;
+    std::vector<hsize_t>      _dimensions;
+    std::shared_ptr<hid_t>    dataspace;
+    unsigned int              _size;
+    bool                      _check_io_mode;
+    H5D_mpio_actual_io_mode_t _io_mode;
+    uint32_t                  _local_no_collective_cause;
+    uint32_t                  _global_no_collective_cause;
   };
 
   /**
