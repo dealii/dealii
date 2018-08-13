@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
 
 #  include <deal.II/base/quadrature.h>
 #  include <deal.II/base/tensor.h>
@@ -32,8 +32,6 @@
 
 #  include <deal.II/lac/affine_constraints.h>
 #  include <deal.II/lac/cuda_vector.h>
-
-#  include <cuda_runtime_api.h>
 
 
 DEAL_II_NAMESPACE_OPEN

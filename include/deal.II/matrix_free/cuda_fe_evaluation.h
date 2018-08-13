@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
 
 #  include <deal.II/base/tensor.h>
 #  include <deal.II/base/utilities.h>

@@ -40,7 +40,7 @@
 #  include <Epetra_Import.h>
 #endif
 
-#ifdef DEAL_II_WITH_CUDA
+#if defined(DEAL_II_WITH_CUDA)
 #  include <deal.II/lac/cuda_vector.h>
 
 #  include <cuda_runtime_api.h>
@@ -568,7 +568,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_CUDA
+#if defined(DEAL_II_WITH_CUDA)
   template <typename Number>
   void
   ReadWriteVector<Number>::import(

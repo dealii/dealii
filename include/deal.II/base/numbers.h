@@ -25,8 +25,7 @@
 #include <complex>
 #include <cstdlib>
 
-#ifdef DEAL_II_WITH_CUDA
-#  include <cuda_runtime_api.h>
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
 #  define DEAL_II_CUDA_HOST_DEV __host__ __device__
 #else
 #  define DEAL_II_CUDA_HOST_DEV
