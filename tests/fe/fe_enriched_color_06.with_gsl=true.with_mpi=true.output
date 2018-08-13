@@ -1,0 +1,18 @@
+
+DEAL:0::fe_collection[index] mapping:
+DEAL:0::name:FE_Enriched<2>[FE_Q<2>(2)-FE_Nothing<2>(dominating)-FE_Nothing<2>(dominating)]
+DEAL:0::n_blocks:3
+DEAL:0::n_comp:1
+DEAL:0::n_dofs:9
+DEAL:0::name:FE_Enriched<2>[FE_Q<2>(2)-FE_Q<2>(1)-FE_Nothing<2>(dominating)]
+DEAL:0::n_blocks:3
+DEAL:0::n_comp:1
+DEAL:0::n_dofs:13
+DEAL:0::name:FE_Enriched<2>[FE_Q<2>(2)-FE_Q<2>(1)-FE_Q<2>(1)]
+DEAL:0::n_blocks:3
+DEAL:0::n_comp:1
+DEAL:0::n_dofs:17
+DEAL:0::name:FE_Enriched<2>[FE_Q<2>(2)-FE_Nothing<2>(dominating)-FE_Q<2>(1)]
+DEAL:0::n_blocks:3
+DEAL:0::n_comp:1
+DEAL:0::n_dofs:13

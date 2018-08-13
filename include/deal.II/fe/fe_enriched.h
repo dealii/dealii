@@ -24,9 +24,14 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_update_flags.h>
 
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
+
+#include <map>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -710,7 +715,511 @@ private:
       &output_data) const;
 };
 
-//}
+
+
+/**
+ * This namespace consists of a class needed to create a collection
+ * of FE_Enriched finite elements (hp::FECollection)
+ * to be used with hp::DoFHandler in a domain with multiple, possibly
+ * overlapping, sub-domains with individual enrichment functions.
+ *
+ * To create hp::FECollection, a graph coloring algorithm is used to assign
+ * colors to enrichment functions before creating hp::FECollection. Hence the
+ * name.
+ */
+namespace ColorEnriched
+{
+  /**
+   * An alias template for predicate function which returns a
+   * boolean for a Triangulation<dim,spacedim>::cell_iterator object.
+   *
+   * This is used by helper functions and in the implementation of
+   * ColorEnriched::Helper class.
+   */
+  template <int dim, int spacedim = dim>
+  using predicate_function = std::function<bool(
+    const typename Triangulation<dim, spacedim>::cell_iterator &)>;
+
+  namespace internal
+  {
+    /**
+     * Returns true if there is a connection between subdomains in the mesh
+     * associated with @p hp::DoFHandler i.e., if the subdomains share at least
+     * a vertex. The two subdomains are defined by predicates provided by
+     * @p predicate_1 and @p predicate_2. A predicate is a function (or
+     * object of a type with an operator()) which takes in a cell iterator and
+     * gives a boolean. It is said to be active in a cell if it returns true.
+     *
+     * An example of a custom predicate is one that checks the distance from a
+     * fixed point. Note that the operator() takes in a cell iterator. Using the
+     * constructor, the fixed point and the distance can be chosen.
+     * @code
+     * <int dim>
+     * struct predicate
+     * {
+     *     predicate(const Point<dim> p, const int radius)
+     *     :p(p),radius(radius){}
+     *
+     *     template <class Iterator>
+     *     bool operator () (const Iterator &i)
+     *     {
+     *         return ( (i->center() - p).norm() < radius);
+     *     }
+     *
+     * private:
+     *     Point<dim> p;
+     *     int radius;
+     *
+     * };
+     * @endcode
+     * and then the function can be used as follows to find if the subdomains
+     * are connected.
+     * @code
+     * find_connection_between_subdomains
+     * (dof_handler,
+     *  predicate<dim>(Point<dim>(0,0), 1)
+     *  predicate<dim>(Point<dim>(2,2), 1));
+     * @endcode
+     *
+     * @param[in] hp::DoFHandler object
+     * @param[in] predicate_1 A function (or object of a type with an
+     * operator()) defining the subdomain 1. The function takes in a cell and
+     * returns a boolean.
+     * @param[in] predicate_2 Same as @p predicate_1 but defines subdomain 2.
+     * @return A boolean "true" if the subdomains share at least a vertex.
+     */
+    template <int dim, int spacedim>
+    bool
+    find_connection_between_subdomains(
+      const hp::DoFHandler<dim, spacedim> &    dof_handler,
+      const predicate_function<dim, spacedim> &predicate_1,
+      const predicate_function<dim, spacedim> &predicate_2);
+
+    /**
+     * Assign colors to subdomains using Graph coloring algorithm where each
+     * subdomain is considered as a graph node. Subdomains which are
+     * connected i.e share at least a vertex have different color. Each
+     * subdomain
+     * is defined using a predicate function of @p predicates.
+     *
+     * @param[in] dof_handler a hp::DoFHandler object
+     * @param[in] predicates predicates defining the subdomains
+     * @param[out] predicate_colors Colors (unsigned int) associated with each
+     * subdomain.
+     */
+    template <int dim, int spacedim>
+    unsigned int
+    color_predicates(
+      const hp::DoFHandler<dim, spacedim> &                 dof_handler,
+      const std::vector<predicate_function<dim, spacedim>> &predicates,
+      std::vector<unsigned int> &                           predicate_colors);
+
+    /**
+     * Used to construct data members @p cellwise_color_predicate_map and
+     * @p fe_sets of Helper class. Inputs are hp::DoFHandler object,
+     * vector of predicates and colors associated with them. Before calling
+     * this function, colors can be assigned to predicates (i.e subdomains)
+     * using the function color_predicates.
+     *
+     * Each active FE index has a set of colors associated with it.
+     * A cell with an active FE index i has a set of colors given by
+     * <code>fe_sets[i]</code>. An active FE index with color {a,b}
+     * means that the cell has two active predicates (i.e they return true
+     * for the cell) of color a and b.
+     *
+     * Eg: fe_sets = { {}, {1}, {2}, {1,2} } means
+     * Cells with active FE index 0 have no predicates associated.
+     * Cells with index 1 have a active predicate with color 1.
+     * Cells with index 2 have a active predicate with color 2.
+     * Cells with index 3 have active predicates with color 1 and color 2.
+     *
+     * A map of maps cellwise_color_predicate_map is used to associate
+     * predicate colors in cells with predicate ids. For this purpose, each
+     * cell is given a unique id which is stored in material id for now.
+     * When the grid is refined, material id is inherited to the children, so
+     * map which associates material id with color map will still be relevant.
+     *
+     * Now the color map can be explained with an example. If the cell with
+     * material id 100 has active predicates 4 (color = 1) and 5 (color = 2),
+     * the map will insert pairs (1, 4) and (2, 5) at key 100 (i.e unique id
+     * of cell is mapped with a map which associates color with predicate id).
+     *
+     * @param[in] dof_handler hp::DoFHandler object
+     * @param[in] predicates vector of predicates defining the subdomains.
+     * <code>@p predicates[i]</code> returns true for a cell if it
+     * belongs to subdomain with index i.
+     * @param[in] predicate_colors vector of colors (unsigned int) associated
+     * with each subdomain.
+     * @param[out] cellwise_color_predicate_map A map of maps used to associate
+     * predicate colors in cells with predicate ids.
+     * @param[out] fe_sets a vector of color lists
+     */
+    template <int dim, int spacedim>
+    void
+    set_cellwise_color_set_and_fe_index(
+      hp::DoFHandler<dim, spacedim> &                       dof_handler,
+      const std::vector<predicate_function<dim, spacedim>> &predicates,
+      const std::vector<unsigned int> &                     predicate_colors,
+      std::map<unsigned int, std::map<unsigned int, unsigned int>>
+        &                                  cellwise_color_predicate_map,
+      std::vector<std::set<unsigned int>> &fe_sets);
+
+    /**
+     * A function that returns a vector of enrichment functions corresponding
+     * to a color. The size of the vector is equal to total number of different
+     * colors associated with predicates (i.e subdomains).
+     *
+     * Assume that a cell has a active predicates with ids 4 (color = 1) and
+     * 5 (color = 2). cellwise_color_predicate_map has this information
+     * provided we know the material id.
+     *
+     * The constructed color_enrichments is such that
+     * color_enrichments[color=1](cell) will return a pointer to
+     * the enrichment function with id=4, i.e. enrichments[4].
+     * In other words, using the previously collected information in
+     * this function we translate a vector of user provided enrichment
+     * functions into a vector of functions suitable for FE_Enriched class.
+     *
+     * @param[in] num_colors number of colors for predicates
+     * @param[in] enrichments vector of enrichment functions
+     * @param[in] cellwise_color_predicate_map A map of maps used to associate
+     * predicate colors in cells with predicate ids.
+     * @param[out] color_enrichments A vector of functions that take in cell
+     * and return a function pointer.
+     */
+    template <int dim, int spacedim>
+    void
+    make_colorwise_enrichment_functions(
+      const unsigned int &                                    num_colors,
+      const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments,
+      const std::map<unsigned int, std::map<unsigned int, unsigned int>>
+        &cellwise_color_predicate_map,
+      std::vector<std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>>
+        &color_enrichments);
+
+
+    /**
+     * Creates a hp::FECollection object constructed using FE_Enriched
+     * elements which itself is constructed using color enrichment functions
+     * and is of size equal to number of colors.
+     *
+     * @param[in] fe_sets a vector of color lists
+     * @param[in] color_enrichments A vector of functions that take in cell
+     * and return a function pointer.
+     * @param[in] fe_base base FiniteElement
+     * @param[in] fe_enriched enriched FiniteElements
+     * @param[in] fe_nothing a finite element with zero degrees of freedom
+     * @param[out] fe_collection a collection of
+     * finite elements
+     */
+    template <int dim, int spacedim>
+    void
+    make_fe_collection_from_colored_enrichments(
+      const unsigned int &num_colors,
+      const std::vector<std::set<unsigned int>>
+        &fe_sets, // total list of color sets possible
+      const std::vector<std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>>
+        &color_enrichments, // color wise enrichment functions
+      const FiniteElement<dim, spacedim> &fe_base, // basic FE element
+      const FiniteElement<dim, spacedim>
+        &fe_enriched, // FE multiplied by enrichment function
+      const FE_Nothing<dim, spacedim> &fe_nothing,
+      hp::FECollection<dim, spacedim> &fe_collection);
+  } // namespace internal
+
+
+
+  /**
+   * ColorEnriched::Helper class creates a collection of FE_Enriched finite
+   * elements (hp::FECollection) to be used with hp::DoFHandler in a domain
+   * with multiple, possibly overlapping, sub-domains with individual
+   * enrichment functions. Note that the overlapping regions may have
+   * multiple enrichment functions associated with them. This is implemented
+   * using a general constructor of FE_Enriched object which allows different
+   * enrichment functions.
+   *
+   * Consider a domain with multiple enriched sub-domains
+   * which are disjoint i.e. not connected with each other.
+   * To ensure $C^0$ continuity at the interface between
+   * the enriched sub-domain (characterized by a single enrichment
+   * function) and the non-enriched domain, we can use an FE_Enriched
+   * object in the enriched sub-domain and in the non-enriched domain
+   * a standard finite element (eg: FE_Q) wrapped into an FE_Enriched
+   * object (which internally uses a dominating FE_Nothing object).
+   * Refer to the documentation on FE_Enriched for more
+   * information on this. It is to be noted that an FE_Enriched
+   * object is constructed using a base FE
+   * (FiniteElement objects) and one or more
+   * enriched FEs. FE_Nothing is a dummy enriched FE.
+   *
+   * The situation becomes more
+   * complicated when two enriched sub-domains
+   * share an interface. When the number of enrichment functions are
+   * same for the sub-domains, FE_Enriched object of one sub-domain
+   * is constructed such that each enriched FE is paired (figuratively) with a
+   * FE_Nothing in the FE_Enriched object of the other sub-domain.
+   * For example, let the FEs fe_enr1 and fe_enr2, which will be
+   * used with enrichment functions, correspond
+   * to the two sub-domains. Then the FE_Enriched objects of the two
+   * sub-domains are built using
+   * [fe_base, fe_enr1, fe_nothing] and
+   * [fe_base, fe_nothing, fe_enr2] respectively.
+   * Note that the size of the vector of enriched FEs
+   * (used in FE_Enriched constructor) is equal to 2, the
+   * same as the number of enrichment functions. When the number of enrichment
+   * functions is not the same, additional enriched FEs are paired
+   * with FE_Nothing. This ensures that the enriched DOF's at the interface
+   * are set to zero by the DoFTools::make_hanging_node_constraints() function.
+   * Using these two strategies, we construct the appropriate FE_Enriched
+   * using the general constructor. Note that this is
+   * done on a mesh without hanging nodes.
+   *
+   * Now consider a domain with multiple sub-domains which may share
+   * an interface with each other. As discussed previously,
+   * the number of enriched FEs in the FE_Enriched object of each
+   * sub-domain needs to be equal to the number of sub-domains. This is because
+   * we are not using the information of how the domains are connected
+   * and any sub-domain may share interface with any other sub-domain (not
+   * considering overlaps for now!). However, in general, a given sub-domain
+   * shares an interface only with a few sub-domains. This warrants
+   * the use of a graph coloring algorithm to reduce
+   * the size of the vector of enriched FEs
+   * (used in the FE_Enriched constructor). By giving the sub-domains
+   * that share no interface the same color, a single 'std::function'
+   * that returns different enrichment functions for each
+   * sub-domain can be constructed. Then the size of the vector of enriched
+   * FEs is equal to the number of different colors
+   * used for predicates (or sub-domains).
+   *
+   * @note The graph coloring function, SparsityTools::color_sparsity_pattern,
+   * used for assigning colors to the sub-domains
+   * needs MPI (use Utilities::MPI::MPI_InitFinalize to initialize MPI
+   * and the necessary Zoltan setup).
+   * The coloring function, based on Zoltan, is a parallel coloring
+   * algorithm but is used in serial by SparsityTools::color_sparsity_pattern.
+   *
+   * Construction of the Helper class needs a base FiniteElement @p fe_base,
+   * an enriched FiniteElement @p fe_enriched (used for all the
+   * enrichment functions), a vector of predicate
+   * functions (used to define sub-domains) as well as the corresponding
+   * enrichment functions. The FECollection object, a collection of FE_Enriched
+   * objects to be used with an hp::DoFHandler object, can be retrieved
+   * using the member function build_fe_collection which also modifies the
+   * active FE indices of the hp::DoFHandler object (provided as an argument
+   * to the build_fe_collection function).
+   *
+   * <h3>Simple example</h3>
+   * Consider a domain with three sub-domains defined by predicate functions.
+   * Different cells are associated with FE indices as shown in the following
+   * image. The three equal-sized square-shaped sub-domains 'a', 'b'
+   * and 'c' can be seen. The predicates associated with these sub-domains
+   * are also labeled 'a', 'b' and 'c'.
+   * The subdomains 'a' and 'b' intersect with cell labeled with FE
+   * index 3. The cells in 'c' are labeled with FE
+   * index 1. As can be seen, connections exist between 'a' and 'b',
+   * 'b' and 'c' but 'a' and 'c' are not connected.
+   *
+   * \htmlonly <style>div.image
+   * img[src="3source_fe_indices.png"]{width:25%;}</style> \endhtmlonly
+   * @image html 3source_fe_indices.png "Active FE indices"
+   *
+   * As discussed before, the colors of predicates are alloted using
+   * the graph coloring algorithm. Each predicate is a node in the graph and if
+   * two sub-domains share an interface, the corresponding predicates
+   * should be given different colors.
+   * (The predicate colors are different from what is shown
+   * in the image. The colors in the image are as per FE indices).
+   * Predicates 'a' and 'c' can be given the same color since they
+   * are not connected but the color given to 'b' has to be different from
+   * 'a' and 'c'.
+   *
+   * The name of finite element at an index (i) of @p fe_collection
+   * (hp::FECollection) can be obtained by
+   * <code>fe_collection[index].get_name()</code> and is
+   * show in the table below. Note that all the FE_Enriched elements
+   * are of the same size and FE_Nothing<2>(dominating) is used as
+   * discussed before.
+   *
+   * <table>
+   * <tr>
+   * <th>Active FE index</th>
+   * <th>FiniteElement name</code> </th>
+   * </tr>
+   * <tr>
+   * <td>0</td>
+   * <td><code>FE_Enriched<2>[FE_Q<2>(2)-FE_Nothing<2>(dominating)-FE_Nothing<2>(dominating)]</code></td>
+   * </tr>
+   * <tr>
+   * <td>1</td>
+   * <td><code>FE_Enriched<2>[FE_Q<2>(2)-FE_Q<2>(1)-FE_Nothing<2>(dominating)]</code></td>
+   * </tr>
+   * <tr>
+   * <td>2</td>
+   * <td><code>FE_Enriched<2>[FE_Q<2>(2)-FE_Q<2>(1)-FE_Q<2>(1)]</code></td>
+   * </tr>
+   * <tr>
+   * <td>3</td>
+   * <td><code>FE_Enriched<2>[FE_Q<2>(2)-FE_Nothing<2>(dominating)-FE_Q<2>(1)]</code></td>
+   * </tr>
+   * </table>
+   *
+   * The internal data members used by this class need to be available when the
+   * problem is solved. This can be ensured by declaring the object static,
+   * which is deallocated only when the program terminates. An alternative
+   * would be to use it as a data member of the containing class. Since vector
+   * of predicates and enrichment functions may not be available while
+   * constructing the Helper, a 'std::shared_ptr' to Helper object can be used
+   * and constructed when the predicates and enrichment functions are
+   * available.
+   *
+   * @warning The current implementation relies on assigning each cell a
+   * material id, which shall not be modified after the setup
+   * and h-adaptive refinement. For a given cell, the material id is used
+   * to define color predicate map, which doesn't change with refinement.
+   *
+   * <h3>Example usage:</h3>
+   * @code
+   * FE_Q<dim> fe_base(2);
+   * FE_Q<dim> fe_enriched(1);
+   * std::vector< predicate_function<dim> > predicates;
+   * std::vector< std::shared_ptr<Function<dim>> > enrichments;
+   *
+   * Triangulation<dim>  triangulation;
+   * hp::DoFHandler<dim> dof_handler(triangulation);
+   *
+   * static ColorEnriched::Helper<dim> FE_helper(fe_base,
+   *                                             fe_enriched,
+   *                                             predicates,
+   *                                             enrichments);
+   * const hp::FECollection<dim>&
+   * fe_collection(FE_helper.build_fe_collection(dof_handler));
+   * @endcode
+   *
+   * @authors Nivesh Dommaraju, Denis Davydov, 2018
+   */
+  template <int dim, int spacedim = dim>
+  struct Helper
+  {
+    /**
+     * Constructor for Helper class.
+     *
+     * @param fe_base A base FiniteElement
+     * @param fe_enriched An enriched FiniteElement
+     * @param predicates std::vector of predicates defining the sub-domains.
+     * <code>@p predicates[i]</code> returns true for a cell if it
+     * belongs to a sub-domain with index (i).
+     * @param enrichments std::vector of enrichment functions
+     */
+    Helper(const FiniteElement<dim, spacedim> &                    fe_base,
+           const FiniteElement<dim, spacedim> &                    fe_enriched,
+           const std::vector<predicate_function<dim, spacedim>> &  predicates,
+           const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments);
+
+    /**
+     * Prepares an hp::DoFHandler object. The active FE indices of
+     * mesh cells are initialized to work with
+     * ColorEnriched::Helper<dim,spacedim>::fe_collection.
+     *
+     * @param dof_handler an hp::DoFHandler object
+     * @return hp::FECollection, a collection of
+     * finite elements needed by @p dof_handler.
+     */
+    const hp::FECollection<dim, spacedim> &
+    build_fe_collection(hp::DoFHandler<dim, spacedim> &dof_handler);
+
+  private:
+    /**
+     * Contains a collection of FiniteElement objects needed by an
+     * hp::DoFHandler object.
+     */
+    hp::FECollection<dim, spacedim> fe_collection;
+
+    /**
+     * A base FiniteElement used for constructing FE_Enriched
+     * object required by ColorEnriched::Helper<dim,spacedim>::fe_collection.
+     */
+    const FiniteElement<dim, spacedim> &fe_base;
+
+    /**
+     * An enriched FiniteElement used for constructing FE_Enriched
+     * object required by ColorEnriched::Helper<dim,spacedim>::fe_collection.
+     */
+    const FiniteElement<dim, spacedim> &fe_enriched;
+
+    /**
+     * A finite element with zero degrees of freedom used for
+     * constructing FE_Enriched object required by
+     * ColorEnriched::Helper<dim,spacedim>::fe_collection
+     */
+    const FE_Nothing<dim, spacedim> fe_nothing;
+
+    /**
+     * std::vector of predicates defining the sub-domains.
+     * <code>@p predicates[i]</code> returns true for a cell if it
+     * belongs to a sub-domain with index (i).
+     */
+    const std::vector<predicate_function<dim, spacedim>> predicates;
+
+    /**
+     * std::vector of enrichment functions corresponding
+     * to the predicates. These are needed while constructing
+     * ColorEnriched::Helper<dim,spacedim>::fe_collection.
+     */
+    const std::vector<std::shared_ptr<Function<spacedim>>> enrichments;
+
+    /**
+     * An alias template for any callable target such as functions, lambda
+     * expressions, function objects that take a
+     * Triangulation<dim,spacedim>::cell_iterator
+     * and return a pointer to Function<dim>. This is used to define
+     * Helper<dim,spacedim>::color_enrichments
+     * which returns an enrichment function
+     * for a cell in Triangulation<dim,spacedim>.
+     */
+    using cell_iterator_function = std::function<const Function<spacedim> *(
+      const typename Triangulation<dim, spacedim>::cell_iterator &)>;
+
+    /**
+     * std::vector of functions that take in a cell
+     * and return a function pointer. These are needed while constructing
+     * fe_collection.
+     *
+     * color_enrichments[i](cell_iterator) returns a pointer to
+     * the correct enrichment function (i.e. whose corresponding
+     * predicate has the color i) for the cell.
+     */
+    std::vector<cell_iterator_function> color_enrichments;
+
+    /**
+     * std::vector of colors (unsigned int) associated
+     * with each sub-domain. No two connected sub-domains (i.e. sub-domains that
+     * share a vertex) have the same color.
+     */
+    std::vector<unsigned int> predicate_colors;
+
+    /**
+     * Total number of different colors in predicate_colors
+     */
+    unsigned int num_colors;
+
+    /**
+     * A map of maps used to associate
+     * a cell with a map that in turn associates colors of active predicates in
+     * the cell with corresponding predicate ids.
+     */
+    std::map<unsigned int, std::map<unsigned int, unsigned int>>
+      cellwise_color_predicate_map;
+
+    /**
+     * A vector of different possible color sets for a given set of
+     * predicates and hp::DoFHandler object
+     */
+    std::vector<std::set<unsigned int>> fe_sets;
+  };
+} // namespace ColorEnriched
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_fe_enriched_h
