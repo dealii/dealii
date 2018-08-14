@@ -206,7 +206,7 @@ namespace parallel
 
 
 // explicit instantiations
-#  include "feindices_transfer.inst"
+#  include "active_fe_indices_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 
