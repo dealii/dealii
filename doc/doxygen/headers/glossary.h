@@ -377,7 +377,42 @@
  * parallel::distributed::Triangulation .
  * </dd>
  *
- * @see @ref boundary "The module on boundaries"
+ * @see @ref boundary "The module on boundaries".
+ *
+ *
+ * <dt class="glossary">@anchor GlossCoarseMesh <b>Coarse mesh</b></dt>
+ * <dd>
+ *   A "coarse mesh" in deal.II is a triangulation object that consists only
+ *   of cells that are not refined, i.e., a mesh in which no cell is a child
+ *   of another cell. This is generally how triangulations are first
+ *   constructed in deal.II, for example using (most of) the functions in
+ *   namespace GridGenerator, the functions in class GridIn, or directly
+ *   using the function Triangulation::create_triangulation(). One can of
+ *   course do computations on such meshes, but most of the time (see, for
+ *   example, almost any of the tutorial programs) one first refines the
+ *   coarse mesh globally (using Triangulation::refine_global()),
+ *   or adaptively (in that case first computing a refinement
+ *   criterion, then one of the functions in namespace GridRefinement,
+ *   and finally calling
+ *   Triangulation::execute_coarsening_and_refinement()). The mesh is
+ *   then no longer a "coarse mesh", but a "refined mesh".
+ *
+ *   In some contexts, we also use the phrase "the coarse mesh of a
+ *   triangulation", and by that mean that set of cells that the triangulation
+ *   started out with, i.e., from which all the currently
+ *   @ref GlossActive "active cells" of the triangulation have been obtained
+ *   by mesh refinement. (Some of the coarse mesh cells may of course also
+ *   be active if they have never been refined.)
+ *
+ *   Triangulation objects store cells in <i>levels</i>: in
+ *   particular, all cells of a coarse mesh are on level zero. Their
+ *   children (if we executed Triangulation::refine_global(1) on a
+ *   coarse mesh) would then be at level one, etc. The coarse mesh of a
+ *   triangulation (in the sense of the previous paragraph) then
+ *   consists of exactly the level-zero cells of a triangulation. (Whether
+ *   they are active (i.e., have no children) or have been refined is not
+ *   important for this definition.)
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor GlossColorization <b>Colorization</b></dt>
@@ -401,6 +436,7 @@
  *   two adjacent cells are given the same color.</li>
  * </ol>
  * </dd>
+ *
  *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
@@ -571,7 +607,8 @@
  * the operation that these <code>compress()</code> functions invoke applies
  * to adding elements or setting them.  In some cases, not all processors may
  * be adding elements, for example if a processor does not own any cells when
- * using a very coarse (initial) mesh.  For this reason, compress() takes an
+ * using a very @ref GlossCoarseMesh "coarse (initial) mesh".
+ * For this reason, compress() takes an
  * argument of type VectorOperation, which can be either ::%add, or ::%insert.
  * This argument is required for vectors and matrices starting with the 7.3
  * release.
@@ -757,14 +794,14 @@
  * @image html distorted_3d.png "A well-formed, a pinched, and a twisted cell in 3d."
  *
  * Distorted cells can appear in two different ways: The original
- * coarse mesh can already contain such cells, or they can be created
- * as the result of mesh refinement if the boundary description in use
- * is sufficiently irregular.
+ * @ref GlossCoarseMesh "coarse mesh" can already contain such cells,
+ * or they can be created as the result of mesh refinement if the boundary
+ * description in use is sufficiently irregular.
  *
  * If the appropriate flag is given upon creation of a triangulation,
  * the function Triangulation::create_triangulation, which is called
  * by the various functions in GridGenerator and GridIn (but can also
- * be called from user code, see step-14, will signal
+ * be called from user code, see step-14), will signal
  * the creation of coarse meshes with distorted cells by throwing an
  * exception of type Triangulation::DistortedCellList. There are
  * legitimate cases for creating meshes with distorted cells (in
@@ -817,10 +854,10 @@
  * The problem with that is, of course, that the bottom two child cells are
  * twisted, whereas the top two children are well-shaped. While such
  * meshes can happen with sufficiently irregular boundary descriptions
- * (and if the coarse mesh is entirely inadequate to resolve the
- * complexity of the boundary), the Triangulation class does not know
- * what to do in such situations unless one attaches an appropriate manifold
- * object to the cells in question (see the
+ * (and if the @ref GlossCoarseMesh "coarse mesh" is entirely inadequate
+ * to resolve the complexity of the boundary), the Triangulation class does not
+ * know what to do in such situations unless one attaches an appropriate
+ * manifold object to the cells in question (see the
  * @ref manifold "documentation module on manifolds"). Consequently, absent
  * such a manifold description or if the manifold description does not
  * provide a sufficient description of the geometry, the
@@ -985,10 +1022,10 @@
  * If a mesh is distributed across multiple MPI processes using the
  * parallel::distributed::Triangulation class, each processor stores
  * only the cells it owns, one layer of adjacent cells that are owned
- * by other processors, all coarse level cells, and all cells that are
- * necessary to maintain the invariant that adjacent cells must differ
- * by at most one refinement level. The cells stored on each process
- * that are not owned by this process but that are adjacent to the
+ * by other processors, all @ref GlossCoarseMesh "coarse level cells",
+ * and all cells that are necessary to maintain the invariant that adjacent
+ * cells must differ by at most one refinement level. The cells stored on
+ * each process that are not owned by this process but that are adjacent to the
  * ones owned by this process are called "ghost cells", and for these
  * cells the predicate <code>cell-@>is_ghost()</code> returns
  * true. Ghost cells are guaranteed to exist in the globally
@@ -1672,7 +1709,8 @@
  * subdomain ids are only assigned to cells that the current processor
  * owns as well as the immediately adjacent @ref GlossGhostCell "ghost cells".
  * Cells further away are held on each processor to ensure
- * that every MPI process has access to the full coarse grid as well
+ * that every MPI process has access to the full
+ * @ref GlossCoarseMesh "coarse grid" as well
  * as to ensure the invariant that neighboring cells differ by at most
  * one refinement level. These cells are called "artificial" (see
  * @ref GlossArtificialCell "here") and have the special subdomain id value
@@ -1863,8 +1901,9 @@
  *
  *  By default, if you write a loop over all cells in deal.II, the cells
  *  will be traversed in an order where coarser cells (i.e., cells that were
- *  obtained from coarse mesh cells with fewer refinement steps) come before
- *  cells that are finer (i.e., cells that were obtained with more refinement
+ *  obtained from
+ *  @ref GlossCoarseMesh "coarse mesh" cells with fewer refinement steps) come
+ *  before cells that are finer (i.e., cells that were obtained with more refinement
  *  steps). Within each refinement level, cells are traversed in an order
  *  that has something to do with the order in which they were created;
  *  in essence, however, this order is best of thought of as "unspecified":
@@ -1894,7 +1933,7 @@
  *  To explain the concept of the Z order, consider the following sequence
  *  of meshes (with each cell numbered using the "level.index" notation,
  *  where "level" is the number of refinements necessary to get from a
- *  coarse mesh cell to a particular cell, and "index" the index of this
+ *  @ref GlossCoarseMesh "coarse mesh" cell to a particular cell, and "index" the index of this
  *  cell within a particular refinement level):
  *
  *  @image html simple-mesh-0.png "A coarse mesh"
