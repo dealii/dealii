@@ -136,7 +136,8 @@ namespace HDF5
     get_container_pointer(FullMatrix<T> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong
+      // the pointer will be wrong.
+      // Use the first element of FullMatrix to get the pointer to the raw data
       return &data[0][0];
     }
 
@@ -210,11 +211,7 @@ namespace HDF5
     // user has to free the memory.
     //
     // Todo:
-    // - In debug mode, check the type of the attribute. If it is not a variable
-    // length string raise an exception
-    // - Use valgrind to check that there are no memory leaks
     // - Use H5Dvlen_reclaim instead of free
-    // - Use collective
 
     char * string_out;
     hid_t  attr;
@@ -514,9 +511,8 @@ namespace HDF5
         plist = H5P_DEFAULT;
       }
 
-    // The iterator of FullMatrix has to be converted to a pointer to the raw
-    // data
-    H5Dwrite(*hdf5_reference, *t_type, H5S_ALL, H5S_ALL, plist, &*data.begin());
+    // Use the first element of FullMatrix to get the pointer to the raw data
+    H5Dwrite(*hdf5_reference, *t_type, H5S_ALL, H5S_ALL, plist, &data[0][0]);
 
     if (mpi)
       {
