@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
 
 DEAL_II_NAMESPACE_OPEN
 

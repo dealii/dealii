@@ -183,7 +183,7 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator=(const Number s)
     {
-      Assert(s == Number(), ExcMessage("Onlyt 0 can be assigned to a vector."));
+      Assert(s == Number(), ExcMessage("Only 0 can be assigned to a vector."));
       (void)s;
 
       cudaError_t error_code = cudaMemset(val, 0, n_elements * sizeof(Number));

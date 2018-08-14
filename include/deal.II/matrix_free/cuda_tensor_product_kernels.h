@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -437,5 +438,7 @@ namespace CUDAWrappers
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

@@ -18,6 +18,8 @@
 
 #include <deal.II/lac/cuda_kernels.h>
 
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
@@ -571,5 +573,7 @@ namespace LinearAlgebra
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif
