@@ -1941,203 +1941,6 @@ namespace GridGenerator
       return (std::abs(p[0] - c[0]) < radius) &&
              (std::abs(p[1] - c[1]) < radius);
     }
-
-    // same as above but will ingore the third component
-    // of both points
-    bool inline point_in_2d_box(const Point<3> &p,
-                                const Point<3> &center,
-                                const double    radius)
-    {
-      return point_in_2d_box(Point<2>(p[0], p[1]),
-                             Point<2>(center[0], center[1]),
-                             radius);
-    }
-
-    /**
-     * Keep the main 2D implementation internal as we will use
-     * material id in 3D case, whereas the actual 2D function
-     * will reset material id in addition to this one.
-     */
-    void plate_with_a_hole(Triangulation<2> &       tria,
-                           const double             inner_radius,
-                           const double             outer_radius,
-                           const double             pad_bottom,
-                           const double             pad_top,
-                           const double             pad_left,
-                           const double             pad_right,
-                           const Point<2>           new_center,
-                           const types::manifold_id polar_manifold_id,
-                           const types::manifold_id tfi_manifold_id,
-                           const double             L,
-                           const unsigned int /*n_slices*/,
-                           const bool colorize)
-    {
-      Assert((pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0),
-             ExcMessage("At least one padding parameter has to be non-zero."));
-      Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
-      Assert(pad_top >= 0., ExcMessage("Negative top padding."));
-      Assert(pad_left >= 0., ExcMessage("Negative left padding."));
-      Assert(pad_right >= 0., ExcMessage("Negative right padding."));
-
-      const Point<2> center;
-
-      auto min_line_length = [](const Triangulation<2> &tria) -> double {
-        double length = std::numeric_limits<double>::max();
-        for (const auto &cell : tria.active_cell_iterators())
-          for (unsigned int n = 0; n < GeometryInfo<2>::lines_per_cell; ++n)
-            length = std::min(length, cell->line(n)->diameter());
-        return length;
-      };
-
-      // start by setting up the cylinder triangulation
-      Triangulation<2> cylinder_tria;
-      GridGenerator::hyper_cube_with_cylindrical_hole(cylinder_tria,
-                                                      inner_radius,
-                                                      outer_radius,
-                                                      L,
-                                                      /*repetitions*/ 1,
-                                                      colorize);
-
-      // Mark the cylinder material ids as 2 to distinguish them from the bulk
-      // cells (these are read again in the loop that sets manifold ids)
-      for (const auto &cell : cylinder_tria.active_cell_iterators())
-        cell->set_material_id(2);
-
-      // hyper_cube_with_cylindrical_hole will have 2 cells along
-      // each face, so he element size is outer_radius
-
-      auto add_sizes = [](std::vector<double> &step_sizes,
-                          const double         padding,
-                          const double         h) -> void {
-        // use std::round instead of std::ceil to improve aspect ratio
-        // in case padding is only slightly larger than h.
-        const unsigned int rounded = std::round(padding / h);
-        // in case padding is much smaller than h, make sure we
-        // have at least 1 element
-        const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;
-        for (unsigned int i = 0; i < num; ++i)
-          step_sizes.push_back(padding / num);
-      };
-
-      std::vector<std::vector<double>> step_sizes(2);
-      // x-coord
-      // left:
-      add_sizes(step_sizes[0], pad_left, outer_radius);
-      // center
-      step_sizes[0].push_back(outer_radius);
-      step_sizes[0].push_back(outer_radius);
-      // right
-      add_sizes(step_sizes[0], pad_right, outer_radius);
-      // y-coord
-      //   bottom
-      add_sizes(step_sizes[1], pad_bottom, outer_radius);
-      //   center
-      step_sizes[1].push_back(outer_radius);
-      step_sizes[1].push_back(outer_radius);
-      //   top
-      add_sizes(step_sizes[1], pad_top, outer_radius);
-
-      // now create bulk
-      Triangulation<2> bulk_tria;
-      const Point<2>   bl(-outer_radius - pad_left, -outer_radius - pad_bottom);
-      const Point<2>   tr(outer_radius + pad_right, outer_radius + pad_top);
-      GridGenerator::subdivided_hyper_rectangle(
-        bulk_tria, step_sizes, bl, tr, colorize);
-
-      // now remove cells reserved from the cylindrical hole
-      std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
-      for (const auto &cell : bulk_tria.active_cell_iterators())
-        if (point_in_2d_box(cell->center(), center, outer_radius))
-          cells_to_remove.insert(cell);
-
-      Triangulation<2> tria_without_cylinder;
-      GridGenerator::create_triangulation_with_removed_cells(
-        bulk_tria, cells_to_remove, tria_without_cylinder);
-
-      const double tolerance = std::min(min_line_length(tria_without_cylinder),
-                                        min_line_length(cylinder_tria)) /
-                               2.0;
-
-      // set material ID in bulk part to something other than 2
-      for (const auto &cell : tria_without_cylinder.active_cell_iterators())
-        cell->set_material_id(1);
-
-      GridGenerator::merge_triangulations(tria_without_cylinder,
-                                          cylinder_tria,
-                                          tria,
-                                          tolerance);
-
-      // now set manifold ids:
-      for (const auto &cell : tria.active_cell_iterators())
-        {
-          // set all non-boundary manifold ids on the cells that came from the
-          // grid around the cylinder to the new TFI manifold id.
-          if (cell->material_id() == 2)
-            {
-              cell->set_manifold_id(tfi_manifold_id);
-              for (unsigned int face_n = 0;
-                   face_n < GeometryInfo<2>::faces_per_cell;
-                   ++face_n)
-                {
-                  const auto &face = cell->face(face_n);
-                  if (face->at_boundary() &&
-                      point_in_2d_box(face->center(), center, outer_radius))
-                    face->set_manifold_id(polar_manifold_id);
-                  else
-                    face->set_manifold_id(tfi_manifold_id);
-                }
-            }
-          else
-            {
-              // ensure that all other manifold ids (including the faces
-              // opposite the cylinder) are set to the flat id
-              cell->set_all_manifold_ids(numbers::flat_manifold_id);
-            }
-        }
-
-      static constexpr double tol =
-        std::numeric_limits<double>::epsilon() * 10000;
-      if (colorize)
-        for (auto &cell : tria.active_cell_iterators())
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<2>::faces_per_cell;
-               ++face_n)
-            {
-              const auto face = cell->face(face_n);
-              if (face->at_boundary())
-                {
-                  const Point<2> center = face->center();
-                  // left side
-                  if (std::abs(center[0] - bl[0]) < tol * std::abs(bl[0]))
-                    face->set_boundary_id(0);
-                  // right side
-                  else if (std::abs(center[0] - tr[0]) < tol * std::abs(tr[0]))
-                    face->set_boundary_id(1);
-                  // bottom
-                  else if (std::abs(center[1] - bl[1]) < tol * std::abs(bl[1]))
-                    face->set_boundary_id(2);
-                  // top
-                  else if (std::abs(center[1] - tr[1]) < tol * std::abs(tr[1]))
-                    face->set_boundary_id(3);
-                  // cylinder boundary
-                  else
-                    {
-                      Assert(cell->material_id() == 2, ExcInternalError());
-                      face->set_boundary_id(4);
-                    }
-                }
-            }
-
-      // move to the new center
-      GridTools::shift(new_center, tria);
-
-      PolarManifold<2> polar_manifold(new_center);
-      tria.set_manifold(polar_manifold_id, polar_manifold);
-      TransfiniteInterpolationManifold<2> inner_manifold;
-      inner_manifold.initialize(tria);
-      tria.set_manifold(tfi_manifold_id, inner_manifold);
-    }
-
   } // namespace internal
 
   template <>
@@ -2152,26 +1955,169 @@ namespace GridGenerator
                          const types::manifold_id polar_manifold_id,
                          const types::manifold_id tfi_manifold_id,
                          const double             L,
-                         const unsigned int       n_slices,
-                         const bool               colorize)
+                         const unsigned int /*n_slices*/,
+                         const bool colorize)
   {
-    internal::plate_with_a_hole(tria,
-                                inner_radius,
-                                outer_radius,
-                                pad_bottom,
-                                pad_top,
-                                pad_left,
-                                pad_right,
-                                new_center,
-                                polar_manifold_id,
-                                tfi_manifold_id,
-                                L,
-                                n_slices,
-                                colorize);
+    Assert((pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0),
+           ExcMessage("At least one padding parameter has to be non-zero."));
+    Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
+    Assert(pad_top >= 0., ExcMessage("Negative top padding."));
+    Assert(pad_left >= 0., ExcMessage("Negative left padding."));
+    Assert(pad_right >= 0., ExcMessage("Negative right padding."));
 
-    // reset material id
-    for (auto &cell : tria.active_cell_iterators())
-      cell->set_material_id(0);
+    const Point<2> center;
+
+    auto min_line_length = [](const Triangulation<2> &tria) -> double {
+      double length = std::numeric_limits<double>::max();
+      for (const auto &cell : tria.active_cell_iterators())
+        for (unsigned int n = 0; n < GeometryInfo<2>::lines_per_cell; ++n)
+          length = std::min(length, cell->line(n)->diameter());
+      return length;
+    };
+
+    // start by setting up the cylinder triangulation
+    Triangulation<2> cylinder_tria;
+    GridGenerator::hyper_cube_with_cylindrical_hole(cylinder_tria,
+                                                    inner_radius,
+                                                    outer_radius,
+                                                    L,
+                                                    /*repetitions*/ 1,
+                                                    colorize);
+
+    // we will deal with face manifold ids after we merge triangulations
+    for (const auto &cell : cylinder_tria.active_cell_iterators())
+      cell->set_manifold_id(tfi_manifold_id);
+
+    // hyper_cube_with_cylindrical_hole will have 2 cells along
+    // each face, so he element size is outer_radius
+
+    auto add_sizes = [](std::vector<double> &step_sizes,
+                        const double         padding,
+                        const double         h) -> void {
+      // use std::round instead of std::ceil to improve aspect ratio
+      // in case padding is only slightly larger than h.
+      const unsigned int rounded = std::round(padding / h);
+      // in case padding is much smaller than h, make sure we
+      // have at least 1 element
+      const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;
+      for (unsigned int i = 0; i < num; ++i)
+        step_sizes.push_back(padding / num);
+    };
+
+    std::vector<std::vector<double>> step_sizes(2);
+    // x-coord
+    // left:
+    add_sizes(step_sizes[0], pad_left, outer_radius);
+    // center
+    step_sizes[0].push_back(outer_radius);
+    step_sizes[0].push_back(outer_radius);
+    // right
+    add_sizes(step_sizes[0], pad_right, outer_radius);
+    // y-coord
+    //   bottom
+    add_sizes(step_sizes[1], pad_bottom, outer_radius);
+    //   center
+    step_sizes[1].push_back(outer_radius);
+    step_sizes[1].push_back(outer_radius);
+    //   top
+    add_sizes(step_sizes[1], pad_top, outer_radius);
+
+    // now create bulk
+    Triangulation<2> bulk_tria;
+    const Point<2>   bl(-outer_radius - pad_left, -outer_radius - pad_bottom);
+    const Point<2>   tr(outer_radius + pad_right, outer_radius + pad_top);
+    GridGenerator::subdivided_hyper_rectangle(
+      bulk_tria, step_sizes, bl, tr, colorize);
+
+    // now remove cells reserved from the cylindrical hole
+    std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
+    for (const auto &cell : bulk_tria.active_cell_iterators())
+      if (internal::point_in_2d_box(cell->center(), center, outer_radius))
+        cells_to_remove.insert(cell);
+
+    Triangulation<2> tria_without_cylinder;
+    GridGenerator::create_triangulation_with_removed_cells(
+      bulk_tria, cells_to_remove, tria_without_cylinder);
+
+    const double tolerance = std::min(min_line_length(tria_without_cylinder),
+                                      min_line_length(cylinder_tria)) /
+                             2.0;
+
+    GridGenerator::merge_triangulations(tria_without_cylinder,
+                                        cylinder_tria,
+                                        tria,
+                                        tolerance);
+
+    // now set manifold ids:
+    for (const auto &cell : tria.active_cell_iterators())
+      {
+        // set all non-boundary manifold ids on the cells that came from the
+        // grid around the cylinder to the new TFI manifold id.
+        if (cell->manifold_id() == tfi_manifold_id)
+          {
+            for (unsigned int face_n = 0;
+                 face_n < GeometryInfo<2>::faces_per_cell;
+                 ++face_n)
+              {
+                const auto &face = cell->face(face_n);
+                if (face->at_boundary() &&
+                    internal::point_in_2d_box(face->center(),
+                                              center,
+                                              outer_radius))
+                  face->set_manifold_id(polar_manifold_id);
+                else
+                  face->set_manifold_id(tfi_manifold_id);
+              }
+          }
+        else
+          {
+            // ensure that all other manifold ids (including the faces
+            // opposite the cylinder) are set to the flat id
+            cell->set_all_manifold_ids(numbers::flat_manifold_id);
+          }
+      }
+
+    static constexpr double tol =
+      std::numeric_limits<double>::epsilon() * 10000;
+    if (colorize)
+      for (auto &cell : tria.active_cell_iterators())
+        for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
+             ++face_n)
+          {
+            const auto face = cell->face(face_n);
+            if (face->at_boundary())
+              {
+                const Point<2> center = face->center();
+                // left side
+                if (std::abs(center[0] - bl[0]) < tol * std::abs(bl[0]))
+                  face->set_boundary_id(0);
+                // right side
+                else if (std::abs(center[0] - tr[0]) < tol * std::abs(tr[0]))
+                  face->set_boundary_id(1);
+                // bottom
+                else if (std::abs(center[1] - bl[1]) < tol * std::abs(bl[1]))
+                  face->set_boundary_id(2);
+                // top
+                else if (std::abs(center[1] - tr[1]) < tol * std::abs(tr[1]))
+                  face->set_boundary_id(3);
+                // cylinder boundary
+                else
+                  {
+                    Assert(cell->manifold_id() == tfi_manifold_id,
+                           ExcInternalError());
+                    face->set_boundary_id(4);
+                  }
+              }
+          }
+
+    // move to the new center
+    GridTools::shift(new_center, tria);
+
+    PolarManifold<2> polar_manifold(new_center);
+    tria.set_manifold(polar_manifold_id, polar_manifold);
+    TransfiniteInterpolationManifold<2> inner_manifold;
+    inner_manifold.initialize(tria);
+    tria.set_manifold(tfi_manifold_id, inner_manifold);
   }
 
 
@@ -2192,56 +2138,25 @@ namespace GridGenerator
                          const bool               colorize)
   {
     Triangulation<2> tria_2;
-    internal::plate_with_a_hole(tria_2,
-                                inner_radius,
-                                outer_radius,
-                                pad_bottom,
-                                pad_top,
-                                pad_left,
-                                pad_right,
-                                Point<2>(new_center[0], new_center[1]),
-                                polar_manifold_id,
-                                tfi_manifold_id,
-                                L,
-                                n_slices,
-                                colorize);
+    plate_with_a_hole(tria_2,
+                      inner_radius,
+                      outer_radius,
+                      pad_bottom,
+                      pad_top,
+                      pad_left,
+                      pad_right,
+                      Point<2>(new_center[0], new_center[1]),
+                      polar_manifold_id,
+                      tfi_manifold_id,
+                      L,
+                      n_slices,
+                      colorize);
 
     // extrude to 3D
-    extrude_triangulation(tria_2, n_slices, L, tria);
+    extrude_triangulation(tria_2, n_slices, L, tria, true);
 
     // shift in Z direction to match specified center
     GridTools::shift(Point<3>(0, 0, new_center[2] - L / 2.), tria);
-
-    // extrude will keep boundary IDs but can not keep manifolds, set them
-    // below:
-    const FlatManifold<3> flat_manifold;
-    for (const auto &cell : tria.active_cell_iterators())
-      if (cell->material_id() == 2)
-        {
-          cell->set_all_manifold_ids(tfi_manifold_id);
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<3>::faces_per_cell;
-               ++face_n)
-            {
-              // similar check to 2D version
-              const auto face = cell->face(face_n);
-              if (face->at_boundary() &&
-                  internal::point_in_2d_box(face->center(),
-                                            new_center,
-                                            outer_radius) &&
-                  std::abs(
-                    flat_manifold.normal_vector(face, face->center())[2]) <
-                    1.0e-10)
-                face->set_manifold_id(polar_manifold_id);
-              else
-                face->set_manifold_id(tfi_manifold_id);
-            }
-        }
-      else
-        {
-          // otherwise set everything to flat manifold
-          cell->set_all_manifold_ids(numbers::flat_manifold_id);
-        }
 
     // set up the new manifolds
     const Tensor<1, 3>           direction{{0.0, 0.0, 1.0}};
@@ -2251,10 +2166,6 @@ namespace GridGenerator
     inner_manifold.initialize(tria);
     tria.set_manifold(polar_manifold_id, cylindrical_manifold);
     tria.set_manifold(tfi_manifold_id, inner_manifold);
-
-    // finally reset material ids
-    for (auto &cell : tria.active_cell_iterators())
-      cell->set_material_id(0);
   }
 
 
@@ -4476,10 +4387,13 @@ namespace GridGenerator
 
 
   void
-  extrude_triangulation(const Triangulation<2, 2> &input,
-                        const unsigned int         n_slices,
-                        const double               height,
-                        Triangulation<3, 3> &      result)
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const unsigned int                     n_slices,
+    const double                           height,
+    Triangulation<3, 3> &                  result,
+    const bool                             copy_manifold_ids,
+    const std::vector<types::manifold_id> &manifold_priorities)
   {
     Assert(input.n_levels() == 1,
            ExcMessage(
@@ -4497,13 +4411,19 @@ namespace GridGenerator
     std::vector<double> slices_z_values;
     for (unsigned int i = 0; i < n_slices; ++i)
       slices_z_values.push_back(i * delta_h);
-    extrude_triangulation(input, slices_z_values, result);
+    extrude_triangulation(
+      input, slices_z_values, result, copy_manifold_ids, manifold_priorities);
   }
 
+
+
   void
-  extrude_triangulation(const Triangulation<2, 2> &input,
-                        const std::vector<double> &slice_coordinates,
-                        Triangulation<3, 3> &      result)
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const std::vector<double> &            slice_coordinates,
+    Triangulation<3, 3> &                  result,
+    const bool                             copy_manifold_ids,
+    const std::vector<types::manifold_id> &manifold_priorities)
   {
     Assert(input.n_levels() == 1,
            ExcMessage(
@@ -4514,82 +4434,162 @@ namespace GridGenerator
     Assert(slice_coordinates.size() >= 2,
            ExcMessage(
              "The number of slices for extrusion must be at least 2."));
-    const unsigned int n_slices = slice_coordinates.size();
     Assert(std::is_sorted(slice_coordinates.begin(), slice_coordinates.end()),
            ExcMessage("Slice z-coordinates should be in ascending order"));
+
+    const auto priorities = [&]() -> std::vector<types::manifold_id> {
+      // if a non-empty (i.e., not the default) vector is given for
+      // manifold_priorities then use it (but check its validity in debug
+      // mode)
+      if (0 < manifold_priorities.size())
+        {
+#ifdef DEBUG
+          // check that the provided manifold_priorities is valid
+          std::vector<types::manifold_id> sorted_manifold_priorities =
+            manifold_priorities;
+          std::sort(sorted_manifold_priorities.begin(),
+                    sorted_manifold_priorities.end());
+          Assert(std::unique(sorted_manifold_priorities.begin(),
+                             sorted_manifold_priorities.end()) ==
+                   sorted_manifold_priorities.end(),
+                 ExcMessage(
+                   "The given vector of manifold ids may not contain any "
+                   "duplicated entries."));
+          std::vector<types::manifold_id> sorted_manifold_ids =
+            input.get_manifold_ids();
+          std::sort(sorted_manifold_ids.begin(), sorted_manifold_ids.end());
+          if (sorted_manifold_priorities != sorted_manifold_ids)
+            {
+              std::ostringstream message;
+              message << "The given triangulation has manifold ids {";
+              for (const types::manifold_id manifold_id : sorted_manifold_ids)
+                if (manifold_id != sorted_manifold_ids.back())
+                  message << manifold_id << ", ";
+              message << sorted_manifold_ids.back() << "}, but \n"
+                      << "    the given vector of manifold ids is {";
+              for (const types::manifold_id manifold_id : manifold_priorities)
+                if (manifold_id != manifold_priorities.back())
+                  message << manifold_id << ", ";
+              message
+                << manifold_priorities.back() << "}.\n"
+                << "    These vectors should contain the same elements.\n";
+              const std::string m = message.str();
+              Assert(false, ExcMessage(m));
+            }
+#endif
+          return manifold_priorities;
+        }
+      // otherwise use the default ranking: ascending order, but TFI manifolds
+      // are at the end.
+      std::vector<types::manifold_id> default_priorities =
+        input.get_manifold_ids();
+      const auto first_tfi_it = std::partition(
+        default_priorities.begin(),
+        default_priorities.end(),
+        [&input](const types::manifold_id &id) {
+          return dynamic_cast<const TransfiniteInterpolationManifold<2, 2> *>(
+                   &input.get_manifold(id)) == nullptr;
+        });
+      std::sort(default_priorities.begin(), first_tfi_it);
+      std::sort(first_tfi_it, default_priorities.end());
+
+      return default_priorities;
+    }();
+
+    const std::size_t        n_slices = slice_coordinates.size();
     std::vector<Point<3>>    points(n_slices * input.n_vertices());
     std::vector<CellData<3>> cells;
     cells.reserve((n_slices - 1) * input.n_active_cells());
 
     // copy the array of points as many times as there will be slices,
     // one slice at a time. The z-axis value are defined in slices_coordinates
-    for (unsigned int slice = 0; slice < n_slices; ++slice)
+    for (std::size_t slice_n = 0; slice_n < n_slices; ++slice_n)
       {
-        for (unsigned int i = 0; i < input.n_vertices(); ++i)
+        for (std::size_t vertex_n = 0; vertex_n < input.n_vertices();
+             ++vertex_n)
           {
-            const Point<2> &v                         = input.get_vertices()[i];
-            points[slice * input.n_vertices() + i](0) = v(0);
-            points[slice * input.n_vertices() + i](1) = v(1);
-            points[slice * input.n_vertices() + i](2) =
-              slice_coordinates[slice];
+            const Point<2> vertex = input.get_vertices()[vertex_n];
+            points[slice_n * input.n_vertices() + vertex_n] =
+              Point<3>(vertex[0], vertex[1], slice_coordinates[slice_n]);
           }
       }
 
     // then create the cells of each of the slices, one stack at a
     // time
-    for (Triangulation<2, 2>::cell_iterator cell = input.begin();
-         cell != input.end();
-         ++cell)
+    for (const auto &cell : input.active_cell_iterators())
       {
-        for (unsigned int slice = 0; slice < n_slices - 1; ++slice)
+        for (std::size_t slice_n = 0; slice_n < n_slices - 1; ++slice_n)
           {
             CellData<3> this_cell;
-            for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell;
-                 ++v)
+            for (unsigned int vertex_n = 0;
+                 vertex_n < GeometryInfo<2>::vertices_per_cell;
+                 ++vertex_n)
               {
-                this_cell.vertices[v] =
-                  cell->vertex_index(v) + slice * input.n_vertices();
-                this_cell.vertices[v + GeometryInfo<2>::vertices_per_cell] =
-                  cell->vertex_index(v) + (slice + 1) * input.n_vertices();
+                this_cell.vertices[vertex_n] =
+                  cell->vertex_index(vertex_n) + slice_n * input.n_vertices();
+                this_cell
+                  .vertices[vertex_n + GeometryInfo<2>::vertices_per_cell] =
+                  cell->vertex_index(vertex_n) +
+                  (slice_n + 1) * input.n_vertices();
               }
 
             this_cell.material_id = cell->material_id();
+            if (copy_manifold_ids)
+              this_cell.manifold_id = cell->manifold_id();
             cells.push_back(this_cell);
           }
       }
 
-    // next, create face data for all of the outer faces for which the
-    // boundary indicator will not be equal to zero (where we would
-    // explicitly set it to something that is already the default --
-    // no need to do that)
-    SubCellData        s;
-    types::boundary_id max_boundary_id = 0;
-    s.boundary_quads.reserve(input.n_active_lines() * (n_slices - 1) +
-                             input.n_active_cells() * 2);
-    for (Triangulation<2, 2>::cell_iterator cell = input.begin();
-         cell != input.end();
-         ++cell)
+    // Next, create face data for all faces that are orthogonal to the x-y
+    // plane
+    SubCellData               subcell_data;
+    std::vector<CellData<2>> &quads           = subcell_data.boundary_quads;
+    types::boundary_id        max_boundary_id = 0;
+    quads.reserve(input.n_active_lines() * (n_slices - 1) +
+                  input.n_active_cells() * 2);
+    for (const auto &face : input.active_face_iterators())
       {
         CellData<2> quad;
-        for (unsigned int f = 0; f < 4; ++f)
-          if (cell->at_boundary(f) && (cell->face(f)->boundary_id() != 0))
-            {
-              quad.boundary_id = cell->face(f)->boundary_id();
-              max_boundary_id  = std::max(max_boundary_id, quad.boundary_id);
-              for (unsigned int slice = 0; slice < n_slices - 1; ++slice)
-                {
-                  quad.vertices[0] =
-                    cell->face(f)->vertex_index(0) + slice * input.n_vertices();
-                  quad.vertices[1] =
-                    cell->face(f)->vertex_index(1) + slice * input.n_vertices();
-                  quad.vertices[2] = cell->face(f)->vertex_index(0) +
-                                     (slice + 1) * input.n_vertices();
-                  quad.vertices[3] = cell->face(f)->vertex_index(1) +
-                                     (slice + 1) * input.n_vertices();
-                  s.boundary_quads.push_back(quad);
-                }
-            }
+        quad.boundary_id = face->boundary_id();
+        if (face->at_boundary())
+          max_boundary_id = std::max(max_boundary_id, quad.boundary_id);
+        if (copy_manifold_ids)
+          quad.manifold_id = face->manifold_id();
+        for (std::size_t slice_n = 0; slice_n < n_slices - 1; ++slice_n)
+          {
+            quad.vertices[0] =
+              face->vertex_index(0) + slice_n * input.n_vertices();
+            quad.vertices[1] =
+              face->vertex_index(1) + slice_n * input.n_vertices();
+            quad.vertices[2] =
+              face->vertex_index(0) + (slice_n + 1) * input.n_vertices();
+            quad.vertices[3] =
+              face->vertex_index(1) + (slice_n + 1) * input.n_vertices();
+            quads.push_back(quad);
+          }
       }
+
+    // if necessary, create face data for faces parallel to the x-y
+    // plane. This is only necessary if we need to set manifolds.
+    if (copy_manifold_ids)
+      for (const auto &cell : input.active_cell_iterators())
+        {
+          CellData<2> quad;
+          quad.boundary_id = numbers::internal_face_boundary_id;
+          quad.manifold_id = cell->manifold_id(); // check is outside loop
+          for (std::size_t slice_n = 1; slice_n < n_slices - 1; ++slice_n)
+            {
+              quad.vertices[0] =
+                cell->vertex_index(0) + slice_n * input.n_vertices();
+              quad.vertices[1] =
+                cell->vertex_index(1) + slice_n * input.n_vertices();
+              quad.vertices[2] =
+                cell->vertex_index(2) + slice_n * input.n_vertices();
+              quad.vertices[3] =
+                cell->vertex_index(3) + slice_n * input.n_vertices();
+              quads.push_back(quad);
+            }
+        }
 
     // then mark the bottom and top boundaries of the extruded mesh
     // with max_boundary_id+1 and max_boundary_id+2. check that this
@@ -4603,22 +4603,28 @@ namespace GridGenerator
              "max_boundary_id+1 and max_boundary_id+2 as boundary "
              "indicators for the bottom and top faces of the "
              "extruded triangulation."));
-    for (Triangulation<2, 2>::cell_iterator cell = input.begin();
-         cell != input.end();
-         ++cell)
+    const types::boundary_id bottom_boundary_id = max_boundary_id + 1;
+    const types::boundary_id top_boundary_id    = max_boundary_id + 2;
+    for (const auto &cell : input.active_cell_iterators())
       {
         CellData<2> quad;
-        quad.boundary_id = max_boundary_id + 1;
+        quad.boundary_id = bottom_boundary_id;
         quad.vertices[0] = cell->vertex_index(0);
         quad.vertices[1] = cell->vertex_index(1);
         quad.vertices[2] = cell->vertex_index(2);
         quad.vertices[3] = cell->vertex_index(3);
-        s.boundary_quads.push_back(quad);
+        if (copy_manifold_ids)
+          quad.manifold_id = cell->manifold_id();
+        quads.push_back(quad);
 
-        quad.boundary_id = max_boundary_id + 2;
-        for (int i = 0; i < 4; ++i)
-          quad.vertices[i] += (n_slices - 1) * input.n_vertices();
-        s.boundary_quads.push_back(quad);
+        quad.boundary_id = top_boundary_id;
+        for (unsigned int vertex_n = 0;
+             vertex_n < GeometryInfo<3>::vertices_per_face;
+             ++vertex_n)
+          quad.vertices[vertex_n] += (n_slices - 1) * input.n_vertices();
+        if (copy_manifold_ids)
+          quad.manifold_id = cell->manifold_id();
+        quads.push_back(quad);
       }
 
     // use all of this to finally create the extruded 3d
@@ -4629,7 +4635,17 @@ namespace GridGenerator
     // extruding it automatically yields a correctly oriented 3d mesh,
     // as discussed in the edge orientation paper mentioned in the
     // introduction to the GridReordering class.
-    result.create_triangulation(points, cells, s);
+    result.create_triangulation(points, cells, subcell_data);
+
+    for (auto manifold_id_it = priorities.rbegin();
+         manifold_id_it != priorities.rend();
+         ++manifold_id_it)
+      for (auto &face : result.active_face_iterators())
+        if (face->manifold_id() == *manifold_id_it)
+          for (unsigned int line_n = 0;
+               line_n < GeometryInfo<3>::lines_per_face;
+               ++line_n)
+            face->line(line_n)->set_manifold_id(*manifold_id_it);
   }
 
 

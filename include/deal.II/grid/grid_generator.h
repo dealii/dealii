@@ -1271,24 +1271,65 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &result);
 
   /**
-   * Take a 2d Triangulation that is being extruded in z direction by the
-   * total height of @p height using @p n_slices slices (minimum is 2). The
-   * boundary indicators of the faces of @p input are going to be assigned to
-   * the corresponding side walls in z direction. The bottom and top get the
-   * next two free boundary indicators.
+   * Extrude @p input in the $z$ direction from $z = 0$ to $z =
+   * \text{height}$. The number of <em>slices</em>, or layers of cells
+   * perpendicular to the $z = 0$ plane, will be @p n_slices slices (minimum is
+   * 2). The boundary indicators of the faces of @p input will be assigned to
+   * the corresponding side walls in $z$ direction. The bottom and top get the
+   * next two free boundary indicators: i.e., if @p input has boundary ids of
+   * $0$, $1$, and $42$, then the $z = 0$ boundary id of @p result will be $43$
+   * and the $z = \text{height}$ boundary id will be $44$.
+   *
+   * This function does not, by default, copy manifold ids. The reason for
+   * this is that there is no way to set the manifold ids on the lines of the
+   * resulting Triangulation without more information: for example, if two
+   * faces of @p input with different manifold ids meet at a shared vertex then
+   * there is no <em>a priori</em> reason to pick one manifold id or another
+   * for the lines created in @p result that are parallel to the $z$-axis and
+   * pass through that point. If @p copy_manifold_ids is <code>true</code>
+   * then this function sets line manifold ids by picking the one that appears
+   * <em>first</em> in @p manifold_priorities. For example: if @p
+   * manifold_priorities is <code>{0, 42, numbers::flat_manifold_id}</code>
+   * and the line under consideration is adjacent to faces with manifold ids of
+   * <code>0</code> and <code>42</code>, then that line will have a manifold id
+   * of <code>0</code>. The correct ordering is almost always
+   * <ol>
+   *   <li>manifold ids set on the boundary,</li>
+   *   <li>manifold ids that describe most of the cells in the Triangulation
+   *   (e.g., numbers::flat_manifold_id), and</li>
+   *   <li>any manifold ids corresponding to TransfiniteInterpolationManifold
+   *   manifolds.</li>
+   * </ol>
+   *
+   * In particular, since TransfiniteInterpolationManifold interpolates
+   * between surrounding manifolds, its manifold id should usually not be set
+   * on lines or faces that are adjacent to cells with different manifold
+   * ids. The default value for @p manifold_priorities follows this ranking
+   * (where each category is sorted in ascending order):
+   * <ol>
+   *   <li>manifold ids associated with manifolds that are not
+   *   TransfiniteInterpolationManifold, and</li>
+   *   <li>manifold ids associated with any TransfiniteInterpolationManifold
+   *   objects.</li>
+   * </ol>
+   * Note that numbers::flat_manifold_id (should it be a manifold id of @p
+   * input) will always be the last entry in the first category.
    *
    * @note The 2d input triangulation @p input must be a coarse mesh that has
    * no refined cells.
    *
    * @note Since @p input and @p output have different spatial dimensions no
-   * manifold objects are copied (nor are any manifold ids set) by this
-   * function.
+   * manifold objects are copied by this function regardless of the value of
+   * @p copy_manifold_ids.
    */
   void
-  extrude_triangulation(const Triangulation<2, 2> &input,
-                        const unsigned int         n_slices,
-                        const double               height,
-                        Triangulation<3, 3> &      result);
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const unsigned int                     n_slices,
+    const double                           height,
+    Triangulation<3, 3> &                  result,
+    const bool                             copy_manifold_ids   = false,
+    const std::vector<types::manifold_id> &manifold_priorities = {});
 
   /**
    * Overload of the previous function. Take a 2d Triangulation that is being
@@ -1309,9 +1350,12 @@ namespace GridGenerator
    * @author Weixiong Zheng, 2018
    */
   void
-  extrude_triangulation(const Triangulation<2, 2> &input,
-                        const std::vector<double> &slice_coordinates,
-                        Triangulation<3, 3> &      result);
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const std::vector<double> &            slice_coordinates,
+    Triangulation<3, 3> &                  result,
+    const bool                             copy_manifold_ids   = false,
+    const std::vector<types::manifold_id> &manifold_priorities = {});
 
 
   /**

@@ -1,0 +1,4 @@
+Improved: GridGenerator::extrude_triangulation can now optionally extrude manifold
+ids.
+<br>
+(2018/08/11, David Wells)
