@@ -253,9 +253,16 @@ namespace MGTools
   extract_inner_interface_dofs(const DoFHandler<dim, spacedim> &mg_dof_handler,
                                std::vector<IndexSet> &          interface_dofs);
 
-
+  /**
+   * For each level in a multigrid hierarchy, produce a std::set of degrees of
+   * freedoms that are not located along interfaces of this level to cells that
+   * only exist on coarser levels.
+   *
+   * @deprecated Use extract_inner_interface_dofs() for computing the complement
+   * of degrees of freedoms instead.
+   */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   extract_non_interface_dofs(
     const DoFHandler<dim, spacedim> &               mg_dof_handler,
     std::vector<std::set<types::global_dof_index>> &non_interface_dofs);
