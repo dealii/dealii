@@ -57,12 +57,12 @@ namespace deal_II_exceptions
     show_stacktrace = false;
   }
 
-  bool abort_on_exception = true;
+  bool allow_abort_on_exception = true;
 
   void
   disable_abort_on_exception()
   {
-    abort_on_exception = false;
+    allow_abort_on_exception = false;
   }
 
 } // namespace deal_II_exceptions
@@ -397,61 +397,60 @@ namespace StandardExceptions
 } // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
 
-namespace
-{
-  [[noreturn]] void
-  internal_abort(const ExceptionBase &exc) noexcept
-  {
-    // first print the error
-    std::cerr << exc.what() << std::endl;
-
-    // then bail out. if in MPI mode, bring down the entire
-    // house by asking the MPI system to do a best-effort
-    // operation at also terminating all of the other MPI
-    // processes. this is useful because if only one process
-    // runs into an assertion, then that may lead to deadlocks
-    // if the others don't recognize this, or at the very least
-    // delay their termination until they realize that their
-    // communication with the job that died times out.
-    //
-    // Unlike std::abort(), MPI_Abort() unfortunately doesn't break when
-    // running inside a debugger like GDB, so only use this strategy if
-    // absolutely necessary and inform the user how to use a debugger.
-#ifdef DEAL_II_WITH_MPI
-    int is_initialized;
-    MPI_Initialized(&is_initialized);
-    if (is_initialized)
-      {
-        // do the same as in Utilities::MPI::n_mpi_processes() here,
-        // but without error checking to not throw again.
-        const int n_proc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-        if (n_proc > 1)
-          {
-            std::cerr
-              << "Calling MPI_Abort now.\n"
-              << "To break execution in a GDB session, execute 'break MPI_Abort' before "
-              << "running. You can also put the following into your ~/.gdbinit:\n"
-              << "  set breakpoint pending on\n"
-              << "  break MPI_Abort\n"
-              << "  set breakpoint pending auto" << std::endl;
-
-            MPI_Abort(MPI_COMM_WORLD,
-                      /* return code = */ 255);
-          }
-      }
-#endif
-    std::abort();
-  }
-} // namespace
-
 namespace deal_II_exceptions
 {
   namespace internals
   {
+    [[noreturn]] void
+    internal_abort(const ExceptionBase &exc) noexcept
+    {
+      // first print the error
+      std::cerr << exc.what() << std::endl;
+
+      // then bail out. if in MPI mode, bring down the entire
+      // house by asking the MPI system to do a best-effort
+      // operation at also terminating all of the other MPI
+      // processes. this is useful because if only one process
+      // runs into an assertion, then that may lead to deadlocks
+      // if the others don't recognize this, or at the very least
+      // delay their termination until they realize that their
+      // communication with the job that died times out.
+      //
+      // Unlike std::abort(), MPI_Abort() unfortunately doesn't break when
+      // running inside a debugger like GDB, so only use this strategy if
+      // absolutely necessary and inform the user how to use a debugger.
+#ifdef DEAL_II_WITH_MPI
+      int is_initialized;
+      MPI_Initialized(&is_initialized);
+      if (is_initialized)
+        {
+          // do the same as in Utilities::MPI::n_mpi_processes() here,
+          // but without error checking to not throw again.
+          const int n_proc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+          if (n_proc > 1)
+            {
+              std::cerr
+                << "Calling MPI_Abort now.\n"
+                << "To break execution in a GDB session, execute 'break MPI_Abort' before "
+                << "running. You can also put the following into your ~/.gdbinit:\n"
+                << "  set breakpoint pending on\n"
+                << "  break MPI_Abort\n"
+                << "  set breakpoint pending auto" << std::endl;
+
+              MPI_Abort(MPI_COMM_WORLD,
+                        /* return code = */ 255);
+            }
+        }
+#endif
+      std::abort();
+    }
+
+
+
     void
     do_issue_error_nothrow(const ExceptionBase &exc) noexcept
     {
-      if (dealii::deal_II_exceptions::abort_on_exception)
+      if (dealii::deal_II_exceptions::allow_abort_on_exception)
         internal_abort(exc);
       else
         {
@@ -464,21 +463,9 @@ namespace deal_II_exceptions
 
 
 
-    [[noreturn]] void
-    abort(const ExceptionBase &exc) {
-      if (dealii::deal_II_exceptions::abort_on_exception)
-        internal_abort(exc);
-      else
-        {
-          // We are not allowed to abort, so just throw the error:
-          throw exc;
-        }
-    }
-
-
-
 #ifdef DEAL_II_WITH_CUDA
-    std::string get_cusparse_error_string(const cusparseStatus_t error_code)
+    std::string
+    get_cusparse_error_string(const cusparseStatus_t error_code)
     {
       switch (error_code)
         {
