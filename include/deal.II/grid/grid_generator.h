@@ -488,7 +488,7 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &              tria,
     const Point<spacedim> &                     origin,
     const std::array<Tensor<1, spacedim>, dim> &edges,
-    const std::vector<unsigned int> &subdivisions = std::vector<unsigned int>(),
+    const std::vector<unsigned int> &subdivisions = {},
     const bool                       colorize     = false);
 
   /**

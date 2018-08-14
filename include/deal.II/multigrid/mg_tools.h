@@ -169,7 +169,7 @@ namespace MGTools
   count_dofs_per_block(
     const DoFHandlerType &                             dof_handler,
     std::vector<std::vector<types::global_dof_index>> &dofs_per_block,
-    std::vector<unsigned int> target_block = std::vector<unsigned int>());
+    std::vector<unsigned int> target_block = {});
 
   /**
    * Count the dofs component-wise on each level.
@@ -184,7 +184,7 @@ namespace MGTools
     const DoFHandler<dim, spacedim> &                  mg_dof,
     std::vector<std::vector<types::global_dof_index>> &result,
     const bool                                         only_once = false,
-    std::vector<unsigned int> target_component = std::vector<unsigned int>());
+    std::vector<unsigned int> target_component = {});
 
   /**
    * Generate a list of those degrees of freedom at the boundary of the domain

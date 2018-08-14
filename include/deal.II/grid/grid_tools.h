@@ -892,7 +892,7 @@ namespace GridTools
   find_closest_vertex(
     const MeshType<dim, spacedim> &mesh,
     const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = std::vector<bool>());
+    const std::vector<bool> &      marked_vertices = {});
 
   /**
    * Find and return the index of the used vertex (or marked vertex) in a
@@ -925,7 +925,7 @@ namespace GridTools
     const Mapping<dim, spacedim> & mapping,
     const MeshType<dim, spacedim> &mesh,
     const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = std::vector<bool>());
+    const std::vector<bool> &      marked_vertices = {});
 
 
   /**
@@ -998,7 +998,7 @@ namespace GridTools
   find_active_cell_around_point(
     const MeshType<dim, spacedim> &mesh,
     const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = std::vector<bool>());
+    const std::vector<bool> &      marked_vertices = {});
 
   /**
    * Find and return an iterator to the active cell that surrounds a given
@@ -1098,7 +1098,7 @@ namespace GridTools
     const Mapping<dim, spacedim> & mapping,
     const MeshType<dim, spacedim> &mesh,
     const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = std::vector<bool>());
+    const std::vector<bool> &      marked_vertices = {});
 
   /**
    * A version of the previous function that exploits an already existing
@@ -1127,7 +1127,7 @@ namespace GridTools
     const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
     const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint =
       typename MeshType<dim, spacedim>::active_cell_iterator(),
-    const std::vector<bool> &marked_vertices = std::vector<bool>());
+    const std::vector<bool> &marked_vertices = {});
 
   /**
    * A version of the previous function where we use that mapping on a given
@@ -1172,7 +1172,7 @@ namespace GridTools
     const Point<spacedim> &     p,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &
                              cell_hint = typename Triangulation<dim, spacedim>::active_cell_iterator(),
-    const std::vector<bool> &marked_vertices = std::vector<bool>());
+    const std::vector<bool> &marked_vertices = {});
 
   /**
    * A variant of the previous find_active_cell_around_point() function that,
@@ -1206,7 +1206,7 @@ namespace GridTools
     const MeshType<dim, spacedim> &mesh,
     const Point<spacedim> &        p,
     const double                   tolerance       = 1e-12,
-    const std::vector<bool> &      marked_vertices = std::vector<bool>());
+    const std::vector<bool> &      marked_vertices = {});
 
   /**
    * Return a list of all descendants of the given cell that are active. For

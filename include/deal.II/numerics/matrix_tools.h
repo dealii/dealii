@@ -411,7 +411,7 @@ namespace MatrixCreator
     Vector<number> &                        rhs_vector,
     std::vector<types::global_dof_index> &  dof_to_boundary_mapping,
     const Function<spacedim, number> *const weight = 0,
-    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+    std::vector<unsigned int> component_mapping = {});
 
 
   /**
@@ -429,7 +429,7 @@ namespace MatrixCreator
     Vector<number> &                        rhs_vector,
     std::vector<types::global_dof_index> &  dof_to_boundary_mapping,
     const Function<spacedim, number> *const a   = nullptr,
-    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+    std::vector<unsigned int> component_mapping = {});
 
   /**
    * Same function as above, but for hp objects.
@@ -446,7 +446,7 @@ namespace MatrixCreator
     Vector<number> &                        rhs_vector,
     std::vector<types::global_dof_index> &  dof_to_boundary_mapping,
     const Function<spacedim, number> *const a   = nullptr,
-    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+    std::vector<unsigned int> component_mapping = {});
 
   /**
    * Same function as above, but for hp objects.
@@ -462,7 +462,7 @@ namespace MatrixCreator
     Vector<number> &                        rhs_vector,
     std::vector<types::global_dof_index> &  dof_to_boundary_mapping,
     const Function<spacedim, number> *const a   = nullptr,
-    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+    std::vector<unsigned int> component_mapping = {});
 
   /**
    * Assemble the Laplace matrix. If no coefficient is given (i.e., if the
