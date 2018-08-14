@@ -802,13 +802,13 @@ public:
    * is left.
    */
   void
-  leave_subsection(const std::string &section_name = std::string());
+  leave_subsection(const std::string &section_name = "");
 
   /**
    * Same as @p leave_subsection.
    */
   void
-  exit_section(const std::string &section_name = std::string());
+  exit_section(const std::string &section_name = "");
 
   /**
    * Get a map with the collected data of the specified type for each subsection

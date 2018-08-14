@@ -1025,7 +1025,7 @@ public:
   declare_entry(const std::string &          entry,
                 const std::string &          default_value,
                 const Patterns::PatternBase &pattern = Patterns::Anything(),
-                const std::string &          documentation = std::string());
+                const std::string &          documentation = "");
 
   /**
    * Attach an action to the parameter with name @p entry in the current
@@ -1087,7 +1087,7 @@ public:
   void
   add_parameter(const std::string &          entry,
                 ParameterType &              parameter,
-                const std::string &          documentation = std::string(),
+                const std::string &          documentation = "",
                 const Patterns::PatternBase &pattern =
                   *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
