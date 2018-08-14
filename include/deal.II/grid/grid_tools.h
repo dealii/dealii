@@ -889,10 +889,9 @@ namespace GridTools
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
-  find_closest_vertex(
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = {});
+  find_closest_vertex(const MeshType<dim, spacedim> &mesh,
+                      const Point<spacedim> &        p,
+                      const std::vector<bool> &      marked_vertices = {});
 
   /**
    * Find and return the index of the used vertex (or marked vertex) in a
@@ -921,11 +920,10 @@ namespace GridTools
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
-  find_closest_vertex(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = {});
+  find_closest_vertex(const Mapping<dim, spacedim> & mapping,
+                      const MeshType<dim, spacedim> &mesh,
+                      const Point<spacedim> &        p,
+                      const std::vector<bool> &      marked_vertices = {});
 
 
   /**
@@ -992,13 +990,13 @@ namespace GridTools
 #  ifndef _MSC_VER
   typename MeshType<dim, spacedim>::active_cell_iterator
 #  else
-  typename dealii::internal::
-    ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
+  typename dealii::internal::ActiveCellIterator<dim,
+                                                spacedim,
+                                                MeshType<dim, spacedim>>::type
 #  endif
-  find_active_cell_around_point(
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = {});
+  find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
+                                const Point<spacedim> &        p,
+                                const std::vector<bool> &marked_vertices = {});
 
   /**
    * Find and return an iterator to the active cell that surrounds a given
@@ -1094,11 +1092,10 @@ namespace GridTools
               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
             Point<dim>>
 #  endif
-  find_active_cell_around_point(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<bool> &      marked_vertices = {});
+  find_active_cell_around_point(const Mapping<dim, spacedim> & mapping,
+                                const MeshType<dim, spacedim> &mesh,
+                                const Point<spacedim> &        p,
+                                const std::vector<bool> &marked_vertices = {});
 
   /**
    * A version of the previous function that exploits an already existing

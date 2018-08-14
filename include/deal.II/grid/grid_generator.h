@@ -484,12 +484,11 @@ namespace GridGenerator
    */
   template <int dim, int spacedim>
   void
-  subdivided_parallelepiped(
-    Triangulation<dim, spacedim> &              tria,
-    const Point<spacedim> &                     origin,
-    const std::array<Tensor<1, spacedim>, dim> &edges,
-    const std::vector<unsigned int> &subdivisions = {},
-    const bool                       colorize     = false);
+  subdivided_parallelepiped(Triangulation<dim, spacedim> &              tria,
+                            const Point<spacedim> &                     origin,
+                            const std::array<Tensor<1, spacedim>, dim> &edges,
+                            const std::vector<unsigned int> &subdivisions = {},
+                            const bool                       colorize = false);
 
   /**
    * Hypercube with a layer of hypercubes around it. The first two parameters

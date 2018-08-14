@@ -1356,7 +1356,7 @@ namespace VectorTools
       &                                        boundary_functions,
     const Quadrature<dim - 1> &                q,
     std::map<types::global_dof_index, number> &boundary_values,
-    std::vector<unsigned int> component_mapping = {});
+    std::vector<unsigned int>                  component_mapping = {});
 
   /**
    * Call the project_boundary_values() function, see above, with
@@ -1370,7 +1370,7 @@ namespace VectorTools
       &                                        boundary_function,
     const Quadrature<dim - 1> &                q,
     std::map<types::global_dof_index, number> &boundary_values,
-    std::vector<unsigned int> component_mapping = {});
+    std::vector<unsigned int>                  component_mapping = {});
 
   /**
    * Same as above, but for objects of type hp::DoFHandler
@@ -1384,7 +1384,7 @@ namespace VectorTools
       &                                        boundary_functions,
     const hp::QCollection<dim - 1> &           q,
     std::map<types::global_dof_index, number> &boundary_values,
-    std::vector<unsigned int> component_mapping = {});
+    std::vector<unsigned int>                  component_mapping = {});
 
   /**
    * Call the project_boundary_values() function, see above, with
@@ -1398,7 +1398,7 @@ namespace VectorTools
       &                                        boundary_function,
     const hp::QCollection<dim - 1> &           q,
     std::map<types::global_dof_index, number> &boundary_values,
-    std::vector<unsigned int> component_mapping = {});
+    std::vector<unsigned int>                  component_mapping = {});
 
   /**
    * Project a function to the boundary of the domain, using the given
@@ -3054,8 +3054,7 @@ namespace VectorTools
    */
   template <typename VectorType>
   void
-  subtract_mean_value(VectorType &             v,
-                      const std::vector<bool> &p_select = {});
+  subtract_mean_value(VectorType &v, const std::vector<bool> &p_select = {});
 
 
   /**

@@ -1943,12 +1943,11 @@ namespace DoFTools
    */
   template <int dim, int spacedim>
   void
-  make_cell_patches(
-    SparsityPattern &                block_list,
-    const DoFHandler<dim, spacedim> &dof_handler,
-    const unsigned int               level,
-    const std::vector<bool> &        selected_dofs = {},
-    const types::global_dof_index    offset        = 0);
+  make_cell_patches(SparsityPattern &                block_list,
+                    const DoFHandler<dim, spacedim> &dof_handler,
+                    const unsigned int               level,
+                    const std::vector<bool> &        selected_dofs = {},
+                    const types::global_dof_index    offset        = 0);
 
   /**
    * Create an incidence matrix that for every vertex on a given level of a
@@ -2156,7 +2155,7 @@ namespace DoFTools
     const DoFHandlerType &                dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
     const bool                            vector_valued_once = false,
-    std::vector<unsigned int> target_component = {});
+    std::vector<unsigned int>             target_component   = {});
 
   /**
    * Count the degrees of freedom in each block. This function is similar to
