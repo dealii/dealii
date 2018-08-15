@@ -210,7 +210,8 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
         if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
           {
             for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-              if (cell->has_periodic_neighbor(f))
+              if (cell->has_periodic_neighbor(f) &&
+                  cell->periodic_neighbor(f)->level() == cell->level())
                 {
                   if (cell->is_locally_owned_on_level())
                     {

@@ -1495,11 +1495,11 @@ namespace MGTools
           {
             const typename DoFHandler<dim, spacedim>::face_iterator face =
               cell->face(face_nr);
-            if (!face->at_boundary())
+            if (!face->at_boundary() || cell->has_periodic_neighbor(face_nr))
               {
                 // interior face
                 const typename DoFHandler<dim>::cell_iterator neighbor =
-                  cell->neighbor(face_nr);
+                  cell->neighbor_or_periodic_neighbor(face_nr);
 
                 if ((neighbor->level() < cell->level()))
                   {
@@ -1576,11 +1576,11 @@ namespace MGTools
           {
             const typename DoFHandler<dim, spacedim>::face_iterator face =
               cell->face(face_nr);
-            if (!face->at_boundary())
+            if (!face->at_boundary() || cell->has_periodic_neighbor(face_nr))
               {
                 // interior face
                 const typename DoFHandler<dim>::cell_iterator neighbor =
-                  cell->neighbor(face_nr);
+                  cell->neighbor_or_periodic_neighbor(face_nr);
 
                 // only process cell pairs if one or both of them are owned by
                 // me (ignore if running in serial)
