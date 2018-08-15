@@ -26,7 +26,7 @@
 // --------------------
 //
 // The input file is typically located in share/deal.II/template-arguments in
-// the build directory and it is built from config/template-arguments.in to
+// the build directory and it is built from cmake/config/template-arguments.in to
 // contain the list of vectors etc. that make sense for the current
 // configuration. For example, the list of VECTORS is going to contain PETSc
 // vectors if so configured.
