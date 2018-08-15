@@ -427,7 +427,7 @@ void
 SolutionTransfer<dim, VectorType, DoFHandlerType>::
   prepare_for_coarsening_and_refinement(const VectorType &in)
 {
-  std::vector<VectorType> all_in = std::vector<VectorType>(1, in);
+  std::vector<VectorType> all_in(1, in);
   prepare_for_coarsening_and_refinement(all_in);
 }
 
