@@ -96,8 +96,10 @@ transfer(const MPI_Comm &mpi_communicator)
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  GridTools::partition_triangulation(
-    Utilities::MPI::n_mpi_processes(mpi_communicator), tria);
+  GridTools::partition_triangulation(Utilities::MPI::n_mpi_processes(
+                                       mpi_communicator),
+                                     tria,
+                                     SparsityTools::Partitioner::zoltan);
 
   const FESystem<dim>             fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1);
   const std::vector<unsigned int> block_component({0, 1});
