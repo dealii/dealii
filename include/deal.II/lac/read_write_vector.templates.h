@@ -531,9 +531,10 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
-    const TrilinosWrappers::MPI::Vector &           trilinos_vec,
-    VectorOperation::values                         operation,
-    std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+    const TrilinosWrappers::MPI::Vector &trilinos_vec,
+    VectorOperation::values              operation,
+    const std::shared_ptr<const CommunicationPatternBase>
+      &communication_pattern)
   {
     // While the import does work with Trilinos 12.8.x, it fails with 12.4.x. To
     // be safe, we disable it here. Note that it would be a useful case, as
@@ -554,9 +555,10 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
-    const LinearAlgebra::EpetraWrappers::Vector &   trilinos_vec,
-    VectorOperation::values                         operation,
-    std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+    const LinearAlgebra::EpetraWrappers::Vector &trilinos_vec,
+    VectorOperation::values                      operation,
+    const std::shared_ptr<const CommunicationPatternBase>
+      &communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(),
            trilinos_vec.locally_owned_elements(),
@@ -574,7 +576,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import(
     const LinearAlgebra::CUDAWrappers::Vector<Number> &cuda_vec,
     VectorOperation::values                            operation,
-    std::shared_ptr<const CommunicationPatternBase>)
+    const std::shared_ptr<const CommunicationPatternBase> &)
   {
     const unsigned int n_elements = stored_elements.n_elements();
     if (operation == VectorOperation::insert)
