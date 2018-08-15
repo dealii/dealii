@@ -1047,7 +1047,6 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  LaplaceProblem();
   LaplaceProblem(const ParameterCollection &prm);
   virtual ~LaplaceProblem();
   void
@@ -1123,26 +1122,6 @@ protected:
   Vector<float>              vec_fe_index;
   Vector<float>              mat_id;
 };
-
-
-
-template <int dim>
-LaplaceProblem<dim>::LaplaceProblem()
-  : prm()
-  , n_enriched_cells(0)
-  , dof_handler(triangulation)
-  , fe_base(prm.fe_base_degree)
-  , fe_enriched(prm.fe_enriched_degree)
-  , fe_nothing(1, true)
-  , mpi_communicator(MPI_COMM_WORLD)
-  , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
-  , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
-  , pcout(std::cout, (this_mpi_process == 0))
-{
-  prm.print();
-
-  pcout << "...default parameters set" << std::endl;
-}
 
 
 
