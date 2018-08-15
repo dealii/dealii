@@ -228,8 +228,6 @@ namespace MeshWorker
                                       dimension>::faces_per_cell;
              ++face_no)
           {
-            typename CellIteratorType::AccessorType::Container::face_iterator
-              face = cell->face(face_no);
             if (cell->at_boundary(face_no) &&
                 !cell->has_periodic_neighbor(face_no))
               {
@@ -361,7 +359,8 @@ namespace MeshWorker
                         cell->periodic_neighbor_face_no(face_no) :
                         cell->neighbor_face_no(face_no);
                     Assert(periodic_neighbor ||
-                             neighbor->face(neighbor_face_no) == face,
+                             neighbor->face(neighbor_face_no) ==
+                               cell->face(face_no),
                            ExcInternalError());
 
                     face_worker(cell,
