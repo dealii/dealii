@@ -19,15 +19,14 @@
 // is given as arguments on the command line and contains entries of the
 // following form:
 // --------------------
-// REAL_SCALARS    := { double; float; long double }
+// REAL_SCALARS    := { double; float}
 // COMPLEX_SCALARS := { std::complex<double>;
-//                      std::complex<float>;
-//                      std::complex<long double> }
-// VECTORS := { Vector<double>; Vector<float>; Vector<long double> }
+//                      std::complex<float>}
+// VECTORS := { Vector<double>; Vector<float>}
 // --------------------
 //
 // The input file is typically located in share/deal.II/template-arguments in
-// the build directory and it is built from config/template-arguments.in to
+// the build directory and it is built from cmake/config/template-arguments.in to
 // contain the list of vectors etc. that make sense for the current
 // configuration. For example, the list of VECTORS is going to contain PETSc
 // vectors if so configured.
@@ -55,7 +54,7 @@
 
 // a map from the keys in the expansion lists to the list itself. For
 // instance, the example above will lead to the entry
-//      expansion_lists[REAL_SCALARS] = (double, float, long double)
+//      expansion_lists[REAL_SCALARS] = (double, float)
 // in this map, among others
 std::map<std::string, std::list<std::string> >  expansion_lists;
 
@@ -284,7 +283,7 @@ std::string substitute_tokens (const std::string &text,
 
 
 // read and parse the expansion lists like
-//   REAL_SCALARS    := { double; float; long double }
+//   REAL_SCALARS    := { double; float}
 // as specified at the top of the file and store them in the global
 // expansion_lists variable
 void read_expansion_lists (const std::string &filename)
