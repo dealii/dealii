@@ -311,7 +311,7 @@ namespace LinearAlgebra
       /**
        * Pointer to the array of elements of this vector.
        */
-      std::unique_ptr<Number, void (*)(Number *)> val;
+      std::unique_ptr<Number[], void (*)(Number *)> val;
 
       /**
        * Number of elements in the vector.

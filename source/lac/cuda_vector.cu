@@ -41,7 +41,7 @@ namespace LinearAlgebra
       void
       delete_device_vector(Number *device_ptr) noexcept
       {
-        cudaError_t error_code = cudaFree(device_ptr);
+        const cudaError_t error_code = cudaFree(device_ptr);
         (void)error_code;
         AssertNothrow(error_code == cudaSuccess,
                       dealii::ExcCudaError(cudaGetErrorString(error_code)));
@@ -51,8 +51,9 @@ namespace LinearAlgebra
       Number *
       allocate_device_vector(const std::size_t size)
       {
-        Number *    device_ptr;
-        cudaError_t error_code = cudaMalloc(&device_ptr, size * sizeof(Number));
+        Number *          device_ptr;
+        const cudaError_t error_code =
+          cudaMalloc(&device_ptr, size * sizeof(Number));
         (void)error_code;
         AssertCuda(error_code);
         return device_ptr;
@@ -76,10 +77,10 @@ namespace LinearAlgebra
       , n_elements(V.n_elements)
     {
       // Copy the values.
-      cudaError_t error_code = cudaMemcpy(val.get(),
-                                          V.val.get(),
-                                          n_elements * sizeof(Number),
-                                          cudaMemcpyDeviceToDevice);
+      const cudaError_t error_code = cudaMemcpy(val.get(),
+                                                V.val.get(),
+                                                n_elements * sizeof(Number),
+                                                cudaMemcpyDeviceToDevice);
       AssertCuda(error_code);
     }
 
@@ -90,15 +91,15 @@ namespace LinearAlgebra
     Vector<Number>::operator=(const Vector<Number> &V)
     {
       if (n_elements < V.n_elements)
-        reinit(V.n_elements);
-
-      n_elements = V.n_elements;
+        reinit(V.n_elements, true);
+      else
+        n_elements = V.n_elements;
 
       // Copy the values.
-      cudaError_t error_code = cudaMemcpy(val.get(),
-                                          V.val.get(),
-                                          n_elements * sizeof(Number),
-                                          cudaMemcpyDeviceToDevice);
+      const cudaError_t error_code = cudaMemcpy(val.get(),
+                                                V.val.get(),
+                                                n_elements * sizeof(Number),
+                                                cudaMemcpyDeviceToDevice);
       AssertCuda(error_code);
     }
 
@@ -127,7 +128,8 @@ namespace LinearAlgebra
       // If necessary set the elements to zero
       if (omit_zeroing_entries == false)
         {
-          cudaError_t error_code = cudaMemset(val.get(), 0, n * sizeof(Number));
+          const cudaError_t error_code =
+            cudaMemset(val.get(), 0, n * sizeof(Number));
           AssertCuda(error_code);
         }
       n_elements = n;
@@ -153,10 +155,10 @@ namespace LinearAlgebra
     {
       if (operation == VectorOperation::insert)
         {
-          cudaError_t error_code = cudaMemcpy(val.get(),
-                                              V.begin(),
-                                              n_elements * sizeof(Number),
-                                              cudaMemcpyHostToDevice);
+          const cudaError_t error_code = cudaMemcpy(val.get(),
+                                                    V.begin(),
+                                                    n_elements * sizeof(Number),
+                                                    cudaMemcpyHostToDevice);
           AssertCuda(error_code);
         }
       else if (operation == VectorOperation::add)
@@ -201,7 +203,7 @@ namespace LinearAlgebra
       Assert(s == Number(), ExcMessage("Only 0 can be assigned to a vector."));
       (void)s;
 
-      cudaError_t error_code =
+      const cudaError_t error_code =
         cudaMemset(val.get(), 0, n_elements * sizeof(Number));
       AssertCuda(error_code);
 
