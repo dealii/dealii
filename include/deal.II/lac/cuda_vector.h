@@ -68,6 +68,11 @@ namespace LinearAlgebra
       Vector(const Vector<Number> &V);
 
       /**
+       * Move constructor.
+       */
+      Vector(Vector<Number> &&) = default;
+
+      /**
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
        *
@@ -80,9 +85,16 @@ namespace LinearAlgebra
       explicit Vector(const size_type n);
 
       /**
-       * Destructor.
+       * Copy assignment operator.
        */
-      ~Vector();
+      Vector &
+      operator=(const Vector<Number> &v);
+
+      /**
+       * Move assignment operator.
+       */
+      Vector &
+      operator=(Vector<Number> &&v) = default;
 
       /**
        * Reinit functionality. The flag <tt>omit_zeroing_entries</tt>
@@ -254,7 +266,8 @@ namespace LinearAlgebra
                   const VectorSpaceVector<Number> &W) override;
 
       /**
-       * Return the pointer to the underlying array.
+       * Return the pointer to the underlying array. Ownership still resides
+       * with this class.
        */
       Number *
       get_values() const;
@@ -298,7 +311,7 @@ namespace LinearAlgebra
       /**
        * Pointer to the array of elements of this vector.
        */
-      Number *val;
+      std::unique_ptr<Number, void (*)(Number *)> val;
 
       /**
        * Number of elements in the vector.
@@ -313,7 +326,7 @@ namespace LinearAlgebra
     inline Number *
     Vector<Number>::get_values() const
     {
-      return val;
+      return val.get();
     }
 
 
