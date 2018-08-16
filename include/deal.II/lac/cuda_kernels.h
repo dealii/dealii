@@ -43,6 +43,8 @@ namespace LinearAlgebra
 
       /**
        * Multiply each entry of @p val of size @p N by @p a.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -52,6 +54,8 @@ namespace LinearAlgebra
 
       /**
        * Functor defining the addition of two Numbers.
+       *
+       * @ingroup CUDAWrappers
        */
       struct Binop_Addition
       {
@@ -67,6 +71,8 @@ namespace LinearAlgebra
 
       /**
        * Functor defining the subtraction of two Numbers.
+       *
+       * @ingroup CUDAWrappers
        */
       struct Binop_Subtraction
       {
@@ -82,6 +88,8 @@ namespace LinearAlgebra
 
       /**
        * Apply the functor @tparam Binop to each element of @p v1 and @p v2.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number, typename Binop>
       __global__ void
@@ -92,6 +100,8 @@ namespace LinearAlgebra
       /**
        * Structure implementing the functions used to add elements when using a
        * reduction.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       struct ElemSum
@@ -114,6 +124,8 @@ namespace LinearAlgebra
       /**
        * Structure implementing the functions used to compute the L1 norm when
        * using a reduction.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       struct L1Norm
@@ -136,6 +148,8 @@ namespace LinearAlgebra
       /**
        * Structure implementing the functions used to compute the L-infinity
        * norm when using a reduction.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       struct LInfty
@@ -156,7 +170,9 @@ namespace LinearAlgebra
 
 
       /**
-       * Perform a reduction on @p v using @tparam Operation
+       * Perform a reduction on @p v using @tparam Operation.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number, typename Operation>
       __global__ void
@@ -167,6 +183,8 @@ namespace LinearAlgebra
       /**
        * Structure implementing the functions used to compute the dot product
        * norm when using a double vector reduction.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       struct DotProduct
@@ -189,6 +207,8 @@ namespace LinearAlgebra
       /**
        * Perform a binary operation on each element of @p v1 and @p v2 followed
        * by reduction on the resulting array.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number, typename Operation>
       __global__ void
@@ -201,6 +221,8 @@ namespace LinearAlgebra
 
       /**
        * Add @p a to each element of @p val.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -210,6 +232,8 @@ namespace LinearAlgebra
 
       /**
        * Addition of a multiple of a vector, i.e., <tt>val += a*V_val</tt>.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -223,6 +247,8 @@ namespace LinearAlgebra
       /**
        * Addition of multiple scaled vector, i.e., <tt>val += a*V_val +
        * b*W_val</tt>.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -238,6 +264,8 @@ namespace LinearAlgebra
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>val =
        * = s*val + a*V_val</tt>
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -252,6 +280,8 @@ namespace LinearAlgebra
       /**
        * Scaling and multiple additions of scaled vectors, i.e. <tt>val =
        * = s*val + a*V_val + b*W_val</tt>
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -268,6 +298,8 @@ namespace LinearAlgebra
       /**
        * Scale each element of this vector by the corresponding element in the
        * argument.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -277,6 +309,8 @@ namespace LinearAlgebra
 
       /**
        * Assignment <tt>val = a*V_val</tt>.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -286,6 +320,8 @@ namespace LinearAlgebra
 
       /**
        * Assignment <tt>val = a*V_val + b*W_val</tt>.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -301,6 +337,8 @@ namespace LinearAlgebra
       /**
        * Perform a combined operation of a vector addition and a subsequent
        * inner product, returning the value of the inner product.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -315,6 +353,8 @@ namespace LinearAlgebra
 
       /**
        * Set each element of @p val to @p s.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -324,6 +364,8 @@ namespace LinearAlgebra
       /**
        * Set each element @v val to @p v using @p indices as permutation, i.e.,
        * <tt>val[indices[i]] = v[i]</tt>.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
@@ -337,6 +379,8 @@ namespace LinearAlgebra
       /**
        * Add each element @v val to @p v using @p indices as permutation, i.e.,
        * <tt>val[indices[i]] += v[i]</tt>.
+       *
+       * @ingroup CUDAWrappers
        */
       template <typename Number>
       __global__ void
