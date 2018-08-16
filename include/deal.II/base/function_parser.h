@@ -55,14 +55,36 @@ class Vector;
  * sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh,
  * atan2, log2, log10, log, ln, exp, sqrt, sign, rint, abs, min, max, sum, avg
  * @endcode
- * this class also supports:
- * - <tt>if(condition, then-value, else-value)</tt>
- * - <tt>|</tt> and <tt>&</tt> (logic or and and)
- * - <tt>int(x)</tt>, <tt>ceil(x)</tt>, <tt>floor(x)</tt> (rounding)
- * - <tt>cot(x)</tt>, <tt>csc(x)</tt>, <tt>sec(x)</tt>
- * - <tt>pow(x,n)</tt>, <tt>log(x)</tt>
- * - <tt>erfc(x)</tt>
- * - <tt>rand()</tt>, <tt>rand_seed(seed)</tt>
+ * this class also supports the following operations:
+ * - <code>if(condition, then-value, else-value)</code>
+ * - <code>|</code> and <code>&</code> (logic or and and)
+ * - <code>int(x)</code>, <code>ceil(x)</code>, <code>floor(x)</code> (rounding)
+ * - <code>cot(x)</code>, <code>csc(x)</code>, <code>sec(x)</code>
+ * - <code>pow(x,n)</code>, <code>log(x)</code>
+ * - <code>erfc(x)</code>
+ * - <code>rand()</code>, <code>rand_seed(seed)</code>
+ *
+ * @note This class implements the list of functions just mentioned as
+ *   user-defined functions by extending muparser. This means, in particular,
+ *   that the `if(condition, then-value, else-value)` syntax evaluates all
+ *   three arguments before determining whether the condition is true, and
+ *   then discarding either the "then" or the "else" expressions. In almost
+ *   all situations, this is not a problem except if the evaluation of
+ *   one of the expressions throws a floating point exception in cases
+ *   where it will later be discarded. (Assuming floating point exceptions
+ *   are switched on, as is the default for deal.II in debug mode on most
+ *   systems.) An example would be the expression `if(x>0, sqrt(x), 0)`
+ *   which is mathematically well defined, but on systems where this is
+ *   enabled will abort the program with a floating point exception when
+ *   evaluated with a negative `x`. This is because the square root of
+ *   `x` is computed before the `if` statement's condition is considered
+ *   to determine whether the result should be the second or third
+ *   argument. If this kind of behavior is a problem, you can resort to
+ *   the muparser built-in syntax `(condition ? then-value : else-value)`,
+ *   using the ternary syntax familiar to C++ programmers. If this
+ *   syntax is used, muparser uses lazy evaluation in which only one of the
+ *   branches is evaluated, depending on whether the `condition` is
+ *   true or false.
  *
  * The following examples shows how to use this class:
  * @code
@@ -249,8 +271,8 @@ public:
    * component of the point in which the function is evaluated, the second
    * variable to the second component and so forth. If this function is also
    * time dependent, then it is necessary to specify it by setting the
-   * <tt>time_dependent</tt> parameter to true.  An exception is thrown if the
-   * number of variables specified here is different from dim (if this
+   * <code>time_dependent</code> parameter to true.  An exception is thrown if
+   * the number of variables specified here is different from dim (if this
    * function is not time-dependent) or from dim+1 (if it is time- dependent).
    *
    * <b>expressions</b>: a list of strings containing the expressions that
@@ -264,7 +286,7 @@ public:
    * number pi). An expression is valid if and only if it contains only
    * defined variables and defined constants (other than the functions
    * specified above). If a constant is given whose name is not valid (eg:
-   * <tt>constants["sin"] = 1.5;</tt>) an exception is thrown.
+   * <code>constants["sin"] = 1.5;</code>) an exception is thrown.
    *
    * <b>time_dependent</b>. If this is a time dependent function, then the
    * last variable declared in <b>vars</b> is assumed to be the time variable,
@@ -313,7 +335,8 @@ public:
    * Return all components of a vector-valued function at the given point @p
    * p.
    *
-   * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
+   * <code>values</code> shall have the right size beforehand, i.e.
+   * #n_components.
    */
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &values) const override;
