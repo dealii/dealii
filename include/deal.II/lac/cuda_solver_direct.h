@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  include <deal.II/base/cuda.h>
 
 #  include <deal.II/lac/cuda_sparse_matrix.h>

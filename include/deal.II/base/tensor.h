@@ -140,7 +140,7 @@ public:
   /**
    * Constructor. Set to zero.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV
   Tensor();
@@ -191,7 +191,7 @@ public:
    * This is the non-const conversion operator that returns a writable
    * reference.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV operator Number &();
 
@@ -201,7 +201,7 @@ public:
    *
    * This is the const conversion operator that returns a read-only reference.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV operator const Number &() const;
 
@@ -264,7 +264,7 @@ public:
   /**
    * Multiply the scalar with a <tt>factor</tt>.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
   DEAL_II_CUDA_HOST_DEV Tensor &
@@ -310,7 +310,7 @@ public:
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV real_type
                         norm_square() const;
@@ -436,7 +436,7 @@ public:
   /**
    * Constructor. Initialize all entries to zero.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV
   Tensor();
@@ -470,14 +470,14 @@ public:
   /**
    * Read-Write access operator.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV value_type &operator[](const unsigned int i);
 
   /**
    * Read-only access operator.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV const value_type &
                               operator[](const unsigned int i) const;
@@ -566,7 +566,7 @@ public:
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
   DEAL_II_CUDA_HOST_DEV Tensor &
@@ -613,7 +613,7 @@ public:
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
    *
-   * @see CUDAWrappers
+   * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type
   norm_square() const;

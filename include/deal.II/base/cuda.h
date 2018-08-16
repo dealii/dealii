@@ -20,7 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  include <cusolverDn.h>
 #  include <cusolverSp.h>
 #  include <cusparse.h>
@@ -58,7 +58,7 @@ namespace Utilities
        */
       ~Handle();
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
       cusolverDnHandle_t cusolver_dn_handle;
 
       cusolverSpHandle_t cusolver_sp_handle;
@@ -77,7 +77,7 @@ namespace Utilities
     inline void
     malloc(T *&pointer, const unsigned int n_elements)
     {
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
       cudaError_t cuda_error_code =
         cudaMalloc(&pointer, n_elements * sizeof(T));
       AssertCuda(cuda_error_code);
@@ -94,7 +94,7 @@ namespace Utilities
     inline void
     free(T *&pointer)
     {
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
       cudaError_t cuda_error_code = cudaFree(pointer);
       AssertCuda(cuda_error_code);
       pointer = nullptr;
@@ -110,7 +110,7 @@ namespace Utilities
     inline void
     copy_to_host(const T *pointer_dev, std::vector<T> &vector_host)
     {
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
       cudaError_t cuda_error_code = cudaMemcpy(vector_host.data(),
                                                pointer_dev,
                                                vector_host.size() * sizeof(T),
@@ -130,7 +130,7 @@ namespace Utilities
     inline void
     copy_to_dev(const std::vector<T> &vector_host, T *pointer_dev)
     {
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
       cudaError_t cuda_error_code = cudaMemcpy(pointer_dev,
                                                vector_host.data(),
                                                vector_host.size() * sizeof(T),

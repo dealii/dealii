@@ -25,7 +25,7 @@
 #include <complex>
 #include <cstdlib>
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  define DEAL_II_CUDA_HOST_DEV __host__ __device__
 #else
 #  define DEAL_II_CUDA_HOST_DEV
@@ -346,6 +346,8 @@ namespace numbers
      * Return the complex-conjugate of the given number. Since the general
      * template is selected if number is not a complex data type, this
      * function simply returns the given number.
+     *
+     * @note This function can also be used in CUDA device code.
      */
     static DEAL_II_CUDA_HOST_DEV const number &
                                        conjugate(const number &x);
@@ -355,7 +357,7 @@ namespace numbers
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
      *
-     * @see CUDAWrappers
+     * @note This function can also be used in CUDA device code.
      */
     static DEAL_II_CUDA_HOST_DEV real_type
                                  abs_square(const number &x);

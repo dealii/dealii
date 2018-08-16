@@ -45,8 +45,7 @@ namespace LinearAlgebra
      *
      * @note Only float and double are supported.
      *
-     * @see CUDAWrappers
-     * @ingroup Vectors
+     * @ingroup CUDAWrappers Vectors
      * @author Karl Ljungkvist, Bruno Turcksin, 2016
      */
     template <typename Number>

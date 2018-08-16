@@ -18,7 +18,7 @@
 
 #include <deal.II/lac/cuda_kernels.h>
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 
 DEAL_II_NAMESPACE_OPEN
 
