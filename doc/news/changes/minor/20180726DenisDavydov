@@ -1,0 +1,3 @@
+New: Add FiniteSizeHistory class to store a finite-size history of objects.
+<br>
+(Denis Davydov 2018/07/26)
