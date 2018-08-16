@@ -19,7 +19,7 @@
 
 #include <deal.II/matrix_free/cuda_matrix_free.h>
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 
 #  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/graph_coloring.h>

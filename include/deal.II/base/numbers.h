@@ -25,7 +25,7 @@
 #include <complex>
 #include <cstdlib>
 
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  define DEAL_II_CUDA_HOST_DEV __host__ __device__
 #else
 #  define DEAL_II_CUDA_HOST_DEV

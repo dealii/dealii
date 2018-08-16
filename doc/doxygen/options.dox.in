@@ -176,6 +176,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_CXX14=1 \
                          DEAL_II_WITH_CXX17=1 \
                          DEAL_II_WITH_CUDA=1 \
+                         DEAL_II_COMPILER_CUDA_AWARE=1 \
                          DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_GMSH=1 \
                          DEAL_II_WITH_HDF5=1 \
