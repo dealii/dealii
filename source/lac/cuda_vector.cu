@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/cuda.h>
 #include <deal.II/base/cuda_size.h>
 #include <deal.II/base/exceptions.h>
 
@@ -688,18 +689,11 @@ namespace LinearAlgebra
       out << std::endl;
 
       // Copy the vector to the host
-      Number *    cpu_val    = new Number[n_elements];
-      cudaError_t error_code = cudaMemcpy(cpu_val,
-                                          val,
-                                          n_elements * sizeof(Number),
-                                          cudaMemcpyHostToDevice);
-      AssertCuda(error_code);
+      std::vector<Number> cpu_val(n_elements);
+      Utilities::CUDA::copy_to_host(val, cpu_val);
       for (unsigned int i = 0; i < n_elements; ++i)
         out << cpu_val[i] << std::endl;
       out << std::flush;
-      delete[] cpu_val;
-      cpu_val = nullptr;
-
 
       AssertThrow(out, ExcIO());
       // reset output format
