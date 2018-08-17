@@ -61,7 +61,7 @@ it shows the power of multigrid methods.
 
 
 We encourage you to generate timings for the solve() call and compare to
-step 6. You will see that the multigrid method has quite an overhead
+step-6. You will see that the multigrid method has quite an overhead
 on coarse meshes, but that it always beats other methods on fine
 meshes because of its optimal complexity.
 
