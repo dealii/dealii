@@ -1020,6 +1020,18 @@ namespace StandardExceptions
  */
 namespace deal_II_exceptions
 {
+  namespace internals
+  {
+    /**
+     * Setting this variable to false will disable deal.II's exception mechanism
+     * to abort the problem. The Assert() macro will throw the exception instead
+     * and the AssertNothrow() macro will just print the error message. This
+     * variable should not be changed directly. Use disable_abort_on_exception()
+     * instead.
+     */
+    extern bool allow_abort_on_exception;
+  } // namespace internals
+
   /**
    * Set a string that is printed upon output of the message indicating a
    * triggered <tt>Assert</tt> statement. This string, which is printed in
@@ -1080,18 +1092,14 @@ namespace deal_II_exceptions
   namespace internals
   {
     /**
-     * Conditionally abort the program.
-     *
-     * Depending on whether deal_II_exceptions::disable_abort_on_exception was
-     * called, this function either aborts the program flow by printing the
-     * error message provided by @p exc and calling <tt>std::abort()</tt>, or
-     * throws @p exc instead.
+     * Abort the program by printing the
+     * error message provided by @p exc and calling <tt>std::abort()</tt>.
      */
     [[noreturn]] void
-    abort(const ExceptionBase &exc);
+    abort(const ExceptionBase &exc) noexcept;
 
     /**
-     * An enum describing how to treat an exception in issue_error.
+     * An enum describing how to treat an exception in issue_error_noreturn.
      */
     enum ExceptionHandling
     {
@@ -1100,24 +1108,21 @@ namespace deal_II_exceptions
        * deal_II_exceptions::disable_abort_on_exception has been called: in
        * that case the program will throw an exception.
        */
-      abort_on_exception,
+      abort_or_throw_on_exception,
       /**
        * Throw the exception normally.
        */
-      throw_on_exception,
-      /**
-       * Call <code>std::abort</code> as long as
-       * deal_II_exceptions::disable_abort_on_exception has not been called:
-       * if it has, then just print a description of the exception to deallog.
-       */
-      abort_nothrow_on_exception
+      throw_on_exception
     };
 
     /**
      * This routine does the main work for the exception generation mechanism
      * used in the <tt>Assert</tt> and <tt>AssertThrow</tt> macros: as the
-     * name implies, this function either ends with a call to <tt>abort</tt>
-     * or throwing an exception.
+     * name implies, this function either ends by throwing an exception (if
+     * @p handling is throw_on_exception, or @p handling is try_abort_exception
+     * and deal_II_exceptions::disable_abort_on_exception is false) or with a
+     * call to <tt>abort</tt> (if @p handling is try_abort_exception and
+     * deal_II_exceptions::disable_abort_on_exception is true).
      *
      * The actual exception object (the last argument) is typically an unnamed
      * object created in place; because we modify it, we can't take it by
@@ -1141,14 +1146,22 @@ namespace deal_II_exceptions
 
       switch (handling)
         {
-          case abort_on_exception:
-            dealii::deal_II_exceptions::internals::abort(e);
+          case abort_or_throw_on_exception:
+            {
+              if (dealii::deal_II_exceptions::internals::
+                    allow_abort_on_exception)
+                internals::abort(e);
+              else
+                {
+                  // We are not allowed to abort, so just throw the error:
+                  throw e;
+                }
+            }
           case throw_on_exception:
             throw e;
           // this function should never return (and AssertNothrow can);
           // something must have gone wrong in the error handling code for us
           // to get this far, so throw an exception.
-          case abort_nothrow_on_exception:
           default:
             throw ::dealii::StandardExceptions::ExcInternalError();
         }
@@ -1169,8 +1182,7 @@ namespace deal_II_exceptions
      */
     template <class ExceptionType>
     void
-    issue_error_nothrow(ExceptionHandling,
-                        const char *  file,
+    issue_error_nothrow(const char *  file,
                         int           line,
                         const char *  function,
                         const char *  cond,
@@ -1228,7 +1240,8 @@ namespace deal_II_exceptions
       {                                                                  \
         if (__builtin_expect(!(cond), false))                            \
           ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::abort_on_exception, \
+            ::dealii::deal_II_exceptions::internals::                    \
+              abort_or_throw_on_exception,                               \
             __FILE__,                                                    \
             __LINE__,                                                    \
             __PRETTY_FUNCTION__,                                         \
@@ -1241,7 +1254,8 @@ namespace deal_II_exceptions
       {                                                                  \
         if (!(cond))                                                     \
           ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::abort_on_exception, \
+            ::dealii::deal_II_exceptions::internals::                    \
+              abort_or_throw_on_exception,                               \
             __FILE__,                                                    \
             __LINE__,                                                    \
             __PRETTY_FUNCTION__,                                         \
@@ -1279,28 +1293,14 @@ namespace deal_II_exceptions
       {                                                                 \
         if (__builtin_expect(!(cond), false))                           \
           ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
-            ::dealii::deal_II_exceptions::internals::                   \
-              abort_nothrow_on_exception,                               \
-            __FILE__,                                                   \
-            __LINE__,                                                   \
-            __PRETTY_FUNCTION__,                                        \
-            #cond,                                                      \
-            #exc,                                                       \
-            exc);                                                       \
+            __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
       }
 #  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #    define AssertNothrow(cond, exc)                                    \
       {                                                                 \
         if (!(cond))                                                    \
           ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
-            ::dealii::deal_II_exceptions::internals::                   \
-              abort_nothrow_on_exception,                               \
-            __FILE__,                                                   \
-            __LINE__,                                                   \
-            __PRETTY_FUNCTION__,                                        \
-            #cond,                                                      \
-            #exc,                                                       \
-            exc);                                                       \
+            __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
       }
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
