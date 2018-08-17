@@ -41,30 +41,32 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace deal_II_exceptions
 {
-  std::string additional_assert_output;
+  namespace internals
+  {
+    std::string additional_assert_output;
+
+    bool show_stacktrace = true;
+
+    bool allow_abort_on_exception = true;
+  } // namespace internals
 
   void
   set_additional_assert_output(const char *const p)
   {
-    additional_assert_output = p;
+    internals::additional_assert_output = p;
   }
-
-  bool show_stacktrace = true;
 
   void
   suppress_stacktrace_in_exceptions()
   {
-    show_stacktrace = false;
+    internals::show_stacktrace = false;
   }
-
-  bool allow_abort_on_exception = true;
 
   void
   disable_abort_on_exception()
   {
-    allow_abort_on_exception = false;
+    internals::allow_abort_on_exception = false;
   }
-
 } // namespace deal_II_exceptions
 
 
@@ -219,7 +221,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
   if (n_stacktrace_frames == 0)
     return;
 
-  if (deal_II_exceptions::show_stacktrace == false)
+  if (deal_II_exceptions::internals::show_stacktrace == false)
     return;
 
   // if there is a stackframe stored, print it
@@ -322,12 +324,13 @@ ExceptionBase::generate_message() const
       print_info(converter);
       print_stack_trace(converter);
 
-      if (!deal_II_exceptions::additional_assert_output.empty())
+      if (!deal_II_exceptions::internals::additional_assert_output.empty())
         {
           converter
             << "--------------------------------------------------------"
             << std::endl
-            << deal_II_exceptions::additional_assert_output << std::endl;
+            << deal_II_exceptions::internals::additional_assert_output
+            << std::endl;
         }
 
       converter << "--------------------------------------------------------"
@@ -402,7 +405,7 @@ namespace deal_II_exceptions
   namespace internals
   {
     [[noreturn]] void
-    internal_abort(const ExceptionBase &exc) noexcept
+    abort(const ExceptionBase &exc) noexcept
     {
       // first print the error
       std::cerr << exc.what() << std::endl;
@@ -450,8 +453,8 @@ namespace deal_II_exceptions
     void
     do_issue_error_nothrow(const ExceptionBase &exc) noexcept
     {
-      if (dealii::deal_II_exceptions::allow_abort_on_exception)
-        internal_abort(exc);
+      if (deal_II_exceptions::internals::allow_abort_on_exception)
+        abort(exc);
       else
         {
           // We are not allowed to throw, and not allowed to abort.

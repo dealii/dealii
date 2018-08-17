@@ -1020,14 +1020,17 @@ namespace StandardExceptions
  */
 namespace deal_II_exceptions
 {
-  /**
-   * Setting this variable to false will disable deal.II's exception mechanism
-   * to abort the problem. The Assert() macro will throw the exception instead
-   * and the AssertNothrow() macro will just print the error message. This
-   * variable should not be changed directly. Use disable_abort_on_exception()
-   * instead.
-   */
-  extern bool allow_abort_on_exception;
+  namespace internals
+  {
+    /**
+     * Setting this variable to false will disable deal.II's exception mechanism
+     * to abort the problem. The Assert() macro will throw the exception instead
+     * and the AssertNothrow() macro will just print the error message. This
+     * variable should not be changed directly. Use disable_abort_on_exception()
+     * instead.
+     */
+    extern bool allow_abort_on_exception;
+  } // namespace internals
 
   /**
    * Set a string that is printed upon output of the message indicating a
@@ -1093,7 +1096,7 @@ namespace deal_II_exceptions
      * error message provided by @p exc and calling <tt>std::abort()</tt>.
      */
     [[noreturn]] void
-    internal_abort(const ExceptionBase &exc) noexcept;
+    abort(const ExceptionBase &exc) noexcept;
 
     /**
      * An enum describing how to treat an exception in issue_error_noreturn.
@@ -1105,7 +1108,7 @@ namespace deal_II_exceptions
        * deal_II_exceptions::disable_abort_on_exception has been called: in
        * that case the program will throw an exception.
        */
-      try_abort_on_exception,
+      abort_or_throw_on_exception,
       /**
        * Throw the exception normally.
        */
@@ -1115,7 +1118,7 @@ namespace deal_II_exceptions
     /**
      * This routine does the main work for the exception generation mechanism
      * used in the <tt>Assert</tt> and <tt>AssertThrow</tt> macros: as the
-     * name implies, this function either ends throwing an exception (if
+     * name implies, this function either ends by throwing an exception (if
      * @p handling is throw_on_exception, or @p handling is try_abort_exception
      * and deal_II_exceptions::disable_abort_on_exception is false) or with a
      * call to <tt>abort</tt> (if @p handling is try_abort_exception and
@@ -1143,10 +1146,11 @@ namespace deal_II_exceptions
 
       switch (handling)
         {
-          case try_abort_on_exception:
+          case abort_or_throw_on_exception:
             {
-              if (dealii::deal_II_exceptions::allow_abort_on_exception)
-                internals::internal_abort(e);
+              if (dealii::deal_II_exceptions::internals::
+                    allow_abort_on_exception)
+                internals::abort(e);
               else
                 {
                   // We are not allowed to abort, so just throw the error:
@@ -1232,30 +1236,32 @@ namespace deal_II_exceptions
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#    define Assert(cond, exc)                                                \
-      {                                                                      \
-        if (__builtin_expect(!(cond), false))                                \
-          ::dealii::deal_II_exceptions::internals::issue_error_noreturn(     \
-            ::dealii::deal_II_exceptions::internals::try_abort_on_exception, \
-            __FILE__,                                                        \
-            __LINE__,                                                        \
-            __PRETTY_FUNCTION__,                                             \
-            #cond,                                                           \
-            #exc,                                                            \
-            exc);                                                            \
+#    define Assert(cond, exc)                                            \
+      {                                                                  \
+        if (__builtin_expect(!(cond), false))                            \
+          ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+            ::dealii::deal_II_exceptions::internals::                    \
+              abort_or_throw_on_exception,                               \
+            __FILE__,                                                    \
+            __LINE__,                                                    \
+            __PRETTY_FUNCTION__,                                         \
+            #cond,                                                       \
+            #exc,                                                        \
+            exc);                                                        \
       }
 #  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    define Assert(cond, exc)                                                \
-      {                                                                      \
-        if (!(cond))                                                         \
-          ::dealii::deal_II_exceptions::internals::issue_error_noreturn(     \
-            ::dealii::deal_II_exceptions::internals::try_abort_on_exception, \
-            __FILE__,                                                        \
-            __LINE__,                                                        \
-            __PRETTY_FUNCTION__,                                             \
-            #cond,                                                           \
-            #exc,                                                            \
-            exc);                                                            \
+#    define Assert(cond, exc)                                            \
+      {                                                                  \
+        if (!(cond))                                                     \
+          ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+            ::dealii::deal_II_exceptions::internals::                    \
+              abort_or_throw_on_exception,                               \
+            __FILE__,                                                    \
+            __LINE__,                                                    \
+            __PRETTY_FUNCTION__,                                         \
+            #cond,                                                       \
+            #exc,                                                        \
+            exc);                                                        \
       }
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else

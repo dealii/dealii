@@ -601,7 +601,10 @@ struct MPILogInitAll
 DEAL_II_NAMESPACE_OPEN
 namespace deal_II_exceptions
 {
-  extern bool show_stacktrace;
+  namespace internals
+  {
+    extern bool show_stacktrace;
+  }
 } // namespace deal_II_exceptions
 DEAL_II_NAMESPACE_CLOSE
 
@@ -619,8 +622,8 @@ new_tbb_assertion_handler(const char *file,
   std::cerr << "Detailed description: " << comment << std::endl;
 
   // Reenable abort and stacktraces:
-  deal_II_exceptions::allow_abort_on_exception = true;
-  deal_II_exceptions::show_stacktrace          = true;
+  deal_II_exceptions::internals::allow_abort_on_exception = true;
+  deal_II_exceptions::internals::show_stacktrace          = true;
 
   // And abort with a deal.II exception:
   Assert(false, ExcMessage("TBB Exception, see above"));
