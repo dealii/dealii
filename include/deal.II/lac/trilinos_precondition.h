@@ -1551,7 +1551,7 @@ namespace TrilinosWrappers
      * This function is similar to the one above, but allows the user to set
      * all the options of the Trilinos ML preconditioner. In order to find out
      * about all the options for ML, we refer to the <a
-     * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
+     * href=http://trilinos.org/packages/ml/mlguide5.pdf>ML user's
      * guide</a>. In particular, users need to follow the ML instructions in
      * case a vector-valued problem ought to be solved.
      */
@@ -1810,7 +1810,7 @@ namespace TrilinosWrappers
      * This function is similar to the one above, but allows the user to set
      * most of the options of the Trilinos ML preconditioner. In order to find
      * out about all the options for ML, we refer to the <a
-     * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
+     * href=http://trilinos.org/packages/ml/mlguide5.pdf>ML user's
      * guide</a>. Not all ML options have a corresponding MueLu option.
      */
     void
