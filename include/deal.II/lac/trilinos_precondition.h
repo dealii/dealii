@@ -1548,12 +1548,14 @@ namespace TrilinosWrappers
      * linear system with the given matrix. The function uses the matrix
      * format specified in TrilinosWrappers::SparseMatrix.
      *
-     * This function is similar to the one above, but allows the user to set
-     * all the options of the Trilinos ML preconditioner. In order to find out
-     * about all the options for ML, we refer to the <a
-     * href=http://trilinos.org/packages/ml/mlguide5.pdf>ML user's
-     * guide</a>. In particular, users need to follow the ML instructions in
-     * case a vector-valued problem ought to be solved.
+     * This function is similar to the one above, but allows the user
+     * to set all the options of the Trilinos ML preconditioner. In
+     * order to find out about all the options for ML, we refer to the
+     * <a
+     * href="https://trilinos.org/docs/dev/packages/ml/doc/html/index.html">ML
+     * documentation page</a>. In particular, users need to follow the
+     * ML instructions in case a vector-valued problem ought to be
+     * solved.
      */
     void
     initialize(const SparseMatrix &          matrix,
@@ -1807,11 +1809,13 @@ namespace TrilinosWrappers
      * linear system with the given matrix. The function uses the matrix
      * format specified in TrilinosWrappers::SparseMatrix.
      *
-     * This function is similar to the one above, but allows the user to set
-     * most of the options of the Trilinos ML preconditioner. In order to find
-     * out about all the options for ML, we refer to the <a
-     * href=http://trilinos.org/packages/ml/mlguide5.pdf>ML user's
-     * guide</a>. Not all ML options have a corresponding MueLu option.
+     * This function is similar to the one above, but allows the user
+     * to set most of the options of the Trilinos ML
+     * preconditioner. In order to find out about all the options for
+     * ML, we refer to the <a
+     * href="https://trilinos.org/docs/dev/packages/ml/doc/html/index.html">ML
+     * documentation page</a>. Not all ML options have a corresponding
+     * MueLu option.
      */
     void
     initialize(const SparseMatrix &    matrix,
