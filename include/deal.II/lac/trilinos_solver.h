@@ -50,8 +50,9 @@ namespace TrilinosWrappers
    * derived classes simply set the right flags to select one solver or
    * another, or to set certain parameters for individual solvers. For a
    * general discussion on the Trilinos solver package AztecOO, we refer to
-   * the <a href = "http://trilinos.sandia.gov/packages/aztecoo/AztecOOUserGui
-   * de.pdf">AztecOO user guide</a>.
+   * the <a
+   * href="https://trilinos.org/docs/dev/packages/aztecoo/doc/html/index.html">AztecOO
+   * user guide</a>.
    *
    * This solver class can also be used as a standalone class, where the
    * respective Krylov method is set via the flag <tt>solver_name</tt>. This
