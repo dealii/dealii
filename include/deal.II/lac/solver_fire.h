@@ -132,7 +132,8 @@ public:
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverFIRE(SolverControl &solver_control, const AdditionalData &data);
+  SolverFIRE(SolverControl &       solver_control,
+             const AdditionalData &data = AdditionalData());
 
   /**
    * Virtual destructor.
