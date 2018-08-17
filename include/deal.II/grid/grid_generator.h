@@ -514,7 +514,8 @@ namespace GridGenerator
                       const bool          colorize  = false);
 
   /**
-   * Initialize the given triangulation with several coarse mesh cells
+   * Initialize the given triangulation with several
+   * @ref GlossCoarseMesh "coarse mesh cells"
    * that cover a hyperball, i.e. a circle or a
    * ball around @p center with given @p radius.
    *
@@ -992,9 +993,9 @@ namespace GridGenerator
 
   /**
    * Produce a grid consisting of concentric shells. The primary difference
-   * between this function and GridGenerator::hyper_shell is that this
-   * function permits unevenly spaced (in the radial direction) coarse level
-   * cells.
+   * between this function and GridGenerator::hyper_shell() is that this
+   * function permits unevenly spaced (in the radial direction)
+   * @ref GlossCoarseMesh "coarse level cells".
    *
    * The parameters @p center, @p inner_radius, and @p outer_radius behave in
    * the same way as the first three arguments to
@@ -1105,7 +1106,8 @@ namespace GridGenerator
    *
    * This function is most often used to compose meshes for more complicated
    * geometries if the geometry can be composed of simpler parts for which
-   * functions exist to generate coarse meshes.  For example, the channel mesh
+   * functions exist to generate
+   * @ref GlossCoarseMesh "coarse meshes". For example, the channel mesh
    * used in step-35 could in principle be created using a mesh created by the
    * GridGenerator::hyper_cube_with_cylindrical_hole function and several
    * rectangles, and merging them using the current function. The rectangles
@@ -1138,7 +1140,8 @@ namespace GridGenerator
    * This will merge any vertices that are closer than any pair of vertices on
    * the input meshes.
    *
-   * @note The two input triangulations must be coarse meshes that have no
+   * @note The two input triangulations must be
+   * @ref GlossCoarseMesh "coarse meshes", i.e., they can not have any
    * refined cells.
    *
    * @note The function copies the material ids of the cells of the two input
@@ -1194,7 +1197,8 @@ namespace GridGenerator
    *
    * @note This function is intended to create an adaptively refined
    * triangulation that contains the <i>most refined cells</i> from two input
-   * triangulations that were derived from the <i>same</i> coarse grid by
+   * triangulations that were derived from the <i>same</i>
+   * @ref GlossCoarseMesh "coarse mesh" by
    * adaptive refinement. This is an operation sometimes needed when one
    * solves for two variables of a coupled problem on separately refined
    * meshes on the same domain (for example because these variables have
@@ -1206,8 +1210,9 @@ namespace GridGenerator
    * needs to have a mesh for the domain that is at least as fine as each of
    * the two initial meshes. This function computes such a mesh.
    *
-   * @note If you want to create a mesh that is the merger of two other coarse
-   * meshes, for example in order to compose a mesh for a complicated geometry
+   * @note If you want to create a mesh that is the merger of two other
+   * @ref GlossCoarseMesh "coarse meshes", for example in order to compose
+   * a mesh for a complicated geometry
    * from meshes for simpler geometries, then this is not the function for
    * you. Instead, consider GridGenerator::merge_triangulations().
    *
@@ -1314,10 +1319,11 @@ namespace GridGenerator
    * Note that numbers::flat_manifold_id (should it be a manifold id of @p
    * input) will always be the last entry in the first category.
    *
-   * @note The 2d input triangulation @p input must be a coarse mesh that has
-   * no refined cells.
+   * @note The 2d input triangulation @p input must be a
+   * @ref GlossCoarseMesh "coarse mesh", i.e., it cannot have any
+   * refined cells.
    *
-   * @note Since @p input and @p output have different spatial dimensions no
+   * @note Since @p input and @p output have different spatial dimensions, no
    * manifold objects are copied by this function regardless of the value of
    * @p copy_manifold_ids.
    */
@@ -1339,8 +1345,9 @@ namespace GridGenerator
    * walls in z direction. The bottom and top get the next two free boundary
    * indicators.
    *
-   * @note The 2d input triangulation @p input must be a coarse mesh that has
-   * no refined cells.
+   * @note The 2d input triangulation @p input must be a
+   * @ref GlossCoarseMesh "coarse mesh", i.e., it cannot have any
+   * refined cells.
    *
    * @note Since @p input and @p output have different spatial dimensions no
    * manifold objects are copied (nor are any manifold ids set) by this
@@ -1427,7 +1434,8 @@ namespace GridGenerator
    * to the corresponding faces on the volume one. This mapping is the return
    * value of the function.
    *
-   * @note The function builds the surface mesh by creating a coarse mesh from
+   * @note The function builds the surface mesh by creating a
+   * @ref GlossCoarseMesh "coarse mesh" from
    * the selected faces of the coarse cells of the volume mesh. It copies the
    * boundary indicators of these faces to the cells of the coarse surface
    * mesh. The surface mesh is then refined in the same way as the faces of

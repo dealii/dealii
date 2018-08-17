@@ -1306,7 +1306,8 @@ public:
      * It would seem that in two space dimensions, the maximum jump in levels
      * between cells sharing a common vertex is two (as in the example above).
      * However, this is not true if more than four cells meet at a vertex. It
-     * is not uncommon that a coarse (initial) mesh contains vertices at which
+     * is not uncommon that a
+     * @ref GlossCoarseMesh "coarse (initial) mesh" contains vertices at which
      * six or even eight cells meet, when small features of the domain have to
      * be resolved even on the coarsest mesh. In that case, the maximum
      * difference in levels is three or four, respectively. The problem gets
@@ -1377,7 +1378,8 @@ public:
      */
     patch_level_1 = 0x4,
     /**
-     * Each coarse grid cell is refined at least once, i.e. the triangulation
+     * Each @ref GlossCoarseMesh "coarse grid" cell is refined at least once,
+     * i.e., the triangulation
      * might have active cells on level 1 but not on level 0. This flag
      * ensures that a mesh which has coarsest_level_1 has still
      * coarsest_level_1 after coarsening and refinement. It is, however, the
@@ -1892,7 +1894,8 @@ public:
    * Create a triangulation from a list of vertices and a list of cells, each
    * of the latter being a list of <tt>1<<dim</tt> vertex indices. The
    * triangulation must be empty upon calling this function and the cell list
-   * should be useful (connected domain, etc.).
+   * should be useful (connected domain, etc.). The result of calling this
+   * function is a @ref GlossCoarseMesh "coarse mesh".
    *
    * Material data for the cells is given within the @p cells array, while
    * boundary information is given in the @p subcelldata field.
