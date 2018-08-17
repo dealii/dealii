@@ -45,8 +45,9 @@ namespace LinearAlgebra
      *
      * @note Only float and double are supported.
      *
-     * @ingroup CUDAWrappers Vectors
-     * @author Karl Ljungkvist, Bruno Turcksin, 2016
+     * @see CUDAWrappers
+     * @ingroup Vectors
+     * @author Karl Ljungkvist, Bruno Turcksin, Daniel Arndt, 2016, 2018
      */
     template <typename Number>
     class Vector : public VectorSpaceVector<Number>
@@ -232,6 +233,12 @@ namespace LinearAlgebra
        */
       virtual real_type
       l2_norm() const override;
+
+      /**
+       * Return the square of the $l_2$-norm.
+       */
+      real_type
+      norm_sqr() const;
 
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute

@@ -597,7 +597,16 @@ namespace LinearAlgebra
     typename Vector<Number>::real_type
     Vector<Number>::l2_norm() const
     {
-      return std::sqrt((*this) * (*this));
+      return std::sqrt(norm_sqr());
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::norm_sqr() const
+    {
+      return (*this) * (*this);
     }
 
 
