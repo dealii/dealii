@@ -40,8 +40,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test()
@@ -61,7 +59,7 @@ test()
 
   GridOut grid_out;
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 
   QTrapez<dim>                                     quad;
   MappingQ1Eulerian<dim, Vector<double>, spacedim> mapping(shift_dh, shift);
@@ -89,11 +87,9 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<1, 1>();
   test<2, 2>();
   test<3, 3>();
-
-  return 0;
 }

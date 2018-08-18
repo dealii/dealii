@@ -35,10 +35,9 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(PRECISION) << std::fixed;
-  deallog.attach(logfile);
 
   // create grid of circle, somehow
   // arbitrarily from only one cell,

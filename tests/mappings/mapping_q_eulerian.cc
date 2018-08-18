@@ -46,8 +46,6 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <iostream>
-
 #include "../tests.h"
 
 
@@ -260,10 +258,9 @@ MappingTest<dim>::graphical_output()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   // convergence studies
 

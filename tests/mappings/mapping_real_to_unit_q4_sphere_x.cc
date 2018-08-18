@@ -95,8 +95,7 @@ test_real_to_unit_cell()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test_real_to_unit_cell();
 

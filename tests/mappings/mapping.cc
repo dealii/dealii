@@ -556,9 +556,8 @@ mapping_test()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(PRECISION);
-  deallog.attach(logfile);
 
   // -----------------------
   // Tests for dim=1
