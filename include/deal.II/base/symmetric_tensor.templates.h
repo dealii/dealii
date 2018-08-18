@@ -882,7 +882,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               // Adol-C taped
               if (method ==
                   SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
-                sf = (dim == 2 ? 2e11 : 2e11);
+                sf = 2e11;
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e6 : 1e9);
               else

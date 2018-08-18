@@ -1406,13 +1406,11 @@ namespace FETools
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcHangingNodesNotAllowed,
-                 int,
-                 << "You are using continuous elements on a grid with "
-                 << "hanging nodes but without providing hanging node "
-                 << "constraints. Use the respective function with "
-                 << "additional AffineConstraints argument(s), instead."
-                 << (arg1 ? "" : ""));
+  DeclExceptionMsg(ExcHangingNodesNotAllowed,
+                   "You are using continuous elements on a grid with "
+                   "hanging nodes but without providing hanging node "
+                   "constraints. Use the respective function with "
+                   "additional AffineConstraints argument(s), instead.");
   /**
    * You need at least two grid levels.
    *

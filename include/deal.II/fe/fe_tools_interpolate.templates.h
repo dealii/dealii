@@ -178,7 +178,7 @@ namespace FETools
                  ++face)
               Assert(cell1->at_boundary(face) ||
                        cell1->neighbor(face)->level() == cell1->level(),
-                     ExcHangingNodesNotAllowed(0));
+                     ExcHangingNodesNotAllowed());
 
 
           const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
@@ -336,7 +336,7 @@ namespace FETools
                  ++face)
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed(0));
+                     ExcHangingNodesNotAllowed());
 
           const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
 
@@ -656,7 +656,7 @@ namespace FETools
                  ++face)
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed(0));
+                     ExcHangingNodesNotAllowed());
 
           cell->get_dof_values(u1, u1_local);
           difference_matrix.vmult(u1_diff_local, u1_local);
