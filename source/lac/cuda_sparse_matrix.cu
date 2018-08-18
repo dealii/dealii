@@ -218,29 +218,30 @@ namespace CUDAWrappers
   {
     if (val_dev != nullptr)
       {
-        cudaError_t error_code = cudaFree(val_dev);
-        AssertCuda(error_code);
+        const cudaError_t error_code = cudaFree(val_dev);
+        AssertNothrowCuda(error_code);
         val_dev = nullptr;
       }
 
     if (column_index_dev != nullptr)
       {
-        cudaError_t error_code = cudaFree(column_index_dev);
-        AssertCuda(error_code);
+        const cudaError_t error_code = cudaFree(column_index_dev);
+        AssertNothrowCuda(error_code);
         column_index_dev = nullptr;
       }
 
     if (row_ptr_dev != nullptr)
       {
-        cudaError_t error_code = cudaFree(row_ptr_dev);
-        AssertCuda(error_code);
+        const cudaError_t error_code = cudaFree(row_ptr_dev);
+        AssertNothrowCuda(error_code);
         row_ptr_dev = nullptr;
       }
 
     if (descr != nullptr)
       {
-        cusparseStatus_t cusparse_error_code = cusparseDestroyMatDescr(descr);
-        AssertCusparse(cusparse_error_code);
+        const cusparseStatus_t cusparse_error_code =
+          cusparseDestroyMatDescr(descr);
+        AssertNothrowCusparse(cusparse_error_code);
         descr = nullptr;
       }
 
