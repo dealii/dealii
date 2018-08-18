@@ -251,6 +251,32 @@ namespace CUDAWrappers
 
 
   template <typename Number>
+  SparseMatrix<Number> &
+  SparseMatrix<Number>::operator=(SparseMatrix<Number> &&other)
+  {
+    cusparse_handle  = other.cusparse_handle;
+    nnz              = other.nnz;
+    n_rows           = other.n_rows;
+    n_cols           = other.n_cols;
+    val_dev          = other.val_dev;
+    column_index_dev = other.column_index_dev;
+    row_ptr_dev      = other.row_ptr_dev;
+    descr            = other.descr;
+
+    other.nnz              = 0;
+    other.n_rows           = 0;
+    other.n_cols           = 0;
+    other.val_dev          = nullptr;
+    other.column_index_dev = nullptr;
+    other.row_ptr_dev      = nullptr;
+    other.descr            = nullptr;
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
   void
   SparseMatrix<Number>::reinit(
     Utilities::CUDA::Handle &             handle,

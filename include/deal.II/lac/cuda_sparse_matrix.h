@@ -104,6 +104,18 @@ namespace CUDAWrappers
     ~SparseMatrix();
 
     /**
+     * Move assignment operator.
+     */
+    SparseMatrix &
+    operator=(CUDAWrappers::SparseMatrix<Number> &&);
+
+    /**
+     * Copy assignment is deleted.
+     */
+    SparseMatrix &
+    operator=(const CUDAWrappers::SparseMatrix<Number> &) = delete;
+
+    /**
      * Reinitialize the sparse matrix. The sparse matrix on the host is copied
      * to the device and the elementes are reordered according to the format
      * supported by cuSPARSE.
