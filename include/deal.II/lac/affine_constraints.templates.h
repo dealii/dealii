@@ -73,16 +73,6 @@ AffineConstraints<number>::copy_from(const AffineConstraints<number> &other)
 
 template <typename number>
 bool
-AffineConstraints<number>::check_zero_weight(
-  const std::pair<size_type, number> &p)
-{
-  return (p.second == number(0.));
-}
-
-
-
-template <typename number>
-bool
 AffineConstraints<number>::ConstraintLine::
 operator<(const ConstraintLine &a) const
 {
@@ -343,7 +333,10 @@ AffineConstraints<number>::close()
     // appears. obviously, 0*something can be omitted
     line.entries.erase(std::remove_if(line.entries.begin(),
                                       line.entries.end(),
-                                      &check_zero_weight),
+                                      [](
+                                        const std::pair<size_type, number> &p) {
+                                        return p.second == number(0.);
+                                      }),
                        line.entries.end());
 
 

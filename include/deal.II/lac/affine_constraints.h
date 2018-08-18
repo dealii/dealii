@@ -1478,13 +1478,6 @@ private:
   calculate_line_index(const size_type line) const;
 
   /**
-   * Return @p true if the weight of an entry (the second element of the pair)
-   * equals zero. This function is used to delete entries with zero weight.
-   */
-  static bool
-  check_zero_weight(const std::pair<size_type, number> &p);
-
-  /**
    * This function actually implements the local_to_global function for
    * standard (non-block) matrices.
    */
