@@ -1467,6 +1467,23 @@ namespace internal
 #  endif
 
 /**
+ * The non-throwing equivalent of AssertCuda.
+ *
+ * @ingroup Exceptions
+ * @author Daniel Arndt, 2018
+ */
+#  ifdef DEBUG
+#    define AssertNothrowCuda(error_code)      \
+      AssertNothrow(error_code == cudaSuccess, \
+                    dealii::ExcCudaError(cudaGetErrorString(error_code)))
+#  else
+#    define AssertNothrowCuda(error_code) \
+      {                                   \
+        (void)(error_code);               \
+      }
+#  endif
+
+/**
  * An assertion that checks that the error code produced by calling a cuSPARSE
  * routine is equal to CUSPARSE_STATUS_SUCCESS.
  *
@@ -1487,6 +1504,33 @@ namespace internal
       }
 #  endif
 
+/**
+ * The non-throwing equivalent of AssertCusparse.
+ *
+ * @ingroup Exceptions
+ * @author Daniel Arndt, 2018
+ */
+#  ifdef DEBUG
+#    define AssertNothrowCusparse(error_code)                               \
+      AssertNothrow(                                                        \
+        error_code == CUSPARSE_STATUS_SUCCESS,                              \
+        dealii::ExcCusparseError(                                           \
+          dealii::deal_II_exceptions::internals::get_cusparse_error_string( \
+            error_code)))
+#  else
+#    define AssertNothrowCusparse(error_code) \
+      {                                       \
+        (void)(error_code);                   \
+      }
+#  endif
+
+/**
+ * An assertion that checks that the error code produced by calling a cuSOLVER
+ * routine is equal to CUSOLVER_STATUS_SUCCESS.
+ *
+ * @ingroup Exceptions
+ * @author Bruno Turcksin, 2018
+ */
 #  ifdef DEBUG
 #    define AssertCusolver(error_code)                                      \
       Assert(                                                               \
