@@ -51,7 +51,7 @@ namespace CUDAWrappers
     /**
      * Declare type for container size.
      */
-    using size_type = unsigned int;
+    using size_type = int;
 
     /**
      * Type of the matrix entries.
@@ -317,7 +317,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline unsigned int
+  inline SparseMatrix<Number>::size_type
   SparseMatrix<Number>::m() const
   {
     return n_rows;
@@ -326,7 +326,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline unsigned int
+  inline SparseMatrix<Number>::size_type
   SparseMatrix<Number>::n() const
   {
     return n_cols;
