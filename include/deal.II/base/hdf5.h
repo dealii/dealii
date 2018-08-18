@@ -72,20 +72,20 @@ DEAL_II_NAMESPACE_OPEN
  * // The displacement_data vector is local. The coordinates vector corresponds
  * // to the coordinates of the data in the hdf5 dataset.
  * if (coordinates.size() > 0) {
- *   displacement.write_data_selection(displacement_data, coordinates);
+ *   displacement.write_selection(displacement_data, coordinates);
  * } else {
  *   // Even if this MPI process has no displacement data to write,
  *   // it has to contribute to the collective call
- *   displacement.write_data_none();
+ *   displacement.write_none();
  * }
  *
  * // ... do some calculations ...
  * // The whole frequency dataset can be written by one single MPI process,
  * // but the rest of the processes have to contribute to the collective call
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0) {
- *   frequency_dataset.write_data(frequency);
+ *   frequency_dataset.write(frequency);
  * } else {
- *   frequency_dataset.write_data_none();
+ *   frequency_dataset.write_none();
  * }
  *
  * // Write the simulation metadata
@@ -199,7 +199,7 @@ namespace HDF5
      */
     template <template <class...> class Container, typename T>
     Container<T>
-    read_data();
+    read();
 
     /**
      * Writes data in the dataset. T can be double, int, unsigned int,
@@ -213,7 +213,7 @@ namespace HDF5
      */
     template <template <class...> class Container, typename T>
     void
-    write_data(const Container<T> &data);
+    write(const Container<T> &data);
 
     /**
      * Writes data to a subset of the dataset. T can be double, int, unsigned
@@ -243,8 +243,8 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_data_selection(const std::vector<T> &     data,
-                         const std::vector<hsize_t> coordinates);
+    write_selection(const std::vector<T> &     data,
+                    const std::vector<hsize_t> coordinates);
 
     /**
      * Writes data to a subset of the dataset. T can be double, int, unsigned
@@ -260,9 +260,9 @@ namespace HDF5
      */
     template <template <class...> class Container, typename T>
     void
-    write_data_hyperslab(const Container<T> &       data,
-                         const std::vector<hsize_t> offset,
-                         const std::vector<hsize_t> count);
+    write_hyperslab(const Container<T> &       data,
+                    const std::vector<hsize_t> offset,
+                    const std::vector<hsize_t> count);
 
     /**
      * This function does not write any data, but can contribute to a collective
@@ -277,7 +277,7 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_data_none();
+    write_none();
 
     /**
      * This funcion retrieves the type of I/O that was performed on the last

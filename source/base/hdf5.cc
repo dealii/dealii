@@ -455,7 +455,7 @@ namespace HDF5
 
   template <template <class...> class Container, typename T>
   Container<T>
-  DataSet::read_data()
+  DataSet::read()
   {
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
     hid_t                  plist;
@@ -504,7 +504,7 @@ namespace HDF5
 
   template <template <class...> class Container, typename T>
   void
-  DataSet::write_data(const Container<T> &data)
+  DataSet::write(const Container<T> &data)
   {
     AssertDimension(_size, internal::get_container_size(data));
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
@@ -545,8 +545,8 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet::write_data_selection(const std::vector<T> &     data,
-                                const std::vector<hsize_t> coordinates)
+  DataSet::write_selection(const std::vector<T> &     data,
+                           const std::vector<hsize_t> coordinates)
   {
     AssertDimension(coordinates.size(), data.size() * _rank);
     std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
@@ -598,9 +598,9 @@ namespace HDF5
 
   template <template <class...> class Container, typename T>
   void
-  DataSet::write_data_hyperslab(const Container<T> &       data,
-                                const std::vector<hsize_t> offset,
-                                const std::vector<hsize_t> count)
+  DataSet::write_hyperslab(const Container<T> &       data,
+                           const std::vector<hsize_t> offset,
+                           const std::vector<hsize_t> count)
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
@@ -653,7 +653,7 @@ namespace HDF5
 
   template <typename T>
   void
-  DataSet::write_data_none()
+  DataSet::write_none()
   {
     std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
     std::vector<hsize_t>   data_dimensions = {0};
@@ -1000,7 +1000,7 @@ namespace HDF5
   {
     std::vector<hsize_t> dimensions = {data.size()};
     auto                 dataset    = create_dataset<T>(name, dimensions);
-    dataset.write_data(data);
+    dataset.write(data);
   }
 
   template <typename T>
@@ -1009,7 +1009,7 @@ namespace HDF5
   {
     std::vector<hsize_t> dimensions = {data.m(), data.n()};
     auto                 dataset    = create_dataset<T>(name, dimensions);
-    dataset.write_data(data);
+    dataset.write(data);
   }
 
 
@@ -1122,110 +1122,109 @@ namespace HDF5
                                        unsigned int      value) const;
 
   template std::vector<float>
-  DataSet::read_data<std::vector, float>();
+  DataSet::read<std::vector, float>();
   template std::vector<double>
-  DataSet::read_data<std::vector, double>();
+  DataSet::read<std::vector, double>();
   template std::vector<long double>
-  DataSet::read_data<std::vector, long double>();
+  DataSet::read<std::vector, long double>();
   template std::vector<std::complex<float>>
-  DataSet::read_data<std::vector, std::complex<float>>();
+  DataSet::read<std::vector, std::complex<float>>();
   template std::vector<std::complex<double>>
-  DataSet::read_data<std::vector, std::complex<double>>();
+  DataSet::read<std::vector, std::complex<double>>();
   template std::vector<std::complex<long double>>
-  DataSet::read_data<std::vector, std::complex<long double>>();
+  DataSet::read<std::vector, std::complex<long double>>();
   template std::vector<int>
-  DataSet::read_data<std::vector, int>();
+  DataSet::read<std::vector, int>();
   template std::vector<unsigned int>
-  DataSet::read_data<std::vector, unsigned int>();
+  DataSet::read<std::vector, unsigned int>();
   template FullMatrix<float>
-  DataSet::read_data<FullMatrix, float>();
+  DataSet::read<FullMatrix, float>();
   template FullMatrix<double>
-  DataSet::read_data<FullMatrix, double>();
+  DataSet::read<FullMatrix, double>();
   template FullMatrix<long double>
-  DataSet::read_data<FullMatrix, long double>();
+  DataSet::read<FullMatrix, long double>();
   template FullMatrix<std::complex<float>>
-  DataSet::read_data<FullMatrix, std::complex<float>>();
+  DataSet::read<FullMatrix, std::complex<float>>();
   template FullMatrix<std::complex<double>>
-  DataSet::read_data<FullMatrix, std::complex<double>>();
+  DataSet::read<FullMatrix, std::complex<double>>();
 
   template void
-  DataSet::write_data<std::vector, float>(const std::vector<float> &data);
+  DataSet::write<std::vector, float>(const std::vector<float> &data);
   template void
-  DataSet::write_data<std::vector, double>(const std::vector<double> &data);
+  DataSet::write<std::vector, double>(const std::vector<double> &data);
   template void
-  DataSet::write_data<std::vector, long double>(
+  DataSet::write<std::vector, long double>(
     const std::vector<long double> &data);
   template void
-  DataSet::write_data<std::vector, std::complex<float>>(
+  DataSet::write<std::vector, std::complex<float>>(
     const std::vector<std::complex<float>> &data);
   template void
-  DataSet::write_data<std::vector, std::complex<double>>(
+  DataSet::write<std::vector, std::complex<double>>(
     const std::vector<std::complex<double>> &data);
   template void
-  DataSet::write_data<std::vector, std::complex<long double>>(
+  DataSet::write<std::vector, std::complex<long double>>(
     const std::vector<std::complex<long double>> &data);
   template void
-  DataSet::write_data<std::vector, int>(const std::vector<int> &data);
+  DataSet::write<std::vector, int>(const std::vector<int> &data);
   template void
-  DataSet::write_data<std::vector, unsigned int>(
+  DataSet::write<std::vector, unsigned int>(
     const std::vector<unsigned int> &data);
   template void
-  DataSet::write_data<FullMatrix, float>(const FullMatrix<float> &data);
+  DataSet::write<FullMatrix, float>(const FullMatrix<float> &data);
   template void
-  DataSet::write_data<FullMatrix, double>(const FullMatrix<double> &data);
+  DataSet::write<FullMatrix, double>(const FullMatrix<double> &data);
   template void
-  DataSet::write_data<FullMatrix, std::complex<float>>(
+  DataSet::write<FullMatrix, std::complex<float>>(
     const FullMatrix<std::complex<float>> &data);
   template void
-  DataSet::write_data<FullMatrix, std::complex<double>>(
+  DataSet::write<FullMatrix, std::complex<double>>(
     const FullMatrix<std::complex<double>> &data);
 
   template void
-  DataSet::write_data_selection<float>(const std::vector<float> & data,
-                                       const std::vector<hsize_t> coordinates);
+  DataSet::write_selection<float>(const std::vector<float> & data,
+                                  const std::vector<hsize_t> coordinates);
   template void
-  DataSet::write_data_selection<double>(const std::vector<double> &data,
+  DataSet::write_selection<double>(const std::vector<double> &data,
+                                   const std::vector<hsize_t> coordinates);
+  template void
+  DataSet::write_selection<long double>(const std::vector<long double> &data,
                                         const std::vector<hsize_t> coordinates);
   template void
-  DataSet::write_data_selection<long double>(
-    const std::vector<long double> &data,
-    const std::vector<hsize_t>      coordinates);
-  template void
-  DataSet::write_data_selection<std::complex<float>>(
+  DataSet::write_selection<std::complex<float>>(
     const std::vector<std::complex<float>> &data,
     const std::vector<hsize_t>              coordinates);
   template void
-  DataSet::write_data_selection<std::complex<double>>(
+  DataSet::write_selection<std::complex<double>>(
     const std::vector<std::complex<double>> &data,
     const std::vector<hsize_t>               coordinates);
   template void
-  DataSet::write_data_selection<std::complex<long double>>(
+  DataSet::write_selection<std::complex<long double>>(
     const std::vector<std::complex<long double>> &data,
     const std::vector<hsize_t>                    coordinates);
   template void
-  DataSet::write_data_selection<int>(const std::vector<int> &   data,
-                                     const std::vector<hsize_t> coordinates);
+  DataSet::write_selection<int>(const std::vector<int> &   data,
+                                const std::vector<hsize_t> coordinates);
   template void
-  DataSet::write_data_selection<unsigned int>(
+  DataSet::write_selection<unsigned int>(
     const std::vector<unsigned int> &data,
     const std::vector<hsize_t>       coordinates);
 
   template void
-  DataSet::write_data_none<float>();
+  DataSet::write_none<float>();
   template void
-  DataSet::write_data_none<double>();
+  DataSet::write_none<double>();
   template void
-  DataSet::write_data_none<long double>();
+  DataSet::write_none<long double>();
   template void
-  DataSet::write_data_none<std::complex<float>>();
+  DataSet::write_none<std::complex<float>>();
   template void
-  DataSet::write_data_none<std::complex<double>>();
+  DataSet::write_none<std::complex<double>>();
   template void
-  DataSet::write_data_none<std::complex<long double>>();
+  DataSet::write_none<std::complex<long double>>();
   template void
-  DataSet::write_data_none<int>();
+  DataSet::write_none<int>();
   template void
-  DataSet::write_data_none<unsigned int>();
+  DataSet::write_none<unsigned int>();
 
   template DataSet
   Group::create_dataset<float>(const std::string          name,
