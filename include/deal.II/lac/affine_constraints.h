@@ -372,7 +372,7 @@ public:
    * the preceding function several times, but is faster.
    */
   void
-  add_entries(const size_type                                  line,
+  add_entries(const size_type                                  line_n,
               const std::vector<std::pair<size_type, number>> &col_val_pairs);
 
   /**

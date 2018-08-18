@@ -245,14 +245,14 @@ AffineConstraints<number>::add_lines(const IndexSet &lines)
 template <typename number>
 void
 AffineConstraints<number>::add_entries(
-  const size_type                                  line,
+  const size_type                                  line_n,
   const std::vector<std::pair<size_type, number>> &col_val_pairs)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(is_constrained(line), ExcLineInexistant(line));
+  Assert(is_constrained(line_n), ExcLineInexistant(line_n));
 
-  ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
-  Assert(line_ptr->index == line, ExcInternalError());
+  const ConstraintLine &line = lines[lines_cache[calculate_line_index(line_n)]];
+  Assert(line.index == line_n, ExcInternalError());
 
   // if in debug mode, check whether an entry for this column already
   // exists and if its the same as the one entered at present
@@ -264,25 +264,25 @@ AffineConstraints<number>::add_entries(
        col_val_pair != col_val_pairs.end();
        ++col_val_pair)
     {
-      Assert(line != col_val_pair->first,
+      Assert(line_n != col_val_pair->first,
              ExcMessage("Can't constrain a degree of freedom to itself"));
 
       for (typename ConstraintLine::Entries::const_iterator p =
-             line_ptr->entries.begin();
-           p != line_ptr->entries.end();
+             line.entries.begin();
+           p != line.entries.end();
            ++p)
         if (p->first == col_val_pair->first)
           {
             // entry exists, break innermost loop
             Assert(p->second == col_val_pair->second,
-                   ExcEntryAlreadyExists(line,
+                   ExcEntryAlreadyExists(line_n,
                                          col_val_pair->first,
                                          p->second,
                                          col_val_pair->second));
             break;
           }
 
-      line_ptr->entries.push_back(*col_val_pair);
+      line.entries.push_back(*col_val_pair);
     }
 }
 
@@ -433,9 +433,9 @@ AffineConstraints<number>::close()
                 Assert(dof_index != line->index,
                        ExcMessage("Cycle in constraints detected!"));
 
-                const ConstraintLine *constrained_line =
-                  &lines[lines_cache[calculate_line_index(dof_index)]];
-                Assert(constrained_line->index == dof_index,
+                const ConstraintLine &constrained_line =
+                  lines[lines_cache[calculate_line_index(dof_index)]];
+                Assert(constrained_line.index == dof_index,
                        ExcInternalError());
 
                 // now we have to replace an entry by its expansion. we do
@@ -446,24 +446,24 @@ AffineConstraints<number>::close()
                 // we can of course only do that if the DoF that we are
                 // currently handle is constrained by a linear combination
                 // of other dofs:
-                if (constrained_line->entries.size() > 0)
+                if (constrained_line.entries.size() > 0)
                   {
-                    for (size_type i = 0; i < constrained_line->entries.size();
+                    for (size_type i = 0; i < constrained_line.entries.size();
                          ++i)
-                      Assert(dof_index != constrained_line->entries[i].first,
+                      Assert(dof_index != constrained_line.entries[i].first,
                              ExcMessage("Cycle in constraints detected!"));
 
                     // replace first entry, then tack the rest to the end
                     // of the list
                     line->entries[entry] = std::pair<size_type, number>(
-                      constrained_line->entries[0].first,
-                      constrained_line->entries[0].second * weight);
+                      constrained_line.entries[0].first,
+                      constrained_line.entries[0].second * weight);
 
                     for (size_type i = 1; i < constrained_line->entries.size();
                          ++i)
                       line->entries.emplace_back(
-                        constrained_line->entries[i].first,
-                        constrained_line->entries[i].second * weight);
+                        constrained_line.entries[i].first,
+                        constrained_line.entries[i].second * weight);
 
 #ifdef DEBUG
                     // keep track of how many entries we replace in this
@@ -486,7 +486,7 @@ AffineConstraints<number>::close()
                     line->entries.erase(line->entries.begin() + entry);
                   }
 
-                line->inhomogeneity += constrained_line->inhomogeneity * weight;
+                line->inhomogeneity += constrained_line.inhomogeneity * weight;
 
                 // now that we're here, do not increase index by one but
                 // rather make another pass for the present entry because
@@ -678,18 +678,15 @@ AffineConstraints<number>::merge(
             // entry by a sequence of new entries taken from the other
             // object, but with multiplied weights
             {
-              const typename ConstraintLine::Entries *other_line =
+              const typename ConstraintLine::Entries * const other_line =
                 other_constraints.get_constraint_entries(
                   line->entries[i].first);
               Assert(other_line != nullptr, ExcInternalError());
 
               const number weight = line->entries[i].second;
 
-              for (typename ConstraintLine::Entries::const_iterator j =
-                     other_line->begin();
-                   j != other_line->end();
-                   ++j)
-                tmp.emplace_back(j->first, j->second * weight);
+              for (const std::pair<size_type, number> &other_entry : *other_line)
+                tmp.emplace_back(other_entry.first, other_entry.second * weight);
 
               line->inhomogeneity +=
                 other_constraints.get_inhomogeneity(line->entries[i].first) *
@@ -2093,14 +2090,14 @@ AffineConstraints<number>::distribute_local_to_global(
         // global dof index
         const size_type line_index =
           calculate_line_index(local_dof_indices_col[i]);
-        const ConstraintLine *position = lines_cache.size() <= line_index ?
-                                           nullptr :
-                                           &lines[lines_cache[line_index]];
+        AssertIndexRange(line_index, lines_cache.size());
+        AssertIndexRange(lines_cache[line_index], lines.size());
+        const ConstraintLine &position = lines[lines_cache[line_index]];
 
         // Gauss elimination of the matrix columns with the inhomogeneity.
         // Go through them one by one and again check whether they are
         // constrained. If so, distribute the constraint
-        const auto val = position->inhomogeneity;
+        const auto val = position.inhomogeneity;
         if (val != number(0.))
           for (size_type j = 0; j < m_local_dofs; ++j)
             {
@@ -2137,14 +2134,14 @@ AffineConstraints<number>::distribute_local_to_global(
         // the entries of fixed dofs
         if (diagonal)
           {
-            for (size_type j = 0; j < position->entries.size(); ++j)
+            for (size_type j = 0; j < position.entries.size(); ++j)
               {
                 Assert(!(!local_lines.size() ||
-                         local_lines.is_element(position->entries[j].first)) ||
-                         is_constrained(position->entries[j].first) == false,
+                         local_lines.is_element(position.entries[j].first)) ||
+                         is_constrained(position.entries[j].first) == false,
                        ExcMessage("Tried to distribute to a fixed dof."));
-                global_vector(position->entries[j].first) +=
-                  local_vector(i) * position->entries[j].second;
+                global_vector(position.entries[j].first) +=
+                  local_vector(i) * position.entries[j].second;
               }
           }
       }
