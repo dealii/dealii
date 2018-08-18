@@ -211,23 +211,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <template <class...> class Container, typename T>
     void
-    write_data(const std::vector<T> &data);
-
-    /**
-     * Writes data in the dataset. T can be double, int, unsigned int,
-     * or std::complex<double>.
-     *
-     * Datatype conversion takes place at the time of a read or write and is
-     * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
-     * User's Guide.
-     */
-    template <typename T>
-    void
-    write_data(const FullMatrix<T> &data);
+    write_data(const Container<T> &data);
 
     /**
      * Writes data to a subset of the dataset. T can be double, int, unsigned
@@ -272,27 +258,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <template <class...> class Container, typename T>
     void
-    write_data_hyperslab(const std::vector<T> &     data,
-                         const std::vector<hsize_t> offset,
-                         const std::vector<hsize_t> count);
-
-    /**
-     * Writes data to a subset of the dataset. T can be double, int, unsigned
-     * int, bool or std::complex<double>.
-     *
-     * The selected elements form a hyperslab in the dataset.
-     *
-     * Datatype conversion takes place at the time of a read or write and is
-     * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
-     * User's Guide.
-     */
-    template <typename T>
-    void
-    write_data_hyperslab(const FullMatrix<T> &      data,
+    write_data_hyperslab(const Container<T> &       data,
                          const std::vector<hsize_t> offset,
                          const std::vector<hsize_t> count);
 

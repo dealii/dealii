@@ -122,6 +122,28 @@ namespace HDF5
     // This function returns the pointer to the raw data of a container
     template <template <class...> class Container, typename T>
     typename std::enable_if<std::is_same<Container<T>, std::vector<T>>::value,
+                            unsigned int>::type
+    get_container_size(const Container<T> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong
+      return static_cast<unsigned int>(data.size());
+    }
+
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, FullMatrix<T>>::value,
+                            unsigned int>::type
+    get_container_size(const Container<T> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong.
+      // Use the first element of FullMatrix to get the pointer to the raw data
+      return static_cast<unsigned int>(data.m() * data.n());
+    }
+
+    // This function returns the pointer to the raw data of a container
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, std::vector<T>>::value,
                             void *>::type
     get_container_pointer(Container<T> &data)
     {
@@ -134,6 +156,30 @@ namespace HDF5
     typename std::enable_if<std::is_same<Container<T>, FullMatrix<T>>::value,
                             void *>::type
     get_container_pointer(FullMatrix<T> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong.
+      // Use the first element of FullMatrix to get the pointer to the raw data
+      return &data[0][0];
+    }
+
+    // This function returns the pointer to the raw data of a container
+    // The returned pointer is const, which means that it can be used only to
+    // read the data
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, std::vector<T>>::value,
+                            const void *>::type
+    get_container_const_pointer(const Container<T> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong
+      return data.data();
+    }
+
+    template <template <class...> class Container, typename T>
+    typename std::enable_if<std::is_same<Container<T>, FullMatrix<T>>::value,
+                            const void *>::type
+    get_container_const_pointer(const FullMatrix<T> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -456,11 +502,11 @@ namespace HDF5
     return data;
   }
 
-  template <typename T>
+  template <template <class...> class Container, typename T>
   void
-  DataSet::write_data(const std::vector<T> &data)
+  DataSet::write_data(const Container<T> &data)
   {
-    AssertDimension(_size, data.size());
+    AssertDimension(_size, internal::get_container_size(data));
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
     hid_t                  plist;
     herr_t                 ret;
@@ -475,44 +521,12 @@ namespace HDF5
         plist = H5P_DEFAULT;
       }
 
-    H5Dwrite(*hdf5_reference, *t_type, H5S_ALL, H5S_ALL, plist, data.data());
-
-    if (mpi)
-      {
-        if (_check_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
-            Assert(ret >= 0, ExcInternalError());
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &_local_no_collective_cause,
-                                                  &_global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
-          }
-        H5Pclose(plist);
-      }
-  }
-
-  template <typename T>
-  void
-  DataSet::write_data(const FullMatrix<T> &data)
-  {
-    AssertDimension(_size, data.m() * data.n());
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
-    hid_t                  plist;
-    herr_t                 ret;
-
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
-
-    // Use the first element of FullMatrix to get the pointer to the raw data
-    H5Dwrite(*hdf5_reference, *t_type, H5S_ALL, H5S_ALL, plist, &data[0][0]);
+    H5Dwrite(*hdf5_reference,
+             *t_type,
+             H5S_ALL,
+             H5S_ALL,
+             plist,
+             internal::get_container_const_pointer<Container, T>(data));
 
     if (mpi)
       {
@@ -582,9 +596,9 @@ namespace HDF5
     H5Sclose(memory_dataspace);
   }
 
-  template <typename T>
+  template <template <class...> class Container, typename T>
   void
-  DataSet::write_data_hyperslab(const std::vector<T> &     data,
+  DataSet::write_data_hyperslab(const Container<T> &       data,
                                 const std::vector<hsize_t> offset,
                                 const std::vector<hsize_t> count)
   {
@@ -619,61 +633,7 @@ namespace HDF5
              memory_dataspace,
              *dataspace,
              plist,
-             &*data.begin());
-
-    if (mpi)
-      {
-        if (_check_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
-            Assert(ret >= 0, ExcInternalError());
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &_local_no_collective_cause,
-                                                  &_global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
-          }
-        H5Pclose(plist);
-      }
-    H5Sclose(memory_dataspace);
-  }
-
-  template <typename T>
-  void
-  DataSet::write_data_hyperslab(const FullMatrix<T> &      data,
-                                const std::vector<hsize_t> offset,
-                                const std::vector<hsize_t> count)
-  {
-    AssertDimension(std::accumulate(count.begin(),
-                                    count.end(),
-                                    1,
-                                    std::multiplies<unsigned int>()),
-                    data.m() * data.n());
-    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
-    std::vector<hsize_t>   data_dimensions = {data.m(), data.n()};
-
-    hid_t  memory_dataspace;
-    hid_t  plist;
-    herr_t ret;
-
-    memory_dataspace = H5Screate_simple(2, data_dimensions.data(), NULL);
-    H5Sselect_hyperslab(
-      *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
-
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
-    H5Dwrite(*hdf5_reference,
-             *t_type,
-             memory_dataspace,
-             *dataspace,
-             plist,
-             &*data.begin());
+             internal::get_container_const_pointer<Container, T>(data));
 
     if (mpi)
       {
@@ -1189,6 +1149,38 @@ namespace HDF5
   DataSet::read_data<FullMatrix, std::complex<double>>();
 
   template void
+  DataSet::write_data<std::vector, float>(const std::vector<float> &data);
+  template void
+  DataSet::write_data<std::vector, double>(const std::vector<double> &data);
+  template void
+  DataSet::write_data<std::vector, long double>(
+    const std::vector<long double> &data);
+  template void
+  DataSet::write_data<std::vector, std::complex<float>>(
+    const std::vector<std::complex<float>> &data);
+  template void
+  DataSet::write_data<std::vector, std::complex<double>>(
+    const std::vector<std::complex<double>> &data);
+  template void
+  DataSet::write_data<std::vector, std::complex<long double>>(
+    const std::vector<std::complex<long double>> &data);
+  template void
+  DataSet::write_data<std::vector, int>(const std::vector<int> &data);
+  template void
+  DataSet::write_data<std::vector, unsigned int>(
+    const std::vector<unsigned int> &data);
+  template void
+  DataSet::write_data<FullMatrix, float>(const FullMatrix<float> &data);
+  template void
+  DataSet::write_data<FullMatrix, double>(const FullMatrix<double> &data);
+  template void
+  DataSet::write_data<FullMatrix, std::complex<float>>(
+    const FullMatrix<std::complex<float>> &data);
+  template void
+  DataSet::write_data<FullMatrix, std::complex<double>>(
+    const FullMatrix<std::complex<double>> &data);
+
+  template void
   DataSet::write_data_selection<float>(const std::vector<float> & data,
                                        const std::vector<hsize_t> coordinates);
   template void
@@ -1290,7 +1282,6 @@ namespace HDF5
   template void
   Group::write_dataset(const std::string                name,
                        const std::vector<unsigned int> &data) const;
-
   template void
   Group::write_dataset(const std::string        name,
                        const FullMatrix<float> &data) const;
@@ -1298,17 +1289,11 @@ namespace HDF5
   Group::write_dataset(const std::string         name,
                        const FullMatrix<double> &data) const;
   template void
-  Group::write_dataset(const std::string              name,
-                       const FullMatrix<long double> &data) const;
-  template void
   Group::write_dataset(const std::string                      name,
                        const FullMatrix<std::complex<float>> &data) const;
   template void
   Group::write_dataset(const std::string                       name,
                        const FullMatrix<std::complex<double>> &data) const;
-  template void
-  Group::write_dataset(const std::string                            name,
-                       const FullMatrix<std::complex<long double>> &data) const;
 } // namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
