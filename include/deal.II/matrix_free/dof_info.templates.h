@@ -928,7 +928,7 @@ namespace internal
       // Step 2: fix single contiguous cell among others with interleaved
       // storage
       if (n_interleaved > 0 && index_kinds[static_cast<unsigned int>(
-                                 IndexStorageVariants::contiguous)])
+                                 IndexStorageVariants::contiguous)] > 0)
         for (unsigned int i = 0; i < irregular_cells.size(); ++i)
           if (index_storage_variants[dof_access_cell][i] ==
               IndexStorageVariants::contiguous)
@@ -940,14 +940,6 @@ namespace internal
               index_kinds[static_cast<unsigned int>(
                 IndexStorageVariants::interleaved_contiguous_mixed_strides)]++;
             }
-
-      n_interleaved =
-        index_kinds[static_cast<unsigned int>(
-          IndexStorageVariants::interleaved_contiguous)] +
-        index_kinds[static_cast<unsigned int>(
-          IndexStorageVariants::interleaved_contiguous_strided)] +
-        index_kinds[static_cast<unsigned int>(
-          IndexStorageVariants::interleaved_contiguous_mixed_strides)];
 
       // Step 3: Interleaved cells are left but also some non-contiguous ones
       // -> revert all to full storage

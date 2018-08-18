@@ -6885,7 +6885,12 @@ FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
                   const bool        evaluate_gradients,
                   const bool        evaluate_hessians)
 {
-  if (this->dof_info->index_storage_variants
+  // If the index storage is interleaved and contiguous and the vector storage
+  // has the correct alignment, we can directly pass the pointer into the
+  // vector to the evaluate() call, without reading the vector entries into a
+  // separate data field. This saves some operations.
+  if (std::is_same<typename VectorType::value_type, Number>::value &&
+      this->dof_info->index_storage_variants
           [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
           [this->cell] == internal::MatrixFreeFunctions::DoFInfo::
                             IndexStorageVariants::interleaved_contiguous &&
@@ -6998,7 +7003,13 @@ FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
                     const bool  integrate_gradients,
                     VectorType &destination)
 {
-  if (this->dof_info->index_storage_variants
+  // If the index storage is interleaved and contiguous and the vector storage
+  // has the correct alignment, we can directly pass the pointer into the
+  // vector to the integrate() call, without writing temporary results into a
+  // separate data field that will later be added into the vector. This saves
+  // some operations.
+  if (std::is_same<typename VectorType::value_type, Number>::value &&
+      this->dof_info->index_storage_variants
           [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
           [this->cell] == internal::MatrixFreeFunctions::DoFInfo::
                             IndexStorageVariants::interleaved_contiguous &&
