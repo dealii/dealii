@@ -193,7 +193,7 @@ namespace HDF5
       return &data[0][0];
     }
 
-    // This function initializes a container of T type
+    // This function initializes a container of number type
     template <template <class...> class Container, typename number>
     typename std::enable_if<
       std::is_same<Container<number>, std::vector<number>>::value,
@@ -1357,6 +1357,7 @@ namespace HDF5
     : File(name, false, MPI_COMM_NULL, mode)
   {}
 
+#  ifndef DOXYGEN
 
   // explicit instantiations of functions
   template float
@@ -1816,6 +1817,8 @@ namespace HDF5
   template void
   Group::write_dataset(const std::string                       name,
                        const FullMatrix<std::complex<double>> &data) const;
+#  endif // DOXYGEN
+
 } // namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
