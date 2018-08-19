@@ -134,8 +134,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
@@ -149,8 +149,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
@@ -193,8 +193,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <template <class...> class Container, typename T>
@@ -207,8 +207,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <template <class...> class Container, typename T>
@@ -237,8 +237,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
@@ -262,16 +262,16 @@ namespace HDF5
     /**
      *
      * See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">"Dataspaces
-     * and Data Transfer"</a>  section in the HDF5 User's Guide. See as well the
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
+     * and Data Transfer</a>  section in the HDF5 User's Guide. See as well the
      * <a
-     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">"H5Sselect_hyperslab
-     * definition"</a>.
+     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
+     * definition</a>.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <template <class...> class Container, typename T>
@@ -292,16 +292,16 @@ namespace HDF5
      *  - Block: The size of the block selected from the dataspace.
      *
      * See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">"Dataspaces
-     * and Data Transfer"</a>  section in the HDF5 User's Guide. See as well the
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
+     * and Data Transfer</a>  section in the HDF5 User's Guide. See as well the
      * <a
-     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">"H5Sselect_hyperslab
-     * definition"</a>.
+     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
+     * definition</a>.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <template <class...> class Container, typename T>
@@ -321,8 +321,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
@@ -332,7 +332,7 @@ namespace HDF5
     /**
      * This funcion retrieves the type of I/O that was performed on the last
      * parallel I/O call. See <a
-     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">"H5Pget_mpio_actual_io_mode"</a>.
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
      * The return type T can be H5D_mpio_actual_io_mode_t or std::string. The
      * type H5D_mpio_actual_io_mode_t corresponds to the value returned by
      * H5Pget_mpio_actual_io_mode and std::string is a human readable
@@ -345,7 +345,7 @@ namespace HDF5
     /**
      * This funcion retrieves the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
-     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">"H5Pget_mpio_no_collective_cause"</a>.
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      * The return type T can be uint32_t or std::string. The type uint32_t
      * corresponds to the value returned by H5Pget_mpio_no_collective_cause and
      * std::string is a human readable conversion.
@@ -357,7 +357,7 @@ namespace HDF5
     /**
      * This funcion retrieves the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
-     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">"H5Pget_mpio_no_collective_cause"</a>.
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      * The return type T can be uint32_t or std::string. The type uint32_t
      * corresponds to the value returned by H5Pget_mpio_no_collective_cause and
      * std::string is a human readable conversion.
@@ -452,8 +452,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
@@ -467,8 +467,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
@@ -481,8 +481,8 @@ namespace HDF5
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
-     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
     template <typename T>
