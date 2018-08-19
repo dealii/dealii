@@ -598,57 +598,131 @@ namespace HDF5
 
   template <template <class...> class Container, typename T>
   void
-  DataSet::write_hyperslab(const Container<T> &       data,
-                           const std::vector<hsize_t> offset,
-                           const std::vector<hsize_t> count)
+  DataSet::write_hyperslab(const Container<T> &        data,
+                           const std::vector<hsize_t> &offset,
+                           const std::vector<hsize_t> &count)
   {
     AssertDimension(std::accumulate(count.begin(),
                                     count.end(),
                                     1,
                                     std::multiplies<unsigned int>()),
-                    data.size());
-    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
-    std::vector<hsize_t>   data_dimensions = {data.size()};
+                    internal::get_container_size(data));
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    // In this particular overload of write_hyperslab the data_dimensions are
+    // the same as count
+    std::vector<hsize_t> data_dimensions = count;
 
     hid_t  memory_dataspace;
     hid_t  plist;
     herr_t ret;
 
-
-    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
-    H5Sselect_hyperslab(
+    memory_dataspace =
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_hyperslab(
       *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
+    Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
     if (mpi)
       {
         plist = H5Pcreate(H5P_DATASET_XFER);
-        H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
       }
     else
       {
         plist = H5P_DEFAULT;
       }
-    H5Dwrite(*hdf5_reference,
-             *t_type,
-             memory_dataspace,
-             *dataspace,
-             plist,
-             internal::get_container_const_pointer<Container, T>(data));
+    ret = H5Dwrite(*hdf5_reference,
+                   *t_type,
+                   memory_dataspace,
+                   *dataspace,
+                   plist,
+                   internal::get_container_const_pointer<Container, T>(data));
+    Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
       {
         if (_check_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
-            Assert(ret >= 0, ExcInternalError());
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
             ret = H5Pget_mpio_no_collective_cause(plist,
                                                   &_local_no_collective_cause,
                                                   &_global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
           }
         H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
     H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
+  }
+
+  template <template <class...> class Container, typename T>
+  void
+  DataSet::write_hyperslab(const Container<T> &        data,
+                           const std::vector<hsize_t> &data_dimensions,
+                           const std::vector<hsize_t> &offset,
+                           const std::vector<hsize_t> &stride,
+                           const std::vector<hsize_t> &count,
+                           const std::vector<hsize_t> &block)
+  {
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+
+    hid_t  memory_dataspace;
+    hid_t  plist;
+    herr_t ret;
+
+    memory_dataspace =
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_hyperslab(*dataspace,
+                              H5S_SELECT_SET,
+                              offset.data(),
+                              stride.data(),
+                              count.data(),
+                              block.data());
+    Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
+
+    if (mpi)
+      {
+        plist = H5Pcreate(H5P_DATASET_XFER);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
+      }
+    else
+      {
+        plist = H5P_DEFAULT;
+      }
+    ret = H5Dwrite(*hdf5_reference,
+                   *t_type,
+                   memory_dataspace,
+                   *dataspace,
+                   plist,
+                   internal::get_container_const_pointer<Container, T>(data));
+    Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
+
+    if (mpi)
+      {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
+          }
+        H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
+      }
+    H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
   template <typename T>
@@ -1208,6 +1282,163 @@ namespace HDF5
   DataSet::write_selection<unsigned int>(
     const std::vector<unsigned int> &data,
     const std::vector<hsize_t>       coordinates);
+
+  template void
+  DataSet::write_hyperslab<std::vector, float>(
+    const std::vector<float> &  data,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template void
+  DataSet::write_hyperslab<std::vector, double>(
+    const std::vector<double> & data,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template void
+  DataSet::write_hyperslab<std::vector, long double>(
+    const std::vector<long double> &data,
+    const std::vector<hsize_t> &    offset,
+    const std::vector<hsize_t> &    count);
+  template void
+  DataSet::write_hyperslab<std::vector, std::complex<float>>(
+    const std::vector<std::complex<float>> &data,
+    const std::vector<hsize_t> &            offset,
+    const std::vector<hsize_t> &            count);
+  template void
+  DataSet::write_hyperslab<std::vector, std::complex<double>>(
+    const std::vector<std::complex<double>> &data,
+    const std::vector<hsize_t> &             offset,
+    const std::vector<hsize_t> &             count);
+  template void
+  DataSet::write_hyperslab<std::vector, std::complex<long double>>(
+    const std::vector<std::complex<long double>> &data,
+    const std::vector<hsize_t> &                  offset,
+    const std::vector<hsize_t> &                  count);
+  template void
+  DataSet::write_hyperslab<std::vector, int>(const std::vector<int> &    data,
+                                             const std::vector<hsize_t> &offset,
+                                             const std::vector<hsize_t> &count);
+  template void
+  DataSet::write_hyperslab<std::vector, unsigned int>(
+    const std::vector<unsigned int> &data,
+    const std::vector<hsize_t> &     offset,
+    const std::vector<hsize_t> &     count);
+  template void
+  DataSet::write_hyperslab<FullMatrix, float>(
+    const FullMatrix<float> &   data,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template void
+  DataSet::write_hyperslab<FullMatrix, double>(
+    const FullMatrix<double> &  data,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template void
+  DataSet::write_hyperslab<FullMatrix, std::complex<float>>(
+    const FullMatrix<std::complex<float>> &data,
+    const std::vector<hsize_t> &           offset,
+    const std::vector<hsize_t> &           count);
+  template void
+  DataSet::write_hyperslab<FullMatrix, std::complex<double>>(
+    const FullMatrix<std::complex<double>> &data,
+    const std::vector<hsize_t> &            offset,
+    const std::vector<hsize_t> &            count);
+
+  template void
+  DataSet::write_hyperslab<std::vector, float>(
+    const std::vector<float> &  data,
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
+  template void
+  DataSet::write_hyperslab<std::vector, double>(
+    const std::vector<double> & data,
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
+  template void
+  DataSet::write_hyperslab<std::vector, long double>(
+    const std::vector<long double> &data,
+    const std::vector<hsize_t> &    data_dimensions,
+    const std::vector<hsize_t> &    offset,
+    const std::vector<hsize_t> &    stride,
+    const std::vector<hsize_t> &    count,
+    const std::vector<hsize_t> &    block);
+  template void
+  DataSet::write_hyperslab<std::vector, std::complex<float>>(
+    const std::vector<std::complex<float>> &data,
+    const std::vector<hsize_t> &            data_dimensions,
+    const std::vector<hsize_t> &            offset,
+    const std::vector<hsize_t> &            stride,
+    const std::vector<hsize_t> &            count,
+    const std::vector<hsize_t> &            block);
+  template void
+  DataSet::write_hyperslab<std::vector, std::complex<double>>(
+    const std::vector<std::complex<double>> &data,
+    const std::vector<hsize_t> &             data_dimensions,
+    const std::vector<hsize_t> &             offset,
+    const std::vector<hsize_t> &             stride,
+    const std::vector<hsize_t> &             count,
+    const std::vector<hsize_t> &             block);
+  template void
+  DataSet::write_hyperslab<std::vector, std::complex<long double>>(
+    const std::vector<std::complex<long double>> &data,
+    const std::vector<hsize_t> &                  data_dimensions,
+    const std::vector<hsize_t> &                  offset,
+    const std::vector<hsize_t> &                  stride,
+    const std::vector<hsize_t> &                  count,
+    const std::vector<hsize_t> &                  block);
+  template void
+  DataSet::write_hyperslab<std::vector, int>(
+    const std::vector<int> &    data,
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
+  template void
+  DataSet::write_hyperslab<std::vector, unsigned int>(
+    const std::vector<unsigned int> &data,
+    const std::vector<hsize_t> &     data_dimensions,
+    const std::vector<hsize_t> &     offset,
+    const std::vector<hsize_t> &     stride,
+    const std::vector<hsize_t> &     count,
+    const std::vector<hsize_t> &     block);
+  template void
+  DataSet::write_hyperslab<FullMatrix, float>(
+    const FullMatrix<float> &   data,
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
+  template void
+  DataSet::write_hyperslab<FullMatrix, double>(
+    const FullMatrix<double> &  data,
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
+  template void
+  DataSet::write_hyperslab<FullMatrix, std::complex<float>>(
+    const FullMatrix<std::complex<float>> &data,
+    const std::vector<hsize_t> &           data_dimensions,
+    const std::vector<hsize_t> &           offset,
+    const std::vector<hsize_t> &           stride,
+    const std::vector<hsize_t> &           count,
+    const std::vector<hsize_t> &           block);
+  template void
+  DataSet::write_hyperslab<FullMatrix, std::complex<double>>(
+    const FullMatrix<std::complex<double>> &data,
+    const std::vector<hsize_t> &            data_dimensions,
+    const std::vector<hsize_t> &            offset,
+    const std::vector<hsize_t> &            stride,
+    const std::vector<hsize_t> &            count,
+    const std::vector<hsize_t> &            block);
 
   template void
   DataSet::write_none<float>();

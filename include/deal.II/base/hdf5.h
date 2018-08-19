@@ -29,7 +29,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Namespace containing the HDF5 wrappers.
+ * Namespace containing the HDF5 interface.
  *
  * This set of classes can be used to store the data in the hdf5 file format.
  *
@@ -247,10 +247,26 @@ namespace HDF5
                     const std::vector<hsize_t> coordinates);
 
     /**
-     * Writes data to a subset of the dataset. T can be double, int, unsigned
-     * int, bool or std::complex<double>.
+     * Writes a data hyperslab to the dataset. The parameters are summarized
+     * below:
+     *  - Offset: The starting location for the hyperslab.
+     *  - Count: The number of elements to select along each dimension.
+     */
+    // clang-format off
+    /**
      *
-     * The selected elements form a hyperslab in the dataset.
+     * stride and block are set to NULL. For more complex hyperslabs see
+     * write_hyperslab(const Container<T> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
+     */
+    // clang-format on
+    /**
+     *
+     * See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">"Dataspaces
+     * and Data Transfer"</a>  section in the HDF5 User's Guide. See as well the
+     * <a
+     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">"H5Sselect_hyperslab
+     * definition"</a>.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -260,9 +276,43 @@ namespace HDF5
      */
     template <template <class...> class Container, typename T>
     void
-    write_hyperslab(const Container<T> &       data,
-                    const std::vector<hsize_t> offset,
-                    const std::vector<hsize_t> count);
+    write_hyperslab(const Container<T> &        data,
+                    const std::vector<hsize_t> &offset,
+                    const std::vector<hsize_t> &count);
+
+    /**
+     * Writes a data hyperslab to the dataset. The parameters are summarized
+     * below:
+     *  - Dataset_dimensions: the dimensions of the data memory block.
+     *  - Offset: The starting location for the hyperslab.
+     *  - Stride: The number of elements to separate each element or block to be
+     * selected.
+     *  - Count: The number of elements or blocks to select along each
+     * dimension.
+     *  - Block: The size of the block selected from the dataspace.
+     *
+     * See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">"Dataspaces
+     * and Data Transfer"</a>  section in the HDF5 User's Guide. See as well the
+     * <a
+     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">"H5Sselect_hyperslab
+     * definition"</a>.
+     *
+     * Datatype conversion takes place at the time of a read or write and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">"Data
+     * Transfer: Datatype Conversion and Selection"</a>  section in the HDF5
+     * User's Guide.
+     */
+    template <template <class...> class Container, typename T>
+    void
+    write_hyperslab(const Container<T> &        data,
+                    const std::vector<hsize_t> &data_dimensions,
+                    const std::vector<hsize_t> &offset,
+                    const std::vector<hsize_t> &stride,
+                    const std::vector<hsize_t> &count,
+                    const std::vector<hsize_t> &block);
+
 
     /**
      * This function does not write any data, but can contribute to a collective
