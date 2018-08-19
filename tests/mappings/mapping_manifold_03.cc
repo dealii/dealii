@@ -99,8 +99,7 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<1, 1>();
   test<1, 2>();
@@ -110,6 +109,4 @@ main()
   test<2, 3>();
 
   test<3, 3>();
-
-  return 0;
 }

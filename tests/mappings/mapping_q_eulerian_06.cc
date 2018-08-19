@@ -36,8 +36,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
 void
 test(unsigned int degree)
 {
@@ -83,10 +81,9 @@ test(unsigned int degree)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test(1);
   test(2);
   test(3);
-  return 0;
 }

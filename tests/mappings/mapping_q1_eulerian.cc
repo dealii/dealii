@@ -105,12 +105,9 @@ show_values()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
-
-
 
   deallog.push("1d");
   show_values<1>();
@@ -123,6 +120,4 @@ main()
   deallog.push("3d");
   show_values<3>();
   deallog.pop();
-
-  return 0;
 }

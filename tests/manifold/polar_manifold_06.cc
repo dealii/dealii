@@ -54,13 +54,9 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<2, 2>();
   test<2, 3>();
-
   test<3, 3>();
-
-  return 0;
 }

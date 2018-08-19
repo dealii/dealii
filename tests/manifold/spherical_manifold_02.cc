@@ -98,13 +98,13 @@ test(MappingEnum::type mapping_name, unsigned int refinements = 1)
   triangulation.refine_global(refinements);
   dof_handler.distribute_dofs(fe);
 
-  {
-    // Save mesh to file for visualization
-    GridOut       grid_out;
-    std::ofstream grid_file("grid.vtk");
-    grid_out.write_vtk(triangulation, grid_file);
-    // deallog << "Grid has been saved into grid.vtk" << std::endl;
-  }
+  if (false) // reenable for visualization
+    {
+      GridOut       grid_out;
+      std::ofstream grid_file("grid.vtk");
+      grid_out.write_vtk(triangulation, grid_file);
+      // deallog << "Grid has been saved into grid.vtk" << std::endl;
+    }
 
   // deallog << "Surface mesh has " << triangulation.n_active_cells()
   //           << " cells."
@@ -174,6 +174,4 @@ main()
   for (unsigned int i = 1; i < 8; ++i)
     test(MappingEnum::MappingQ, i);
   deallog << bar << std::endl;
-
-  return 0;
 }

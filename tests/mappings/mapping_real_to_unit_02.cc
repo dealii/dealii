@@ -82,10 +82,7 @@ test2()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test2<2>();
-
-  return 0;
 }

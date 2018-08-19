@@ -38,8 +38,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(unsigned int degree)
@@ -59,7 +57,7 @@ test(unsigned int degree)
 
   GridOut grid_out;
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 
   QTrapez<dim>                                    quad;
   MappingQEulerian<dim, Vector<double>, spacedim> mapping(degree,
@@ -89,7 +87,7 @@ test(unsigned int degree)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<1, 1>(1);
   test<2, 2>(1);
@@ -98,5 +96,4 @@ main()
   test<1, 1>(2);
   test<2, 2>(2);
   test<3, 3>(2);
-  return 0;
 }
