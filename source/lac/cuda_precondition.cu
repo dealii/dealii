@@ -1311,6 +1311,7 @@ namespace CUDAWrappers
     n_nonzero_elements = A.n_nonzero_elements();
     AssertDimension(A.m(), A.n());
 
+    matrix_pointer                      = &A;
     const auto          cusparse_matrix = A.get_cusparse_matrix();
     const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
 
@@ -1626,7 +1627,7 @@ namespace CUDAWrappers
         policy_M = CUSPARSE_SOLVE_POLICY_NO_LEVEL;
       }
 
-
+    matrix_pointer     = &A;
     n_rows             = A.m();
     n_nonzero_elements = A.n_nonzero_elements();
     AssertDimension(A.m(), A.n());

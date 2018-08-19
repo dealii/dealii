@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/cuda.h>
+#include <deal.II/base/smartpointer.h>
 
 #include <memory>
 
@@ -190,6 +191,11 @@ namespace CUDAWrappers
     csrsv2Info_t info_Lt;
 
     /**
+     * Pointer to the matrix this object was initialized with.
+     */
+    SmartPointer<const SparseMatrix<Number>> matrix_pointer;
+
+    /**
      * Pointer to the values (on the device) of the computed preconditioning
      * matrix.
      */
@@ -197,13 +203,13 @@ namespace CUDAWrappers
 
     /**
      * Pointer to the row pointer (on the device) of the sparse matrix this
-     * object was initialized with.
+     * object was initialized with. Guarded by matrix_pointer.
      */
     const int *P_row_ptr_dev;
 
     /**
      * Pointer to the column indices (on the device) of the sparse matrix this
-     * object was initialized with.
+     * object was initialized with. Guarded by matrix_pointer.
      */
     const int *P_column_index_dev;
 
@@ -404,6 +410,11 @@ namespace CUDAWrappers
     csrsv2Info_t info_U;
 
     /**
+     * Pointer to the matrix this object was initialized with.
+     */
+    SmartPointer<const SparseMatrix<Number>> matrix_pointer;
+
+    /**
      * Pointer to the values (on the device) of the computed preconditioning
      * matrix.
      */
@@ -411,13 +422,13 @@ namespace CUDAWrappers
 
     /**
      * Pointer to the row pointer (on the device) of the sparse matrix this
-     * object was initialized with.
+     * object was initialized with. Guarded by matrix_pointer.
      */
     const int *P_row_ptr_dev;
 
     /**
      * Pointer to the column indices (on the device) of the sparse matrix this
-     * object was initialized with.
+     * object was initialized with. Guarded by matrix_pointer.
      */
     const int *P_column_index_dev;
 
