@@ -190,7 +190,7 @@ namespace HDF5
 
   public:
     /**
-     * Reads data of the dataset. T can be float, double, long double,
+     * Reads data of the dataset. Number can be float, double, long double,
      * std::complex<float>, std::complex<double>, std::complex<long double>, int
      * or unsigned int.
      *
@@ -200,12 +200,12 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename T>
-    Container<T>
+    template <template <class...> class Container, typename number>
+    Container<number>
     read();
 
     /**
-     * Reads data of a subset of the dataset. T can be float, double, long
+     * Reads data of a subset of the dataset. Number can be float, double, long
      * double, std::complex<float>, std::complex<double>,
      * std::complex<long double>, int or unsigned int.
      *
@@ -231,8 +231,8 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
-    std::vector<T>
+    template <typename number>
+    std::vector<number>
     read_selection(const std::vector<hsize_t> coordinates);
 
     /**
@@ -256,14 +256,14 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename T>
-    Container<T>
+    template <template <class...> class Container, typename number>
+    Container<number>
     read_hyperslab(const std::vector<hsize_t> &offset,
                    const std::vector<hsize_t> &count);
 
     /**
      * This function does not read any data, but can contribute to a collective
-     * read call. T can be float, double, long double, std::complex<float>,
+     * read call. Number can be float, double, long double, std::complex<float>,
      * std::complex<double>, std::complex<long double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -272,12 +272,12 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <typename number>
     void
     read_none();
 
     /**
-     * Writes data in the dataset. T can be float, double, long double,
+     * Writes data in the dataset. Number can be float, double, long double,
      * std::complex<float>, std::complex<double>, std::complex<long double>, int
      * or unsigned int.
      *
@@ -287,12 +287,12 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename T>
+    template <template <class...> class Container, typename number>
     void
-    write(const Container<T> &data);
+    write(const Container<number> &data);
 
     /**
-     * Writes data to a subset of the dataset. T can be float, double, long
+     * Writes data to a subset of the dataset. Number can be float, double, long
      * double, std::complex<float>, std::complex<double>,
      * std::complex<long double>, int or unsigned int.
      *
@@ -318,9 +318,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <typename number>
     void
-    write_selection(const std::vector<T> &     data,
+    write_selection(const std::vector<number> &data,
                     const std::vector<hsize_t> coordinates);
 
     /**
@@ -333,7 +333,7 @@ namespace HDF5
     /**
      *
      * Stride and block are set to NULL. For more complex hyperslabs see
-     * write_hyperslab(const Container<T> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
+     * write_hyperslab(const Container<number> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
      */
     // clang-format on
     /**
@@ -351,9 +351,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename T>
+    template <template <class...> class Container, typename number>
     void
-    write_hyperslab(const Container<T> &        data,
+    write_hyperslab(const Container<number> &   data,
                     const std::vector<hsize_t> &offset,
                     const std::vector<hsize_t> &count);
 
@@ -381,9 +381,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename T>
+    template <template <class...> class Container, typename number>
     void
-    write_hyperslab(const Container<T> &        data,
+    write_hyperslab(const Container<number> &   data,
                     const std::vector<hsize_t> &data_dimensions,
                     const std::vector<hsize_t> &offset,
                     const std::vector<hsize_t> &stride,
@@ -392,8 +392,9 @@ namespace HDF5
 
     /**
      * This function does not write any data, but can contribute to a collective
-     * write call. T can be float, double, long double, std::complex<float>,
-     * std::complex<double>, std::complex<long double>, int or unsigned int.
+     * write call. Number can be float, double, long double,
+     * std::complex<float>, std::complex<double>, std::complex<long double>, int
+     * or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -401,7 +402,7 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <typename number>
     void
     write_none();
 
@@ -523,8 +524,9 @@ namespace HDF5
     dataset(const std::string name);
 
     /**
-     * Creates a dataset. T can be double, int, unsigned int, bool or
-     * std::complex<double>.
+     * Creates a dataset. Number can be float, double, long
+     * double, std::complex<float>, std::complex<double>,
+     * std::complex<long double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -532,14 +534,15 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <typename number>
     DataSet
     create_dataset(const std::string          name,
                    const std::vector<hsize_t> dimensions) const;
 
     /**
-     * Creates and writes data to a dataset. T can be double, int, unsigned int,
-     * bool or std::complex<double>.
+     * Creates and writes data to a dataset. Number can be float, double, long
+     * double, std::complex<float>, std::complex<double>,
+     * std::complex<long double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -547,13 +550,14 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <typename number>
     void
-    write_dataset(const std::string name, const std::vector<T> &data) const;
+    write_dataset(const std::string          name,
+                  const std::vector<number> &data) const;
 
     /**
-     * Creates and writes data to a dataset. T can be double, int, unsigned int,
-     * bool or std::complex<double>.
+     * Creates and writes data to a dataset. Number can be double, int, unsigned
+     * int, bool or std::complex<double>.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -561,9 +565,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename T>
+    template <typename number>
     void
-    write_dataset(const std::string name, const FullMatrix<T> &data) const;
+    write_dataset(const std::string name, const FullMatrix<number> &data) const;
   };
 
   /**
