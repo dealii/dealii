@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 // Check that dealii::SolverCG works with CUDAWrappers::SparseMatrix
+// and PreconditionIC
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/exceptions.h>
