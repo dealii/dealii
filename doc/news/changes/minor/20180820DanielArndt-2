@@ -1,0 +1,4 @@
+New: CUDAWrappers::PreconditionILU and CUDAWrappers::PreconditionIC can be used
+for preconditioning CUDAWrappers::SparseMatrix objects.
+<br>
+(Daniel Arndt, 2018/08/20)
