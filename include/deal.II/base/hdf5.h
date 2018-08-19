@@ -128,8 +128,9 @@ namespace HDF5
     };
 
     /**
-     * Reads an attribute. T can be double, int, unsigned int, bool,
-     * std::complex<double> or std::string. Note that the encoding of
+     * Reads an attribute. T can be float, double, long double,
+     * std::complex<float>, std::complex<double>, std::complex<long double>,
+     * int, unsigned int, bool or std::string. Note that the encoding of
      * std::string is UTF8 in order to be compatible with python3.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -143,8 +144,9 @@ namespace HDF5
     attr(const std::string attr_name) const;
 
     /**
-     * Writes an attribute. T can be double, int, unsigned int, bool,
-     * std::complex<double> or std::string. Note that the encoding of
+     * Reads an attribute. T can be float, double, long double,
+     * std::complex<float>, std::complex<double>, std::complex<long double>,
+     * int, unsigned int, bool or std::string. Note that the encoding of
      * std::string is UTF8 in order to be compatible with python3.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -188,8 +190,9 @@ namespace HDF5
 
   public:
     /**
-     * Reads data of the dataset. T can be double, int, unsigned int, bool
-     * or std::complex<double>.
+     * Reads data of the dataset. T can be float, double, long double,
+     * std::complex<float>, std::complex<double>, std::complex<long double>, int
+     * or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -202,8 +205,81 @@ namespace HDF5
     read();
 
     /**
-     * Writes data in the dataset. T can be double, int, unsigned int,
-     * or std::complex<double>.
+     * Reads data of a subset of the dataset. T can be float, double, long
+     * double, std::complex<float>, std::complex<double>,
+     * std::complex<long double>, int or unsigned int.
+     *
+     * The selected elements can be scattered and take any shape in the dataset.
+     * For examples, in the 4D case, we will be selecting three points and a 4D
+     * dataspace has rank 4, so the selection will be described in a 3-by-4
+     * array. To select the points (1,1,1,1), (14,6,12,18), and (8,22,30,22),
+     * the point selection array would be as follows:
+     *
+     *    0  0  0  0
+     *
+     *   13  5 11 17
+     *
+     *    7 21 29 21
+     *
+     * <a
+     * href="https://support.hdfgroup.org/newsletters/newsletter140.html">Parallel
+     * HDF5 supports collective I/O on point selections.</a>
+     *
+     * Datatype conversion takes place at the time of a read or write and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
+     * User's Guide.
+     */
+    template <typename T>
+    std::vector<T>
+    read_selection(const std::vector<hsize_t> coordinates);
+
+    /**
+     * Reads a hyperslab from the dataset. The parameters are summarized
+     * below:
+     *  - Offset: The starting location for the hyperslab.
+     *  - Count: The number of elements to select along each dimension.
+     *
+     * Stride and block are set to NULL.
+     *
+     * See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
+     * and Data Transfer</a>  section in the HDF5 User's Guide. See as well the
+     * <a
+     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
+     * definition</a>.
+     *
+     * Datatype conversion takes place at the time of a read or read and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
+     * User's Guide.
+     */
+    template <template <class...> class Container, typename T>
+    Container<T>
+    read_hyperslab(const std::vector<hsize_t> &offset,
+                   const std::vector<hsize_t> &count);
+
+    /**
+     * This function does not read any data, but can contribute to a collective
+     * read call. T can be float, double, long double, std::complex<float>,
+     * std::complex<double>, std::complex<long double>, int or unsigned int.
+     *
+     * Datatype conversion takes place at the time of a read or write and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
+     * User's Guide.
+     */
+    template <typename T>
+    void
+    read_none();
+
+    /**
+     * Writes data in the dataset. T can be float, double, long double,
+     * std::complex<float>, std::complex<double>, std::complex<long double>, int
+     * or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -216,8 +292,9 @@ namespace HDF5
     write(const Container<T> &data);
 
     /**
-     * Writes data to a subset of the dataset. T can be double, int, unsigned
-     * int, bool or std::complex<double>.
+     * Writes data to a subset of the dataset. T can be float, double, long
+     * double, std::complex<float>, std::complex<double>,
+     * std::complex<long double>, int or unsigned int.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For examples, in the 4D case, we will be selecting three points and a 4D
@@ -255,7 +332,7 @@ namespace HDF5
     // clang-format off
     /**
      *
-     * stride and block are set to NULL. For more complex hyperslabs see
+     * Stride and block are set to NULL. For more complex hyperslabs see
      * write_hyperslab(const Container<T> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
      */
     // clang-format on
@@ -313,11 +390,10 @@ namespace HDF5
                     const std::vector<hsize_t> &count,
                     const std::vector<hsize_t> &block);
 
-
     /**
      * This function does not write any data, but can contribute to a collective
-     * write call. T can be double, int, unsigned int, bool or
-     * std::complex<double>.
+     * write call. T can be float, double, long double, std::complex<float>,
+     * std::complex<double>, std::complex<long double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a

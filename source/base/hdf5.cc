@@ -502,6 +502,194 @@ namespace HDF5
     return data;
   }
 
+  template <typename T>
+  std::vector<T>
+  DataSet::read_selection(const std::vector<hsize_t> coordinates)
+  {
+    Assert(coordinates.size() % _rank == 0,
+           ExcMessage(
+             "The dimension of coordinates has to be divisible by the rank"));
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    hid_t                  plist;
+    hid_t                  memory_dataspace;
+    herr_t                 ret;
+
+    std::vector<hsize_t> data_dimensions{
+      static_cast<hsize_t>(coordinates.size() / _rank)};
+
+    std::vector<T> data(static_cast<unsigned int>(coordinates.size() / _rank));
+
+    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_elements(*dataspace,
+                             H5S_SELECT_SET,
+                             data.size(),
+                             coordinates.data());
+    Assert(ret >= 0, ExcMessage("Error at H5Sselect_elements"));
+
+    if (mpi)
+      {
+        plist = H5Pcreate(H5P_DATASET_XFER);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
+      }
+    else
+      {
+        plist = H5P_DEFAULT;
+      }
+
+    ret = H5Dread(*hdf5_reference,
+                  *t_type,
+                  memory_dataspace,
+                  *dataspace,
+                  plist,
+                  data.data());
+    Assert(ret >= 0, ExcMessage("Error at H5Dread"));
+
+    if (mpi)
+      {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
+          }
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
+      }
+
+    ret = H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5SClose"));
+
+    return data;
+  }
+
+  template <template <class...> class Container, typename T>
+  Container<T>
+  DataSet::read_hyperslab(const std::vector<hsize_t> &offset,
+                          const std::vector<hsize_t> &count)
+  {
+    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    hid_t                  plist;
+    hid_t                  memory_dataspace;
+    herr_t                 ret;
+
+    // In this particular overload of read_hyperslab the data_dimensions are
+    // the same as count
+    std::vector<hsize_t> data_dimensions = count;
+
+    Container<T> data =
+      internal::initialize_container<Container, T>(data_dimensions);
+
+    memory_dataspace =
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_hyperslab(
+      *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
+    Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
+
+    if (mpi)
+      {
+        plist = H5Pcreate(H5P_DATASET_XFER);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
+      }
+    else
+      {
+        plist = H5P_DEFAULT;
+      }
+
+    ret = H5Dread(*hdf5_reference,
+                  *t_type,
+                  memory_dataspace,
+                  *dataspace,
+                  plist,
+                  internal::get_container_pointer<Container, T>(data));
+    Assert(ret >= 0, ExcMessage("Error at H5Dread"));
+
+    if (mpi)
+      {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
+          }
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
+      }
+
+    ret = H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5SClose"));
+
+    return data;
+  }
+
+  template <typename T>
+  void
+  DataSet::read_none()
+  {
+    std::shared_ptr<hid_t> t_type          = internal::get_hdf5_datatype<T>();
+    std::vector<hsize_t>   data_dimensions = {0};
+
+    hid_t  memory_dataspace;
+    hid_t  plist;
+    herr_t ret;
+
+    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_none(*dataspace);
+    Assert(ret >= 0, ExcMessage("H5Sselect_none"));
+
+    if (mpi)
+      {
+        plist = H5Pcreate(H5P_DATASET_XFER);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
+      }
+    else
+      {
+        plist = H5P_DEFAULT;
+      }
+
+    // The pointer of data can safely be NULL, see the discussion at the HDF5
+    // forum:
+    // https://forum.hdfgroup.org/t/parallel-i-o-does-not-support-filters-yet/884/17
+    ret = H5Dread(
+      *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, NULL);
+    Assert(ret >= 0, ExcMessage("Error at H5Dread"));
+
+    if (mpi)
+      {
+        if (_check_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &_local_no_collective_cause,
+                                                  &_global_no_collective_cause);
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
+          }
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
+      }
+
+    ret = H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5SClose"));
+  }
+
   template <template <class...> class Container, typename T>
   void
   DataSet::write(const Container<T> &data)
@@ -558,42 +746,49 @@ namespace HDF5
 
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
-    H5Sselect_elements(*dataspace,
-                       H5S_SELECT_SET,
-                       data.size(),
-                       coordinates.data());
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_elements(*dataspace,
+                             H5S_SELECT_SET,
+                             data.size(),
+                             coordinates.data());
+    Assert(ret >= 0, ExcMessage("Error at H5Sselect_elements"));
 
     if (mpi)
       {
         plist = H5Pcreate(H5P_DATASET_XFER);
-        H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
       }
     else
       {
         plist = H5P_DEFAULT;
       }
 
-    H5Dwrite(*hdf5_reference,
-             *t_type,
-             memory_dataspace,
-             *dataspace,
-             plist,
-             data.data());
+    ret = H5Dwrite(*hdf5_reference,
+                   *t_type,
+                   memory_dataspace,
+                   *dataspace,
+                   plist,
+                   data.data());
+    Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
       {
         if (_check_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
-            Assert(ret >= 0, ExcInternalError());
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
             ret = H5Pget_mpio_no_collective_cause(plist,
                                                   &_local_no_collective_cause,
                                                   &_global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
           }
         H5Pclose(plist);
       }
-    H5Sclose(memory_dataspace);
+    ret = H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5SClose"));
   }
 
   template <template <class...> class Container, typename T>
@@ -1221,6 +1416,90 @@ namespace HDF5
   DataSet::read<FullMatrix, std::complex<float>>();
   template FullMatrix<std::complex<double>>
   DataSet::read<FullMatrix, std::complex<double>>();
+
+  template std::vector<float>
+  DataSet::read_selection<float>(const std::vector<hsize_t> coordinates);
+  template std::vector<double>
+  DataSet::read_selection<double>(const std::vector<hsize_t> coordinates);
+  template std::vector<long double>
+  DataSet::read_selection<long double>(const std::vector<hsize_t> coordinates);
+  template std::vector<std::complex<float>>
+  DataSet::read_selection<std::complex<float>>(
+    const std::vector<hsize_t> coordinates);
+  template std::vector<std::complex<double>>
+  DataSet::read_selection<std::complex<double>>(
+    const std::vector<hsize_t> coordinates);
+  template std::vector<std::complex<long double>>
+  DataSet::read_selection<std::complex<long double>>(
+    const std::vector<hsize_t> coordinates);
+  template std::vector<int>
+  DataSet::read_selection<int>(const std::vector<hsize_t> coordinates);
+  template std::vector<unsigned int>
+  DataSet::read_selection<unsigned int>(const std::vector<hsize_t> coordinates);
+
+  template std::vector<float>
+  DataSet::read_hyperslab<std::vector, float>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template std::vector<double>
+  DataSet::read_hyperslab<std::vector, double>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template std::vector<long double>
+  DataSet::read_hyperslab<std::vector, long double>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template std::vector<std::complex<float>>
+  DataSet::read_hyperslab<std::vector, std::complex<float>>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template std::vector<std::complex<double>>
+  DataSet::read_hyperslab<std::vector, std::complex<double>>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template std::vector<std::complex<long double>>
+  DataSet::read_hyperslab<std::vector, std::complex<long double>>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template std::vector<int>
+  DataSet::read_hyperslab<std::vector, int>(const std::vector<hsize_t> &offset,
+                                            const std::vector<hsize_t> &count);
+  template std::vector<unsigned int>
+  DataSet::read_hyperslab<std::vector, unsigned int>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template FullMatrix<float>
+  DataSet::read_hyperslab<FullMatrix, float>(const std::vector<hsize_t> &offset,
+                                             const std::vector<hsize_t> &count);
+  template FullMatrix<double>
+  DataSet::read_hyperslab<FullMatrix, double>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template FullMatrix<std::complex<float>>
+  DataSet::read_hyperslab<FullMatrix, std::complex<float>>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+  template FullMatrix<std::complex<double>>
+  DataSet::read_hyperslab<FullMatrix, std::complex<double>>(
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &count);
+
+  template void
+  DataSet::read_none<float>();
+  template void
+  DataSet::read_none<double>();
+  template void
+  DataSet::read_none<long double>();
+  template void
+  DataSet::read_none<std::complex<float>>();
+  template void
+  DataSet::read_none<std::complex<double>>();
+  template void
+  DataSet::read_none<std::complex<long double>>();
+  template void
+  DataSet::read_none<int>();
+  template void
+  DataSet::read_none<unsigned int>();
 
   template void
   DataSet::write<std::vector, float>(const std::vector<float> &data);
