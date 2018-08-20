@@ -83,7 +83,7 @@
  * where also preconditioning can be done in a matrix-free way, as
  * demonstrated in the step-37 and step-59 tutorial programs.
  *
- * <h3>Internal layout of matrix-free infrastructure</h3>
+ * <h3>The matrix-free evaluation infrastructure</h3>
  *
  * The top level interface is provided by the FEEvaluation class, which also
  * contains an extensive description of different use cases.
@@ -171,7 +171,7 @@
  * by somewhat increased compile times because the compiler needs to generate
  * code for all paths, though).
  *
- * <h3>The data storage in MatrixFree</h3>
+ * <h3>The data storage through the MatrixFree class</h3>
  *
  * The tasks performed by FEEvaluation and FEFaceEvaluation can be split into
  * the three categories <i>index access into vectors</i>, <i>evaluation and
@@ -260,7 +260,11 @@
  * access patterns and the data in this special case is small, we are better
  * off storing 3 such vectors, one for the faces decorated as `interior`
  * (index 0), one for the faces decorated as `exterior` (index 1), and one for
- * the cells (index 2), rather than using the indirection through FaceInfo.
+ * the cells (index 2), rather than using the indirection through
+ * FaceInfo. There is a series of additional special storage formats available
+ * in DoFInfo. We refer to the documentation of the struct
+ * internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants for the
+ * options implemented in deal.II and their motivation.
  *
  * Finally, the DoFInfo class also holds a shared pointer describing the
  * parallel partitioning of the vectors. Due to the restriction of

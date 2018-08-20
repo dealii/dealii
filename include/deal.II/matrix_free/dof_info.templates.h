@@ -167,6 +167,14 @@ namespace internal
       start_components.clear();
       row_starts_plain_indices.clear();
       plain_dof_indices.clear();
+      dof_indices_interleaved.clear();
+      for (unsigned int i = 0; i < 3; ++i)
+        {
+          index_storage_variants[i].clear();
+          dof_indices_contiguous[i].clear();
+          dof_indices_interleave_strides[i].clear();
+          n_vectorization_lanes_filled[i].clear();
+        }
       store_plain_indices = false;
       cell_active_fe_index.clear();
       max_fe_index = 0;
@@ -699,9 +707,14 @@ namespace internal
         numbers::invalid_unsigned_int);
       dof_indices_interleaved.resize(dof_indices.size(),
                                      numbers::invalid_unsigned_int);
+      dof_indices_interleave_strides[dof_access_cell].resize(
+        irregular_cells.size() * vectorization_length,
+        numbers::invalid_unsigned_int);
 
       std::vector<unsigned int> index_kinds(
-        static_cast<unsigned int>(IndexStorageVariants::contiguous) + 1);
+        static_cast<unsigned int>(
+          IndexStorageVariants::interleaved_contiguous_mixed_strides) +
+        1);
       std::vector<unsigned int> offsets(vectorization_length);
       for (unsigned int i = 0; i < irregular_cells.size(); ++i)
         {
@@ -745,8 +758,10 @@ namespace internal
                         break;
                       }
                 }
+
               bool indices_are_interleaved_and_contiguous =
                 (ndofs > 1 && n_comp == vectorization_length);
+
               {
                 const unsigned int *dof_indices =
                   this->dof_indices.data() +
@@ -760,6 +775,7 @@ namespace internal
                         break;
                       }
               }
+
               if (indices_are_contiguous ||
                   indices_are_interleaved_and_contiguous)
                 {
@@ -772,52 +788,201 @@ namespace internal
                                             .first];
                 }
 
-              if (indices_are_contiguous)
+              if (indices_are_interleaved_and_contiguous)
+                {
+                  Assert(n_comp == vectorization_length, ExcInternalError());
+                  index_storage_variants[dof_access_cell][i] =
+                    IndexStorageVariants::interleaved_contiguous;
+                  for (unsigned int j = 0; j < n_comp; ++j)
+                    dof_indices_interleave_strides[2][i * vectorization_length +
+                                                      j] = n_comp;
+                }
+              else if (indices_are_contiguous)
                 {
                   index_storage_variants[dof_access_cell][i] =
                     IndexStorageVariants::contiguous;
+                  for (unsigned int j = 0; j < n_comp; ++j)
+                    dof_indices_interleave_strides[2][i * vectorization_length +
+                                                      j] = 1;
                 }
               else
                 {
+                  int                 indices_are_interleaved_and_mixed = 2;
                   const unsigned int *dof_indices =
-                    this->dof_indices.data() +
-                    row_starts[i * vectorization_length * n_components].first;
-                  if (n_comp == vectorization_length)
-                    index_storage_variants[dof_access_cell][i] =
-                      IndexStorageVariants::interleaved;
-                  else
-                    index_storage_variants[dof_access_cell][i] =
-                      IndexStorageVariants::full;
-
-                  // do not use interleaved storage if two vectorized
-                  // components point to the same field (scatter not possible)
+                    &this->dof_indices[row_starts[i * vectorization_length *
+                                                  n_components]
+                                         .first];
+                  for (unsigned int j = 0; j < n_comp; ++j)
+                    offsets[j] =
+                      dof_indices[j * ndofs + 1] - dof_indices[j * ndofs];
                   for (unsigned int k = 0; k < ndofs; ++k)
-                    for (unsigned int l = 0; l < n_comp; ++l)
-                      for (unsigned int j = l + 1; j < n_comp; ++j)
-                        if (dof_indices[j * ndofs + k] ==
-                            dof_indices[l * ndofs + k])
+                    for (unsigned int j = 0; j < n_comp; ++j)
+                      if (dof_indices[j * ndofs + k] !=
+                          dof_indices[j * ndofs] + k * offsets[j])
+                        {
+                          indices_are_interleaved_and_mixed = 0;
+                          break;
+                        }
+                  if (indices_are_interleaved_and_mixed == 2)
+                    {
+                      for (unsigned int j = 0; j < n_comp; ++j)
+                        dof_indices_interleave_strides
+                          [dof_access_cell][i * vectorization_length + j] =
+                            offsets[j];
+                      for (unsigned int j = 0; j < n_comp; ++j)
+                        dof_indices_contiguous[dof_access_cell]
+                                              [i * vectorization_length + j] =
+                                                dof_indices[j * ndofs];
+                      for (unsigned int j = 0; j < n_comp; ++j)
+                        if (offsets[j] != vectorization_length)
                           {
-                            index_storage_variants[dof_access_cell][i] =
-                              IndexStorageVariants::full;
+                            indices_are_interleaved_and_mixed = 1;
                             break;
                           }
-                  if (index_storage_variants[dof_access_cell][i] !=
-                      IndexStorageVariants::full)
+                      if (indices_are_interleaved_and_mixed == 1 ||
+                          n_comp != vectorization_length)
+                        index_storage_variants[dof_access_cell][i] =
+                          IndexStorageVariants::
+                            interleaved_contiguous_mixed_strides;
+                      else
+                        index_storage_variants[dof_access_cell][i] =
+                          IndexStorageVariants::interleaved_contiguous_strided;
+                    }
+                  else
                     {
-                      unsigned int *interleaved_dof_indices =
-                        this->dof_indices_interleaved.data() +
+                      const unsigned int *dof_indices =
+                        this->dof_indices.data() +
                         row_starts[i * vectorization_length * n_components]
                           .first;
+                      if (n_comp == vectorization_length)
+                        index_storage_variants[dof_access_cell][i] =
+                          IndexStorageVariants::interleaved;
+                      else
+                        index_storage_variants[dof_access_cell][i] =
+                          IndexStorageVariants::full;
+
+                      // do not use interleaved storage if two vectorized
+                      // components point to the same field (scatter not
+                      // possible)
                       for (unsigned int k = 0; k < ndofs; ++k)
-                        for (unsigned int j = 0; j < n_comp; ++j)
-                          interleaved_dof_indices[k * n_comp + j] =
-                            dof_indices[j * ndofs + k];
+                        for (unsigned int l = 0; l < n_comp; ++l)
+                          for (unsigned int j = l + 1; j < n_comp; ++j)
+                            if (dof_indices[j * ndofs + k] ==
+                                dof_indices[l * ndofs + k])
+                              {
+                                index_storage_variants[dof_access_cell][i] =
+                                  IndexStorageVariants::full;
+                                break;
+                              }
                     }
                 }
             }
           index_kinds[static_cast<unsigned int>(
             index_storage_variants[dof_access_cell][i])]++;
         }
+
+      // Cleanup phase: we want to avoid single cells with different properties
+      // than the bulk of the domain in order to avoid extra checks in the face
+      // identification.
+
+      // Step 1: check whether the interleaved indices were only assigned to
+      // the single cell within a vectorized array.
+      auto fix_single_interleaved_indices =
+        [&](const IndexStorageVariants variant) {
+          if (index_kinds[static_cast<unsigned int>(
+                IndexStorageVariants::interleaved_contiguous_mixed_strides)] >
+                0 &&
+              index_kinds[static_cast<unsigned int>(variant)] > 0)
+            for (unsigned int i = 0; i < irregular_cells.size(); ++i)
+              {
+                if (index_storage_variants[dof_access_cell][i] ==
+                      IndexStorageVariants::
+                        interleaved_contiguous_mixed_strides &&
+                    n_vectorization_lanes_filled[dof_access_cell][i] == 1 &&
+                    (variant != IndexStorageVariants::contiguous ||
+                     dof_indices_interleave_strides[dof_access_cell]
+                                                   [i * vectorization_length] ==
+                       1))
+                  {
+                    index_storage_variants[dof_access_cell][i] = variant;
+                    index_kinds[static_cast<unsigned int>(
+                      IndexStorageVariants::
+                        interleaved_contiguous_mixed_strides)]--;
+                    index_kinds[static_cast<unsigned int>(variant)]++;
+                  }
+              }
+        };
+
+      fix_single_interleaved_indices(IndexStorageVariants::full);
+      fix_single_interleaved_indices(IndexStorageVariants::contiguous);
+      fix_single_interleaved_indices(IndexStorageVariants::interleaved);
+
+      unsigned int n_interleaved =
+        index_kinds[static_cast<unsigned int>(
+          IndexStorageVariants::interleaved_contiguous)] +
+        index_kinds[static_cast<unsigned int>(
+          IndexStorageVariants::interleaved_contiguous_strided)] +
+        index_kinds[static_cast<unsigned int>(
+          IndexStorageVariants::interleaved_contiguous_mixed_strides)];
+
+      // Step 2: fix single contiguous cell among others with interleaved
+      // storage
+      if (n_interleaved > 0 && index_kinds[static_cast<unsigned int>(
+                                 IndexStorageVariants::contiguous)] > 0)
+        for (unsigned int i = 0; i < irregular_cells.size(); ++i)
+          if (index_storage_variants[dof_access_cell][i] ==
+              IndexStorageVariants::contiguous)
+            {
+              index_storage_variants[dof_access_cell][i] =
+                IndexStorageVariants::interleaved_contiguous_mixed_strides;
+              index_kinds[static_cast<unsigned int>(
+                IndexStorageVariants::contiguous)]--;
+              index_kinds[static_cast<unsigned int>(
+                IndexStorageVariants::interleaved_contiguous_mixed_strides)]++;
+            }
+
+      // Step 3: Interleaved cells are left but also some non-contiguous ones
+      // -> revert all to full storage
+      if (n_interleaved > 0 &&
+          index_kinds[static_cast<unsigned int>(IndexStorageVariants::full)] +
+              index_kinds[static_cast<unsigned int>(
+                IndexStorageVariants::interleaved)] >
+            0)
+        for (unsigned int i = 0; i < irregular_cells.size(); ++i)
+          if (index_storage_variants[dof_access_cell][i] >
+              IndexStorageVariants::contiguous)
+            {
+              index_kinds[static_cast<unsigned int>(
+                index_storage_variants[2][i])]--;
+              if (n_vectorization_lanes_filled[dof_access_cell][i] ==
+                  vectorization_length)
+                index_storage_variants[dof_access_cell][i] =
+                  IndexStorageVariants::interleaved;
+              else
+                index_storage_variants[dof_access_cell][i] =
+                  IndexStorageVariants::full;
+              index_kinds[static_cast<unsigned int>(
+                index_storage_variants[dof_access_cell][i])]++;
+            }
+
+      // Step 4: Copy the interleaved indices into their own data structure
+      for (unsigned int i = 0; i < irregular_cells.size(); ++i)
+        if (index_storage_variants[dof_access_cell][i] ==
+            IndexStorageVariants::interleaved)
+          {
+            const unsigned int ndofs =
+              dofs_per_cell[have_hp ? cell_active_fe_index[i] : 0];
+            const unsigned int *dof_indices =
+              &this->dof_indices
+                 [row_starts[i * vectorization_length * n_components].first];
+            unsigned int *interleaved_dof_indices =
+              &this->dof_indices_interleaved
+                 [row_starts[i * vectorization_length * n_components].first];
+            for (unsigned int k = 0; k < ndofs; ++k)
+              for (unsigned int j = 0; j < vectorization_length; ++j)
+                interleaved_dof_indices[k * vectorization_length + j] =
+                  dof_indices[j * ndofs + k];
+          }
     }
 
 
@@ -833,6 +998,8 @@ namespace internal
         faces.size(), IndexStorageVariants::full);
       dof_indices_contiguous[dof_access_face_interior].resize(
         faces.size() * length, numbers::invalid_unsigned_int);
+      dof_indices_interleave_strides[dof_access_face_interior].resize(
+        faces.size() * length, numbers::invalid_unsigned_int);
       n_vectorization_lanes_filled[dof_access_face_interior].resize(
         faces.size());
 
@@ -846,6 +1013,8 @@ namespace internal
         n_exterior_faces, IndexStorageVariants::full);
       dof_indices_contiguous[dof_access_face_exterior].resize(
         n_exterior_faces * length, numbers::invalid_unsigned_int);
+      dof_indices_interleave_strides[dof_access_face_exterior].resize(
+        faces.size() * length, numbers::invalid_unsigned_int);
       n_vectorization_lanes_filled[dof_access_face_exterior].resize(
         n_exterior_faces);
 
@@ -854,6 +1023,7 @@ namespace internal
           auto face_computation = [&](const DoFAccessIndex face_index,
                                       const unsigned int * cell_indices_face) {
             bool is_contiguous      = false;
+            bool is_interleaved     = false;
             bool needs_full_storage = false;
             for (unsigned int v = 0;
                  v < length &&
@@ -862,21 +1032,73 @@ namespace internal
               {
                 n_vectorization_lanes_filled[face_index][face]++;
                 if (index_storage_variants[dof_access_cell]
+                                          [cell_indices_face[v] / length] >=
+                    IndexStorageVariants::interleaved_contiguous)
+                  is_interleaved = true;
+                if (index_storage_variants[dof_access_cell]
                                           [cell_indices_face[v] / length] ==
                     IndexStorageVariants::contiguous)
                   is_contiguous = true;
+                if (index_storage_variants[dof_access_cell]
+                                          [cell_indices_face[v] / length] >=
+                    IndexStorageVariants::contiguous)
+                  dof_indices_interleave_strides[face_index][face * length +
+                                                             v] =
+                    dof_indices_interleave_strides[dof_access_cell]
+                                                  [cell_indices_face[v]];
                 if (index_storage_variants[dof_access_cell]
                                           [cell_indices_face[v] / length] <
                     IndexStorageVariants::contiguous)
                   needs_full_storage = true;
               }
-            if (is_contiguous)
+            Assert(!(is_interleaved && is_contiguous),
+                   ExcMessage("Unsupported index compression found"));
+
+            if (is_interleaved || is_contiguous)
               for (unsigned int v = 0;
                    v < n_vectorization_lanes_filled[face_index][face];
                    ++v)
                 dof_indices_contiguous[face_index][face * length + v] =
                   dof_indices_contiguous[dof_access_cell][cell_indices_face[v]];
-            if (is_contiguous && !needs_full_storage)
+            if (is_interleaved)
+              {
+                bool is_also_contiguous =
+                  n_vectorization_lanes_filled[face_index][face] == length;
+                for (unsigned int v = 0;
+                     v < n_vectorization_lanes_filled[face_index][face];
+                     ++v)
+                  if (dof_indices_contiguous[face_index][face * length + v] !=
+                        dof_indices_contiguous[face_index][face * length] + v ||
+                      dof_indices_interleave_strides[dof_access_cell]
+                                                    [cell_indices_face[v]] !=
+                        length)
+                    is_also_contiguous = false;
+
+                if (is_also_contiguous)
+                  {
+                    index_storage_variants[face_index][face] =
+                      IndexStorageVariants::interleaved_contiguous;
+                  }
+                else
+                  {
+                    bool all_indices_same_offset =
+                      n_vectorization_lanes_filled[face_index][face] == length;
+                    for (unsigned int v = 0;
+                         v < n_vectorization_lanes_filled[face_index][face];
+                         ++v)
+                      if (dof_indices_interleave_strides
+                            [dof_access_cell][cell_indices_face[v]] != length)
+                        all_indices_same_offset = false;
+                    if (all_indices_same_offset)
+                      index_storage_variants[face_index][face] =
+                        IndexStorageVariants::interleaved_contiguous_strided;
+                    else
+                      index_storage_variants[face_index][face] =
+                        IndexStorageVariants::
+                          interleaved_contiguous_mixed_strides;
+                  }
+              }
+            else if (is_contiguous && !needs_full_storage)
               index_storage_variants[face_index][face] =
                 IndexStorageVariants::contiguous;
             else
