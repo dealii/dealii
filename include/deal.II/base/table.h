@@ -1630,6 +1630,15 @@ namespace TransposeTableIterators
     std::ptrdiff_t linear_index;
 
     /**
+     * Check that <code>linear_index</code> corresponds to an entry that is
+     * actually stored by the Table (i.e., assert that
+     * <code>linear_index</code> is nonnegative and less than
+     * <code>container->size()</code>).
+     */
+    void
+    assert_valid_linear_index() const;
+
+    /**
      * Make the const version a friend for copying.
      */
     friend class AccessorBase<T, true>;
@@ -2644,7 +2653,8 @@ namespace TransposeTableIterators
     : container(table)
     , linear_index(index)
   {
-    Assert(0 <= linear_index && linear_index < container->values.size() + 1,
+    Assert(0 <= linear_index &&
+             std::size_t(linear_index) < container->values.size() + 1,
            ExcMessage("The current iterator points outside of the table and is "
                       "not the end iterator."));
   }
@@ -2655,8 +2665,7 @@ namespace TransposeTableIterators
   inline const T &
   AccessorBase<T, Constness>::value() const
   {
-    Assert(0 <= linear_index && linear_index < container->values.size(),
-           ExcMessage("The current iterator points outside of the table."));
+    assert_valid_linear_index();
     return this->container->values[linear_index];
   }
 
@@ -2666,12 +2675,8 @@ namespace TransposeTableIterators
   inline typename AccessorBase<T, Constness>::size_type
   AccessorBase<T, Constness>::AccessorBase::row() const
   {
-    Assert(!container->empty(),
-           ExcMessage("An empty table has no rows or columns."));
-    const auto row_n = linear_index % container->n_rows();
-    Assert(0 <= row_n && row_n < container->n_rows(),
-           ExcMessage("The current iterator points outside the table."));
-    return row_n;
+    assert_valid_linear_index();
+    return linear_index % container->n_rows();
   }
 
 
@@ -2680,22 +2685,38 @@ namespace TransposeTableIterators
   inline typename AccessorBase<T, Constness>::size_type
   AccessorBase<T, Constness>::AccessorBase::column() const
   {
+    assert_valid_linear_index();
+    return linear_index / container->n_rows();
+  }
+
+
+
+  template <typename T, bool Constness>
+  inline void
+  AccessorBase<T, Constness>::AccessorBase::assert_valid_linear_index() const
+  {
+#  ifdef DEBUG // avoid unused variable warnings by guarding everything
     Assert(!container->empty(),
            ExcMessage("An empty table has no rows or columns."));
+    Assert(0 <= linear_index &&
+             std::size_t(linear_index) < container->values.size(),
+           ExcMessage("The current iterator points outside of the table."));
     const auto column_n = linear_index / container->n_rows();
-    Assert(0 <= column_n && column_n < container->n_cols(),
+    Assert(0 <= column_n && std::size_t(column_n) < container->n_cols(),
            ExcMessage("The current iterator points outside the table."));
-    return column_n;
+    const auto row_n = linear_index % container->n_rows();
+    Assert(0 <= row_n && std::size_t(row_n) < container->n_rows(),
+           ExcMessage("The current iterator points outside the table."));
+#  endif
   }
+
 
 
   template <typename T>
   inline const Accessor<T, false> &
   Accessor<T, false>::operator=(const T &t) const
   {
-    Assert(0 <= this->linear_index &&
-             this->linear_index < this->container->values.size(),
-           ExcMessage("The current iterator points outside of the table."));
+    this->assert_valid_linear_index();
     this->container->values[this->linear_index] = t;
     return *this;
   }
@@ -2706,9 +2727,7 @@ namespace TransposeTableIterators
   inline const Accessor<T, false> &
   Accessor<T, false>::operator=(T &&t) const
   {
-    Assert(0 <= this->linear_index &&
-             this->linear_index < this->container->values.size(),
-           ExcMessage("The current iterator points outside of the table."));
+    this->assert_valid_linear_index();
     this->container->values[this->linear_index] = t;
     return *this;
   }
@@ -2719,9 +2738,7 @@ namespace TransposeTableIterators
   inline T &
   Accessor<T, false>::value() const
   {
-    Assert(0 <= this->linear_index &&
-             this->linear_index < this->container->values.size(),
-           ExcMessage("The current iterator points outside of the table."));
+    this->assert_valid_linear_index();
     return this->container->values[this->linear_index];
   }
 
