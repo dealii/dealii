@@ -33,6 +33,46 @@ DEAL_II_NAMESPACE_OPEN
  * <code>(dim*dim + dim)/2</code> components, as well as second order
  * nonsymmetric tensors.
  *
+ * One can think of extractors as the equivalent of an index, or an index range.
+ * In the case of scalar extractors (i.e., the FEValuesExtractors::Scalar
+ * class), creating an object like (see step-20 for this use)
+ * @code
+ *   const FEValuesExtractors::Scalar pressure(dim);
+ * @endcode
+ * can be thought of as creating a single index with value `dim`. By
+ * itself, an index does not know what it is an index to, so it takes
+ * the equivalent of an array to extract anything. Consequently,
+ * assume that there is a finite element with at least `dim+1` vector
+ * components (as indeed there is in step-20), and an FEValues object
+ * that operates on it, then writing
+ * @code
+ *   fe_values[pressure]
+ * @endcode
+ * results in an object that represents the shape functions of only the
+ * `dim`th component of the overall element. In the example, these
+ * would be the values of the pressure shape functions, or more precisely:
+ * the (scalar) pressure values of all shape functions (even for shape
+ * functions that are not associated with the pressure, but for example
+ * the velocity). In the example above, the result of using
+ * `operator[]` on the `fe_values` object as shown is of type
+ * FEValuesViews::Scalar.
+ *
+ * Likewise, when using
+ * @code
+ *   const FEValuesExtractors::Vector velocities(0);
+ * @endcode
+ * then the object so created can be thought of as an <i>index range</i>,
+ * starting at zero and extending exactly `dim` components on. In Matlab
+ * notation, one could write this as `0:dim-1`. Then, writing
+ * @code
+ *   fe_values[velocities]
+ * @endcode
+ * will result in an object that represents the values of a subset of
+ * exactly `dim` vector components of the overall finite element, in
+ * much the same way as writing `array(3:7)` in Matlab would return
+ * an array of length 5 that has been extracted from the original
+ * array by looking at indices 3 through 7 (inclusive).
+ *
  * See the description of the
  * @ref vector_valued
  * module for examples how to use the features of this namespace.
