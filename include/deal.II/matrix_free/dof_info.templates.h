@@ -970,6 +970,13 @@ namespace internal
         if (index_storage_variants[dof_access_cell][i] ==
             IndexStorageVariants::interleaved)
           {
+            if (n_vectorization_lanes_filled[dof_access_cell][i] <
+                vectorization_length)
+              {
+                index_storage_variants[dof_access_cell][i] =
+                  IndexStorageVariants::full;
+                continue;
+              }
             const unsigned int ndofs =
               dofs_per_cell[have_hp ? cell_active_fe_index[i] : 0];
             const unsigned int *dof_indices =
@@ -978,6 +985,17 @@ namespace internal
             unsigned int *interleaved_dof_indices =
               &this->dof_indices_interleaved
                  [row_starts[i * vectorization_length * n_components].first];
+            AssertDimension(this->dof_indices.size(),
+                            this->dof_indices_interleaved.size());
+            AssertDimension(n_vectorization_lanes_filled[dof_access_cell][i],
+                            vectorization_length);
+            AssertIndexRange(
+              row_starts[i * vectorization_length * n_components].first,
+              this->dof_indices_interleaved.size());
+            AssertIndexRange(
+              row_starts[i * vectorization_length * n_components].first +
+                ndofs * vectorization_length,
+              this->dof_indices_interleaved.size() + 1);
             for (unsigned int k = 0; k < ndofs; ++k)
               for (unsigned int j = 0; j < vectorization_length; ++j)
                 interleaved_dof_indices[k * vectorization_length + j] =
