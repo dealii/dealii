@@ -1046,8 +1046,7 @@ namespace MatrixFreeOperators
                                      const VectorizedArray<Number> *in_array,
                                      VectorizedArray<Number> *out_array) const
   {
-    const unsigned int dofs_per_cell =
-      Utilities::fixed_int_power<fe_degree + 1, dim>::value;
+    constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
     internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
                                      dim,
                                      fe_degree + 1,
