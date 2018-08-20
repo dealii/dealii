@@ -30,7 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  * with corresponding type from the namespace FEValuesViews. There are
  * extractors for single scalar components, vector components consisting of
  * <code>dim</code> elements, and second order symmetric tensors consisting of
- * <code>(dim*dim + dim)/2</code> components
+ * <code>(dim*dim + dim)/2</code> components, as well as second order
+ * nonsymmetric tensors.
  *
  * See the description of the
  * @ref vector_valued
