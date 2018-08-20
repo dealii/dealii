@@ -122,12 +122,12 @@ AffineConstraints<number>::is_consistent_in_parallel(
   // Helper to return a ConstraintLine object that belongs to row @p row.
   // If @p row is not constrained or not stored locally, return an empty
   // constraint object that would correspond to a zero constraints
-  auto get_line = [&](const size_type row) -> ConstraintLine {
-    const size_type line_index = calculate_line_index(row);
+  auto get_line = [&](const size_type line_n) -> ConstraintLine {
+    const size_type line_index = calculate_line_index(line_n);
     if (line_index >= lines_cache.size() ||
         lines_cache[line_index] == numbers::invalid_size_type)
       {
-        const ConstraintLine empty = {row, {}, 0.0};
+        const ConstraintLine empty = {line_n, {}, 0.0};
         return empty;
       }
     else
@@ -800,47 +800,49 @@ AffineConstraints<number>::reinit(const IndexSet &local_constraints)
 
 template <typename number>
 bool
-AffineConstraints<number>::is_identity_constrained(const size_type index) const
+AffineConstraints<number>::is_identity_constrained(const size_type line_n) const
 {
-  if (is_constrained(index) == false)
+  if (is_constrained(line_n) == false)
     return false;
 
-  const ConstraintLine &p = lines[lines_cache[calculate_line_index(index)]];
-  Assert(p.index == index, ExcInternalError());
+  const ConstraintLine &line = lines[lines_cache[calculate_line_index(line_n)]];
+  Assert(line.index == line_n, ExcInternalError());
 
   // return if an entry for this line was found and if it has only one
   // entry equal to 1.0
-  return (p.entries.size() == 1) && (p.entries[0].second == number(1.0));
+  return (line.entries.size() == 1) && (line.entries[0].second == number(1.0));
 }
 
 
 template <typename number>
 bool
 AffineConstraints<number>::are_identity_constrained(
-  const size_type index1,
-  const size_type index2) const
+  const size_type line_n_1,
+  const size_type line_n_2) const
 {
-  if (is_constrained(index1) == true)
+  if (is_constrained(line_n_1) == true)
     {
-      const ConstraintLine &p =
-        lines[lines_cache[calculate_line_index(index1)]];
-      Assert(p.index == index1, ExcInternalError());
+      const ConstraintLine &line =
+        lines[lines_cache[calculate_line_index(line_n_1)]];
+      Assert(line.index == line_n_1, ExcInternalError());
 
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is index2
-      return ((p.entries.size() == 1) && (p.entries[0].first == index2) &&
-              (p.entries[0].second == number(1.0)));
+      return ((line.entries.size() == 1) &&
+              (line.entries[0].first == line_n_2) &&
+              (line.entries[0].second == number(1.0)));
     }
-  else if (is_constrained(index2) == true)
+  else if (is_constrained(line_n_2) == true)
     {
-      const ConstraintLine &p =
-        lines[lines_cache[calculate_line_index(index2)]];
-      Assert(p.index == index2, ExcInternalError());
+      const ConstraintLine &line =
+        lines[lines_cache[calculate_line_index(line_n_2)]];
+      Assert(line.index == line_n_2, ExcInternalError());
 
       // return if an entry for this line was found and if it has only one
-      // entry equal to 1.0 and that one is index1
-      return ((p.entries.size() == 1) && (p.entries[0].first == index1) &&
-              (p.entries[0].second == number(1.0)));
+      // entry equal to 1.0 and that one is line_n_1
+      return ((line.entries.size() == 1) &&
+              (line.entries[0].first == line_n_1) &&
+              (line.entries[0].second == number(1.0)));
     }
   else
     return false;
