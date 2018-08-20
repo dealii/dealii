@@ -777,6 +777,9 @@ private:
  * @image html circular_mesh_only_boundary_manifold.png
  * </p>
  *
+ * This manifold is used in a few GridGenerator functions, including
+ * GridGenerator::channel_with_cylinder.
+ *
  * <h3>Implementation details</h3>
  *
  * In the implementation of this class, the manifolds surrounding a coarse
