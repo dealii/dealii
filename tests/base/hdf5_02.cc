@@ -34,31 +34,24 @@ test()
     // Create attributes attached to the root
     const float        root_float        = 2.45681934e5;
     const double       root_double       = 6.234542e3;
-    const long double  root_long_double  = 4.321432e6;
     const int          root_int          = -56;
     const unsigned int root_unsigned_int = 22;
     data_file.write_attr("root_float", root_float);
     data_file.write_attr("root_double", root_double);
-    data_file.write_attr("root_long_double", root_long_double);
     data_file.write_attr("root_int", root_int);
     data_file.write_attr("root_unsigned_int", root_unsigned_int);
     data_file.write_attr("root_total",
-                         (root_float + root_double + root_long_double) *
-                           root_int * root_unsigned_int);
+                         (root_float + root_double) * root_int *
+                           root_unsigned_int);
 
     // Create attributes attached to a group
     auto                      test_group = data_file.create_group("test_group");
-    const std::complex<float> group_complex_float        = {2.45681934e5, 45e2};
-    const std::complex<double>      group_complex_double = {6.234542e3, 2};
-    const std::complex<long double> group_complex_long_double = {4.321432e6,
-                                                                 23};
+    const std::complex<float> group_complex_float   = {2.45681934e5, 45e2};
+    const std::complex<double> group_complex_double = {6.234542e3, 2};
     test_group.write_attr("group_complex_float", group_complex_float);
     test_group.write_attr("group_complex_double", group_complex_double);
-    test_group.write_attr("group_complex_long_double",
-                          group_complex_long_double);
     test_group.write_attr("group_complex_total",
-                          group_complex_float * group_complex_double *
-                            group_complex_long_double);
+                          group_complex_float * group_complex_double);
     test_group.write_attr("group_string", std::string("test_string_attribute"));
 
     // Create attributes attached to a dataset
@@ -78,15 +71,13 @@ test()
     HDF5::File data_file(filename, MPI_COMM_WORLD, HDF5::File::Mode::open);
     auto       root_float  = data_file.attr<float>("root_float");
     auto       root_double = data_file.attr<double>("root_double");
-    auto root_long_double  = data_file.attr<long double>("root_long_double");
-    auto root_int          = data_file.attr<int>("root_int");
+    auto       root_int    = data_file.attr<int>("root_int");
     auto root_unsigned_int = data_file.attr<unsigned int>("root_unsigned_int");
     // calculated and read should be the same
     deallog << "root_total calculated:"
-            << (root_float + root_double + root_long_double) * root_int *
-                 root_unsigned_int
+            << (root_float + root_double) * root_int * root_unsigned_int
             << std::endl;
-    deallog << "root_total read:" << data_file.attr<long double>("root_total")
+    deallog << "root_total read:" << data_file.attr<double>("root_total")
             << std::endl;
 
     // Read attributes attached to a group
@@ -95,14 +86,10 @@ test()
       test_group.attr<std::complex<float>>("group_complex_float");
     auto group_complex_double =
       test_group.attr<std::complex<double>>("group_complex_double");
-    auto group_complex_long_double =
-      test_group.attr<std::complex<long double>>("group_complex_long_double");
     deallog << "group_complex_total calculated:"
-            << (group_complex_float * group_complex_double *
-                group_complex_long_double)
-            << std::endl;
+            << (group_complex_float * group_complex_double) << std::endl;
     deallog << "group_complex_total read:"
-            << test_group.attr<std::complex<long double>>("group_complex_total")
+            << test_group.attr<std::complex<double>>("group_complex_total")
             << std::endl;
     deallog << "group_string read:"
             << test_group.attr<std::string>("group_string") << std::endl;

@@ -128,10 +128,10 @@ namespace HDF5
     };
 
     /**
-     * Reads an attribute. T can be float, double, long double,
-     * std::complex<float>, std::complex<double>, std::complex<long double>,
-     * int, unsigned int, bool or std::string. Note that the encoding of
-     * std::string is UTF8 in order to be compatible with python3.
+     * Reads an attribute. T can be float, double, std::complex<float>,
+     * std::complex<double>, int, unsigned int, bool or std::string. Note that
+     * the encoding of std::string is UTF8 in order to be compatible with
+     * python3.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -144,10 +144,10 @@ namespace HDF5
     attr(const std::string attr_name) const;
 
     /**
-     * Reads an attribute. T can be float, double, long double,
-     * std::complex<float>, std::complex<double>, std::complex<long double>,
-     * int, unsigned int, bool or std::string. Note that the encoding of
-     * std::string is UTF8 in order to be compatible with python3.
+     * Reads an attribute. T can be float, double, std::complex<float>,
+     * std::complex<double>, int, unsigned int, bool or std::string. Note that
+     * the encoding of std::string is UTF8 in order to be compatible with
+     * python3.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -190,9 +190,8 @@ namespace HDF5
 
   public:
     /**
-     * Reads data of the dataset. Number can be float, double, long double,
-     * std::complex<float>, std::complex<double>, std::complex<long double>, int
-     * or unsigned int.
+     * Reads data of the dataset. Number can be float, double,
+     * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -205,9 +204,8 @@ namespace HDF5
     read();
 
     /**
-     * Reads data of a subset of the dataset. Number can be float, double, long
-     * double, std::complex<float>, std::complex<double>,
-     * std::complex<long double>, int or unsigned int.
+     * Reads data of a subset of the dataset. Number can be float, double,
+     * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For examples, in the 4D case, we will be selecting three points and a 4D
@@ -263,8 +261,8 @@ namespace HDF5
 
     /**
      * This function does not read any data, but can contribute to a collective
-     * read call. Number can be float, double, long double, std::complex<float>,
-     * std::complex<double>, std::complex<long double>, int or unsigned int.
+     * read call. Number can be float, double, std::complex<float>,
+     * std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -277,9 +275,8 @@ namespace HDF5
     read_none();
 
     /**
-     * Writes data in the dataset. Number can be float, double, long double,
-     * std::complex<float>, std::complex<double>, std::complex<long double>, int
-     * or unsigned int.
+     * Writes data in the dataset. Number can be float, double,
+     * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -292,9 +289,8 @@ namespace HDF5
     write(const Container<number> &data);
 
     /**
-     * Writes data to a subset of the dataset. Number can be float, double, long
-     * double, std::complex<float>, std::complex<double>,
-     * std::complex<long double>, int or unsigned int.
+     * Writes data to a subset of the dataset. Number can be float, double,
+     * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For examples, in the 4D case, we will be selecting three points and a 4D
@@ -392,9 +388,8 @@ namespace HDF5
 
     /**
      * This function does not write any data, but can contribute to a collective
-     * write call. Number can be float, double, long double,
-     * std::complex<float>, std::complex<double>, std::complex<long double>, int
-     * or unsigned int.
+     * write call. Number can be float, double, std::complex<float>,
+     * std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -524,9 +519,8 @@ namespace HDF5
     dataset(const std::string name);
 
     /**
-     * Creates a dataset. Number can be float, double, long
-     * double, std::complex<float>, std::complex<double>,
-     * std::complex<long double>, int or unsigned int.
+     * Creates a dataset. Number can be float, double, std::complex<float>,
+     * std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -540,9 +534,8 @@ namespace HDF5
                    const std::vector<hsize_t> dimensions) const;
 
     /**
-     * Creates and writes data to a dataset. Number can be float, double, long
-     * double, std::complex<float>, std::complex<double>,
-     * std::complex<long double>, int or unsigned int.
+     * Creates and writes data to a dataset. Number can be float, double,
+     * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
