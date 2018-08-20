@@ -232,8 +232,7 @@ check(const unsigned int orientation, bool reverse)
     }
   const unsigned int n_constraints =
     Utilities::MPI::sum(n_local_constraints, MPI_COMM_WORLD);
-  const unsigned int n_expected_constraints =
-    Utilities::fixed_int_power<9, dim - 1>::value;
+  constexpr unsigned int n_expected_constraints = Utilities::pow(9, dim - 1);
   if (myid == 0)
     deallog << "n_constraints: " << n_constraints
             << " n_expected_constraints: " << n_expected_constraints

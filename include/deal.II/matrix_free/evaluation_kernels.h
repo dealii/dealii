@@ -1550,10 +1550,9 @@ namespace internal
           Utilities::pow(fe_degree + 1, dim - 1) :
           (dim > 1 ? Utilities::fixed_power<dim - 1>(data.fe_degree + 1) : 1);
 
-      const unsigned int n_q_points =
-        fe_degree > -1 ?
-          Utilities::fixed_int_power<n_q_points_1d, dim - 1>::value :
-          data.n_q_points_face;
+      const unsigned int n_q_points = fe_degree > -1 ?
+                                        Utilities::pow(n_q_points_1d, dim - 1) :
+                                        data.n_q_points_face;
 
       if (integrate_grad == false)
         for (unsigned int c = 0; c < n_components; ++c)

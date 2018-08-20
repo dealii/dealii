@@ -353,7 +353,7 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
   const unsigned int n_child_dofs_1d = 2 * degree_size - element_is_continuous;
   const unsigned int n_scalar_cell_dofs =
     Utilities::fixed_power<dim>(n_child_dofs_1d);
-  const unsigned int three_to_dim = Utilities::fixed_int_power<3, dim>::value;
+  constexpr unsigned int three_to_dim = Utilities::pow(3, dim);
 
   for (unsigned int cell = 0; cell < n_owned_level_cells[to_level - 1];
        cell += vec_size)
@@ -468,7 +468,7 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
   const unsigned int n_child_dofs_1d = 2 * degree_size - element_is_continuous;
   const unsigned int n_scalar_cell_dofs =
     Utilities::fixed_power<dim>(n_child_dofs_1d);
-  const unsigned int three_to_dim = Utilities::fixed_int_power<3, dim>::value;
+  constexpr unsigned int three_to_dim = Utilities::pow(3, dim);
 
   for (unsigned int cell = 0; cell < n_owned_level_cells[from_level - 1];
        cell += vec_size)
