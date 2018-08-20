@@ -25,6 +25,8 @@
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/lac/full_matrix.h>
+
 #include <memory>
 
 

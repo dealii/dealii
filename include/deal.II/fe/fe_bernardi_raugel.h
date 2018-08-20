@@ -21,7 +21,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_bernardi_raugel.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/fe.h>

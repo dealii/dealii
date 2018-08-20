@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/table.h>
 #include <deal.II/base/table_handler.h>
 
 #include <boost/io/ios_state.hpp>
