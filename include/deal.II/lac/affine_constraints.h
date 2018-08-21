@@ -255,13 +255,13 @@ public:
   reinit(const IndexSet &local_constraints = IndexSet());
 
   /**
-   * Determines if we can store a constraint for the given @p line_index. This
+   * Determines if we can store a constraint for the given @p line_n. This
    * routine only matters in the distributed case and checks if the IndexSet
    * allows storage of this line. Always returns true if not in the
    * distributed case.
    */
   bool
-  can_store_line(const size_type line_index) const;
+  can_store_line(const size_type line_n) const;
 
   /**
    * Return the index set describing locally relevant lines if any are
@@ -305,7 +305,7 @@ public:
    * function simply returns without doing anything.
    */
   void
-  add_line(const size_type line);
+  add_line(const size_type line_n);
 
   /**
    * Call the first add_line() function for every index <code>i</code> for
@@ -364,7 +364,7 @@ public:
    * twice.
    */
   void
-  add_entry(const size_type line, const size_type column, const number value);
+  add_entry(const size_type line_n, const size_type column, const number value);
 
   /**
    * Add a whole series of entries, denoted by pairs of column indices and
@@ -372,17 +372,17 @@ public:
    * the preceding function several times, but is faster.
    */
   void
-  add_entries(const size_type                                  line,
+  add_entries(const size_type                                  line_n,
               const std::vector<std::pair<size_type, number>> &col_val_pairs);
 
   /**
-   * Set an inhomogeneity to the constraint line <i>i</i>, according to the
+   * Set an inhomogeneity to the constraint line @p line_n, according to the
    * discussion in the general class description.
    *
    * @note the line needs to be added with one of the add_line() calls first.
    */
   void
-  set_inhomogeneity(const size_type line, const number value);
+  set_inhomogeneity(const size_type line_n, const number value);
 
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
@@ -478,7 +478,7 @@ public:
   n_constraints() const;
 
   /**
-   * Return whether the degree of freedom with number @p index is a
+   * Return whether the degree of freedom with number @p line_n is a
    * constrained one.
    *
    * Note that if close() was called before, then this function is
@@ -487,7 +487,7 @@ public:
    * have to perform a linear search through all entries.
    */
   bool
-  is_constrained(const size_type index) const;
+  is_constrained(const size_type line_n) const;
 
   /**
    * Return whether the dof is constrained, and whether it is constrained to
@@ -501,7 +501,7 @@ public:
    * with a weight different from one.
    */
   bool
-  is_identity_constrained(const size_type index) const;
+  is_identity_constrained(const size_type line_n) const;
 
   /**
    * Return whether the two given degrees of freedom are linked by an equality
@@ -510,8 +510,8 @@ public:
    * <code>index2=index1</code>.
    */
   bool
-  are_identity_constrained(const size_type index1,
-                           const size_type index2) const;
+  are_identity_constrained(const size_type line_n_1,
+                           const size_type line_n_2) const;
 
   /**
    * Return the maximum number of other dofs that one dof is constrained to.
@@ -546,14 +546,14 @@ public:
    * and a zero pointer in case the dof is not constrained.
    */
   const std::vector<std::pair<size_type, number>> *
-  get_constraint_entries(const size_type line) const;
+  get_constraint_entries(const size_type line_n) const;
 
   /**
    * Return the value of the inhomogeneity stored in the constrained dof @p
-   * line. Unconstrained dofs also return a zero value.
+   * line_n. Unconstrained dofs also return a zero value.
    */
   number
-  get_inhomogeneity(const size_type line) const;
+  get_inhomogeneity(const size_type line_n) const;
 
   /**
    * Print the constraints represented by the current object to the
@@ -1471,18 +1471,11 @@ private:
   bool sorted;
 
   /**
-   * Internal function to calculate the index of line @p line in the vector
+   * Internal function to calculate the index of line @p line_n in the vector
    * lines_cache using local_lines.
    */
   size_type
-  calculate_line_index(const size_type line) const;
-
-  /**
-   * Return @p true if the weight of an entry (the second element of the pair)
-   * equals zero. This function is used to delete entries with zero weight.
-   */
-  static bool
-  check_zero_weight(const std::pair<size_type, number> &p);
+  calculate_line_index(const size_type line_n) const;
 
   /**
    * This function actually implements the local_to_global function for
@@ -1599,7 +1592,7 @@ inline AffineConstraints<number>::AffineConstraints(
 
 template <typename number>
 inline void
-AffineConstraints<number>::add_line(const size_type line)
+AffineConstraints<number>::add_line(const size_type line_n)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
 
@@ -1607,11 +1600,11 @@ AffineConstraints<number>::add_line(const size_type line)
   // handlers and we constrain a degree of freedom whose number we don't have
   // locally. if we don't abort here the program will try to allocate several
   // terabytes of memory to resize the various arrays below :-)
-  Assert(line != numbers::invalid_size_type, ExcInternalError());
-  const size_type line_index = calculate_line_index(line);
+  Assert(line_n != numbers::invalid_size_type, ExcInternalError());
+  const size_type line_index = calculate_line_index(line_n);
 
   // check whether line already exists; it may, in which case we can just quit
-  if (is_constrained(line))
+  if (is_constrained(line_n))
     return;
 
   // if necessary enlarge vector of existing entries for cache
@@ -1622,23 +1615,23 @@ AffineConstraints<number>::add_line(const size_type line)
 
   // push a new line to the end of the list
   lines.emplace_back();
-  lines.back().index         = line;
+  lines.back().index         = line_n;
   lines.back().inhomogeneity = 0.;
   lines_cache[line_index]    = lines.size() - 1;
 }
 
 template <typename number>
 inline void
-AffineConstraints<number>::add_entry(const size_type line,
+AffineConstraints<number>::add_entry(const size_type line_n,
                                      const size_type column,
                                      const number    value)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(line != column,
+  Assert(line_n != column,
          ExcMessage("Can't constrain a degree of freedom to itself"));
 
   // Ensure that the current line is present in the cache:
-  const size_type line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line_n);
   Assert(line_index < lines_cache.size(),
          ExcMessage("The current AffineConstraints does not contain the line "
                     "for the current entry. Call AffineConstraints::add_line "
@@ -1652,14 +1645,14 @@ AffineConstraints<number>::add_entry(const size_type line,
   Assert(lines_cache[line_index] != numbers::invalid_size_type,
          ExcInternalError());
   Assert(!local_lines.size() || local_lines.is_element(column),
-         ExcColumnNotStoredHere(line, column));
+         ExcColumnNotStoredHere(line_n, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert(line_ptr->index == line, ExcInternalError());
+  Assert(line_ptr->index == line_n, ExcInternalError());
   for (const auto &p : line_ptr->entries)
     if (p.first == column)
       {
         Assert(std::abs(p.second - value) < 1.e-14,
-               ExcEntryAlreadyExists(line, column, p.second, value));
+               ExcEntryAlreadyExists(line_n, column, p.second, value));
         return;
       }
 
@@ -1668,10 +1661,10 @@ AffineConstraints<number>::add_entry(const size_type line,
 
 template <typename number>
 inline void
-AffineConstraints<number>::set_inhomogeneity(const size_type line,
+AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
                                              const number    value)
 {
-  const size_type line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line_n);
   Assert(line_index < lines_cache.size() &&
            lines_cache[line_index] != numbers::invalid_size_type,
          ExcMessage("call add_line() before calling set_inhomogeneity()"));
@@ -1699,11 +1692,11 @@ AffineConstraints<number>::is_constrained(const size_type index) const
 template <typename number>
 inline bool
 AffineConstraints<number>::is_inhomogeneously_constrained(
-  const size_type index) const
+  const size_type line_n) const
 {
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
-  const size_type line_index = calculate_line_index(index);
+  const size_type line_index = calculate_line_index(line_n);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_size_type)
     return false;
@@ -1716,11 +1709,11 @@ AffineConstraints<number>::is_inhomogeneously_constrained(
 
 template <typename number>
 inline const std::vector<std::pair<types::global_dof_index, number>> *
-AffineConstraints<number>::get_constraint_entries(const size_type line) const
+AffineConstraints<number>::get_constraint_entries(const size_type line_n) const
 {
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
-  const size_type line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line_n);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_size_type)
     return nullptr;
@@ -1730,11 +1723,11 @@ AffineConstraints<number>::get_constraint_entries(const size_type line) const
 
 template <typename number>
 inline number
-AffineConstraints<number>::get_inhomogeneity(const size_type line) const
+AffineConstraints<number>::get_inhomogeneity(const size_type line_n) const
 {
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
-  const size_type line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line_n);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_size_type)
     return 0;
@@ -1744,22 +1737,22 @@ AffineConstraints<number>::get_inhomogeneity(const size_type line) const
 
 template <typename number>
 inline types::global_dof_index
-AffineConstraints<number>::calculate_line_index(const size_type line) const
+AffineConstraints<number>::calculate_line_index(const size_type line_n) const
 {
   // IndexSet is unused (serial case)
   if (!local_lines.size())
-    return line;
+    return line_n;
 
-  Assert(local_lines.is_element(line), ExcRowNotStoredHere(line));
+  Assert(local_lines.is_element(line_n), ExcRowNotStoredHere(line_n));
 
-  return local_lines.index_within_set(line);
+  return local_lines.index_within_set(line_n);
 }
 
 template <typename number>
 inline bool
-AffineConstraints<number>::can_store_line(size_type line_index) const
+AffineConstraints<number>::can_store_line(size_type line_n) const
 {
-  return !local_lines.size() || local_lines.is_element(line_index);
+  return !local_lines.size() || local_lines.is_element(line_n);
 }
 
 template <typename number>
