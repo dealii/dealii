@@ -220,6 +220,19 @@ namespace Particles
     template <int, int>
     friend class ParticleHandler;
   };
+
+
+
+  template <int dim, int spacedim>
+  template <class Archive>
+  void
+  ParticleAccessor<dim, spacedim>::serialize(Archive &          ar,
+                                             const unsigned int version)
+  {
+    return particle->second.serialize(ar, version);
+  }
+
+
 } // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE
