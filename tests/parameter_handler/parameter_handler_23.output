@@ -1,0 +1,41 @@
+
+DEAL::a = 1
+DEAL::x.a = 2
+DEAL::x.y.a = 3
+DEAL::x.y.b = 4
+DEAL::x.v.v.v.a = 5
+DEAL::x.v.v.v.b = 6
+DEAL::x.v.v.a = 7
+DEAL::x.z.a = 8
+DEAL::b = 9
+DEAL::in x
+DEAL::a = 2
+DEAL::y.a = 3
+DEAL::y.b = 4
+DEAL::v.v.v.a = 5
+DEAL::v.v.v.b = 6
+DEAL::v.v.a = 7
+DEAL::z.a = 8
+DEAL::in y
+DEAL::a = 3
+DEAL::b = 4
+DEAL::in v (first)
+DEAL::v.v.a = 5
+DEAL::v.v.b = 6
+DEAL::v.a = 7
+DEAL::in v (second)
+DEAL::v.a = 5
+DEAL::v.b = 6
+DEAL::a = 7
+DEAL::in test_getting_types top level
+DEAL::Can't convert the parameter value <77.3> for entry <foo.bar.baz> to an integer.
+DEAL::Can't convert the parameter value <true> for entry <foo.bar.yox> to an integer.
+DEAL::Can't convert the parameter value <true> for entry <foo.bar.yox> to a double precision variable.
+DEAL::Can't convert the parameter value <1> for entry <foo.bar.jik> to a boolean.
+DEAL::Can't convert the parameter value <eggs> for entry <foo.bar.spam> to a boolean.
+DEAL::in <weird_strings[3]>
+DEAL::<<>>>]]]	
+
+   .****&//&%.^$!.$@$%@^*&(*)_/*-`~..,/<["';:=-_)*&~	`/.\.value =  set value = 5 
+
+.

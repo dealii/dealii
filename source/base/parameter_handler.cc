@@ -294,6 +294,25 @@ ParameterHandler::get_current_full_path(const std::string &name) const
 
 
 
+std::string
+ParameterHandler::get_current_full_path(
+  const std::vector<std::string> &sub_path,
+  const std::string &             name) const
+{
+  std::string path = get_current_path();
+  if (path.empty() == false)
+    path += path_separator;
+
+  if (sub_path.empty() == false)
+    path += collate_path_string(sub_path) + path_separator;
+
+  path += mangle(name);
+
+  return path;
+}
+
+
+
 void
 ParameterHandler::parse_input(std::istream &     input,
                               const std::string &filename,
@@ -783,6 +802,27 @@ ParameterHandler::get(const std::string &entry_string) const
 
 
 
+std::string
+ParameterHandler::get(const std::vector<std::string> &entry_subsection_path,
+                      const std::string &             entry_string) const
+{
+  // assert that the entry is indeed
+  // declared
+  if (boost::optional<std::string> value = entries->get_optional<std::string>(
+        get_current_full_path(entry_subsection_path, entry_string) +
+        path_separator + "value"))
+    return value.get();
+  else
+    {
+      Assert(false,
+             ExcEntryUndeclared(demangle(
+               get_current_full_path(entry_subsection_path, entry_string))));
+      return "";
+    }
+}
+
+
+
 long int
 ParameterHandler::get_integer(const std::string &entry_string) const
 {
@@ -795,7 +835,31 @@ ParameterHandler::get_integer(const std::string &entry_string) const
       AssertThrow(false,
                   ExcMessage("Can't convert the parameter value <" +
                              get(entry_string) + "> for entry <" +
-                             entry_string + " to an integer."));
+                             entry_string + "> to an integer."));
+      return 0;
+    }
+}
+
+
+
+long int
+ParameterHandler::get_integer(
+  const std::vector<std::string> &entry_subsection_path,
+  const std::string &             entry_string) const
+{
+  try
+    {
+      return Utilities::string_to_int(get(entry_subsection_path, entry_string));
+    }
+  catch (...)
+    {
+      AssertThrow(false,
+                  ExcMessage(
+                    "Can't convert the parameter value <" +
+                    get(entry_subsection_path, entry_string) + "> for entry <" +
+                    demangle(get_current_full_path(entry_subsection_path,
+                                                   entry_string)) +
+                    "> to an integer."));
       return 0;
     }
 }
@@ -815,7 +879,32 @@ ParameterHandler::get_double(const std::string &entry_string) const
                   ExcMessage("Can't convert the parameter value <" +
                              get(entry_string) + "> for entry <" +
                              entry_string +
-                             " to a double precision variable."));
+                             "> to a double precision variable."));
+      return 0;
+    }
+}
+
+
+
+double
+ParameterHandler::get_double(
+  const std::vector<std::string> &entry_subsection_path,
+  const std::string &             entry_string) const
+{
+  try
+    {
+      return Utilities::string_to_double(
+        get(entry_subsection_path, entry_string));
+    }
+  catch (...)
+    {
+      AssertThrow(false,
+                  ExcMessage(
+                    "Can't convert the parameter value <" +
+                    get(entry_subsection_path, entry_string) + "> for entry <" +
+                    demangle(get_current_full_path(entry_subsection_path,
+                                                   entry_string)) +
+                    "> to a double precision variable."));
       return 0;
     }
 }
@@ -830,7 +919,29 @@ ParameterHandler::get_bool(const std::string &entry_string) const
   AssertThrow((s == "true") || (s == "false") || (s == "yes") || (s == "no"),
               ExcMessage("Can't convert the parameter value <" +
                          get(entry_string) + "> for entry <" + entry_string +
-                         " to a boolean."));
+                         "> to a boolean."));
+  if (s == "true" || s == "yes")
+    return true;
+  else
+    return false;
+}
+
+
+
+bool
+ParameterHandler::get_bool(
+  const std::vector<std::string> &entry_subsection_path,
+  const std::string &             entry_string) const
+{
+  const std::string s = get(entry_subsection_path, entry_string);
+
+  AssertThrow((s == "true") || (s == "false") || (s == "yes") || (s == "no"),
+              ExcMessage("Can't convert the parameter value <" +
+                         get(entry_subsection_path, entry_string) +
+                         "> for entry <" +
+                         demangle(get_current_full_path(entry_subsection_path,
+                                                        entry_string)) +
+                         "> to a boolean."));
   if (s == "true" || s == "yes")
     return true;
   else
