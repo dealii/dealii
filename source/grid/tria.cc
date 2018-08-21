@@ -14483,10 +14483,12 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // the RefineCase currently flagged for
                     const bool has_periodic_neighbor =
                       cell->has_periodic_neighbor(i);
-                    if ((!cell->at_boundary(i) || has_periodic_neighbor) &&
-                        (GeometryInfo<dim>::face_refinement_case(
-                           cell->refine_flag_set(), i) !=
-                         RefinementCase<dim - 1>::no_refinement))
+                    const bool has_neighbor_or_periodic_neighbor =
+                      !cell->at_boundary(i) || has_periodic_neighbor;
+                    if (has_neighbor_or_periodic_neighbor &&
+                        GeometryInfo<dim>::face_refinement_case(
+                          cell->refine_flag_set(), i) !=
+                          RefinementCase<dim - 1>::no_refinement)
                       {
                         // 1) if the neighbor has children: nothing to
                         // worry about.  2) if the neighbor is active
@@ -14707,7 +14709,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     const auto parent_face = [&]() {
                                       if (has_periodic_neighbor)
                                         {
-                                          const auto &neighbor =
+                                          const auto neighbor =
                                             cell->periodic_neighbor(i);
                                           const auto parent_face_no =
                                             neighbor
@@ -14719,9 +14721,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                           return parent->face(parent_face_no);
                                         }
                                       else
-                                        return cell
-                                          ->neighbor_or_periodic_neighbor(i)
-                                          ->face(nb_indices.first);
+                                        return cell->neighbor(i)->face(
+                                          nb_indices.first);
                                     }();
 
                                     if ((this_face_index ==
