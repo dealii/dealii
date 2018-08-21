@@ -20,6 +20,8 @@
 
 #include <deal.II/base/subscriptor.h>
 
+#include <iomanip>
+
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  include <deal.II/base/cuda.h>
 
@@ -51,7 +53,7 @@ namespace CUDAWrappers
     /**
      * Declare type for container size.
      */
-    using size_type = unsigned int;
+    using size_type = int;
 
     /**
      * Type of the matrix entries.
@@ -102,6 +104,18 @@ namespace CUDAWrappers
     ~SparseMatrix();
 
     /**
+     * Move assignment operator.
+     */
+    SparseMatrix &
+    operator=(CUDAWrappers::SparseMatrix<Number> &&);
+
+    /**
+     * Copy assignment is deleted.
+     */
+    SparseMatrix &
+    operator=(const CUDAWrappers::SparseMatrix<Number> &) = delete;
+
+    /**
      * Reinitialize the sparse matrix. The sparse matrix on the host is copied
      * to the device and the elementes are reordered according to the format
      * supported by cuSPARSE.
@@ -136,6 +150,50 @@ namespace CUDAWrappers
      */
     std::size_t
     n_nonzero_elements() const;
+
+    /**
+     * Print the matrix to the given stream, using the format <tt>(row,column)
+     * value</tt>, i.e. one nonzero entry of the matrix per line. If
+     * <tt>across</tt> is true, print all entries on a single line, using the
+     * format row,column:value.
+     *
+     * If the argument <tt>diagonal_first</tt> is true, diagonal elements of
+     * quadratic matrices are printed first in their row. If it is false,
+     * the elements in a row are written in ascending column order.
+     */
+    template <class StreamType>
+    void
+    print(StreamType &out,
+          const bool  across         = false,
+          const bool  diagonal_first = true) const;
+
+    /**
+     * Print the matrix in the usual format, i.e. as a matrix and not as a list
+     * of nonzero elements. For better readability, elements not in the matrix
+     * are displayed as empty space, while matrix elements which are explicitly
+     * set to zero are displayed as such.
+     *
+     * The parameters allow for a flexible setting of the output format:
+     * <tt>precision</tt> and <tt>scientific</tt> are used to determine the
+     * number format, where <tt>scientific = false</tt> means fixed point
+     * notation.  A zero entry for <tt>width</tt> makes the function compute a
+     * width, but it may be changed to a positive value, if output is crude.
+     *
+     * Additionally, a character for an empty value may be specified.
+     *
+     * Finally, the whole matrix can be multiplied with a common denominator to
+     * produce more readable output, even integers.
+     *
+     * @attention This function may produce <b>large</b> amounts of output if
+     * applied to a large matrix!
+     */
+    void
+    print_formatted(std::ostream &     out,
+                    const unsigned int precision   = 3,
+                    const bool         scientific  = true,
+                    const unsigned int width       = 0,
+                    const char *       zero_string = " ",
+                    const double       denominator = 1.) const;
     //@}
 
     /**
@@ -317,7 +375,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline unsigned int
+  inline SparseMatrix<Number>::size_type
   SparseMatrix<Number>::m() const
   {
     return n_rows;
@@ -326,7 +384,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline unsigned int
+  inline SparseMatrix<Number>::size_type
   SparseMatrix<Number>::n() const
   {
     return n_cols;
@@ -339,6 +397,125 @@ namespace CUDAWrappers
   SparseMatrix<Number>::n_nonzero_elements() const
   {
     return nnz;
+  }
+
+
+
+  template <typename Number>
+  template <class StreamType>
+  inline void
+  SparseMatrix<Number>::print(StreamType &out,
+                              const bool  across,
+                              const bool  diagonal_first) const
+  {
+    Assert(column_index_dev != nullptr, ExcNotInitialized());
+    Assert(val_dev != nullptr, ExcNotInitialized());
+    Assert(row_ptr_dev != nullptr, ExcNotInitialized());
+
+    std::vector<int>    rows(n_rows + 1);
+    std::vector<int>    cols(nnz);
+    std::vector<double> val(nnz);
+    Utilities::CUDA::copy_to_host(row_ptr_dev, rows);
+    Utilities::CUDA::copy_to_host(column_index_dev, cols);
+    Utilities::CUDA::copy_to_host(val_dev, val);
+
+    bool   has_diagonal = false;
+    Number diagonal     = Number();
+
+    for (size_type i = 0; i < n_rows; ++i)
+      {
+        if (diagonal_first)
+          {
+            // find the diagonal and print if it exists
+            for (size_type j = rows[i]; j < rows[i + 1] && cols[j] <= i; ++j)
+              {
+                if (i == cols[j])
+                  {
+                    diagonal     = val[j];
+                    has_diagonal = true;
+                    if (across)
+                      out << ' ' << i << ',' << i << ':' << diagonal;
+                    else
+                      out << '(' << i << ',' << i << ") " << diagonal
+                          << std::endl;
+                    break;
+                  }
+              }
+          }
+        for (size_type j = rows[i]; j < rows[i + 1]; ++j)
+          {
+            if (has_diagonal && i == cols[j])
+              continue;
+            if (across)
+              out << ' ' << i << ',' << cols[j] << ':' << val[j];
+            else
+              out << "(" << i << "," << cols[j] << ") " << val[j] << std::endl;
+          }
+      }
+    if (across)
+      out << std::endl;
+  }
+
+
+
+  template <typename Number>
+  void
+  SparseMatrix<Number>::print_formatted(std::ostream &     out,
+                                        const unsigned int precision,
+                                        const bool         scientific,
+                                        const unsigned int width_,
+                                        const char *       zero_string,
+                                        const double       denominator) const
+  {
+    Assert(column_index_dev != nullptr, ExcNotInitialized());
+    Assert(val_dev != nullptr, ExcNotInitialized());
+    Assert(row_ptr_dev != nullptr, ExcNotInitialized());
+
+    std::vector<int>    rows(n_rows + 1);
+    std::vector<int>    cols(nnz);
+    std::vector<Number> val(nnz);
+    Utilities::CUDA::copy_to_host(row_ptr_dev, rows);
+    Utilities::CUDA::copy_to_host(column_index_dev, cols);
+    Utilities::CUDA::copy_to_host(val_dev, val);
+
+    unsigned int width = width_;
+
+    std::ios::fmtflags old_flags     = out.flags();
+    unsigned int       old_precision = out.precision(precision);
+
+    if (scientific)
+      {
+        out.setf(std::ios::scientific, std::ios::floatfield);
+        if (!width)
+          width = precision + 7;
+      }
+    else
+      {
+        out.setf(std::ios::fixed, std::ios::floatfield);
+        if (!width)
+          width = precision + 2;
+      }
+
+    for (size_type i = 0; i < n_rows; ++i)
+      {
+        size_type j = rows[i];
+        for (size_type k = 0; k < n_cols; ++k)
+          {
+            if (k == cols[j])
+              {
+                out << std::setw(width) << val[j] * Number(denominator) << ' ';
+                ++j;
+              }
+            else
+              out << std::setw(width) << zero_string << ' ';
+          }
+        out << std::endl;
+      };
+    AssertThrow(out, ExcIO());
+
+    // reset output format
+    out.precision(old_precision);
+    out.flags(old_flags);
   }
 } // namespace CUDAWrappers
 
