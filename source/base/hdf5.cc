@@ -193,6 +193,85 @@ namespace HDF5
       return FullMatrix<number>(dimensions[0], dimensions[1]);
     }
 
+    // Convert a HDF5 no_collective_cause code to a human readable string
+    std::string
+    no_collective_cause_to_string(uint32_t no_collective_cause)
+    {
+      std::string message;
+      // The first is not a bitmask compararison, the rest are bitmask
+      // comparisons.
+      // https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause
+      // See H5Ppublic.h
+      // Hex codes are used because the HDF5 Group can deprecate some of the
+      // enum codes. For example the enum code H5D_MPIO_FILTERS is not defined
+      // in 1.10.2 because it is possible to use compressed datasets with the
+      // MPI/IO driver.
+
+      // H5D_MPIO_COLLECTIVE
+      if (no_collective_cause == 0x00)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_COLLECTIVE";
+        }
+      // H5D_MPIO_SET_INDEPENDENT
+      if ((no_collective_cause & 0x01) == 0x01)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_SET_INDEPENDENT";
+        }
+      // H5D_MPIO_DATATYPE_CONVERSION
+      if ((no_collective_cause & 0x02) == 0x02)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_DATATYPE_CONVERSION";
+        }
+      // H5D_MPIO_DATA_TRANSFORMS
+      if ((no_collective_cause & 0x04) == 0x04)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_DATA_TRANSFORMS";
+        }
+      // H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES
+      if ((no_collective_cause & 0x10) == 0x10)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES";
+        }
+      // H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET
+      if ((no_collective_cause & 0x20) == 0x20)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET";
+        }
+      // H5D_MPIO_FILTERS
+      if ((no_collective_cause & 0x40) == 0x40)
+        {
+          if (message.length() > 0)
+            {
+              message += ", ";
+            }
+          message += "H5D_MPIO_FILTERS";
+        }
+      return message;
+    }
   } // namespace internal
 
 
@@ -1020,65 +1099,7 @@ namespace HDF5
       _check_io_mode,
       ExcMessage(
         "check_io_mode() should be true in order to use local_no_collective_cause()"));
-    std::string message;
-    // Normal if comparison is used with H5D_MPIO_COLLECTIVE, the rest are
-    // bitmask comparisons.
-    // https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause
-    if (_local_no_collective_cause == H5D_MPIO_COLLECTIVE)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_COLLECTIVE";
-      }
-    if ((_local_no_collective_cause & H5D_MPIO_DATATYPE_CONVERSION) ==
-        H5D_MPIO_DATATYPE_CONVERSION)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_DATATYPE_CONVERSION";
-      }
-    if ((_local_no_collective_cause & H5D_MPIO_DATA_TRANSFORMS) ==
-        H5D_MPIO_DATA_TRANSFORMS)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_DATA_TRANSFORMS";
-      }
-    if ((_local_no_collective_cause &
-         H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES) ==
-        H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES";
-      }
-    if ((_local_no_collective_cause &
-         H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET) ==
-        H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET";
-      }
-    if ((_local_no_collective_cause & H5D_MPIO_FILTERS) == H5D_MPIO_FILTERS)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_FILTERS";
-      }
-    return message;
+    return internal::no_collective_cause_to_string(_local_no_collective_cause);
   }
 
   template <>
@@ -1102,65 +1123,7 @@ namespace HDF5
       _check_io_mode,
       ExcMessage(
         "check_io_mode() should be true in order to use global_no_collective_cause()"));
-    std::string message;
-    // Normal if comparison is used with H5D_MPIO_COLLECTIVE, the rest are
-    // bitmask comparisons.
-    // https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause
-    if (_global_no_collective_cause == H5D_MPIO_COLLECTIVE)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_COLLECTIVE";
-      }
-    if ((_global_no_collective_cause & H5D_MPIO_DATATYPE_CONVERSION) ==
-        H5D_MPIO_DATATYPE_CONVERSION)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_DATATYPE_CONVERSION";
-      }
-    if ((_global_no_collective_cause & H5D_MPIO_DATA_TRANSFORMS) ==
-        H5D_MPIO_DATA_TRANSFORMS)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_DATA_TRANSFORMS";
-      }
-    if ((_global_no_collective_cause &
-         H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES) ==
-        H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES";
-      }
-    if ((_global_no_collective_cause &
-         H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET) ==
-        H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET";
-      }
-    if ((_global_no_collective_cause & H5D_MPIO_FILTERS) == H5D_MPIO_FILTERS)
-      {
-        if (message.length() > 0)
-          {
-            message += ", ";
-          }
-        message += "H5D_MPIO_FILTERS";
-      }
-    return message;
+    return internal::no_collective_cause_to_string(_global_no_collective_cause);
   }
 
   bool
