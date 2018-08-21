@@ -3986,12 +3986,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
 
   // Case 3: standard operation with one index per degree of freedom -> go on
   // here
-
   constexpr unsigned int n_vectorization =
     VectorizedArray<Number>::n_array_elements;
   Assert(mask.count() == n_vectorization,
          ExcNotImplemented("Masking currently not implemented for "
                            "non-contiguous DoF storage"));
+
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
   if (dof_info->index_storage_variants
@@ -4572,24 +4572,29 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
               contiguous)
           {
             if (n_components == 1 || n_fe_components == 1)
-              for (unsigned int v = 0; v < vectorization_populated; ++v)
-                if (mask[v] == true)
-                  for (unsigned int i = 0; i < data->dofs_per_component_on_cell;
-                       ++i)
-                    operation.process_dof(dof_indices[v] + i,
-                                          *src[comp],
-                                          values_dofs[comp][i][v]);
-                else
-                  for (unsigned int v = 0; v < vectorization_populated; ++v)
-                    if (mask[v] == true)
-                      for (unsigned int i = 0;
-                           i < data->dofs_per_component_on_cell;
-                           ++i)
-                        operation.process_dof(
-                          dof_indices[v] + i +
-                            comp * data->dofs_per_component_on_cell,
-                          *src[0],
-                          values_dofs[comp][i][v]);
+              {
+                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(dof_indices[v] + i,
+                                            *src[comp],
+                                            values_dofs[comp][i][v]);
+              }
+            else
+              {
+                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(
+                        dof_indices[v] + i +
+                          comp * data->dofs_per_component_on_cell,
+                        *src[0],
+                        values_dofs[comp][i][v]);
+              }
           }
         else
           {
@@ -4601,24 +4606,29 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
                                VectorizedArray<Number>::n_array_elements + 1);
             if (n_components == 1 || n_fe_components == 1)
               for (unsigned int v = 0; v < vectorization_populated; ++v)
-                if (mask[v] == true)
-                  for (unsigned int i = 0; i < data->dofs_per_component_on_cell;
-                       ++i)
-                    operation.process_dof(dof_indices[v] + i * offsets[v],
-                                          *src[comp],
-                                          values_dofs[comp][i][v]);
-                else
-                  for (unsigned int v = 0; v < vectorization_populated; ++v)
-                    if (mask[v] == true)
-                      for (unsigned int i = 0;
-                           i < data->dofs_per_component_on_cell;
-                           ++i)
-                        operation.process_dof(
-                          dof_indices[v] +
-                            (i + comp * data->dofs_per_component_on_cell) *
-                              offsets[v],
-                          *src[0],
-                          values_dofs[comp][i][v]);
+                {
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(dof_indices[v] + i * offsets[v],
+                                            *src[comp],
+                                            values_dofs[comp][i][v]);
+                }
+            else
+              {
+                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(
+                        dof_indices[v] +
+                          (i + comp * data->dofs_per_component_on_cell) *
+                            offsets[v],
+                        *src[0],
+                        values_dofs[comp][i][v]);
+              }
           }
       }
 }
