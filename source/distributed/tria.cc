@@ -3428,9 +3428,7 @@ namespace parallel
             prepare_coarsening_and_refinement();
           this->update_periodic_face_map();
           // enforce 2:1 mesh balance over periodic boundaries
-          if (this->smooth_grid & dealii::Triangulation<dim, spacedim>::
-                                    limit_level_difference_at_vertices)
-            mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this);
+          mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this);
         }
       while (mesh_changed);
 
