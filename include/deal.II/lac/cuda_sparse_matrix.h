@@ -331,10 +331,9 @@ namespace CUDAWrappers
 
   private:
     /**
-     * cuSPARSE handle used to call cuSPARSE functions. The cuSPARSE handle
-     * needs to be mutable to be called in a const function.
+     * cuSPARSE handle used to call cuSPARSE functions.
      */
-    mutable cusparseHandle_t cusparse_handle;
+    cusparseHandle_t cusparse_handle;
 
     /**
      * Number of non-zero elements in the sparse matrix.
@@ -354,17 +353,17 @@ namespace CUDAWrappers
     /**
      * Pointer to the values (on the device) of the sparse matrix.
      */
-    Number *val_dev;
+    std::unique_ptr<Number[], void (*)(Number *)> val_dev;
 
     /**
      * Pointer to the column indices (on the device) of the sparse matrix.
      */
-    int *column_index_dev;
+    std::unique_ptr<int[], void (*)(int *)> column_index_dev;
 
     /**
      * Pointer to the row pointer (on the device) of the sparse matrix.
      */
-    int *row_ptr_dev;
+    std::unique_ptr<int[], void (*)(int *)> row_ptr_dev;
 
     /**
      * cuSPARSE description of the sparse matrix.
@@ -415,9 +414,9 @@ namespace CUDAWrappers
     std::vector<int>    rows(n_rows + 1);
     std::vector<int>    cols(nnz);
     std::vector<double> val(nnz);
-    Utilities::CUDA::copy_to_host(row_ptr_dev, rows);
-    Utilities::CUDA::copy_to_host(column_index_dev, cols);
-    Utilities::CUDA::copy_to_host(val_dev, val);
+    Utilities::CUDA::copy_to_host(row_ptr_dev.get(), rows);
+    Utilities::CUDA::copy_to_host(column_index_dev.get(), cols);
+    Utilities::CUDA::copy_to_host(val_dev.get(), val);
 
     bool   has_diagonal = false;
     Number diagonal     = Number();
@@ -474,9 +473,9 @@ namespace CUDAWrappers
     std::vector<int>    rows(n_rows + 1);
     std::vector<int>    cols(nnz);
     std::vector<Number> val(nnz);
-    Utilities::CUDA::copy_to_host(row_ptr_dev, rows);
-    Utilities::CUDA::copy_to_host(column_index_dev, cols);
-    Utilities::CUDA::copy_to_host(val_dev, val);
+    Utilities::CUDA::copy_to_host(row_ptr_dev.get(), rows);
+    Utilities::CUDA::copy_to_host(column_index_dev.get(), cols);
+    Utilities::CUDA::copy_to_host(val_dev.get(), val);
 
     unsigned int width = width_;
 
