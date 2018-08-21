@@ -27,6 +27,28 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace CUDAWrappers
 {
+  namespace
+  {
+    template <typename Number>
+    void
+    delete_device_data(Number *device_ptr) noexcept
+    {
+      const cudaError_t error_code = cudaFree(device_ptr);
+      (void)error_code;
+      AssertNothrow(error_code == cudaSuccess,
+                    dealii::ExcCudaError(cudaGetErrorString(error_code)));
+    }
+
+    template <typename Number>
+    Number *
+    allocate_device_data(const std::size_t size)
+    {
+      Number *device_ptr;
+      Utilities::CUDA::malloc(device_ptr, size);
+      return device_ptr;
+    }
+  } // namespace
+
   namespace internal
   {
     template <typename Number>
@@ -168,9 +190,9 @@ namespace CUDAWrappers
   SparseMatrix<Number>::SparseMatrix()
     : nnz(0)
     , n_rows(0)
-    , val_dev(nullptr)
-    , column_index_dev(nullptr)
-    , row_ptr_dev(nullptr)
+    , val_dev(nullptr, delete_device_data<Number>)
+    , column_index_dev(nullptr, delete_device_data<int>)
+    , row_ptr_dev(nullptr, delete_device_data<int>)
     , descr(nullptr)
   {}
 
@@ -180,9 +202,9 @@ namespace CUDAWrappers
   SparseMatrix<Number>::SparseMatrix(
     Utilities::CUDA::Handle &             handle,
     const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
-    : val_dev(nullptr)
-    , column_index_dev(nullptr)
-    , row_ptr_dev(nullptr)
+    : val_dev(nullptr, delete_device_data<Number>)
+    , column_index_dev(nullptr, delete_device_data<int>)
+    , row_ptr_dev(nullptr, delete_device_data<int>)
     , descr(nullptr)
   {
     reinit(handle, sparse_matrix_host);
@@ -192,23 +214,19 @@ namespace CUDAWrappers
 
   template <typename Number>
   SparseMatrix<Number>::SparseMatrix(CUDAWrappers::SparseMatrix<Number> &&other)
+    : cusparse_handle(other.cusparse_handle)
+    , nnz(other.nnz)
+    , n_rows(other.n_rows)
+    , n_cols(other.n_cols)
+    , val_dev(std::move(other.val_dev))
+    , column_index_dev(std::move(other.column_index_dev))
+    , row_ptr_dev(std::move(other.row_ptr_dev))
+    , descr(other.descr)
   {
-    cusparse_handle  = other.cusparse_handle;
-    nnz              = other.nnz;
-    n_rows           = other.n_rows;
-    n_cols           = other.n_cols;
-    val_dev          = other.val_dev;
-    column_index_dev = other.column_index_dev;
-    row_ptr_dev      = other.row_ptr_dev;
-    descr            = other.descr;
-
-    other.nnz              = 0;
-    other.n_rows           = 0;
-    other.n_cols           = 0;
-    other.val_dev          = nullptr;
-    other.column_index_dev = nullptr;
-    other.row_ptr_dev      = nullptr;
-    other.descr            = nullptr;
+    other.nnz    = 0;
+    other.n_rows = 0;
+    other.n_cols = 0;
+    other.descr  = nullptr;
   }
 
 
@@ -216,27 +234,6 @@ namespace CUDAWrappers
   template <typename Number>
   SparseMatrix<Number>::~SparseMatrix<Number>()
   {
-    if (val_dev != nullptr)
-      {
-        const cudaError_t error_code = cudaFree(val_dev);
-        AssertNothrowCuda(error_code);
-        val_dev = nullptr;
-      }
-
-    if (column_index_dev != nullptr)
-      {
-        const cudaError_t error_code = cudaFree(column_index_dev);
-        AssertNothrowCuda(error_code);
-        column_index_dev = nullptr;
-      }
-
-    if (row_ptr_dev != nullptr)
-      {
-        const cudaError_t error_code = cudaFree(row_ptr_dev);
-        AssertNothrowCuda(error_code);
-        row_ptr_dev = nullptr;
-      }
-
     if (descr != nullptr)
       {
         const cusparseStatus_t cusparse_error_code =
@@ -259,18 +256,15 @@ namespace CUDAWrappers
     nnz              = other.nnz;
     n_rows           = other.n_rows;
     n_cols           = other.n_cols;
-    val_dev          = other.val_dev;
-    column_index_dev = other.column_index_dev;
-    row_ptr_dev      = other.row_ptr_dev;
+    val_dev          = std::move(other.val_dev);
+    column_index_dev = std::move(other.column_index_dev);
+    row_ptr_dev      = std::move(other.row_ptr_dev);
     descr            = other.descr;
 
-    other.nnz              = 0;
-    other.n_rows           = 0;
-    other.n_cols           = 0;
-    other.val_dev          = nullptr;
-    other.column_index_dev = nullptr;
-    other.row_ptr_dev      = nullptr;
-    other.descr            = nullptr;
+    other.nnz    = 0;
+    other.n_rows = 0;
+    other.n_cols = 0;
+    other.descr  = nullptr;
 
     return *this;
   }
@@ -324,27 +318,26 @@ namespace CUDAWrappers
       }
 
     // Copy the elements to the gpu
-    cudaError_t error_code = cudaMalloc(&val_dev, nnz * sizeof(Number));
-    AssertCuda(error_code);
-    error_code = cudaMemcpy(val_dev,
-                            &val[0],
-                            nnz * sizeof(Number),
-                            cudaMemcpyHostToDevice);
+    val_dev.reset(allocate_device_data<Number>(nnz));
+    cudaError_t error_code = cudaMemcpy(val_dev.get(),
+                                        &val[0],
+                                        nnz * sizeof(Number),
+                                        cudaMemcpyHostToDevice);
     AssertCuda(error_code);
 
     // Copy the column indices to the gpu
-    error_code = cudaMalloc(&column_index_dev, nnz * sizeof(int));
+    column_index_dev.reset(allocate_device_data<int>(nnz));
     AssertCuda(error_code);
-    error_code = cudaMemcpy(column_index_dev,
+    error_code = cudaMemcpy(column_index_dev.get(),
                             &column_index[0],
                             nnz * sizeof(int),
                             cudaMemcpyHostToDevice);
     AssertCuda(error_code);
 
     // Copy the row pointer to the gpu
-    error_code = cudaMalloc(&row_ptr_dev, row_ptr_size * sizeof(int));
+    row_ptr_dev.reset(allocate_device_data<int>(row_ptr_size));
     AssertCuda(error_code);
-    error_code = cudaMemcpy(row_ptr_dev,
+    error_code = cudaMemcpy(row_ptr_dev.get(),
                             &row_ptr[0],
                             row_ptr_size * sizeof(int),
                             cudaMemcpyHostToDevice);
@@ -369,7 +362,8 @@ namespace CUDAWrappers
   {
     AssertIsFinite(factor);
     const int n_blocks = 1 + (nnz - 1) / block_size;
-    internal::scale<Number><<<n_blocks, block_size>>>(val_dev, factor, nnz);
+    internal::scale<Number>
+      <<<n_blocks, block_size>>>(val_dev.get(), factor, nnz);
 
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
@@ -389,7 +383,7 @@ namespace CUDAWrappers
     Assert(factor != Number(0.), ExcZero());
     const int n_blocks = 1 + (nnz - 1) / block_size;
     internal::scale<Number>
-      <<<n_blocks, block_size>>>(val_dev, 1. / factor, nnz);
+      <<<n_blocks, block_size>>>(val_dev.get(), 1. / factor, nnz);
 
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
@@ -413,9 +407,9 @@ namespace CUDAWrappers
                     n_cols,
                     nnz,
                     descr,
-                    val_dev,
-                    row_ptr_dev,
-                    column_index_dev,
+                    val_dev.get(),
+                    row_ptr_dev.get(),
+                    column_index_dev.get(),
                     src.get_values(),
                     false,
                     dst.get_values());
@@ -435,9 +429,9 @@ namespace CUDAWrappers
                     n_cols,
                     nnz,
                     descr,
-                    val_dev,
-                    row_ptr_dev,
-                    column_index_dev,
+                    val_dev.get(),
+                    row_ptr_dev.get(),
+                    column_index_dev.get(),
                     src.get_values(),
                     false,
                     dst.get_values());
@@ -457,9 +451,9 @@ namespace CUDAWrappers
                     n_cols,
                     nnz,
                     descr,
-                    val_dev,
-                    row_ptr_dev,
-                    column_index_dev,
+                    val_dev.get(),
+                    row_ptr_dev.get(),
+                    column_index_dev.get(),
                     src.get_values(),
                     true,
                     dst.get_values());
@@ -479,9 +473,9 @@ namespace CUDAWrappers
                     n_cols,
                     nnz,
                     descr,
-                    val_dev,
-                    row_ptr_dev,
-                    column_index_dev,
+                    val_dev.get(),
+                    row_ptr_dev.get(),
+                    column_index_dev.get(),
                     src.get_values(),
                     true,
                     dst.get_values());
@@ -537,8 +531,12 @@ namespace CUDAWrappers
   {
     LinearAlgebra::CUDAWrappers::Vector<real_type> column_sums(n_cols);
     const int n_blocks = 1 + (nnz - 1) / block_size;
-    internal::l1_norm<Number><<<n_blocks, block_size>>>(
-      n_rows, val_dev, column_index_dev, row_ptr_dev, column_sums.get_values());
+    internal::l1_norm<Number>
+      <<<n_blocks, block_size>>>(n_rows,
+                                 val_dev.get(),
+                                 column_index_dev.get(),
+                                 row_ptr_dev.get(),
+                                 column_sums.get_values());
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
@@ -555,8 +553,12 @@ namespace CUDAWrappers
   {
     LinearAlgebra::CUDAWrappers::Vector<real_type> row_sums(n_rows);
     const int n_blocks = 1 + (nnz - 1) / block_size;
-    internal::linfty_norm<Number><<<n_blocks, block_size>>>(
-      n_rows, val_dev, column_index_dev, row_ptr_dev, row_sums.get_values());
+    internal::linfty_norm<Number>
+      <<<n_blocks, block_size>>>(n_rows,
+                                 val_dev.get(),
+                                 column_index_dev.get(),
+                                 row_ptr_dev.get(),
+                                 row_sums.get_values());
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
@@ -573,7 +575,7 @@ namespace CUDAWrappers
   {
     LinearAlgebra::CUDAWrappers::Vector<real_type> matrix_values(nnz);
     cudaError_t cuda_error = cudaMemcpy(matrix_values.get_values(),
-                                        val_dev,
+                                        val_dev.get(),
                                         nnz * sizeof(Number),
                                         cudaMemcpyDeviceToDevice);
 
@@ -586,7 +588,10 @@ namespace CUDAWrappers
   std::tuple<Number *, int *, int *, cusparseMatDescr_t>
   SparseMatrix<Number>::get_cusparse_matrix() const
   {
-    return std::make_tuple(val_dev, column_index_dev, row_ptr_dev, descr);
+    return std::make_tuple(val_dev.get(),
+                           column_index_dev.get(),
+                           row_ptr_dev.get(),
+                           descr);
   }
 
 
