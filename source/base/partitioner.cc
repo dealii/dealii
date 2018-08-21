@@ -213,19 +213,13 @@ namespace Utilities
 
       // fix case when there are some processors without any locally owned
       // indices: then there might be a zero in some entries. The reason
-      // is that local_range_data will contain [0,0) and second indix is
-      // incorrect inside the Allgather'ed first_index.
+      // is that local_range_data will contain [0,0) and second index is
+      // incorrect inside the Allgather'ed first_index. Below we fix this
+      // by ensuring that the start point is always the end index of the
+      // processor immediately before.
       if (global_size > 0)
         {
-          unsigned int first_proc_with_nonzero_dofs = 0;
-          for (unsigned int i = 0; i < n_procs; ++i)
-            if (first_index[i + 1] > 0)
-              {
-                first_proc_with_nonzero_dofs = i;
-                break;
-              }
-          for (unsigned int i = first_proc_with_nonzero_dofs + 1; i < n_procs;
-               ++i)
+          for (unsigned int i = 1; i < n_procs; ++i)
             if (first_index[i] == 0)
               first_index[i] = first_index[i - 1];
 
