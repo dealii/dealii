@@ -212,7 +212,9 @@ namespace Utilities
       first_index[n_procs] = global_size;
 
       // fix case when there are some processors without any locally owned
-      // indices: then there might be a zero in some entries
+      // indices: then there might be a zero in some entries. The reason
+      // is that local_range_data will contain [0,0) and second indix is
+      // incorrect inside the Allgather'ed first_index.
       if (global_size > 0)
         {
           unsigned int first_proc_with_nonzero_dofs = 0;
