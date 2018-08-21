@@ -212,18 +212,14 @@ namespace Utilities
       first_index[n_procs] = global_size;
 
       // fix case when there are some processors without any locally owned
-      // indices: then there might be a zero in some entries
+      // indices: then there might be a zero in some entries. The reason
+      // is that local_range_data will contain [0,0) and second index is
+      // incorrect inside the Allgather'ed first_index. Below we fix this
+      // by ensuring that the start point is always the end index of the
+      // processor immediately before.
       if (global_size > 0)
         {
-          unsigned int first_proc_with_nonzero_dofs = 0;
-          for (unsigned int i = 0; i < n_procs; ++i)
-            if (first_index[i + 1] > 0)
-              {
-                first_proc_with_nonzero_dofs = i;
-                break;
-              }
-          for (unsigned int i = first_proc_with_nonzero_dofs + 1; i < n_procs;
-               ++i)
+          for (unsigned int i = 1; i < n_procs; ++i)
             if (first_index[i] == 0)
               first_index[i] = first_index[i - 1];
 
@@ -253,10 +249,15 @@ namespace Utilities
           types::global_dof_index current_index = expanded_ghost_indices[0];
           while (current_index >= first_index[current_proc + 1])
             current_proc++;
+          AssertIndexRange(current_proc, n_procs);
+
+          // since DoFs are contiguous, populate a vector which stores
+          // a process rank and the number of ghosts
           std::vector<std::pair<unsigned int, unsigned int>> ghost_targets_temp(
             1, std::pair<unsigned int, unsigned int>(current_proc, 0));
           n_ghost_targets++;
 
+          // find which process is the owner of other indices:
           for (unsigned int iterator = 1; iterator < n_ghost_indices_data;
                ++iterator)
             {
@@ -264,6 +265,9 @@ namespace Utilities
               while (current_index >= first_index[current_proc + 1])
                 current_proc++;
               AssertIndexRange(current_proc, n_procs);
+              // if we found a new target (i.e. higher rank) then adjust the
+              // pair.second in the last element so that it stores the total
+              // number of ghosts owned by pair.first
               if (ghost_targets_temp[n_ghost_targets - 1].first < current_proc)
                 {
                   ghost_targets_temp[n_ghost_targets - 1].second =
@@ -272,6 +276,8 @@ namespace Utilities
                   n_ghost_targets++;
                 }
             }
+          // adjust the last element so that pair.second stores the number of
+          // elements
           ghost_targets_temp[n_ghost_targets - 1].second =
             n_ghost_indices_data -
             ghost_targets_temp[n_ghost_targets - 1].second;
@@ -307,8 +313,9 @@ namespace Utilities
         import_targets_data = import_targets_temp;
       }
 
-      // send and receive indices for import data. non-blocking receives and
-      // blocking sends
+      // now that we know how many indices each process will recieve from
+      // ghosts, send and receive indices for import data. non-blocking receives
+      // and blocking sends
       std::vector<types::global_dof_index> expanded_import_indices(
         n_import_indices_data);
       {
@@ -329,7 +336,7 @@ namespace Utilities
           }
         AssertDimension(current_index_start, n_import_indices_data);
 
-        // use blocking send
+        // use blocking send for ghost indices stored in expanded_ghost_indices
         current_index_start = 0;
         for (unsigned int i = 0; i < n_ghost_targets; i++)
           {
@@ -345,6 +352,7 @@ namespace Utilities
           }
         AssertDimension(current_index_start, n_ghost_indices_data);
 
+        // wait for all import from other processes to be done
         if (import_requests.size() > 0)
           {
             const int ierr = MPI_Waitall(import_requests.size(),
@@ -359,6 +367,7 @@ namespace Utilities
           import_indices_chunks_by_rank_data.resize(import_targets_data.size() +
                                                     1);
           import_indices_chunks_by_rank_data[0] = 0;
+          // a vector which stores import indices as ranges [a_i,b_i)
           std::vector<std::pair<unsigned int, unsigned int>>
                        compressed_import_indices;
           unsigned int shift = 0;
@@ -369,19 +378,24 @@ namespace Utilities
               for (unsigned int ii = 0; ii < import_targets_data[p].second;
                    ++ii)
                 {
+                  // index in expanded_import_indices for a pair (p,ii):
                   const unsigned int i = shift + ii;
                   Assert(expanded_import_indices[i] >= local_range_data.first &&
                            expanded_import_indices[i] < local_range_data.second,
                          ExcIndexRange(expanded_import_indices[i],
                                        local_range_data.first,
                                        local_range_data.second));
+                  // local index starting from the beginning of locally owned
+                  // DoFs:
                   types::global_dof_index new_index =
                     (expanded_import_indices[i] - local_range_data.first);
                   Assert(new_index < numbers::invalid_unsigned_int,
                          ExcNotImplemented());
                   if (new_index == last_index + 1)
+                    // if contiguous, increment the end of last range:
                     compressed_import_indices.back().second++;
                   else
+                    // otherwise start a new range:
                     compressed_import_indices.emplace_back(new_index,
                                                            new_index + 1);
                   last_index = new_index;
@@ -429,6 +443,8 @@ namespace Utilities
 
           n_ghost_indices_in_larger_set = larger_ghost_index_set.n_elements();
 
+          // first translate tight ghost indices into indices within the large
+          // set:
           std::vector<unsigned int> expanded_numbering;
           for (IndexSet::ElementIterator it = ghost_indices_data.begin();
                it != ghost_indices_data.end();
@@ -437,14 +453,22 @@ namespace Utilities
               Assert(larger_ghost_index_set.is_element(*it),
                      ExcMessage("The given larger ghost index set must contain"
                                 "all indices in the actual index set."));
+              Assert(
+                larger_ghost_index_set.index_within_set(*it) <
+                  static_cast<types::global_dof_index>(
+                    std::numeric_limits<unsigned int>::max()),
+                ExcMessage(
+                  "Index overflow: This class supports at most 2^32-1 ghost elements"));
               expanded_numbering.push_back(
                 larger_ghost_index_set.index_within_set(*it));
             }
 
+          // now rework expanded_numbering into ranges and store in:
           std::vector<std::pair<unsigned int, unsigned int>>
             ghost_indices_subset;
           ghost_indices_subset_chunks_by_rank_data.resize(
             ghost_targets_data.size() + 1);
+          // also populate ghost_indices_subset_chunks_by_rank_data
           ghost_indices_subset_chunks_by_rank_data[0] = 0;
           unsigned int shift                          = 0;
           for (unsigned int p = 0; p < ghost_targets_data.size(); ++p)
@@ -454,8 +478,10 @@ namespace Utilities
                 {
                   const unsigned int i = shift + ii;
                   if (expanded_numbering[i] == last_index + 1)
+                    // if contiguous, increment the end of last range:
                     ghost_indices_subset.back().second++;
                   else
+                    // otherwise start a new range
                     ghost_indices_subset.emplace_back(expanded_numbering[i],
                                                       expanded_numbering[i] +
                                                         1);
