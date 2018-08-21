@@ -270,8 +270,34 @@ class MultipleParameterLoop;
  *   @endcode
  * get() returns the value of the given entry. If the entry was not specified
  * in the input source(s), the default value is returned. You have to enter
- * and leave subsections exactly as you did when declaring subsection. You may
- * chose the order in which to transverse the subsection tree.
+ * and leave subsections exactly as you did when declaring subsections. You may
+ * choose the order in which to traverse the subsection tree.
+ *
+ * It is possible to avoid calls to enter_subsection() and leave_subsection()
+ * by supplying get() with a vector of strings representing the path from
+ * which to get a value. For example, the following two versions of
+ * get_parameters() will produce the same result:
+ *   @code
+ *     void NonLinEq::get_parameters (ParameterHandler &prm)
+ *     {
+ *       prm.enter_subsection ("Equation 1 Settings");
+ *       prm.enter_subsection ("Linear solver");
+ *       solver_ = prm.get ("Solver");
+ *       prm.leave_subsection ();
+ *       prm.leave_subsection ();
+ *     }
+ *   @endcode
+ *
+ *   @code
+ *     void NonLinEq::get_parameters (const ParameterHandler &prm)
+ *     {
+ *       std::vector<std::string> path =
+ *         {"Equation 1 Settings", "Linear solver"};
+ *       solver_ = prm.get (path, "Solver");
+ *     }
+ *   @endcode
+ *
+ * The latter method allows the ParameterHandler reference to be @p const.
  *
  * It is guaranteed that only entries matching the given regular expression
  * are returned, i.e. an input entry value which does not match the regular
@@ -1152,15 +1178,29 @@ public:
   leave_subsection();
 
   /**
-   * Return value of entry <tt>entry_string</tt>.  If the entry was changed,
+   * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
-   * value of an undeclared entry is required, an exception will be thrown.
+   * value of an undeclared entry is required, an @p Assert will fail.
    */
   std::string
   get(const std::string &entry_string) const;
 
   /**
-   * Return value of entry <tt>entry_string</tt> as <tt>long int</tt>. (A long
+   * Return value of entry @p entry_string.  If the entry was changed,
+   * then the changed value is returned, otherwise the default value. If the
+   * value of an undeclared entry is required, an @p Assert will fail.
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection. The first string in @p entry_subsection_path must be the name
+   * of a subsection of the current section, and each next string must be the
+   * name of a subsection of the one before it.
+   */
+  std::string
+  get(const std::vector<std::string> &entry_subsection_path,
+      const std::string &             entry_string) const;
+
+  /**
+   * Return value of entry @p entry_string as <code>long int</code>. (A long
    * int is chosen so that even very large unsigned values can be returned by
    * this function).
    */
@@ -1168,18 +1208,51 @@ public:
   get_integer(const std::string &entry_string) const;
 
   /**
-   * Return value of entry <tt>entry_name</tt> as <tt>double</tt>.
+   * Return value of entry @p entry_string as <code>long int</code>. (A long
+   * int is chosen so that even very large unsigned values can be returned by
+   * this function).
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection.
+   */
+  long int
+  get_integer(const std::vector<std::string> &entry_subsection_path,
+              const std::string &             entry_string) const;
+
+  /**
+   * Return value of entry @p entry_name as @p double.
    */
   double
   get_double(const std::string &entry_name) const;
 
   /**
-   * Return value of entry <tt>entry_name</tt> as <tt>bool</tt>. The entry may
-   * be "true" or "yes" for <tt>true</tt>, "false" or "no" for <tt>false</tt>
+   * Return value of entry @p entry_name as @p double.
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection.
+   */
+  double
+  get_double(const std::vector<std::string> &entry_subsection_path,
+             const std::string &             entry_string) const;
+  /**
+   * Return value of entry @p entry_name as @p bool. The entry may
+   * be "true" or "yes" for @p true, "false" or "no" for @p false
    * respectively.
    */
   bool
   get_bool(const std::string &entry_name) const;
+
+  /**
+   * Return value of entry @p entry_name as @p bool. The entry may
+   * be "true" or "yes" for @p true, "false" or "no" for @p false
+   * respectively.
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection.
+   */
+  bool
+  get_bool(const std::vector<std::string> &entry_subsection_path,
+           const std::string &             entry_string) const;
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1581,6 +1654,14 @@ private:
    */
   std::string
   get_current_full_path(const std::string &name) const;
+
+  /**
+   * This function computes a full path into the parameter tree given a path
+   * from the current subsection and the name of an entry.
+   */
+  std::string
+  get_current_full_path(const std::vector<std::string> &sub_path,
+                        const std::string &             name) const;
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
