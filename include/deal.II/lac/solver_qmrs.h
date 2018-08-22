@@ -457,7 +457,7 @@ SolverQMRS<VectorType>::iterate(const MatrixType &        A,
       // Double and vector updates
       rho               = u * r;
       const double beta = rho / rho_old;
-      q.sadd(beta, u);
+      q.sadd(beta, 1., u);
     }
   return IterationResult(SolverControl::success, res);
 }

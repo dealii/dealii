@@ -329,13 +329,6 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
       // All vectors have to be shifted
       // one iteration step.
       // This should be changed one time.
-      //
-      // the previous code was like this:
-      //   m[2] = m[1];
-      //   m[1] = m[0];
-      // but it can be made more efficient,
-      // since the value of m[0] is no more
-      // needed in the next iteration
       swap(*m[2], *m[1]);
       swap(*m[1], *m[0]);
 
