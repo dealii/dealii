@@ -573,7 +573,7 @@ namespace LinearAlgebra
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         local_result =
           std::max(local_result,
-                   -static_cast<int>(this->block(i).all_zero_local()));
+                   (this->block(i).linfty_norm_local() == 0) ? -1 : 0);
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return -Utilities::MPI::max(

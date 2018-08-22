@@ -150,6 +150,8 @@ IF(DEAL_II_WITH_CUDA)
     cuda_solver_direct.cu
     cuda_sparse_matrix.cu
     cuda_vector.cu
+    la_parallel_vector.cu
+    read_write_vector.cu
   )
 ENDIF()
 

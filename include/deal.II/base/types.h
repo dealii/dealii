@@ -276,7 +276,6 @@ namespace numbers
     static_cast<types::subdomain_id>(-2);
 } // namespace numbers
 
-
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

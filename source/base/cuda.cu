@@ -15,9 +15,12 @@
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_space.h>
 
 #include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/vector_memory.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,6 +49,13 @@ namespace Utilities
         LinearAlgebra::CUDAWrappers::Vector<float>>::release_unused_memory();
       dealii::GrowingVectorMemory<
         LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
+
+      dealii::GrowingVectorMemory<
+        LinearAlgebra::distributed::Vector<float, dealii::MemorySpace::CUDA>>::
+        release_unused_memory();
+      dealii::GrowingVectorMemory<
+        LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>>::
+        release_unused_memory();
 
       cusolverStatus_t cusolver_error_code =
         cusolverDnDestroy(cusolver_dn_handle);

@@ -47,9 +47,9 @@ namespace LinearAlgebra
   class CommunicationPatternBase;
   namespace distributed
   {
-    template <typename>
+    template <typename, typename>
     class Vector;
-  }
+  } // namespace distributed
 } // namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_PETSC
@@ -290,9 +290,10 @@ namespace LinearAlgebra
      * be used if the same communication pattern is used multiple times. This
      * can be used to improve performance.
      */
+    template <typename MemorySpace>
     void
-    import(const distributed::Vector<Number> &vec,
-           VectorOperation::values            operation,
+    import(const distributed::Vector<Number, MemorySpace> &vec,
+           VectorOperation::values                         operation,
            const std::shared_ptr<const CommunicationPatternBase>
              &communication_pattern =
                std::shared_ptr<const CommunicationPatternBase>());
@@ -326,11 +327,11 @@ namespace LinearAlgebra
      * @note: The @p trilinos_vec is not allowed to have ghost entries.
      */
     void
-    import(
-      const TrilinosWrappers::MPI::Vector &           trilinos_vec,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>());
+    import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
+           VectorOperation::values              operation,
+           const std::shared_ptr<const CommunicationPatternBase>
+             &communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>());
 
 #  ifdef DEAL_II_WITH_MPI
     /**
@@ -342,11 +343,11 @@ namespace LinearAlgebra
      * performance.
      */
     void
-    import(
-      const EpetraWrappers::Vector &                  epetra_vec,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>());
+    import(const EpetraWrappers::Vector &epetra_vec,
+           VectorOperation::values       operation,
+           const std::shared_ptr<const CommunicationPatternBase>
+             &communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>());
 #  endif
 #endif
 
@@ -358,11 +359,11 @@ namespace LinearAlgebra
      * replace the current elements. The last parameter is not used.
      */
     void
-    import(
-      const CUDAWrappers::Vector<Number> &            cuda_vec,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>());
+    import(const CUDAWrappers::Vector<Number> &cuda_vec,
+           VectorOperation::values             operation,
+           const std::shared_ptr<const CommunicationPatternBase>
+             &communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>());
 #endif
 
     /**

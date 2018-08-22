@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/partitioner.h>
@@ -175,13 +176,54 @@ namespace LinearAlgebra
      * fail in some circumstances. Therefore, it is strongly recommended to
      * not rely on this class to automatically detect the unsupported case.
      *
-     * @author Katharina Kormann, Martin Kronbichler, 2010, 2011, 2016
+     * <h4>CUDA support</h4>
+     *
+     * This vector class supports two different memory spaces: Host and CUDA. By
+     * default, the memory space is Host and all the data are allocated on the
+     * CPU. When the memory space is CUDA, all the data is allocated on the GPU.
+     * The operations on the vector are performed on the chosen memory space. *
+     * From the host, there are two methods to access the elements of the Vector
+     * when using the CUDA memory space: <ul>
+     * <li> use get_values()
+     * <code>
+     * Vector<double, MemorySpace::CUDA> vector(local_range, comm);
+     * double* vector_dev = vector.get_values();
+     * std::vector<double> vector_host(local_range.n_elements(), 1.);
+     * Utilities::CUDA::copy_to_dev(vector_host, vector_dev);
+     * </code>
+     * <li> use import()
+     * <code>
+     * Vector<double, MemorySpace::CUDA> vector(local_range, comm);
+     * ReadWriteVector<double> rw_vector(local_range);
+     * for (auto & val : rw_vector)
+     *   val = 1.;
+     * vector.import(rw_vector, VectorOperations::insert);
+     * </code>
+     * </ul>
+     * The import method is a lot safer and will perform an MPI communication if
+     * necessary. Since an MPI communication may be performed, import needs to
+     * be called on all the processors.
+     *
+     * @note By default, all the ranks will try to access the device 0. This is
+     * fine is if you have one rank per node and one gpu per node. If you
+     * have multiple GPUs on one node, we need each process to access a
+     * different GPU. If each node has the same number of GPUs, this can be done
+     * as follows:
+     * <code> int n_devices = 0; cudaGetDeviceCount(&n_devices); int
+     * device_id = my_rank % n_devices;
+     * cudaSetDevice(device_id);
+     * </code>
+     * @see CUDAWrappers
+     *
+     * @author Katharina Kormann, Martin Kronbichler, Bruno Turcksin 2010, 2011,
+     * 2016, 2018
      */
-    template <typename Number>
+    template <typename Number, typename MemorySpace = MemorySpace::Host>
     class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
                    public Subscriptor
     {
     public:
+      using memory_space    = MemorySpace;
       using value_type      = Number;
       using pointer         = value_type *;
       using const_pointer   = const value_type *;
@@ -191,6 +233,11 @@ namespace LinearAlgebra
       using const_reference = const value_type &;
       using size_type       = types::global_dof_index;
       using real_type       = typename numbers::NumberTraits<Number>::real_type;
+
+      static_assert(
+        std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
+          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
+        "MemorySpace should be Host or CUDA");
 
       /**
        * @name 1: Basic Object-handling
@@ -204,7 +251,7 @@ namespace LinearAlgebra
       /**
        * Copy constructor. Uses the parallel partitioning of @p in_vector.
        */
-      Vector(const Vector<Number> &in_vector);
+      Vector(const Vector<Number, MemorySpace> &in_vector);
 
       /**
        * Construct a parallel vector of the given global size without any
@@ -270,8 +317,8 @@ namespace LinearAlgebra
        */
       template <typename Number2>
       void
-      reinit(const Vector<Number2> &in_vector,
-             const bool             omit_zeroing_entries = false);
+      reinit(const Vector<Number2, MemorySpace> &in_vector,
+             const bool                          omit_zeroing_entries = false);
 
       /**
        * Initialize the vector. The local range is specified by @p
@@ -326,7 +373,7 @@ namespace LinearAlgebra
        * handle memory separately.
        */
       void
-      swap(Vector<Number> &v);
+      swap(Vector<Number, MemorySpace> &v);
 
       /**
        * Assigns the vector to the parallel partitioning of the input vector
@@ -339,8 +386,8 @@ namespace LinearAlgebra
        * at all, the vector will also update its ghost values in analogy to
        * the respective setting the Trilinos and PETSc vectors.
        */
-      Vector<Number> &
-      operator=(const Vector<Number> &in_vector);
+      Vector<Number, MemorySpace> &
+      operator=(const Vector<Number, MemorySpace> &in_vector);
 
       /**
        * Assigns the vector to the parallel partitioning of the input vector
@@ -354,8 +401,8 @@ namespace LinearAlgebra
        * the respective setting the Trilinos and PETSc vectors.
        */
       template <typename Number2>
-      Vector<Number> &
-      operator=(const Vector<Number2> &in_vector);
+      Vector<Number, MemorySpace> &
+      operator=(const Vector<Number2, MemorySpace> &in_vector);
 
 #ifdef DEAL_II_WITH_PETSC
       /**
@@ -369,7 +416,7 @@ namespace LinearAlgebra
        * ReadWriteVector instead.
        */
       DEAL_II_DEPRECATED
-      Vector<Number> &
+      Vector<Number, MemorySpace> &
       operator=(const PETScWrappers::MPI::Vector &petsc_vec);
 #endif
 
@@ -386,7 +433,7 @@ namespace LinearAlgebra
        * ReadWriteVector instead.
        */
       DEAL_II_DEPRECATED
-      Vector<Number> &
+      Vector<Number, MemorySpace> &
       operator=(const TrilinosWrappers::MPI::Vector &trilinos_vec);
 #endif
       //@}
@@ -564,7 +611,7 @@ namespace LinearAlgebra
        */
       template <typename Number2>
       void
-      copy_locally_owned_data_from(const Vector<Number2> &src);
+      copy_locally_owned_data_from(const Vector<Number2, MemorySpace> &src);
 
       //@}
 
@@ -584,25 +631,25 @@ namespace LinearAlgebra
       /**
        * Multiply the entire vector by a fixed factor.
        */
-      virtual Vector<Number> &
+      virtual Vector<Number, MemorySpace> &
       operator*=(const Number factor) override;
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual Vector<Number> &
+      virtual Vector<Number, MemorySpace> &
       operator/=(const Number factor) override;
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual Vector<Number> &
+      virtual Vector<Number, MemorySpace> &
       operator+=(const VectorSpaceVector<Number> &V) override;
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      virtual Vector<Number> &
+      virtual Vector<Number, MemorySpace> &
       operator-=(const VectorSpaceVector<Number> &V) override;
 
       /**
@@ -612,6 +659,9 @@ namespace LinearAlgebra
        * current elements. The last parameter can be used if the same
        * communication pattern is used multiple times. This can be used to
        * improve performance.
+       *
+       * @note If the MemorySpace is CUDA, the data in the ReadWriteVector will
+       * be moved to the device.
        */
       virtual void
       import(
@@ -777,7 +827,7 @@ namespace LinearAlgebra
        * zero, also ghost elements are set to zero, otherwise they remain
        * unchanged.
        */
-      virtual Vector<Number> &
+      virtual Vector<Number, MemorySpace> &
       operator=(const Number s) override;
 
       /**
@@ -804,7 +854,7 @@ namespace LinearAlgebra
        * s*(*this)+V</tt>.
        */
       void
-      sadd(const Number s, const Vector<Number> &V);
+      sadd(const Number s, const Vector<Number, MemorySpace> &V);
 
       /**
        * Scaling and multiple addition.
@@ -813,11 +863,11 @@ namespace LinearAlgebra
        */
       DEAL_II_DEPRECATED
       void
-      sadd(const Number          s,
-           const Number          a,
-           const Vector<Number> &V,
-           const Number          b,
-           const Vector<Number> &W);
+      sadd(const Number                       s,
+           const Number                       a,
+           const Vector<Number, MemorySpace> &V,
+           const Number                       b,
+           const Vector<Number, MemorySpace> &W);
 
       /**
        * Assignment <tt>*this = a*u + b*v</tt>.
@@ -826,10 +876,10 @@ namespace LinearAlgebra
        */
       DEAL_II_DEPRECATED
       void
-      equ(const Number          a,
-          const Vector<Number> &u,
-          const Number          b,
-          const Vector<Number> &v);
+      equ(const Number                       a,
+          const Vector<Number, MemorySpace> &u,
+          const Number                       b,
+          const Vector<Number, MemorySpace> &v);
 
       //@}
 
@@ -904,6 +954,9 @@ namespace LinearAlgebra
        * of the <i>locally owned</i> elements of this vector.
        *
        * It holds that end() - begin() == local_size().
+       *
+       * @note For the CUDA memory space, the iterator points to memory on the
+       * device.
        */
       iterator
       begin();
@@ -911,6 +964,9 @@ namespace LinearAlgebra
       /**
        * Return constant iterator to the start of the locally owned elements
        * of the vector.
+       *
+       * @note For the CUDA memory space, the iterator points to memory on the
+       * device.
        */
       const_iterator
       begin() const;
@@ -918,6 +974,9 @@ namespace LinearAlgebra
       /**
        * Return an iterator pointing to the element past the end of the array
        * of locally owned entries.
+       *
+       * @note For the CUDA memory space, the iterator points to memory on the
+       * device.
        */
       iterator
       end();
@@ -925,6 +984,9 @@ namespace LinearAlgebra
       /**
        * Return a constant iterator pointing to the element past the end of
        * the array of the locally owned entries.
+       *
+       * @note For the CUDA memory space, the iterator points to memory on the
+       * device.
        */
       const_iterator
       end() const;
@@ -993,6 +1055,15 @@ namespace LinearAlgebra
       local_element(const size_type local_index);
 
       /**
+       * Return the pointer to the underlying raw array.
+       *
+       * @note For the CUDA memory space, the pointer points to memory on the
+       * device.
+       */
+      Number *
+      get_values() const;
+
+      /**
        * Instead of getting individual elements of a vector via operator(),
        * this function allows getting a whole set of elements at once. The
        * indices of the elements to be read are stated in the first argument,
@@ -1006,6 +1077,8 @@ namespace LinearAlgebra
        * @endcode
        *
        * @pre The sizes of the @p indices and @p values arrays must be identical.
+       *
+       * @note This function is not implemented for CUDA memory space.
        */
       template <typename OtherNumber>
       void
@@ -1126,6 +1199,13 @@ namespace LinearAlgebra
       DeclException0(ExcVectorTypeNotCompatible);
 
       /**
+       * Attempt to perform an operation not implemented on the device.
+       *
+       * @ingroup Exceptions
+       */
+      DeclException0(ExcNotAllowedForCuda);
+
+      /**
        * Exception
        */
       DeclException3(ExcNonMatchingElements,
@@ -1172,17 +1252,11 @@ namespace LinearAlgebra
                  const VectorSpaceVector<Number> &V);
 
       /**
-       * Local part of all_zero().
-       */
-      bool
-      all_zero_local() const;
-
-      /**
        * Local part of the inner product of two vectors.
        */
       template <typename Number2>
       Number
-      inner_product_local(const Vector<Number2> &V) const;
+      inner_product_local(const Vector<Number2, MemorySpace> &V) const;
 
       /**
        * Local part of norm_sqr().
@@ -1220,9 +1294,9 @@ namespace LinearAlgebra
        * the add_and_dot() function.
        */
       Number
-      add_and_dot_local(const Number          a,
-                        const Vector<Number> &V,
-                        const Vector<Number> &W);
+      add_and_dot_local(const Number                       a,
+                        const Vector<Number, MemorySpace> &V,
+                        const Vector<Number, MemorySpace> &W);
 
       /**
        * Shared pointer to store the parallel partitioning information. This
@@ -1237,13 +1311,9 @@ namespace LinearAlgebra
       size_type allocated_size;
 
       /**
-       * Pointer to the array of local elements of this vector.
-       *
-       * Because we allocate these arrays via Utilities::System::posix_memalign,
-       * we need to use a custom deleter for this object that does not call
-       * <code>delete[]</code>, but instead calls @p free().
+       * Underlying data structure storing the local elements of this vector.
        */
-      std::unique_ptr<Number[], decltype(&free)> values;
+      mutable ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> data;
 
       /**
        * For parallel loops with TBB, this member variable stores the affinity
@@ -1309,7 +1379,7 @@ namespace LinearAlgebra
       /*
        * Make all other vector types friends.
        */
-      template <typename Number2>
+      template <typename Number2, typename MemorySpace2>
       friend class Vector;
 
       /**
@@ -1325,56 +1395,142 @@ namespace LinearAlgebra
 
 #ifndef DOXYGEN
 
+    namespace internal
+    {
+      template <typename Number, typename MemorySpace>
+      struct Policy
+      {
+        static inline typename Vector<Number, MemorySpace>::iterator
+        begin(::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
+        {
+          return nullptr;
+        }
 
-    template <typename Number>
+        static inline typename Vector<Number, MemorySpace>::const_iterator
+        begin(
+          const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
+        {
+          return nullptr;
+        }
+
+        static inline Number *
+        get_values(
+          ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
+        {
+          return nullptr;
+        }
+      };
+
+
+
+      template <typename Number>
+      struct Policy<Number, ::dealii::MemorySpace::Host>
+      {
+        static inline
+          typename Vector<Number, ::dealii::MemorySpace::Host>::iterator
+          begin(::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+        {
+          return data.values.get();
+        }
+
+        static inline
+          typename Vector<Number, ::dealii::MemorySpace::Host>::const_iterator
+          begin(const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+        {
+          return data.values.get();
+        }
+
+        static inline Number *
+        get_values(::dealii::MemorySpace::
+                     MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+        {
+          return data.values.get();
+        }
+      };
+
+
+
+      template <typename Number>
+      struct Policy<Number, ::dealii::MemorySpace::CUDA>
+      {
+        static inline
+          typename Vector<Number, ::dealii::MemorySpace::CUDA>::iterator
+          begin(::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        {
+          return data.values_dev.get();
+        }
+
+        static inline
+          typename Vector<Number, ::dealii::MemorySpace::CUDA>::const_iterator
+          begin(const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        {
+          return data.values_dev.get();
+        }
+
+        static inline Number *
+        get_values(::dealii::MemorySpace::
+                     MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        {
+          return data.values_dev.get();
+        }
+      };
+    } // namespace internal
+
+
+    template <typename Number, typename MemorySpace>
     inline bool
-    Vector<Number>::has_ghost_elements() const
+    Vector<Number, MemorySpace>::has_ghost_elements() const
     {
       return vector_is_ghosted;
     }
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::size_type
-    Vector<Number>::size() const
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::size_type
+    Vector<Number, MemorySpace>::size() const
     {
       return partitioner->size();
     }
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::size_type
-    Vector<Number>::local_size() const
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::size_type
+    Vector<Number, MemorySpace>::local_size() const
     {
       return partitioner->local_size();
     }
 
 
 
-    template <typename Number>
-    inline std::pair<typename Vector<Number>::size_type,
-                     typename Vector<Number>::size_type>
-    Vector<Number>::local_range() const
+    template <typename Number, typename MemorySpace>
+    inline std::pair<typename Vector<Number, MemorySpace>::size_type,
+                     typename Vector<Number, MemorySpace>::size_type>
+    Vector<Number, MemorySpace>::local_range() const
     {
       return partitioner->local_range();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline bool
-    Vector<Number>::in_local_range(const size_type global_index) const
+    Vector<Number, MemorySpace>::in_local_range(
+      const size_type global_index) const
     {
       return partitioner->in_local_range(global_index);
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline IndexSet
-    Vector<Number>::locally_owned_elements() const
+    Vector<Number, MemorySpace>::locally_owned_elements() const
     {
       IndexSet is(size());
 
@@ -1386,73 +1542,79 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::size_type
-    Vector<Number>::n_ghost_entries() const
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::size_type
+    Vector<Number, MemorySpace>::n_ghost_entries() const
     {
       return partitioner->n_ghost_indices();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline const IndexSet &
-    Vector<Number>::ghost_elements() const
+    Vector<Number, MemorySpace>::ghost_elements() const
     {
       return partitioner->ghost_indices();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline bool
-    Vector<Number>::is_ghost_entry(const size_type global_index) const
+    Vector<Number, MemorySpace>::is_ghost_entry(
+      const size_type global_index) const
     {
       return partitioner->is_ghost_entry(global_index);
     }
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::iterator
-    Vector<Number>::begin()
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::iterator
+    Vector<Number, MemorySpace>::begin()
     {
-      return values.get();
+      return internal::Policy<Number, MemorySpace>::begin(data);
     }
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::const_iterator
-    Vector<Number>::begin() const
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::const_iterator
+    Vector<Number, MemorySpace>::begin() const
     {
-      return values.get();
+      return internal::Policy<Number, MemorySpace>::begin(data);
     }
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::iterator
-    Vector<Number>::end()
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::iterator
+    Vector<Number, MemorySpace>::end()
     {
-      return values.get() + partitioner->local_size();
+      return internal::Policy<Number, MemorySpace>::begin(data) +
+             partitioner->local_size();
     }
 
 
 
-    template <typename Number>
-    inline typename Vector<Number>::const_iterator
-    Vector<Number>::end() const
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::const_iterator
+    Vector<Number, MemorySpace>::end() const
     {
-      return values.get() + partitioner->local_size();
+      return internal::Policy<Number, MemorySpace>::begin(data) +
+             partitioner->local_size();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline Number
-    Vector<Number>::operator()(const size_type global_index) const
+    Vector<Number, MemorySpace>::operator()(const size_type global_index) const
     {
+      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+             ExcMessage(
+               "This function is only implemented for the Host memory space"));
       Assert(
         partitioner->in_local_range(global_index) ||
           partitioner->ghost_indices().is_element(global_index),
@@ -1465,15 +1627,18 @@ namespace LinearAlgebra
                vector_is_ghosted == true,
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
-      return values[partitioner->global_to_local(global_index)];
+      return data.values[partitioner->global_to_local(global_index)];
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline Number &
-    Vector<Number>::operator()(const size_type global_index)
+    Vector<Number, MemorySpace>::operator()(const size_type global_index)
     {
+      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+             ExcMessage(
+               "This function is only implemented for the Host memory space"));
       Assert(
         partitioner->in_local_range(global_index) ||
           partitioner->ghost_indices().is_element(global_index),
@@ -1487,31 +1652,37 @@ namespace LinearAlgebra
       // (then, the compiler picks this method according to the C++ rule book
       // even if a human would pick the const method when this subsequent use
       // is just a read)
-      return values[partitioner->global_to_local(global_index)];
+      return data.values[partitioner->global_to_local(global_index)];
     }
 
 
 
-    template <typename Number>
-    inline Number Vector<Number>::operator[](const size_type global_index) const
+    template <typename Number, typename MemorySpace>
+    inline Number Vector<Number, MemorySpace>::
+                  operator[](const size_type global_index) const
     {
       return operator()(global_index);
     }
 
 
 
-    template <typename Number>
-    inline Number &Vector<Number>::operator[](const size_type global_index)
+    template <typename Number, typename MemorySpace>
+    inline Number &Vector<Number, MemorySpace>::
+                   operator[](const size_type global_index)
     {
       return operator()(global_index);
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline Number
-    Vector<Number>::local_element(const size_type local_index) const
+    Vector<Number, MemorySpace>::local_element(
+      const size_type local_index) const
     {
+      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+             ExcMessage(
+               "This function is only implemented for the Host memory space"));
       AssertIndexRange(local_index,
                        partitioner->local_size() +
                          partitioner->n_ghost_indices());
@@ -1519,28 +1690,44 @@ namespace LinearAlgebra
       Assert(local_index < local_size() || vector_is_ghosted == true,
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
-      return values[local_index];
+
+      return data.values[local_index];
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline Number &
-    Vector<Number>::local_element(const size_type local_index)
+    Vector<Number, MemorySpace>::local_element(const size_type local_index)
     {
+      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+             ExcMessage(
+               "This function is only implemented for the Host memory space"));
+
       AssertIndexRange(local_index,
                        partitioner->local_size() +
                          partitioner->n_ghost_indices());
-      return values[local_index];
+
+      return data.values[local_index];
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
+    inline Number *
+    Vector<Number, MemorySpace>::get_values() const
+    {
+      return internal::Policy<Number, MemorySpace>::get_values(data);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     template <typename OtherNumber>
     inline void
-    Vector<Number>::extract_subvector_to(const std::vector<size_type> &indices,
-                                         std::vector<OtherNumber> &values) const
+    Vector<Number, MemorySpace>::extract_subvector_to(
+      const std::vector<size_type> &indices,
+      std::vector<OtherNumber> &    values) const
     {
       for (size_type i = 0; i < indices.size(); ++i)
         values[i] = operator()(indices[i]);
@@ -1548,12 +1735,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     template <typename ForwardIterator, typename OutputIterator>
     inline void
-    Vector<Number>::extract_subvector_to(ForwardIterator       indices_begin,
-                                         const ForwardIterator indices_end,
-                                         OutputIterator values_begin) const
+    Vector<Number, MemorySpace>::extract_subvector_to(
+      ForwardIterator       indices_begin,
+      const ForwardIterator indices_end,
+      OutputIterator        values_begin) const
     {
       while (indices_begin != indices_end)
         {
@@ -1565,11 +1753,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     template <typename OtherNumber>
     inline void
-    Vector<Number>::add(const std::vector<size_type> &       indices,
-                        const ::dealii::Vector<OtherNumber> &values)
+    Vector<Number, MemorySpace>::add(
+      const std::vector<size_type> &       indices,
+      const ::dealii::Vector<OtherNumber> &values)
     {
       AssertDimension(indices.size(), values.size());
       for (size_type i = 0; i < indices.size(); ++i)
@@ -1584,12 +1773,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     template <typename OtherNumber>
     inline void
-    Vector<Number>::add(const size_type    n_elements,
-                        const size_type *  indices,
-                        const OtherNumber *values)
+    Vector<Number, MemorySpace>::add(const size_type    n_elements,
+                                     const size_type *  indices,
+                                     const OtherNumber *values)
     {
       for (size_type i = 0; i < n_elements; ++i, ++indices, ++values)
         {
@@ -1603,18 +1792,18 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline const MPI_Comm &
-    Vector<Number>::get_mpi_communicator() const
+    Vector<Number, MemorySpace>::get_mpi_communicator() const
     {
       return partitioner->get_mpi_communicator();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
-    Vector<Number>::get_partitioner() const
+    Vector<Number, MemorySpace>::get_partitioner() const
     {
       return partitioner;
     }
@@ -1633,10 +1822,10 @@ namespace LinearAlgebra
  * @relatesalso Vector
  * @author Katharina Kormann, Martin Kronbichler, 2011
  */
-template <typename Number>
+template <typename Number, typename MemorySpace>
 inline void
-swap(LinearAlgebra::distributed::Vector<Number> &u,
-     LinearAlgebra::distributed::Vector<Number> &v)
+swap(LinearAlgebra::distributed::Vector<Number, MemorySpace> &u,
+     LinearAlgebra::distributed::Vector<Number, MemorySpace> &v)
 {
   u.swap(v);
 }
@@ -1647,10 +1836,11 @@ swap(LinearAlgebra::distributed::Vector<Number> &u,
  *
  * @author Uwe Koecher, 2017
  */
-template <typename Number>
-struct is_serial_vector<LinearAlgebra::distributed::Vector<Number>>
+template <typename Number, typename MemorySpace>
+struct is_serial_vector<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
   : std::false_type
 {};
+
 
 
 namespace internal
