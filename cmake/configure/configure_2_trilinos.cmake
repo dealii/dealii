@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-      Amesos Epetra Ifpack AztecOO Teuchos ML MueLu
+        Amesos Epetra Ifpack AztecOO Teuchos ML MueLu
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
@@ -146,7 +146,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     CHECK_MPI_INTERFACE(TRILINOS ${var})
 
     IF (${var})
-      FOREACH(_optional_module ROL Sacado Zoltan)
+      FOREACH(_optional_module EpetraExt ROL Sacado Zoltan)
       ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
