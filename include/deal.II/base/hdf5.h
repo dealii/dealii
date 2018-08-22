@@ -31,79 +31,187 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Namespace containing the HDF5 interface.
  *
- * This set of classes can be used to store the data in the hdf5 file format.
+ * The [Hierarchical Data Format (HDF)](https://www.hdfgroup.org/) is a cross
+ * platform and high I/O performance format designed to store large amounts of
+ * data. It supports serial and MPI I/O access. This set of classes provide an
+ * interface to the [C HDF5 library](https://www.hdfgroup.org/downloads/hdf5/).
  *
- * The classes can be used to improve the interaction with python scripts.
+ * # Data exchange with python scripts
+ * The HDF5 format can be used to exchange data with python scripts. The strings
+ * are stored as HDF5 variable-length UTF-8 strings and the complex numbers are
+ * stored as HDF5 compound datatypes compatible with
+ * [h5py](https://www.h5py.org/) and [numpy](http://www.numpy.org/).
  */
 // clang-format off
 /**
+ *
  * This python script writes the parameters for a deal.ii simulation:
  * @code
  * h5_file = h5py.File('simulation.hdf5','w')
  * data = h5_file.create_group('data')
  * data.attrs['nb_frequency_points'] = 50 # int
- * data.attrs['nb_slice_points'] = 10 # int
  * data.attrs['rho'] = 2300.5 # double
+ * data.attrs['save_vtk_files'] = True # bool
  * data.attrs['simulation_type'] = 'elastic_equation' # utf8 string
  * @endcode
  *
  * C++ deal.ii simulation with MPI HDF5:
  * @code
- * hdf5::File data_file("simulation.hdf5", MPI_COMM_WORLD, hdf5::File::Mode::open);
+ * hdf5::File data_file("simulation.hdf5", MPI_COMM_WORLD, HDF5::File::Mode::open);
  * hdf5::Group data = data_file.group("data");
  *
- * // Read some parameters
- * const int nb_frequency_points = data.attr<int>("nb_frequency_points");
- * const int nb_slice_points = data.attr<int>("nb_cut_points");
- * const double rho = data.attr<double>("rho");
- * const std::string simulation_type =
- * data.attr<std::string>("simulation_type");
+ * auto nb_frequency_points = data.attr<int>("nb_frequency_points");
+ * auto rho = data.attr<double>("rho");
+ * auto save_vtk_files = data.attr<bool>("save_vtk_files");
+ * auto simulation_type = data.attr<std::string>("simulation_type");
  *
- * // Create some distributed datasets.
- * // Note that the keyword template is used between data and create because
- * // the function create_dataset returns a dependent template.
- * auto frequency_dataset = data.create_dataset<double>("frequency", std::vector<hsize_t>{nb_frequency_points});
+ * std::vector<std::complex<double>> displacement = {...};
  *
- * auto displacement = data.create_dataset<std::complex<double>>("displacement",
- *                                                           std::vector<hsize_t>{nb_slice_points, nb_frequency_points}));
- *
- * // ... do some calculations ...
- * // The displacement data is distributed across the MPI processes.
- * // The displacement_data vector is local. The coordinates vector corresponds
- * // to the coordinates of the data in the hdf5 dataset.
- * if (coordinates.size() > 0) {
- *   displacement.write_selection(displacement_data, coordinates);
- * } else {
- *   // Even if this MPI process has no displacement data to write,
- *   // it has to contribute to the collective call
- *   displacement.write_none();
- * }
- *
- * // ... do some calculations ...
- * // The whole frequency dataset can be written by one single MPI process,
- * // but the rest of the processes have to contribute to the collective call
- * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0) {
- *   frequency_dataset.write(frequency);
- * } else {
- *   frequency_dataset.write_none();
- * }
+ * auto some_data = data.write_dataset<double>("displacement", displacement);
  *
  * // Write the simulation metadata
  * data.write_attr("active_cells", triangulation.n_active_cells());
- * data.write_attr("degrees_of_freedom", dof_handler.n_dofs());
  * @endcode
  *
- * Read the simulation data with python:
+ * Read the simulation results with python:
  * @code
  * h5_file = h5py.File('simulation.hdf5','r+')
  * data = h5_file['data']
- * frequency = data['frequency'] # float64 dtype
  * displacement = data['displacement'] # complex128 dtype
- * print('Degrees of freedom: ' + repr(data.attrs['degrees_of_freedom']))
+ * active_cells = data.attrs['degrees_of_freedom'])
  * @endcode
  */
 // clang-format on
 /**
+ *
+ * # Groups, Datasets and attributes
+ * The HDF5 file is organized in
+ * [groups](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Groups/HDF5_Groups.htm)
+ * and
+ * [datasets](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Datasets/HDF5_Datasets.htm).
+ * In the most comon case the file structure is a tree. Groups can contain
+ * datasets and others groups. Datasets are objects composed by a collection of
+ * data elements which can be seen as tensors or a matrices. The methods of the
+ * DataSet class have been instantiated for the types: `float`, `double`,
+ * `std::complex<float>`, `std::complex<double>`, `int` and `unsigned int`.
+ *
+ * In addtition attributes can be attached to the root file, a group or a
+ * dataset. An [HDF5
+ * attribute](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Attributes/HDF5_Attributes.htm)
+ * is a small meta data. The methods HDF5Object::attr(const std::string) and
+ * HDF5Object::write_attr(const std::string, const T) have been instantiated for
+ * the types: `float`, `double`, `std::complex<float>`, `std::complex<double>`,
+ * `int`, `unsigned int`, `bool`, and `std::string`.
+ *
+ * Below an example code can be found. Note that, if the group already exists
+ * the method Group::group(std::string) should be used instead of
+ * Group::create_group(std::string).
+ * @code
+ * HDF5::File data_file(filename, HDF5::File::Mode::create);
+ * double double_attribute = 2.2;
+ * data_file.write_attr("double_attribute", double attribute);
+ * auto group = data_file.create_group("group");
+ * group.write_attr("simulation_type", std::string("elastic_equation"));
+ * auto dataset = group.create_dataset<double>("dataset_name", dimensions);
+ * dataset.write_attr("complex_double_attribute", std::complex<double>(2,2.3));
+ * @endcode
+ *
+ * # MPI I/O
+ * The HDF5 calls that modify the structure of the file are
+ * always collective, whereas writing and reading raw data in a dataset can be
+ * done independently or collectively. [Collective access is usually
+ * faster](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/) since it
+ * allows MPI to do optimizations. In these set of classes all the calls are set
+ * to collective in order to maximize the performance. This means that all the
+ * MPI processes have to contribute to every single call, even if they don't
+ * have data to write.
+ *
+ * ## Write a hyperslab in parallel
+ * The example below shows how to write a hyperslab.
+ * @code
+ * std::vector<hsize_t> dataset_dimensions = {50, 30};
+ * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
+ *  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ *    {
+ *      // data can be std::vector, FullMatrix or Vector
+ *      FullMatrix<double> data = {...};
+ *      std::vector<hsize_t> hyperslab_dimensions = {2, 5};
+ *      std::vector<hsize_t> hyperslab_offset     = {0, 0};
+ *      dataset.write_hyperslab(hyperslab_data,
+ *                              hyperslab_offset,
+ *                              hyperslab_dimensions);
+ *    }
+ *  else
+ *    {
+ *      dataset.write_none<double>();
+ *    }
+ * @endcode
+ *
+ * ## Write unordered data in parallel
+ * The example below shows how to write a selection of data.
+ * @code
+ * std::vector<hsize_t> dataset_dimensions = {50, 30};
+ * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
+ * std::vector<hsize_t> coordinates_a = {0,
+ *                                       0, // first point
+ *                                       0,
+ *                                       2, // second point
+ *                                       3,
+ *                                       4, // third point
+ *                                       25,
+ *                                       12}; // fourth point
+ *  std::vector<double>  data_a        = {2, 3, 5, 6};
+ *
+ *  std::vector<hsize_t> coordinates_b = {5,
+ *                                        0, // first point
+ *                                        0,
+ *                                        4, // second point
+ *                                        5,
+ *                                        4, // third point
+ *                                        26,
+ *                                        12}; // fourth point
+ *  std::vector<double>  data_b        = {9, 4, 7, 6};
+ *  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ *    {
+ *      dataset.write_selection(data_a, coordinates_a);
+ *    }
+ *  else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
+ *    {
+ *      dataset.write_selection(data_b, coordinates_b);
+ *    }
+ *  else
+ *    {
+ *      dataset.write_none<double>();
+ *    }
+ * @endcode
+ *
+ * ## Query the type of I/O that HDF5 performed on the last parallel I/O call
+ * In some cases such as when there is type conversion the HDF5 library can
+ * decide to do independent I/O instead of collective I/O. The following code
+ * can be used to query the I/O method.
+ * @code
+ * auto dataset = group.create_dataset<double>("name", dimensions);
+ * #ifdef DEBUG
+ * dataset.check_io_mode(true);
+ * #endif
+ *
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ *     {
+ *       dataset.write(data);
+ *     }
+ * else
+ *     {
+ *       dataset.write_none<double>();
+ *     }
+ *
+ * #ifdef DEBUG
+ * pcout << "IO mode :" << dataset.io_mode<std::string>() << std::endl;
+ * pcout << "Local no collective cause :"
+ *       << dataset.local_no_collective_cause<std::string>() << std::endl;
+ * pcout << "Global no collective cause :"
+ *       << dataset.global_no_collective_cause<std::string>() << std::endl;
+ * #endif
+ * @endcode
  *
  * @author Daniel Garcia-Sanchez, 2018
  */
@@ -111,7 +219,7 @@ namespace HDF5
 
 {
   /**
-   * General class for the HDF5 objects.
+   * Base class for the HDF5 objects.
    *
    * @author Daniel Garcia-Sanchez, 2018
    */
@@ -144,7 +252,7 @@ namespace HDF5
     attr(const std::string attr_name) const;
 
     /**
-     * Reads an attribute. T can be float, double, std::complex<float>,
+     * Writes an attribute. T can be float, double, std::complex<float>,
      * std::complex<double>, int, unsigned int, bool or std::string. Note that
      * the encoding of std::string is UTF8 in order to be compatible with
      * python3.
@@ -208,10 +316,10 @@ namespace HDF5
      * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * The selected elements can be scattered and take any shape in the dataset.
-     * For examples, in the 4D case, we will be selecting three points and a 4D
-     * dataspace has rank 4, so the selection will be described in a 3-by-4
-     * array. To select the points (1,1,1,1), (14,6,12,18), and (8,22,30,22),
-     * the point selection array would be as follows:
+     * For example, in the case of a dataset with rank 4 a selection of 3 points
+     * will be described by a 3-by-4 array. To select the points (1,1,1,1),
+     * (14,6,12,18), and (8,22,30,22), the point selection array would be as
+     * follows:
      *
      *    0  0  0  0
      *
@@ -260,8 +368,8 @@ namespace HDF5
                    const std::vector<hsize_t> &count);
 
     /**
-     * This function does not read any data, but can contribute to a collective
-     * read call. Number can be float, double, std::complex<float>,
+     * This function does not read any data, but it can contribute to a
+     * collective read call. Number can be float, double, std::complex<float>,
      * std::complex<double>, int or unsigned int.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -293,10 +401,10 @@ namespace HDF5
      * std::complex<float>, std::complex<double>, int or unsigned int.
      *
      * The selected elements can be scattered and take any shape in the dataset.
-     * For examples, in the 4D case, we will be selecting three points and a 4D
-     * dataspace has rank 4, so the selection will be described in a 3-by-4
-     * array. To select the points (1,1,1,1), (14,6,12,18), and (8,22,30,22),
-     * the point selection array would be as follows:
+     * For example, in the case of a dataset with rank 4 a selection of 3 points
+     * will be described by a 3-by-4 array. To select the points (1,1,1,1),
+     * (14,6,12,18), and (8,22,30,22), the point selection array would be as
+     * follows:
      *
      *    0  0  0  0
      *
@@ -387,9 +495,9 @@ namespace HDF5
                     const std::vector<hsize_t> &block);
 
     /**
-     * This function does not write any data, but can contribute to a collective
-     * write call. Number can be float, double, std::complex<float>,
-     * std::complex<double>, int or unsigned int.
+     * This function does not write any data, but it can contribute to a
+     * collective write call. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -578,14 +686,14 @@ namespace HDF5
 
   public:
     /**
-     * Creates or opens a hdf5 file.
+     * Creates or opens a hdf5 file in parallel.
      */
     File(const std::string name,
          const MPI_Comm    mpi_communicator,
          const Mode        mode = Mode::create);
 
     /**
-     * Creates or opens a hdf5 file in parallel.
+     * Creates or opens a hdf5 file.
      */
     File(const std::string name, const Mode mode = Mode::create);
   };
