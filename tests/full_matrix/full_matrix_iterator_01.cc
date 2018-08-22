@@ -22,16 +22,20 @@
 #include "../tests.h"
 
 
+template <typename IteratorType>
 void
 test()
 {
   FullMatrix<double> A(3, 3);
 
   // test prefix operator
-  const FullMatrix<double>::const_iterator k = A.begin(), j = ++A.begin();
+  const IteratorType k = A.begin(), j = ++A.begin();
 
   AssertThrow(k < j, ExcInternalError());
   AssertThrow(j > k, ExcInternalError());
+
+  AssertThrow(k <= j, ExcInternalError());
+  AssertThrow(j >= k, ExcInternalError());
 
   AssertThrow(!(j < k), ExcInternalError());
   AssertThrow(!(k > j), ExcInternalError());
@@ -43,15 +47,12 @@ test()
   AssertThrow(!(k != k), ExcInternalError());
 
   // test postfix operator
-  FullMatrix<double>::const_iterator l = A.begin();
-  FullMatrix<double>::const_iterator m = l++;
+  IteratorType l = A.begin();
+  IteratorType m = l++;
 
   AssertThrow(m == k, ExcInternalError());
   AssertThrow(l > m, ExcInternalError());
   AssertThrow(l->column() == k->column() + 1, ExcInternalError());
-
-
-  deallog << "OK" << std::endl;
 }
 
 
@@ -63,7 +64,9 @@ main()
 
   try
     {
-      test();
+      test<FullMatrix<double>::iterator>();
+      test<FullMatrix<double>::const_iterator>();
+      deallog << "OK" << std::endl;
     }
   catch (std::exception &exc)
     {

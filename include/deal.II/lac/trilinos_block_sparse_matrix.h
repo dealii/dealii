@@ -21,7 +21,6 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/table.h>
 #  include <deal.II/base/template_constraints.h>
 
 #  include <deal.II/lac/block_matrix_base.h>

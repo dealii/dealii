@@ -504,7 +504,7 @@ inline bool
 LinearIndexIterator<DerivedIterator, AccessorType>::
 operator>(const DerivedIterator &other) const
 {
-  return other < *this;
+  return other < static_cast<const DerivedIterator &>(*this);
 }
 
 

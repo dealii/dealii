@@ -87,6 +87,25 @@ public:
    */
   using value_type = number;
 
+  /**
+   * Use the base class mutable iterator type.
+   */
+  using iterator = typename Table<2, number>::iterator;
+
+  /**
+   * Use the base class constant iterator type.
+   */
+  using const_iterator = typename Table<2, number>::const_iterator;
+
+  /**
+   * Use the base class iterator functions.
+   */
+  using Table<2, number>::begin;
+
+  /**
+   * Use the base class iterator functions
+   */
+  using Table<2, number>::end;
 
   /**
    * Declare a type that has holds real-valued numbers with the same precision
@@ -99,129 +118,6 @@ public:
    */
   using real_type = typename numbers::NumberTraits<number>::real_type;
 
-
-  class const_iterator;
-
-  /**
-   * Accessor class for iterators
-   */
-  class Accessor
-  {
-  public:
-    /**
-     * Constructor. Since we use accessors only for read access, a const
-     * matrix pointer is sufficient.
-     */
-    Accessor(const FullMatrix<number> *matrix,
-             const size_type           row,
-             const size_type           col);
-
-    /**
-     * Row number of the element represented by this object.
-     */
-    size_type
-    row() const;
-
-    /**
-     * Column number of the element represented by this object.
-     */
-    size_type
-    column() const;
-
-    /**
-     * Value of this matrix entry.
-     */
-    number
-    value() const;
-
-  protected:
-    /**
-     * The matrix accessed.
-     */
-    const FullMatrix<number> *matrix;
-
-    /**
-     * Current row number.
-     */
-    size_type a_row;
-
-    /**
-     * Current column number.
-     */
-    size_type a_col;
-
-    /*
-     * Make enclosing class a friend.
-     */
-    friend class const_iterator;
-  };
-
-  /**
-   * Standard-conforming iterator.
-   */
-  class const_iterator
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    const_iterator(const FullMatrix<number> *matrix,
-                   const size_type           row,
-                   const size_type           col);
-
-    /**
-     * Prefix increment.
-     */
-    const_iterator &
-    operator++();
-
-    /**
-     * Postfix increment.
-     */
-    const_iterator
-    operator++(int);
-
-    /**
-     * Dereferencing operator.
-     */
-    const Accessor &operator*() const;
-
-    /**
-     * Dereferencing operator.
-     */
-    const Accessor *operator->() const;
-
-    /**
-     * Comparison. True, if both iterators point to the same matrix position.
-     */
-    bool
-    operator==(const const_iterator &) const;
-    /**
-     * Inverse of <tt>==</tt>.
-     */
-    bool
-    operator!=(const const_iterator &) const;
-
-    /**
-     * Comparison operator. Result is true if either the first row number is
-     * smaller or if the row numbers are equal and the first index is smaller.
-     */
-    bool
-    operator<(const const_iterator &) const;
-
-    /**
-     * Comparison operator. Compares just the other way around than the
-     * operator above.
-     */
-    bool
-    operator>(const const_iterator &) const;
-
-  private:
-    /**
-     * Store an object of the accessor class.
-     */
-    Accessor accessor;
-  };
   /**
    * @name Constructors and initialization.  See also the base class Table.
    */
@@ -627,25 +523,25 @@ public:
   //@{
 
   /**
-   * Iterator starting at the first entry.
+   * Mutable iterator starting at the first entry of row <tt>r</tt>.
    */
-  const_iterator
-  begin() const;
+  iterator
+  begin(const size_type r);
 
   /**
-   * Final iterator.
+   * One past the end mutable iterator of row <tt>r</tt>.
    */
-  const_iterator
-  end() const;
+  iterator
+  end(const size_type r);
 
   /**
-   * Iterator starting at the first entry of row <tt>r</tt>.
+   * Constant iterator starting at the first entry of row <tt>r</tt>.
    */
   const_iterator
   begin(const size_type r) const;
 
   /**
-   * Final iterator of row <tt>r</tt>.
+   * One past the end constant iterator of row <tt>r</tt>.
    */
   const_iterator
   end(const size_type r) const;
@@ -1202,8 +1098,6 @@ public:
    */
   DeclException0(ExcMatrixNotPositiveDefinite);
   //@}
-
-  friend class Accessor;
 };
 
 /**@}*/
@@ -1376,146 +1270,24 @@ FullMatrix<number>::Tvmult_add(Vector<number2> &      w,
 
 
 //---------------------------------------------------------------------------
-
-
 template <typename number>
-inline FullMatrix<number>::Accessor::Accessor(const FullMatrix<number> *matrix,
-                                              const size_type           r,
-                                              const size_type           c)
-  : matrix(matrix)
-  , a_row(r)
-  , a_col(c)
-{}
-
-
-template <typename number>
-inline typename FullMatrix<number>::size_type
-FullMatrix<number>::Accessor::row() const
+inline typename FullMatrix<number>::iterator
+FullMatrix<number>::begin(const size_type r)
 {
-  return a_row;
+  AssertIndexRange(r, m());
+  return iterator(this, r, 0);
 }
 
 
+
 template <typename number>
-inline typename FullMatrix<number>::size_type
-FullMatrix<number>::Accessor::column() const
+inline typename FullMatrix<number>::iterator
+FullMatrix<number>::end(const size_type r)
 {
-  return a_col;
+  AssertIndexRange(r, m());
+  return iterator(this, r + 1, 0);
 }
 
-
-template <typename number>
-inline number
-FullMatrix<number>::Accessor::value() const
-{
-  AssertIsFinite(matrix->el(a_row, a_col));
-  return matrix->el(a_row, a_col);
-}
-
-
-template <typename number>
-inline FullMatrix<number>::const_iterator::const_iterator(
-  const FullMatrix<number> *matrix,
-  const size_type           r,
-  const size_type           c)
-  : accessor(matrix, r, c)
-{}
-
-
-template <typename number>
-inline typename FullMatrix<number>::const_iterator &
-FullMatrix<number>::const_iterator::operator++()
-{
-  Assert(accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-
-  ++accessor.a_col;
-  if (accessor.a_col >= accessor.matrix->n())
-    {
-      accessor.a_col = 0;
-      accessor.a_row++;
-    }
-  return *this;
-}
-
-
-template <typename number>
-inline typename FullMatrix<number>::const_iterator
-FullMatrix<number>::const_iterator::operator++(int)
-{
-  const typename FullMatrix<number>::const_iterator current = *this;
-  ++(*this);
-
-  return current;
-}
-
-
-template <typename number>
-inline const typename FullMatrix<number>::Accessor &
-  FullMatrix<number>::const_iterator::operator*() const
-{
-  return accessor;
-}
-
-
-template <typename number>
-inline const typename FullMatrix<number>::Accessor *
-  FullMatrix<number>::const_iterator::operator->() const
-{
-  return &accessor;
-}
-
-
-template <typename number>
-inline bool
-FullMatrix<number>::const_iterator::
-operator==(const const_iterator &other) const
-{
-  return (accessor.row() == other.accessor.row() &&
-          accessor.column() == other.accessor.column());
-}
-
-
-template <typename number>
-inline bool
-FullMatrix<number>::const_iterator::
-operator!=(const const_iterator &other) const
-{
-  return !(*this == other);
-}
-
-
-template <typename number>
-inline bool
-FullMatrix<number>::const_iterator::operator<(const const_iterator &other) const
-{
-  return (accessor.row() < other.accessor.row() ||
-          (accessor.row() == other.accessor.row() &&
-           accessor.column() < other.accessor.column()));
-}
-
-
-template <typename number>
-inline bool
-FullMatrix<number>::const_iterator::operator>(const const_iterator &other) const
-{
-  return (other < *this);
-}
-
-
-template <typename number>
-inline typename FullMatrix<number>::const_iterator
-FullMatrix<number>::begin() const
-{
-  return const_iterator(this, 0, 0);
-}
-
-
-template <typename number>
-inline typename FullMatrix<number>::const_iterator
-FullMatrix<number>::end() const
-{
-  return const_iterator(this, m(), 0);
-}
 
 
 template <typename number>

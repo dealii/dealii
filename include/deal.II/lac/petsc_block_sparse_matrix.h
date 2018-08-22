@@ -21,8 +21,6 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/base/table.h>
-
 #  include <deal.II/lac/block_matrix_base.h>
 #  include <deal.II/lac/block_sparsity_pattern.h>
 #  include <deal.II/lac/exceptions.h>

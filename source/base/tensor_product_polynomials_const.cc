@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>
 
 DEAL_II_NAMESPACE_OPEN

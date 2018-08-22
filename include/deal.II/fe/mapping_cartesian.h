@@ -19,8 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/table.h>
-
 #include <deal.II/fe/mapping.h>
 
 #include <cmath>
