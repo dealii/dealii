@@ -18,6 +18,9 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/hdf5.h>
 
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <boost/type_traits.hpp>
 
 #include <numeric>
@@ -31,7 +34,16 @@ typename std::enable_if<
   Container<Number>>::type
 initialize_container(std::vector<hsize_t> dimensions)
 {
-  return std::vector<Number>(std::accumulate(
+  return Container<Number>(std::accumulate(
+    dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
+}
+
+template <template <class...> class Container, typename Number>
+typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
+                        Container<Number>>::type
+initialize_container(std::vector<hsize_t> dimensions)
+{
+  return Container<Number>(std::accumulate(
     dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
 }
 
@@ -49,6 +61,14 @@ template <template <class...> class Container, typename Number>
 typename std::enable_if<
   std::is_same<Container<Number>, std::vector<Number>>::value,
   Number>::type
+container_sum(Container<Number> data)
+{
+  return std::accumulate(data.begin(), data.end(), static_cast<Number>(0));
+}
+
+template <template <class...> class Container, typename Number>
+typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
+                        Number>::type
 container_sum(Container<Number> data)
 {
   return std::accumulate(data.begin(), data.end(), static_cast<Number>(0));
@@ -94,6 +114,17 @@ template <template <class...> class Container, typename Number>
 typename std::enable_if<
   std::is_same<Container<Number>, std::vector<Number>>::value,
   void>::type
+assign_data(Container<Number> &data)
+{
+  for (unsigned int idx = 0; idx < data.size(); ++idx)
+    {
+      data[idx] = static_cast<Number>(idx) * get_factor<Number>();
+    }
+}
+
+template <template <class...> class Container, typename Number>
+typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
+                        void>::type
 assign_data(Container<Number> &data)
 {
   for (unsigned int idx = 0; idx < data.size(); ++idx)
@@ -815,6 +846,22 @@ main(int argc, char **argv)
                                                      dataset_dimensions,
                                                      mpi_communicator,
                                                      pcout);
+        write_test<Vector, float>(data_file,
+                                  dataset_dimensions,
+                                  mpi_communicator,
+                                  pcout);
+        write_test<Vector, double>(data_file,
+                                   dataset_dimensions,
+                                   mpi_communicator,
+                                   pcout);
+        write_test<Vector, std::complex<float>>(data_file,
+                                                dataset_dimensions,
+                                                mpi_communicator,
+                                                pcout);
+        write_test<Vector, std::complex<double>>(data_file,
+                                                 dataset_dimensions,
+                                                 mpi_communicator,
+                                                 pcout);
       }
 
       {
@@ -841,6 +888,14 @@ main(int argc, char **argv)
         read_test<FullMatrix, std::complex<double>>(data_file,
                                                     mpi_communicator,
                                                     pcout);
+        read_test<Vector, float>(data_file, mpi_communicator, pcout);
+        read_test<Vector, double>(data_file, mpi_communicator, pcout);
+        read_test<Vector, std::complex<float>>(data_file,
+                                               mpi_communicator,
+                                               pcout);
+        read_test<Vector, std::complex<double>>(data_file,
+                                                mpi_communicator,
+                                                pcout);
       }
     }
   catch (std::exception &exc)

@@ -20,6 +20,7 @@
 #  include <deal.II/base/hdf5.h>
 
 #  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/vector.h>
 
 #  include <hdf5.h>
 
@@ -113,6 +114,17 @@ namespace HDF5
 
     template <template <class...> class Container, typename number>
     typename std::enable_if<
+      std::is_same<Container<number>, Vector<number>>::value,
+      unsigned int>::type
+    get_container_size(const Container<number> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong
+      return static_cast<unsigned int>(data.size());
+    }
+
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
       std::is_same<Container<number>, FullMatrix<number>>::value,
       unsigned int>::type
     get_container_size(const Container<number> &data)
@@ -137,9 +149,21 @@ namespace HDF5
 
     template <template <class...> class Container, typename number>
     typename std::enable_if<
+      std::is_same<Container<number>, Vector<number>>::value,
+      void *>::type
+    get_container_pointer(Container<number> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong.
+      // Use the first element of FullMatrix to get the pointer to the raw data
+      return &data[0];
+    }
+
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
       std::is_same<Container<number>, FullMatrix<number>>::value,
       void *>::type
-    get_container_pointer(FullMatrix<number> &data)
+    get_container_pointer(Container<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -163,9 +187,22 @@ namespace HDF5
 
     template <template <class...> class Container, typename number>
     typename std::enable_if<
+      std::is_same<Container<number>, Vector<number>>::value,
+      const void *>::type
+    get_container_const_pointer(const Container<number> &data)
+    {
+      // It is very important to pass the variable "data" by reference otherwise
+      // the pointer will be wrong.
+      // Use the first element of FullMatrix to get the pointer to the raw data
+      return &*data.begin();
+    }
+
+
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
       std::is_same<Container<number>, FullMatrix<number>>::value,
       const void *>::type
-    get_container_const_pointer(const FullMatrix<number> &data)
+    get_container_const_pointer(const Container<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -180,7 +217,17 @@ namespace HDF5
       Container<number>>::type
     initialize_container(std::vector<hsize_t> dimensions)
     {
-      return std::vector<number>(std::accumulate(
+      return Container<number>(std::accumulate(
+        dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
+    }
+
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
+      std::is_same<Container<number>, Vector<number>>::value,
+      Container<number>>::type
+    initialize_container(std::vector<hsize_t> dimensions)
+    {
+      return Container<number>(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
     }
 

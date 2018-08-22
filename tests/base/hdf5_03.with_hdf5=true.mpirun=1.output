@@ -159,6 +159,71 @@ DEAL::Rank dataset_4 FullMatrix<std::complex<double>> (Write): 2
 DEAL::Sum dataset_4 FullMatrix<std::complex<double>> (Write): (1179.00,1179.00)
 DEAL::Hyperslab_a sum dataset_4 FullMatrix<std::complex<double>> (Write): (45.0000,45.0000)
 DEAL::Hyperslab_b sum dataset_4 FullMatrix<std::complex<double>> (Write): (6.00000,6.00000)
+DEAL::Write tests for <float> datasets
+DEAL::Dimensions dataset_1 <float> (Write): 50 30
+DEAL::Size dataset_1 <float> (Write): 1500
+DEAL::Rank dataset_1 <float> (Write): 2
+DEAL::Sum dataset_1 <float> (Write): 1.12425e+06
+DEAL::Dimensions dataset_2 <float> (Write): 50 30
+DEAL::Size dataset_2 <float> (Write): 1500
+DEAL::Rank dataset_2 <float> (Write): 2
+DEAL::Sum dataset_2 <float> (Write): 61.0000
+DEAL::Dimensions dataset_3 <float> (Write): 50 30
+DEAL::Size dataset_3 <float> (Write): 1500
+DEAL::Rank dataset_3 <float> (Write): 2
+DEAL::Sum dataset_3 <float> (Write): 1.12425e+06
+DEAL::Dimensions dataset_4 <float> (Write): 50 30
+DEAL::Size dataset_4 <float> (Write): 1500
+DEAL::Rank dataset_4 <float> (Write): 2
+DEAL::Sum dataset_4 <float> (Write): 1179.00
+DEAL::Hyperslab_a sum dataset_4 <float> (Write): 45.0000
+DEAL::Hyperslab_b sum dataset_4 <float> (Write): 6.00000
+DEAL::Write tests for <double> datasets
+DEAL::Dimensions dataset_1 <double> (Write): 50 30
+DEAL::Size dataset_1 <double> (Write): 1500
+DEAL::Rank dataset_1 <double> (Write): 2
+DEAL::Sum dataset_1 <double> (Write): 1.12425e+06
+DEAL::Dimensions dataset_2 <double> (Write): 50 30
+DEAL::Size dataset_2 <double> (Write): 1500
+DEAL::Rank dataset_2 <double> (Write): 2
+DEAL::Sum dataset_2 <double> (Write): 61.0000
+DEAL::Sum dataset_3 <double> (Write): 1.12425e+06
+DEAL::Dimensions dataset_4 <double> (Write): 50 30
+DEAL::Size dataset_4 <double> (Write): 1500
+DEAL::Rank dataset_4 <double> (Write): 2
+DEAL::Sum dataset_4 <double> (Write): 1179.00
+DEAL::Hyperslab_a sum dataset_4 <double> (Write): 45.0000
+DEAL::Hyperslab_b sum dataset_4 <double> (Write): 6.00000
+DEAL::Write tests for <std::complex<float>> datasets
+DEAL::Dimensions dataset_1 <std::complex<float>> (Write): 50 30
+DEAL::Size dataset_1 <std::complex<float>> (Write): 1500
+DEAL::Rank dataset_1 <std::complex<float>> (Write): 2
+DEAL::Sum dataset_1 <std::complex<float>> (Write): (1.12425e+06,1.12425e+06)
+DEAL::Dimensions dataset_2 <std::complex<float>> (Write): 50 30
+DEAL::Size dataset_2 <std::complex<float>> (Write): 1500
+DEAL::Rank dataset_2 <std::complex<float>> (Write): 2
+DEAL::Sum dataset_2 <std::complex<float>> (Write): (61.0000,0.00000)
+DEAL::Dimensions dataset_4 <std::complex<float>> (Write): 50 30
+DEAL::Size dataset_4 <std::complex<float>> (Write): 1500
+DEAL::Rank dataset_4 <std::complex<float>> (Write): 2
+DEAL::Sum dataset_4 <std::complex<float>> (Write): (1179.00,1179.00)
+DEAL::Hyperslab_a sum dataset_4 <std::complex<float>> (Write): (45.0000,45.0000)
+DEAL::Hyperslab_b sum dataset_4 <std::complex<float>> (Write): (6.00000,6.00000)
+DEAL::Write tests for <std::complex<double>> datasets
+DEAL::Dimensions dataset_1 <std::complex<double>> (Write): 50 30
+DEAL::Size dataset_1 <std::complex<double>> (Write): 1500
+DEAL::Rank dataset_1 <std::complex<double>> (Write): 2
+DEAL::Sum dataset_1 <std::complex<double>> (Write): (1.12425e+06,1.12425e+06)
+DEAL::Dimensions dataset_2 <std::complex<double>> (Write): 50 30
+DEAL::Size dataset_2 <std::complex<double>> (Write): 1500
+DEAL::Rank dataset_2 <std::complex<double>> (Write): 2
+DEAL::Sum dataset_2 <std::complex<double>> (Write): (61.0000,0.00000)
+DEAL::Dimensions dataset_4 <std::complex<double>> (Write): 50 30
+DEAL::Size dataset_4 <std::complex<double>> (Write): 1500
+DEAL::Rank dataset_4 <std::complex<double>> (Write): 2
+DEAL::Sum dataset_4 <std::complex<double>> (Write): (1179.00,1179.00)
+DEAL::Hyperslab_a sum dataset_4 <std::complex<double>> (Write): (45.0000,45.0000)
+DEAL::Hyperslab_b sum dataset_4 <std::complex<double>> (Write): (6.00000,6.00000)
 DEAL::Read tests for std::vector<float> datasets
 DEAL::Dimensions dataset_1 std::vector<float> (Read): 50 30
 DEAL::Size dataset_1 std::vector<float> (Read): 1500
@@ -335,3 +400,75 @@ DEAL::Rank dataset_4 FullMatrix<std::complex<double>> (Read): 2
 DEAL::Sum dataset_4 FullMatrix<std::complex<double>> (Read): (1173.00,1173.00)
 DEAL::Hyperslab_a sum dataset_4 FullMatrix<std::complex<double>> (Read): (45.0000,45.0000)
 DEAL::Hyperslab_b sum dataset_4 FullMatrix<std::complex<double>> (Read): (0.00000,0.00000)
+DEAL::Read tests for <float> datasets
+DEAL::Dimensions dataset_1 <float> (Read): 50 30
+DEAL::Size dataset_1 <float> (Read): 1500
+DEAL::Rank dataset_1 <float> (Read): 2
+DEAL::Sum dataset_1 <float> (Read): 1.12425e+06
+DEAL::Dimensions dataset_2 <float> (Read): 50 30
+DEAL::Size dataset_2 <float> (Read): 1500
+DEAL::Rank dataset_2 <float> (Read): 2
+DEAL::Sum dataset_2 <float> (Read): 16.0000
+DEAL::Selection dataset_2 <float> (Read): 2.00000, 3.00000, 5.00000, 6.00000
+DEAL::Dimensions dataset_3 <float> (Read): 50 30
+DEAL::Size dataset_3 <float> (Read): 1500
+DEAL::Rank dataset_3 <float> (Read): 2
+DEAL::Sum dataset_3 <float> (Read): 1.12425e+06
+DEAL::Dimensions dataset_4 <float> (Read): 50 30
+DEAL::Size dataset_4 <float> (Read): 1500
+DEAL::Rank dataset_4 <float> (Read): 2
+DEAL::Sum dataset_4 <float> (Read): 1173.00
+DEAL::Hyperslab_a sum dataset_4 <float> (Read): 45.0000
+DEAL::Hyperslab_b sum dataset_4 <float> (Read): 0.00000
+DEAL::Read tests for <double> datasets
+DEAL::Dimensions dataset_1 <double> (Read): 50 30
+DEAL::Size dataset_1 <double> (Read): 1500
+DEAL::Rank dataset_1 <double> (Read): 2
+DEAL::Sum dataset_1 <double> (Read): 1.12425e+06
+DEAL::Dimensions dataset_2 <double> (Read): 50 30
+DEAL::Size dataset_2 <double> (Read): 1500
+DEAL::Rank dataset_2 <double> (Read): 2
+DEAL::Sum dataset_2 <double> (Read): 16.0000
+DEAL::Selection dataset_2 <double> (Read): 2.00000, 3.00000, 5.00000, 6.00000
+DEAL::Dimensions dataset_3 <double> (Read): 50 30
+DEAL::Size dataset_3 <double> (Read): 1500
+DEAL::Rank dataset_3 <double> (Read): 2
+DEAL::Sum dataset_3 <double> (Read): 1.12425e+06
+DEAL::Dimensions dataset_4 <double> (Read): 50 30
+DEAL::Size dataset_4 <double> (Read): 1500
+DEAL::Rank dataset_4 <double> (Read): 2
+DEAL::Sum dataset_4 <double> (Read): 1173.00
+DEAL::Hyperslab_a sum dataset_4 <double> (Read): 45.0000
+DEAL::Hyperslab_b sum dataset_4 <double> (Read): 0.00000
+DEAL::Read tests for <std::complex<float>> datasets
+DEAL::Dimensions dataset_1 <std::complex<float>> (Read): 50 30
+DEAL::Size dataset_1 <std::complex<float>> (Read): 1500
+DEAL::Rank dataset_1 <std::complex<float>> (Read): 2
+DEAL::Sum dataset_1 <std::complex<float>> (Read): (1.12425e+06,1.12425e+06)
+DEAL::Dimensions dataset_2 <std::complex<float>> (Read): 50 30
+DEAL::Size dataset_2 <std::complex<float>> (Read): 1500
+DEAL::Rank dataset_2 <std::complex<float>> (Read): 2
+DEAL::Sum dataset_2 <std::complex<float>> (Read): (16.0000,0.00000)
+DEAL::Selection dataset_2 <std::complex<float>> (Read): (2.00000,0.00000), (3.00000,0.00000), (5.00000,0.00000), (6.00000,0.00000)
+DEAL::Dimensions dataset_4 <std::complex<float>> (Read): 50 30
+DEAL::Size dataset_4 <std::complex<float>> (Read): 1500
+DEAL::Rank dataset_4 <std::complex<float>> (Read): 2
+DEAL::Sum dataset_4 <std::complex<float>> (Read): (1173.00,1173.00)
+DEAL::Hyperslab_a sum dataset_4 <std::complex<float>> (Read): (45.0000,45.0000)
+DEAL::Hyperslab_b sum dataset_4 <std::complex<float>> (Read): (0.00000,0.00000)
+DEAL::Read tests for <std::complex<double>> datasets
+DEAL::Dimensions dataset_1 <std::complex<double>> (Read): 50 30
+DEAL::Size dataset_1 <std::complex<double>> (Read): 1500
+DEAL::Rank dataset_1 <std::complex<double>> (Read): 2
+DEAL::Sum dataset_1 <std::complex<double>> (Read): (1.12425e+06,1.12425e+06)
+DEAL::Dimensions dataset_2 <std::complex<double>> (Read): 50 30
+DEAL::Size dataset_2 <std::complex<double>> (Read): 1500
+DEAL::Rank dataset_2 <std::complex<double>> (Read): 2
+DEAL::Sum dataset_2 <std::complex<double>> (Read): (16.0000,0.00000)
+DEAL::Selection dataset_2 <std::complex<double>> (Read): (2.00000,0.00000), (3.00000,0.00000), (5.00000,0.00000), (6.00000,0.00000)
+DEAL::Dimensions dataset_4 <std::complex<double>> (Read): 50 30
+DEAL::Size dataset_4 <std::complex<double>> (Read): 1500
+DEAL::Rank dataset_4 <std::complex<double>> (Read): 2
+DEAL::Sum dataset_4 <std::complex<double>> (Read): (1173.00,1173.00)
+DEAL::Hyperslab_a sum dataset_4 <std::complex<double>> (Read): (45.0000,45.0000)
+DEAL::Hyperslab_b sum dataset_4 <std::complex<double>> (Read): (0.00000,0.00000)
