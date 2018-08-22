@@ -116,87 +116,6 @@ namespace internal
   namespace BlockVectorIterators
   {
     /**
-     * Declaration of the general template of a structure which is used to
-     * determine some types based on the template arguments of other classes.
-     */
-    template <class BlockVectorType, bool Constness>
-    struct Types
-    {};
-
-
-
-    /**
-     * Declaration of a specialized template of a structure which is used to
-     * determine some types based on the template arguments of other classes.
-     *
-     * This is for the use of non-const iterators.
-     */
-    template <class BlockVectorType>
-    struct Types<BlockVectorType, false>
-    {
-      /**
-       * Type of the vector underlying the block vector used in non-const
-       * iterators. There, the vector must not be constant.
-       */
-      using Vector = typename BlockVectorType::BlockType;
-
-      /**
-       * Type of the block vector used in non-const iterators. There, the
-       * block vector must not be constant.
-       */
-      using BlockVector = BlockVectorType;
-
-      /**
-       * Type of the numbers we point to. Here, they are not constant.
-       */
-      using value_type = typename BlockVector::value_type;
-
-      /**
-       * Typedef the result of a dereferencing operation for an iterator of
-       * the underlying iterator.
-       */
-      using dereference_type = typename Vector::reference;
-    };
-
-
-
-    /**
-     * Declaration of a specialized template of a structure which is used to
-     * determine some types based on the template arguments of other classes.
-     *
-     * This is for the use of const_iterator.
-     */
-    template <class BlockVectorType>
-    struct Types<BlockVectorType, true>
-    {
-      /**
-       * Type of the vector underlying the block vector used in
-       * const_iterator. There, the vector must be constant.
-       */
-      using Vector = const typename BlockVectorType::BlockType;
-
-      /**
-       * Type of the block vector used in const_iterator. There, the block
-       * vector must be constant.
-       */
-      using BlockVector = const BlockVectorType;
-
-      /**
-       * Type of the numbers we point to. Here, they are constant since the
-       * block vector we use is constant.
-       */
-      using value_type = const typename BlockVector::value_type;
-
-      /**
-       * Typedef the result of a dereferencing operation for an iterator of
-       * the underlying iterator. Since this is for constant iterators, we can
-       * only return values, not actual references.
-       */
-      using dereference_type = value_type;
-    };
-
-
-    /**
      * General random-access iterator class for block vectors. Since we do not
      * want to have two classes for non-const iterator and const_iterator, we
      * take a second template argument which denotes whether the vector we
@@ -227,7 +146,10 @@ namespace internal
        * the second template parameter, this is either a constant or non-const
        * number.
        */
-      using value_type = typename Types<BlockVectorType, Constness>::value_type;
+      using value_type =
+        typename std::conditional<Constness,
+                                  const typename BlockVectorType::value_type,
+                                  typename BlockVectorType::value_type>::type;
 
       /**
        * Declare some alias which are standard for iterators and are used
@@ -239,15 +161,17 @@ namespace internal
       using reference         = typename BlockVectorType::reference;
       using pointer           = value_type *;
 
-      using dereference_type =
-        typename Types<BlockVectorType, Constness>::dereference_type;
+      using dereference_type = typename std::conditional<
+        Constness,
+        value_type,
+        typename BlockVectorType::BlockType::reference>::type;
 
       /**
        * Typedef the type of the block vector (which differs in constness,
        * depending on the second template parameter).
        */
-      using BlockVector =
-        typename Types<BlockVectorType, Constness>::BlockVector;
+      using BlockVector = typename std::
+        conditional<Constness, const BlockVectorType, BlockVectorType>::type;
 
       /**
        * Construct an iterator from a vector to which we point and the global
