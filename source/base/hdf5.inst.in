@@ -1,0 +1,81 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 - 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (number : REAL_AND_COMPLEX_SCALARS)
+  {
+    template number HDF5Object::attr<number>(const std::string attr_name) const;
+    template void   HDF5Object::write_attr<number>(const std::string attr_name,
+                                                 number            value) const;
+
+    template std::vector<number> DataSet::read<std::vector, number>();
+    template FullMatrix<number>  DataSet::read<FullMatrix, number>();
+
+    template std::vector<number> DataSet::read_selection<number>(
+      const std::vector<hsize_t> coordinates);
+
+    template std::vector<number> DataSet::read_hyperslab<std::vector, number>(
+      const std::vector<hsize_t> &offset, const std::vector<hsize_t> &count);
+
+    template FullMatrix<number> DataSet::read_hyperslab<FullMatrix, number>(
+      const std::vector<hsize_t> &offset, const std::vector<hsize_t> &count);
+
+    template void DataSet::read_none<number>();
+
+    template void DataSet::write<std::vector, number>(
+      const std::vector<number> &data);
+
+    template void DataSet::write<FullMatrix, number>(
+      const FullMatrix<number> &data);
+
+    template void DataSet::write_selection<number>(
+      const std::vector<number> &data, const std::vector<hsize_t> coordinates);
+    template void DataSet::write_hyperslab<std::vector, number>(
+      const std::vector<number> & data,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &count);
+
+    template void DataSet::write_hyperslab<FullMatrix, number>(
+      const FullMatrix<number> &  data,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &count);
+
+    template void DataSet::write_hyperslab<std::vector, number>(
+      const std::vector<number> & data,
+      const std::vector<hsize_t> &data_dimensions,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &stride,
+      const std::vector<hsize_t> &count,
+      const std::vector<hsize_t> &block);
+
+    template void DataSet::write_hyperslab<FullMatrix, number>(
+      const FullMatrix<number> &  data,
+      const std::vector<hsize_t> &data_dimensions,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &stride,
+      const std::vector<hsize_t> &count,
+      const std::vector<hsize_t> &block);
+
+    template void DataSet::write_none<number>();
+
+    template DataSet Group::create_dataset<number>(
+      const std::string name, const std::vector<hsize_t> dimensions) const;
+
+    template void Group::write_dataset(const std::string          name,
+                                       const std::vector<number> &data) const;
+
+    template void Group::write_dataset(const std::string         name,
+                                       const FullMatrix<number> &data) const;
+  }

@@ -117,6 +117,7 @@ SET(_inst
   function_time.inst.in
   incremental_function.inst.in
   geometric_utilities.inst.in
+  hdf5.inst.in
   mpi.inst.in
   partitioner.inst.in
   partitioner.cuda.inst.in
