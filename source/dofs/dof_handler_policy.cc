@@ -872,6 +872,22 @@ namespace internal
                                            fe_index_2 =
                                              line->nth_active_fe_index(g);
 
+                        // as described in the hp paper, we only unify on lines
+                        // when there are at most two different FE objects
+                        // assigned on it.
+                        // however, more than two 'active_fe_indices' can be
+                        // attached that still fulfill the above criterion,
+                        // i.e. when two different FiniteElement objects are
+                        // assigned to neighboring cells that map their degrees
+                        // of freedom one-to-one.
+                        // we cannot verify with certainty if two dofs each of
+                        // separate FiniteElement objects actually map
+                        // one-to-one. however, checking for the number of
+                        // 'dofs_per_line' turned out to be a reasonable
+                        // approach, that also works for e.g. two different
+                        // FE_Q objects of the same order, from which one is
+                        // enhanced by a bubble function that is zero on the
+                        // boundary.
                         if ((dof_handler.get_fe(fe_index_1).dofs_per_line ==
                              dof_handler.get_fe(fe_index_2).dofs_per_line) &&
                             (dof_handler.get_fe(fe_index_1).dofs_per_line > 0))

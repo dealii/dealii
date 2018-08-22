@@ -1232,7 +1232,14 @@ namespace GridTools
 
   /**
    * Extract the active cells around a given cell @p cell and return them in
-   * the vector @p active_neighbors.
+   * the vector @p active_neighbors. These neighbors are specifically the
+   * <i>face</i> neighbors of a cell or, if that neighbor is further
+   * refined, its active children that border on that face. On the other
+   * hand, the neighbors returned do not include cells that lie, for
+   * example, diagonally opposite to a vertex but are not face neighbors
+   * themselves. (In 3d, it also does not include cells that are
+   * adjacent to one of the edges of the current cell, but are not
+   * face neighbors.)
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
