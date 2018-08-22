@@ -31,7 +31,9 @@
 
 #  include <boost/container/small_vector.hpp>
 
-#  include <EpetraExt_MatrixMatrix.h>
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
+#    include <EpetraExt_MatrixMatrix.h>
+#  endif
 #  include <Epetra_Export.h>
 #  include <Teuchos_RCP.hpp>
 #  include <ml_epetra_utils.h>
@@ -2307,13 +2309,16 @@ namespace TrilinosWrappers
                               inputright.locally_owned_domain_indices(),
                               inputleft.get_mpi_communicator());
 
-
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
       EpetraExt::MatrixMatrix::Multiply(inputleft.trilinos_matrix(),
                                         transpose_left,
                                         *mod_B,
                                         false,
                                         const_cast<Epetra_CrsMatrix &>(
                                           tmp_result.trilinos_matrix()));
+#  else
+      Assert("false", ExcMessage("This function requires EpetraExt."));
+#  endif
       result.reinit(tmp_result.trilinos_matrix());
     }
   } // namespace internals
