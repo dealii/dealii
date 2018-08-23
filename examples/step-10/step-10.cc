@@ -83,21 +83,15 @@ namespace Step10
     Triangulation<dim> triangulation;
     GridGenerator::hyper_ball(triangulation);
 
-    // Next generate output for this grid and for a once refined grid. Note
-    // that we have hidden the mesh refinement in the loop header, which might
-    // be uncommon but nevertheless works. Also it is strangely consistent
-    // with incrementing the loop index denoting the refinement level.
-    for (unsigned int refinement = 0; refinement < 2;
-         ++refinement, triangulation.refine_global(1))
+    // Then alternate between generating output on the current mesh
+    // for $Q_1$, $Q_2$, and $Q_3$ mappings, and (at the end of the
+    // loop body) refining the mesh once globally.
+    for (unsigned int refinement = 0; refinement < 2; ++refinement)
       {
         std::cout << "Refinement level: " << refinement << std::endl;
 
-        // Then have a string which denotes the base part of the names of the
-        // files into which we write the output (ending with the refinement
-        // level).
         std::string filename_base = "ball_" + Utilities::to_string(refinement);
 
-        // Then output the present grid for $Q_1$, $Q_2$, and $Q_3$ mappings:
         for (unsigned int degree = 1; degree < 4; ++degree)
           {
             std::cout << "Degree = " << degree << std::endl;
@@ -118,7 +112,7 @@ namespace Step10
             // explicitly.
 
 
-            // In degree to actually write out the present grid with this
+            // In order to actually write out the present grid with this
             // mapping, we set up an object which we will use for output. We
             // will generate Gnuplot output, which consists of a set of lines
             // describing the mapped triangulation. By default, only one line
@@ -149,6 +143,9 @@ namespace Step10
             grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
           }
         std::cout << std::endl;
+
+        // At the end of the loop, refine the mesh globally.
+        triangulation.refine_global();
       }
   }
 
