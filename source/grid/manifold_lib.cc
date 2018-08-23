@@ -53,7 +53,8 @@ namespace internal
     else
       {
         const Tensor<1, 3> dirUnit = dir / theta;
-        const Tensor<1, 3> tmp     = cos(theta) * u + sin(theta) * dirUnit;
+        const Tensor<1, 3> tmp =
+          std::cos(theta) * u + std::sin(theta) * dirUnit;
         return tmp / tmp.norm();
       }
   }
@@ -167,15 +168,15 @@ PolarManifold<dim, spacedim>::push_forward(
     switch (spacedim)
       {
         case 2:
-          p[0] = rho * cos(theta);
-          p[1] = rho * sin(theta);
+          p[0] = rho * std::cos(theta);
+          p[1] = rho * std::sin(theta);
           break;
         case 3:
           {
             const double phi = spherical_point[2];
-            p[0]             = rho * sin(theta) * cos(phi);
-            p[1]             = rho * sin(theta) * sin(phi);
-            p[2]             = rho * cos(theta);
+            p[0]             = rho * std::sin(theta) * std::cos(phi);
+            p[1]             = rho * std::sin(theta) * std::sin(phi);
+            p[2]             = rho * std::cos(theta);
             break;
           }
         default:
@@ -201,7 +202,7 @@ PolarManifold<dim, spacedim>::pull_back(
     {
       case 2:
         {
-          p[1] = atan2(R[1], R[0]);
+          p[1] = std::atan2(R[1], R[0]);
           if (p[1] < 0)
             p[1] += 2 * numbers::PI;
           break;
@@ -210,10 +211,10 @@ PolarManifold<dim, spacedim>::pull_back(
       case 3:
         {
           const double z = R[2];
-          p[2]           = atan2(R[1], R[0]); // phi
+          p[2]           = std::atan2(R[1], R[0]); // phi
           if (p[2] < 0)
-            p[2] += 2 * numbers::PI;                        // phi is periodic
-          p[1] = atan2(sqrt(R[0] * R[0] + R[1] * R[1]), z); // theta
+            p[2] += 2 * numbers::PI; // phi is periodic
+          p[1] = std::atan2(std::sqrt(R[0] * R[0] + R[1] * R[1]), z); // theta
           break;
         }
 
@@ -241,26 +242,26 @@ PolarManifold<dim, spacedim>::push_forward_gradient(
       {
         case 2:
           {
-            DX[0][0] = cos(theta);
-            DX[0][1] = -rho * sin(theta);
-            DX[1][0] = sin(theta);
-            DX[1][1] = rho * cos(theta);
+            DX[0][0] = std::cos(theta);
+            DX[0][1] = -rho * std::sin(theta);
+            DX[1][0] = std::sin(theta);
+            DX[1][1] = rho * std::cos(theta);
             break;
           }
 
         case 3:
           {
             const double phi = spherical_point[2];
-            DX[0][0]         = sin(theta) * cos(phi);
-            DX[0][1]         = rho * cos(theta) * cos(phi);
-            DX[0][2]         = -rho * sin(theta) * sin(phi);
+            DX[0][0]         = std::sin(theta) * std::cos(phi);
+            DX[0][1]         = rho * std::cos(theta) * std::cos(phi);
+            DX[0][2]         = -rho * std::sin(theta) * std::sin(phi);
 
-            DX[1][0] = sin(theta) * sin(phi);
-            DX[1][1] = rho * cos(theta) * sin(phi);
-            DX[1][2] = rho * sin(theta) * cos(phi);
+            DX[1][0] = std::sin(theta) * std::sin(phi);
+            DX[1][1] = rho * std::cos(theta) * std::sin(phi);
+            DX[1][2] = rho * std::sin(theta) * std::cos(phi);
 
-            DX[2][0] = cos(theta);
-            DX[2][1] = -rho * sin(theta);
+            DX[2][0] = std::cos(theta);
+            DX[2][1] = -rho * std::sin(theta);
             DX[2][2] = 0;
             break;
           }
@@ -881,7 +882,7 @@ namespace
                 else
                   {
                     const double costheta     = (directions[i]) * candidate;
-                    const double theta        = atan2(sintheta, costheta);
+                    const double theta        = std::atan2(sintheta, costheta);
                     const double sincthetaInv = theta / sintheta;
 
                     const double cosphi = vPerp * Clocalx;
@@ -1323,11 +1324,11 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   double x     = p(0);
   double z     = p(1);
   double y     = p(2);
-  double phi   = atan2(y, x);
-  double theta = atan2(z, std::sqrt(x * x + y * y) - R);
-  double w =
-    std::sqrt(pow(y - sin(phi) * R, 2.0) + pow(x - cos(phi) * R, 2.0) + z * z) /
-    r;
+  double phi   = std::atan2(y, x);
+  double theta = std::atan2(z, std::sqrt(x * x + y * y) - R);
+  double w     = std::sqrt(std::pow(y - std::sin(phi) * R, 2.0) +
+                       std::pow(x - std::cos(phi) * R, 2.0) + z * z) /
+             r;
   return Point<3>(phi, theta, w);
 }
 
@@ -1341,9 +1342,9 @@ TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
   double theta = chart_point(1);
   double w     = chart_point(2);
 
-  return Point<3>(cos(phi) * R + r * w * cos(theta) * cos(phi),
-                  r * w * sin(theta),
-                  sin(phi) * R + r * w * cos(theta) * sin(phi));
+  return Point<3>(std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi),
+                  r * w * std::sin(theta),
+                  std::sin(phi) * R + r * w * std::cos(theta) * std::sin(phi));
 }
 
 
@@ -1381,17 +1382,17 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
   double theta = chart_point(1);
   double w     = chart_point(2);
 
-  DX[0][0] = -sin(phi) * R - r * w * cos(theta) * sin(phi);
-  DX[0][1] = -r * w * sin(theta) * cos(phi);
-  DX[0][2] = r * cos(theta) * cos(phi);
+  DX[0][0] = -std::sin(phi) * R - r * w * std::cos(theta) * std::sin(phi);
+  DX[0][1] = -r * w * std::sin(theta) * std::cos(phi);
+  DX[0][2] = r * std::cos(theta) * std::cos(phi);
 
   DX[1][0] = 0;
-  DX[1][1] = r * w * cos(theta);
-  DX[1][2] = r * sin(theta);
+  DX[1][1] = r * w * std::cos(theta);
+  DX[1][2] = r * std::sin(theta);
 
-  DX[2][0] = cos(phi) * R + r * w * cos(theta) * cos(phi);
-  DX[2][1] = -r * w * sin(theta) * sin(phi);
-  DX[2][2] = r * cos(theta) * sin(phi);
+  DX[2][0] = std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi);
+  DX[2][1] = -r * w * std::sin(theta) * std::sin(phi);
+  DX[2][2] = r * std::cos(theta) * std::sin(phi);
 
   return DX;
 }

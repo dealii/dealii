@@ -1712,25 +1712,25 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
   // (I) rotate the camera to the chosen polar angle
   camera_position_temp[1] =
-    cos(angle_factor * svg_flags.polar_angle) * camera_position[1] -
-    sin(angle_factor * svg_flags.polar_angle) * camera_position[2];
+    std::cos(angle_factor * svg_flags.polar_angle) * camera_position[1] -
+    std::sin(angle_factor * svg_flags.polar_angle) * camera_position[2];
   camera_position_temp[2] =
-    sin(angle_factor * svg_flags.polar_angle) * camera_position[1] +
-    cos(angle_factor * svg_flags.polar_angle) * camera_position[2];
+    std::sin(angle_factor * svg_flags.polar_angle) * camera_position[1] +
+    std::cos(angle_factor * svg_flags.polar_angle) * camera_position[2];
 
   camera_direction_temp[1] =
-    cos(angle_factor * svg_flags.polar_angle) * camera_direction[1] -
-    sin(angle_factor * svg_flags.polar_angle) * camera_direction[2];
+    std::cos(angle_factor * svg_flags.polar_angle) * camera_direction[1] -
+    std::sin(angle_factor * svg_flags.polar_angle) * camera_direction[2];
   camera_direction_temp[2] =
-    sin(angle_factor * svg_flags.polar_angle) * camera_direction[1] +
-    cos(angle_factor * svg_flags.polar_angle) * camera_direction[2];
+    std::sin(angle_factor * svg_flags.polar_angle) * camera_direction[1] +
+    std::cos(angle_factor * svg_flags.polar_angle) * camera_direction[2];
 
   camera_horizontal_temp[1] =
-    cos(angle_factor * svg_flags.polar_angle) * camera_horizontal[1] -
-    sin(angle_factor * svg_flags.polar_angle) * camera_horizontal[2];
+    std::cos(angle_factor * svg_flags.polar_angle) * camera_horizontal[1] -
+    std::sin(angle_factor * svg_flags.polar_angle) * camera_horizontal[2];
   camera_horizontal_temp[2] =
-    sin(angle_factor * svg_flags.polar_angle) * camera_horizontal[1] +
-    cos(angle_factor * svg_flags.polar_angle) * camera_horizontal[2];
+    std::sin(angle_factor * svg_flags.polar_angle) * camera_horizontal[1] +
+    std::cos(angle_factor * svg_flags.polar_angle) * camera_horizontal[2];
 
   camera_position[1] = camera_position_temp[1];
   camera_position[2] = camera_position_temp[2];
@@ -1743,25 +1743,25 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
   // (II) rotate the camera to the chosen azimuth angle
   camera_position_temp[0] =
-    cos(angle_factor * svg_flags.azimuth_angle) * camera_position[0] -
-    sin(angle_factor * svg_flags.azimuth_angle) * camera_position[1];
+    std::cos(angle_factor * svg_flags.azimuth_angle) * camera_position[0] -
+    std::sin(angle_factor * svg_flags.azimuth_angle) * camera_position[1];
   camera_position_temp[1] =
-    sin(angle_factor * svg_flags.azimuth_angle) * camera_position[0] +
-    cos(angle_factor * svg_flags.azimuth_angle) * camera_position[1];
+    std::sin(angle_factor * svg_flags.azimuth_angle) * camera_position[0] +
+    std::cos(angle_factor * svg_flags.azimuth_angle) * camera_position[1];
 
   camera_direction_temp[0] =
-    cos(angle_factor * svg_flags.azimuth_angle) * camera_direction[0] -
-    sin(angle_factor * svg_flags.azimuth_angle) * camera_direction[1];
+    std::cos(angle_factor * svg_flags.azimuth_angle) * camera_direction[0] -
+    std::sin(angle_factor * svg_flags.azimuth_angle) * camera_direction[1];
   camera_direction_temp[1] =
-    sin(angle_factor * svg_flags.azimuth_angle) * camera_direction[0] +
-    cos(angle_factor * svg_flags.azimuth_angle) * camera_direction[1];
+    std::sin(angle_factor * svg_flags.azimuth_angle) * camera_direction[0] +
+    std::cos(angle_factor * svg_flags.azimuth_angle) * camera_direction[1];
 
   camera_horizontal_temp[0] =
-    cos(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[0] -
-    sin(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[1];
+    std::cos(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[0] -
+    std::sin(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[1];
   camera_horizontal_temp[1] =
-    sin(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[0] +
-    cos(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[1];
+    std::sin(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[0] +
+    std::cos(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[1];
 
   camera_position[0] = camera_position_temp[0];
   camera_position[1] = camera_position_temp[1];
@@ -1777,11 +1777,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   camera_position[1] = y_min + .5 * y_dimension;
 
   camera_position[0] += 2. * std::max(x_dimension, y_dimension) *
-                        sin(angle_factor * svg_flags.polar_angle) *
-                        sin(angle_factor * svg_flags.azimuth_angle);
+                        std::sin(angle_factor * svg_flags.polar_angle) *
+                        std::sin(angle_factor * svg_flags.azimuth_angle);
   camera_position[1] -= 2. * std::max(x_dimension, y_dimension) *
-                        sin(angle_factor * svg_flags.polar_angle) *
-                        cos(angle_factor * svg_flags.azimuth_angle);
+                        std::sin(angle_factor * svg_flags.polar_angle) *
+                        std::cos(angle_factor * svg_flags.azimuth_angle);
 
 
   // determine the bounding box of the given triangulation on the projection
@@ -2312,9 +2312,9 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                 }
 
               float distance_to_camera =
-                sqrt(pow(point[0] - camera_position[0], 2.) +
-                     pow(point[1] - camera_position[1], 2.) +
-                     pow(point[2] - camera_position[2], 2.));
+                std::sqrt(std::pow(point[0] - camera_position[0], 2.) +
+                          std::pow(point[1] - camera_position[1], 2.) +
+                          std::pow(point[2] - camera_position[2], 2.));
               float distance_factor =
                 distance_to_camera / (2. * std::max(x_dimension, y_dimension));
 
@@ -2326,10 +2326,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                                            camera_focus);
 
               const unsigned int font_size_this_cell =
-                static_cast<unsigned int>(
-                  .5 +
-                  cell_label_font_size *
-                    pow(.5, (float)cell->level() - 4. + 3.5 * distance_factor));
+                static_cast<unsigned int>(.5 +
+                                          cell_label_font_size *
+                                            std::pow(.5,
+                                                     (float)cell->level() - 4. +
+                                                       3.5 * distance_factor));
 
               out << "  <text"
                   << " x=\""

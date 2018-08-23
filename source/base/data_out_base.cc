@@ -2982,7 +2982,7 @@ namespace DataOutBase
 
       // normalize the gradient
       double gradient_norm =
-        sqrt(pow(gradient[0], 2.0) + pow(gradient[1], 2.0));
+        std::sqrt(std::pow(gradient[0], 2.0) + std::pow(gradient[1], 2.0));
       gradient[0] /= gradient_norm;
       gradient[1] /= gradient_norm;
 

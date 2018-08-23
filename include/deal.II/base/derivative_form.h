@@ -337,7 +337,7 @@ DerivativeForm<order, dim, spacedim, Number>::determinant() const
         for (unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
 
-      return (sqrt(dealii::determinant(G)));
+      return (std::sqrt(dealii::determinant(G)));
     }
 }
 

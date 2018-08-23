@@ -2273,7 +2273,7 @@ namespace GridTools
         if (i == direction)
           continue;
 
-        if (fabs(distance(i)) > 1.e-10)
+        if (std::abs(distance(i)) > 1.e-10)
           return false;
       }
 

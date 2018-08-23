@@ -212,7 +212,7 @@ namespace FESeries
         const double x = 2.0 * (x_q[d] - 0.5);
         Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.), ExcLegendre(d, x_q[d]));
         const int ind = indices[d];
-        res *= sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
+        res *= std::sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
       }
     return res;
 

@@ -33,7 +33,7 @@ test(PETScWrappers::MPI::Vector &v)
   for (unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) = i;
-      norm = std::max(norm, fabs(i));
+      norm = std::max<double>(norm, i);
     }
   v.compress(VectorOperation::insert);
 

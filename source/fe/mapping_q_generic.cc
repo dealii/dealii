@@ -2915,7 +2915,7 @@ MappingQGeneric<dim, spacedim>::fill_fe_values(
                     G[i][j] = DX_t[i] * DX_t[j];
 
                 output_data.JxW_values[point] =
-                  sqrt(determinant(G)) * weights[point];
+                  std::sqrt(determinant(G)) * weights[point];
 
                 if (computed_cell_similarity ==
                     CellSimilarity::inverted_translation)

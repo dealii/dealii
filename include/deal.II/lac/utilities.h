@@ -238,7 +238,7 @@ namespace Utilities
                     "real-valued Hyperbolic rotation does not exist for (" +
                     std::to_string(f) + "," + std::to_string(g) + ")"));
       const NumberType u =
-        std::copysign(sqrt((1. - tau) * (1. + tau)),
+        std::copysign(std::sqrt((1. - tau) * (1. + tau)),
                       f); // <-- more stable than std::sqrt(1.-tau*tau)
       std::array<NumberType, 3> csr;
       csr[0] = 1. / u;       // c

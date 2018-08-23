@@ -184,37 +184,37 @@ namespace internal
   double
   mu_ceil(double value)
   {
-    return ceil(value);
+    return std::ceil(value);
   }
 
   double
   mu_floor(double value)
   {
-    return floor(value);
+    return std::floor(value);
   }
 
   double
   mu_cot(double value)
   {
-    return 1.0 / tan(value);
+    return 1.0 / std::tan(value);
   }
 
   double
   mu_csc(double value)
   {
-    return 1.0 / sin(value);
+    return 1.0 / std::sin(value);
   }
 
   double
   mu_sec(double value)
   {
-    return 1.0 / cos(value);
+    return 1.0 / std::cos(value);
   }
 
   double
   mu_log(double value)
   {
-    return log(value);
+    return std::log(value);
   }
 
   double
@@ -226,7 +226,7 @@ namespace internal
   double
   mu_erfc(double value)
   {
-    return boost::math::erfc(value);
+    return std::erfc(value);
   }
 
   // returns a random value in the range [0,1] initializing the generator
