@@ -2992,7 +2992,7 @@ namespace GridGenerator
                                     p + Point<dim>(+1, 0) * (radius / 2),
                                     p + Point<dim>(0, +1) * (radius / 2),
                                     p + Point<dim>(+1, +1) *
-                                          (radius / (2 * sqrt(2.0))),
+                                          (radius / (2 * std::sqrt(2.0))),
                                     p + Point<dim>(0, +1) * radius,
                                     p + Point<dim>(+1, +1) *
                                           (radius / std::sqrt(2.0))};
@@ -3757,7 +3757,7 @@ namespace GridGenerator
       center + Point<dim>(+1, 0, 0) * radius,
       center + Point<dim>(+1, 0, 0) * (radius / 2.),
       center + Point<dim>(0, +1, 0) * (radius / 2.),
-      center + Point<dim>(+1, +1, 0) * (radius / (2 * sqrt(2.0))),
+      center + Point<dim>(+1, +1, 0) * (radius / (2 * std::sqrt(2.0))),
       center + Point<dim>(0, +1, 0) * radius,
       center + Point<dim>(+1, +1, 0) * (radius / std::sqrt(2.0)),
       center + Point<dim>(0, 0, 1) * radius / 2.,

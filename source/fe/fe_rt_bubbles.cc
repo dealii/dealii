@@ -213,7 +213,8 @@ FE_RT_Bubbles<dim>::get_dpo_vector(const unsigned int deg)
     dofs_per_face *= deg + 1;
 
   // ...plus the interior DoFs for the total of dim*(deg+1)^dim
-  const unsigned int interior_dofs = dim * (deg - 1) * pow(deg + 1, dim - 1);
+  const unsigned int interior_dofs =
+    dim * (deg - 1) * Utilities::pow(deg + 1, dim - 1);
 
   std::vector<unsigned int> dpo(dim + 1);
   dpo[dim - 1] = dofs_per_face;

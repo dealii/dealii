@@ -573,8 +573,8 @@ namespace GridTools
           {
             bool equal = true;
             for (unsigned int d = 0; d < spacedim; ++d)
-              equal &= (fabs(vertices[considered_vertices[j]](d) -
-                             vertices[considered_vertices[i]](d)) < tol);
+              equal &= (std::abs(vertices[considered_vertices[j]](d) -
+                                 vertices[considered_vertices[i]](d)) < tol);
             if (equal)
               {
                 new_vertex_numbers[considered_vertices[j]] =
@@ -2633,9 +2633,9 @@ namespace GridTools
     {
       if (cell->active())
         {
-          while (
-            current_cell_idx >=
-            floor((long)n_active_cells * (current_proc_idx + 1) / n_partitions))
+          while (current_cell_idx >=
+                 std::floor((long)n_active_cells * (current_proc_idx + 1) /
+                            n_partitions))
             ++current_proc_idx;
           cell->set_subdomain_id(current_proc_idx);
           ++current_cell_idx;

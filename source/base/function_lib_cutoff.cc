@@ -215,7 +215,7 @@ namespace Functions
         if (d >= r)
           return 0.;
         const double e = -r * r / (r * r - d * d);
-        return ((e < -50) ? 0. : numbers::E * exp(e));
+        return ((e < -50) ? 0. : numbers::E * std::exp(e));
       }
     return 0.;
   }
@@ -244,7 +244,7 @@ namespace Functions
           else
             {
               const double e = -r * r / (r * r - d * d);
-              values[i]      = (e < -50) ? 0. : numbers::E * exp(e);
+              values[i]      = (e < -50) ? 0. : numbers::E * std::exp(e);
             }
         }
     else
@@ -270,7 +270,7 @@ namespace Functions
           {
             const double e = -r * r / (r * r - d * d);
             if (e > -50)
-              val = numbers::E * exp(e);
+              val = numbers::E * std::exp(e);
           }
 
         if (this->selected == CutOffFunctionBase<dim>::no_component)
@@ -295,10 +295,10 @@ namespace Functions
     if (d >= r)
       return Tensor<1, dim>();
     const double e = -d * d / (r - d) / (r + d);
-    return ((e < -50) ?
-              Point<dim>() :
-              (p - this->center) / d *
-                (-2.0 * r * r / pow(-r * r + d * d, 2.0) * d * exp(e)));
+    return ((e < -50) ? Point<dim>() :
+                        (p - this->center) / d *
+                          (-2.0 * r * r / std::pow(-r * r + d * d, 2.0) * d *
+                           std::exp(e)));
   }
 
 
