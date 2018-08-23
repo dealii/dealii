@@ -466,11 +466,11 @@ namespace Step22
     // Dirichlet conditions are to be set for the velocity only.  To this end,
     // we use a ComponentMask that only selects the velocity components. The
     // component mask is obtained from the finite element by specifying the
-    // particular components we want. Since we use adaptively refined grids
-    // the constraint matrix needs to be first filled with hanging node
+    // particular components we want. Since we use adaptively refined grids,
+    // the affine constraints object needs to be first filled with hanging node
     // constraints generated from the DoF handler. Note the order of the two
     // functions &mdash; we first compute the hanging node constraints, and
-    // then insert the boundary values into the constraint matrix. This makes
+    // then insert the boundary values into the constraints object. This makes
     // sure that we respect H<sup>1</sup> conformity on boundaries with
     // hanging nodes (in three space dimensions), where the hanging node needs
     // to dominate the Dirichlet boundary values.

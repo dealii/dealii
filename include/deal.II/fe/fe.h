@@ -304,8 +304,8 @@ class FESystem;
  *
  * <h4>Interpolation matrices in two dimensions</h4>
  *
- * In addition to the fields discussed above for 1D, a constraint matrix is
- * needed to describe hanging node constraints if the finite element has
+ * In addition to the fields discussed above for 1D, a constraint matrix
+ * is needed to describe hanging node constraints if the finite element has
  * degrees of freedom located on edges or vertices. These constraints are
  * represented by an $m\times n$-matrix #interface_constraints, where <i>m</i>
  * is the number of degrees of freedom on the refined side without the corner
@@ -415,9 +415,9 @@ class FESystem;
  * weights. This is sometimes tricky since the nodes on the edge may have
  * different local numbers.
  *
- * For the constraint matrix this means the following: if a degree of freedom
- * on one edge of a face is constrained by some other nodes on the same edge
- * with some weights, then the weights have to be exactly the same as those
+ * For the constraint matrix this means the following: if a degree of
+ * freedom on one edge of a face is constrained by some other nodes on the same
+ * edge with some weights, then the weights have to be exactly the same as those
  * for constrained nodes on the three other edges with respect to the
  * corresponding nodes on these edges. If this isn't the case, you will get
  * into trouble with the AffineConstraints class that is the primary consumer

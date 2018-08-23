@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,7 @@
 // example
 
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -49,7 +49,7 @@ int main()
   DoFRenumbering::Cuthill_McKee(dof);
   DoFRenumbering::component_wise(dof);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 

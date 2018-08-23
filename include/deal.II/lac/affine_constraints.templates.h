@@ -281,7 +281,8 @@ AffineConstraints<number>::add_selected_constraints(
     return;
 
   Assert(filter.size() > constraints.lines.back().index,
-         ExcMessage("Filter needs to be larger than constraint matrix size."));
+         ExcMessage(
+           "The filter must be larger than the given constraints object."));
   for (const ConstraintLine &line : constraints.lines)
     if (filter.is_element(line.index))
       {
@@ -984,7 +985,7 @@ AffineConstraints<number>::condense(SparsityPattern &sparsity) const
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
+  // otherwise, the number states which line in the AffineConstraints object
   // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
@@ -1079,7 +1080,7 @@ AffineConstraints<number>::condense(BlockSparsityPattern &sparsity) const
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
+  // otherwise, the number states which line in the AffineConstraints object
   // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
@@ -1189,7 +1190,7 @@ AffineConstraints<number>::condense(DynamicSparsityPattern &sparsity) const
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
+  // otherwise, the number states which line in the constraints object
   // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
@@ -1289,7 +1290,7 @@ AffineConstraints<number>::condense(BlockDynamicSparsityPattern &sparsity) const
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
+  // otherwise, the number states which line in the constraints object
   // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
@@ -1490,7 +1491,7 @@ AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
 
   // store for each index whether it must be distributed or not. If entry
   // is invalid_size_type, no distribution is necessary.  otherwise, the
-  // number states which line in the constraint matrix handles this index
+  // number states which line in the constraints object handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
 
@@ -1676,7 +1677,7 @@ AffineConstraints<number>::condense(BlockSparseMatrix<number> &uncondensed,
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_size_type, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
+  // otherwise, the number states which line in the constraints object
   // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);

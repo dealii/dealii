@@ -55,8 +55,8 @@ public:
    *
    * Furthermore, this call sets up an AffineConstraints object on each
    * level that contains possible periodicity constraints in case those
-   * have been added to the underlying triangulation. The constraint matrix
-   * can be queried by get_level_constraint_matrix(level). Note that the
+   * have been added to the underlying triangulation. The AffineConstraints
+   * object can be queried by get_level_constraints(level). Note that the
    * current implementation of periodicity constraints in this class does
    * not support rotation matrices in the periodicity definition, i.e., the
    * respective argument in the GridTools::collect_periodic_faces() may not
@@ -157,9 +157,19 @@ public:
   have_boundary_indices() const;
 
   /**
-   * Return the level constraint matrix for a given level, containing
+   * Return the AffineConstraints object for a given level, containing
    * periodicity constraints (if enabled on the triangulation).
    */
+  const AffineConstraints<double> &
+  get_level_constraints(const unsigned int level) const;
+
+  /**
+   * Return the AffineConstraints object for a given level, containing
+   * periodicity constraints (if enabled on the triangulation).
+   *
+   * @deprecated Use get_level_constraints instead, which has a more descriptive name.
+   */
+  DEAL_II_DEPRECATED
   const AffineConstraints<double> &
   get_level_constraint_matrix(const unsigned int level) const;
 
@@ -240,11 +250,11 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                     ->face(cell->periodic_neighbor_face_no(f))
                     ->get_mg_dof_indices(l, dofs_1, 0);
                   cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
-                  // Store periodicity information in the level constraint
-                  // matrix Skip DoFs for which we've previously entered
-                  // periodicity constraints already; this can happen, for
-                  // example, for a vertex dof at a periodic boundary that we
-                  // visit from more than one cell
+                  // Store periodicity information in the level
+                  // AffineConstraints object. Skip DoFs for which we've
+                  // previously entered periodicity constraints already; this
+                  // can happen, for example, for a vertex dof at a periodic
+                  // boundary that we visit from more than one cell
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     if (level_constraints[l].can_store_line(dofs_2[i]) &&
                         level_constraints[l].can_store_line(dofs_1[i]) &&
@@ -383,10 +393,18 @@ MGConstrainedDoFs::have_boundary_indices() const
 
 
 inline const AffineConstraints<double> &
-MGConstrainedDoFs::get_level_constraint_matrix(const unsigned int level) const
+MGConstrainedDoFs::get_level_constraints(const unsigned int level) const
 {
   AssertIndexRange(level, level_constraints.size());
   return level_constraints[level];
+}
+
+
+
+inline const AffineConstraints<double> &
+MGConstrainedDoFs::get_level_constraint_matrix(const unsigned int level) const
+{
+  return get_level_constraints(level);
 }
 
 

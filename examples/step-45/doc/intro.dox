@@ -129,7 +129,7 @@ constrained:
 using namespace DoFTools;
 make_periodicity_constraints(face_1,
                              face_2,
-                             constraint_matrix,
+                             affine_constraints,
                              component_mask = <default value>;
                              face_orientation = <default value>,
                              face_flip = <default value>,
@@ -140,7 +140,7 @@ Here, we need to specify the orientation of the two faces using
 @p face_orientation, @p face_flip and @p face_orientation. For a closer description
 have a look at the documentation of DoFTools::make_periodicity_constraints.
 The remaining parameters are the same as for the high level interface apart
-from the self-explaining @p component_mask and @p constraint_matrix.
+from the self-explaining @p component_mask and @p affine_constraints.
 
 
 <a name="problem"></a>

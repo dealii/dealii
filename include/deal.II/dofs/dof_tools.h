@@ -764,11 +764,11 @@ namespace DoFTools
 
   /**
    * This function does essentially the same as the previous
-   * make_flux_sparsity_pattern() function but allows the application of
-   * a constraint matrix. This is useful in the case where some components
-   * of a finite element are continuous and some discontinuous, allowing
-   * constraints to be imposed on the continuous part while also building
-   * the flux terms needed for the discontinuous part.
+   * make_flux_sparsity_pattern() function but allows the application of an
+   * AffineConstraints object. This is useful in the case where some
+   * components of a finite element are continuous and some discontinuous,
+   * allowing constraints to be imposed on the continuous part while also
+   * building the flux terms needed for the discontinuous part.
    */
   template <typename DoFHandlerType,
             typename SparsityPatternType,
@@ -855,7 +855,7 @@ namespace DoFTools
    * @ref step_6 "step-6"
    * tutorial program and is used in almost all following programs as well.
    *
-   * This function does not clear the constraint matrix object before use, in
+   * This function does not clear the AffineConstraints object before use, in
    * order to allow adding constraints from different sources to the same
    * object. You therefore need to make sure it contains only constraints you
    * still want; otherwise call the AffineConstraints::clear() function.
@@ -2514,8 +2514,8 @@ namespace DoFTools
 
 
   /**
-   * Make a constraint matrix for the constraints that result from zero
-   * boundary values on the given boundary indicator.
+   * Add constraints to @p zero_boundary_constraints corresponding to
+   * enforcing a zero boundary condition on the given boundary indicator.
    *
    * This function constrains all degrees of freedom on the given part of the
    * boundary.

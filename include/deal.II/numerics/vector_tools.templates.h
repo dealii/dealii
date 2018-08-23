@@ -1054,7 +1054,7 @@ namespace VectorTools
       SparseMatrix<number> mass_matrix(sparsity);
       Vector<number>       tmp(mass_matrix.n());
 
-      // If the constraint matrix does not conflict with the given boundary
+      // If the constraints object does not conflict with the given boundary
       // values (i.e., it either does not contain boundary values or it contains
       // the same as boundary_values), we can let it call
       // distribute_local_to_global straight away, otherwise we need to first
@@ -4006,7 +4006,7 @@ namespace VectorTools
     /**
      * Add the constraint $(\vec u-\vec u_\Gamma) \| \vec t$ to the list of
      * constraints. In 2d, this is a single constraint, in 3d these are two
-     * constraints
+     * constraints.
      *
      * Here, $\vec u$ is represented by the set of given DoF indices, and
      * $\vec t$ by the vector specified as the second argument.
@@ -4924,12 +4924,9 @@ namespace VectorTools
                       cell->face(face)->get_dof_indices(
                         face_dof_indices, cell->active_fe_index());
 
-                      // Add the computed
-                      // constraints to the
-                      // constraint matrix,
-                      // if the degree of
-                      // freedom is not
-                      // already constrained.
+                      // Add the computed constraints to the constraints
+                      // object, if the degree of freedom is not already
+                      // constrained.
                       for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                         if (dofs_processed[dof] &&
                             constraints.can_store_line(face_dof_indices[dof]) &&
@@ -6133,9 +6130,9 @@ namespace VectorTools
                               cell->face(face)->get_dof_indices(
                                 face_dof_indices, cell->active_fe_index());
 
-                              // Add the computed constraints to the constraint
-                              // matrix, assuming the degree of freedom is not
-                              // already constrained.
+                              // Add the computed constraints to the
+                              // AffineConstraints object, assuming the degree
+                              // of freedom is not already constrained.
                               for (unsigned int dof = 0; dof < dofs_per_face;
                                    ++dof)
                                 {
@@ -7312,7 +7309,7 @@ namespace VectorTools
                 }
 
                 // so all components of this vector dof are constrained. enter
-                // this into the constraint matrix
+                // this into the AffineConstraints object
                 //
                 // ignore dofs already constrained
                 const internal::VectorDoFTuple<dim> &dof_indices =

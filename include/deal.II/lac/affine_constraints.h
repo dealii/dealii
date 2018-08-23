@@ -281,9 +281,9 @@ public:
    * numbering of all (global) DoFs that are elements in the filter.
    *
    * If, for example, the filter represents the range <tt>[10,20)</tt>, and
-   * the constraint matrix @p constraints_in includes the global indices
+   * the constraints object @p constraints_in includes the global indices
    * <tt>{7,13,14}</tt>, the indices <tt>{3,4}</tt> are added to the calling
-   * constraint matrix (since 13 and 14 are elements in the filter and element
+   * constraints object (since 13 and 14 are elements in the filter and element
    * 13 is the fourth element in the index, and 14 is the fifth).
    *
    * This function provides an easy way to create a AffineConstraints for
@@ -631,9 +631,8 @@ public:
    * system.
    *
    * Since this function adds new nonzero entries to the sparsity pattern, the
-   * given sparsity pattern must not be compressed. The constraint matrix
-   * (i.e., the current object) must be closed. The sparsity pattern is
-   * compressed at the end of the function.
+   * given sparsity pattern must not be compressed. The current object must be
+   * closed. The sparsity pattern is compressed at the end of the function.
    */
   void
   condense(SparsityPattern &sparsity) const;
@@ -706,7 +705,7 @@ public:
    * condensed and compressed.  This function is the appropriate choice for
    * applying inhomogeneous constraints.
    *
-   * The constraint matrix object must be closed to call this function.
+   * The current object object must be closed to call this function.
    *
    * See the general documentation of this class for more detailed
    * information.
@@ -1093,8 +1092,8 @@ public:
    * of freedom.
    *
    * This function is not typically called from user code, but is used in the
-   * DoFTools::make_sparsity_pattern() function when passed a constraint
-   * matrix object.
+   * DoFTools::make_sparsity_pattern() function when passed an
+   * AffineConstraints object.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
@@ -1182,7 +1181,7 @@ public:
    */
 
   /**
-   * This class represents one line of a constraint matrix.
+   * This class represents one constraint in an AffineConstraints object.
    */
   struct ConstraintLine
   {
@@ -1374,7 +1373,7 @@ public:
    */
   DeclException1(ExcRowNotStoredHere,
                  size_type,
-                 << "The index set given to this constraint matrix indicates "
+                 << "The index set given to this constraints object indicates "
                  << "constraints for degree of freedom " << arg1
                  << " should not be stored by this object, but a constraint "
                  << "is being added.");
@@ -1387,7 +1386,7 @@ public:
   DeclException2(ExcColumnNotStoredHere,
                  size_type,
                  size_type,
-                 << "The index set given to this constraint matrix indicates "
+                 << "The index set given to this constraints object indicates "
                  << "constraints using degree of freedom " << arg2
                  << " should not be stored by this object, but a constraint "
                  << "for degree of freedom " << arg1 << " uses it.");
