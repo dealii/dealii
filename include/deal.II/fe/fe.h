@@ -475,22 +475,22 @@ class FESystem;
  * <i>w<sub>j</sub></i>.
  * </ol>
  *
- * The matrix <i>M</i> may be computed using FETools::compute_node_matrix().
- * This function relies on the existence of #generalized_support_points and an
- * implementation of the FiniteElement::interpolate() function with
- * VectorSlice argument. (See the
- * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
- * for more information.) With this, one can then use the following piece of
- * code in the constructor of a class derived from FiniteElement to compute the
- * $M$ matrix:
+ * The matrix <i>M</i> may be computed with FETools::compute_node_matrix().
+ * This function relies on the existence of #generalized_support_points and
+ * FiniteElement::convert_generalized_support_point_values_to_dof_values()
+ * (see the @ref GlossGeneralizedSupport "glossary entry on generalized
+ * support points" for more information). With this, one can then use the
+ * following piece of code in the constructor of a class derived from
+ * FiniteElement to compute the $M$ matrix:
  * @code
  * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
  * FETools::compute_node_matrix(M, *this);
  * this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
  * this->inverse_node_matrix.invert(M);
  * @endcode
- * Don't forget to make sure that #unit_support_points or
- * #generalized_support_points are initialized before this!
+ * Don't forget to make sure
+ * that #unit_support_points or #generalized_support_points are initialized
+ * before this!
  *
  * <h5>Computing prolongation matrices</h5>
  *
