@@ -167,10 +167,10 @@ namespace internal
     template <typename Functor>
     void
     parallel_for(
-      Functor &                                            functor,
-      size_type                                            start,
-      size_type                                            end,
-      std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+      Functor &                                                  functor,
+      size_type                                                  start,
+      size_type                                                  end,
+      const std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end - start;
@@ -1355,11 +1355,11 @@ namespace internal
     template <typename Operation, typename ResultType>
     void
     parallel_reduce(
-      const Operation &                                    op,
-      const size_type                                      start,
-      const size_type                                      end,
-      ResultType &                                         result,
-      std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+      const Operation &                                          op,
+      const size_type                                            start,
+      const size_type                                            end,
+      ResultType &                                               result,
+      const std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end - start;
@@ -1400,7 +1400,7 @@ namespace internal
     {
       static void
       copy(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
@@ -1415,7 +1415,7 @@ namespace internal
 
       static void
       set(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*s*/,
@@ -1424,7 +1424,7 @@ namespace internal
 
       static void
       add_vector(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
@@ -1434,7 +1434,7 @@ namespace internal
 
       static void
       subtract_vector(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
@@ -1444,7 +1444,7 @@ namespace internal
 
       static void
       add_factor(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         Number /*a*/,
@@ -1453,7 +1453,7 @@ namespace internal
 
       static void
       add_av(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*a*/,
@@ -1464,7 +1464,7 @@ namespace internal
 
       static void
       add_avpbw(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*a*/,
@@ -1478,7 +1478,7 @@ namespace internal
 
       static void
       sadd_xv(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*x*/,
@@ -1489,7 +1489,7 @@ namespace internal
 
       static void
       sadd_xav(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*x*/,
@@ -1501,7 +1501,7 @@ namespace internal
 
       static void
       sadd_xavbw(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*x*/,
@@ -1516,7 +1516,7 @@ namespace internal
 
       static void
       multiply_factor(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*factor*/,
@@ -1525,7 +1525,7 @@ namespace internal
 
       static void
       scale(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
@@ -1535,7 +1535,7 @@ namespace internal
 
       static void
       equ_au(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*a*/,
@@ -1546,7 +1546,7 @@ namespace internal
 
       static void
       equ_aubv(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*a*/,
@@ -1560,7 +1560,7 @@ namespace internal
 
       static Number
       dot(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
@@ -1573,7 +1573,7 @@ namespace internal
       template <typename real_type>
       static void
       norm_2(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         real_type & /*sum*/,
@@ -1584,7 +1584,7 @@ namespace internal
 
       static Number
       mean_value(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
@@ -1595,18 +1595,19 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_1(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-             /*thread_loop_partitioner*/,
-             const size_type /*size*/,
-             real_type & /*sum*/,
-             Number * /*values*/,
-             Number * /*values_dev*/)
+      norm_1(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        real_type & /*sum*/,
+        Number * /*values*/,
+        Number * /*values_dev*/)
       {}
 
       template <typename real_type>
       static void
       norm_p(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         real_type & /*sum*/,
@@ -1616,7 +1617,7 @@ namespace internal
 
       static Number
       add_and_dot(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
         const Number /*a*/,
@@ -1636,8 +1637,8 @@ namespace internal
     struct functions<Number, Number2, ::dealii::MemorySpace::Host>
     {
       static void
-      copy(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                           thread_loop_partitioner,
+      copy(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+             &             thread_loop_partitioner,
            const size_type size,
            const ::dealii::MemorySpace::
              MemorySpaceData<Number2, ::dealii::MemorySpace::Host> &v_data,
@@ -1651,8 +1652,8 @@ namespace internal
       }
 
       static void
-      set(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                          thread_loop_partitioner,
+      set(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+            &             thread_loop_partitioner,
           const size_type size,
           const Number    s,
           ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -1664,13 +1665,15 @@ namespace internal
       }
 
       static void
-      add_vector(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                                 thread_loop_partitioner,
-                 const size_type size,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-                 ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      add_vector(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_add_v<Number> vector_add(data.values.get(),
                                                v_data.values.get());
@@ -1679,8 +1682,8 @@ namespace internal
 
       static void
       subtract_vector(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                        thread_loop_partitioner,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
         const size_type size,
         const ::dealii::MemorySpace::
           MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
@@ -1694,20 +1697,22 @@ namespace internal
       }
 
       static void
-      add_factor(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                                 thread_loop_partitioner,
-                 const size_type size,
-                 Number          a,
-                 ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      add_factor(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        Number          a,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_add_factor<Number> vector_add(data.values.get(), a);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
       static void
-      add_av(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                             thread_loop_partitioner,
+      add_av(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &             thread_loop_partitioner,
              const size_type size,
              const Number    a,
              const ::dealii::MemorySpace::
@@ -1723,17 +1728,19 @@ namespace internal
       }
 
       static void
-      add_avpbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                                thread_loop_partitioner,
-                const size_type size,
-                const Number    a,
-                const Number    b,
-                const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-                const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-                ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      add_avpbw(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const Number    a,
+        const Number    b,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_add_avpbw<Number> vector_add(
           data.values.get(), v_data.values.get(), w_data.values.get(), a, b);
@@ -1741,14 +1748,16 @@ namespace internal
       }
 
       static void
-      sadd_xv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                              thread_loop_partitioner,
-              const size_type size,
-              const Number    x,
-              const ::dealii::MemorySpace::
-                MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-              ::dealii::MemorySpace::
-                MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      sadd_xv(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const Number    x,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_sadd_xv<Number> vector_sadd(data.values.get(),
                                                   v_data.values.get(),
@@ -1757,15 +1766,17 @@ namespace internal
       }
 
       static void
-      sadd_xav(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                               thread_loop_partitioner,
-               const size_type size,
-               const Number    x,
-               const Number    a,
-               const ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      sadd_xav(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const Number    x,
+        const Number    a,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_sadd_xav<Number> vector_sadd(data.values.get(),
                                                    v_data.values.get(),
@@ -1775,18 +1786,20 @@ namespace internal
       }
 
       static void
-      sadd_xavbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                                 thread_loop_partitioner,
-                 const size_type size,
-                 const Number    x,
-                 const Number    a,
-                 const Number    b,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-                 ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      sadd_xavbw(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const Number    x,
+        const Number    a,
+        const Number    b,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_sadd_xavbw<Number> vector_sadd(
           data.values.get(), v_data.values.get(), w_data.values.get(), x, a, b);
@@ -1795,8 +1808,8 @@ namespace internal
 
       static void
       multiply_factor(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                        thread_loop_partitioner,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
         const size_type size,
         const Number    factor,
         ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -1809,8 +1822,8 @@ namespace internal
       }
 
       static void
-      scale(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                            thread_loop_partitioner,
+      scale(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+              &             thread_loop_partitioner,
             const size_type size,
             const ::dealii::MemorySpace::
               MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
@@ -1824,8 +1837,8 @@ namespace internal
       }
 
       static void
-      equ_au(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                             thread_loop_partitioner,
+      equ_au(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &             thread_loop_partitioner,
              const size_type size,
              const Number    a,
              const ::dealii::MemorySpace::
@@ -1841,17 +1854,19 @@ namespace internal
       }
 
       static void
-      equ_aubv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                               thread_loop_partitioner,
-               const size_type size,
-               const Number    a,
-               const Number    b,
-               const ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-               const ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      equ_aubv(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const Number    a,
+        const Number    b,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data)
       {
         Vectorization_equ_aubv<Number> vector_equ(
           data.values.get(), v_data.values.get(), w_data.values.get(), a, b);
@@ -1859,8 +1874,8 @@ namespace internal
       }
 
       static Number
-      dot(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                          thread_loop_partitioner,
+      dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+            &             thread_loop_partitioner,
           const size_type size,
           const ::dealii::MemorySpace::
             MemorySpaceData<Number2, ::dealii::MemorySpace::Host> &v_data,
@@ -1880,8 +1895,8 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_2(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                             thread_loop_partitioner,
+      norm_2(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &             thread_loop_partitioner,
              const size_type size,
              real_type &     sum,
              ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -1893,11 +1908,12 @@ namespace internal
       }
 
       static Number
-      mean_value(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                                 thread_loop_partitioner,
-                 const size_type size,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+      mean_value(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
       {
         Number            sum;
         MeanValue<Number> mean(data.values.get());
@@ -1908,8 +1924,8 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_1(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                             thread_loop_partitioner,
+      norm_1(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &             thread_loop_partitioner,
              const size_type size,
              real_type &     sum,
              ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -1922,8 +1938,8 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_p(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                             thread_loop_partitioner,
+      norm_p(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &             thread_loop_partitioner,
              const size_type size,
              real_type &     sum,
              real_type       p,
@@ -1937,8 +1953,8 @@ namespace internal
 
       static Number
       add_and_dot(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                        thread_loop_partitioner,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &             thread_loop_partitioner,
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
@@ -1972,13 +1988,14 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::chunk_size;
 
       static void
-      copy(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-           const size_type size,
-           const ::dealii::MemorySpace::
-             MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                  ::dealii::MemorySpace::CUDA>
-             &data)
+      copy(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
                                                  v_data.values_dev.get(),
@@ -1988,7 +2005,7 @@ namespace internal
       }
 
       static void
-      set(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+      set(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
           const size_type size,
           const Number    s,
           ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -2006,12 +2023,14 @@ namespace internal
       }
 
       static void
-      add_vector(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-                 const size_type size,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-                 ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      add_vector(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
@@ -2028,7 +2047,7 @@ namespace internal
 
       static void
       subtract_vector(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
           MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
@@ -2050,11 +2069,13 @@ namespace internal
       }
 
       static void
-      add_factor(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-                 const size_type size,
-                 Number          a,
-                 ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      add_factor(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        Number          a,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
@@ -2067,14 +2088,15 @@ namespace internal
       }
 
       static void
-      add_av(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-             const size_type size,
-             const Number    a,
-             const ::dealii::MemorySpace::
-               MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data)
+      add_av(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    a,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
@@ -2090,16 +2112,18 @@ namespace internal
       }
 
       static void
-      add_avpbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-                const size_type size,
-                const Number    a,
-                const Number    b,
-                const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-                const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
-                ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      add_avpbw(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    a,
+        const Number    b,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
@@ -2117,13 +2141,15 @@ namespace internal
       }
 
       static void
-      sadd_xv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-              const size_type size,
-              const Number    x,
-              const ::dealii::MemorySpace::
-                MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-              ::dealii::MemorySpace::
-                MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      sadd_xv(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    x,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
@@ -2137,14 +2163,16 @@ namespace internal
       }
 
       static void
-      sadd_xav(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-               const size_type size,
-               const Number    x,
-               const Number    a,
-               const ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      sadd_xav(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    x,
+        const Number    a,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
@@ -2158,17 +2186,19 @@ namespace internal
       }
 
       static void
-      sadd_xavbw(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-                 const size_type size,
-                 const Number    x,
-                 const Number    a,
-                 const Number    b,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
-                 ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      sadd_xavbw(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    x,
+        const Number    a,
+        const Number    b,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
@@ -2188,7 +2218,7 @@ namespace internal
 
       static void
       multiply_factor(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Number    factor,
         ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -2206,13 +2236,14 @@ namespace internal
       }
 
       static void
-      scale(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-            const size_type size,
-            const ::dealii::MemorySpace::
-              MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-            ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                   ::dealii::MemorySpace::CUDA>
-              &data)
+      scale(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
@@ -2227,14 +2258,15 @@ namespace internal
       }
 
       static void
-      equ_au(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-             const size_type size,
-             const Number    a,
-             const ::dealii::MemorySpace::
-               MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data)
+      equ_au(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    a,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
@@ -2250,16 +2282,18 @@ namespace internal
       }
 
       static void
-      equ_aubv(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-               const size_type size,
-               const Number    a,
-               const Number    b,
-               const ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
-               const ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      equ_aubv(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const Number    a,
+        const Number    b,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
@@ -2277,7 +2311,7 @@ namespace internal
       }
 
       static Number
-      dot(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+      dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
           const size_type size,
           const ::dealii::MemorySpace::
             MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
@@ -2319,8 +2353,8 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_2(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-                             thread_loop_partitioner,
+      norm_2(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &             thread_loop_partitioner,
              const size_type size,
              real_type &     sum,
              ::dealii::MemorySpace::MemorySpaceData<Number,
@@ -2331,10 +2365,11 @@ namespace internal
       }
 
       static Number
-      mean_value(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-                 const size_type size,
-                 const ::dealii::MemorySpace::
-                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+      mean_value(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        const ::dealii::MemorySpace::
+          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
       {
         Number *    result_device;
         cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
@@ -2365,12 +2400,13 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_1(std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
-             const size_type size,
-             real_type &     sum,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data)
+      norm_1(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+        const size_type size,
+        real_type &     sum,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data)
       {
         Number *    result_device;
         cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
@@ -2399,7 +2435,7 @@ namespace internal
       template <typename real_type>
       static void
       norm_p(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type,
         real_type &,
         real_type,
@@ -2411,7 +2447,7 @@ namespace internal
 
       static Number
       add_and_dot(
-        std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
