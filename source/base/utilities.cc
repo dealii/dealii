@@ -28,7 +28,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/math/special_functions/erf.hpp>
 #include <boost/random.hpp>
 
 #include <algorithm>
