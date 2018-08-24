@@ -21,7 +21,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/math/special_functions/erf.hpp>
 #include <boost/random.hpp>
 
 #include <cmath>
