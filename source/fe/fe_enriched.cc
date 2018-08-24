@@ -1334,7 +1334,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     make_colorwise_enrichment_functions(
-      const unsigned int &                                    num_colors,
+      const unsigned int &                                    n_colors,
       const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments,
       const std::map<unsigned int, std::map<unsigned int, unsigned int>>
         &cellwise_color_predicate_map,
@@ -1358,8 +1358,8 @@ namespace ColorEnriched
       // In other words, using the previously collected information in
       // this function we translate a vector of user provided enrichment
       // functions into a vector of functions suitable for FE_Enriched class.
-      color_enrichments.resize(num_colors);
-      for (unsigned int i = 0; i < num_colors; ++i)
+      color_enrichments.resize(n_colors);
+      for (unsigned int i = 0; i < n_colors; ++i)
         {
           color_enrichments[i] =
             [&, i](const typename Triangulation<dim, spacedim>::cell_iterator
@@ -1382,7 +1382,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     make_fe_collection_from_colored_enrichments(
-      const unsigned int &                       num_colors,
+      const unsigned int &                       n_colors,
       const std::vector<std::set<unsigned int>> &fe_sets,
       const std::vector<std::function<const Function<spacedim> *(
         const typename Triangulation<dim, spacedim>::cell_iterator &)>>
@@ -1411,10 +1411,10 @@ namespace ColorEnriched
            ++color_set_id)
         {
           std::vector<const FiniteElement<dim, spacedim> *> vec_fe_enriched(
-            num_colors, &fe_nothing);
+            n_colors, &fe_nothing);
           std::vector<std::vector<std::function<const Function<spacedim> *(
             const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
-            functions(num_colors, {dummy_function});
+            functions(n_colors, {dummy_function});
 
           for (const auto it : fe_sets[color_set_id])
             {
@@ -1461,7 +1461,7 @@ namespace ColorEnriched
     , fe_nothing(fe_base.n_components(), true)
     , predicates(predicates)
     , enrichments(enrichments)
-    , num_colors(numbers::invalid_unsigned_int)
+    , n_colors(numbers::invalid_unsigned_int)
   {
     AssertDimension(predicates.size(), enrichments.size());
     AssertDimension(fe_base.n_components(), fe_enriched.n_components());
@@ -1478,7 +1478,7 @@ namespace ColorEnriched
   {
     // color the predicates based on connections between corresponding
     // subdomains
-    num_colors =
+    n_colors =
       internal::color_predicates(dof_handler, predicates, predicate_colors);
 
     // create color maps and color list for each cell
@@ -1490,10 +1490,10 @@ namespace ColorEnriched
     // setup color wise enrichment functions
     // i'th function corresponds to (i+1) color!
     internal::make_colorwise_enrichment_functions<dim, spacedim>(
-      num_colors, enrichments, cellwise_color_predicate_map, color_enrichments);
+      n_colors, enrichments, cellwise_color_predicate_map, color_enrichments);
 
     // make FE_Collection
-    internal::make_fe_collection_from_colored_enrichments(num_colors,
+    internal::make_fe_collection_from_colored_enrichments(n_colors,
                                                           fe_sets,
                                                           color_enrichments,
                                                           fe_base,
