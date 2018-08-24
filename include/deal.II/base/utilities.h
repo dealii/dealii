@@ -347,12 +347,18 @@ namespace Utilities
 
   /**
    * A replacement for <code>std::pow</code> that allows compile-time
-   * calculations for constant expression arguments.
+   * calculations for constant expression arguments. The exponent @p iexp
+   * must not be negative.
    */
   constexpr unsigned int
-  pow(const unsigned int base, const unsigned int iexp)
+  pow(const unsigned int base, const int iexp)
   {
-    return iexp == 0 ? 1 : base * dealii::Utilities::pow(base, iexp - 1);
+#ifdef DEAL_II_WITH_CXX17
+    AssertThrow(iexp >= 0, ExcMessage("The exponent must not be negative!"));
+#endif
+    return iexp <= 0 ? 1 :
+                       (((iexp % 2 == 1) ? base : 1) *
+                        dealii::Utilities::pow(base * base, iexp / 2));
   }
 
   /**
