@@ -252,7 +252,7 @@ AffineConstraints<number>::add_entries(
     {
       Assert(line_n != col_val_pair.first,
              ExcMessage("Can't constrain a degree of freedom to itself"));
-
+      bool entry_exists = false;
       for (const std::pair<size_type, number> &entry : line.entries)
         if (entry.first == col_val_pair.first)
           {
@@ -262,10 +262,12 @@ AffineConstraints<number>::add_entries(
                                          col_val_pair.first,
                                          entry.second,
                                          col_val_pair.second));
+            entry_exists = true;
             break;
           }
 
-      line.entries.push_back(col_val_pair);
+      if (entry_exists == false)
+        line.entries.push_back(col_val_pair);
     }
 }
 
