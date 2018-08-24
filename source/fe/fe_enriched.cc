@@ -1461,6 +1461,7 @@ namespace ColorEnriched
     , fe_nothing(fe_base.n_components(), true)
     , predicates(predicates)
     , enrichments(enrichments)
+    , num_colors(numbers::invalid_unsigned_int)
   {
     AssertDimension(predicates.size(), enrichments.size());
     AssertDimension(fe_base.n_components(), fe_enriched.n_components());
