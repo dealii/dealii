@@ -15,10 +15,13 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp
-// case with an FECollection that contains multiple copies of the same
-// FE_Q(2) element. the hp code will unify DoF indices on boundaries
-// between all subdomains.
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp
+// case with an FECollection that contains a FE_Q(4) and a FE_Q(2) element.
+// the hp code will unify DoF indices on boundaries between all subdomains.
+//
+// in this testcase, each cell has a face neighbor which is
+//  - locally owned with a different active_fe_index
+//  - a ghost cell with the same active_fe_index
 
 
 #include <deal.II/base/tensor.h>
@@ -50,6 +53,7 @@ test()
 
   std::vector<unsigned int> reps(dim, 1U);
   reps[0] = 2;
+  reps[1] = 2;
   Point<dim> top_right;
   for (unsigned int d = 0; d < dim; ++d)
     top_right[d] = (d == 0 ? 2 : 1);
@@ -57,34 +61,32 @@ test()
                                             reps,
                                             Point<dim>(),
                                             top_right);
-  Assert(triangulation.n_global_active_cells() == 2, ExcInternalError());
-  Assert(triangulation.n_active_cells() == 2, ExcInternalError());
+  Assert(triangulation.n_global_active_cells() == 4, ExcInternalError());
+  Assert(triangulation.n_active_cells() == 4, ExcInternalError());
 
   hp::FECollection<dim> fe;
-  fe.push_back(FE_Q<dim>(2));
+  fe.push_back(FE_Q<dim>(4));
   fe.push_back(FE_Q<dim>(2));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
-  if (dof_handler.begin_active()->is_locally_owned())
-    dof_handler.begin_active()->set_active_fe_index(0);
-  if ((++dof_handler.begin_active())->is_locally_owned())
-    (++dof_handler.begin_active())->set_active_fe_index(1);
+  for (auto cell : dof_handler.active_cell_iterators())
+    {
+      if (cell->is_locally_owned())
+        {
+          if (cell->id().to_string() == "0_0:")
+            cell->set_active_fe_index(0);
+          if (cell->id().to_string() == "1_0:")
+            cell->set_active_fe_index(1);
+          if (cell->id().to_string() == "2_0:")
+            cell->set_active_fe_index(0);
+          if (cell->id().to_string() == "3_0:")
+            cell->set_active_fe_index(1);
+        }
+    }
   dof_handler.distribute_dofs(fe);
 
   deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
           << std::endl;
-  for (auto cell : dof_handler.active_cell_iterators())
-    {
-      deallog << "  Cell: " << cell << std::endl;
-
-      std::vector<types::global_dof_index> dof_indices(
-        cell->get_fe().dofs_per_cell);
-      cell->get_dof_indices(dof_indices);
-      deallog << "    ";
-      for (auto i : dof_indices)
-        deallog << i << ' ';
-      deallog << std::endl;
-    }
   deallog << "  n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
           << std::endl;
   deallog << "  n_global_dofs: " << dof_handler.n_dofs() << std::endl;
