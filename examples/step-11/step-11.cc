@@ -415,12 +415,13 @@ namespace Step11
   {
     GridGenerator::hyper_ball(triangulation);
 
-    for (unsigned int cycle = 0; cycle < 6;
-         ++cycle, triangulation.refine_global(1))
+    for (unsigned int cycle = 0; cycle < 6; ++cycle)
       {
         setup_system();
         assemble_and_solve();
-      };
+
+        triangulation.refine_global();
+      }
 
     // After all the data is generated, write a table of results to the
     // screen:
