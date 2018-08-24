@@ -267,7 +267,7 @@ AffineConstraints<number>::add_entries(
           }
 
       if (entry_exists == false)
-        line_ptr->entries.push_back(col_val_pair);
+        line.entries.push_back(col_val_pair);
     }
 }
 
