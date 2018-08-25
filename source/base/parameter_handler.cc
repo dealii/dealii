@@ -1018,8 +1018,7 @@ ParameterHandler::set(const std::string &entry_string, const double &new_value)
 
 
 void
-ParameterHandler::set(const std::string &entry_string,
-                      const long int &   new_value)
+ParameterHandler::set(const std::string &entry_string, const long int new_value)
 {
   std::ostringstream s;
   s << new_value;
