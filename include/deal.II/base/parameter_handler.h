@@ -1317,7 +1317,7 @@ public:
    * the new value does not conform to the pattern for this entry.
    */
   void
-  set(const std::string &entry_name, const bool &new_value);
+  set(const std::string &entry_name, const bool new_value);
 
 
   /**

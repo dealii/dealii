@@ -4425,7 +4425,7 @@ namespace GridTools
                      std::vector<Point<spacedim>>,
                      std::vector<unsigned int>>,
           cell_hash<dim, spacedim>> &output_unmap,
-        const bool &                 check_owned)
+        const bool                   check_owned)
       {
         bool no_check = !check_owned;
 

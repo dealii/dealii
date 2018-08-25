@@ -315,7 +315,7 @@ namespace SUNDIALS
         // Error parameters
         const double &absolute_tolerance                = 1e-6,
         const double &relative_tolerance                = 1e-5,
-        const bool &  ignore_algebraic_terms_for_errors = true,
+        const bool    ignore_algebraic_terms_for_errors = true,
         // Initial conditions parameters
         const InitialConditionCorrection &ic_type    = use_y_diff,
         const InitialConditionCorrection &reset_type = use_y_diff,

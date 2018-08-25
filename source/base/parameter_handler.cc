@@ -1031,7 +1031,7 @@ ParameterHandler::set(const std::string &entry_string, const long int new_value)
 
 
 void
-ParameterHandler::set(const std::string &entry_string, const bool &new_value)
+ParameterHandler::set(const std::string &entry_string, const bool new_value)
 {
   // hand this off to the function that
   // actually sets the value as a string
