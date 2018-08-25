@@ -890,7 +890,7 @@ namespace MatrixFreeOperators
     local_diagonal_cell(
       const MatrixFree<dim, value_type> &data,
       VectorType &                       dst,
-      const unsigned int &,
+      const VectorType &,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     /**
@@ -1894,7 +1894,6 @@ namespace MatrixFreeOperators
     using Number = typename Base<dim, VectorType>::value_type;
     Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
 
-    unsigned int dummy = 0;
     this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
     this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
     VectorType &inverse_diagonal_vector =
@@ -1906,7 +1905,7 @@ namespace MatrixFreeOperators
     this->data->cell_loop(&LaplaceOperator::local_diagonal_cell,
                           this,
                           diagonal_vector,
-                          dummy);
+                          /*unused*/ diagonal_vector);
     this->set_constrained_entries_to_one(diagonal_vector);
 
     inverse_diagonal_vector = diagonal_vector;
@@ -2032,7 +2031,7 @@ namespace MatrixFreeOperators
     local_diagonal_cell(
       const MatrixFree<dim, typename Base<dim, VectorType>::value_type> &data,
       VectorType &                                                       dst,
-      const unsigned int &,
+      const VectorType &,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     using Number = typename Base<dim, VectorType>::value_type;
