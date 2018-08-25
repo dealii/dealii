@@ -880,7 +880,7 @@ namespace ColorEnriched
      * this function we translate a vector of user provided enrichment
      * functions into a vector of functions suitable for FE_Enriched class.
      *
-     * @param[in] num_colors number of colors for predicates
+     * @param[in] n_colors number of colors for predicates
      * @param[in] enrichments vector of enrichment functions
      * @param[in] cellwise_color_predicate_map A map of maps used to associate
      * predicate colors in cells with predicate ids.
@@ -890,7 +890,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     make_colorwise_enrichment_functions(
-      const unsigned int &                                    num_colors,
+      const unsigned int &                                    n_colors,
       const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments,
       const std::map<unsigned int, std::map<unsigned int, unsigned int>>
         &cellwise_color_predicate_map,
@@ -916,7 +916,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     make_fe_collection_from_colored_enrichments(
-      const unsigned int &num_colors,
+      const unsigned int &n_colors,
       const std::vector<std::set<unsigned int>>
         &fe_sets, // total list of color sets possible
       const std::vector<std::function<const Function<spacedim> *(
@@ -1202,7 +1202,7 @@ namespace ColorEnriched
     /**
      * Total number of different colors in predicate_colors
      */
-    unsigned int num_colors;
+    unsigned int n_colors;
 
     /**
      * A map of maps used to associate
