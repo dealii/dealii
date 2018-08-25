@@ -99,7 +99,7 @@ namespace Differentiation
     {
       /**
        * Typedef for tape indices. ADOL-C uses short integers, so
-       * we restrict outselves to similar types.
+       * we restrict ourselves to similar types.
        */
       using tape_index = unsigned short;
 
@@ -107,7 +107,14 @@ namespace Differentiation
        * Typedef for tape buffer sizes.
        */
       using tape_buffer_sizes = unsigned int;
+    } // namespace types
 
+    /**
+     * A collection of special numbers used within the context of
+     * auto-differentiable numbers.
+     */
+    namespace numbers
+    {
       /**
        * A tape index that is unusable and can be used to invalidate recording
        * operations.
@@ -133,7 +140,7 @@ namespace Differentiation
       static const types::tape_index max_tape_index =
         std::numeric_limits<types::tape_index>::max();
 #endif // DEAL_II_WITH_ADOLC
-    }  // namespace types
+    }  // namespace numbers
 
     /**
      * A driver class for taped auto-differentiable numbers.
@@ -173,8 +180,8 @@ namespace Differentiation
        *            tape buffer.
        */
       static void
-      enable_taping(const types::tape_index tape_index,
-                    const bool              keep_independent_values);
+      start_taping(const types::tape_index tape_index,
+                   const bool              keep_independent_values);
 
       /**
        * Enable the recording mode for a given tape, using the run-time
@@ -190,12 +197,12 @@ namespace Differentiation
        * @param[in] tbufsize ADOL-C Taylor buffer size
        */
       static void
-      enable_taping(const types::tape_index        tape_index,
-                    const bool                     keep_independent_values,
-                    const types::tape_buffer_sizes obufsize,
-                    const types::tape_buffer_sizes lbufsize,
-                    const types::tape_buffer_sizes vbufsize,
-                    const types::tape_buffer_sizes tbufsize);
+      start_taping(const types::tape_index        tape_index,
+                   const bool                     keep_independent_values,
+                   const types::tape_buffer_sizes obufsize,
+                   const types::tape_buffer_sizes lbufsize,
+                   const types::tape_buffer_sizes vbufsize,
+                   const types::tape_buffer_sizes tbufsize);
 
       /**
        * Disable the recording mode for a given tape.
@@ -206,19 +213,19 @@ namespace Differentiation
        *            should be written to file or kept in memory.
        */
       static void
-      disable_taping(const types::tape_index active_tape_index,
-                     const bool              write_tapes_to_file);
+      stop_taping(const types::tape_index active_tape_index,
+                  const bool              write_tapes_to_file);
 
       /**
-       * Prints the statistics regarding the usage of the tapes.
+       * Print the statistics regarding the usage of the tapes.
        *
-       * @param[in] stream The output stream to which the values are to be
-       *            written.
        * @param[in] tape_index The index of the tape to get the statistics of.
+       * @param[out] stream The output stream to which the values are to be
+       *            written.
        */
       static void
-      print_tape_stats(std::ostream &          stream,
-                       const types::tape_index tape_index);
+      print_tape_stats(const types::tape_index tape_index,
+                       std::ostream &          stream);
 
       //@}
 
@@ -249,7 +256,7 @@ namespace Differentiation
        *            dependent function is recorded.
        * @param[in] independent_variables The scalar values of the independent
        *            variables whose sensitivities were tracked.
-       * @param[out] gradient The scalar values of the dependent function's
+       * @param[out] gradient The values of the dependent function's
        *             gradients. It is expected that this vector be of the
        *             correct size (with length
        *             <code>n_independent_variables</code>).
@@ -267,7 +274,7 @@ namespace Differentiation
        *            dependent function is recorded.
        * @param[in] independent_variables The scalar values of the independent
        *            variables whose sensitivities were tracked.
-       * @param[out] hessian The scalar values of the dependent function's
+       * @param[out] hessian The values of the dependent function's
        *             Hessian. It is expected that this matrix be of the correct
        *             size (with dimensions
        *             <code>n_independent_variables</code>$\times$<code>n_independent_variables</code>).
@@ -292,7 +299,7 @@ namespace Differentiation
        * @param[in] n_dependent_variables The number of dependent variables.
        * @param[in] independent_variables The scalar values of the independent
        *            variables whose sensitivities were tracked.
-       * @param[out] values The scalar values of the dependent functions.
+       * @param[out] values The component values of the dependent functions.
        *             It is expected that this vector be of the correct size
        *             (with length <code>n_dependent_variables</code>).
        */
@@ -315,7 +322,7 @@ namespace Differentiation
        * @param[in] n_dependent_variables The number of dependent variables.
        * @param[in] independent_variables The scalar values of the independent
        *            variables whose sensitivities were tracked.
-       * @param[out] jacobian The scalar values of the dependent functions'
+       * @param[out] jacobian The component values of the dependent functions'
        *             Jacobian. It is expected that this matrix be of the correct
        *             size (with dimensions
        *             <code>n_dependent_variables</code>$\times$<code>n_independent_variables</code>).
@@ -406,7 +413,7 @@ namespace Differentiation
        *            sensitivities were tracked.
        * @param[in] dependent_variables The (single) dependent variable whose
        *            gradients are to be extracted.
-       * @param[out] gradient The scalar values of the dependent function's
+       * @param[out] gradient The values of the dependent function's
        *             gradients. It is expected that this vector be of the
        *             correct size (with length
        *             <code>n_independent_variables</code>).
@@ -424,7 +431,7 @@ namespace Differentiation
        *            sensitivities were tracked.
        * @param[in] dependent_variables The (single) dependent variable whose
        *            Hessians are to be extracted.
-       * @param[out] hessian The scalar values of the dependent function's
+       * @param[out] hessian The values of the dependent function's
        *             Hessian. It is expected that this matrix be of the correct
        *             size (with dimensions
        *             <code>n_independent_variables</code>$\times$<code>n_independent_variables</code>).
@@ -446,7 +453,7 @@ namespace Differentiation
        *
        * @param[in] dependent_variables The dependent variables whose Hessians
        *            are to be extracted.
-       * @param[out] values The scalar values of the dependent functions.
+       * @param[out] values The component values of the dependent functions.
        *             It is expected that this vector be of the correct size
        *             (with length <code>n_dependent_variables</code>).
        */
@@ -466,7 +473,7 @@ namespace Differentiation
        *            sensitivities were tracked.
        * @param[in] dependent_variables The dependent variables whose Jacobian
        *            are to be extracted.
-       * @param[out] jacobian The scalar values of the dependent functions'
+       * @param[out] jacobian The component values of the dependent functions'
        *             Jacobian. It is expected that this matrix be of the correct
        *             size (with dimensions
        *             <code>n_dependent_variables</code>$\times$<code>n_independent_variables</code>).
@@ -498,7 +505,7 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType, typename T>
     void
-    TapedDrivers<ADNumberType, ScalarType, T>::enable_taping(
+    TapedDrivers<ADNumberType, ScalarType, T>::start_taping(
       const types::tape_index,
       const bool)
     {
@@ -508,7 +515,7 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType, typename T>
     void
-    TapedDrivers<ADNumberType, ScalarType, T>::enable_taping(
+    TapedDrivers<ADNumberType, ScalarType, T>::start_taping(
       const types::tape_index,
       const bool,
       const types::tape_buffer_sizes,
@@ -522,7 +529,7 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType, typename T>
     void
-    TapedDrivers<ADNumberType, ScalarType, T>::disable_taping(
+    TapedDrivers<ADNumberType, ScalarType, T>::stop_taping(
       const types::tape_index,
       const bool)
     {
@@ -533,8 +540,8 @@ namespace Differentiation
     template <typename ADNumberType, typename ScalarType, typename T>
     void
     TapedDrivers<ADNumberType, ScalarType, T>::print_tape_stats(
-      std::ostream &,
-      const types::tape_index)
+      const types::tape_index,
+      std::ostream &)
     {
       AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
@@ -618,19 +625,19 @@ namespace Differentiation
       // === Taping ===
 
       static void
-      enable_taping(const types::tape_index tape_index,
-                    const bool              keep_independent_values)
+      start_taping(const types::tape_index tape_index,
+                   const bool              keep_independent_values)
       {
         trace_on(tape_index, keep_independent_values);
       }
 
       static void
-      enable_taping(const types::tape_index        tape_index,
-                    const bool                     keep_independent_values,
-                    const types::tape_buffer_sizes obufsize,
-                    const types::tape_buffer_sizes lbufsize,
-                    const types::tape_buffer_sizes vbufsize,
-                    const types::tape_buffer_sizes tbufsize)
+      start_taping(const types::tape_index        tape_index,
+                   const bool                     keep_independent_values,
+                   const types::tape_buffer_sizes obufsize,
+                   const types::tape_buffer_sizes lbufsize,
+                   const types::tape_buffer_sizes vbufsize,
+                   const types::tape_buffer_sizes tbufsize)
       {
         trace_on(tape_index,
                  keep_independent_values,
@@ -641,8 +648,8 @@ namespace Differentiation
       }
 
       static void
-      disable_taping(const types::tape_index active_tape_index,
-                     const bool              write_tapes_to_file)
+      stop_taping(const types::tape_index active_tape_index,
+                  const bool              write_tapes_to_file)
       {
         if (write_tapes_to_file)
           trace_off(active_tape_index); // Slow
@@ -651,7 +658,7 @@ namespace Differentiation
       }
 
       static void
-      print_tape_stats(std::ostream &stream, const types::tape_index tape_index)
+      print_tape_stats(const types::tape_index tape_index, std::ostream &stream)
       {
         // See ADOL-C manual section 2.1
         // and adolc/taping.h
@@ -832,30 +839,30 @@ namespace Differentiation
       // === Taping ===
 
       static void
-      enable_taping(const types::tape_index, const bool)
+      start_taping(const types::tape_index, const bool)
       {
         AssertThrow(false, ExcRequiresAdolC());
       }
 
       static void
-      enable_taping(const types::tape_index,
-                    const bool,
-                    const types::tape_buffer_sizes,
-                    const types::tape_buffer_sizes,
-                    const types::tape_buffer_sizes,
-                    const types::tape_buffer_sizes)
+      start_taping(const types::tape_index,
+                   const bool,
+                   const types::tape_buffer_sizes,
+                   const types::tape_buffer_sizes,
+                   const types::tape_buffer_sizes,
+                   const types::tape_buffer_sizes)
       {
         AssertThrow(false, ExcRequiresAdolC());
       }
 
       static void
-      disable_taping(const types::tape_index, const bool)
+      stop_taping(const types::tape_index, const bool)
       {
         AssertThrow(false, ExcRequiresAdolC());
       }
 
       static void
-      print_tape_stats(std::ostream &, const types::tape_index)
+      print_tape_stats(const types::tape_index, std::ostream &)
       {
         AssertThrow(false, ExcRequiresAdolC());
       }
@@ -914,7 +921,7 @@ namespace Differentiation
      * Specialization for ADOL-C taped numbers. It is expected that the
      * scalar return type for this class is a float.
      *
-     * Note: ADOL-C only has drivers for doubles, and so floats are
+     * @note ADOL-C only has drivers for doubles, and so floats are
      * not intrinsically supported. This wrapper struct works around
      * the issue when necessary.
      */
@@ -930,26 +937,26 @@ namespace Differentiation
       // === Taping ===
 
       static void
-      enable_taping(const types::tape_index tape_index,
-                    const bool              keep_independent_values)
+      start_taping(const types::tape_index tape_index,
+                   const bool              keep_independent_values)
       {
         // ADOL-C only supports 'double', not 'float', so we can forward to
         // the 'double' implementation of this function
-        TapedDrivers<ADNumberType, double>::enable_taping(
+        TapedDrivers<ADNumberType, double>::start_taping(
           tape_index, keep_independent_values);
       }
 
       static void
-      enable_taping(const types::tape_index        tape_index,
-                    const bool                     keep_independent_values,
-                    const types::tape_buffer_sizes obufsize,
-                    const types::tape_buffer_sizes lbufsize,
-                    const types::tape_buffer_sizes vbufsize,
-                    const types::tape_buffer_sizes tbufsize)
+      start_taping(const types::tape_index        tape_index,
+                   const bool                     keep_independent_values,
+                   const types::tape_buffer_sizes obufsize,
+                   const types::tape_buffer_sizes lbufsize,
+                   const types::tape_buffer_sizes vbufsize,
+                   const types::tape_buffer_sizes tbufsize)
       {
         // ADOL-C only supports 'double', not 'float', so we can forward to
         // the 'double' implementation of this function
-        TapedDrivers<ADNumberType, double>::enable_taping(
+        TapedDrivers<ADNumberType, double>::start_taping(
           tape_index,
           keep_independent_values,
           obufsize,
@@ -959,22 +966,22 @@ namespace Differentiation
       }
 
       static void
-      disable_taping(const types::tape_index active_tape_index,
-                     const bool              write_tapes_to_file)
+      stop_taping(const types::tape_index active_tape_index,
+                  const bool              write_tapes_to_file)
       {
         // ADOL-C only supports 'double', not 'float', so we can forward to
         // the 'double' implementation of this function
-        TapedDrivers<ADNumberType, double>::disable_taping(active_tape_index,
-                                                           write_tapes_to_file);
+        TapedDrivers<ADNumberType, double>::stop_taping(active_tape_index,
+                                                        write_tapes_to_file);
       }
 
       static void
-      print_tape_stats(std::ostream &stream, const types::tape_index tape_index)
+      print_tape_stats(const types::tape_index tape_index, std::ostream &stream)
       {
         // ADOL-C only supports 'double', not 'float', so we can forward to
         // the 'double' implementation of this function
-        TapedDrivers<ADNumberType, double>::print_tape_stats(stream,
-                                                             tape_index);
+        TapedDrivers<ADNumberType, double>::print_tape_stats(tape_index,
+                                                             stream);
       }
 
       // === Scalar drivers ===
@@ -1141,12 +1148,11 @@ namespace Differentiation
        * reverse-mode AD.
        */
       template <typename ADNumberType>
-      static
-        typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
-                                    NumberTypes::sacado_rad ||
-                                  ADNumberTraits<ADNumberType>::type_code ==
-                                    NumberTypes::sacado_rad_dfad)>::type
-        reverse_mode_dependent_variable_activation(ADNumberType &)
+      typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::sacado_rad ||
+                                ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::sacado_rad_dfad)>::type
+      reverse_mode_dependent_variable_activation(ADNumberType &)
       {}
 
 #  ifdef DEAL_II_TRILINOS_WITH_SACADO
@@ -1161,10 +1167,10 @@ namespace Differentiation
        * to. This function broadcasts this information.
        */
       template <typename ADNumberType>
-      static typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                       NumberTypes::sacado_rad ||
-                                     ADNumberTraits<ADNumberType>::type_code ==
-                                       NumberTypes::sacado_rad_dfad>::type
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
+                                NumberTypes::sacado_rad ||
+                              ADNumberTraits<ADNumberType>::type_code ==
+                                NumberTypes::sacado_rad_dfad>::type
       reverse_mode_dependent_variable_activation(
         ADNumberType &dependent_variable)
       {
@@ -1187,10 +1193,9 @@ namespace Differentiation
        * auto-differentiable numbers.
        */
       template <typename ADNumberType>
-      static
-        typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
-                                  NumberTypes::adolc_tapeless)>::type
-        configure_tapeless_mode(const unsigned int)
+      typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
+                                NumberTypes::adolc_tapeless)>::type
+      configure_tapeless_mode(const unsigned int)
       {}
 
 
@@ -1205,8 +1210,8 @@ namespace Differentiation
        * If not then it throws an error.
        */
       template <typename ADNumberType>
-      static typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                     NumberTypes::adolc_tapeless>::type
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
+                              NumberTypes::adolc_tapeless>::type
       configure_tapeless_mode(const unsigned int n_directional_derivatives)
       {
 #    ifdef DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING
@@ -1266,8 +1271,8 @@ namespace Differentiation
 #  else // DEAL_II_WITH_ADOLC
 
       template <typename ADNumberType>
-      static typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                     NumberTypes::adolc_tapeless>::type
+      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
+                              NumberTypes::adolc_tapeless>::type
       configure_tapeless_mode(const unsigned int n_directional_derivatives)
       {
         AssertThrow(false, ExcRequiresAdolC());
