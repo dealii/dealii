@@ -27,7 +27,7 @@ for (deal_II_dimension : DIMENSIONS)
                                 const double                        tolerance);
 
     template Point<deal_II_dimension> point(const gp_Pnt &p,
-                                            const double &tolerance);
+                                            const double  tolerance);
 
     template gp_Pnt point(const Point<deal_II_dimension> &p);
 

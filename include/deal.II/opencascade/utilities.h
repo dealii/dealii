@@ -371,7 +371,7 @@ namespace OpenCASCADE
    */
   template <int spacedim>
   Point<spacedim>
-  point(const gp_Pnt &p, const double &tolerance = 1e-10);
+  point(const gp_Pnt &p, const double tolerance = 1e-10);
 
 
   /**

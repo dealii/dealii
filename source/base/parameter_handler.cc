@@ -1004,7 +1004,7 @@ ParameterHandler::set(const std::string &entry_string, const char *new_value)
 
 
 void
-ParameterHandler::set(const std::string &entry_string, const double &new_value)
+ParameterHandler::set(const std::string &entry_string, const double new_value)
 {
   std::ostringstream s;
   s << std::setprecision(16);

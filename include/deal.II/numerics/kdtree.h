@@ -210,7 +210,7 @@ public:
    */
   std::vector<std::pair<unsigned int, double>>
   get_points_within_ball(const Point<dim> &target,
-                         const double &    radius,
+                         const double      radius,
                          const bool        sorted = false) const;
 
   /**

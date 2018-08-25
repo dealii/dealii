@@ -36,7 +36,7 @@ KDTree<dim>::KDTree(const unsigned int             max_leaf_size,
 template <int dim>
 std::vector<std::pair<unsigned int, double>>
 KDTree<dim>::get_points_within_ball(const Point<dim> &center,
-                                    const double &    radius,
+                                    const double      radius,
                                     bool              sorted) const
 {
   Assert(adaptor, ExcNotInitialized());

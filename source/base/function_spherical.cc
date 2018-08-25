@@ -98,10 +98,10 @@ namespace Functions
      */
     template <int dim>
     void
-    set_unit_vectors(const double &  cos_theta,
-                     const double &  sin_theta,
-                     const double &  cos_phi,
-                     const double &  sin_phi,
+    set_unit_vectors(const double    cos_theta,
+                     const double    sin_theta,
+                     const double    cos_phi,
+                     const double    sin_phi,
                      Tensor<1, dim> &unit_r,
                      Tensor<1, dim> &unit_theta,
                      Tensor<1, dim> &unit_phi)
@@ -125,7 +125,7 @@ namespace Functions
      */
     template <int dim>
     void add_outer_product(SymmetricTensor<2, dim> &out,
-                           const double &           val,
+                           const double             val,
                            const Tensor<1, dim> &   in1,
                            const Tensor<1, dim> &   in2)
     {
@@ -140,7 +140,7 @@ namespace Functions
      */
     template <int dim>
     void add_outer_product(SymmetricTensor<2, dim> &out,
-                           const double &           val,
+                           const double             val,
                            const Tensor<1, dim> &   in)
     {
       if (val != 0.)

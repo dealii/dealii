@@ -8975,7 +8975,7 @@ namespace VectorTools
   {
     template <typename Number>
     void
-    set_possibly_complex_number(const double &r, const double &, Number &n)
+    set_possibly_complex_number(const double r, const double, Number &n)
     {
       n = r;
     }
@@ -8984,8 +8984,8 @@ namespace VectorTools
 
     template <typename Type>
     void
-    set_possibly_complex_number(const double &      r,
-                                const double &      i,
+    set_possibly_complex_number(const double        r,
+                                const double        i,
                                 std::complex<Type> &n)
     {
       n = std::complex<Type>(r, i);

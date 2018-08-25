@@ -260,12 +260,12 @@ namespace SUNDIALS
         // Global parameters
         const SolutionStrategy &strategy                      = linesearch,
         const unsigned int      maximum_non_linear_iterations = 200,
-        const double &          function_tolerance            = 0.0,
-        const double &          step_tolerance                = 0.0,
+        const double            function_tolerance            = 0.0,
+        const double            step_tolerance                = 0.0,
         const bool              no_init_setup                 = false,
         const unsigned int      maximum_setup_calls           = 0,
-        const double &          maximum_newton_step           = 0.0,
-        const double &          dq_relative_error             = 0.0,
+        const double            maximum_newton_step           = 0.0,
+        const double            dq_relative_error             = 0.0,
         const unsigned int      maximum_beta_failures         = 0,
         const unsigned int      anderson_subspace_size        = 0)
         : strategy(strategy)

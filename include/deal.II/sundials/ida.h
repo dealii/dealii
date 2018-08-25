@@ -304,18 +304,18 @@ namespace SUNDIALS
        * iterations
        */
       AdditionalData( // Initial parameters
-        const double &initial_time      = 0.0,
-        const double &final_time        = 1.0,
-        const double &initial_step_size = 1e-2,
-        const double &output_period     = 1e-1,
+        const double initial_time      = 0.0,
+        const double final_time        = 1.0,
+        const double initial_step_size = 1e-2,
+        const double output_period     = 1e-1,
         // Running parameters
-        const double &     minimum_step_size             = 1e-6,
+        const double       minimum_step_size             = 1e-6,
         const unsigned int maximum_order                 = 5,
         const unsigned int maximum_non_linear_iterations = 10,
         // Error parameters
-        const double &absolute_tolerance                = 1e-6,
-        const double &relative_tolerance                = 1e-5,
-        const bool    ignore_algebraic_terms_for_errors = true,
+        const double absolute_tolerance                = 1e-6,
+        const double relative_tolerance                = 1e-5,
+        const bool   ignore_algebraic_terms_for_errors = true,
         // Initial conditions parameters
         const InitialConditionCorrection &ic_type    = use_y_diff,
         const InitialConditionCorrection &reset_type = use_y_diff,
@@ -619,7 +619,7 @@ namespace SUNDIALS
      * @param[in,out] yp  The new (tentative) initial solution_dot
      */
     void
-    reset(const double &t, const double &h, VectorType &y, VectorType &yp);
+    reset(const double t, const double h, VectorType &y, VectorType &yp);
 
     /**
      * Reinit vector to have the right size, MPI communicator, etc.
