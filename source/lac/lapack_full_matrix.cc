@@ -160,7 +160,7 @@ namespace internal
                  std::vector<T> &      real_work,
                  std::vector<T> & /*complex work*/,
                  std::vector<types::blas_int> &integer_work,
-                 const types::blas_int &       work_flag,
+                 const types::blas_int         work_flag,
                  types::blas_int &             info)
     {
       Assert(job == 'A' || job == 'S' || job == 'O' || job == 'N',

@@ -296,7 +296,7 @@ namespace TrilinosWrappers
       class TrilinosReductionControl : public AztecOO_StatusTest
       {
       public:
-        TrilinosReductionControl(const int &                 max_steps,
+        TrilinosReductionControl(const int                   max_steps,
                                  const double &              tolerance,
                                  const double &              reduction,
                                  const Epetra_LinearProblem &linear_problem);
@@ -364,7 +364,7 @@ namespace TrilinosWrappers
 
 
       TrilinosReductionControl::TrilinosReductionControl(
-        const int &                 max_steps,
+        const int                   max_steps,
         const double &              tolerance,
         const double &              reduction,
         const Epetra_LinearProblem &linear_problem)
