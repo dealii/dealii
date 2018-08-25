@@ -890,7 +890,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     make_colorwise_enrichment_functions(
-      const unsigned int &                                    n_colors,
+      const unsigned int                                      n_colors,
       const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments,
       const std::map<unsigned int, std::map<unsigned int, unsigned int>>
         &cellwise_color_predicate_map,
@@ -916,7 +916,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     make_fe_collection_from_colored_enrichments(
-      const unsigned int &n_colors,
+      const unsigned int n_colors,
       const std::vector<std::set<unsigned int>>
         &fe_sets, // total list of color sets possible
       const std::vector<std::function<const Function<spacedim> *(
