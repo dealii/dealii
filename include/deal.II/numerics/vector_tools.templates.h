@@ -6667,7 +6667,7 @@ namespace VectorTools
             // choose the one, which was computed with the higher order
             // element. If both elements are of the same order, we just
             // keep the first value and do not compute a second one.
-            const unsigned int &                 n_dofs = dof_handler.n_dofs();
+            const unsigned int                   n_dofs = dof_handler.n_dofs();
             std::vector<double>                  dof_values(n_dofs);
             std::vector<types::global_dof_index> projected_dofs(n_dofs);
 
@@ -6832,7 +6832,7 @@ namespace VectorTools
 
         case 3:
           {
-            const unsigned int &                 n_dofs = dof_handler.n_dofs();
+            const unsigned int                   n_dofs = dof_handler.n_dofs();
             std::vector<double>                  dof_values(n_dofs);
             std::vector<types::global_dof_index> projected_dofs(n_dofs);
 

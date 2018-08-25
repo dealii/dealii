@@ -266,8 +266,8 @@ FE_Q_Hierarchical<dim>::hp_line_dof_identities(
   // one is an FE_Nothing.
   if (dynamic_cast<const FE_Q_Hierarchical<dim> *>(&fe_other) != nullptr)
     {
-      const unsigned int &this_dpl  = this->dofs_per_line;
-      const unsigned int &other_dpl = fe_other.dofs_per_line;
+      const unsigned int this_dpl  = this->dofs_per_line;
+      const unsigned int other_dpl = fe_other.dofs_per_line;
 
       // we deal with hierarchical 1d polynomials where dofs are enumerated
       // increasingly. Thus we return a vector of pairs for the first N-1, where
@@ -304,8 +304,8 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
   // one is an FE_Nothing.
   if (dynamic_cast<const FE_Q_Hierarchical<dim> *>(&fe_other) != nullptr)
     {
-      const unsigned int &this_dpq  = this->dofs_per_quad;
-      const unsigned int &other_dpq = fe_other.dofs_per_quad;
+      const unsigned int this_dpq  = this->dofs_per_quad;
+      const unsigned int other_dpq = fe_other.dofs_per_quad;
 
       // we deal with hierarchical 1d polynomials where dofs are enumerated
       // increasingly. Thus we return a vector of pairs for the first N-1, where

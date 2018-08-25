@@ -309,9 +309,9 @@ namespace SUNDIALS
         const double &initial_step_size = 1e-2,
         const double &output_period     = 1e-1,
         // Running parameters
-        const double &      minimum_step_size             = 1e-6,
-        const unsigned int &maximum_order                 = 5,
-        const unsigned int &maximum_non_linear_iterations = 10,
+        const double &     minimum_step_size             = 1e-6,
+        const unsigned int maximum_order                 = 5,
+        const unsigned int maximum_non_linear_iterations = 10,
         // Error parameters
         const double &absolute_tolerance                = 1e-6,
         const double &relative_tolerance                = 1e-5,
@@ -319,7 +319,7 @@ namespace SUNDIALS
         // Initial conditions parameters
         const InitialConditionCorrection &ic_type    = use_y_diff,
         const InitialConditionCorrection &reset_type = use_y_diff,
-        const unsigned int &              maximum_non_linear_iterations_ic = 5)
+        const unsigned int                maximum_non_linear_iterations_ic = 5)
         : initial_time(initial_time)
         , final_time(final_time)
         , initial_step_size(initial_step_size)

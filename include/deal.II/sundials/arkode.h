@@ -350,11 +350,11 @@ namespace SUNDIALS
         const double &initial_step_size = 1e-2,
         const double &output_period     = 1e-1,
         // Running parameters
-        const double &      minimum_step_size                     = 1e-6,
-        const unsigned int &maximum_order                         = 5,
-        const unsigned int &maximum_non_linear_iterations         = 10,
-        const bool          implicit_function_is_linear           = false,
-        const bool          implicit_function_is_time_independent = false,
+        const double &     minimum_step_size                     = 1e-6,
+        const unsigned int maximum_order                         = 5,
+        const unsigned int maximum_non_linear_iterations         = 10,
+        const bool         implicit_function_is_linear           = false,
+        const bool         implicit_function_is_time_independent = false,
         // Error parameters
         const double &absolute_tolerance = 1e-6,
         const double &relative_tolerance = 1e-5)

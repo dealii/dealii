@@ -284,8 +284,8 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
       // If the polynomial degree is positive
       // we have support points on the faces
       // and in the interior of a cell.
-      const QGauss<dim>   quadrature(order + 1);
-      const unsigned int &n_interior_points = quadrature.size();
+      const QGauss<dim>  quadrature(order + 1);
+      const unsigned int n_interior_points = quadrature.size();
 
       this->generalized_support_points.resize(n_boundary_points +
                                               n_interior_points);
@@ -348,7 +348,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
   // Initialize quadratures to obtain
   // quadrature points later on.
   const QGauss<1>            reference_edge_quadrature(order + 1);
-  const unsigned int &       n_edge_points = reference_edge_quadrature.size();
+  const unsigned int         n_edge_points = reference_edge_quadrature.size();
   const Quadrature<dim - 1> &edge_quadrature =
     QProjector<dim - 1>::project_to_all_faces(reference_edge_quadrature);
 
@@ -358,12 +358,12 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
       // we have support points on the edges,
       // faces and in the interior of a cell.
       const QGauss<dim - 1> reference_face_quadrature(order + 1);
-      const unsigned int &  n_face_points = reference_face_quadrature.size();
+      const unsigned int    n_face_points = reference_face_quadrature.size();
       const unsigned int    n_boundary_points =
         GeometryInfo<dim>::lines_per_cell * n_edge_points +
         GeometryInfo<dim>::faces_per_cell * n_face_points;
-      const QGauss<dim>   quadrature(order + 1);
-      const unsigned int &n_interior_points = quadrature.size();
+      const QGauss<dim>  quadrature(order + 1);
+      const unsigned int n_interior_points = quadrature.size();
 
       boundary_weights.reinit(n_edge_points + n_face_points,
                               2 * (order + 1) * order);
@@ -524,8 +524,8 @@ FE_Nedelec<dim>::initialize_restriction()
   const QGauss<1>              edge_quadrature(2 * this->degree);
   const std::vector<Point<1>> &edge_quadrature_points =
     edge_quadrature.get_points();
-  const unsigned int &n_edge_quadrature_points = edge_quadrature.size();
-  const unsigned int  index = RefinementCase<dim>::isotropic_refinement - 1;
+  const unsigned int n_edge_quadrature_points = edge_quadrature.size();
+  const unsigned int index = RefinementCase<dim>::isotropic_refinement - 1;
 
   switch (dim)
     {
@@ -764,7 +764,7 @@ FE_Nedelec<dim>::initialize_restriction()
                   Polynomials::Lobatto::generate_complete_basis(this->degree);
               const unsigned int n_boundary_dofs =
                 GeometryInfo<dim>::faces_per_cell * this->degree;
-              const unsigned int &n_quadrature_points = quadrature.size();
+              const unsigned int n_quadrature_points = quadrature.size();
 
               {
                 FullMatrix<double> assembling_matrix((this->degree - 1) *
@@ -1261,7 +1261,7 @@ FE_Nedelec<dim>::initialize_restriction()
                   Polynomials::Lobatto::generate_complete_basis(this->degree);
               const unsigned int n_edge_dofs =
                 GeometryInfo<dim>::lines_per_cell * this->degree;
-              const unsigned int &n_face_quadrature_points =
+              const unsigned int n_face_quadrature_points =
                 face_quadrature.size();
 
               {
@@ -1598,7 +1598,7 @@ FE_Nedelec<dim>::initialize_restriction()
               const unsigned int n_boundary_dofs =
                 2 * GeometryInfo<dim>::faces_per_cell * deg * this->degree +
                 n_edge_dofs;
-              const unsigned int &n_quadrature_points = quadrature.size();
+              const unsigned int n_quadrature_points = quadrature.size();
 
               {
                 FullMatrix<double> assembling_matrix(deg * deg * this->degree,
@@ -2575,7 +2575,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   const QGauss<1>              edge_quadrature(source_fe.degree);
   const std::vector<Point<1>> &edge_quadrature_points =
     edge_quadrature.get_points();
-  const unsigned int &n_edge_quadrature_points = edge_quadrature.size();
+  const unsigned int n_edge_quadrature_points = edge_quadrature.size();
 
   switch (dim)
     {
@@ -2830,7 +2830,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                     source_fe.degree);
               const unsigned int n_boundary_dofs =
                 GeometryInfo<dim>::lines_per_face * source_fe.degree;
-              const unsigned int &n_quadrature_points = quadrature.size();
+              const unsigned int n_quadrature_points = quadrature.size();
 
               {
                 FullMatrix<double> assembling_matrix(source_fe.degree *
@@ -3117,7 +3117,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
           // Let us begin with the
           // interpolation part.
           const QGauss<dim - 1> reference_edge_quadrature(this->degree);
-          const unsigned int &n_edge_points = reference_edge_quadrature.size();
+          const unsigned int n_edge_points = reference_edge_quadrature.size();
 
           for (unsigned int i = 0; i < 2; ++i)
             for (unsigned int j = 0; j < 2; ++j)
@@ -3230,8 +3230,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               // horizontal and the
               // vertical, interior
               // shape functions.
-              const QGauss<dim>   reference_quadrature(this->degree);
-              const unsigned int &n_interior_points =
+              const QGauss<dim>  reference_quadrature(this->degree);
+              const unsigned int n_interior_points =
                 reference_quadrature.size();
               const std::vector<Polynomials::Polynomial<double>>
                 &legendre_polynomials =
@@ -3381,8 +3381,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
         {
           // Let us begin with the
           // interpolation part.
-          const QGauss<1>     reference_edge_quadrature(this->degree);
-          const unsigned int &n_edge_points = reference_edge_quadrature.size();
+          const QGauss<1>    reference_edge_quadrature(this->degree);
+          const unsigned int n_edge_points = reference_edge_quadrature.size();
 
           for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
             {

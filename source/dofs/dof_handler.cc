@@ -399,8 +399,8 @@ namespace internal
 
         const dealii::Triangulation<1, spacedim> &tria =
           dof_handler.get_triangulation();
-        const unsigned int &dofs_per_line = dof_handler.get_fe().dofs_per_line;
-        const unsigned int &n_levels      = tria.n_levels();
+        const unsigned int dofs_per_line = dof_handler.get_fe().dofs_per_line;
+        const unsigned int n_levels      = tria.n_levels();
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
@@ -412,7 +412,7 @@ namespace internal
                                                    numbers::invalid_dof_index);
           }
 
-        const unsigned int &n_vertices = tria.n_vertices();
+        const unsigned int n_vertices = tria.n_vertices();
 
         dof_handler.mg_vertex_dofs.resize(n_vertices);
 
@@ -470,7 +470,7 @@ namespace internal
         const dealii::FiniteElement<2, spacedim> &fe = dof_handler.get_fe();
         const dealii::Triangulation<2, spacedim> &tria =
           dof_handler.get_triangulation();
-        const unsigned int &n_levels = tria.n_levels();
+        const unsigned int n_levels = tria.n_levels();
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
@@ -488,7 +488,7 @@ namespace internal
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index>(
           tria.n_raw_lines() * fe.dofs_per_line, numbers::invalid_dof_index);
 
-        const unsigned int &n_vertices = tria.n_vertices();
+        const unsigned int n_vertices = tria.n_vertices();
 
         dof_handler.mg_vertex_dofs.resize(n_vertices);
 
@@ -545,7 +545,7 @@ namespace internal
         const dealii::FiniteElement<3, spacedim> &fe = dof_handler.get_fe();
         const dealii::Triangulation<3, spacedim> &tria =
           dof_handler.get_triangulation();
-        const unsigned int &n_levels = tria.n_levels();
+        const unsigned int n_levels = tria.n_levels();
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
@@ -565,7 +565,7 @@ namespace internal
         dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index>(
           tria.n_raw_quads() * fe.dofs_per_quad, numbers::invalid_dof_index);
 
-        const unsigned int &n_vertices = tria.n_vertices();
+        const unsigned int n_vertices = tria.n_vertices();
 
         dof_handler.mg_vertex_dofs.resize(n_vertices);
 

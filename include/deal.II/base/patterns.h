@@ -860,7 +860,7 @@ namespace Patterns
      * Return a reference to the i-th pattern in the tuple.
      */
     const PatternBase &
-    get_pattern(const unsigned int &i) const;
+    get_pattern(const unsigned int i) const;
 
     /**
      * Return the separator of the tuple entries.
