@@ -502,61 +502,95 @@ read_test(HDF5::Group        root_group,
           MPI_Comm           mpi_communicator,
           ConditionalOStream pcout)
 {
-    std::string container_name;
-    std::string type_name;
+  std::string container_name;
+  std::string type_name;
 
-    if (std::is_same<Container<Number>, std::vector<Number>>::value)
-      {
-        container_name = std::string("std::vector");
-      }
-    else if (std::is_same<Container<Number>, FullMatrix<Number>>::value)
-      {
-        container_name = std::string("FullMatrix");
-      }
-
-    if (std::is_same<Number, float>::value)
-      {
-        type_name = std::string("float");
-      }
-    else if (std::is_same<Number, double>::value)
-      {
-        type_name = std::string("double");
-      }
-    else if (std::is_same<Number, std::complex<float>>::value)
-      {
-        type_name = std::string("std::complex<float>");
-      }
-    else if (std::is_same<Number, std::complex<double>>::value)
-      {
-        type_name = std::string("std::complex<double>");
-      }
-    else if (std::is_same<Number, int>::value)
-      {
-        type_name = std::string("int");
-      }
-    else if (std::is_same<Number, unsigned int>::value)
-      {
-        type_name = std::string("unsigned int");
-      }
-
-    deallog << "Read tests for " << container_name << "<" << type_name << ">"
-            << " datasets" << std::endl;
-
-    auto group = root_group.group(container_name + "<" + type_name + ">");
-
+  if (std::is_same<Container<Number>, std::vector<Number>>::value)
     {
-      std::string dataset_name("dataset_1");
-      auto        dataset = group.dataset(dataset_name);
-      dataset.check_io_mode(true);
-      deallog << "Dimensions " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.dimensions() << std::endl;
-      deallog << "Size " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.size() << std::endl;
-      deallog << "Rank " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.rank() << std::endl;
+      container_name = std::string("std::vector");
+    }
+  else if (std::is_same<Container<Number>, FullMatrix<Number>>::value)
+    {
+      container_name = std::string("FullMatrix");
+    }
+
+  if (std::is_same<Number, float>::value)
+    {
+      type_name = std::string("float");
+    }
+  else if (std::is_same<Number, double>::value)
+    {
+      type_name = std::string("double");
+    }
+  else if (std::is_same<Number, std::complex<float>>::value)
+    {
+      type_name = std::string("std::complex<float>");
+    }
+  else if (std::is_same<Number, std::complex<double>>::value)
+    {
+      type_name = std::string("std::complex<double>");
+    }
+  else if (std::is_same<Number, int>::value)
+    {
+      type_name = std::string("int");
+    }
+  else if (std::is_same<Number, unsigned int>::value)
+    {
+      type_name = std::string("unsigned int");
+    }
+
+  deallog << "Read tests for " << container_name << "<" << type_name << ">"
+          << " datasets" << std::endl;
+
+  auto group = root_group.group(container_name + "<" + type_name + ">");
+
+  {
+    std::string dataset_name("dataset_1");
+    auto        dataset = group.dataset(dataset_name);
+    dataset.check_io_mode(true);
+    deallog << "Dimensions " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.dimensions() << std::endl;
+    deallog << "Size " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.size() << std::endl;
+    deallog << "Rank " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.rank() << std::endl;
+    Container<Number> data = dataset.read<Container, Number>();
+    deallog << "Sum " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << container_sum(data) << std::endl;
+    pcout << "IO mode " + dataset_name << " " << container_name << "<"
+          << type_name << ">"
+          << " (Read): " << dataset.template io_mode<std::string>()
+          << std::endl;
+    pcout << "Local no collective cause " + dataset_name << " "
+          << container_name << "<" << type_name << ">"
+          << " (Read): "
+          << dataset.template local_no_collective_cause<std::string>()
+          << std::endl;
+    pcout << "Global no collective cause " + dataset_name << " "
+          << container_name << "<" << type_name << ">"
+          << " (Read): "
+          << dataset.template global_no_collective_cause<std::string>()
+          << std::endl;
+  }
+
+  {
+    std::string dataset_name("dataset_2");
+    auto        dataset = group.dataset(dataset_name);
+    dataset.check_io_mode(true);
+    deallog << "Dimensions " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.dimensions() << std::endl;
+    deallog << "Size " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.size() << std::endl;
+    deallog << "Rank " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.rank() << std::endl;
+    {
       Container<Number> data = dataset.read<Container, Number>();
       deallog << "Sum " + dataset_name << " " << container_name << "<"
               << type_name << ">"
@@ -578,19 +612,54 @@ read_test(HDF5::Group        root_group,
     }
 
     {
-      std::string dataset_name("dataset_2");
-      auto        dataset = group.dataset(dataset_name);
-      dataset.check_io_mode(true);
-      deallog << "Dimensions " + dataset_name << " " << container_name << "<"
+      std::vector<hsize_t> coordinates_a = {0,
+                                            0, // first point
+                                            0,
+                                            2, // second point
+                                            3,
+                                            4, // third point
+                                            25,
+                                            12}; // fourth point
+      auto data_a = dataset.template read_selection<Number>(coordinates_a);
+      deallog << "Selection " + dataset_name << " " << container_name << "<"
               << type_name << ">"
-              << " (Read): " << dataset.dimensions() << std::endl;
-      deallog << "Size " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.size() << std::endl;
-      deallog << "Rank " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.rank() << std::endl;
+              << " (Read): " << data_a[0] << ", " << data_a[1] << ", "
+              << data_a[2] << ", " << data_a[3] << std::endl;
+      pcout << "IO mode " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.template io_mode<std::string>()
+            << std::endl;
+      pcout << "Local no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template local_no_collective_cause<std::string>()
+            << std::endl;
+      pcout << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
+    }
+  }
+
+  {
+    // In this test data conversion is tested. The dataset only exists for
+    // float and double.
+    if (std::is_same<Number, float>::value ||
+        std::is_same<Number, double>::value)
       {
+        std::string dataset_name("dataset_3");
+        auto        dataset = group.dataset(dataset_name);
+        dataset.check_io_mode(true);
+        deallog << "Dimensions " + dataset_name << " " << container_name << "<"
+                << type_name << ">"
+                << " (Read): " << dataset.dimensions() << std::endl;
+        deallog << "Size " + dataset_name << " " << container_name << "<"
+                << type_name << ">"
+                << " (Read): " << dataset.size() << std::endl;
+        deallog << "Rank " + dataset_name << " " << container_name << "<"
+                << type_name << ">"
+                << " (Read): " << dataset.rank() << std::endl;
         Container<Number> data = dataset.read<Container, Number>();
         deallog << "Sum " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
@@ -610,175 +679,107 @@ read_test(HDF5::Group        root_group,
               << dataset.template global_no_collective_cause<std::string>()
               << std::endl;
       }
+  }
 
-      {
-        std::vector<hsize_t> coordinates_a = {0,
-                                              0, // first point
-                                              0,
-                                              2, // second point
-                                              3,
-                                              4, // third point
-                                              25,
-                                              12}; // fourth point
-        auto data_a = dataset.template read_selection<Number>(coordinates_a);
-        deallog << "Selection " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << data_a[0] << ", " << data_a[1] << ", "
-                << data_a[2] << ", " << data_a[3] << std::endl;
-        pcout << "IO mode " + dataset_name << " " << container_name << "<"
+  {
+    std::string dataset_name("dataset_4");
+    auto        dataset = group.dataset(dataset_name);
+    dataset.check_io_mode(true);
+    deallog << "Dimensions " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.dimensions() << std::endl;
+    deallog << "Size " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.size() << std::endl;
+    deallog << "Rank " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.rank() << std::endl;
+    {
+      Container<Number> data = dataset.read<Container, Number>();
+      deallog << "Sum " + dataset_name << " " << container_name << "<"
               << type_name << ">"
-              << " (Read): " << dataset.template io_mode<std::string>()
-              << std::endl;
-        pcout << "Local no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template local_no_collective_cause<std::string>()
-              << std::endl;
-        pcout << "Global no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template global_no_collective_cause<std::string>()
-              << std::endl;
-      }
+              << " (Read): " << container_sum(data) << std::endl;
+      pcout << "IO mode " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.template io_mode<std::string>()
+            << std::endl;
+      pcout << "Local no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template local_no_collective_cause<std::string>()
+            << std::endl;
+      pcout << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
     }
 
     {
-      // In this test data conversion is tested. The dataset only exists for
-      // float and double.
-      if (std::is_same<Number, float>::value ||
-          std::is_same<Number, double>::value)
-        {
-          std::string dataset_name("dataset_3");
-          auto        dataset = group.dataset(dataset_name);
-          dataset.check_io_mode(true);
-          deallog << "Dimensions " + dataset_name << " " << container_name
-                  << "<" << type_name << ">"
-                  << " (Read): " << dataset.dimensions() << std::endl;
-          deallog << "Size " + dataset_name << " " << container_name << "<"
-                  << type_name << ">"
-                  << " (Read): " << dataset.size() << std::endl;
-          deallog << "Rank " + dataset_name << " " << container_name << "<"
-                  << type_name << ">"
-                  << " (Read): " << dataset.rank() << std::endl;
-          Container<Number> data = dataset.read<Container, Number>();
-          deallog << "Sum " + dataset_name << " " << container_name << "<"
-                  << type_name << ">"
-                  << " (Read): " << container_sum(data) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
-        }   
+      const std::vector<hsize_t> hyperslab_offset_a = {0, 0};
+      const std::vector<hsize_t> hyperslab_count_a  = {2, 5};
+      auto                       data_a =
+        dataset.read_hyperslab<Container, Number>(hyperslab_offset_a,
+                                                  hyperslab_count_a);
+      deallog << "Hyperslab_a sum " + dataset_name << " " << container_name
+              << "<" << type_name << ">"
+              << " (Read): " << container_sum(data_a) << std::endl;
+      pcout << "IO mode " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.template io_mode<std::string>()
+            << std::endl;
+      pcout << "Local no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template local_no_collective_cause<std::string>()
+            << std::endl;
+      pcout << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
     }
 
     {
-        std::string dataset_name("dataset_4");
-        auto        dataset = group.dataset(dataset_name);
-        dataset.check_io_mode(true);
-        deallog << "Dimensions " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.dimensions() << std::endl;
-        deallog << "Size " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.size() << std::endl;
-        deallog << "Rank " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.rank() << std::endl;
+      const std::vector<hsize_t> hyperslab_offset_b = {2, 0};
+      const std::vector<hsize_t> hyperslab_count_b  = {1, 4};
+      Container<Number>          data_b;
+      // This loop is used to test read_none(). At the end of the loop every
+      // MPI process will have read data_b
+      for (unsigned int mpi_idx = 0;
+           mpi_idx < Utilities::MPI::n_mpi_processes(mpi_communicator);
+           ++mpi_idx)
         {
-          Container<Number> data = dataset.read<Container, Number>();
-          deallog << "Sum " + dataset_name << " " << container_name << "<"
-                  << type_name << ">"
-                  << " (Read): " << container_sum(data) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
-        }
-
-        {
-          const std::vector<hsize_t> hyperslab_offset_a = {0, 0};
-          const std::vector<hsize_t> hyperslab_count_a  = {2, 5};
-          auto                       data_a =
-            dataset.read_hyperslab<Container, Number>(hyperslab_offset_a,
-                                                      hyperslab_count_a);
-          deallog << "Hyperslab_a sum " + dataset_name << " " << container_name
-                  << "<" << type_name << ">"
-                  << " (Read): " << container_sum(data_a) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
-        }
-
-        {
-          const std::vector<hsize_t> hyperslab_offset_b = {2, 0};
-          const std::vector<hsize_t> hyperslab_count_b  = {1, 4};
-          Container<Number>          data_b;
-          // This loop is used to test read_none(). At the end of the loop every
-          // MPI process will have read data_b
-          for (unsigned int mpi_idx = 0;
-               mpi_idx < Utilities::MPI::n_mpi_processes(mpi_communicator);
-               ++mpi_idx)
+          if (Utilities::MPI::this_mpi_process(mpi_communicator) == mpi_idx)
             {
-              if (Utilities::MPI::this_mpi_process(mpi_communicator) == mpi_idx)
-                {
-                  data_b = dataset.read_hyperslab<Container, Number>(
-                    hyperslab_offset_b, hyperslab_count_b);
-                }
-              else
-                {
-                  dataset.read_none<Number>();
-                }
+              data_b =
+                dataset.read_hyperslab<Container, Number>(hyperslab_offset_b,
+                                                          hyperslab_count_b);
             }
-          deallog << "Hyperslab_b sum " + dataset_name << " " << container_name
-                  << "<" << type_name << ">"
-                  << " (Read): " << container_sum(data_b) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
+          else
+            {
+              dataset.read_none<Number>();
+            }
         }
-      }
+      deallog << "Hyperslab_b sum " + dataset_name << " " << container_name
+              << "<" << type_name << ">"
+              << " (Read): " << container_sum(data_b) << std::endl;
+      pcout << "IO mode " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Read): " << dataset.template io_mode<std::string>()
+            << std::endl;
+      pcout << "Local no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template local_no_collective_cause<std::string>()
+            << std::endl;
+      pcout << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
+    }
+  }
 }
 
 
