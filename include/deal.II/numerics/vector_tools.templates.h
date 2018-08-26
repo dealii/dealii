@@ -2842,9 +2842,6 @@ namespace VectorTools
           std::vector<types::global_dof_index> face_dofs;
           face_dofs.reserve(DoFTools::max_dofs_per_face(dof));
 
-          std::vector<Point<spacedim>> dof_locations;
-          dof_locations.reserve(DoFTools::max_dofs_per_face(dof));
-
           // array to store the values of the boundary function at the boundary
           // points. have two arrays for scalar and vector functions to use the
           // more efficient one respectively
