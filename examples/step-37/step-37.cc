@@ -1142,6 +1142,7 @@ namespace Step37
   template <int dim>
   void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
+    Timer time;
     if (triangulation.n_global_active_cells() > 1000000)
       return;
 
@@ -1175,6 +1176,9 @@ namespace Step37
         std::ofstream master_output(master_name);
         data_out.write_pvtu_record(master_output, filenames);
       }
+
+    time_details << "Time write output          (CPU/wall) " << time.cpu_time()
+                 << "s/" << time.wall_time() << "s\n";
   }
 
 
