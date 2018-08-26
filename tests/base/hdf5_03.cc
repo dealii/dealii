@@ -502,7 +502,6 @@ read_test(HDF5::Group        root_group,
           MPI_Comm           mpi_communicator,
           ConditionalOStream pcout)
 {
-  {
     std::string container_name;
     std::string type_name;
 
@@ -679,9 +678,10 @@ read_test(HDF5::Group        root_group,
                 << " (Read): "
                 << dataset.template global_no_collective_cause<std::string>()
                 << std::endl;
-        }
+        }   
+    }
 
-      {
+    {
         std::string dataset_name("dataset_4");
         auto        dataset = group.dataset(dataset_name);
         dataset.check_io_mode(true);
@@ -779,8 +779,6 @@ read_test(HDF5::Group        root_group,
                 << std::endl;
         }
       }
-    }
-  }
 }
 
 

@@ -456,7 +456,6 @@ template <template <class...> class Container, typename Number>
 void
 read_test(HDF5::Group root_group)
 {
-  {
     std::string container_name;
     std::string type_name;
 
@@ -634,9 +633,10 @@ read_test(HDF5::Group root_group)
             << " (Read): "
             << dataset.template global_no_collective_cause<std::string>()
             << std::endl;
-        }
+        }    
+    }
 
-      {
+    {
         std::string dataset_name("dataset_4");
         auto        dataset = group.dataset(dataset_name);
         dataset.check_io_mode(true);
@@ -723,7 +723,6 @@ read_test(HDF5::Group root_group)
             << std::endl;
         }
       }
-    }
 
     {
       std::string dataset_name("dataset_5");
@@ -757,7 +756,6 @@ read_test(HDF5::Group root_group)
                 << dataset.template global_no_collective_cause<std::string>()
                 << std::endl;
     }
-  }
 }
 
 
