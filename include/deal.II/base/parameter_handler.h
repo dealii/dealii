@@ -1289,7 +1289,7 @@ public:
    * the new value does not conform to the pattern for this entry.
    */
   void
-  set(const std::string &entry_name, const long int &new_value);
+  set(const std::string &entry_name, const long int new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1305,7 +1305,7 @@ public:
    * the new value does not conform to the pattern for this entry.
    */
   void
-  set(const std::string &entry_name, const double &new_value);
+  set(const std::string &entry_name, const double new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1317,7 +1317,7 @@ public:
    * the new value does not conform to the pattern for this entry.
    */
   void
-  set(const std::string &entry_name, const bool &new_value);
+  set(const std::string &entry_name, const bool new_value);
 
 
   /**

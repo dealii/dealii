@@ -277,10 +277,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  IDA<VectorType>::reset(const double &current_time,
-                         const double &current_time_step,
-                         VectorType &  solution,
-                         VectorType &  solution_dot)
+  IDA<VectorType>::reset(const double current_time,
+                         const double current_time_step,
+                         VectorType & solution,
+                         VectorType & solution_dot)
   {
     unsigned int system_size;
     bool         first_step = (current_time == data.initial_time);

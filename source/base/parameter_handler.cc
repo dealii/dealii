@@ -1004,7 +1004,7 @@ ParameterHandler::set(const std::string &entry_string, const char *new_value)
 
 
 void
-ParameterHandler::set(const std::string &entry_string, const double &new_value)
+ParameterHandler::set(const std::string &entry_string, const double new_value)
 {
   std::ostringstream s;
   s << std::setprecision(16);
@@ -1018,8 +1018,7 @@ ParameterHandler::set(const std::string &entry_string, const double &new_value)
 
 
 void
-ParameterHandler::set(const std::string &entry_string,
-                      const long int &   new_value)
+ParameterHandler::set(const std::string &entry_string, const long int new_value)
 {
   std::ostringstream s;
   s << new_value;
@@ -1032,7 +1031,7 @@ ParameterHandler::set(const std::string &entry_string,
 
 
 void
-ParameterHandler::set(const std::string &entry_string, const bool &new_value)
+ParameterHandler::set(const std::string &entry_string, const bool new_value)
 {
   // hand this off to the function that
   // actually sets the value as a string

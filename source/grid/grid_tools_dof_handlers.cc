@@ -949,8 +949,7 @@ namespace GridTools
       compute_bounding_box(mesh, predicate);
 
     // DOUBLE_EPSILON to compare really close double values
-    const double &DOUBLE_EPSILON =
-      100. * std::numeric_limits<double>::epsilon();
+    const double DOUBLE_EPSILON = 100. * std::numeric_limits<double>::epsilon();
 
     // Add layer_thickness to the bounding box
     for (unsigned int d = 0; d < spacedim; ++d)
@@ -1004,9 +1003,9 @@ namespace GridTools
         const std::pair<Point<spacedim>, double> &cell_enclosing_ball =
           cell->enclosing_ball();
 
-        const Point<spacedim> &cell_enclosing_ball_center =
+        const Point<spacedim> cell_enclosing_ball_center =
           cell_enclosing_ball.first;
-        const double &cell_enclosing_ball_radius = cell_enclosing_ball.second;
+        const double cell_enclosing_ball_radius = cell_enclosing_ball.second;
 
         bool cell_inside = true; // reset for each cell
 

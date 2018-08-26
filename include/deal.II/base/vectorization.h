@@ -2976,7 +2976,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator+(const double &u, const VectorizedArray<float> &v)
+                             operator+(const double u, const VectorizedArray<float> &v)
 {
   VectorizedArray<float> tmp;
   tmp = u;
@@ -3005,7 +3005,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator+(const VectorizedArray<float> &v, const double &u)
+                             operator+(const VectorizedArray<float> &v, const double u)
 {
   return u + v;
 }
@@ -3034,7 +3034,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator-(const double &u, const VectorizedArray<float> &v)
+                             operator-(const double u, const VectorizedArray<float> &v)
 {
   VectorizedArray<float> tmp;
   tmp = float(u);
@@ -3065,7 +3065,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator-(const VectorizedArray<float> &v, const double &u)
+                             operator-(const VectorizedArray<float> &v, const double u)
 {
   VectorizedArray<float> tmp;
   tmp = float(u);
@@ -3096,7 +3096,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator*(const double &u, const VectorizedArray<float> &v)
+                             operator*(const double u, const VectorizedArray<float> &v)
 {
   VectorizedArray<float> tmp;
   tmp = float(u);
@@ -3125,7 +3125,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator*(const VectorizedArray<float> &v, const double &u)
+                             operator*(const VectorizedArray<float> &v, const double u)
 {
   return u * v;
 }
@@ -3154,7 +3154,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator/(const double &u, const VectorizedArray<float> &v)
+                             operator/(const double u, const VectorizedArray<float> &v)
 {
   VectorizedArray<float> tmp;
   tmp = float(u);
@@ -3185,7 +3185,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator/(const VectorizedArray<float> &v, const double &u)
+                             operator/(const VectorizedArray<float> &v, const double u)
 {
   VectorizedArray<float> tmp;
   tmp = float(u);

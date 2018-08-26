@@ -75,7 +75,7 @@ namespace Functions
     // structures via a mutex.
     Threads::Mutex::ScopedLock lock(acc_mutex);
 
-    const double &x = p[0];
+    const double x = p[0];
     Assert(x >= interpolation_points.front() &&
              x <= interpolation_points.back(),
            ExcCSplineRange(x,
@@ -96,7 +96,7 @@ namespace Functions
     // structures via a mutex.
     Threads::Mutex::ScopedLock lock(acc_mutex);
 
-    const double &x = p[0];
+    const double x = p[0];
     Assert(x >= interpolation_points.front() &&
              x <= interpolation_points.back(),
            ExcCSplineRange(x,
@@ -120,7 +120,7 @@ namespace Functions
     // structures via a mutex.
     Threads::Mutex::ScopedLock lock(acc_mutex);
 
-    const double &x = p[0];
+    const double x = p[0];
     Assert(x >= interpolation_points.front() &&
              x <= interpolation_points.back(),
            ExcCSplineRange(x,

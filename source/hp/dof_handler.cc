@@ -970,7 +970,7 @@ namespace internal
                 [&dof_handler](
                   const typename dealii::hp::DoFHandler<dim, spacedim>::
                     active_cell_iterator &cell,
-                  const unsigned int &    active_fe_index) -> void {
+                  const unsigned int      active_fe_index) -> void {
                 // we would like to say
                 //   cell->set_active_fe_index(active_fe_index);
                 // but this is not allowed on cells that are not

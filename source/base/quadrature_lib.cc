@@ -1275,7 +1275,7 @@ QTrianglePolar::QTrianglePolar(const Quadrature<1> &radial_quadrature,
 
 
 
-QTrianglePolar::QTrianglePolar(const unsigned int &n)
+QTrianglePolar::QTrianglePolar(const unsigned int n)
   : QTrianglePolar(QGauss<1>(n), QGauss<1>(n))
 {}
 

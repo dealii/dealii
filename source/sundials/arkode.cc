@@ -344,8 +344,8 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ARKode<VectorType>::reset(const double &    current_time,
-                            const double &    current_time_step,
+  ARKode<VectorType>::reset(const double      current_time,
+                            const double      current_time_step,
                             const VectorType &solution)
   {
     unsigned int system_size;

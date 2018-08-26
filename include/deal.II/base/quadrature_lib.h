@@ -686,7 +686,7 @@ public:
    *
    * @param n Order of QGauss quadrature
    */
-  QTrianglePolar(const unsigned int &n);
+  QTrianglePolar(const unsigned int n);
 };
 
 /**

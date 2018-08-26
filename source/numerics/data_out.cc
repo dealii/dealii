@@ -589,7 +589,7 @@ DataOut<dim, DoFHandlerType>::build_patches(
                 n_subdivisions,
                 curved_cell_region),
       // no copy-local-to-global function needed here
-      std::function<void(const int &)>(),
+      std::function<void(const int)>(),
       thread_data,
       /* dummy CopyData object = */ 0,
       // experimenting shows that we can make things run a bit

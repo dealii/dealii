@@ -1216,7 +1216,7 @@ namespace Patterns
 
 
   const PatternBase &
-  Tuple::get_pattern(const unsigned int &i) const
+  Tuple::get_pattern(const unsigned int i) const
   {
     return *patterns[i];
   }

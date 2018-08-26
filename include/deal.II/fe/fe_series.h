@@ -305,8 +305,8 @@ namespace internal
       if (pred_pair.first == false)
         return;
 
-      const unsigned int &pred_value  = pred_pair.second;
-      const T &           coeff_value = coefficients(ind);
+      const unsigned int pred_value  = pred_pair.second;
+      const T &          coeff_value = coefficients(ind);
       // If pred_value is not in the pred_to_values map, the element will be
       // created. Otherwise a reference to the existing element is returned.
       pred_to_values[pred_value].push_back(coeff_value);

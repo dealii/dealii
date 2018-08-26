@@ -66,11 +66,11 @@ namespace std
         return func_from(static_cast<const badouble &>(x),                     \
                          static_cast<const badouble &>(y));                    \
       }                                                                        \
-      inline adouble func_to(const double &x, const adouble &y)                \
+      inline adouble func_to(const double x, const adouble &y)                 \
       {                                                                        \
         return func_from(x, static_cast<const badouble &>(y));                 \
       }                                                                        \
-      inline adouble func_to(const adouble &x, const double &y)                \
+      inline adouble func_to(const adouble &x, const double y)                 \
       {                                                                        \
         return func_from(static_cast<const badouble &>(x), y);                 \
       }                                                                        \
@@ -79,11 +79,11 @@ namespace std
       {                                                                        \
         return adtl::func_from(x, y);                                          \
       }                                                                        \
-      inline adtl::adouble func_to(const double &x, const adtl::adouble &y)    \
+      inline adtl::adouble func_to(const double x, const adtl::adouble &y)     \
       {                                                                        \
         return adtl::func_from(x, y);                                          \
       }                                                                        \
-      inline adtl::adouble func_to(const adtl::adouble &x, const double &y)    \
+      inline adtl::adouble func_to(const adtl::adouble &x, const double y)     \
       {                                                                        \
         return adtl::func_from(x, y);                                          \
       }

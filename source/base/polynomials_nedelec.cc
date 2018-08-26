@@ -80,7 +80,7 @@ PolynomialsNedelec<dim>::compute(
   // and second derivatives vectors of
   // <tt>polynomial_space</tt> at
   // <tt>unit_point</tt>
-  const unsigned int &n_basis = polynomial_space.n();
+  const unsigned int  n_basis = polynomial_space.n();
   std::vector<double> unit_point_values((values.size() == 0) ? 0 : n_basis);
   std::vector<Tensor<1, dim>> unit_point_grads((grads.size() == 0) ? 0 :
                                                                      n_basis);

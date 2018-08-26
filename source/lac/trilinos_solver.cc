@@ -296,9 +296,9 @@ namespace TrilinosWrappers
       class TrilinosReductionControl : public AztecOO_StatusTest
       {
       public:
-        TrilinosReductionControl(const int &                 max_steps,
-                                 const double &              tolerance,
-                                 const double &              reduction,
+        TrilinosReductionControl(const int                   max_steps,
+                                 const double                tolerance,
+                                 const double                reduction,
                                  const Epetra_LinearProblem &linear_problem);
 
         virtual ~TrilinosReductionControl() override = default;
@@ -364,9 +364,9 @@ namespace TrilinosWrappers
 
 
       TrilinosReductionControl::TrilinosReductionControl(
-        const int &                 max_steps,
-        const double &              tolerance,
-        const double &              reduction,
+        const int                   max_steps,
+        const double                tolerance,
+        const double                reduction,
         const Epetra_LinearProblem &linear_problem)
         : initial_residual(std::numeric_limits<double>::max())
         , current_residual(std::numeric_limits<double>::max())
