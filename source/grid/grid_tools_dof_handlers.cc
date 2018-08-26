@@ -1003,7 +1003,7 @@ namespace GridTools
         const std::pair<Point<spacedim>, double> &cell_enclosing_ball =
           cell->enclosing_ball();
 
-        const Point<spacedim> &cell_enclosing_ball_center =
+        const Point<spacedim> cell_enclosing_ball_center =
           cell_enclosing_ball.first;
         const double cell_enclosing_ball_radius = cell_enclosing_ball.second;
 
