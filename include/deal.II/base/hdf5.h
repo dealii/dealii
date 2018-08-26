@@ -651,24 +651,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename number>
+    template <template <class...> class Container, typename number>
     void
-    write_dataset(const std::string          name,
-                  const std::vector<number> &data) const;
-
-    /**
-     * Creates and writes data to a dataset. Number can be double, int, unsigned
-     * int, bool or std::complex<double>.
-     *
-     * Datatype conversion takes place at the time of a read or write and is
-     * automatic. See the <a
-     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
-     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
-     * User's Guide.
-     */
-    template <typename number>
-    void
-    write_dataset(const std::string name, const FullMatrix<number> &data) const;
+    write_dataset(const std::string name, const Container<number> &data) const;
   };
 
   /**

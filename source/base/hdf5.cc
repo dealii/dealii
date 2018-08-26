@@ -104,11 +104,38 @@ namespace HDF5
     template <template <class...> class Container, typename number>
     typename std::enable_if<
       std::is_same<Container<number>, std::vector<number>>::value,
+      std::vector<hsize_t>>::type
+    get_container_dimensions(const Container<number> &data)
+    {
+      return std::vector<hsize_t>{data.size()};
+    }
+
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
+      std::is_same<Container<number>, Vector<number>>::value,
+      std::vector<hsize_t>>::type
+    get_container_dimensions(const Container<number> &data)
+    {
+      return std::vector<hsize_t>{data.size()};
+    }
+
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
+      std::is_same<Container<number>, FullMatrix<number>>::value,
+      std::vector<hsize_t>>::type
+    get_container_dimensions(const Container<number> &data)
+    {
+      return std::vector<hsize_t>{data.m(), data.n()};
+    }
+
+
+    // This function returns the pointer to the raw data of a container
+    template <template <class...> class Container, typename number>
+    typename std::enable_if<
+      std::is_same<Container<number>, std::vector<number>>::value,
       unsigned int>::type
     get_container_size(const Container<number> &data)
     {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong
       return static_cast<unsigned int>(data.size());
     }
 
@@ -118,8 +145,6 @@ namespace HDF5
       unsigned int>::type
     get_container_size(const Container<number> &data)
     {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong
       return static_cast<unsigned int>(data.size());
     }
 
@@ -129,9 +154,6 @@ namespace HDF5
       unsigned int>::type
     get_container_size(const Container<number> &data)
     {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong.
-      // Use the first element of FullMatrix to get the pointer to the raw data
       return static_cast<unsigned int>(data.m() * data.n());
     }
 
@@ -1264,26 +1286,15 @@ namespace HDF5
     return DataSet(name, *hdf5_reference, dimensions, t_type, mpi);
   }
 
-  template <typename number>
+  template <template <class...> class Container, typename number>
   void
-  Group::write_dataset(const std::string          name,
-                       const std::vector<number> &data) const
+  Group::write_dataset(const std::string        name,
+                       const Container<number> &data) const
   {
-    std::vector<hsize_t> dimensions = {data.size()};
+    std::vector<hsize_t> dimensions = internal::get_container_dimensions(data);
     auto                 dataset    = create_dataset<number>(name, dimensions);
     dataset.write(data);
   }
-
-  template <typename number>
-  void
-  Group::write_dataset(const std::string         name,
-                       const FullMatrix<number> &data) const
-  {
-    std::vector<hsize_t> dimensions = {data.m(), data.n()};
-    auto                 dataset    = create_dataset<number>(name, dimensions);
-    dataset.write(data);
-  }
-
 
   File::File(const std::string name,
              const bool        mpi,
@@ -1449,11 +1460,12 @@ namespace HDF5
     const std::vector<hsize_t> dimensions) const;
 
   template void
-  Group::write_dataset(const std::string       name,
-                       const std::vector<int> &data) const;
+  Group::write_dataset<std::vector, int>(const std::string       name,
+                                         const std::vector<int> &data) const;
   template void
-  Group::write_dataset(const std::string                name,
-                       const std::vector<unsigned int> &data) const;
+  Group::write_dataset<std::vector, unsigned int>(
+    const std::string                name,
+    const std::vector<unsigned int> &data) const;
 
 #  endif // DOXYGEN
 
