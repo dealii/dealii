@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test the attributes of serial HDF5
+// Attributes tests with serial HDF5
 
 #include <deal.II/base/hdf5.h>
 

@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test the attributes of parallel HDF5
+// Attributes tests with parallel HDF5
 
 #include <deal.II/base/hdf5.h>
 

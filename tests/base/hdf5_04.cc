@@ -13,9 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Read/write tests with parallel HDF5
+// Read/write tests with serial HDF5
 
-#include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/hdf5.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -154,9 +153,7 @@ assign_data(Container<Number> &data)
 template <template <class...> class Container, typename Number>
 void
 write_test(HDF5::Group &              root_group,
-           const std::vector<hsize_t> dataset_dimensions,
-           MPI_Comm                   mpi_communicator,
-           ConditionalOStream         pcout)
+           const std::vector<hsize_t> dataset_dimensions)
 {
   AssertDimension(dataset_dimensions.size(), 2);
 
@@ -218,31 +215,24 @@ write_test(HDF5::Group &              root_group,
             << " (Write): " << dataset.rank() << std::endl;
     auto data = initialize_container<Container, Number>(dataset_dimensions);
     assign_data(data);
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        dataset.write(data);
-      }
-    else
-      {
-        dataset.template write_none<Number>();
-      }
+    dataset.write(data);
     deallog << "Sum " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Write): " << container_sum(data) << std::endl;
-    pcout << "IO mode " + dataset_name << " " << container_name << "<"
-          << type_name << ">"
-          << " (Write): " << dataset.template io_mode<std::string>()
-          << std::endl;
-    pcout << "Local no collective cause " + dataset_name << " "
-          << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template local_no_collective_cause<std::string>()
-          << std::endl;
-    pcout << "Global no collective cause " + dataset_name << " "
-          << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template global_no_collective_cause<std::string>()
-          << std::endl;
+    std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Write): " << dataset.template io_mode<std::string>()
+              << std::endl;
+    std::cout << "Local no collective cause " + dataset_name << " "
+              << container_name << "<" << type_name << ">"
+              << " (Write): "
+              << dataset.template local_no_collective_cause<std::string>()
+              << std::endl;
+    std::cout << "Global no collective cause " + dataset_name << " "
+              << container_name << "<" << type_name << ">"
+              << " (Write): "
+              << dataset.template global_no_collective_cause<std::string>()
+              << std::endl;
   }
 
   {
@@ -292,42 +282,29 @@ write_test(HDF5::Group &              root_group,
                                           29}; // fifth point
     std::vector<Number>  data_c        = {2, 3, 5, 6, 3};
 
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        dataset.write_selection(data_a, coordinates_a);
-      }
-    else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
-      {
-        dataset.write_selection(data_b, coordinates_b);
-      }
-    else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 2)
-      {
-        dataset.write_selection(data_c, coordinates_c);
-      }
-    else
-      {
-        dataset.template write_none<Number>();
-      }
+    dataset.write_selection(data_a, coordinates_a);
+    dataset.write_selection(data_b, coordinates_b);
+    dataset.write_selection(data_c, coordinates_c);
     deallog << "Sum " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Write): "
             << container_sum(data_a) + container_sum(data_b) +
                  container_sum(data_c)
             << std::endl;
-    pcout << "IO mode " + dataset_name << " " << container_name << "<"
-          << type_name << ">"
-          << " (Write): " << dataset.template io_mode<std::string>()
-          << std::endl;
-    pcout << "Local no collective cause " + dataset_name << " "
-          << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template local_no_collective_cause<std::string>()
-          << std::endl;
-    pcout << "Global no collective cause " + dataset_name << " "
-          << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template global_no_collective_cause<std::string>()
-          << std::endl;
+    std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Write): " << dataset.template io_mode<std::string>()
+              << std::endl;
+    std::cout << "Local no collective cause " + dataset_name << " "
+              << container_name << "<" << type_name << ">"
+              << " (Write): "
+              << dataset.template local_no_collective_cause<std::string>()
+              << std::endl;
+    std::cout << "Global no collective cause " + dataset_name << " "
+              << container_name << "<" << type_name << ">"
+              << " (Write): "
+              << dataset.template global_no_collective_cause<std::string>()
+              << std::endl;
   }
 
   {
@@ -350,14 +327,7 @@ write_test(HDF5::Group &              root_group,
                 << " (Write): " << dataset.rank() << std::endl;
         auto data = initialize_container<Container, double>(dataset_dimensions);
         assign_data(data);
-        if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-          {
-            dataset.write(data);
-          }
-        else
-          {
-            dataset.template write_none<Number>();
-          }
+        dataset.write(data);
         deallog << "Sum " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Write): " << container_sum(data) << std::endl;
@@ -370,31 +340,24 @@ write_test(HDF5::Group &              root_group,
         dataset.check_io_mode(true);
         auto data = initialize_container<Container, float>(dataset_dimensions);
         assign_data(data);
-        if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-          {
-            dataset.write(data);
-          }
-        else
-          {
-            dataset.template write_none<Number>();
-          }
+        dataset.write(data);
         deallog << "Sum " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Write): " << container_sum(data) << std::endl;
-        pcout << "IO mode " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Write): " << dataset.template io_mode<std::string>()
-              << std::endl;
-        pcout << "Local no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Write): "
-              << dataset.template local_no_collective_cause<std::string>()
-              << std::endl;
-        pcout << "Global no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Write): "
-              << dataset.template global_no_collective_cause<std::string>()
-              << std::endl;
+        std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                  << type_name << ">"
+                  << " (Write): " << dataset.template io_mode<std::string>()
+                  << std::endl;
+        std::cout << "Local no collective cause " + dataset_name << " "
+                  << container_name << "<" << type_name << ">"
+                  << " (Write): "
+                  << dataset.template local_no_collective_cause<std::string>()
+                  << std::endl;
+        std::cout << "Global no collective cause " + dataset_name << " "
+                  << container_name << "<" << type_name << ">"
+                  << " (Write): "
+                  << dataset.template global_no_collective_cause<std::string>()
+                  << std::endl;
       }
   }
 
@@ -422,22 +385,12 @@ write_test(HDF5::Group &              root_group,
     auto                       hyperslab_data_b =
       initialize_container<Container, Number>(hyperslab_dimensions_b);
     assign_data(hyperslab_data_b);
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        dataset.write_hyperslab(hyperslab_data_a,
-                                hyperslab_offset_a,
-                                hyperslab_dimensions_a);
-      }
-    else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
-      {
-        dataset.write_hyperslab(hyperslab_data_b,
-                                hyperslab_offset_b,
-                                hyperslab_dimensions_b);
-      }
-    else
-      {
-        dataset.template write_none<Number>();
-      }
+    dataset.write_hyperslab(hyperslab_data_a,
+                            hyperslab_offset_a,
+                            hyperslab_dimensions_a);
+    dataset.write_hyperslab(hyperslab_data_b,
+                            hyperslab_offset_b,
+                            hyperslab_dimensions_b);
 
     // Now let's do a second write operation to the dataset using the complex
     // version of write_hyperslab()
@@ -449,19 +402,12 @@ write_test(HDF5::Group &              root_group,
     auto                       hyperslab_data_c =
       initialize_container<Container, Number>(hyperslab_dimensions_c);
     assign_data(hyperslab_data_c);
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        dataset.write_hyperslab(hyperslab_data_c,
-                                hyperslab_dimensions_c,
-                                hyperslab_offset_c,
-                                hyperslab_stride_c,
-                                hyperslab_count_c,
-                                hyperslab_block_c);
-      }
-    else
-      {
-        dataset.template write_none<Number>();
-      }
+    dataset.write_hyperslab(hyperslab_data_c,
+                            hyperslab_dimensions_c,
+                            hyperslab_offset_c,
+                            hyperslab_stride_c,
+                            hyperslab_count_c,
+                            hyperslab_block_c);
 
     deallog << "Sum " + dataset_name << " " << container_name << "<"
             << type_name << ">"
@@ -476,20 +422,30 @@ write_test(HDF5::Group &              root_group,
     deallog << "Hyperslab_b sum " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Write): " << container_sum(hyperslab_data_b) << std::endl;
-    pcout << "IO mode " + dataset_name << " " << container_name << "<"
-          << type_name << ">"
-          << " (Write): " << dataset.template io_mode<std::string>()
-          << std::endl;
-    pcout << "Local no collective cause " + dataset_name << " "
-          << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template local_no_collective_cause<std::string>()
-          << std::endl;
-    pcout << "Global no collective cause " + dataset_name << " "
-          << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template global_no_collective_cause<std::string>()
-          << std::endl;
+    std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Write): " << dataset.template io_mode<std::string>()
+              << std::endl;
+    std::cout << "Local no collective cause " + dataset_name << " "
+              << container_name << "<" << type_name << ">"
+              << " (Write): "
+              << dataset.template local_no_collective_cause<std::string>()
+              << std::endl;
+    std::cout << "Global no collective cause " + dataset_name << " "
+              << container_name << "<" << type_name << ">"
+              << " (Write): "
+              << dataset.template global_no_collective_cause<std::string>()
+              << std::endl;
+  }
+
+  {
+    std::string dataset_name("dataset_5");
+    auto data = initialize_container<Container, Number>(dataset_dimensions);
+    assign_data(data);
+    group.write_dataset(dataset_name, data);
+    deallog << "Sum " + dataset_name << " " << container_name << "<"
+            << type_name << ">"
+            << " (Write): " << container_sum(data) << std::endl;
   }
 }
 
@@ -498,9 +454,7 @@ write_test(HDF5::Group &              root_group,
 // copy of the group
 template <template <class...> class Container, typename Number>
 void
-read_test(HDF5::Group        root_group,
-          MPI_Comm           mpi_communicator,
-          ConditionalOStream pcout)
+read_test(HDF5::Group root_group)
 {
   {
     std::string container_name;
@@ -562,20 +516,20 @@ read_test(HDF5::Group        root_group,
       deallog << "Sum " + dataset_name << " " << container_name << "<"
               << type_name << ">"
               << " (Read): " << container_sum(data) << std::endl;
-      pcout << "IO mode " + dataset_name << " " << container_name << "<"
-            << type_name << ">"
-            << " (Read): " << dataset.template io_mode<std::string>()
-            << std::endl;
-      pcout << "Local no collective cause " + dataset_name << " "
-            << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template local_no_collective_cause<std::string>()
-            << std::endl;
-      pcout << "Global no collective cause " + dataset_name << " "
-            << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template global_no_collective_cause<std::string>()
-            << std::endl;
+      std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                << type_name << ">"
+                << " (Read): " << dataset.template io_mode<std::string>()
+                << std::endl;
+      std::cout << "Local no collective cause " + dataset_name << " "
+                << container_name << "<" << type_name << ">"
+                << " (Read): "
+                << dataset.template local_no_collective_cause<std::string>()
+                << std::endl;
+      std::cout << "Global no collective cause " + dataset_name << " "
+                << container_name << "<" << type_name << ">"
+                << " (Read): "
+                << dataset.template global_no_collective_cause<std::string>()
+                << std::endl;
     }
 
     {
@@ -596,20 +550,20 @@ read_test(HDF5::Group        root_group,
         deallog << "Sum " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Read): " << container_sum(data) << std::endl;
-        pcout << "IO mode " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.template io_mode<std::string>()
-              << std::endl;
-        pcout << "Local no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template local_no_collective_cause<std::string>()
-              << std::endl;
-        pcout << "Global no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template global_no_collective_cause<std::string>()
-              << std::endl;
+        std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                  << type_name << ">"
+                  << " (Read): " << dataset.template io_mode<std::string>()
+                  << std::endl;
+        std::cout << "Local no collective cause " + dataset_name << " "
+                  << container_name << "<" << type_name << ">"
+                  << " (Read): "
+                  << dataset.template local_no_collective_cause<std::string>()
+                  << std::endl;
+        std::cout << "Global no collective cause " + dataset_name << " "
+                  << container_name << "<" << type_name << ">"
+                  << " (Read): "
+                  << dataset.template global_no_collective_cause<std::string>()
+                  << std::endl;
       }
 
       {
@@ -626,20 +580,20 @@ read_test(HDF5::Group        root_group,
                 << type_name << ">"
                 << " (Read): " << data_a[0] << ", " << data_a[1] << ", "
                 << data_a[2] << ", " << data_a[3] << std::endl;
-        pcout << "IO mode " + dataset_name << " " << container_name << "<"
-              << type_name << ">"
-              << " (Read): " << dataset.template io_mode<std::string>()
-              << std::endl;
-        pcout << "Local no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template local_no_collective_cause<std::string>()
-              << std::endl;
-        pcout << "Global no collective cause " + dataset_name << " "
-              << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template global_no_collective_cause<std::string>()
-              << std::endl;
+        std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                  << type_name << ">"
+                  << " (Read): " << dataset.template io_mode<std::string>()
+                  << std::endl;
+        std::cout << "Local no collective cause " + dataset_name << " "
+                  << container_name << "<" << type_name << ">"
+                  << " (Read): "
+                  << dataset.template local_no_collective_cause<std::string>()
+                  << std::endl;
+        std::cout << "Global no collective cause " + dataset_name << " "
+                  << container_name << "<" << type_name << ">"
+                  << " (Read): "
+                  << dataset.template global_no_collective_cause<std::string>()
+                  << std::endl;
       }
     }
 
@@ -665,20 +619,21 @@ read_test(HDF5::Group        root_group,
           deallog << "Sum " + dataset_name << " " << container_name << "<"
                   << type_name << ">"
                   << " (Read): " << container_sum(data) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
+          std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                    << type_name << ">"
+                    << " (Read): " << dataset.template io_mode<std::string>()
+                    << std::endl;
+          std::cout << "Local no collective cause " + dataset_name << " "
+                    << container_name << "<" << type_name << ">"
+                    << " (Read): "
+                    << dataset.template local_no_collective_cause<std::string>()
+                    << std::endl;
+          std::cout
+            << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
         }
 
       {
@@ -699,20 +654,21 @@ read_test(HDF5::Group        root_group,
           deallog << "Sum " + dataset_name << " " << container_name << "<"
                   << type_name << ">"
                   << " (Read): " << container_sum(data) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
+          std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                    << type_name << ">"
+                    << " (Read): " << dataset.template io_mode<std::string>()
+                    << std::endl;
+          std::cout << "Local no collective cause " + dataset_name << " "
+                    << container_name << "<" << type_name << ">"
+                    << " (Read): "
+                    << dataset.template local_no_collective_cause<std::string>()
+                    << std::endl;
+          std::cout
+            << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
         }
 
         {
@@ -724,178 +680,136 @@ read_test(HDF5::Group        root_group,
           deallog << "Hyperslab_a sum " + dataset_name << " " << container_name
                   << "<" << type_name << ">"
                   << " (Read): " << container_sum(data_a) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
-                << type_name << ">"
-                << " (Read): " << dataset.template io_mode<std::string>()
-                << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template local_no_collective_cause<std::string>()
-                << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
-                << container_name << "<" << type_name << ">"
-                << " (Read): "
-                << dataset.template global_no_collective_cause<std::string>()
-                << std::endl;
+          std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                    << type_name << ">"
+                    << " (Read): " << dataset.template io_mode<std::string>()
+                    << std::endl;
+          std::cout << "Local no collective cause " + dataset_name << " "
+                    << container_name << "<" << type_name << ">"
+                    << " (Read): "
+                    << dataset.template local_no_collective_cause<std::string>()
+                    << std::endl;
+          std::cout
+            << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
         }
 
         {
           const std::vector<hsize_t> hyperslab_offset_b = {2, 0};
           const std::vector<hsize_t> hyperslab_count_b  = {1, 4};
           Container<Number>          data_b;
-          // This loop is used to test read_none(). At the end of the loop every
-          // MPI process will have read data_b
-          for (unsigned int mpi_idx = 0;
-               mpi_idx < Utilities::MPI::n_mpi_processes(mpi_communicator);
-               ++mpi_idx)
-            {
-              if (Utilities::MPI::this_mpi_process(mpi_communicator) == mpi_idx)
-                {
-                  data_b = dataset.read_hyperslab<Container, Number>(
-                    hyperslab_offset_b, hyperslab_count_b);
-                }
-              else
-                {
-                  dataset.read_none<Number>();
-                }
-            }
+          data_b = dataset.read_hyperslab<Container, Number>(hyperslab_offset_b,
+                                                             hyperslab_count_b);
           deallog << "Hyperslab_b sum " + dataset_name << " " << container_name
                   << "<" << type_name << ">"
                   << " (Read): " << container_sum(data_b) << std::endl;
-          pcout << "IO mode " + dataset_name << " " << container_name << "<"
+          std::cout << "IO mode " + dataset_name << " " << container_name << "<"
+                    << type_name << ">"
+                    << " (Read): " << dataset.template io_mode<std::string>()
+                    << std::endl;
+          std::cout << "Local no collective cause " + dataset_name << " "
+                    << container_name << "<" << type_name << ">"
+                    << " (Read): "
+                    << dataset.template local_no_collective_cause<std::string>()
+                    << std::endl;
+          std::cout
+            << "Global no collective cause " + dataset_name << " "
+            << container_name << "<" << type_name << ">"
+            << " (Read): "
+            << dataset.template global_no_collective_cause<std::string>()
+            << std::endl;
+        }
+      }
+    }
+
+    {
+      std::string dataset_name("dataset_5");
+      auto        dataset = group.dataset(dataset_name);
+      dataset.check_io_mode(true);
+      deallog << "Dimensions " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Read): " << dataset.dimensions() << std::endl;
+      deallog << "Size " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Read): " << dataset.size() << std::endl;
+      deallog << "Rank " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Read): " << dataset.rank() << std::endl;
+      Container<Number> data = dataset.read<Container, Number>();
+      deallog << "Sum " + dataset_name << " " << container_name << "<"
+              << type_name << ">"
+              << " (Read): " << container_sum(data) << std::endl;
+      std::cout << "IO mode " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Read): " << dataset.template io_mode<std::string>()
                 << std::endl;
-          pcout << "Local no collective cause " + dataset_name << " "
+      std::cout << "Local no collective cause " + dataset_name << " "
                 << container_name << "<" << type_name << ">"
                 << " (Read): "
                 << dataset.template local_no_collective_cause<std::string>()
                 << std::endl;
-          pcout << "Global no collective cause " + dataset_name << " "
+      std::cout << "Global no collective cause " + dataset_name << " "
                 << container_name << "<" << type_name << ">"
                 << " (Read): "
                 << dataset.template global_no_collective_cause<std::string>()
                 << std::endl;
-        }
-      }
     }
   }
 }
 
 
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
-      MPI_Comm mpi_communicator = MPI_COMM_WORLD;
-
-      ConditionalOStream pcout(
-        std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0);
-
       std::string                filename           = "test.h5";
       const std::vector<hsize_t> dataset_dimensions = {50, 30};
 
       {
-        HDF5::File data_file(filename,
-                             mpi_communicator,
-                             HDF5::File::Mode::create);
+        HDF5::File data_file(filename, HDF5::File::Mode::create);
 
-        write_test<std::vector, float>(data_file,
-                                       dataset_dimensions,
-                                       mpi_communicator,
-                                       pcout);
-        write_test<std::vector, double>(data_file,
-                                        dataset_dimensions,
-                                        mpi_communicator,
-                                        pcout);
+        write_test<std::vector, float>(data_file, dataset_dimensions);
+        write_test<std::vector, double>(data_file, dataset_dimensions);
         write_test<std::vector, std::complex<float>>(data_file,
-                                                     dataset_dimensions,
-                                                     mpi_communicator,
-                                                     pcout);
+                                                     dataset_dimensions);
         write_test<std::vector, std::complex<double>>(data_file,
-                                                      dataset_dimensions,
-                                                      mpi_communicator,
-                                                      pcout);
-        write_test<std::vector, int>(data_file,
-                                     dataset_dimensions,
-                                     mpi_communicator,
-                                     pcout);
-        write_test<std::vector, unsigned int>(data_file,
-                                              dataset_dimensions,
-                                              mpi_communicator,
-                                              pcout);
-        write_test<FullMatrix, float>(data_file,
-                                      dataset_dimensions,
-                                      mpi_communicator,
-                                      pcout);
-        write_test<FullMatrix, double>(data_file,
-                                       dataset_dimensions,
-                                       mpi_communicator,
-                                       pcout);
+                                                      dataset_dimensions);
+        write_test<std::vector, int>(data_file, dataset_dimensions);
+        write_test<std::vector, unsigned int>(data_file, dataset_dimensions);
+        write_test<FullMatrix, float>(data_file, dataset_dimensions);
+        write_test<FullMatrix, double>(data_file, dataset_dimensions);
         write_test<FullMatrix, std::complex<float>>(data_file,
-                                                    dataset_dimensions,
-                                                    mpi_communicator,
-                                                    pcout);
+                                                    dataset_dimensions);
         write_test<FullMatrix, std::complex<double>>(data_file,
-                                                     dataset_dimensions,
-                                                     mpi_communicator,
-                                                     pcout);
-        write_test<Vector, float>(data_file,
-                                  dataset_dimensions,
-                                  mpi_communicator,
-                                  pcout);
-        write_test<Vector, double>(data_file,
-                                   dataset_dimensions,
-                                   mpi_communicator,
-                                   pcout);
-        write_test<Vector, std::complex<float>>(data_file,
-                                                dataset_dimensions,
-                                                mpi_communicator,
-                                                pcout);
-        write_test<Vector, std::complex<double>>(data_file,
-                                                 dataset_dimensions,
-                                                 mpi_communicator,
-                                                 pcout);
+                                                     dataset_dimensions);
+        write_test<Vector, float>(data_file, dataset_dimensions);
+        write_test<Vector, double>(data_file, dataset_dimensions);
+        write_test<Vector, std::complex<float>>(data_file, dataset_dimensions);
+        write_test<Vector, std::complex<double>>(data_file, dataset_dimensions);
       }
 
       {
-        HDF5::File data_file(filename,
-                             mpi_communicator,
-                             HDF5::File::Mode::open);
-        read_test<std::vector, float>(data_file, mpi_communicator, pcout);
-        read_test<std::vector, double>(data_file, mpi_communicator, pcout);
-        read_test<std::vector, std::complex<float>>(data_file,
-                                                    mpi_communicator,
-                                                    pcout);
-        read_test<std::vector, std::complex<double>>(data_file,
-                                                     mpi_communicator,
-                                                     pcout);
-        read_test<std::vector, int>(data_file, mpi_communicator, pcout);
-        read_test<std::vector, unsigned int>(data_file,
-                                             mpi_communicator,
-                                             pcout);
-        read_test<FullMatrix, float>(data_file, mpi_communicator, pcout);
-        read_test<FullMatrix, double>(data_file, mpi_communicator, pcout);
-        read_test<FullMatrix, std::complex<float>>(data_file,
-                                                   mpi_communicator,
-                                                   pcout);
-        read_test<FullMatrix, std::complex<double>>(data_file,
-                                                    mpi_communicator,
-                                                    pcout);
-        read_test<Vector, float>(data_file, mpi_communicator, pcout);
-        read_test<Vector, double>(data_file, mpi_communicator, pcout);
-        read_test<Vector, std::complex<float>>(data_file,
-                                               mpi_communicator,
-                                               pcout);
-        read_test<Vector, std::complex<double>>(data_file,
-                                                mpi_communicator,
-                                                pcout);
+        HDF5::File data_file(filename, HDF5::File::Mode::open);
+        read_test<std::vector, float>(data_file);
+        read_test<std::vector, double>(data_file);
+        read_test<std::vector, std::complex<float>>(data_file);
+        read_test<std::vector, std::complex<double>>(data_file);
+        read_test<std::vector, int>(data_file);
+        read_test<std::vector, unsigned int>(data_file);
+        read_test<FullMatrix, float>(data_file);
+        read_test<FullMatrix, double>(data_file);
+        read_test<FullMatrix, std::complex<float>>(data_file);
+        read_test<FullMatrix, std::complex<double>>(data_file);
+        read_test<Vector, float>(data_file);
+        read_test<Vector, double>(data_file);
+        read_test<Vector, std::complex<float>>(data_file);
+        read_test<Vector, std::complex<double>>(data_file);
       }
     }
   catch (std::exception &exc)
