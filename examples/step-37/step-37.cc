@@ -1127,10 +1127,18 @@ namespace Step37
 
   // Here is the data output, which is a simplified version of step-5. We use
   // the standard VTU (= compressed VTK) output for each grid produced in the
-  // refinement process. We disable the output when the mesh gets too
-  // large. Note that a variant of program has been run on hundreds of
-  // thousands MPI ranks with as many as 100 billion grid cells, which is not
-  // directly accessible to classical visualization tools.
+  // refinement process. In addition, we use a compression algorithm that is
+  // optimized for speed rather than disk usage. The default setting (which
+  // optimizes for disk usage) makes saving the output take about 4 times as
+  // long as running the linear solver, while setting
+  // DataOutBase::VtkFlags::compression_level to
+  // DataOutBase::VtkFlags::best_speed lowers this to only one fourth the time
+  // of the linear solve.
+  //
+  // We disable the output when the mesh gets too large. Note that a variant
+  // of program has been run on hundreds of thousands MPI ranks with as many
+  // as 100 billion grid cells, which is not directly accessible to classical
+  // visualization tools.
   template <int dim>
   void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
@@ -1148,6 +1156,9 @@ namespace Step37
       "solution-" + std::to_string(cycle) + "." +
       std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
       ".vtu");
+    DataOutBase::VtkFlags flags;
+    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    data_out.set_flags(flags);
     data_out.write_vtu(output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
