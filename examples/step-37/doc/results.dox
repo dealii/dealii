@@ -483,7 +483,7 @@ constrained by Dirichlet conditions.
 In the implementation in deal.II, the integrals $(\nabla \varphi_i,\nabla \varphi_j)_\Omega$
 on the right hand side are already contained in the local matrix contributions
 we assemble on each cell. When using
-ConstraintMatrix::distributed_local_to_global() as first described in the
+AffineConstraints::distributed_local_to_global() as first described in the
 step-6 and step-7 tutorial programs, we can account for the contribution of
 inhomogeneous constraints <i>j</i> by multiplying the columns <i>j</i> and
 rows <i>i</i> of the local matrix according to the integrals $(\varphi_i,
@@ -507,10 +507,10 @@ unrelated to the real entries.
 In a matrix-free method, we need to take a different approach, since the @p
 LaplaceOperator class represents the matrix-vector product of a
 <b>homogeneous</b> operator (the left-hand side of the last formula).  It does
-not matter whether the ConstraintMatrix passed to the MatrixFree::reinit()
-contains inhomogeneous constraints or not, the MatrixFree::cell_loop() call
-will only resolve the homogeneous part of the constraints as long as it
-represents a <b>linear</b> operator.
+not matter whether the AffineConstraints object passed to the
+MatrixFree::reinit() contains inhomogeneous constraints or not, the
+MatrixFree::cell_loop() call will only resolve the homogeneous part of the
+constraints as long as it represents a <b>linear</b> operator.
 
 In our matrix-free code, the right hand side computation where the
 contribution of inhomogeneous conditions ends up is completely decoupled from
@@ -530,7 +530,7 @@ where we only set the Dirichlet values:
       solution(it->first) = it->second;
 @endcode
 or, equivalently, if we already had filled the inhomogeneous constraints into
-a constraint matrix object,
+an AffineConstraints object,
 @code
   solution = 0;
   constraints.distribute(solution);
@@ -613,13 +613,13 @@ assemble_residual() that computes the (weak) form of the residual, whereas the
 @p LaplaceOperator::apply_add() function would get the linearization of the
 residual with respect to the solution variable.
 
-<h5> Use LaplaceOperator with a second ConstraintMatrix without Dirichlet conditions </h5>
+<h5> Use LaplaceOperator with a second AffineConstraints object without Dirichlet conditions </h5>
 
 A second alternative to get the right hand side that re-uses the
 @p LaplaceOperator::apply_add() function is to instead add a second constraint
 matrix that skips Dirichlet constraints on the read operation. To do this, we
 initialize a MatrixFree object in a more extended way with two different
-DoFHandler / ConstraintMatrix combinations. The 0-th component includes
+DoFHandler-AffineConstraints combinations. The 0-th component includes
 Dirichlet conditions for solving the linear system, whereas 1-st component
 does read also from Dirichlet-constrained degrees of freedom for the right
 hand side assembly:
@@ -680,7 +680,7 @@ void LaplaceProblem<dim>::assemble_rhs ()
 }
 @endcode
 
-Instead of adding a second DoFHandler / ConstraintMatrix pair to the same
+Instead of adding a second DoFHandler-AffineConstraints pair to the same
 MatrixFree::reinit() call, one could of course also construct an independent
 MatrixFree object that feeds the second @p LaplaceOperator instance, see also
 the discussion in MatrixFreeOperators::Base.
