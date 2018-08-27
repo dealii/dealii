@@ -1584,6 +1584,21 @@ namespace FETools
     template <int dim, int spacedim>
     void
     reinit_distributed(const DoFHandler<dim, spacedim> &      dh,
+                       LinearAlgebra::TpetraWrappers::Vector &vector)
+    {
+      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
+        dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> *>(
+          &dh.get_triangulation());
+      Assert(parallel_tria != nullptr, ExcNotImplemented());
+
+      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
+      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+    }
+
+    template <int dim, int spacedim>
+    void
+    reinit_distributed(const DoFHandler<dim, spacedim> &      dh,
                        LinearAlgebra::EpetraWrappers::Vector &vector)
     {
       const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =

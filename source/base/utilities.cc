@@ -979,6 +979,20 @@ namespace Utilities
 
 
 
+    const Teuchos::RCP<const Teuchos::Comm<int>> &
+    tpetra_comm_self()
+    {
+#  ifdef DEAL_II_WITH_MPI
+      static auto communicator = Teuchos::RCP<const Teuchos::Comm<int>>(
+        new Teuchos::MpiComm<int>(MPI_COMM_SELF));
+#  else
+      static auto communicator =
+        Teuchos::RCP<const Teuchos::Comm<int>>(new Teuchos::Comm<int>());
+#  endif
+
+      return communicator;
+    }
+
     const Epetra_Comm &
     comm_self()
     {

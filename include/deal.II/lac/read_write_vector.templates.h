@@ -34,7 +34,6 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
-#  include <deal.II/lac/trilinos_epetra_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
 #  include <Epetra_Import.h>
@@ -510,6 +509,93 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
+    const Tpetra::Vector<> &vector,
+    const IndexSet &        source_elements,
+    VectorOperation::values operation,
+    const MPI_Comm &        mpi_comm,
+    const std::shared_ptr<const CommunicationPatternBase>
+      &communication_pattern)
+  {
+    std::shared_ptr<const TpetraWrappers::CommunicationPattern>
+      tpetra_comm_pattern;
+
+    // If no communication pattern is given, create one. Otherwise, use the one
+    // given.
+    if (communication_pattern == nullptr)
+      {
+        // The first time import is called, we create a communication pattern.
+        // Check if the communication pattern already exists and if it can be
+        // reused.
+        if ((source_elements.size() == source_stored_elements.size()) &&
+            (source_elements == source_stored_elements))
+          {
+            tpetra_comm_pattern = std::dynamic_pointer_cast<
+              const TpetraWrappers::CommunicationPattern>(comm_pattern);
+            if (tpetra_comm_pattern == nullptr)
+              tpetra_comm_pattern =
+                std::make_shared<const TpetraWrappers::CommunicationPattern>(
+                  create_tpetra_comm_pattern(source_elements, mpi_comm));
+          }
+        else
+          tpetra_comm_pattern =
+            std::make_shared<const TpetraWrappers::CommunicationPattern>(
+              create_tpetra_comm_pattern(source_elements, mpi_comm));
+      }
+    else
+      {
+        tpetra_comm_pattern =
+          std::dynamic_pointer_cast<const TpetraWrappers::CommunicationPattern>(
+            communication_pattern);
+        AssertThrow(tpetra_comm_pattern != nullptr,
+                    ExcMessage(
+                      std::string("The communication pattern is not of type ") +
+                      "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
+      }
+
+    Tpetra::Export<> tpetra_export(tpetra_comm_pattern->get_tpetra_export());
+
+    Tpetra::Vector<> target_vector(tpetra_export.getSourceMap());
+    target_vector.doImport(vector, tpetra_export, Tpetra::REPLACE);
+
+    const auto *new_values = target_vector.getData().get();
+    const auto  size       = target_vector.getLocalLength();
+
+    using size_type = std::decay<decltype(size)>::type;
+
+    Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
+    AssertDimension(size, stored_elements.n_elements());
+
+    if (operation == VectorOperation::insert)
+      {
+        for (size_type i = 0; i < size; ++i)
+          values[i] = new_values[i];
+      }
+    else if (operation == VectorOperation::add)
+      {
+        for (size_type i = 0; i < size; ++i)
+          values[i] += new_values[i];
+      }
+    else if (operation == VectorOperation::min)
+      {
+        for (size_type i = 0; i < size; ++i)
+          if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+            values[i] = new_values[i];
+      }
+    else if (operation == VectorOperation::max)
+      {
+        for (size_type i = 0; i < size; ++i)
+          if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+            values[i] = new_values[i];
+      }
+    else
+      AssertThrow(false, ExcNotImplemented());
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
     const Epetra_MultiVector &multivector,
     const IndexSet &          source_elements,
     VectorOperation::values   operation,
@@ -643,6 +729,23 @@ namespace LinearAlgebra
       !trilinos_vec.has_ghost_elements(),
       ExcMessage(
         "Import() from TrilinosWrappers::MPI::Vector with ghost entries is not supported!"));
+    import(trilinos_vec.trilinos_vector(),
+           trilinos_vec.locally_owned_elements(),
+           operation,
+           trilinos_vec.get_mpi_communicator(),
+           communication_pattern);
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const LinearAlgebra::TpetraWrappers::Vector &trilinos_vec,
+    VectorOperation::values                      operation,
+    const std::shared_ptr<const CommunicationPatternBase>
+      &communication_pattern)
+  {
     import(trilinos_vec.trilinos_vector(),
            trilinos_vec.locally_owned_elements(),
            operation,
@@ -793,6 +896,22 @@ namespace LinearAlgebra
 
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+  template <typename Number>
+  TpetraWrappers::CommunicationPattern
+  ReadWriteVector<Number>::create_tpetra_comm_pattern(
+    const IndexSet &source_index_set,
+    const MPI_Comm &mpi_comm)
+  {
+    source_stored_elements = source_index_set;
+    TpetraWrappers::CommunicationPattern epetra_comm_pattern(
+      source_stored_elements, stored_elements, mpi_comm);
+    comm_pattern = std::make_shared<TpetraWrappers::CommunicationPattern>(
+      source_stored_elements, stored_elements, mpi_comm);
+
+    return epetra_comm_pattern;
+  }
+
+
   template <typename Number>
   EpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_epetra_comm_pattern(

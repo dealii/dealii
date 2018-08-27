@@ -103,6 +103,36 @@ namespace TrilinosWrappers
     {
       return V.trilinos_vector()[0] + V.trilinos_vector().MyLength();
     }
+
+    template <>
+    double *
+    begin(LinearAlgebra::TpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector().getDataNonConst().get();
+    }
+
+    template <>
+    const double *
+    begin(const LinearAlgebra::TpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector().getData().get();
+    }
+
+    template <>
+    double *
+    end(LinearAlgebra::TpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector().getDataNonConst().get() +
+             V.trilinos_vector().getLocalLength();
+    }
+
+    template <>
+    const double *
+    end(const LinearAlgebra::TpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector().getData().get() +
+             V.trilinos_vector().getLocalLength();
+    }
 #  endif
   } // namespace internal
 
@@ -3456,6 +3486,11 @@ namespace TrilinosWrappers
 #  ifdef DEAL_II_WITH_MPI
   template void
   SparseMatrix::vmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector &) const;
+
+  template void
+  SparseMatrix::vmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
@@ -3469,6 +3504,11 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
 #  ifdef DEAL_II_WITH_MPI
+  template void
+  SparseMatrix::Tvmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector &) const;
+
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
@@ -3486,6 +3526,11 @@ namespace TrilinosWrappers
 #  ifdef DEAL_II_WITH_MPI
   template void
   SparseMatrix::vmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector &) const;
+
+  template void
+  SparseMatrix::vmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
@@ -3499,6 +3544,11 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
 #  ifdef DEAL_II_WITH_MPI
+  template void
+  SparseMatrix::Tvmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector &) const;
+
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,

@@ -520,6 +520,72 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+Tpetra::Map<>
+IndexSet::make_tpetra_map(const MPI_Comm &communicator,
+                          const bool      overlapping) const
+{
+  compress();
+  (void)communicator;
+
+#  ifdef DEBUG
+  if (!overlapping)
+    {
+      const size_type n_global_elements =
+        Utilities::MPI::sum(n_elements(), communicator);
+      Assert(n_global_elements == size(),
+             ExcMessage("You are trying to create an Tpetra::Map object "
+                        "that partitions elements of an index set "
+                        "between processors. However, the union of the "
+                        "index sets on different processors does not "
+                        "contain all indices exactly once: the sum of "
+                        "the number of entries the various processors "
+                        "want to store locally is " +
+                        Utilities::to_string(n_global_elements) +
+                        " whereas the total size of the object to be "
+                        "allocated is " +
+                        Utilities::to_string(size()) +
+                        ". In other words, there are "
+                        "either indices that are not spoken for "
+                        "by any processor, or there are indices that are "
+                        "claimed by multiple processors."));
+    }
+#  endif
+
+  // Find out if the IndexSet is ascending and 1:1. This corresponds to a
+  // linear Tpetra::Map. Overlapping IndexSets are never 1:1.
+  const bool linear =
+    overlapping ? false : is_ascending_and_one_to_one(communicator);
+  if (linear)
+    return Tpetra::Map<>(size(),
+                         n_elements(),
+                         0,
+#  ifdef DEAL_II_WITH_MPI
+                         Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
+#  else
+                         Teuchos::rcp(new Teuchos::Comm<int>())
+#  endif
+    );
+  else
+    {
+      std::vector<size_type> indices;
+      fill_index_vector(indices);
+      std::vector<int> int_indices(indices.size());
+      std::copy(indices.begin(), indices.end(), int_indices.begin());
+      return Tpetra::Map<>(size(),
+                           (n_elements() > 0 ? int_indices.data() : nullptr),
+                           n_elements(),
+                           0,
+#  ifdef DEAL_II_WITH_MPI
+                           Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
+#  else
+                           Teuchos::rcp(new Teuchos::Comm<int>())
+#  endif
+      );
+    }
+}
+
+
+
 Epetra_Map
 IndexSet::make_trilinos_map(const MPI_Comm &communicator,
                             const bool      overlapping) const

@@ -35,6 +35,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
+#  include <deal.II/lac/trilinos_tpetra_vector.h>
 
 #  include <Epetra_MultiVector.h>
 
@@ -336,6 +337,21 @@ namespace LinearAlgebra
 #  ifdef DEAL_II_WITH_MPI
     /**
      * Imports all the elements present in the vector's IndexSet from the input
+     * vector @p tpetra_vec. VectorOperation::values @p operation is used to
+     * decide if the elements in @p V should be added to the current vector or
+     * replace the current elements. The last parameter can be used if the same
+     * communication pattern is used multiple times. This can be used to improve
+     * performance.
+     */
+    void
+    import(const TpetraWrappers::Vector &tpetra_vec,
+           VectorOperation::values       operation,
+           const std::shared_ptr<const CommunicationPatternBase>
+             &communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>());
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the input
      * vector @p epetra_vec. VectorOperation::values @p operation is used to
      * decide if the elements in @p V should be added to the current vector or
      * replace the current elements. The last parameter can be used if the same
@@ -595,6 +611,19 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_TRILINOS
     /**
      * Import all the elements present in the vector's IndexSet from the input
+     * vector @p tpetra_vector. This is an helper function and it should not be
+     * used directly.
+     */
+    void
+    import(const Tpetra::Vector<> &tpetra_vector,
+           const IndexSet &        locally_owned_elements,
+           VectorOperation::values operation,
+           const MPI_Comm &        mpi_comm,
+           const std::shared_ptr<const CommunicationPatternBase>
+             &communication_pattern);
+
+    /**
+     * Import all the elements present in the vector's IndexSet from the input
      * vector @p multivector. This is an helper function and it should not be
      * used directly.
      */
@@ -627,7 +656,15 @@ namespace LinearAlgebra
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
     /**
-     * Return a EpetraWrappers::Communication pattern and store it for future
+     * Return a TpetraWrappers::CommunicationPattern and store it for future
+     * use.
+     */
+    TpetraWrappers::CommunicationPattern
+    create_tpetra_comm_pattern(const IndexSet &source_index_set,
+                               const MPI_Comm &mpi_comm);
+
+    /**
+     * Return a EpetraWrappers::CommunicationPattern and store it for future
      * use.
      */
     EpetraWrappers::CommunicationPattern

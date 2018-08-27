@@ -888,6 +888,9 @@ namespace Utilities
     const Epetra_Comm &
     comm_self();
 
+    const Teuchos::RCP<const Teuchos::Comm<int>> &
+    tpetra_comm_self();
+
     /**
      * Given a communicator, duplicate it. If the given communicator is
      * serial, that means to just return a copy of itself. On the other hand,
