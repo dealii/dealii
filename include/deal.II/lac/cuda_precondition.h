@@ -75,7 +75,7 @@ namespace CUDAWrappers
     {
       /**
        * Constructor. cuSPARSE allows to compute and use level information.
-       * According to the documentation it is this might improve performance.
+       * According to the documentation this might improve performance.
        * It is suggested to try both options.
        */
       AdditionalData(bool use_level_analysis = true);
@@ -140,7 +140,7 @@ namespace CUDAWrappers
            const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
-     *  Return the dimension of the codomain (or range) space. Note that the
+     * Return the dimension of the codomain (or range) space. Note that the
      * matrix is square and has dimension $m \times m$.
      *
      * @note This function should only be called if the preconditioner has been
@@ -150,8 +150,8 @@ namespace CUDAWrappers
     m() const;
 
     /**
-     *  Return the dimension of the codomain (or range) space. Note that the
-     * matrix is square and has dimension $m \times m$.
+     * Return the dimension of the codomain (or range) space. Note that the
+     * matrix is square and has dimension $n \times n$.
      *
      * @note This function should only be called if the preconditioner has been
      * initialized.
@@ -220,7 +220,8 @@ namespace CUDAWrappers
     std::unique_ptr<Number[], void (*)(Number *)> tmp_dev;
 
     /**
-     *
+     * Pointer to an internal buffer (on the device) that is used for
+     * computing the decomposition.
      */
     std::unique_ptr<void, void (*)(void *)> buffer_dev;
 
@@ -259,7 +260,7 @@ namespace CUDAWrappers
 
   /**
    * This class implements an incomplete LU factorization preconditioner for
-   * @em symmetric CUDAWrappers::SparseMatrix matrices.
+   * CUDAWrappers::SparseMatrix matrices.
    *
    * The implementation closely follows the one documented in the cuSPARSE
    * documentation
@@ -346,15 +347,14 @@ namespace CUDAWrappers
           const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
-     * Apply the preconditioner. Since the preconditioner is symmetric, this
-     * is the same as vmult().
+     * Apply the transposed preconditioner. Not yet implemented.
      */
     void
     Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
            const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
-     *  Return the dimension of the codomain (or range) space. Note that the
+     * Return the dimension of the codomain (or range) space. Note that the
      * matrix is square and has dimension $m \times m$.
      *
      * @note This function should only be called if the preconditioner has been
@@ -364,8 +364,8 @@ namespace CUDAWrappers
     m() const;
 
     /**
-     *  Return the dimension of the codomain (or range) space. Note that the
-     * matrix is square and has dimension $m \times m$.
+     * Return the dimension of the codomain (or range) space. Note that the
+     * matrix is square and has dimension $n \times n$.
      *
      * @note This function should only be called if the preconditioner has been
      * initialized.
@@ -439,7 +439,8 @@ namespace CUDAWrappers
     std::unique_ptr<Number[], void (*)(Number *)> tmp_dev;
 
     /**
-     *
+     * Pointer to an internal buffer (on the device) that is used for
+     * computing the decomposition.
      */
     std::unique_ptr<void, void (*)(void *)> buffer_dev;
 

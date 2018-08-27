@@ -1315,17 +1315,18 @@ namespace CUDAWrappers
     const auto          cusparse_matrix = A.get_cusparse_matrix();
     const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
 
-    // create a copy of the matrix entries
+    // create a copy of the matrix entries since the algorithm works in-place.
     P_val_dev.reset(allocate_device_vector<Number>(n_nonzero_elements));
-    cudaError_t cuda_status            = cudaMemcpy(P_val_dev.get(),
+    cudaError_t cuda_status = cudaMemcpy(P_val_dev.get(),
                                          A_val_dev,
                                          n_nonzero_elements * sizeof(Number),
                                          cudaMemcpyDeviceToDevice);
+
     P_column_index_dev                 = std::get<1>(cusparse_matrix);
     P_row_ptr_dev                      = std::get<2>(cusparse_matrix);
     const cusparseMatDescr_t mat_descr = std::get<3>(cusparse_matrix);
 
-    // initializa an internal buffer we need later on
+    // initialize an internal buffer we need later on
     tmp_dev.reset(allocate_device_vector<Number>(n_rows));
 
     // step 3: query how much memory used in csric02 and csrsv2, and allocate
@@ -1635,17 +1636,18 @@ namespace CUDAWrappers
     const auto          cusparse_matrix = A.get_cusparse_matrix();
     const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
 
-    // create a copy of the matrix entries
+    // create a copy of the matrix entries since the algorithm works in-place.
     P_val_dev.reset(allocate_device_vector<Number>(n_nonzero_elements));
-    cudaError_t cuda_status            = cudaMemcpy(P_val_dev.get(),
+    cudaError_t cuda_status = cudaMemcpy(P_val_dev.get(),
                                          A_val_dev,
                                          n_nonzero_elements * sizeof(Number),
                                          cudaMemcpyDeviceToDevice);
+
     P_column_index_dev                 = std::get<1>(cusparse_matrix);
     P_row_ptr_dev                      = std::get<2>(cusparse_matrix);
     const cusparseMatDescr_t mat_descr = std::get<3>(cusparse_matrix);
 
-    // initializa an internal buffer we need later on
+    // initialize an internal buffer we need later on
     tmp_dev.reset(allocate_device_vector<Number>(n_rows));
 
     // step 3: query how much memory used in csrilu02 and csrsv2, and allocate
