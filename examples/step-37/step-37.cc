@@ -427,7 +427,8 @@ namespace Step37
   // @code
   // src.update_ghost_values();
   // local_apply(*this->data, dst, src, std::make_pair(0U,
-  // data.n_macro_cells())); dst.compress(VectorOperation::add);
+  //                                                   data.n_macro_cells()));
+  // dst.compress(VectorOperation::add);
   // @endcode
   //
   // Here, the two calls update_ghost_values() and compress() perform the data
@@ -1094,9 +1095,9 @@ namespace Step37
 
     constraints.distribute(solution);
 
-    pcout << "Time solve (" << solver_control.last_step()
-          << " iterations)  (CPU/wall) " << time.cpu_time() << "s/"
-          << time.wall_time() << "s\n";
+    pcout << "Time solve (" << solver_control.last_step() << " iterations)"
+          << (solver_control.last_step() < 10 ? "  " : " ") << "(CPU/wall) "
+          << time.cpu_time() << "s/" << time.wall_time() << "s\n";
   }
 
 
@@ -1113,9 +1114,9 @@ namespace Step37
   // DataOutBase::VtkFlags::best_speed lowers this to only one fourth the time
   // of the linear solve.
   //
-  // We disable the output when the mesh gets too large. Note that a variant
-  // of program has been run on hundreds of thousands MPI ranks with as many
-  // as 100 billion grid cells, which is not directly accessible to classical
+  // We disable the output when the mesh gets too large. A variant of this
+  // program has been run on hundreds of thousands MPI ranks with as many as
+  // 100 billion grid cells, which is not directly accessible to classical
   // visualization tools.
   template <int dim>
   void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
