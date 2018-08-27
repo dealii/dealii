@@ -355,9 +355,17 @@ struct RefinementPossibilities
     no_refinement = 0,
 
     /**
-     * Perform isotropic refinement.
+     * Perform isotropic refinement. This implies
+     * refining in all coordinate directions. For the
+     * current general template class -- which is never used
+     * because there are specializations for the 1d, 2d, and 3d
+     * cases --, we simply set this number to a value that has
+     * all bits set. The specializations in
+     * RefinementPossibilities<1>, RefinementPossibilities<2>,
+     * and RefinementPossibilities<3> set the corresponding `enum` element
+     * to more reasonable values.
      */
-    isotropic_refinement = static_cast<std::uint8_t>(-1)
+    isotropic_refinement = 0xFF
   };
 };
 
