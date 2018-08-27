@@ -249,7 +249,7 @@ namespace HDF5
      */
     template <typename T>
     T
-    attr(const std::string attr_name) const;
+    attr(const std::string attr_name);
 
     /**
      * Writes an attribute. T can be float, double, std::complex<float>,
@@ -265,15 +265,35 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_attr(const std::string attr_name, const T value) const;
+    write_attr(const std::string attr_name, const T value);
 
 
     const std::string name;
 
   protected:
+    /**
+     * HDF5 identifier for the objects File, Group and Dataset
+     */
     std::shared_ptr<hid_t> hdf5_reference;
-    // If true use mpi hdf5. If false use serial hdf5.
+
+    /**
+     * If true use parallel HDF5, if false use serial HDF5.
+     */
     const bool mpi;
+
+    /**
+     * Returned value of the last HDF5 C library call.
+     *
+     * The HDF5 calls return a non-negative value if successful; otherwise they
+     * return a negative value.
+     *
+     * Calls such as
+     * [H5DWrite](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write)
+     * use this variable to store the returned value. Other calls such as
+     * [H5Pcreate](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-Create)
+     * don't use this variable to store the returned value.
+     */
+    herr_t ret;
   };
 
   /**
