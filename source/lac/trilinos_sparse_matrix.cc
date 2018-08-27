@@ -31,6 +31,9 @@
 
 #  include <boost/container/small_vector.hpp>
 
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
+#    include <EpetraExt_MatrixMatrix.h>
+#  endif
 #  include <Epetra_Export.h>
 #  include <Teuchos_RCP.hpp>
 #  include <ml_epetra_utils.h>
@@ -2299,177 +2302,24 @@ namespace TrilinosWrappers
             }
         }
 
-      // use ML built-in method for performing
-      // the matrix-matrix product.
-      // create ML operators on top of the
-      // Epetra matrices. if we use a
-      // transposed matrix, let ML know it
-      ML_Comm *comm;
-      ML_Comm_Create(&comm);
-#  ifdef ML_MPI
-      const Epetra_MpiComm *epcomm = dynamic_cast<const Epetra_MpiComm *>(
-        &(inputleft.trilinos_matrix().Comm()));
-      // Get the MPI communicator, as it may not be MPI_COMM_W0RLD, and update
-      // the ML comm object
-      if (epcomm)
-        ML_Comm_Set_UsrComm(comm, epcomm->Comm());
+
+      SparseMatrix tmp_result(transpose_left ?
+                                inputleft.locally_owned_domain_indices() :
+                                inputleft.locally_owned_range_indices(),
+                              inputright.locally_owned_domain_indices(),
+                              inputleft.get_mpi_communicator());
+
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRAEXT
+      EpetraExt::MatrixMatrix::Multiply(inputleft.trilinos_matrix(),
+                                        transpose_left,
+                                        *mod_B,
+                                        false,
+                                        const_cast<Epetra_CrsMatrix &>(
+                                          tmp_result.trilinos_matrix()));
+#  else
+      Assert("false", ExcMessage("This function requires EpetraExt."));
 #  endif
-      ML_Operator *A_ = ML_Operator_Create(comm);
-      ML_Operator *B_ = ML_Operator_Create(comm);
-      ML_Operator *C_ = ML_Operator_Create(comm);
-      SparseMatrix transposed_mat;
-
-      if (transpose_left == false)
-        ML_Operator_WrapEpetraCrsMatrix(const_cast<Epetra_CrsMatrix *>(
-                                          &inputleft.trilinos_matrix()),
-                                        A_,
-                                        false);
-      else
-        {
-          // create transposed matrix
-          SparsityPattern sparsity_transposed(inputleft.domain_partitioner(),
-                                              inputleft.range_partitioner());
-          Assert(inputleft.domain_partitioner().LinearMap() == true,
-                 ExcMessage(
-                   "Matrix must be partitioned contiguously between procs."));
-          for (dealii::types::global_dof_index i = 0;
-               i < inputleft.local_size();
-               ++i)
-            {
-              int num_entries, *indices;
-              inputleft.trilinos_sparsity_pattern().ExtractMyRowView(
-                i, num_entries, indices);
-              Assert(num_entries >= 0, ExcInternalError());
-
-              const auto &    trilinos_matrix = inputleft.trilinos_matrix();
-              const size_type GID =
-                TrilinosWrappers::global_index(trilinos_matrix.RowMap(), i);
-              for (TrilinosWrappers::types::int_type j = 0; j < num_entries;
-                   ++j)
-                sparsity_transposed.add(TrilinosWrappers::global_index(
-                                          trilinos_matrix.ColMap(), indices[j]),
-                                        GID);
-            }
-
-          sparsity_transposed.compress();
-          transposed_mat.reinit(sparsity_transposed);
-          for (dealii::types::global_dof_index i = 0;
-               i < inputleft.local_size();
-               ++i)
-            {
-              int     num_entries, *indices;
-              double *values;
-              inputleft.trilinos_matrix().ExtractMyRowView(i,
-                                                           num_entries,
-                                                           values,
-                                                           indices);
-              Assert(num_entries >= 0, ExcInternalError());
-
-              const auto &    trilinos_matrix = inputleft.trilinos_matrix();
-              const size_type GID =
-                TrilinosWrappers::global_index(trilinos_matrix.RowMap(), i);
-              for (TrilinosWrappers::types::int_type j = 0; j < num_entries;
-                   ++j)
-                transposed_mat.set(TrilinosWrappers::global_index(
-                                     trilinos_matrix.ColMap(), indices[j]),
-                                   GID,
-                                   values[j]);
-            }
-          transposed_mat.compress(VectorOperation::insert);
-          ML_Operator_WrapEpetraCrsMatrix(const_cast<Epetra_CrsMatrix *>(
-                                            &transposed_mat.trilinos_matrix()),
-                                          A_,
-                                          false);
-        }
-      ML_Operator_WrapEpetraCrsMatrix(mod_B.get(), B_, false);
-
-      // We implement the multiplication by
-      // hand in a similar way as is done in
-      // ml/src/Operator/ml_rap.c for a triple
-      // matrix product. This means that the
-      // code is very similar to the one found
-      // in ml/src/Operator/ml_rap.c
-
-      // import data if necessary
-      ML_Operator *                     Btmp, *Ctmp, *Ctmp2, *tptr;
-      ML_CommInfoOP *                   getrow_comm;
-      int                               max_per_proc;
-      TrilinosWrappers::types::int_type N_input_vector = B_->invec_leng;
-      getrow_comm                                      = B_->getrow->pre_comm;
-      if (getrow_comm != nullptr)
-        for (TrilinosWrappers::types::int_type i = 0;
-             i < getrow_comm->N_neighbors;
-             i++)
-          for (TrilinosWrappers::types::int_type j = 0;
-               j < getrow_comm->neighbors[i].N_send;
-               j++)
-            AssertThrow(getrow_comm->neighbors[i].send_list[j] < N_input_vector,
-                        ExcInternalError());
-
-      ML_create_unique_col_id(N_input_vector,
-                              &(B_->getrow->loc_glob_map),
-                              getrow_comm,
-                              &max_per_proc,
-                              B_->comm);
-      B_->getrow->use_loc_glob_map = ML_YES;
-      if (A_->getrow->pre_comm != nullptr)
-        ML_exchange_rows(B_, &Btmp, A_->getrow->pre_comm);
-      else
-        Btmp = B_;
-
-      // perform matrix-matrix product
-      ML_matmat_mult(A_, Btmp, &Ctmp);
-
-      // release temporary structures we needed
-      // for multiplication
-      ML_free(B_->getrow->loc_glob_map);
-      B_->getrow->loc_glob_map     = nullptr;
-      B_->getrow->use_loc_glob_map = ML_NO;
-      if (A_->getrow->pre_comm != nullptr)
-        {
-          tptr = Btmp;
-          while ((tptr != nullptr) && (tptr->sub_matrix != B_))
-            tptr = tptr->sub_matrix;
-          if (tptr != nullptr)
-            tptr->sub_matrix = nullptr;
-          ML_RECUR_CSR_MSRdata_Destroy(Btmp);
-          ML_Operator_Destroy(&Btmp);
-        }
-
-      // make correct data structures
-      if (A_->getrow->post_comm != nullptr)
-        ML_exchange_rows(Ctmp, &Ctmp2, A_->getrow->post_comm);
-      else
-        Ctmp2 = Ctmp;
-
-      ML_back_to_csrlocal(Ctmp2, C_, max_per_proc);
-
-      ML_RECUR_CSR_MSRdata_Destroy(Ctmp);
-      ML_Operator_Destroy(&Ctmp);
-
-      if (A_->getrow->post_comm != nullptr)
-        {
-          ML_RECUR_CSR_MSRdata_Destroy(Ctmp2);
-          ML_Operator_Destroy(&Ctmp2);
-        }
-
-      // create an Epetra matrix from the ML
-      // matrix that we got as a result.
-      Epetra_CrsMatrix *C_mat;
-      ML_Operator2EpetraCrsMatrix(C_, C_mat);
-      C_mat->FillComplete(mod_B->DomainMap(),
-                          transpose_left ?
-                            inputleft.trilinos_matrix().DomainMap() :
-                            inputleft.trilinos_matrix().RangeMap());
-      C_mat->OptimizeStorage();
-      result.reinit(*C_mat);
-
-      // destroy allocated memory
-      delete C_mat;
-      ML_Operator_Destroy(&A_);
-      ML_Operator_Destroy(&B_);
-      ML_Operator_Destroy(&C_);
-      ML_Comm_Destroy(&comm);
+      result.reinit(tmp_result.trilinos_matrix());
     }
   } // namespace internals
 
