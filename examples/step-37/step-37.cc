@@ -96,10 +96,6 @@ namespace Step37
     template <typename number>
     number value(const Point<dim, number> &p,
                  const unsigned int        component = 0) const;
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
   };
 
 
@@ -121,10 +117,9 @@ namespace Step37
   // make use of vectorized operations.
   //
   // In the function implementation, we assume that the number type overloads
-  // basic arithmetic operations, so we just write the code as usual. The
-  // standard functions @p value and value_list that are virtual functions
-  // contained in the base class are then computed from the templated function
-  // with double type, in order to avoid duplicating code.
+  // basic arithmetic operations, so we just write the code as usual. The base
+  // class function @p value is then computed from the templated function with
+  // double type, in order to avoid duplicating code.
   template <int dim>
   template <typename number>
   number Coefficient<dim>::value(const Point<dim, number> &p,
@@ -141,23 +136,6 @@ namespace Step37
   {
     return value<double>(p, component);
   }
-
-
-
-  template <int dim>
-  void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
-                                    std::vector<double> &          values,
-                                    const unsigned int component) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    const unsigned int n_points = points.size();
-    for (unsigned int i = 0; i < n_points; ++i)
-      values[i] = value<double>(points[i], component);
-  }
-
 
 
   // @sect3{Matrix-free implementation}
