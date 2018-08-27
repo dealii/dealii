@@ -347,12 +347,35 @@ namespace Utilities
 
   /**
    * A replacement for <code>std::pow</code> that allows compile-time
-   * calculations for constant expression arguments.
+   * calculations for constant expression arguments. The exponent @p iexp
+   * must not be negative.
    */
   constexpr unsigned int
-  pow(const unsigned int base, const unsigned int iexp)
+  pow(const unsigned int base, const int iexp)
   {
-    return iexp == 0 ? 1 : base * dealii::Utilities::pow(base, iexp - 1);
+#ifdef DEAL_II_WITH_CXX14
+    Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
+#endif
+    // The "exponentiation by squaring" algorithm used below has to be
+    // compressed to one statement due to C++11's restrictions on constexpr
+    // functions. A more descriptive version would be:
+    //
+    // <code>
+    // if (iexp <= 0)
+    //   return 1;
+    //
+    // // if the current exponent is not divisible by two,
+    // // we need to account for that.
+    // const unsigned int prefactor = (iexp % 2 == 1) ? base : 1;
+    //
+    // // a^b = (a*a)^(b/2)      for b evenb
+    // // a^b = a*(a*a)^((b-1)/2 for b odd
+    // return prefactor * dealii::Utilities::pow(base*base, iexp/2);
+    // </code>
+
+    return iexp <= 0 ? 1 :
+                       (((iexp % 2 == 1) ? base : 1) *
+                        dealii::Utilities::pow(base * base, iexp / 2));
   }
 
   /**
