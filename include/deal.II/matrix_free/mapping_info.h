@@ -53,15 +53,18 @@ namespace internal
        * The cell or face is Cartesian.
        */
       cartesian = 0,
+
       /**
        * The cell or face can be described with an affine mapping.
        */
       affine = 1,
+
       /**
        * The face is flat, i.e., the normal factor on a face is the same on
        * all quadrature points. This type is not assigned for cells.
        */
       flat_faces = 2,
+
       /**
        * There is no special information available for compressing the
        * representation of the object under consideration.

@@ -35,6 +35,8 @@ namespace internal
      * An enum that encodes the type of element detected during
      * initialization. FEEvaluation will select the most efficient algorithm
      * based on the given element type.
+     *
+     * @ingroup matrixfree
      */
     enum ElementType
     {
@@ -47,27 +49,32 @@ namespace internal
        * integration in the Gauss-Lobatto quadrature points of the same order.
        */
       tensor_symmetric_collocation = 0,
+
       /**
        * Symmetric tensor product shape functions fulfilling a Hermite
        * identity with values and first derivatives zero at the element end
        * points in 1D.
        */
       tensor_symmetric_hermite = 1,
+
       /**
        * Usual tensor product shape functions whose shape values and
        * quadrature points are symmetric about the midpoint of the unit
        * interval 0.5
        */
       tensor_symmetric = 2,
+
       /**
        * Tensor product shape functions without further particular properties
        */
       tensor_general = 3,
+
       /**
        * Polynomials of complete degree rather than tensor degree which can be
        * described by a truncated tensor product
        */
       truncated_tensor = 4,
+
       /**
        * Tensor product shape functions that are symmetric about the midpoint
        * of the unit interval 0.5 that additionally add a constant shape

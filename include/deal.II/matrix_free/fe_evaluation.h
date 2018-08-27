@@ -2129,7 +2129,7 @@ protected:
  * way cells are looped by MatrixFree::cell_loop() can be different for
  * different DoFHandler or AffineConstraints arguments. More precisely, even
  * though the layout is going to be the same in serial, there is no guarantee
- * about the ordering for different DoFHandler/Constraints in the MPI
+ * about the ordering for different DoFHandler/AffineConstraints in the MPI
  * case. The reason is that the algorithm detects cells that need data
  * exchange with MPI and those can change for different elements &mdash; FE_Q
  * with hanging node constraints connects to more neighbors than a FE_DGQ
