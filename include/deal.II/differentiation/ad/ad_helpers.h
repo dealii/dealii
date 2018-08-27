@@ -50,13 +50,12 @@ namespace Differentiation
      * with respect to a set of independent variables $\mathbf{X}$, that is
      * $\dfrac{d^{i} \mathbf{f}(\mathbf{X})}{d \mathbf{X}^{i}}$.
      *
-     * In addition to the dimension @p dim, this class is templated on the
-     * floating point type @p scalar_type of the number that we'd like to
-     * differentiate, as well as an enumeration indicating the @p ADNumberTypeCode .
-     * The @p ADNumberTypeCode dictates which auto-differentiation library is
-     * to be used, and what the nature of the underlying auto-differentiable
-     * number is. Refer to the @ref auto_symb_diff module for more details in
-     * this regard.
+     * This class is templated on the floating point type @p scalar_type of the
+     * number that we'd like to differentiate, as well as an enumeration
+     * indicating the @p ADNumberTypeCode . The @p ADNumberTypeCode dictates
+     * which auto-differentiation library is to be used, and what the nature of
+     * the underlying auto-differentiable number is. Refer to the
+     * @ref auto_symb_diff module for more details in this regard.
      *
      * For all of the classes derived from this base class, there are two
      * possible ways that the code in which they are used can be structured.
@@ -69,7 +68,7 @@ namespace Differentiation
      *
      * @code
      *   // Initialize AD helper
-     *   ADHelperType<dim,tapeless_AD_typecode> ad_helper (...);
+     *   ADHelperType<tapeless_AD_typecode> ad_helper (...);
      *
      *   // Register independent variables
      *   ad_helper.register_independent_variable(...);
@@ -171,7 +170,7 @@ namespace Differentiation
     public:
       /**
        * Type definition for the floating point number type that is used in,
-       * and result from, all computations.
+       * and results from, all computations.
        */
       using scalar_type =
         typename AD::NumberTraits<ScalarType, ADNumberTypeCode>::scalar_type;
@@ -195,12 +194,12 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the range space.
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
        * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
-       * domain or image space.
+       * image space.
        */
       ADHelperBase(const unsigned int n_independent_variables,
                    const unsigned int n_dependent_variables);
@@ -219,14 +218,14 @@ namespace Differentiation
 
       /**
        * Returns the number of independent variables that this object expects to
-       * work with. This is the dimension of the range space.
+       * work with. This is the dimension of the domain space.
        */
       std::size_t
       n_independent_variables() const;
 
       /**
        * Returns the number of dependent variables that this object expects to
-       * operate on. This is the dimension of the domain or image space.
+       * operate on. This is the dimension of the image space.
        */
       std::size_t
       n_dependent_variables() const;
@@ -316,6 +315,19 @@ namespace Differentiation
        * In the rare case that the number of independent or dependent variables
        * has changed, this can also reconfigured by passing in the appropriate
        * arguments to the function.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * image space.
+       * @param[in] clear_registered_tapes A flag that indicates the that
+       * list of @p registered_tapes must be cleared.
        *
        * @note This also resets the active tape number to an invalid number, and
        * deactivates the recording mode for taped variables.
@@ -644,6 +656,7 @@ namespace Differentiation
        */
       unsigned int
       n_registered_independent_variables() const;
+
       //@}
 
       /**
@@ -699,9 +712,15 @@ namespace Differentiation
       void
       register_dependent_variable(const unsigned int index,
                                   const ad_type &    func);
+
       //@}
 
     private:
+      /**
+       * @name Miscellaneous
+       */
+      //@{
+
       /**
        * A counter keeping track of the number of helpers in existence.
        *
@@ -711,6 +730,8 @@ namespace Differentiation
        * out of scope then the tapes can be written over.
        */
       static unsigned int n_helpers;
+
+      //@}
 
     }; // class ADHelperBase
 
