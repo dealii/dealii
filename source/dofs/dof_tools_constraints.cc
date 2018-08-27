@@ -469,14 +469,14 @@ namespace DoFTools
 
 
       /**
-       * Copy constraints into a constraint matrix object.
+       * Copy constraints into an AffineConstraints object.
        *
        * This function removes zero constraints and those, which constrain a DoF
        * which was already eliminated in one of the previous steps of the hp
        * hanging node procedure.
        *
-       * It also suppresses very small entries in the constraint matrix to avoid
-       * making the sparsity pattern fuller than necessary.
+       * It also suppresses very small entries in the AffineConstraints object
+       * to avoid making the sparsity pattern fuller than necessary.
        */
       template <typename number1, typename number2>
       void
@@ -752,7 +752,7 @@ namespace DoFTools
                 Assert(dofs_on_children.size() <= n_dofs_on_children,
                        ExcInternalError());
 
-                // for each row in the constraint matrix for this line:
+                // for each row in the AffineConstraints object for this line:
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
                   {
@@ -990,7 +990,7 @@ namespace DoFTools
                 Assert(dofs_on_children.size() <= n_dofs_on_children,
                        ExcInternalError());
 
-                // for each row in the constraint matrix for this line:
+                // for each row in the AffineConstraints object for this line:
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
                   {
@@ -1169,7 +1169,7 @@ namespace DoFTools
                         cell->face(face)->get_dof_indices(
                           master_dofs, cell->active_fe_index());
 
-                        // Now create constraint matrix for the subfaces and
+                        // Now create constraints for the subfaces and
                         // assemble it. ignore all interfaces with artificial
                         // cells because we can only get to such interfaces if
                         // the current cell is a ghost cell
@@ -1245,7 +1245,8 @@ namespace DoFTools
                               subface_interpolation_matrices
                                 [cell->active_fe_index()][subface_fe_index][c]);
 
-                            // Add constraints to global constraint matrix.
+                            // Add constraints to global AffineConstraints
+                            // object.
                             filter_constraints(master_dofs,
                                                slave_dofs,
                                                *(subface_interpolation_matrices
@@ -1802,7 +1803,7 @@ namespace DoFTools
       const FaceIterator &                         face_1,
       const typename identity<FaceIterator>::type &face_2,
       const FullMatrix<double> &                   transformation,
-      AffineConstraints<double> &                  constraint_matrix,
+      AffineConstraints<double> &                  affine_constraints,
       const ComponentMask &                        component_mask,
       const bool                                   face_orientation,
       const bool                                   face_flip,
@@ -1841,7 +1842,7 @@ namespace DoFTools
               set_periodicity_constraints(face_1,
                                           face_2->child(c),
                                           child_transformation,
-                                          constraint_matrix,
+                                          affine_constraints,
                                           component_mask,
                                           face_orientation,
                                           face_flip,
@@ -2026,7 +2027,7 @@ namespace DoFTools
                     if (dofs_2[i] == dofs_1[j])
                       if (!(is_identity_constrained && target == i))
                         {
-                          constraint_matrix.add_line(dofs_2[i]);
+                          affine_constraints.add_line(dofs_2[i]);
                           constraint_set = true;
                         }
                   }
@@ -2049,7 +2050,7 @@ namespace DoFTools
                             face_flip,
                             face_rotation)];
 
-                        if (constraint_matrix.is_constrained(dofs_2[i]))
+                        if (affine_constraints.is_constrained(dofs_2[i]))
                           {
                             // if the two aren't already identity constrained
                             // (whichever way around) or already identical (in
@@ -2059,16 +2060,17 @@ namespace DoFTools
                             bool enter_constraint = false;
                             // see if this would add an identity constraint
                             // cycle
-                            if (!constraint_matrix.is_constrained(dofs_1[j]))
+                            if (!affine_constraints.is_constrained(dofs_1[j]))
                               {
                                 types::global_dof_index new_dof = dofs_2[i];
                                 while (new_dof != dofs_1[j])
-                                  if (constraint_matrix.is_constrained(new_dof))
+                                  if (affine_constraints.is_constrained(
+                                        new_dof))
                                     {
                                       const std::vector<
                                         std::pair<types::global_dof_index,
                                                   double>> *constraint_entries =
-                                        constraint_matrix
+                                        affine_constraints
                                           .get_constraint_entries(new_dof);
                                       if (constraint_entries->size() == 1)
                                         new_dof =
@@ -2088,8 +2090,8 @@ namespace DoFTools
 
                             if (enter_constraint)
                               {
-                                constraint_matrix.add_line(dofs_1[j]);
-                                constraint_matrix.add_entry(
+                                affine_constraints.add_line(dofs_1[j]);
+                                affine_constraints.add_entry(
                                   dofs_1[j],
                                   dofs_2[i],
                                   is_identity_constrained ? 1.0 : -1.0);
@@ -2103,7 +2105,7 @@ namespace DoFTools
                             // enter the constraint. otherwise there is nothing
                             // for us still to do
                             bool enter_constraint = false;
-                            if (!constraint_matrix.is_constrained(dofs_1[j]))
+                            if (!affine_constraints.is_constrained(dofs_1[j]))
                               {
                                 if (dofs_2[i] != dofs_1[j])
                                   enter_constraint = true;
@@ -2114,7 +2116,7 @@ namespace DoFTools
                                 const std::vector<
                                   std::pair<types::global_dof_index, double>>
                                   *constraint_entries =
-                                    constraint_matrix.get_constraint_entries(
+                                    affine_constraints.get_constraint_entries(
                                       dofs_1[j]);
                                 if (constraint_entries->size() == 1 &&
                                     (*constraint_entries)[0].first == dofs_2[i])
@@ -2131,7 +2133,7 @@ namespace DoFTools
                                         // this pair of constraints means that
                                         // both dofs have to be constrained to
                                         // 0.
-                                        constraint_matrix.add_line(dofs_2[i]);
+                                        affine_constraints.add_line(dofs_2[i]);
                                       }
                                   }
                                 else
@@ -2140,13 +2142,13 @@ namespace DoFTools
                                     // constraint cycle
                                     types::global_dof_index new_dof = dofs_1[j];
                                     while (new_dof != dofs_2[i])
-                                      if (constraint_matrix.is_constrained(
+                                      if (affine_constraints.is_constrained(
                                             new_dof))
                                         {
                                           const std::vector<std::pair<
                                             types::global_dof_index,
                                             double>> *constraint_entries =
-                                            constraint_matrix
+                                            affine_constraints
                                               .get_constraint_entries(new_dof);
                                           if (constraint_entries->size() == 1)
                                             new_dof =
@@ -2167,19 +2169,19 @@ namespace DoFTools
 
                             if (enter_constraint)
                               {
-                                constraint_matrix.add_line(dofs_2[i]);
-                                constraint_matrix.add_entry(
+                                affine_constraints.add_line(dofs_2[i]);
+                                affine_constraints.add_entry(
                                   dofs_2[i],
                                   dofs_1[j],
                                   is_identity_constrained ? 1.0 : -1.0);
                               }
                           }
                       }
-                    else if (!constraint_matrix.is_constrained(dofs_2[i]))
+                    else if (!affine_constraints.is_constrained(dofs_2[i]))
                       {
                         // this is just a regular constraint. enter it piece by
                         // piece
-                        constraint_matrix.add_line(dofs_2[i]);
+                        affine_constraints.add_line(dofs_2[i]);
                         for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
                           {
                             // Query the correct face_index on face_1 respecting
@@ -2195,7 +2197,7 @@ namespace DoFTools
                             // And finally constrain the two DoFs respecting
                             // component_mask:
                             if (transformation(i, jj) != 0)
-                              constraint_matrix.add_entry(
+                              affine_constraints.add_entry(
                                 dofs_2[i], dofs_1[j], transformation(i, jj));
                           }
                       }
@@ -2310,7 +2312,7 @@ namespace DoFTools
   make_periodicity_constraints(
     const FaceIterator &                         face_1,
     const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<double> &                  constraint_matrix,
+    AffineConstraints<double> &                  affine_constraints,
     const ComponentMask &                        component_mask,
     const bool                                   face_orientation,
     const bool                                   face_flip,
@@ -2448,7 +2450,7 @@ namespace DoFTools
 
             make_periodicity_constraints(face_1->child(i),
                                          face_2->child(j),
-                                         constraint_matrix,
+                                         affine_constraints,
                                          component_mask,
                                          face_orientation,
                                          face_flip,
@@ -2487,7 +2489,7 @@ namespace DoFTools
                 set_periodicity_constraints(face_2,
                                             face_1,
                                             transformation,
-                                            constraint_matrix,
+                                            affine_constraints,
                                             component_mask,
                                             face_orientation,
                                             face_flip,
@@ -2501,7 +2503,7 @@ namespace DoFTools
                 set_periodicity_constraints(face_2,
                                             face_1,
                                             inverse,
-                                            constraint_matrix,
+                                            affine_constraints,
                                             component_mask,
                                             face_orientation,
                                             face_flip,
@@ -2521,7 +2523,7 @@ namespace DoFTools
             set_periodicity_constraints(face_1,
                                         face_2,
                                         transformation,
-                                        constraint_matrix,
+                                        affine_constraints,
                                         component_mask,
                                         face_orientation,
                                         face_orientation ?

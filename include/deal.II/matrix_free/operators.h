@@ -153,18 +153,18 @@ namespace MatrixFreeOperators
    * then added to the initial guess. This setup can be realized by using a
    * vector of two pointers pointing to the same DoFHandler object and a
    * vector of two pointers to the two AffineConstraints objects. If the first
-   * constraint matrix is the one including the zero Dirichlet constraints,
-   * one would give a std::vector<unsigned int>(1, 0) to the initialize()
-   * function, i.e., a vector of length 1 that selects exactly the first
-   * constraint matrix with index 0.
+   * AffineConstraints object is the one including the zero Dirichlet
+   * constraints, one would give a std::vector<unsigned int>(1, 0) to the
+   * initialize() function, i.e., a vector of length 1 that selects exactly the
+   * first AffineConstraints object with index 0.
    *
    * For systems of PDEs where the different blocks of MatrixFree are
    * associated with different physical components of the equations, adding
    * another block with a different AffineConstraints argument solely for the
    * purpose of boundary conditions might lead to cumbersome index
    * handling. Instead, one could set up a second MatrixFree instance with the
-   * different constraint matrix but the same interpretation of blocks, and
-   * use that for interpolating inhomogeneous boundary conditions (see also
+   * different AffineConstraints object but the same interpretation of blocks,
+   * and use that for interpolating inhomogeneous boundary conditions (see also
    * the discussion in the results section of the step-37 tutorial program):
    *
    * @code

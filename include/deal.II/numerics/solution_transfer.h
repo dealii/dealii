@@ -278,7 +278,7 @@ DEAL_II_NAMESPACE_OPEN
  * Whether this is a problem you need to worry about or not depends on your
  * application. The situation is easily corrected, of course, by applying
  * AffineConstraints::distribute() to your solution vector after transfer,
- * using a constraint matrix object computed on the new DoFHandler object (you
+ * using a constraints object computed on the new DoFHandler object (you
  * probably need to create this object anyway if you have hanging nodes). This
  * is also what is done, for example, in step-15.
  *

@@ -376,9 +376,9 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
             constraint_point(k) = 1. * coord_int / interval;
 
             // The following lines of code should eliminate the problems with
-            // the Constraint-Matrix, which appeared for P>=4. The
+            // the constraints object which appeared for P>=4. The
             // AffineConstraints class complained about different constraints
-            // for the same entry of the Constraint-Matrix.  Actually this
+            // for the same entry: Actually, this
             // difference could be attributed to FP errors, as it was in the
             // range of 1.0e-16. These errors originate in the loss of
             // symmetry in the FP approximation of the shape-functions.

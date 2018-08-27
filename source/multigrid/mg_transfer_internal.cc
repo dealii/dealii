@@ -543,17 +543,17 @@ namespace internal
               std::vector<types::global_dof_index> &dof_indices)
       {
         if (mg_constrained_dofs != nullptr &&
-            mg_constrained_dofs->get_level_constraint_matrix(level)
-                .n_constraints() > 0)
+            mg_constrained_dofs->get_level_constraints(level).n_constraints() >
+              0)
           for (auto &ind : dof_indices)
-            if (mg_constrained_dofs->get_level_constraint_matrix(level)
+            if (mg_constrained_dofs->get_level_constraints(level)
                   .is_identity_constrained(ind))
               {
-                Assert(mg_constrained_dofs->get_level_constraint_matrix(level)
+                Assert(mg_constrained_dofs->get_level_constraints(level)
                            .get_constraint_entries(ind)
                            ->size() == 1,
                        ExcInternalError());
-                ind = mg_constrained_dofs->get_level_constraint_matrix(level)
+                ind = mg_constrained_dofs->get_level_constraints(level)
                         .get_constraint_entries(ind)
                         ->front()
                         .first;
