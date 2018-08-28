@@ -134,7 +134,7 @@ namespace Particles
     /**
      * Constructor for Particle, creates a particle from a data vector.
      * This constructor is usually called after serializing a particle by
-     * calling the write_data function.
+     * calling the write_data() function.
      *
      * @param[in,out] begin_data A pointer to a memory location from which
      * to read the information that completely describes a particle. This
@@ -178,9 +178,9 @@ namespace Particles
     /**
      * Write particle data into a data array. The array is expected
      * to be large enough to take the data, and the void pointer should
-     * point to the first element in which the data should be written. This
-     * function is meant for serializing all particle properties and
-     * afterwards de-serializing the properties by calling the appropriate
+     * point to the first entry of the array to which the data should be
+     * written. This function is meant for serializing all particle properties
+     * and later de-serializing the properties by calling the appropriate
      * constructor Particle(void *&data, PropertyPool *property_pool = NULL);
      *
      * @param [in,out] data The memory location to write particle data
