@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test that all of the Adol-C number traits return the correct information
+// Test that all of the ADOL-C number traits return the correct information
 
 #include <deal.II/differentiation/ad.h>
 

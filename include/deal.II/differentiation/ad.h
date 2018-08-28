@@ -40,7 +40,7 @@ namespace Differentiation
   /**
    * Wrappers for automatic differentiation libraries. Currently there is
    * support for the following libraries:
-   *   - Adol-C
+   *   - ADOL-C
    *   - Sacado (a component of Trilinos)
    *
    * @ingroup auto_symb_diff

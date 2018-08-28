@@ -675,7 +675,7 @@ namespace numbers
    * returns only whether the scalar values stored by the input values are
    * equal.
    *
-   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
    */
@@ -690,7 +690,7 @@ namespace numbers
    * returns only whether the scalar values stored by the input values are
    * equal.
    *
-   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
    */
@@ -698,7 +698,7 @@ namespace numbers
   bool
   values_are_equal(const adouble &value_1, const Number &value_2)
   {
-    // Use the specialized definition for two Adol-C taped types
+    // Use the specialized definition for two ADOL-C taped types
     return values_are_equal(value_1,
                             internal::NumberType<adouble>::value(value_2));
   }
@@ -710,7 +710,7 @@ namespace numbers
    * returns only whether the scalar values stored by the input values are
    * equal.
    *
-   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
    */
@@ -729,7 +729,7 @@ namespace numbers
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
-   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
    */
@@ -745,7 +745,7 @@ namespace numbers
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
-   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
    */
@@ -753,7 +753,7 @@ namespace numbers
   bool
   value_is_less_than(const adouble &value_1, const Number &value_2)
   {
-    // Use the specialized definition for two Adol-C taped types
+    // Use the specialized definition for two ADOL-C taped types
     return value_is_less_than(value_1,
                               internal::NumberType<adouble>::value(value_2));
   }
@@ -766,7 +766,7 @@ namespace numbers
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
-   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
    */
@@ -774,7 +774,7 @@ namespace numbers
   bool
   value_is_less_than(const Number &value_1, const adouble &value_2)
   {
-    // Use the specialized definition for two Adol-C taped types
+    // Use the specialized definition for two ADOL-C taped types
     return value_is_less_than(internal::NumberType<adouble>::value(value_1),
                               value_2);
   }

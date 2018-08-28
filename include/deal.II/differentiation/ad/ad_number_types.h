@@ -29,23 +29,23 @@ namespace Differentiation
     /**
      * An enumeration to indicate which type of auto-differentiable number
      * is to be used for computations. If a type that is selected for use
-     * is not available in the library, a compile-time error will be thrown.
+     * is not available in the library, a run-time error will be thrown.
      *
      * @author Jean-Paul Pelteret, 2017
      */
     enum class NumberTypes
     {
       /**
-       * Taped forward and reverse-mode Adol-C number type (n-differentiable).
+       * Taped forward and reverse-mode ADOL-C number type (n-differentiable).
        *
        * First derivatives will be computed using reverse mode, while the second
        * derivatives will be computed using forward mode. Even higher-order
-       * derivatives can be computed using Adol-C's own driver functions.
+       * derivatives can be computed using ADOL-C's own driver functions.
        */
       adolc_taped,
 
       /**
-       * Tapeless dynamic forward-mode Adol-C number type (once differentiable).
+       * Tapeless dynamic forward-mode ADOL-C number type (once differentiable).
        */
       adolc_tapeless,
 
