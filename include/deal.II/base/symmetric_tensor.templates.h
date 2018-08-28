@@ -879,7 +879,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           double sf = 1.0;
           if (Differentiation::AD::is_taped_ad_number<Number>::value)
             {
-              // Adol-C taped
+              // ADOL-C taped
               if (method ==
                   SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
                 sf = 2e11;
@@ -1004,10 +1004,10 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
 
 #ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 
-// Specializations of the above functions for taped Adol-C numbers
+// Specializations of the above functions for taped ADOL-C numbers
 // when the advanced branching feature is activated.
 // We could copy-paste all of these functions and add the appropriate
-// conditional assignments (see the Adol-C manual, section 1.8).
+// conditional assignments (see the ADOL-C manual, section 1.8).
 // However, some of the conditions are quite complicated (with possibly
 // no 1-1 correspondence for the operations along each branch) so this
 // needs some careful attention. For the sake of simplicity and until

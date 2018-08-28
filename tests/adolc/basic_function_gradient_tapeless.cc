@@ -17,7 +17,7 @@
 //  - Tapeless doubles
 //  - Function and gradient computations
 // Adapted from
-// https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb See Adol-C
+// https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb See ADOL-C
 // manual v2.6 p65 figure 8
 
 #include <adolc/adtl.h>

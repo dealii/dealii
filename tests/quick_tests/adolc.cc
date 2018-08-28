@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test of basic functionality for Adol-C:
+// Test of basic functionality for ADOL-C:
 //  - Taped doubles
 //  - Gradient and hessian computations
 // Adapted from

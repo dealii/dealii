@@ -29,11 +29,11 @@
 #  ifndef DOXYGEN
 
 /**
- * Import Adol-C math operations into standard namespace. This gives us the
+ * Import ADOL-C math operations into standard namespace. This gives us the
  * ability to use them within the Tensor class, and it also allows the user
  * to write generic code and switch between AD number types.
  *
- * The math functions to be exposed come from the Adol-C's taped
+ * The math functions to be exposed come from the ADOL-C's taped
  * (anonymous) and tapeless namespaces.
  */
 namespace std

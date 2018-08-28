@@ -887,7 +887,7 @@ Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
   Assert(!(std::is_same<Number, adouble>::value ||
            std::is_same<OtherNumber, adouble>::value),
          ExcMessage(
-           "The Tensor equality operator for Adol-C taped numbers has not yet "
+           "The Tensor equality operator for ADOL-C taped numbers has not yet "
            "been extended to support advanced branching."));
 #endif
 
@@ -2385,7 +2385,7 @@ linfty_norm(const Tensor<2, dim, Number> &t)
 
 #  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 
-// Specialization of functions for Adol-C number types when
+// Specialization of functions for ADOL-C number types when
 // the advanced branching feature is used
 template <int dim>
 inline adouble

@@ -29,7 +29,7 @@ namespace Differentiation
   {
     /**
      * A struct to indicate whether a given @p NumberType is an
-     * Adol-C number or not. By default, numbers are not considered to
+     * ADOL-C number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
      *
      * @author Jean-Paul Pelteret, 2017
@@ -41,7 +41,7 @@ namespace Differentiation
 
     /**
      * A struct to indicate whether a given @p NumberType is a taped
-     * Adol-C number or not. By default, numbers are not considered to
+     * ADOL-C number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
      *
      * @author Jean-Paul Pelteret, 2017
@@ -53,7 +53,7 @@ namespace Differentiation
 
     /**
      * A struct to indicate whether a given @p NumberType is a tapeless
-     * Adol-C number or not. By default, numbers are not considered to
+     * ADOL-C number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
      *
      * @author Jean-Paul Pelteret, 2017
@@ -88,12 +88,12 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * An exception which states that a function has been disabled due to the
- * configuration of Adol-C with the advanced branching feature enabled.
+ * configuration of ADOL-C with the advanced branching feature enabled.
  *
  * @ingroup Exceptions
  */
 DeclExceptionMsg(ExcADOLCAdvancedBranching,
-                 "This function has not yet been implemented for taped Adol-C "
+                 "This function has not yet been implemented for taped ADOL-C "
                  "numbers when the advanced branching feature is activated.");
 
 
@@ -110,7 +110,7 @@ namespace Differentiation
     namespace internal
     {
       /**
-       * A specialization for the information struct for taped Adol-C
+       * A specialization for the information struct for taped ADOL-C
        * numbers.
        */
       template <typename ScalarType>
@@ -129,7 +129,7 @@ namespace Differentiation
 
 
       /**
-       * A specialization for the information struct for tapeless Adol-C
+       * A specialization for the information struct for tapeless ADOL-C
        * numbers.
        */
       template <typename ScalarType>
@@ -206,7 +206,7 @@ namespace Differentiation
           // before defining their directional derivative index
           out = in;
 
-          // Violating this condition when will result in an Adol-C internal
+          // Violating this condition when will result in an ADOL-C internal
           // error. We could rather always throw here in order to provide a
           // less cryptic message.
           AssertThrow(index < adtl::getNumDir(),
@@ -232,7 +232,7 @@ namespace Differentiation
 
       /**
        * A struct to help extract certain information associated with
-       * taped Adol-C auto-differentiable numbers.
+       * taped ADOL-C auto-differentiable numbers.
        *
        * @author Jean-Paul Pelteret, 2017
        */
@@ -274,7 +274,7 @@ namespace Differentiation
         {
           AssertThrow(false,
                       ExcMessage(
-                        "The derivative values for taped Adol-C numbers must be"
+                        "The derivative values for taped ADOL-C numbers must be"
                         "computed through the ::gradient function."));
           return 0.0;
         }
@@ -283,7 +283,7 @@ namespace Differentiation
 
       /**
        * A struct to help extract certain information associated with
-       * tapeless Adol-C auto-differentiable numbers.
+       * tapeless ADOL-C auto-differentiable numbers.
        *
        * @author Jean-Paul Pelteret, 2017
        */
@@ -322,7 +322,7 @@ namespace Differentiation
             direction < n_directional_derivatives(x),
             ExcMessage(
               "Requested directional derivative is greater than the number "
-              "registered by Adol-C."));
+              "registered by ADOL-C."));
           return x.getADValue(direction);
         }
       };
@@ -335,7 +335,7 @@ namespace Differentiation
      * Specialization of the general AdolCWrappers::ADNumberTraits class that
      * provides relevant information for auto-differentiable numbers.
      * This specialization is for the case where @p ADNumberType is an
-     * taped Adol-C (real) double.
+     * taped ADOL-C (real) double.
      *
      * @note In this case the number traits are the same as those for a taped double.
      *
@@ -358,7 +358,7 @@ namespace Differentiation
      * Specialization of the general ADNumberTraits class that
      * provides relevant information for auto-differentiable numbers.
      * This specialization is for the case where @p ADNumberType is an
-     * taped Adol-C complex double.
+     * taped ADOL-C complex double.
      *
      * @note In this case the number traits are the same as those for a taped complex
      * double.
@@ -383,7 +383,7 @@ namespace Differentiation
      * Specialization of the general ADNumberTraits class that
      * provides relevant information for auto-differentiable numbers.
      * This specialization is for the case where @p ADNumberType is an
-     * tapeless Adol-C (real) double.
+     * tapeless ADOL-C (real) double.
      *
      * @note In this case the number traits are the same as those for a tapeless double.
      *
@@ -407,7 +407,7 @@ namespace Differentiation
      * Specialization of the general ADNumberTraits class that
      * provides relevant information for auto-differentiable numbers.
      * This specialization is for the case where @p ADNumberType is an
-     * tapeless Adol-C complex double.
+     * tapeless ADOL-C complex double.
      *
      * @note In this case the number traits are the same as those for a tapeless
      * complex double.
@@ -430,7 +430,7 @@ namespace Differentiation
 
     /**
      * Specialization of the NumberTraits struct for
-     * the (otherwise disabled) taped Adol-C number type.
+     * the (otherwise disabled) taped ADOL-C number type.
      */
     template <>
     struct NumberTraits<adouble, NumberTypes::adolc_taped>
@@ -441,7 +441,7 @@ namespace Differentiation
 
     /**
      * Specialization of the NumberTraits struct for
-     * the (otherwise disabled) taped Adol-C complex number type.
+     * the (otherwise disabled) taped ADOL-C complex number type.
      */
     template <>
     struct NumberTraits<std::complex<adouble>, NumberTypes::adolc_taped>
@@ -453,7 +453,7 @@ namespace Differentiation
 
     /**
      * Specialization of the NumberTraits struct for
-     * the (otherwise disabled) tapeless Adol-C number type.
+     * the (otherwise disabled) tapeless ADOL-C number type.
      */
     template <>
     struct NumberTraits<adtl::adouble, NumberTypes::adolc_tapeless>
@@ -464,7 +464,7 @@ namespace Differentiation
 
     /**
      * Specialization of the NumberTraits struct for
-     * the (otherwise disabled) tapeless Adol-C complex number type.
+     * the (otherwise disabled) tapeless ADOL-C complex number type.
      */
     template <>
     struct NumberTraits<std::complex<adtl::adouble>,
@@ -477,7 +477,7 @@ namespace Differentiation
 
     /**
      * Specialization of the struct for the case when the input template
-     * parameter is a (real or complex) taped Adol-C number.
+     * parameter is a (real or complex) taped ADOL-C number.
      */
     template <typename NumberType>
     struct is_adolc_taped_number<
@@ -490,7 +490,7 @@ namespace Differentiation
 
     /**
      * Specialization of the struct for the case when the input template
-     * parameter is a (real or complex) tapeless Adol-C number.
+     * parameter is a (real or complex) tapeless ADOL-C number.
      */
     template <typename NumberType>
     struct is_adolc_tapeless_number<
@@ -503,7 +503,7 @@ namespace Differentiation
 
     /**
      * Specialization of the struct for the case when the input template
-     * parameter is a (real or complex; taped or tapeless) Adol-C number.
+     * parameter is a (real or complex; taped or tapeless) ADOL-C number.
      */
     template <typename NumberType>
     struct is_adolc_number<NumberType,

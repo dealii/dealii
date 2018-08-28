@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test that all of the Adol-C number traits return the correct information
+// Test that all of the ADOL-C number traits return the correct information
 // adtl::adouble (Tapeless)
 
 #include <deal.II/differentiation/ad/ad_number_types.h>

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test that all of the Adol-C number traits combinations are constructible
+// Test that all of the ADOL-C number traits combinations are constructible
 
 #include <deal.II/differentiation/ad/ad_number_types.h>
 #include <deal.II/differentiation/ad/adolc_number_types.h>

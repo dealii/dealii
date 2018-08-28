@@ -18,7 +18,7 @@ REAL_AND_COMPLEX_SCALARS    := { double;
                                  std::complex<double>;
                                  std::complex<float> }
 
-// differentiable Adol-C scalar types
+// differentiable ADOL-C scalar types
 DIFFERENTIABLE_ADOLC_REAL_SCALARS := {
         @DEAL_II_EXPAND_ADOLC_TYPES@;
         }

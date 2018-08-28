@@ -207,7 +207,7 @@ namespace Differentiation
        * definition given in @p base/numbers.h , this extension allows the
        * conversion of automatic-differentiation numbers to generic floats.
        *
-       * This is necessary because Adol-C doesn't provide a convenient
+       * This is necessary because ADOL-C doesn't provide a convenient
        * way to convert from an @p ADNumberType to floats (@p T) other than
        * the real-type equivalent that its associated with. For Sacado, and
        * likely other AD number types,  the floating point value stored in
@@ -1018,9 +1018,9 @@ namespace Differentiation
      * AD numbers.
      *
      * Sacado nests the directional derivatives within Sacado numbers, while
-     * Adol-C does not. So, starting off from a scalar function f(x), the number
+     * ADOL-C does not. So, starting off from a scalar function f(x), the number
      * type resulting from the computation of a directional derivative f'(x) of
-     * that function is a floating point number for Adol-C number types and
+     * that function is a floating point number for ADOL-C number types and
      * Sacado::FAD<double>, but that of a Sacado::FAD<Sacado::FAD<double>> is a
      * Sacado::FAD<double>.
      *
@@ -1046,7 +1046,7 @@ namespace Differentiation
         // If the AD drivers are correctly implemented then we should not get
         // here. This is essentially a dummy for when the ADNumberTypeCode for
         // the original AD number (from which one is getting a derivative >= 2)
-        // is one that specified Adol-C taped and tapeless numbers, or a
+        // is one that specified ADOL-C taped and tapeless numbers, or a
         // non-nested Sacado number.
         AssertThrow(
           false,
