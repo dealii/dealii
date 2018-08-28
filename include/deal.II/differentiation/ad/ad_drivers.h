@@ -1273,7 +1273,7 @@ namespace Differentiation
       template <typename ADNumberType>
       typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
                               NumberTypes::adolc_tapeless>::type
-      configure_tapeless_mode(const unsigned int n_directional_derivatives)
+      configure_tapeless_mode(const unsigned int /*n_directional_derivatives*/)
       {
         AssertThrow(false, ExcRequiresAdolC());
       }
