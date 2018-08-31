@@ -354,7 +354,19 @@ namespace Utilities
   pow(const unsigned int base, const int iexp)
   {
 #ifdef DEAL_II_WITH_CXX14
+#  if defined(DEAL_II_HAVE_BUILTIN_EXPECT) && defined(__INTEL_COMPILER)
+    if (!(iexp >= 0))
+      ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
+        ::dealii::deal_II_exceptions::internals::abort_or_throw_on_exception,
+        __FILE__,
+        __LINE__,
+        __PRETTY_FUNCTION__,
+        "iexp>=0",
+        "ExcMessage(\"The exponent must not be negative!\")",
+        ExcMessage("The exponent must not be negative!"));
+#  else
     Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
+#  endif
 #endif
     // The "exponentiation by squaring" algorithm used below has to be
     // compressed to one statement due to C++11's restrictions on constexpr
