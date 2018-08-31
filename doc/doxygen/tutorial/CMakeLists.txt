@@ -140,7 +140,6 @@ FOREACH(_step ${_deal_ii_steps})
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxyplain
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
