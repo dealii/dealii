@@ -37,12 +37,18 @@ $state =  $comment_mode;
 print " * \n";
 
 do {
-    # substitute tabs. also make sure that we don't output comment end
-    # markers that might confuse doxygen
+
+    # Make sure that we don't output comment end markers that might confuse
+    # doxygen.
     s!/\*!/ \*!g;
     s!\*/!\* /!g;
 
+    # substitute tabs
     s/\t/        /g;
+
+    # Remove "//" if it is present at the end of a line. These comments exist
+    # to force a specific formatting of the line for clang-format.
+    s!//$!!g;
 
     # We are entering code fragments
     if (($state != $code_fragment_mode) && m!^\s*//\s*\@code!)
