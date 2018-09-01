@@ -621,72 +621,58 @@ residual with respect to the solution variable.
 
 <h5> Use LaplaceOperator with a second AffineConstraints object without Dirichlet conditions </h5>
 
-A second alternative to get the right hand side that re-uses the
-@p LaplaceOperator::apply_add() function is to instead add a second constraint
-matrix that skips Dirichlet constraints on the read operation. To do this, we
-initialize a MatrixFree object in a more extended way with two different
-DoFHandler&thinsp;-&thinsp;AffineConstraints combinations. The zeroth component includes
-Dirichlet conditions for solving the linear system, whereas first component
-also reads from Dirichlet-constrained degrees of freedom for the right hand
-side assembly:
-
-@code
-  constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          constraints);
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            BoundaryValues<dim>(),
-                                            constraints);
-  constraints.close();
-  constraints_without_dirichlet.clear();
-  constraints_without_dirichlet.reinit(locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          constraints_without_dirichlet);
-  constraints_without_dirichlet.close();
-
-  std::vector<const DoFHandler<dim> *> dof_handlers(2, &dof_handler);
-  {
-    std::vector<const ConstraintMatrix *> constraint(2);
-    constraint[0] = &constraints;
-    constraint[1] = &constraints_without_dirichlet;
-    typename MatrixFree<dim,number>::AdditionalData additional_data;
-    additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
-                                            update_quadrature_points);
-
-    std::shared_ptr<MatrixFree<dim,double> > matrix_free;
-    matrix_free->reinit (mapping, dof_handlers, constraint,
-                         QGauss<1>(fe.degree+1), additional_data);
-
-    // select zeroth block in matrix_free for the main matrix
-    std::vector<unsigned int> selected_block {0};
-    laplace_operator.initialize(matrix_free, selected_block);
-  }
-@endcode
-
-This @p matrix_free object is then passed to a @p LaplaceOperator class
-instance @p laplace_operator that gets used in the linear solver. Alongside,
-we create a second @p LaplaceOperator object that fills the right hand side:
+A second alternative to get the right hand side that re-uses the @p
+LaplaceOperator::apply_add() function is to instead add a second LaplaceOperator
+that skips Dirichlet constraints. To do this, we initialize a second MatrixFree
+object which does not have any boundary value constraints. This @p matrix_free
+object is then passed to a @p LaplaceOperator class instance @p
+inhomogeneous_operator that is only used to create the right hand side:
 @code
 template <int dim>
 void LaplaceProblem<dim>::assemble_rhs()
 {
-  LaplaceOperator<dim, fe_degree, double> laplace_operator_inhomogenous;
+  system_rhs = 0;
+  AffineConstraints<double> no_constraints;
+  no_constraints.close();
+  LaplaceOperator<dim, degree_finite_element, double> inhomogeneous_operator;
 
-  // select first block in matrix_free to use constraints_without_dirichlet
-  std::vector<unsigned int> selected_block{1};
-  laplace_operator_inhomogeneous.initialize(matrix_free, selected_block);
-  solution = 0;
+  typename MatrixFree<dim, double>::AdditionalData additional_data;
+  additional_data.mapping_update_flags =
+    (update_gradients | update_JxW_values | update_quadrature_points);
+  std::shared_ptr<MatrixFree<dim, double>> matrix_free(
+    new MatrixFree<dim, double>());
+  matrix_free->reinit(dof_handler,
+                      no_constraints,
+                      QGauss<1>(fe.degree + 1),
+                      additional_data);
+  inhomogeneous_operator.initialize(matrix_free);
+
+  solution = 0.0;
   constraints.distribute(solution);
-  laplace_operator_inhomogeneous.vmult(system_rhs, solution);
-  system_rhs *= -1.;
+  inhomogeneous_operator.evaluate_coefficient(Coefficient<dim>());
+  inhomogeneous_operator.vmult(system_rhs, solution);
+  system_rhs *= -1.0;
 
-  // proceed as usual with integration of right hand side function...
+  FEEvaluation<dim, degree_finite_element> phi(
+    *inhomogeneous_operator.get_matrix_free());
+  for (unsigned int cell = 0;
+       cell < inhomogeneous_operator.get_matrix_free()->n_macro_cells();
+       ++cell)
+    {
+      phi.reinit(cell);
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        phi.submit_value(make_vectorized_array<double>(1.0), q);
+      phi.integrate(true, false);
+      phi.distribute_local_to_global(system_rhs);
+    }
+  system_rhs.compress(VectorOperation::add);
 }
 @endcode
 
-Instead of adding a second DoFHandler&thinsp;-&thinsp;AffineConstraints pair to
-the same MatrixFree::reinit() call, one could of course also construct an
-independent MatrixFree object that feeds the second @p LaplaceOperator instance,
-see also the discussion in MatrixFreeOperators::Base.
+A more sophisticated implementation of this technique could reuse the original
+MatrixFree object. This can be done by initializing the MatrixFree object with
+multiple blocks, where each block corresponds to a different AffineConstraints
+object. Doing this would require making substantial modifications to the
+LaplaceOperator class, but the MatrixFreeOperators::LaplaceOperator class that
+comes with the library can do this. See the discussion on blocks in
+MatrixFreeOperators::Base for more information on how to set up blocks.
