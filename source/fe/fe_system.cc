@@ -1994,7 +1994,7 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix) const
 {
   AssertThrow(
-    (x_source_fe.get_name().find("FE_System<") == 0) ||
+    (x_source_fe.get_name().find("FESystem<") == 0) ||
       (dynamic_cast<const FESystem<dim, spacedim> *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 

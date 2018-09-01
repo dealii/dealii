@@ -534,7 +534,7 @@ public:
    * pointers to the initialization function. Note that the finite element
    * underlying an DoFHandler must either be scalar or contain several copies
    * of the same element. Mixing several different elements into one
-   * @p FE_System is not allowed.
+   * FESystem is not allowed.
    *
    * This function also allows for using several quadrature formulas, e.g.
    * when the description contains independent integrations of elements of

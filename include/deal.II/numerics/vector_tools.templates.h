@@ -5839,7 +5839,7 @@ namespace VectorTools
               // For FE_Nedelec<3> we just need to have a face numbering greater
               // than the number of edge DoFs (=lines_per_face*(degree+1).
               //
-              // For FE_System<3> we need to base the base_indices (base element
+              // For FESystem<3> we need to base the base_indices (base element
               // and copy within that base element) and ensure we're above the
               // number of edge DoFs within that base element.
               std::vector<unsigned int> associated_face_dof_to_face_dof(
