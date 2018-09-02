@@ -247,7 +247,7 @@ public:
   distribute_local_to_global(
     VectorType &       dst,
     const unsigned int first_index = 0,
-    const std::bitset<VectorizedArray<Number>::n_array_elements> mask =
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask =
       std::bitset<VectorizedArray<Number>::n_array_elements>().flip()) const;
 
   /**
@@ -285,7 +285,7 @@ public:
   set_dof_values(
     VectorType &       dst,
     const unsigned int first_index = 0,
-    const std::bitset<VectorizedArray<Number>::n_array_elements> mask =
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask =
       std::bitset<VectorizedArray<Number>::n_array_elements>().flip()) const;
 
   //@}
@@ -802,9 +802,9 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation(
-    const VectorOperation &                                      operation,
-    VectorType *                                                 vectors[],
-    const std::bitset<VectorizedArray<Number>::n_array_elements> mask,
+    const VectorOperation &                                       operation,
+    VectorType *                                                  vectors[],
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask,
     const bool apply_constraints = true) const;
 
   /**
@@ -817,9 +817,9 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation_contiguous(
-    const VectorOperation &                                      operation,
-    VectorType *                                                 vectors[],
-    const std::bitset<VectorizedArray<Number>::n_array_elements> mask) const;
+    const VectorOperation &                                       operation,
+    VectorType *                                                  vectors[],
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const;
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -3946,9 +3946,9 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
-  const VectorOperation &                                      operation,
-  VectorType *                                                 src[],
-  const std::bitset<VectorizedArray<Number>::n_array_elements> mask,
+  const VectorOperation &                                       operation,
+  VectorType *                                                  src[],
+  const std::bitset<VectorizedArray<Number>::n_array_elements> &mask,
   const bool apply_constraints) const
 {
   // Case 1: No MatrixFree object given, simple case because we do not need to
@@ -4395,9 +4395,9 @@ template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::
   read_write_operation_contiguous(
-    const VectorOperation &                                      operation,
-    VectorType *                                                 src[],
-    const std::bitset<VectorizedArray<Number>::n_array_elements> mask) const
+    const VectorOperation &                                       operation,
+    VectorType *                                                  src[],
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const
 {
   // This functions processes the functions read_dof_values,
   // distribute_local_to_global, and set_dof_values with the same code for
@@ -4704,9 +4704,9 @@ template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::
   distribute_local_to_global(
-    VectorType &                                                 dst,
-    const unsigned int                                           first_index,
-    const std::bitset<VectorizedArray<Number>::n_array_elements> mask) const
+    VectorType &                                                  dst,
+    const unsigned int                                            first_index,
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const
 {
   Assert(dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
@@ -4732,9 +4732,9 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::set_dof_values(
-  VectorType &                                                 dst,
-  const unsigned int                                           first_index,
-  const std::bitset<VectorizedArray<Number>::n_array_elements> mask) const
+  VectorType &                                                  dst,
+  const unsigned int                                            first_index,
+  const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const
 {
   Assert(dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
