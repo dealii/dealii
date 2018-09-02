@@ -58,7 +58,7 @@ next. The code is also very efficient in terms of storage. Around 2-4 million
 degrees of freedom fit into 1 GB of memory, see also the MPI results below. An
 interesting fact is that solving one linear system is cheaper than the setup,
 despite not building a matrix (approximately half of which is spent in the
-DoFHandler::distribute_dofs() and DoFHandler::distributed_mg_dofs()
+DoFHandler::distribute_dofs() and DoFHandler::distribute_mg_dofs()
 calls). This shows the high efficiency of this approach, but also that the
 deal.II data structures are quite expensive to set up and the setup cost must
 be amortized over several system solves.
@@ -427,11 +427,12 @@ temporary vector and LinearAlgebra::distributed::Vector::copy_locally_owned_data
 as shown below.
 
 @code
-IndexSet locally_relevant_set;
-DoFTools::extract_locally_relevant_dofs (dof_handler,
-                                         locally_relevant_set);
+IndexSet locally_relevant_dofs;
+DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 LinearAlgebra::distributed::Vector<double> copy_vec(solution);
-solution.reinit(locally_owned_dofs, locally_relevant_set, mpi_communicator);
+solution.reinit(dof_handler.locally_owned_dofs(),
+                locally_relevant_dofs,
+                triangulation.get_communicator());
 solution.copy_locally_owned_data_from(copy_vec);
 constraints.distribute(solution);
 solution.update_ghost_values();
@@ -483,7 +484,7 @@ constrained by Dirichlet conditions.
 In the implementation in deal.II, the integrals $(\nabla \varphi_i,\nabla \varphi_j)_\Omega$
 on the right hand side are already contained in the local matrix contributions
 we assemble on each cell. When using
-ConstraintMatrix::distributed_local_to_global() as first described in the
+AffineConstraints::distribute_local_to_global() as first described in the
 step-6 and step-7 tutorial programs, we can account for the contribution of
 inhomogeneous constraints <i>j</i> by multiplying the columns <i>j</i> and
 rows <i>i</i> of the local matrix according to the integrals $(\varphi_i,
@@ -507,10 +508,10 @@ unrelated to the real entries.
 In a matrix-free method, we need to take a different approach, since the @p
 LaplaceOperator class represents the matrix-vector product of a
 <b>homogeneous</b> operator (the left-hand side of the last formula).  It does
-not matter whether the ConstraintMatrix passed to the MatrixFree::reinit()
-contains inhomogeneous constraints or not, the MatrixFree::cell_loop() call
-will only resolve the homogeneous part of the constraints as long as it
-represents a <b>linear</b> operator.
+not matter whether the AffineConstraints object passed to the
+MatrixFree::reinit() contains inhomogeneous constraints or not, the
+MatrixFree::cell_loop() call will only resolve the homogeneous part of the
+constraints as long as it represents a <b>linear</b> operator.
 
 In our matrix-free code, the right hand side computation where the
 contribution of inhomogeneous conditions ends up is completely decoupled from
@@ -522,15 +523,17 @@ where we only set the Dirichlet values:
 @code
   // interpolate boundary values on vector solution
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(mapping, dof_handler, 0,
-                                           BoundaryValueFunction<dim>(), boundary_values);
-  for (typename std::map<types::global_dof_index, double>::iterator it = boundary_values.begin();
-       it != boundary_values.end(); ++it)
-    if (solution.locally_owned_elements().is_element(it->first))
-      solution(it->first) = it->second;
+  VectorTools::interpolate_boundary_values(mapping,
+                                           dof_handler,
+                                           0,
+                                           BoundaryValueFunction<dim>(),
+                                           boundary_values);
+  for (const std::pair<const types::global_dof_index, double> &pair : boundary_values)
+    if (solution.locally_owned_elements().is_element(pair.first))
+      solution(pair.first) = pair.second;
 @endcode
 or, equivalently, if we already had filled the inhomogeneous constraints into
-a constraint matrix object,
+an AffineConstraints object,
 @code
   solution = 0;
   constraints.distribute(solution);
@@ -556,22 +559,25 @@ values as follows, assuming the Dirichlet values have been interpolated into
 the object @p constraints:
 @code
 template <int dim>
-void LaplaceProblem<dim>::assemble_rhs ()
+void LaplaceProblem<dim>::assemble_rhs()
 {
   solution = 0;
   constraints.distribute(solution);
+  solution.update_ghost_values();
   system_rhs = 0;
 
-  solution.update_ghost_values();
-  FEEvaluation<dim,degree_finite_element> phi(*system_matrix.get_matrix_free());
-  for (unsigned int cell=0; cell<system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
+  const Table<2, VectorizedArray<double>> &coefficient = system_matrix.get_coefficient();
+  FEEvaluation<dim, degree_finite_element> phi(*system_matrix.get_matrix_free());
+  for (unsigned int cell = 0;
+       cell < system_matrix.get_matrix_free()->n_macro_cells();
+       ++cell)
     {
       phi.reinit(cell);
       phi.read_dof_values_plain(solution);
       phi.evaluate(false, true);
-      for (unsigned int q=0; q<phi.n_q_points; ++q)
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
         {
-          phi.submit_gradient(-coefficient(cell,q) * phi.get_gradient(q), q);
+          phi.submit_gradient(-coefficient(cell, q) * phi.get_gradient(q), q);
           phi.submit_value(make_vectorized_array<double>(1.0), q);
         }
       phi.integrate(true, true);
@@ -613,74 +619,60 @@ assemble_residual() that computes the (weak) form of the residual, whereas the
 @p LaplaceOperator::apply_add() function would get the linearization of the
 residual with respect to the solution variable.
 
-<h5> Use LaplaceOperator with a second ConstraintMatrix without Dirichlet conditions </h5>
+<h5> Use LaplaceOperator with a second AffineConstraints object without Dirichlet conditions </h5>
 
-A second alternative to get the right hand side that re-uses the
-@p LaplaceOperator::apply_add() function is to instead add a second constraint
-matrix that skips Dirichlet constraints on the read operation. To do this, we
-initialize a MatrixFree object in a more extended way with two different
-DoFHandler / ConstraintMatrix combinations. The 0-th component includes
-Dirichlet conditions for solving the linear system, whereas 1-st component
-does read also from Dirichlet-constrained degrees of freedom for the right
-hand side assembly:
-
-@code
-  constraints.clear();
-  constraints.reinit(locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          constraints);
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            BoundaryValues<dim>(),
-                                            constraints);
-  constraints.close();
-  constraints_without_dirichlet.clear();
-  constraints_without_dirichlet.reinit(locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          constraints_without_dirichlet);
-  constraints_without_dirichlet.close();
-
-  std::vector<const DoFHandler<dim> *> dof_handlers(2, &dof_handler);
-  {
-    std::vector<const ConstraintMatrix *> constraint(2);
-    constraint[0] = &constraints;
-    constraint[1] = &constraints_without_dirichlet;
-    typename MatrixFree<dim,number>::AdditionalData additional_data;
-    additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
-                                            update_quadrature_points);
-
-    std::shared_ptr<MatrixFree<dim,double> > matrix_free;
-    matrix_free->reinit (mapping, dof_handlers, constraint,
-                         QGauss<1>(fe.degree+1), additional_data);
-
-    // select zeroth block in matrix_free for the main matrix
-    std::vector<unsigned int> selected_block {0};
-    laplace_operator.initialize(matrix_free, selected_block);
-  }
-@endcode
-
-This @p matrix_free object is then passed to a @p LaplaceOperator class
-instance @p laplace_operator that gets used in the linear solver. Alongside,
-we create a second @p LaplaceOperator object that fills the right hand side:
+A second alternative to get the right hand side that re-uses the @p
+LaplaceOperator::apply_add() function is to instead add a second LaplaceOperator
+that skips Dirichlet constraints. To do this, we initialize a second MatrixFree
+object which does not have any boundary value constraints. This @p matrix_free
+object is then passed to a @p LaplaceOperator class instance @p
+inhomogeneous_operator that is only used to create the right hand side:
 @code
 template <int dim>
-void LaplaceProblem<dim>::assemble_rhs ()
+void LaplaceProblem<dim>::assemble_rhs()
 {
-  LaplaceOperator<dim,fe_degree,double> laplace_operator_inhomogenous;
+  system_rhs = 0;
+  AffineConstraints<double> no_constraints;
+  no_constraints.close();
+  LaplaceOperator<dim, degree_finite_element, double> inhomogeneous_operator;
 
-  // select first block in matrix_free to use constraints_without_dirichlet
-  std::vector<unsigned int> selected_block {1};
-  laplace_operator_inhomogeneous.initialize(matrix_free, selected_block);
-  solution = 0;
+  typename MatrixFree<dim, double>::AdditionalData additional_data;
+  additional_data.mapping_update_flags =
+    (update_gradients | update_JxW_values | update_quadrature_points);
+  std::shared_ptr<MatrixFree<dim, double>> matrix_free(
+    new MatrixFree<dim, double>());
+  matrix_free->reinit(dof_handler,
+                      no_constraints,
+                      QGauss<1>(fe.degree + 1),
+                      additional_data);
+  inhomogeneous_operator.initialize(matrix_free);
+
+  solution = 0.0;
   constraints.distribute(solution);
-  laplace_operator_inhomogeneous.vmult(system_rhs, solution);
-  system_rhs *= -1.;
+  inhomogeneous_operator.evaluate_coefficient(Coefficient<dim>());
+  inhomogeneous_operator.vmult(system_rhs, solution);
+  system_rhs *= -1.0;
 
-  // proceed as usual with integration of right hand side function...
+  FEEvaluation<dim, degree_finite_element> phi(
+    *inhomogeneous_operator.get_matrix_free());
+  for (unsigned int cell = 0;
+       cell < inhomogeneous_operator.get_matrix_free()->n_macro_cells();
+       ++cell)
+    {
+      phi.reinit(cell);
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        phi.submit_value(make_vectorized_array<double>(1.0), q);
+      phi.integrate(true, false);
+      phi.distribute_local_to_global(system_rhs);
+    }
+  system_rhs.compress(VectorOperation::add);
 }
 @endcode
 
-Instead of adding a second DoFHandler / ConstraintMatrix pair to the same
-MatrixFree::reinit() call, one could of course also construct an independent
-MatrixFree object that feeds the second @p LaplaceOperator instance, see also
-the discussion in MatrixFreeOperators::Base.
+A more sophisticated implementation of this technique could reuse the original
+MatrixFree object. This can be done by initializing the MatrixFree object with
+multiple blocks, where each block corresponds to a different AffineConstraints
+object. Doing this would require making substantial modifications to the
+LaplaceOperator class, but the MatrixFreeOperators::LaplaceOperator class that
+comes with the library can do this. See the discussion on blocks in
+MatrixFreeOperators::Base for more information on how to set up blocks.

@@ -22,21 +22,16 @@
 // First include the necessary files from the deal.II library.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/multigrid/multigrid.h>
@@ -101,10 +96,6 @@ namespace Step37
     template <typename number>
     number value(const Point<dim, number> &p,
                  const unsigned int        component = 0) const;
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
   };
 
 
@@ -126,10 +117,9 @@ namespace Step37
   // make use of vectorized operations.
   //
   // In the function implementation, we assume that the number type overloads
-  // basic arithmetic operations, so we just write the code as usual. The
-  // standard functions @p value and value_list that are virtual functions
-  // contained in the base class are then computed from the templated function
-  // with double type, in order to avoid duplicating code.
+  // basic arithmetic operations, so we just write the code as usual. The base
+  // class function @p value is then computed from the templated function with
+  // double type, in order to avoid duplicating code.
   template <int dim>
   template <typename number>
   number Coefficient<dim>::value(const Point<dim, number> &p,
@@ -146,23 +136,6 @@ namespace Step37
   {
     return value<double>(p, component);
   }
-
-
-
-  template <int dim>
-  void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
-                                    std::vector<double> &          values,
-                                    const unsigned int component) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    const unsigned int n_points = points.size();
-    for (unsigned int i = 0; i < n_points; ++i)
-      values[i] = value<double>(points[i], component);
-  }
-
 
 
   // @sect3{Matrix-free implementation}
@@ -415,7 +388,7 @@ namespace Step37
   // $v_\mathrm{cell}$ as mentioned in the introduction need to be added into
   // the result vector (and constraints are applied). This is done with a call
   // to @p distribute_local_to_global, the same name as the corresponding
-  // function in the ConstraintMatrix (only that we now store the local vector
+  // function in the AffineConstraints (only that we now store the local vector
   // in the FEEvaluation object, as are the indices between local and global
   // degrees of freedom).  </ol>
   template <int dim, int fe_degree, typename number>
@@ -454,7 +427,8 @@ namespace Step37
   // @code
   // src.update_ghost_values();
   // local_apply(*this->data, dst, src, std::make_pair(0U,
-  // data.n_macro_cells())); dst.compress(VectorOperation::add);
+  //                                                   data.n_macro_cells()));
+  // dst.compress(VectorOperation::add);
   // @endcode
   //
   // Here, the two calls update_ghost_values() and compress() perform the data
@@ -476,7 +450,7 @@ namespace Step37
   // Note that after the cell loop, the constrained degrees of freedom need to
   // be touched once more for sensible vmult() operators: Since the assembly
   // loop automatically resolves constraints (just as the
-  // ConstraintMatrix::distribute_local_to_global call does), it does not
+  // AffineConstraints::distribute_local_to_global() call does), it does not
   // compute any contribution for constrained degrees of freedom, leaving the
   // respective entries zero. This would represent a matrix that had empty
   // rows and columns for constrained degrees of freedom. However, iterative
@@ -552,7 +526,7 @@ namespace Step37
   // <tt>unsigned int</tt> in place of the source vector to confirm with the
   // cell_loop interface. After the loop, we need to set the vector entries
   // subject to Dirichlet boundary conditions to one (either those on the
-  // boundary described by the ConstraintMatrix object inside MatrixFree or
+  // boundary described by the AffineConstraints object inside MatrixFree or
   // the indices at the interface between different grid levels in adaptive
   // multigrid). This is done through the function
   // MatrixFreeOperators::Base::set_constrained_entries_to_one() and matches
@@ -718,7 +692,7 @@ namespace Step37
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     using SystemMatrixType =
       LaplaceOperator<dim, degree_finite_element, double>;
     SystemMatrixType system_matrix;
@@ -885,7 +859,7 @@ namespace Step37
         DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                       level,
                                                       relevant_dofs);
-        ConstraintMatrix level_constraints;
+        AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
@@ -1121,9 +1095,9 @@ namespace Step37
 
     constraints.distribute(solution);
 
-    pcout << "Time solve (" << solver_control.last_step()
-          << " iterations)  (CPU/wall) " << time.cpu_time() << "s/"
-          << time.wall_time() << "s\n";
+    pcout << "Time solve (" << solver_control.last_step() << " iterations)"
+          << (solver_control.last_step() < 10 ? "  " : " ") << "(CPU/wall) "
+          << time.cpu_time() << "s/" << time.wall_time() << "s\n";
   }
 
 
@@ -1132,13 +1106,22 @@ namespace Step37
 
   // Here is the data output, which is a simplified version of step-5. We use
   // the standard VTU (= compressed VTK) output for each grid produced in the
-  // refinement process. We disable the output when the mesh gets too
-  // large. Note that a variant of program has been run on hundreds of
-  // thousands MPI ranks with as many as 100 billion grid cells, which is not
-  // directly accessible to classical visualization tools.
+  // refinement process. In addition, we use a compression algorithm that is
+  // optimized for speed rather than disk usage. The default setting (which
+  // optimizes for disk usage) makes saving the output take about 4 times as
+  // long as running the linear solver, while setting
+  // DataOutBase::VtkFlags::compression_level to
+  // DataOutBase::VtkFlags::best_speed lowers this to only one fourth the time
+  // of the linear solve.
+  //
+  // We disable the output when the mesh gets too large. A variant of this
+  // program has been run on hundreds of thousands MPI ranks with as many as
+  // 100 billion grid cells, which is not directly accessible to classical
+  // visualization tools.
   template <int dim>
   void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
+    Timer time;
     if (triangulation.n_global_active_cells() > 1000000)
       return;
 
@@ -1153,6 +1136,9 @@ namespace Step37
       "solution-" + std::to_string(cycle) + "." +
       std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
       ".vtu");
+    DataOutBase::VtkFlags flags;
+    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    data_out.set_flags(flags);
     data_out.write_vtu(output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -1169,6 +1155,9 @@ namespace Step37
         std::ofstream master_output(master_name);
         data_out.write_pvtu_record(master_output, filenames);
       }
+
+    time_details << "Time write output          (CPU/wall) " << time.cpu_time()
+                 << "s/" << time.wall_time() << "s\n";
   }
 
 

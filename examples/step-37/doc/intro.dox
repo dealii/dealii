@@ -147,7 +147,7 @@ Matrixfree<dim>::vmult (Vector<double>       &dst,
 
 Here we neglected boundary conditions as well as any hanging nodes we may
 have, though neither would be very difficult to include using the
-ConstraintMatrix class. Note how we first generate the local matrix in the
+AffineConstraints class. Note how we first generate the local matrix in the
 usual way as a sum over all quadrature points for each local matrix entry.
 To form the actual product as expressed in the above formula, we
 extract the values of <code>src</code> of the cell-related degrees of freedom
