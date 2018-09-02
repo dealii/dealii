@@ -333,6 +333,11 @@ namespace parallel
     Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(
       const unsigned int level) const
     {
+      Assert(level < true_level_subdomain_ids_of_cells.size(),
+             ExcInternalError());
+      Assert(true_level_subdomain_ids_of_cells[level].size() ==
+               this->n_cells(level),
+             ExcInternalError());
       return true_level_subdomain_ids_of_cells[level];
     }
 
