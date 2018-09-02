@@ -531,10 +531,11 @@ public:
    * opposed to the scalar case treated with the other initialization
    * functions, this function allows for problems with two or more different
    * finite elements. The DoFHandlers to each element must be passed as
-   * pointers to the initialization function. Note that the finite element
-   * underlying an DoFHandler must either be scalar or contain several copies
-   * of the same element. Mixing several different elements into one
-   * @p FE_System is not allowed.
+   * pointers to the initialization function. Alternatively, a system of
+   * several components may also be represented by a single DoFHandler with an
+   * FESystem element. The prerequisite for this case is that each base
+   * element of the FESystem must be compatible with the present class, such
+   * as the FE_Q or FE_DGQ classes.
    *
    * This function also allows for using several quadrature formulas, e.g.
    * when the description contains independent integrations of elements of
