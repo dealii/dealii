@@ -317,7 +317,7 @@ separately and uses the gradient as the main source of information.
 <h3> Problem specific data </h3>
 
 For this tutorial program, we consider almost the same test case as in
-step-7. The computational domain is $\Omega := [-1,1]^d$ and the exact
+step-7. The computational domain is $\Omega \dealcoloneq [-1,1]^d$ and the exact
 solution corresponds to the one in step-7, except for a scaling. We use the
 following source centers $x_i$ for the exponentials
 <ul>

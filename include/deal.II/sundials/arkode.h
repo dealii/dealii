@@ -139,17 +139,19 @@ namespace SUNDIALS
    *
    * For both DIRK and ARK methods, an implicit system of the form
    * \f[
-   *  G(z_i) := M z_i − h_n A^I_{i,i} f_I (t^I_{n,i}, z_i) − a_i = 0
+   *  G(z_i) \dealcoloneq M z_i − h_n A^I_{i,i} f_I (t^I_{n,i}, z_i) − a_i = 0
    * \f]
    * must be solved for each stage $z_i , i = 1, \ldot, s$, where
    * we have the data
    * \f[
-   *  a_i :=  M y_{n−1} + h_n \sum_{j=1}^{i−1} [ A^E_{i,j} f_E(t^E_{n,j}, z_j)
+   *  a_i \dealcoloneq
+   *  M y_{n−1} + h_n \sum_{j=1}^{i−1} [ A^E_{i,j} f_E(t^E_{n,j}, z_j)
    *  + A^I_{i,j} f_I (t^I_{n,j}, z_j)]
    * \f]
    * for the ARK methods, or
    * \f[
-   *  a_i :=  M y_{n−1} + h_n \sum_{j=1}^{i−1} A^I_{i,j} f_I (t^I_{n,j}, z_j)
+   *  a_i \dealcoloneq
+   *  M y_{n−1} + h_n \sum_{j=1}^{i−1} A^I_{i,j} f_I (t^I_{n,j}, z_j)
    * \f]
    * for the DIRK methods. Here $A^I_{i,j}$ and $A^E_{i,j}$ are the Butcher's
    * tables for the chosen solver.
@@ -172,8 +174,9 @@ namespace SUNDIALS
    * \f]
    * where
    * \f[
-   * N := M - \gamma J, \quad J := \frac{\partial f_I}{\partial y},
-   * \qquad \gamma:= h_n A^I_{i,i}.
+   * N \dealcoloneq M - \gamma J, \quad J
+   * \dealcoloneq \frac{\partial f_I}{\partial y},
+   * \qquad \gamma\dealcoloneq h_n A^I_{i,i}.
    * \f]
    *
    * As an alternate to Newton’s method, ARKode may solve for each stage $z_i ,i
@@ -264,7 +267,7 @@ namespace SUNDIALS
    * That is $y' = A y$
    * where
    * \f[
-   * A:=
+   * A \dealcoloneq
    * \begin{matrix}
    * 0 & 1 \\
    * -k^2 &0

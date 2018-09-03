@@ -127,13 +127,13 @@ namespace Physics
    * in the current (spatial) configuration through the nonlinear map
    * @f[
    *  \mathbf{x}
-   *   := \boldsymbol{\varphi} \left( \mathbf{X} \right)
+   *   \dealcoloneq \boldsymbol{\varphi} \left( \mathbf{X} \right)
    *    = \mathbf{X} + \mathbf{u}(\mathbf{X}) \, ,
    * @f]
    * where the $\mathbf{u}(\mathbf{X})$ represents the displacement vector.
    * From this we can compute the deformation gradient tensor as
    * @f[
-   *  \mathbf{F} := \mathbf{I} + \nabla_{0}\mathbf{u} \, ,
+   *  \mathbf{F} \dealcoloneq \mathbf{I} + \nabla_{0}\mathbf{u} \, ,
    * @f]
    * wherein the differential operator $\nabla_{0}$ is defined as
    * $\frac{\partial}{\partial \mathbf{X}}$ and $\mathbf{I}$ is the identity
@@ -171,9 +171,11 @@ namespace Physics
    *
    * We then define the symmetric and skew-symmetric fourth-order unit tensors by
    * @f[
-   *      \mathcal{S} := \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
-   *    \qquad \text{and} \qquad
-   *      \mathcal{W} := \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
+   * \mathcal{S} \dealcoloneq
+   * \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
+   * \qquad \text{and} \qquad
+   * \mathcal{W} \dealcoloneq
+   * \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
    * @f]
    * such that
    * @f[

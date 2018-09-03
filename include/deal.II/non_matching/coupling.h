@@ -52,7 +52,8 @@ namespace NonMatching
    * \text{span}\{w_j\}_{j=0}^m$, compute the sparsity pattern that would be
    * necessary to assemble the matrix
    * \f[
-   * M_{ij} := \int_{B} v_i(x) w_j(x) dx, \quad i \in [0,n), j \in [0,m),
+   * M_{ij} \dealcoloneq \int_{B} v_i(x) w_j(x) dx,
+   *                     \quad i \in [0,n), j \in [0,m),
    * \f]
    * where $V(\Omega)$ is the finite element space associated with the
    * `space_dh` passed to this function (or part of it, if specified in
@@ -144,7 +145,8 @@ namespace NonMatching
    * $V(\Omega) = \text{span}\{v_i\}_{i=0}^n$ and $Q(B) =
    * \text{span}\{w_j\}_{j=0}^m$, compute the coupling matrix
    * \f[
-   * M_{ij} := \int_{B} v_i(x) w_j(x) dx, \quad i \in [0,n), j \in [0,m),
+   * M_{ij} \dealcoloneq \int_{B} v_i(x) w_j(x) dx,
+   *                     \quad i \in [0,n), j \in [0,m),
    * \f]
    * where $V(\Omega)$ is the finite element space associated with the
    * `space_dh` passed to this function (or part of it, if specified in

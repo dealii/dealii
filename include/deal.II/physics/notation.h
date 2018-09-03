@@ -43,7 +43,7 @@ namespace Physics
      * a rank-2 symmetric tensor $\mathbf{S}$ we enumerate its tensor
      * components
      * @f[
-     * \mathbf{S} := \left[ \begin{array}{ccc}
+     * \mathbf{S} \dealcoloneq \left[ \begin{array}{ccc}
      *  S_{00}          & S_{01}          & S_{02} \\
      *  S_{10} = S_{01} & S_{11}          & S_{12} \\
      *  S_{20} = S_{02} & S_{21} = S_{12} & S_{22}
@@ -58,7 +58,7 @@ namespace Physics
      * where $n$ denotes the Kelvin index for the tensor component,
      * while for a general rank-2 tensor $\mathbf{T}$
      * @f[
-     * \mathbf{T} := \left[ \begin{array}{ccc}
+     * \mathbf{T} \dealcoloneq \left[ \begin{array}{ccc}
      *  T_{00} & T_{01} & T_{02} \\
      *  T_{10} & T_{11} & T_{12} \\
      *  T_{20} & T_{21} & T_{22}
@@ -72,7 +72,7 @@ namespace Physics
      * @f]
      * and for a rank-1 tensor $\mathbf{v}$
      * @f[
-     * \mathbf{v} := \left[ \begin{array}{c}
+     * \mathbf{v} \dealcoloneq \left[ \begin{array}{c}
      *  v_{0} \\ v_{1} \\ v_{2}
      * \end{array}\right]
      * \quad \Rightarrow \quad

@@ -237,7 +237,7 @@ ScaLAPACKMatrix<NumberType> &
 ScaLAPACKMatrix<NumberType>::operator=(const FullMatrix<NumberType> &matrix)
 {
   // FIXME: another way to copy is to use pdgeadd_ PBLAS routine.
-  // This routine computes the sum of two matrices B:=a*A+b*B.
+  // This routine computes the sum of two matrices B := a*A + b*B.
   // Matrices can have different distribution,in particular matrix A can
   // be owned by only one process, so we can set a=1 and b=0 to copy
   // non-distributed matrix A into distributed matrix B.

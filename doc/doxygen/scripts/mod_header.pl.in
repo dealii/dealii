@@ -14,3 +14,14 @@ if (m'</head>')
 }
 
 s/\$projectname// unless (m/<title>/);
+
+# Finally, define some extra commands for MathJax in every file. These are in an
+# undisplayed div so that the \newcommand text does not pop up and then
+# disappear while MathJax works.
+if (eof)
+{
+    CORE::say '<!--Extra macros for MathJax:-->';
+    CORE::say '<div style="display:none">';
+    CORE::say '\(\newcommand{\dealcoloneq}{\mathrel{\vcenter{:}}=}\)';
+    CORE::say '</div>';
+}

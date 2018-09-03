@@ -499,12 +499,12 @@ namespace Step44
   // \Psi_{\text{iso}}(\overline{\mathbf{b}}) = c_{1} [\overline{I}_{1} - 3] $
   // where $ c_{1} = \frac{\mu}{2} $ and $\overline{I}_{1}$ is the first
   // invariant of the left- or right-isochoric Cauchy-Green deformation tensors.
-  // That is $\overline{I}_1 :=\textrm{tr}(\overline{\mathbf{b}})$.  In this
-  // example the SEF that governs the volumetric response is defined as $
-  // \Psi_{\text{vol}}(\widetilde{J}) = \kappa \frac{1}{4} [ \widetilde{J}^2 - 1
-  // - 2\textrm{ln}\; \widetilde{J} ]$,  where $\kappa:= \lambda + 2/3 \mu$ is
-  // the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk modulus</a>
-  // and $\lambda$ is <a
+  // That is $\overline{I}_1 \dealcoloneq \textrm{tr}(\overline{\mathbf{b}})$.
+  // In this example the SEF that governs the volumetric response is defined as
+  // $ \Psi_{\text{vol}}(\widetilde{J}) = \kappa \frac{1}{4} [ \widetilde{J}^2 -
+  // 1 - 2\textrm{ln}\; \widetilde{J} ]$, where $\kappa \dealcoloneq \lambda +
+  // 2/3 \mu$ is the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk
+  // modulus</a> and $\lambda$ is <a
   // href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lame's first
   // parameter</a>.
   //
@@ -1141,7 +1141,7 @@ namespace Step44
     time.increment();
 
     // We then declare the incremental solution update $\varDelta
-    // \mathbf{\Xi}:= \{\varDelta \mathbf{u},\varDelta \widetilde{p},
+    // \mathbf{\Xi} \dealcoloneq \{\varDelta \mathbf{u},\varDelta \widetilde{p},
     // \varDelta \widetilde{J} \}$ and start the loop over the time domain.
     //
     // At the beginning, we reset the solution update for this time step...
@@ -1955,10 +1955,9 @@ namespace Step44
     return vol_current;
   }
 
-  // Calculate how well the dilatation $\widetilde{J}$ agrees with $J :=
-  // \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[ \int_{\Omega_0} {[
-  // J
-  // - \widetilde{J}]}^{2}\textrm{d}V \bigr]^{1/2}$.
+  // Calculate how well the dilatation $\widetilde{J}$ agrees with $J
+  // \dealcoloneq \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[
+  // \int_{\Omega_0} {[ J - \widetilde{J}]}^{2}\textrm{d}V \bigr]^{1/2}$.
   // We also return the ratio of the current volume of the
   // domain to the reference volume. This is of interest for incompressible
   // media where we want to check how well the isochoric constraint has been
@@ -2731,8 +2730,8 @@ namespace Step44
     // with $\mathsf{\mathbf{k}}_{\textrm{con}} = \bigl[
     // \mathsf{\mathbf{k}}_{uu} +\overline{\overline{\mathsf{\mathbf{k}}}}~
     // \bigr]$ where $               \overline{\overline{\mathsf{\mathbf{k}}}}
-    // := \mathsf{\mathbf{k}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{k}}}
-    // \mathsf{\mathbf{k}}_{\widetilde{p}u}
+    // \dealcoloneq \mathsf{\mathbf{k}}_{u\widetilde{p}}
+    // \overline{\mathsf{\mathbf{k}}} \mathsf{\mathbf{k}}_{\widetilde{p}u}
     // $
     // and
     // $
@@ -2891,7 +2890,7 @@ namespace Step44
         // the tangent matrix. For the following, recall that
         // @f{align*}
         //  \mathsf{\mathbf{K}}_{\textrm{store}}
-        //:=
+        //\dealcoloneq
         //  \begin{bmatrix}
         //      \mathsf{\mathbf{K}}_{\textrm{con}}      &
         //      \mathsf{\mathbf{K}}_{u\widetilde{p}}    & \mathbf{0}
@@ -2949,7 +2948,7 @@ namespace Step44
         //  @f]
         //  where
         //  @f[
-        //              \overline{\overline{\mathsf{\mathbf{K}}}} :=
+        //              \overline{\overline{\mathsf{\mathbf{K}}}} \dealcoloneq
         //                      \mathsf{\mathbf{K}}_{u\widetilde{p}}
         //                      \overline{\mathsf{\mathbf{K}}}
         //                      \mathsf{\mathbf{K}}_{\widetilde{p}u} \, .

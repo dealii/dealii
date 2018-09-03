@@ -847,11 +847,11 @@ namespace FEValuesViews
      * For 1d this function does not make any sense. Thus it is not
      * implemented for <code>spacedim=1</code>.  In 2d the curl is defined as
      * @f{equation*}{
-     * \operatorname{curl}(u):=\frac{du_2}{dx} -\frac{du_1}{dy},
+     * \operatorname{curl}(u) \dealcoloneq \frac{du_2}{dx} -\frac{du_1}{dy},
      * @f}
      * whereas in 3d it is given by
      * @f{equation*}{
-     * \operatorname{curl}(u):=\left( \begin{array}{c}
+     * \operatorname{curl}(u) \dealcoloneq \left( \begin{array}{c}
      * \frac{du_3}{dy}-\frac{du_2}{dz}\\ \frac{du_1}{dz}-\frac{du_3}{dx}\\
      * \frac{du_2}{dx}-\frac{du_1}{dy} \end{array} \right).
      * @f}
@@ -4542,9 +4542,9 @@ namespace FEValuesViews
         // A_{ij} = A_{ji} and there is only one (if diagonal) or two non-zero
         // entries in the tensorial representation.  define the
         // divergence as:
-        // b_i := \dfrac{\partial phi_{ij}}{\partial x_j}.
+        // b_i \dealcoloneq \dfrac{\partial phi_{ij}}{\partial x_j}.
         // (which is incidentally also
-        // b_j := \dfrac{\partial phi_{ij}}{\partial x_i}).
+        // b_j \dealcoloneq \dfrac{\partial phi_{ij}}{\partial x_i}).
         // In both cases, a sum is implied.
         //
         // Now, we know the nonzero component in unrolled form: it is indicated
@@ -4559,13 +4559,13 @@ namespace FEValuesViews
         // given the form of the divergence above, if ii=jj there is only a
         // single nonzero component of the full tensor and the gradient
         // equals
-        // b_ii := \dfrac{\partial phi_{ii,ii}}{\partial x_ii}.
+        // b_ii \dealcoloneq \dfrac{\partial phi_{ii,ii}}{\partial x_ii}.
         // all other entries of 'b' are zero
         //
         // on the other hand, if ii!=jj, then there are two nonzero entries in
         // the full tensor and
-        // b_ii := \dfrac{\partial phi_{ii,jj}}{\partial x_ii}.
-        // b_jj := \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
+        // b_ii \dealcoloneq \dfrac{\partial phi_{ii,jj}}{\partial x_ii}.
+        // b_jj \dealcoloneq \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
         // again, all other entries of 'b' are zero
         const dealii::Tensor<1, spacedim> &phi_grad =
           fe_values->finite_element_output.shape_gradients[snc][q_point];

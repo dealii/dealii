@@ -77,7 +77,8 @@ namespace Physics
        * \}$ the following holds:
        * @f[
        *   \mathcal{S} : \{ \hat{\bullet} \}
-       *     := \dfrac{1}{2}[\{ \hat{\bullet} \} + \{ \hat{\bullet} \}^T] \, .
+       *   \dealcoloneq \dfrac{1}{2}
+       *   \left[ \{ \hat{\bullet} \} + \{ \hat{\bullet} \}^T \right] \, .
        * @f]
        *
        * As a corollary to this, for any second-order symmetric tensor $\{
@@ -125,8 +126,8 @@ namespace Physics
        * This is defined as
        * @f[
        *   \mathcal{P}
-       *     := \mathcal{S} - \frac{1}{\textrm{dim}} \mathbf{I} \otimes
-       * \mathbf{I}
+       *     \dealcoloneq \mathcal{S} - \frac{1}{\textrm{dim}} \mathbf{I}
+       *     \otimes \mathbf{I}
        * @f]
        * where $\mathcal{S}$ is the fourth-order unit symmetric tensor and
        * $\mathbf{I}$ is the second-order identity tensor.
@@ -134,9 +135,10 @@ namespace Physics
        * For any second-order (spatial) symmetric tensor the following holds:
        * @f[
        *  \mathcal{P} : \{ \bullet \}
-       *  := \{ \bullet \} - \frac{1}{\textrm{dim}} \left[ \{ \bullet \} :
-       * \mathbf{I} \right]\mathbf{I} = \mathcal{P}^{T} : \{ \bullet \} =
-       * \texttt{dev\_P} \left( \{ \bullet \} \right)
+       *  \dealcoloneq \{ \bullet \} - \frac{1}{\textrm{dim}}
+       *  \left[ \{ \bullet \} : \mathbf{I} \right]\mathbf{I}
+       *  = \mathcal{P}^{T} : \{ \bullet \}
+       *  = \texttt{dev\_P} \left( \{ \bullet \} \right)
        * @f]
        * and, therefore,
        * @f[
@@ -164,11 +166,11 @@ namespace Physics
        * This referential isochoric projection tensor is defined as
        * @f[
        *   \hat{\mathcal{P}}
-       *     := \frac{\partial \bar{\mathbf{C}}}{\partial \mathbf{C}}
+       *     \dealcoloneq \frac{\partial \bar{\mathbf{C}}}{\partial \mathbf{C}}
        * @f]
        * with
        * @f[
-       *  \bar{\mathbf{C}} := J^{-2/\textrm{dim}} \mathbf{C}
+       *  \bar{\mathbf{C}} \dealcoloneq J^{-2/\textrm{dim}} \mathbf{C}
        *    \qquad \text{,} \qquad
        *  \mathbf{C} = \mathbf{F}^{T}\cdot\mathbf{F}
        *    \qquad \text{and} \qquad
@@ -178,7 +180,7 @@ namespace Physics
        * the following holds:
        * @f[
        *  \{ \bullet \} : \hat{\mathcal{P}}
-       *    := J^{-2/\textrm{dim}} \left[ \{ \bullet \} -
+       *    \dealcoloneq J^{-2/\textrm{dim}} \left[ \{ \bullet \} -
        * \frac{1}{\textrm{dim}}\left[\mathbf{C} : \{ \bullet \}\right]
        * \mathbf{C}^{-1} \right] = \texttt{Dev\_P} \left( \{ \bullet \} \right)
        * \, .
@@ -272,7 +274,7 @@ namespace Physics
        * @f[
        *  \left[ \frac{\partial \mathbf{C}^{-1}}{\partial \mathbf{C}}
        * \right]_{IJKL}
-       *    := -\frac{1}{2}[ C^{-1}_{IK}C^{-1}_{JL}
+       *    \dealcoloneq -\frac{1}{2}[ C^{-1}_{IK}C^{-1}_{JL}
        *     + C^{-1}_{IL}C^{-1}_{JK}  ]
        * @f]
        *

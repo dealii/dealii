@@ -73,7 +73,7 @@ or implicit Euler method, respectively. Another important choice is
 $\theta=\frac{1}{2}$, which gives the second-order accurate
 Crank-Nicolson scheme. Henceforth, a superscript $n$ denotes the
 values of the variables at the $n^{\mathrm{th}}$ time step, i.e. at
-$t=t_n:= n k$, where $k$ is the (fixed) time step size. Thus,
+$t=t_n \dealcoloneq n k$, where $k$ is the (fixed) time step size. Thus,
 the split formulation of the time-discretized sine-Gordon equation becomes
 \f{eqnarray*}
   \frac{u^n - u^{n-1}}{k} - \left[\theta v^n + (1-\theta) v^{n-1}\right] &=& 0,\\
