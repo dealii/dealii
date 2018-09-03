@@ -183,8 +183,8 @@
         </li>
 
         <li> If your machine has multiple processors, use <code>make
-	  -jN</code> in the last step, where <code>N</code> is the number of simultaneous build processes you want <code>make</code> to use at any given time. Allowing <code>make</code> to use more simultaneous build processes (assuming you have that many processor
-            cores) will greatly lower the build time.
+	  -jN install</code> in the second to last step instead, where <code>N</code> is the number of simultaneous build processes you want <code>make</code> to use at any given time. Allowing <code>make</code> to use more simultaneous build processes (assuming you have that many processor
+            cores) will greatly lower the build time. <code>make test</code> automatically runs in parallel and no <code>-jN</code> flag should be supplied to it.
         </li>
 
         <li> If you do not intend to modify the <acronym>deal.II</acronym> sources and recompile things, then you can remove the <code>build/</code> directory after the last step.
