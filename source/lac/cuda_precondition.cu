@@ -1184,27 +1184,6 @@ namespace
                                        pBufferSizeInBytes);
   }
   */
-
-
-
-  template <typename Number>
-  void
-  delete_device_vector(Number *device_ptr) noexcept
-  {
-    const cudaError_t error_code = cudaFree(device_ptr);
-    (void)error_code;
-    AssertNothrow(error_code == cudaSuccess,
-                  dealii::ExcCudaError(cudaGetErrorString(error_code)));
-  }
-
-  template <typename Number>
-  Number *
-  allocate_device_vector(const std::size_t size)
-  {
-    Number *device_ptr;
-    Utilities::CUDA::malloc(device_ptr, size);
-    return device_ptr;
-  }
 } // namespace
 
 namespace CUDAWrappers
@@ -1220,11 +1199,11 @@ namespace CUDAWrappers
   template <typename Number>
   PreconditionIC<Number>::PreconditionIC(const Utilities::CUDA::Handle &handle)
     : cusparse_handle(handle.cusparse_handle)
-    , P_val_dev(nullptr, delete_device_vector<Number>)
+    , P_val_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
     , P_row_ptr_dev(nullptr)
     , P_column_index_dev(nullptr)
-    , tmp_dev(nullptr, delete_device_vector<Number>)
-    , buffer_dev(nullptr, delete_device_vector<void>)
+    , tmp_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
+    , buffer_dev(nullptr, Utilities::CUDA::delete_device_data<void>)
     , policy_L(CUSPARSE_SOLVE_POLICY_USE_LEVEL)
     , policy_Lt(CUSPARSE_SOLVE_POLICY_USE_LEVEL)
     , policy_M(CUSPARSE_SOLVE_POLICY_USE_LEVEL)
@@ -1316,7 +1295,8 @@ namespace CUDAWrappers
     const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
 
     // create a copy of the matrix entries since the algorithm works in-place.
-    P_val_dev.reset(allocate_device_vector<Number>(n_nonzero_elements));
+    P_val_dev.reset(
+      Utilities::CUDA::allocate_device_data<Number>(n_nonzero_elements));
     cudaError_t cuda_status = cudaMemcpy(P_val_dev.get(),
                                          A_val_dev,
                                          n_nonzero_elements * sizeof(Number),
@@ -1327,7 +1307,7 @@ namespace CUDAWrappers
     const cusparseMatDescr_t mat_descr = std::get<3>(cusparse_matrix);
 
     // initialize an internal buffer we need later on
-    tmp_dev.reset(allocate_device_vector<Number>(n_rows));
+    tmp_dev.reset(Utilities::CUDA::allocate_device_data<Number>(n_rows));
 
     // step 3: query how much memory used in csric02 and csrsv2, and allocate
     // the buffer
@@ -1371,10 +1351,10 @@ namespace CUDAWrappers
 
     const int BufferSize =
       std::max(BufferSize_M, std::max(BufferSize_L, BufferSize_Lt));
-    // workaround: since allocate_device_vector needs a type, we pass char
+    // workaround: since allocate_device_data needs a type, we pass char
     // which is required to have size 1.
     buffer_dev.reset(static_cast<void *>(
-      allocate_device_vector<char>(BufferSize / sizeof(char))));
+      Utilities::CUDA::allocate_device_data<char>(BufferSize / sizeof(char))));
 
     // step 4: perform analysis of incomplete Cholesky on M
     //         perform analysis of triangular solve on L
@@ -1524,11 +1504,11 @@ namespace CUDAWrappers
   PreconditionILU<Number>::PreconditionILU(
     const Utilities::CUDA::Handle &handle)
     : cusparse_handle(handle.cusparse_handle)
-    , P_val_dev(nullptr, delete_device_vector<Number>)
+    , P_val_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
     , P_row_ptr_dev(nullptr)
     , P_column_index_dev(nullptr)
-    , tmp_dev(nullptr, delete_device_vector<Number>)
-    , buffer_dev(nullptr, delete_device_vector<void>)
+    , tmp_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
+    , buffer_dev(nullptr, Utilities::CUDA::delete_device_data<void>)
     , policy_L(CUSPARSE_SOLVE_POLICY_USE_LEVEL)
     , policy_U(CUSPARSE_SOLVE_POLICY_USE_LEVEL)
     , policy_M(CUSPARSE_SOLVE_POLICY_USE_LEVEL)
@@ -1637,7 +1617,8 @@ namespace CUDAWrappers
     const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
 
     // create a copy of the matrix entries since the algorithm works in-place.
-    P_val_dev.reset(allocate_device_vector<Number>(n_nonzero_elements));
+    P_val_dev.reset(
+      Utilities::CUDA::allocate_device_data<Number>(n_nonzero_elements));
     cudaError_t cuda_status = cudaMemcpy(P_val_dev.get(),
                                          A_val_dev,
                                          n_nonzero_elements * sizeof(Number),
@@ -1648,7 +1629,7 @@ namespace CUDAWrappers
     const cusparseMatDescr_t mat_descr = std::get<3>(cusparse_matrix);
 
     // initialize an internal buffer we need later on
-    tmp_dev.reset(allocate_device_vector<Number>(n_rows));
+    tmp_dev.reset(Utilities::CUDA::allocate_device_data<Number>(n_rows));
 
     // step 3: query how much memory used in csrilu02 and csrsv2, and allocate
     // the buffer
@@ -1692,10 +1673,10 @@ namespace CUDAWrappers
 
     const int BufferSize =
       std::max(BufferSize_M, std::max(BufferSize_L, BufferSize_U));
-    // workaround: since allocate_device_vector needs a type, we pass char
+    // workaround: since allocate_device_data needs a type, we pass char
     // which is required to have size 1.
     buffer_dev.reset(static_cast<void *>(
-      allocate_device_vector<char>(BufferSize / sizeof(char))));
+      Utilities::CUDA::allocate_device_data<char>(BufferSize / sizeof(char))));
 
     // step 4: perform analysis of incomplete Cholesky on M
     //         perform analysis of triangular solve on L
