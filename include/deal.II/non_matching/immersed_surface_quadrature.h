@@ -57,7 +57,7 @@ namespace NonMatching
    * also the normalized normal for each quadrature point. This can be viewed
    * as storing a discrete surface element,
    * @f[
-   * \Delta \hat{S}_q := w_q \hat{n}_q \approx d\hat{S}(\hat{x}_q),
+   * \Delta \hat{S}_q \dealcoloneq w_q \hat{n}_q \approx d\hat{S}(\hat{x}_q),
    * @f]
    * for each quadrature point. The surface integral in real space would then be
    * approximated as

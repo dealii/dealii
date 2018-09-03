@@ -146,7 +146,7 @@ V^+$ so that
 @f}
 where the projector $P_\Pi$ is defined as
 @f{align*}
- P_{\Pi}(\tau):=\begin{cases}
+ P_{\Pi}(\tau) \dealcoloneq \begin{cases}
     \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
     \left[
       \dfrac{\gamma^{\text{iso}}}{2\mu + \gamma^{\text{iso}}} +
@@ -275,11 +275,11 @@ method for the contact. It works as follows:
  \mathcal{F}_i = \emptyset$ and set $i = 1$. Here, $\mathcal{S}$ is the set of
  all degrees of freedom located at the surface of the domain where contact
  may happen.
- The start value $\hat U^0 :=
+ The start value $\hat U^0 \dealcoloneq
  P_{\mathcal{A}_k}(0)$ fulfills our obstacle condition, i.e., we project an
  initial zero displacement onto the set of feasible displacements.
 
- <li> Assemble the Newton matrix $A_{pq} := a'(
+ <li> Assemble the Newton matrix $A_{pq} \dealcoloneq a'(
  U^{i-1};\varphi_p,\varphi_q)$ and the right-hand-side $F(\hat U^{i-1})$.
  These correspond to the linearized Newton step, ignoring for the moment
  the contact inequality.
@@ -299,8 +299,8 @@ method for the contact. It works as follows:
  <li> Damp the Newton iteration for $i>2$ by applying a line search and
  calculating a linear combination of $U^{i-1}$ and $\tilde U^i$. This
  requires finding an
- $\alpha^i_l:=2^{-l},(l=0,\ldots,10)$ so that
- @f{gather*}U^i := \alpha^i_l\bar U^i +
+ $\alpha^i_l \dealcoloneq 2^{-l},(l=0,\ldots,10)$ so that
+ @f{gather*}U^i \dealcoloneq \alpha^i_l\bar U^i +
  (1-\alpha^i_l)U^{i-1}@f}
  satisfies
  @f{gather*}
@@ -311,17 +311,17 @@ method for the contact. It works as follows:
  and (ii) elements that correspond to hanging nodes, which we eliminate in the usual manner.
 
  <li> Define the new active and inactive sets by
- @f{gather*}\mathcal{A}_{i+1}:=\lbrace p\in\mathcal{S}:\Lambda^i_p +
+ @f{gather*}\mathcal{A}_{i+1} \dealcoloneq \lbrace p\in\mathcal{S}:\Lambda^i_p +
  c\left(\left[B^TU^i\right]_p - G_p\right) > 0\rbrace,@f}
- @f{gather*}\mathcal{F}_{i+1}:=\lbrace p\in\mathcal{S}:\Lambda^i_p +
+ @f{gather*}\mathcal{F}_{i+1} \dealcoloneq \lbrace p\in\mathcal{S}:\Lambda^i_p +
  c\left(\left[B^TU^i\right]_p - G_p\right) \leq 0\rbrace.@f}
 
  <li>Project $U^i$ so that it satisfies the contact inequality,
- @f{gather*}\hat U^i := P_{\mathcal{A}_{i+1}}(U^i).@f}
+ @f{gather*}\hat U^i \dealcoloneq P_{\mathcal{A}_{i+1}}(U^i).@f}
  Here,
  $P_{\mathcal{A}}(U)$ is the projection of the active
  components in $\mathcal{A}$ to the gap
- @f{gather*}P_{\mathcal{A}}(U)_p:=\begin{cases}
+ @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}
  U_p, & \textrm{if}\quad p\notin\mathcal{A}\\
  g_{h,p}, & \textrm{if}\quad
  p\in\mathcal{A},

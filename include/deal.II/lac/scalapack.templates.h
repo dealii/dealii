@@ -449,10 +449,15 @@ extern "C"
 
   /**
    * Perform one of the matrix-matrix operations:
-   * sub( C ) := alpha*op( sub( A ) )*op( sub( B ) ) + beta*sub( C ),
+   * @f{align*}
+   * \mathrm{sub}(C) &\dealcoloneq \alpha op(\mathrm{sub}(A))op(\mathrm{sub}(B))
+   *                            + \beta \mathrm{sub}(C), \\
+   * \mathrm{sub}(C) &\dealcoloneq \alpha op(\mathrm{sub}(A))op(\mathrm{sub}(B))
+   *                            + beta sub(C),
+   * @f
    * where
-   * sub( C ) denotes C(IC:IC+M-1,JC:JC+N-1),  and, op( X )  is one  of
-   * op( X ) = X   or   op( X ) = X'.
+   * $\mathrm{sub}(C)$ denotes C(IC:IC+M-1,JC:JC+N-1),  and, $op(X)$ is one of
+   * $op(X) = X$ or $op(X) = X^T$.
    */
   void
   pdgemm_(const char *  transa,
@@ -574,10 +579,11 @@ extern "C"
           int *       info);
 
   /**
-   * Copy all or a part of a distributed matrix A to another
-   * distributed matrix B. No communication is performed, pdlacpy
-   * performs a local copy sub(A) := sub(B), where sub(A) denotes
-   * A(ia:ia+m-1,ja:ja+n-1) and sub(B) denotes B(ib:ib+m-1,jb:jb+n-1)
+   * Copy all or a part of a distributed matrix A to another distributed matrix
+   * B. No communication is performed, pdlacpy performs a local copy
+   * $\mathrm{sub}(A) \dealcoloneq \mathrm{sub}(B)$, where $\mathrm{sub}(A)$
+   * denotes $A(ia:ia+m-1, ja:ja+n-1)$ and $\mathrm{sub}(B)$ denotes
+   * $B(ib:ib+m-1, jb:jb+n-1)$.
    */
   void
   pdlacpy_(const char *  uplo,
@@ -801,8 +807,10 @@ extern "C"
 
   /*
    * Perform matrix sum:
-   * C := beta*C + alpha*op(A),
-   * where op(A) denotes either op(A)=A or op(A)=A^T
+   * @f{equation*}
+   * C \dealcoloneq \beta C + \alpha op(A),
+   * @f
+   * where $op(A)$ denotes either $op(A) = A$ or $op(A)=A^T$.
    */
   void
   pdgeadd_(const char *  transa,

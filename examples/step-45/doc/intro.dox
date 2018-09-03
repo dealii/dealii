@@ -157,7 +157,7 @@ going to solve the Stokes problem
   -\textrm{div}\;  \textbf{u}&=&0,\\
   \textbf{u}|_{\Gamma_1}&=&{\bf 0},
 @f}
-where the boundary $\Gamma_1$ is defined as $\Gamma_1:=\{x\in \partial\Omega: \|x\|\in\{0.5,1\}\}$.
+where the boundary $\Gamma_1$ is defined as $\Gamma_1 \dealcoloneq \{x\in \partial\Omega: \|x\|\in\{0.5,1\}\}$.
 For the remaining parts of the boundary we are going to use periodic boundary conditions, i.e.
 @f{align*}
   u_x(0,\nu)&=-u_y(\nu,0)&\nu&\in[0,1]\\

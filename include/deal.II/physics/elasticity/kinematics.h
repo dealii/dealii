@@ -57,7 +57,8 @@ namespace Physics
        * The result is expressed as
        * @f[
        *  \mathbf{F}
-       *    := \nabla_{0} \boldsymbol{\varphi} \left( \mathbf{X} \right)
+       *    \dealcoloneq \nabla_{0} \boldsymbol{\varphi}
+       *    \left( \mathbf{X} \right)
        *     =\mathbf{I} + \nabla_{0}\mathbf{u}
        * @f]
        * where $\mathbf{u} = \mathbf{u}\left(\mathbf{X}\right)$ is the
@@ -77,7 +78,7 @@ namespace Physics
        * tensor @p F .
        * The result is expressed as
        * @f[
-       *  \mathbf{F}^{\text{iso}} := J^{-1/\textrm{dim}} \mathbf{F}
+       *  \mathbf{F}^{\text{iso}} \dealcoloneq J^{-1/\textrm{dim}} \mathbf{F}
        * @f]
        * where $J = \text{det}\left(\mathbf{F}\right)$.
        *
@@ -93,7 +94,7 @@ namespace Physics
        * tensor @p F .
        * The result is expressed as
        * @f[
-       *  \mathbf{F}^{\text{vol}} := J^{1/\textrm{dim}} \mathbf{I}
+       *  \mathbf{F}^{\text{vol}} \dealcoloneq J^{1/\textrm{dim}} \mathbf{I}
        * @f]
        * where $J = \text{det}\left(\mathbf{F}\right)$.
        *
@@ -109,7 +110,7 @@ namespace Physics
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
-       *  \mathbf{C} := \mathbf{F}^{T}\cdot\mathbf{F} \, .
+       *  \mathbf{C} \dealcoloneq \mathbf{F}^{T}\cdot\mathbf{F} \, .
        * @f]
        *
        * @dealiiWriggersA{23,3.15}
@@ -124,7 +125,7 @@ namespace Physics
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
-       *  \mathbf{b} := \mathbf{F}\cdot\mathbf{F}^{T} \, .
+       *  \mathbf{b} \dealcoloneq \mathbf{F}\cdot\mathbf{F}^{T} \, .
        * @f]
        *
        * @dealiiWriggersA{28,3.25}
@@ -146,8 +147,8 @@ namespace Physics
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
-       *  \mathbf{E} := \frac{1}{2}[\mathbf{F}^{T}\cdot\mathbf{F} - \mathbf{I}]
-       * \, .
+       *  \mathbf{E} \dealcoloneq \frac{1}{2}
+       *  \left[ \mathbf{F}^{T}\cdot\mathbf{F} - \mathbf{I} \right] \, .
        * @f]
        *
        * @dealiiWriggersA{23,3.15}
@@ -162,8 +163,8 @@ namespace Physics
        * as constructed from the displacement gradient tensor @p Grad_u.
        * The result is expressed as
        * @f[
-       *  \boldsymbol{\varepsilon} := \frac{1}{2} \left[ \nabla_{0}\mathbf{u}
-       *   + [\nabla_{0}\mathbf{u}]^{T} \right] \, .
+       *  \boldsymbol{\varepsilon} \dealcoloneq \frac{1}{2}
+       *  \left[ \nabla_{0}\mathbf{u} + [\nabla_{0}\mathbf{u}]^{T} \right] \, .
        * @f]
        * where $\mathbf{u} = \mathbf{u}(\mathbf{X})$ is the displacement at
        * position
@@ -182,7 +183,7 @@ namespace Physics
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
-       *  \mathbf{e} := \frac{1}{2} \left[ \mathbf{I}
+       *  \mathbf{e} \dealcoloneq \frac{1}{2} \left[ \mathbf{I}
        *   - \mathbf{F}^{-T}\cdot\mathbf{F}^{-1} \right] \, .
        * @f]
        *
@@ -207,7 +208,7 @@ namespace Physics
        * gradient).
        * The result is expressed as
        * @f[
-       *  \mathbf{l} := \dot{\mathbf{F}}\cdot\mathbf{F}^{-1} \, .
+       *  \mathbf{l} \dealcoloneq \dot{\mathbf{F}}\cdot\mathbf{F}^{-1} \, .
        * @f]
        *
        * @dealiiWriggersA{32,3.47}
@@ -224,7 +225,8 @@ namespace Physics
        * gradient).
        * The result is expressed as
        * @f[
-       *  \mathbf{d} := \frac{1}{2} \left[ \mathbf{l} + \mathbf{l}^{T} \right]
+       *  \mathbf{d} \dealcoloneq \frac{1}{2}
+       *  \left[ \mathbf{l} + \mathbf{l}^{T} \right]
        * @f]
        * where
        * @f[
@@ -246,7 +248,8 @@ namespace Physics
        * gradient).
        * The result is expressed as
        * @f[
-       *  \mathbf{w} := \frac{1}{2} \left[ \mathbf{l} - \mathbf{l}^{T} \right]
+       *  \mathbf{w} \dealcoloneq \frac{1}{2}
+       *  \left[ \mathbf{l} - \mathbf{l}^{T} \right]
        * @f]
        * where
        * @f[

@@ -2288,7 +2288,8 @@ inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
  * The adjugate of a tensor $\left(\bullet\right)$ is defined as
  * @f[
  *  \textrm{adj}\left(\bullet\right)
- *   := \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-1} \; .
+ *   \dealcoloneq \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-1}
+ * \; .
  * @f]
  *
  * @note This requires that the tensor is invertible.
@@ -2309,7 +2310,7 @@ adjugate(const Tensor<2, dim, Number> &t)
  * The cofactor of a tensor $\left(\bullet\right)$ is defined as
  * @f[
  *  \textrm{cof}\left(\bullet\right)
- *   := \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-T}
+ *   \dealcoloneq \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-T}
  *    = \left[ \textrm{adj}\left(\bullet\right) \right]^{T} \; .
  * @f]
  *

@@ -208,9 +208,9 @@ G
 where
 
 @f{eqnarray*}{
-K_{ij} &:=& (\nabla v_j, \nabla v_i)_\Omega   \qquad i,j=1,\dots,n \\
-C_{\alpha j} &:=& (v_j, q_\alpha)_\Gamma  \qquad j=1,\dots,n, \alpha = 1,\dots, m \\\\
-G_{\alpha} &:=& (g, q_\alpha)_\Gamma \qquad \alpha = 1,\dots, m.
+K_{ij} &\dealcoloneq& (\nabla v_j, \nabla v_i)_\Omega   \qquad i,j=1,\dots,n \\
+C_{\alpha j} &\dealcoloneq& (v_j, q_\alpha)_\Gamma  \qquad j=1,\dots,n, \alpha = 1,\dots, m \\\\
+G_{\alpha} &\dealcoloneq& (g, q_\alpha)_\Gamma \qquad \alpha = 1,\dots, m.
 @f}
 
 While the matrix $K$ is the standard stiffness matrix for the Poisson problem on
@@ -227,7 +227,7 @@ reference element $\hat K$, where $F_{K}$ is the mapping from $\hat K$ to $K$,
 and compute the integral on $\hat K$ using a quadrature formula:
 
 \f[
-C_{\alpha j} := (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
+C_{\alpha j} \dealcoloneq (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
 \hat q_\alpha(\hat x) (v_j \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
 \sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat q_\alpha(\hat x_i)  (v_j \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
 \f]
@@ -242,7 +242,7 @@ of the matrix $C$.
 To evaluate $(v_j \circ F_{K}) (\hat x_i)$ the following steps needs to be
 taken (as shown in the picture below):
 
-- For a given cell $K$ in $\Gamma$ compute the real point $y_i := F_{K} (\hat
+- For a given cell $K$ in $\Gamma$ compute the real point $y_i \dealcoloneq F_{K} (\hat
 x_i)$, where $x_i$ is one of the quadrature points used for the integral on $K
 \subseteq \Gamma$.
 

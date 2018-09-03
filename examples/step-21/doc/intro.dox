@@ -254,8 +254,8 @@ define that we want to evaluate it in the following sense:
   +
   \left(F(S^n_-) (\mathbf n \cdot \mathbf{u}^{n+1}_-), \sigma\right)_{\partial K_-},
 @f}
-where $\partial K_{-}:= \{x\in \partial K, \mathbf{u}(x) \cdot \mathbf{n}<0\}$
-denotes the inflow boundary and $\partial K_{+}:= \{\partial K \setminus
+where $\partial K_{-} \dealcoloneq \{x\in \partial K, \mathbf{u}(x) \cdot \mathbf{n}<0\}$
+denotes the inflow boundary and $\partial K_{+} \dealcoloneq \{\partial K \setminus
 \partial K_{-}\}$ is the outflow part of the boundary.
 The quantities $S_+,\mathbf{u}_+$ then correspond to the values of these
 variables on the present cell, whereas $S_-,\mathbf{u}_-$ (needed on the

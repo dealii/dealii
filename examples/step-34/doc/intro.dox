@@ -154,7 +154,7 @@ $\mathbb{R}^n\backslash\Omega$, whose boundary is $ \Gamma_\infty \cup
 \Gamma$, where the "boundary" at infinity is defined as
 
 \f[
-\Gamma_\infty := \lim_{r\to\infty} \partial B_r(0).
+\Gamma_\infty \dealcoloneq \lim_{r\to\infty} \partial B_r(0).
 \f]
 
 In our program the normals are defined as <i>outer</i> to the domain
@@ -265,7 +265,7 @@ Notice that the fraction of angle (in 2d) or solid angle (in 3d)
 $\alpha(\mathbf{x})$ by which the point $\mathbf{x}$ sees the domain
 $\Omega$ can be defined using the double layer potential itself:
 \f[
-\alpha(\mathbf{x}) := 1 -
+\alpha(\mathbf{x}) \dealcoloneq 1 -
 \frac{1}{2(n-1)\pi}\int_{\partial \Omega} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }
 { |\mathbf{y}-\mathbf{x}|^{n} }\phi(\mathbf{y})\,ds_y = 1+
 \int_{\partial \Omega} \frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y.
@@ -490,7 +490,7 @@ dimension $n$ of the surrounding space $\mathbb{R}^n$.
 We define the finite dimensional space $V_h$ as
 \f[
   \label{eq:definition-Vh}
-  V_h := \{ v \in C^0(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{Q}^1(K_i),
+  V_h \dealcoloneq \{ v \in C^0(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{Q}^1(K_i),
   \forall i\},
 \f]
 with basis functions $\psi_i(\mathbf{x})$ for which we will use the usual FE_Q
@@ -504,8 +504,8 @@ identified by the vector $\boldsymbol{\phi}$ of its coefficients
 $\phi_i$, that is:
 \f[
   \label{eq:definition-of-element}
-  \phi_h(\mathbf{x}) := \phi_i \psi_i(\mathbf{x}), \qquad
-  \boldsymbol{\phi} := \{ \phi_i \},
+  \phi_h(\mathbf{x}) \dealcoloneq \phi_i \psi_i(\mathbf{x}), \qquad
+  \boldsymbol{\phi} \dealcoloneq \{ \phi_i \},
 \f]
 where summation  is implied over repeated indexes. Note that we could use
 discontinuous elements here &mdash; in fact, there is no real reason to use
@@ -593,7 +593,7 @@ As usual in these cases, all integrations are performed on a reference
 simple domain, i.e., we assume that each element $K_i$ of
 $\mathcal{T}_h$ can be expressed as a linear (in two dimensions) or
 bi-linear (in three dimensions) transformation of the reference
-boundary element $\hat K := [0,1]^{n-1}$, and we perform the integrations after a
+boundary element $\hat K \dealcoloneq [0,1]^{n-1}$, and we perform the integrations after a
 change of variables from the real element $K_i$ to the reference
 element $\hat K$.
 

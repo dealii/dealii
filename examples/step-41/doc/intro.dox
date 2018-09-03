@@ -92,7 +92,7 @@ obstacle).
 
 An obvious way to obtain the variational formulation of the obstacle problem is to consider the total potential energy:
 @f{equation*}
- E(u):=\dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla u - \int\limits_{\Omega} fu.
+ E(u) \dealcoloneq \dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla u - \int\limits_{\Omega} fu.
 @f}
 We have to find a solution $u\in G$ of the following minimization problem:
 @f{equation*}
@@ -100,7 +100,7 @@ We have to find a solution $u\in G$ of the following minimization problem:
 @f}
 with the convex set of admissible displacements:
 @f{equation*}
- G:=\lbrace v\in V: v\geq g \text{ a.e. in } \Omega\rbrace,\quad V:=H^1_0(\Omega).
+ G \dealcoloneq \lbrace v\in V: v\geq g \text{ a.e. in } \Omega\rbrace,\quad V\dealcoloneq H^1_0(\Omega).
 @f}
 This set takes care of the third and fifth conditions above (the boundary
 values and the complementarity condition).
@@ -108,7 +108,7 @@ values and the complementarity condition).
 Consider now the minimizer $u\in G$ of $E$ and any other function $v\in
 G$. Then the function
 @f{equation*}
- F(\varepsilon) := E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],
+ F(\varepsilon) \dealcoloneq E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],
 @f}
 takes its minimum at $\varepsilon = 0$ (because $u$ is a minimizer of the
 energy functional $E(\cdot)$), so that $F'(0)\geq 0$ for any choice
@@ -142,7 +142,7 @@ condition above.
 The variational inequality above is awkward to work with. We would therefore
 like to reformulate it as an equivalent saddle point problem. We introduce a
 Lagrange multiplier $\lambda$ and the convex cone $K\subset V'$, $V'$
-dual space of $V$, $K:=\{\mu\in V': \langle\mu,v\rangle\geq 0,\quad \forall
+dual space of $V$, $K \dealcoloneq \{\mu\in V': \langle\mu,v\rangle\geq 0,\quad \forall
 v\in V, v \le 0 \}$ of
 Lagrange multipliers, where $\langle\cdot,\cdot\rangle$ denotes the duality
 pairing between $V'$ and $V$. Intuitively, $K$ is the cone of all "non-positive
@@ -157,8 +157,8 @@ This yields:
 @f}
 <i>with</i>
 @f{align*}
- a(u,v) &:= \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
- b(u,\mu) &:= \langle u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
+ a(u,v) &\dealcoloneq \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
+ b(u,\mu) &\dealcoloneq \langle u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
 @f}
 In other words, we can consider $\lambda$ as the negative of the additional, positive force that the
 obstacle exerts on the membrane. The inequality in the second line of the
@@ -215,7 +215,7 @@ With this, the equations above can be restated as
 
 Now we define for each degree of freedom $i$ the function
 @f{equation*}
- C([BU]_i,\Lambda_i):=-\Lambda_i + \min\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
+ C([BU]_i,\Lambda_i) \dealcoloneq -\Lambda_i + \min\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
 @f}
 with some $c>0$. (In this program we choose $c = 100$. It is a kind of a
 penalty parameter which depends on the problem itself and needs to be chosen
@@ -254,8 +254,8 @@ The algorithm for the primal-dual active set method works as follows (NOTE: $B =
 3. Define the new active and inactive sets by
  @f{equation*}
  \begin{split}
-  \mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)< 0\rbrace,\\
-  \mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\geq 0\rbrace.
+  \mathcal{A}_{k+1} \dealcoloneq \lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)< 0\rbrace,\\
+  \mathcal{F}_{k+1} \dealcoloneq \lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\geq 0\rbrace.
  \end{split}
  @f}
 4. If $\mathcal{A}_{k+1}=\mathcal{A}_k$ (and then, obviously, also
@@ -322,8 +322,8 @@ rows and columns whose indices belong to either the active set
 ${\mathcal{A}_k}$ or the inactive set ${\mathcal{F}_k}$.
 
 Rather than solving for updates $\delta U, \delta \Lambda$, we can also solve
-for the variables we are interested in right away by setting $\delta U^k :=
-U^{k+1} - U^k$ and $\delta \Lambda^k := \Lambda^{k+1} - \Lambda^k$ and
+for the variables we are interested in right away by setting $\delta U^k \dealcoloneq
+U^{k+1} - U^k$ and $\delta \Lambda^k \dealcoloneq \Lambda^{k+1} - \Lambda^k$ and
 bringing all known terms to the right hand side. This yields
 @f{equation*}
 \begin{pmatrix}

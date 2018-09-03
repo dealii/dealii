@@ -124,7 +124,7 @@ with the neighbor cell $K'$, to obtain
 Using that for the normal vectors on adjacent cells we have $n'=-n$, we define the jump of the
 normal derivative by
 @f[
-  [\partial_n u_h] := \partial_n u_h|_K + \partial_{n'} u_h|_{K'}
+  [\partial_n u_h] \dealcoloneq \partial_n u_h|_K + \partial_{n'} u_h|_{K'}
   =
   \partial_n u_h|_K - \partial_n u_h|_{K'},
 @f]

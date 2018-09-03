@@ -230,7 +230,7 @@ public:
   /**
    * Enables the failure check. Solving is stopped with @p ReturnState @p
    * failure if <tt>residual>failure_residual</tt> with
-   * <tt>failure_residual:=rel_failure_residual*first_residual</tt>.
+   * <tt>failure_residual := rel_failure_residual*first_residual</tt>.
    */
   void
   set_failure_criterion(const double rel_failure_residual);
