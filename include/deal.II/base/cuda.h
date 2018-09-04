@@ -104,23 +104,6 @@ namespace Utilities
     }
 
     /**
-     * Deleter to be used for `std::unique_ptr` pointing to device memory.
-     */
-    template <typename Number>
-    void
-    delete_device_data(Number *device_ptr) noexcept
-    {
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
-      const cudaError_t error_code = cudaFree(device_ptr);
-      (void)error_code;
-      AssertNothrow(error_code == cudaSuccess,
-                    dealii::ExcCudaError(cudaGetErrorString(error_code)));
-#else
-      (void)device_ptr;
-#endif
-    }
-
-    /**
      * Allocator to be used for `std::unique_ptr` pointing to device memory.
      */
     template <typename Number>
@@ -133,6 +116,29 @@ namespace Utilities
       return device_ptr;
 #else
       (void)size;
+      Assert(
+        false,
+        ExcMessage(
+          "This function can only be used if deal.II is built with CUDA support!"));
+#endif
+    }
+
+    /**
+     * Deleter to be used for `std::unique_ptr` pointing to device memory.
+     */
+    template <typename Number>
+    void
+    delete_device_data(Number *device_ptr) noexcept
+    {
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+      const cudaError_t error_code = cudaFree(device_ptr);
+      AssertNothrowCuda(error_code);
+#else
+      (void)device_ptr;
+      AssertNothrow(
+        false,
+        ExcMessage(
+          "This function can only be used if deal.II is built with CUDA support!"));
 #endif
     }
 
