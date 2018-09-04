@@ -987,9 +987,8 @@ namespace SparsityTools
         send_to.push_back(it->first);
 
       num_receive =
-        Utilities::MPI::compute_point_to_point_communication_pattern(mpi_comm,
-                                                                     send_to)
-          .size();
+        Utilities::MPI::compute_n_point_to_point_communications(mpi_comm,
+                                                                send_to);
     }
 
     std::vector<MPI_Request> requests(send_data.size());
@@ -1134,9 +1133,8 @@ namespace SparsityTools
         send_to.push_back(it->first);
 
       num_receive =
-        Utilities::MPI::compute_point_to_point_communication_pattern(mpi_comm,
-                                                                     send_to)
-          .size();
+        Utilities::MPI::compute_n_point_to_point_communications(mpi_comm,
+                                                                send_to);
     }
 
     std::vector<MPI_Request> requests(send_data.size());

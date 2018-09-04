@@ -118,6 +118,30 @@ namespace Utilities
       const std::vector<unsigned int> &destinations);
 
     /**
+     * Simplified (for efficiency) version of the
+     * compute_point_to_point_communication_pattern()
+     * which only computes the number of processes in an MPI universe to expect
+     * communication from.
+     *
+     * @param mpi_comm A
+     * @ref GlossMPICommunicator "communicator"
+     * that describes the processors that are going to communicate with each
+     * other.
+     *
+     * @param destinations The list of processors the current process wants to
+     * send information to. This list need not be sorted in any way. If it
+     * contains duplicate entries that means that multiple messages are
+     * intended for a given destination.
+     *
+     * @return A number of processors that want to send something to the current
+     * processor.
+     */
+    unsigned int
+    compute_n_point_to_point_communications(
+      const MPI_Comm &                 mpi_comm,
+      const std::vector<unsigned int> &destinations);
+
+    /**
      * Given a
      * @ref GlossMPICommunicator "communicator",
      * generate a new communicator that contains the same set of processors

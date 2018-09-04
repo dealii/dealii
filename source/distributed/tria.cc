@@ -4262,14 +4262,14 @@ namespace parallel
 
       // collect the neighbors
       // that are going to send stuff to us
-      const std::vector<unsigned int> senders =
-        Utilities::MPI::compute_point_to_point_communication_pattern(
+      const unsigned int n_senders =
+        Utilities::MPI::compute_n_point_to_point_communications(
           this->get_communicator(), destinations);
 
       // receive ghostcelldata
       std::vector<char>                                        receive;
       CommunicateLocallyMovedVertices::CellInfo<dim, spacedim> cellinfo;
-      for (unsigned int i = 0; i < senders.size(); ++i)
+      for (unsigned int i = 0; i < n_senders; ++i)
         {
           MPI_Status status;
           int        len;
@@ -4329,7 +4329,7 @@ namespace parallel
       // check all msgs got sent and received
       Assert(Utilities::MPI::sum(needs_to_get_cells.size(),
                                  this->get_communicator()) ==
-               Utilities::MPI::sum(senders.size(), this->get_communicator()),
+               Utilities::MPI::sum(n_senders, this->get_communicator()),
              ExcInternalError());
     }
 

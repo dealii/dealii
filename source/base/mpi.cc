@@ -293,6 +293,68 @@ namespace Utilities
     }
 
 
+
+    unsigned int
+    compute_n_point_to_point_communications(
+      const MPI_Comm &                 mpi_comm,
+      const std::vector<unsigned int> &destinations)
+    {
+      const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
+      const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
+
+      for (unsigned int i = 0; i < destinations.size(); ++i)
+        {
+          Assert(destinations[i] < n_procs,
+                 ExcIndexRange(destinations[i], 0, n_procs));
+          Assert(destinations[i] != myid,
+                 ExcMessage(
+                   "There is no point in communicating with ourselves."));
+        }
+
+      // Calculate the number of messages to send to each process
+      std::vector<unsigned int> dest_vector(n_procs);
+      for (const auto &el : destinations)
+        ++dest_vector[el];
+
+#  if DEAL_II_MPI_VERSION_GTE(2, 2)
+      // Find out how many processes will send to this one
+      // MPI_Reduce_scatter(_block) does exactly this
+      unsigned int n_recv_from;
+      const int    ierr = MPI_Reduce_scatter_block(
+        &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
+
+      AssertThrowMPI(ierr);
+
+      return n_recv_from;
+#  else
+      // Find out how many processes will send to this one
+      // by reducing with sum and then scattering the
+      // results over all processes
+      std::vector<unsigned int> buffer(dest_vector.size());
+      unsigned int              n_recv_from;
+
+      MPI_Reduce(&dest_vector[0],
+                 &buffer[0],
+                 dest_vector.size(),
+                 MPI_UNSIGNED,
+                 MPI_SUM,
+                 0,
+                 mpi_comm);
+      MPI_Scatter(&buffer[0],
+                  1,
+                  MPI_UNSIGNED,
+                  &n_recv_from,
+                  1,
+                  MPI_UNSIGNED,
+                  0,
+                  mpi_comm);
+
+      return n_recv_from;
+#  endif
+    }
+
+
+
     namespace
     {
       // custom MIP_Op for calculate_collective_mpi_min_max_avg
