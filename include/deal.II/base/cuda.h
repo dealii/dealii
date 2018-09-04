@@ -104,6 +104,45 @@ namespace Utilities
     }
 
     /**
+     * Allocator to be used for `std::unique_ptr` pointing to device memory.
+     */
+    template <typename Number>
+    Number *
+    allocate_device_data(const std::size_t size)
+    {
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+      Number *device_ptr;
+      Utilities::CUDA::malloc(device_ptr, size);
+      return device_ptr;
+#else
+      (void)size;
+      Assert(
+        false,
+        ExcMessage(
+          "This function can only be used if deal.II is built with CUDA support!"));
+#endif
+    }
+
+    /**
+     * Deleter to be used for `std::unique_ptr` pointing to device memory.
+     */
+    template <typename Number>
+    void
+    delete_device_data(Number *device_ptr) noexcept
+    {
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+      const cudaError_t error_code = cudaFree(device_ptr);
+      AssertNothrowCuda(error_code);
+#else
+      (void)device_ptr;
+      AssertNothrow(
+        false,
+        ExcMessage(
+          "This function can only be used if deal.II is built with CUDA support!"));
+#endif
+    }
+
+    /**
      * Copy the elements in @p pointer_dev to the host in @p vector_host.
      */
     template <typename T>

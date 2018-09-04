@@ -27,28 +27,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace CUDAWrappers
 {
-  namespace
-  {
-    template <typename Number>
-    void
-    delete_device_data(Number *device_ptr) noexcept
-    {
-      const cudaError_t error_code = cudaFree(device_ptr);
-      (void)error_code;
-      AssertNothrow(error_code == cudaSuccess,
-                    dealii::ExcCudaError(cudaGetErrorString(error_code)));
-    }
-
-    template <typename Number>
-    Number *
-    allocate_device_data(const std::size_t size)
-    {
-      Number *device_ptr;
-      Utilities::CUDA::malloc(device_ptr, size);
-      return device_ptr;
-    }
-  } // namespace
-
   namespace internal
   {
     template <typename Number>
@@ -190,9 +168,9 @@ namespace CUDAWrappers
   SparseMatrix<Number>::SparseMatrix()
     : nnz(0)
     , n_rows(0)
-    , val_dev(nullptr, delete_device_data<Number>)
-    , column_index_dev(nullptr, delete_device_data<int>)
-    , row_ptr_dev(nullptr, delete_device_data<int>)
+    , val_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
+    , column_index_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
+    , row_ptr_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
     , descr(nullptr)
   {}
 
@@ -202,9 +180,9 @@ namespace CUDAWrappers
   SparseMatrix<Number>::SparseMatrix(
     Utilities::CUDA::Handle &             handle,
     const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
-    : val_dev(nullptr, delete_device_data<Number>)
-    , column_index_dev(nullptr, delete_device_data<int>)
-    , row_ptr_dev(nullptr, delete_device_data<int>)
+    : val_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
+    , column_index_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
+    , row_ptr_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
     , descr(nullptr)
   {
     reinit(handle, sparse_matrix_host);
@@ -318,7 +296,7 @@ namespace CUDAWrappers
       }
 
     // Copy the elements to the gpu
-    val_dev.reset(allocate_device_data<Number>(nnz));
+    val_dev.reset(Utilities::CUDA::allocate_device_data<Number>(nnz));
     cudaError_t error_code = cudaMemcpy(val_dev.get(),
                                         &val[0],
                                         nnz * sizeof(Number),
@@ -326,7 +304,7 @@ namespace CUDAWrappers
     AssertCuda(error_code);
 
     // Copy the column indices to the gpu
-    column_index_dev.reset(allocate_device_data<int>(nnz));
+    column_index_dev.reset(Utilities::CUDA::allocate_device_data<int>(nnz));
     AssertCuda(error_code);
     error_code = cudaMemcpy(column_index_dev.get(),
                             &column_index[0],
@@ -335,7 +313,7 @@ namespace CUDAWrappers
     AssertCuda(error_code);
 
     // Copy the row pointer to the gpu
-    row_ptr_dev.reset(allocate_device_data<int>(row_ptr_size));
+    row_ptr_dev.reset(Utilities::CUDA::allocate_device_data<int>(row_ptr_size));
     AssertCuda(error_code);
     error_code = cudaMemcpy(row_ptr_dev.get(),
                             &row_ptr[0],

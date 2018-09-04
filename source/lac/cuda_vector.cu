@@ -35,33 +35,11 @@ namespace LinearAlgebra
     using ::dealii::CUDAWrappers::block_size;
     using ::dealii::CUDAWrappers::chunk_size;
 
-    namespace
-    {
-      template <typename Number>
-      void
-      delete_device_vector(Number *device_ptr) noexcept
-      {
-        const cudaError_t error_code = cudaFree(device_ptr);
-        (void)error_code;
-        AssertNothrow(error_code == cudaSuccess,
-                      dealii::ExcCudaError(cudaGetErrorString(error_code)));
-      }
-
-      template <typename Number>
-      Number *
-      allocate_device_vector(const std::size_t size)
-      {
-        Number *device_ptr;
-        Utilities::CUDA::malloc(device_ptr, size);
-        return device_ptr;
-      }
-    } // namespace
-
 
 
     template <typename Number>
     Vector<Number>::Vector()
-      : val(nullptr, delete_device_vector<Number>)
+      : val(nullptr, Utilities::CUDA::delete_device_data<Number>)
       , n_elements(0)
     {}
 
@@ -69,8 +47,8 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::Vector(const Vector<Number> &V)
-      : val(allocate_device_vector<Number>(V.n_elements),
-            delete_device_vector<Number>)
+      : val(Utilities::CUDA::allocate_device_data<Number>(V.n_elements),
+            Utilities::CUDA::delete_device_data<Number>)
       , n_elements(V.n_elements)
     {
       // Copy the values.
@@ -106,7 +84,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::Vector(const size_type n)
-      : val(nullptr, delete_device_vector<Number>)
+      : val(nullptr, Utilities::CUDA::delete_device_data<Number>)
       , n_elements(0)
     {
       reinit(n, false);
@@ -122,7 +100,7 @@ namespace LinearAlgebra
       if (n == 0)
         val.reset();
       else if (n != n_elements)
-        val.reset(allocate_device_vector<Number>(n));
+        val.reset(Utilities::CUDA::allocate_device_data<Number>(n));
 
       // If necessary set the elements to zero
       if (omit_zeroing_entries == false)
