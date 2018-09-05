@@ -1987,23 +1987,20 @@ namespace internal
           {
             Threads::TaskGroup<> tasks;
 
-            unsigned int i = 0;
-            tasks += Threads::new_task([&, i]() {
+            tasks += Threads::new_task([&]() {
               merge_invalid_vertex_dofs_on_ghost_interfaces(dof_handler);
             });
 
             if (dim > 1)
               {
-                ++i;
-                tasks += Threads::new_task([&, i]() {
+                tasks += Threads::new_task([&]() {
                   merge_invalid_line_dofs_on_ghost_interfaces(dof_handler);
                 });
               }
 
             if (dim > 2)
               {
-                ++i;
-                tasks += Threads::new_task([&, i]() {
+                tasks += Threads::new_task([&]() {
                   merge_invalid_quad_dofs_on_ghost_interfaces(dof_handler);
                 });
               }
