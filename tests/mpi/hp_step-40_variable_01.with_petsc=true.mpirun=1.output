@@ -1,0 +1,17 @@
+
+Cycle 0:
+   Number of active cells:       1024
+      1024+
+   Number of degrees of freedom: 4225
+      4225+
+DEAL:mpi::Solver stopped within 10 - 10 iterations
+   Solved in 10 iterations.
+
+Cycle 1:
+   Number of active cells:       4096
+      4096+
+   Number of degrees of freedom: 16641
+      16641+
+DEAL:mpi::Solver stopped within 10 - 10 iterations
+   Solved in 10 iterations.
+
