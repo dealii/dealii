@@ -1744,7 +1744,7 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpace>::real_type
     Vector<Number, MemorySpace>::lp_norm_local(const real_type p) const
     {
-      real_type sum;
+      real_type sum = 0.;
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::norm_p(
