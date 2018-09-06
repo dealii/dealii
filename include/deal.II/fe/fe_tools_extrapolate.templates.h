@@ -1170,14 +1170,14 @@ namespace FETools
 
       Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
 
-      std::vector<unsigned int> senders =
-        Utilities::MPI::compute_point_to_point_communication_pattern(
-          communicator, destinations);
+      const unsigned int n_senders =
+        Utilities::MPI::compute_n_point_to_point_communications(communicator,
+                                                                destinations);
 
       // receive data
       std::vector<char> receive;
       CellData          cell_data;
-      for (unsigned int index = 0; index < senders.size(); ++index)
+      for (unsigned int index = 0; index < n_senders; ++index)
         {
           MPI_Status status;
           int        len;

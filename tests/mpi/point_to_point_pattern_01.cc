@@ -17,7 +17,13 @@
 
 // Check if point-to-point communication
 // works correctly with MPI_Reduce_scatter_block
-// implementation
+// implementation.
+// Also check that the simplified point-to-point communication
+// computation agrees with the original function.
+// Namely, the size of
+// compute_point_to_point_communication_pattern()
+// returned vector should agree with the number returned
+// by compute_point_to_point_communications()
 
 #include <deal.II/base/utilities.h>
 
@@ -76,6 +82,14 @@ test_mpi()
   std::vector<unsigned int> origins =
     Utilities::MPI::compute_point_to_point_communication_pattern(MPI_COMM_WORLD,
                                                                  destinations);
+
+  const unsigned int n_origins =
+    Utilities::MPI::compute_n_point_to_point_communications(MPI_COMM_WORLD,
+                                                            destinations);
+
+  if (origins.size() != n_origins)
+    deallog << "Size mismatch!" << std::endl;
+
   std::sort(origins.begin(), origins.end());
 
   if (myid == 0)
