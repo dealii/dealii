@@ -1547,6 +1547,8 @@ namespace parallel
                             dest_sizes_variable.end(),
                             std::vector<int>::size_type(0)));
 
+#  if DEAL_II_P4EST_VERSION_GTE(2, 0, 65, 0)
+#  else
           // ----- WORKAROUND -----
           // An assertion in p4est prevents us from sending/receiving no data
           // at all, which is mandatory if one of our processes does not own
@@ -1556,6 +1558,7 @@ namespace parallel
             src_sizes_variable.resize(1);
           if (dest_sizes_variable.size() == 0)
             dest_sizes_variable.resize(1);
+#  endif
 
           // Execute variable size transfer.
           dealii::internal::p4est::functions<dim>::transfer_custom(
