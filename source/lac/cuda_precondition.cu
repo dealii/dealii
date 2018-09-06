@@ -1210,13 +1210,12 @@ namespace CUDAWrappers
     , n_rows(0)
     , n_nonzero_elements(0)
   {
-    cusparseStatus_t status;
     // step 1: create a descriptor which contains
     // - matrix M is base-0
     // - matrix L is base-0
     // - matrix L is lower triangular
     // - matrix L has non-unit diagonal
-    status = cusparseCreateMatDescr(&descr_M);
+    cusparseStatus_t status = cusparseCreateMatDescr(&descr_M);
     AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_M, CUSPARSE_INDEX_BASE_ZERO);
     AssertCusparse(status);
@@ -1515,7 +1514,6 @@ namespace CUDAWrappers
     , n_rows(0)
     , n_nonzero_elements(0)
   {
-    cusparseStatus_t status;
     // step 1: create a descriptor which contains
     // - matrix M is base-0
     // - matrix L is base-0
@@ -1524,7 +1522,7 @@ namespace CUDAWrappers
     // - matrix U is base-0
     // - matrix U is upper triangular
     // - matrix U has non-unit diagonal
-    status = cusparseCreateMatDescr(&descr_M);
+    cusparseStatus_t status = cusparseCreateMatDescr(&descr_M);
     AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_M, CUSPARSE_INDEX_BASE_ZERO);
     AssertCusparse(status);
