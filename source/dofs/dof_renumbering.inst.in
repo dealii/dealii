@@ -67,6 +67,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &dof_handler);
 
+      template void
+      hierarchical(DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
+
+      template void
+      hierarchical(
+        hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
     \}
 #endif
   }
@@ -167,9 +173,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       block_wise<deal_II_dimension>(DoFHandler<deal_II_dimension> &,
                                     unsigned int);
-
-      template void
-      hierarchical<deal_II_dimension>(DoFHandler<deal_II_dimension> &);
 
       template void
       cell_wise<DoFHandler<deal_II_dimension>>(

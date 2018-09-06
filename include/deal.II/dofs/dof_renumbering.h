@@ -832,9 +832,9 @@ namespace DoFRenumbering
    * have been produced by a previous call to a renumbering function is
    * ignored.
    */
-  template <int dim>
+  template <typename DoFHandlerType>
   void
-  hierarchical(DoFHandler<dim> &dof_handler);
+  hierarchical(DoFHandlerType &dof_handler);
 
   /**
    * Renumber degrees of freedom by cell. The function takes a vector of cell
