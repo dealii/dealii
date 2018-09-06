@@ -1246,7 +1246,7 @@ namespace DoFRenumbering
 
   namespace
   {
-    // Helper function for DoFRenumbering::hierarchical(). this function
+    // Helper function for DoFRenumbering::hierarchical(). This function
     // recurses into the given cell or, if that should be an active (terminal)
     // cell, renumbers DoF indices on it. The function starts renumbering with
     // 'next_free_dof_index' and returns the first still unused DoF index at the
@@ -1341,10 +1341,13 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <typename DoFHandlerType>
   void
-  hierarchical(DoFHandler<dim> &dof_handler)
+  hierarchical(DoFHandlerType &dof_handler)
   {
+    const int dim      = DoFHandlerType::dimension;
+    const int spacedim = DoFHandlerType::space_dimension;
+
     std::vector<types::global_dof_index> renumbering(
       dof_handler.n_locally_owned_dofs(), numbers::invalid_dof_index);
 
@@ -1364,8 +1367,8 @@ namespace DoFRenumbering
     // DoFs for all previous processes
     types::global_dof_index my_starting_index = 0;
 
-    if (const parallel::Triangulation<dim> *tria =
-          dynamic_cast<const parallel::Triangulation<dim> *>(
+    if (const parallel::Triangulation<dim, spacedim> *tria =
+          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
             &dof_handler.get_triangulation()))
       {
         const std::vector<types::global_dof_index>
@@ -1378,9 +1381,9 @@ namespace DoFRenumbering
                           types::global_dof_index(0));
       }
 
-    if (const parallel::distributed::Triangulation<dim> *tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim> *>(
-            &dof_handler.get_triangulation()))
+    if (const parallel::distributed::Triangulation<dim, spacedim> *tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                         *>(&dof_handler.get_triangulation()))
       {
 #ifdef DEAL_II_WITH_P4EST
         // this is a distributed Triangulation. we need to traverse the coarse
@@ -1392,7 +1395,7 @@ namespace DoFRenumbering
             const unsigned int coarse_cell_index =
               tria->get_p4est_tree_to_coarse_cell_permutation()[c];
 
-            const typename DoFHandler<dim>::level_cell_iterator this_cell(
+            const typename DoFHandlerType::level_cell_iterator this_cell(
               tria, 0, coarse_cell_index, &dof_handler);
 
             next_free_dof_offset =
@@ -1410,8 +1413,7 @@ namespace DoFRenumbering
       {
         // this is not a distributed Triangulation, so we can traverse coarse
         // cells in the normal order
-        for (typename DoFHandler<dim>::cell_iterator cell =
-               dof_handler.begin(0);
+        for (typename DoFHandlerType::cell_iterator cell = dof_handler.begin(0);
              cell != dof_handler.end(0);
              ++cell)
           next_free_dof_offset =
