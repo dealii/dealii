@@ -1,0 +1,31 @@
+
+DEAL:0::Without prior reordering:
+DEAL:0::Cell=0.0
+DEAL:0::0 1 2 3 
+DEAL:0::With prior reordering:
+DEAL:0::Cell=0.0
+DEAL:0::0 1 2 3 
+
+DEAL:1::Without prior reordering:
+DEAL:1::Cell=0.1
+DEAL:1::1 4 3 5 
+DEAL:1::With prior reordering:
+DEAL:1::Cell=0.1
+DEAL:1::1 4 3 5 
+
+
+DEAL:2::Without prior reordering:
+DEAL:2::Cell=0.2
+DEAL:2::2 3 6 7 
+DEAL:2::With prior reordering:
+DEAL:2::Cell=0.2
+DEAL:2::2 3 6 7 
+
+
+DEAL:3::Without prior reordering:
+DEAL:3::Cell=0.3
+DEAL:3::3 5 7 8 
+DEAL:3::With prior reordering:
+DEAL:3::Cell=0.3
+DEAL:3::3 5 7 8 
+
