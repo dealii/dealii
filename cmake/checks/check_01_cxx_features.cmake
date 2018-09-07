@@ -23,6 +23,7 @@
 #
 #   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+#   DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
 #   DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
@@ -552,6 +553,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
   DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
@@ -667,6 +669,33 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
+
+#
+# As long as there exists an argument value such that an invocation of the
+# function or constructor could be an evaluated subexpression of a core constant
+# expression, C++14 allows to call non-constexpr functions from constexpr
+# functions. Unfortunately, not all compilers obey the standard in this regard.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  void bar()
+  {}
+
+  constexpr int
+  foo(const int n)
+  {
+    if(!(n >= 0))
+      bar();
+    return n;
+  }
+
+  int main()
+  {
+    constexpr unsigned int n=foo(1);
+    return n;
+  }
+  "
+  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
 
 #
 # Not all compilers with C++17 support include the new special math
