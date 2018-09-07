@@ -221,10 +221,13 @@ public:
    * during the write operation. The functionality is hence similar to the
    * function AffineConstraints::distribute_local_to_global. If vectorization
    * is enabled, the DoF values for several cells are used. The mask can be
-   * used to suppress the write access for some of the vectorized cells, e.g.
-   * in case of local time stepping, where some cells are excluded from a
-   * call. A value of `true` in the bitset means that the respective lane
-   * index will be processed, whereas a value of `false` skips this index.
+   * used to suppress the write access for some of the cells contained in the
+   * current cell vectorization batch, e.g. in case of local time stepping,
+   * where some cells are excluded from a call. A value of `true` in the
+   * bitset means that the respective lane index will be processed, whereas a
+   * value of `false` skips this index. The default setting is a bitset that
+   * contains all ones, which will write the accumulated integrals to all
+   * cells in the batch.
    *
    * If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
@@ -259,10 +262,12 @@ public:
    * associated to more than one cell (as usual in continuous finite
    * elements), the values will be overwritten and only the value written last
    * is retained. The mask can be used to suppress the write access for some
-   * of the vectorized cells, e.g. in case of local time stepping, where some
-   * cells are excluded from a call. A value of `true` in the bitset means
-   * that the respective lane index will be processed, whereas a value of
-   * `false` skips this index.
+   * of the cells contained in the current cell vectorization batch, e.g. in
+   * case of local time stepping, where some  cells are excluded from a call.
+   * A value of `true` in the bitset means that the respective lane index will
+   * be processed, whereas a value of `false` skips this index. The default
+   * setting is a bitset that contains all ones, which will write the
+   * accumulated integrals to all cells in the batch.
    *
    * If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
