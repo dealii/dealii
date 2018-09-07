@@ -319,8 +319,9 @@ namespace Utilities
 #  if DEAL_II_MPI_VERSION_GTE(2, 2)
       // Find out how many processes will send to this one
       // MPI_Reduce_scatter(_block) does exactly this
-      unsigned int n_recv_from;
-      const int    ierr = MPI_Reduce_scatter_block(
+      unsigned int n_recv_from = 0;
+
+      const int ierr = MPI_Reduce_scatter_block(
         &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
 
       AssertThrowMPI(ierr);
@@ -331,7 +332,7 @@ namespace Utilities
       // by reducing with sum and then scattering the
       // results over all processes
       std::vector<unsigned int> buffer(dest_vector.size());
-      unsigned int              n_recv_from;
+      unsigned int              n_recv_from = 0;
 
       MPI_Reduce(&dest_vector[0],
                  &buffer[0],
