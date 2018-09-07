@@ -251,12 +251,29 @@ public:
 
   /**
    * In case the quadrature formula is a tensor product, this function
-   * returns the one-dimensional basis objects.
+   * returns the @p dim one-dimensional basis objects.
    * Otherwise, calling this function is not allowed.
+   *
+   * For @p dim equal to one, we can not return the std::array as a const
+   * reference and have to return it by value. In this case, the array
+   * will always contain a single element (@p this).
+   *
+   * @note The actual return type of this function is
+   * @code
+   * std::conditional<dim == 1,
+   *                  std::array<Quadrature<1>, dim>,
+   *                  const std::array<Quadrature<1>, dim> &>::type
+   * @endcode
+   * The type is abbreviated in the online documentation to improve
+   * readability of this page.
    */
+#ifndef DOXYGEN
   typename std::conditional<dim == 1,
                             std::array<Quadrature<1>, dim>,
                             const std::array<Quadrature<1>, dim> &>::type
+#else
+  const std::array<Quadrature<1>, dim> &
+#endif
   get_tensor_basis() const;
 
 protected:
