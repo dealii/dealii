@@ -300,14 +300,13 @@ namespace Utilities
       const MPI_Comm &                 mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
-      const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
       for (unsigned int i = 0; i < destinations.size(); ++i)
         {
           Assert(destinations[i] < n_procs,
                  ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(destinations[i] != myid,
+          Assert(destinations[i] != Utilities::MPI::this_mpi_process(mpi_comm),
                  ExcMessage(
                    "There is no point in communicating with ourselves."));
         }
