@@ -25,6 +25,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <iostream>
+#include <numeric>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
