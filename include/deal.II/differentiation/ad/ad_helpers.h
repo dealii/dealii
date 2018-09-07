@@ -29,6 +29,9 @@
 #  include <deal.II/differentiation/ad/sacado_number_types.h>
 #  include <deal.II/differentiation/ad/sacado_product_types.h>
 
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/vector.h>
+
 #  include <algorithm>
 #  include <iostream>
 #  include <iterator>
@@ -47,13 +50,12 @@ namespace Differentiation
      * with respect to a set of independent variables $\mathbf{X}$, that is
      * $\dfrac{d^{i} \mathbf{f}(\mathbf{X})}{d \mathbf{X}^{i}}$.
      *
-     * In addition to the dimension @p dim, this class is templated on the
-     * floating point type @p scalar_type of the number that we'd like to
-     * differentiate, as well as an enumeration indicating the @p ADNumberTypeCode .
-     * The @p ADNumberTypeCode dictates which auto-differentiation library is
-     * to be used, and what the nature of the underlying auto-differentiable
-     * number is. Refer to the @ref auto_symb_diff module for more details in
-     * this regard.
+     * This class is templated on the floating point type @p scalar_type of the
+     * number that we'd like to differentiate, as well as an enumeration
+     * indicating the @p ADNumberTypeCode . The @p ADNumberTypeCode dictates
+     * which auto-differentiation library is to be used, and what the nature of
+     * the underlying auto-differentiable number is. Refer to the
+     * @ref auto_symb_diff module for more details in this regard.
      *
      * For all of the classes derived from this base class, there are two
      * possible ways that the code in which they are used can be structured.
@@ -66,7 +68,7 @@ namespace Differentiation
      *
      * @code
      *   // Initialize AD helper
-     *   ADHelperType<dim,tapeless_AD_typecode> ad_helper (...);
+     *   ADHelperType<tapeless_AD_typecode> ad_helper (...);
      *
      *   // Register independent variables
      *   ad_helper.register_independent_variable(...);
@@ -168,7 +170,7 @@ namespace Differentiation
     public:
       /**
        * Type definition for the floating point number type that is used in,
-       * and result from, all computations.
+       * and results from, all computations.
        */
       using scalar_type =
         typename AD::NumberTraits<ScalarType, ADNumberTypeCode>::scalar_type;
@@ -192,12 +194,12 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the range space.
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
        * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
-       * domain or image space.
+       * image space.
        */
       ADHelperBase(const unsigned int n_independent_variables,
                    const unsigned int n_dependent_variables);
@@ -216,14 +218,14 @@ namespace Differentiation
 
       /**
        * Returns the number of independent variables that this object expects to
-       * work with. This is the dimension of the range space.
+       * work with. This is the dimension of the domain space.
        */
       std::size_t
       n_independent_variables() const;
 
       /**
        * Returns the number of dependent variables that this object expects to
-       * operate on. This is the dimension of the domain or image space.
+       * operate on. This is the dimension of the image space.
        */
       std::size_t
       n_dependent_variables() const;
@@ -313,6 +315,19 @@ namespace Differentiation
        * In the rare case that the number of independent or dependent variables
        * has changed, this can also reconfigured by passing in the appropriate
        * arguments to the function.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * image space.
+       * @param[in] clear_registered_tapes A flag that indicates the that
+       * list of @p registered_tapes must be cleared.
        *
        * @note This also resets the active tape number to an invalid number, and
        * deactivates the recording mode for taped variables.
@@ -641,6 +656,7 @@ namespace Differentiation
        */
       unsigned int
       n_registered_independent_variables() const;
+
       //@}
 
       /**
@@ -696,9 +712,15 @@ namespace Differentiation
       void
       register_dependent_variable(const unsigned int index,
                                   const ad_type &    func);
+
       //@}
 
     private:
+      /**
+       * @name Miscellaneous
+       */
+      //@{
+
       /**
        * A counter keeping track of the number of helpers in existence.
        *
@@ -709,11 +731,371 @@ namespace Differentiation
        */
       static unsigned int n_helpers;
 
+      //@}
+
     }; // class ADHelperBase
+
+
+
+    /**
+     * A general helper class that facilitates the evaluation of a vector of
+     * functions, as well as its first derivatives (their Jacobian).
+     * This class would typically be used to compute the linearization of a
+     * set of local nonlinear equations, but can also be used as the basis of
+     * the linearization of the residual vector defined on the level of a finite
+     * element (for example, in order to compute the Jacobian matrix necessary
+     * in Newton-type solvers for nonlinear problems).
+     *
+     * @note When using the cell-level taped AD methods in 3d and/or with higher
+     * order elements, it is incredibly easy to exceed the tape buffer size.
+     * The reason for this is two-fold:
+     *   1. there are are many independent variables (the local
+     *      degrees-of-freedom) to take the derivatives with respect to, and
+     *   2. the expressions for the dependent variables (each being a component
+     *      of the residual vector) in terms of all of the independent variables
+     *      are lengthy, especially when non-trivial constitutive laws are
+     *      considered.
+     * These buffer variables dictate the amount of memory allocated to a tape
+     * before it is written to file (at a significant performance loss).
+     * Therefore for ADOL-C taped AD numbers, it may be desirable to
+     * create a file ".adolcrc" in the program run directory and set the buffer
+     * size therein (as is suggested by the ADOL-C manual). For example, the
+     * following settings increase the default buffer size by 128 times:
+     * @code
+     * "OBUFSIZE" "67108864"
+     * "LBUFSIZE" "67108864"
+     * "VBUFSIZE" "67108864"
+     * "TBUFSIZE" "67108864"
+     * @endcode
+     * Note that the quotation marks are mandatory.
+     * An alternative approach that allows for run-time decision making is to
+     * use the ADHelperBase::set_tape_buffer_sizes() function before starting
+     * taping (as done via the ADHelperBase::start_recording_operations()
+     * function).
+     *
+     * @warning ADOL-C does not support the standard threading models used by
+     * deal.II, so this class should @b not be embedded within a multithreaded
+     * function when using ADOL-C number types. It is, however, suitable for use
+     * in both serial and MPI routines.
+     *
+     * @author Jean-Paul Pelteret, 2016, 2017, 2018
+     */
+    template <enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType = double>
+    class ADHelperCellLevelBase
+      : public ADHelperBase<ADNumberTypeCode, ScalarType>
+    {
+    public:
+      /**
+       * Type definition for the floating point number type that is used in,
+       * and results from, all computations.
+       */
+      using scalar_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+
+      /**
+       * Type definition for the auto-differentiation number type that is used
+       * in all computations.
+       */
+      using ad_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+
+      /**
+       * @name Constructor / destructor
+       */
+      //@{
+
+      /**
+       * The constructor for the class.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * image space.
+       */
+      ADHelperCellLevelBase(const unsigned int n_independent_variables,
+                            const unsigned int n_dependent_variables);
+
+      /**
+       * Destructor
+       */
+      virtual ~ADHelperCellLevelBase() = default;
+
+      //@}
+
+      /**
+       * @name Independent variables
+       */
+      //@{
+
+      /**
+       * Register the complete set of independent variables $\mathbf{X}$ that
+       * represent the local degree-of-freedom values.
+       *
+       * @param[in] dof_values A vector field associated with local
+       * degree-of-freedom values on the current finite element. These define
+       * the values of all independent variables. When considering taped AD
+       * numbers with branching functions, to avoid potential issues with branch
+       * switching it may be a good idea to choose these values close or equal
+       * to those that will be later evaluated and linearized around.
+       *
+       * @note The input value type must correspond to this class's @p scalar_type.
+       * Depending on the selected @p ADNumberTypeCode, this may or may not
+       * correspond with the @p ScalarType prescribed as a template argument.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      void
+      register_dof_values(const std::vector<scalar_type> &dof_values);
+
+      /**
+       * Register the complete set of independent variables $\mathbf{X}$ that
+       * represent the local degree-of-freedom values.
+       *
+       * @param[in] values A global field from which the values of all
+       * independent variables will be extracted. This typically will be the
+       * solution vector around which point a residual vector is to be
+       * computed and around which linearization is to occur.
+       * When considering taped AD numbers with branching functions, to avoid
+       * potential issues with branch switching it may be a good idea to choose
+       * these values close or equal to those that will be later evaluated and
+       * linearized around.
+       * @param[in] local_dof_indices A vector of degree-of-freedom indices from
+       * which to extract the local degree-of-freedom values. This would
+       * typically obtained by calling <code>cell->get_dof_indices()</code>.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      template <typename VectorType>
+      void
+      register_dof_values(
+        const VectorType &                                  values,
+        const std::vector<dealii::types::global_dof_index> &local_dof_indices);
+
+      /**
+       * Returns the complete set of degree-of-freedom values as represented by
+       * auto-differentiable numbers. These are the independent
+       * variables $\mathbf{X}$ about which the solution is linearized.
+       *
+       * It is indicated to the AD library that operations performed with these
+       * numbers are to be tracked, so they are considered "sensitive"
+       * variables. This is, therefore, the set of variables with which one
+       * would then perform computations, and based on which one can then
+       * extract both the value of the function and its derivatives with the
+       * member functions below. The values of the components of the returned
+       * object are initialized to the values set with
+       * register_independent_variable().
+       *
+       * @return An array of auto-differentiable type numbers representing the
+       * local degree-of-freedom values.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      const std::vector<ad_type> &
+      get_sensitive_dof_values();
+
+      //@}
+
+      /**
+       * @name Post-processing
+       */
+      //@{
+
+      /*
+       * Returns the complete set of degree-of-freedom values of
+       * auto-differentiable number type. These store the same scalar values as
+       * the independent variables $\mathbf{X}$ about which the solution is
+       * linearized.
+       *
+       * Operations performed with these numbers are not tracked by the AD,
+       * libraries so they are considered "non-sensitive" variables.
+       * The values of the components of the returned object are initialized to
+       * the values set with register_dof_values().
+       *
+       * @return An array of auto-differentiable type numbers representing the
+       * local degree-of-freedom values.
+       *
+       * @note This function is not typically used within the context of automatic
+       * differentation computations, but can make performing substutitions in
+       * other post-processing computations more straight forward.
+       *
+       * @note For taped AD numbers, this operation is only valid outside recording mode.
+       */
+      std::vector<ad_type>
+      get_non_sensitive_dof_values() const;
+
+      //@}
+
+      /**
+       * @name Operations specific to taped mode: Reusing tapes
+       */
+      //@{
+
+      /**
+       * Set the values for the independent variables $\mathbf{X}$, i.e. the
+       * linearization point.
+       *
+       * @param[in] dof_values A vector field associated with local
+       * degree-of-freedom values on the current finite element. These define
+       * the values of all independent variables.
+       *
+       * @note The input value type must correspond to this class's @p scalar_type.
+       * Depending on the selected @p ADNumberTypeCode, this may or may not
+       * correspond with the @p ScalarType prescribed as a template argument.
+       *
+       * @note If the keep flag has been set when
+       * ADHelperBase::start_recording_operations() is called then the tape is
+       * immediately usable after creation, and the values of the independent
+       * variables set by register_dof_values() are those at which the function
+       * is to be evaluated. In this case, a separate call to this function is
+       * not strictly necessary.
+       */
+      void
+      set_dof_values(const std::vector<scalar_type> &dof_values);
+
+      /**
+       * Set the values for the independent variables $\mathbf{X}$, i.e. the
+       * linearization point.
+       *
+       * @param[in] values A vector field from which the values of all
+       * independent variables is to be extracted.
+       * @param[in] local_dof_indices A vector of degree-of-freedom indices from
+       * which to extract the local degree-of-freedom values. This would
+       * typically obtained by calling <code>cell->get_dof_indices()</code>.
+       *
+       * @note If the keep flag has been set when
+       * ADHelperBase::start_recording_operations() is called then the tape is
+       * immediately usable after creation, and the values of the independent
+       * variables set by register_dof_values() are those at which the function
+       * is to be evaluated. In this case, a separate call to this function is
+       * not strictly necessary.
+       */
+      template <typename VectorType>
+      void
+      set_dof_values(
+        const VectorType &                                  values,
+        const std::vector<dealii::types::global_dof_index> &local_dof_indices);
+
+      //@}
+
+      /**
+       * @name Dependent variables
+       */
+      //@{
+
+      /**
+       * Computes the value of the residual vector field
+       * $\mathbf{r}(\mathbf{X})$.
+       *
+       * @param[out] residual A Vector object with the value for each component
+       * of the vector field evaluated at the point defined by the independent
+       * variable values.
+       *
+       * @note The size of the @p residual vector is determined by the derived
+       * classes, as it depends on the order of the dependent variable(s)
+       * derivative(s) that it represents. Code examples that show how to use
+       * this interface will be provided in the documentation of the derived
+       * classes.
+       */
+      virtual void
+      compute_residual(Vector<scalar_type> &residual) const = 0;
+
+      /**
+       * Computes the gradient (first derivative) of the residual vector field
+       * with respect to all independent variables, i.e.
+       * @f[
+       *   \frac{\partial\mathbf{r}(\mathbf{X})}{\partial\mathbf{X}}
+       * @f]
+       *
+       * @param[out] linearization A FullMatrix with the gradient of each
+       * component of the vector field evaluated at the point defined by the
+       * independent variable values.
+       *
+       * @note The dimensions of the @p linearization matrix is determined by
+       * the derived classes, as it depends on the order of the dependent
+       * variable(s) derivative(s) that it represents. Code examples that show
+       * how to use this interface will be provided in the documentation of
+       * the derived classes.
+       */
+      virtual void
+      compute_linearization(FullMatrix<scalar_type> &linearization) const = 0;
+
+      //@}
+
+    }; // class ADHelperCellLevelBase
 
 
   } // namespace AD
 } // namespace Differentiation
+
+
+/* ----------------- inline and template functions ----------------- */
+
+
+#  ifndef DOXYGEN
+
+namespace Differentiation
+{
+  namespace AD
+  {
+    /* ----------------- ADHelperCellLevelBase ----------------- */
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    template <typename VectorType>
+    void
+    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
+      const VectorType &                                  values,
+      const std::vector<dealii::types::global_dof_index> &local_dof_indices)
+    {
+      // This is actually the same thing the set_dof_values() function,
+      // in the sense that we simply populate our array of independent values
+      // with a meaningful number. However, in this case we need to double check
+      // that we're not registering these variables twice
+      Assert(
+        local_dof_indices.size() == this->n_independent_variables(),
+        ExcMessage(
+          "Degree-of-freedom index vector size does not match number of independent variables"));
+#    ifdef DEBUG
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        {
+          Assert(this->registered_independent_variable_values[i] == false,
+                 ExcMessage("Independent variables already registered."));
+        }
+#    endif
+      set_dof_values(values, local_dof_indices);
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    template <typename VectorType>
+    void
+    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
+      const VectorType &                                  values,
+      const std::vector<dealii::types::global_dof_index> &local_dof_indices)
+    {
+      Assert(local_dof_indices.size() == this->n_independent_variables(),
+             ExcMessage(
+               "Vector size does not match number of independent variables"));
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+          i, values[local_dof_indices[i]]);
+    }
+
+
+  } // namespace AD
+} // namespace Differentiation
+
+
+#  endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE

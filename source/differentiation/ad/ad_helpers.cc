@@ -725,6 +725,111 @@ namespace Differentiation
                                                      func);
       registered_marked_dependent_variables[index] = true;
     }
+
+
+
+    /* -------------------- ADHelperCellLevelBase -------------------- */
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ADHelperCellLevelBase(
+      const unsigned int n_independent_variables,
+      const unsigned int n_dependent_variables)
+      : ADHelperBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
+                                                   n_dependent_variables)
+    {}
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
+      const std::vector<scalar_type> &dof_values)
+    {
+      // This is actually the same thing the set_independent_variable function,
+      // in the sense that we simply populate our array of independent values
+      // with a meaningful number. However, in this case we need to double check
+      // that we're not registering these variables twice
+      Assert(dof_values.size() == this->n_independent_variables(),
+             ExcMessage(
+               "Vector size does not match number of independent variables"));
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        {
+          Assert(this->registered_independent_variable_values[i] == false,
+                 ExcMessage("Independent variable value already registered."));
+        }
+      set_dof_values(dof_values);
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    const std::vector<
+      typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type> &
+    ADHelperCellLevelBase<ADNumberTypeCode,
+                          ScalarType>::get_sensitive_dof_values()
+    {
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape() != numbers::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+        }
+
+      // If necessary, initialize the internally stored vector of
+      // AD numbers that represents the independent variables
+      this->finalize_sensitive_independent_variables();
+      Assert(this->independent_variables.size() ==
+               this->n_independent_variables(),
+             ExcInternalError());
+
+      return this->independent_variables;
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    std::vector<
+      typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type>
+    ADHelperCellLevelBase<ADNumberTypeCode,
+                          ScalarType>::get_non_sensitive_dof_values() const
+    {
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape() != numbers::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+        }
+
+      std::vector<ad_type> out(this->n_independent_variables(),
+                               dealii::internal::NumberType<ad_type>::value(
+                                 0.0));
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        this->initialize_non_sensitive_independent_variable(i, out[i]);
+
+      return out;
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
+      const std::vector<scalar_type> &values)
+    {
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape() != numbers::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+        }
+      Assert(values.size() == this->n_independent_variables(),
+             ExcMessage(
+               "Vector size does not match number of independent variables"));
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+          i, values[i]);
+    }
+
+
   } // namespace AD
 } // namespace Differentiation
 
