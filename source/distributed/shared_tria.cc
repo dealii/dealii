@@ -53,19 +53,18 @@ namespace parallel
          partition_custom_signal) &
         settings;
       (void)partition_settings;
-      Assert(
-        partition_settings == partition_auto ||
-          partition_settings == partition_metis ||
-          partition_settings == partition_zoltan ||
-          partition_settings == partition_zorder ||
-          partition_settings == partition_custom_signal,
-        ExcMessage(
-          "Settings must contain exactly one type of the active cell partitioning scheme."))
+      Assert(partition_settings == partition_auto ||
+               partition_settings == partition_metis ||
+               partition_settings == partition_zoltan ||
+               partition_settings == partition_zorder ||
+               partition_settings == partition_custom_signal,
+             ExcMessage("Settings must contain exactly one type of the active "
+                        "cell partitioning scheme."));
 
-        if (settings & construct_multigrid_hierarchy) Assert(
-          allow_artificial_cells,
-          ExcMessage(
-            "construct_multigrid_hierarchy requires allow_artificial_cells to be set to true."))
+      if (settings & construct_multigrid_hierarchy)
+        Assert(allow_artificial_cells,
+               ExcMessage("construct_multigrid_hierarchy requires "
+                          "allow_artificial_cells to be set to true."));
     }
 
 
@@ -84,12 +83,12 @@ namespace parallel
         ExcMessage(
           "A parallel::shared::Triangulation needs to be refined in the same"
           "way on all processors, but the participating processors don't "
-          "agree on the number of active cells."))
+          "agree on the number of active cells."));
 #  endif
 
-        auto partition_settings = (partition_zoltan | partition_metis |
-                                   partition_zorder | partition_custom_signal) &
-                                  settings;
+      auto partition_settings = (partition_zoltan | partition_metis |
+                                 partition_zorder | partition_custom_signal) &
+                                settings;
       if (partition_settings == partition_auto)
 #  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
         partition_settings = partition_zoltan;
@@ -286,7 +285,7 @@ namespace parallel
         const unsigned int total_cells =
           Utilities::MPI::sum(n_my_cells, this->get_communicator());
         Assert(total_cells == this->n_active_cells(),
-               ExcMessage("Not all cells are assigned to a processor."))
+               ExcMessage("Not all cells are assigned to a processor."));
       }
 
       // If running with multigrid, assert that each level
@@ -304,7 +303,7 @@ namespace parallel
           const unsigned int total_cells =
             Utilities::MPI::sum(n_my_cells, this->get_communicator());
           Assert(total_cells == this->n_cells(),
-                 ExcMessage("Not all cells are assigned to a processor."))
+                 ExcMessage("Not all cells are assigned to a processor."));
         }
 #  endif
     }
@@ -334,6 +333,11 @@ namespace parallel
     Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(
       const unsigned int level) const
     {
+      Assert(level < true_level_subdomain_ids_of_cells.size(),
+             ExcInternalError());
+      Assert(true_level_subdomain_ids_of_cells[level].size() ==
+               this->n_cells(level),
+             ExcInternalError());
       return true_level_subdomain_ids_of_cells[level];
     }
 
