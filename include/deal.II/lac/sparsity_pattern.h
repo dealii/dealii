@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/linear_index_iterator.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
@@ -132,10 +133,14 @@ namespace SparsityPatternIterators
   {
   public:
     /**
+     * Size type of SparsityPattern.
+     */
+    using size_type = SparsityPatternIterators::size_type;
+
+    /**
      * Constructor.
      */
-    Accessor(const SparsityPattern *matrix,
-             const std::size_t      index_within_sparsity);
+    Accessor(const SparsityPattern *matrix, const std::size_t linear_index);
 
     /**
      * Constructor. Construct the end accessor for the given sparsity pattern.
@@ -208,7 +213,7 @@ namespace SparsityPatternIterators
     /**
      * The sparsity pattern we operate on accessed.
      */
-    const SparsityPattern *sparsity_pattern;
+    const SparsityPattern *container;
 
     /**
      * Index in global sparsity pattern. This index represents the location
@@ -217,7 +222,7 @@ namespace SparsityPatternIterators
      * values array of a sparse matrix that stores the corresponding value of
      * this site.
      */
-    std::size_t index_within_sparsity;
+    std::size_t linear_index;
 
     /**
      * Move the accessor to the next nonzero entry in the matrix.
@@ -228,7 +233,7 @@ namespace SparsityPatternIterators
     /**
      * Grant access to iterator class.
      */
-    friend class Iterator;
+    friend class LinearIndexIterator<Iterator, Accessor>;
 
     /**
      * Grant access to accessor class of ChunkSparsityPattern.
@@ -262,75 +267,25 @@ namespace SparsityPatternIterators
    * indices whereas the (expensive) lookup of the row index can be avoided by
    * using the loop index instead.
    */
-  class Iterator
+  class Iterator : public LinearIndexIterator<Iterator, Accessor>
   {
   public:
+    /**
+     * Size type.
+     */
+    using size_type = types::global_dof_index;
+
+    /**
+     * Type of the stored pointer.
+     */
+    using container_pointer_type = SparsityPattern *;
+
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
      * given global index (i.e., the index of the given element counting from
      * the zeroth row).
      */
-    Iterator(const SparsityPattern *sp,
-             const std::size_t      index_within_sparsity);
-
-    /**
-     * Prefix increment.
-     */
-    Iterator &
-    operator++();
-
-    /**
-     * Postfix increment.
-     */
-    Iterator
-    operator++(int);
-
-    /**
-     * Dereferencing operator.
-     */
-    const Accessor &operator*() const;
-
-    /**
-     * Dereferencing operator.
-     */
-    const Accessor *operator->() const;
-
-    /**
-     * Comparison. True, if both iterators point to the same matrix position.
-     */
-    bool
-    operator==(const Iterator &) const;
-
-    /**
-     * Inverse of <tt>==</tt>.
-     */
-    bool
-    operator!=(const Iterator &) const;
-
-    /**
-     * Comparison operator. Result is true if either the first row number is
-     * smaller or if the row numbers are equal and the first index is smaller.
-     *
-     * This function is only valid if both iterators point into the same
-     * matrix.
-     */
-    bool
-    operator<(const Iterator &) const;
-
-    /**
-     * Return the distance between the current iterator and the argument. The
-     * distance is given by how many times one has to apply operator++ to the
-     * current iterator to get the argument (for a positive return value), or
-     * operator-- (for a negative return value).
-     */
-    int
-    operator-(const Iterator &p) const;
-
-  private:
-    /**
-     * Store an object of the accessor class.
-     */
-    Accessor accessor;
+    Iterator(const SparsityPattern *sp, const std::size_t linear_index);
   };
 } // namespace SparsityPatternIterators
 
@@ -1194,15 +1149,15 @@ namespace SparsityPatternIterators
 {
   inline Accessor::Accessor(const SparsityPattern *sparsity_pattern,
                             const std::size_t      i)
-    : sparsity_pattern(sparsity_pattern)
-    , index_within_sparsity(i)
+    : container(sparsity_pattern)
+    , linear_index(i)
   {}
 
 
 
   inline Accessor::Accessor(const SparsityPattern *sparsity_pattern)
-    : sparsity_pattern(sparsity_pattern)
-    , index_within_sparsity(sparsity_pattern->rowstart[sparsity_pattern->rows])
+    : container(sparsity_pattern)
+    , linear_index(container->rowstart[container->rows])
   {}
 
 
@@ -1210,10 +1165,8 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::is_valid_entry() const
   {
-    return (index_within_sparsity <
-              sparsity_pattern->rowstart[sparsity_pattern->rows] &&
-            sparsity_pattern->colnums[index_within_sparsity] !=
-              SparsityPattern::invalid_entry);
+    return (linear_index < container->rowstart[container->rows] &&
+            container->colnums[linear_index] != SparsityPattern::invalid_entry);
   }
 
 
@@ -1224,11 +1177,10 @@ namespace SparsityPatternIterators
     Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     const std::size_t *insert_point =
-      std::upper_bound(sparsity_pattern->rowstart.get(),
-                       sparsity_pattern->rowstart.get() +
-                         sparsity_pattern->rows + 1,
-                       index_within_sparsity);
-    return insert_point - sparsity_pattern->rowstart.get() - 1;
+      std::upper_bound(container->rowstart.get(),
+                       container->rowstart.get() + container->rows + 1,
+                       linear_index);
+    return insert_point - container->rowstart.get() - 1;
   }
 
 
@@ -1238,7 +1190,7 @@ namespace SparsityPatternIterators
   {
     Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    return (sparsity_pattern->colnums[index_within_sparsity]);
+    return (container->colnums[linear_index]);
   }
 
 
@@ -1248,7 +1200,7 @@ namespace SparsityPatternIterators
   {
     Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    return index_within_sparsity - sparsity_pattern->rowstart[row()];
+    return linear_index - container->rowstart[row()];
   }
 
 
@@ -1258,7 +1210,7 @@ namespace SparsityPatternIterators
   {
     Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    return index_within_sparsity;
+    return linear_index;
   }
 
 
@@ -1266,8 +1218,7 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
-    return (sparsity_pattern == other.sparsity_pattern &&
-            index_within_sparsity == other.index_within_sparsity);
+    return (container == other.container && linear_index == other.linear_index);
   }
 
 
@@ -1275,94 +1226,26 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator<(const Accessor &other) const
   {
-    Assert(sparsity_pattern == other.sparsity_pattern, ExcInternalError());
+    Assert(container == other.container, ExcInternalError());
 
-    return index_within_sparsity < other.index_within_sparsity;
+    return linear_index < other.linear_index;
   }
+
 
 
   inline void
   Accessor::advance()
   {
-    Assert(index_within_sparsity <
-             sparsity_pattern->rowstart[sparsity_pattern->rows],
+    Assert(linear_index < container->rowstart[container->rows],
            ExcIteratorPastEnd());
-    ++index_within_sparsity;
+    ++linear_index;
   }
 
 
-
-  inline Iterator::Iterator(const SparsityPattern *sparsity_pattern,
-                            const std::size_t      i)
-    : accessor(sparsity_pattern, i)
+  inline Iterator::Iterator(const SparsityPattern *sp,
+                            const std::size_t      linear_index)
+    : LinearIndexIterator<Iterator, Accessor>(Accessor(sp, linear_index))
   {}
-
-
-
-  inline Iterator &
-  Iterator::operator++()
-  {
-    accessor.advance();
-    return *this;
-  }
-
-
-
-  inline Iterator
-  Iterator::operator++(int)
-  {
-    const Iterator iter = *this;
-    accessor.advance();
-    return iter;
-  }
-
-
-
-  inline const Accessor &Iterator::operator*() const
-  {
-    return accessor;
-  }
-
-
-
-  inline const Accessor *Iterator::operator->() const
-  {
-    return &accessor;
-  }
-
-
-  inline bool
-  Iterator::operator==(const Iterator &other) const
-  {
-    return (accessor == other.accessor);
-  }
-
-
-
-  inline bool
-  Iterator::operator!=(const Iterator &other) const
-  {
-    return !(*this == other);
-  }
-
-
-
-  inline bool
-  Iterator::operator<(const Iterator &other) const
-  {
-    return accessor < other.accessor;
-  }
-
-
-
-  inline int
-  Iterator::operator-(const Iterator &other) const
-  {
-    Assert(accessor.sparsity_pattern == other.accessor.sparsity_pattern,
-           ExcInternalError());
-
-    return (*this)->index_within_sparsity - other->index_within_sparsity;
-  }
 } // namespace SparsityPatternIterators
 
 
