@@ -220,7 +220,14 @@ public:
    * sums them into the vector @p dst. The function also applies constraints
    * during the write operation. The functionality is hence similar to the
    * function AffineConstraints::distribute_local_to_global. If vectorization
-   * is enabled, the DoF values for several cells are used.
+   * is enabled, the DoF values for several cells are used. The mask can be
+   * used to suppress the write access for some of the cells contained in the
+   * current cell vectorization batch, e.g. in case of local time stepping,
+   * where some cells are excluded from a call. A value of `true` in the
+   * bitset means that the respective lane index will be processed, whereas a
+   * value of `false` skips this index. The default setting is a bitset that
+   * contains all ones, which will write the accumulated integrals to all
+   * cells in the batch.
    *
    * If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
@@ -240,8 +247,11 @@ public:
    */
   template <typename VectorType>
   void
-  distribute_local_to_global(VectorType &       dst,
-                             const unsigned int first_index = 0) const;
+  distribute_local_to_global(
+    VectorType &       dst,
+    const unsigned int first_index = 0,
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask =
+      std::bitset<VectorizedArray<Number>::n_array_elements>().flip()) const;
 
   /**
    * Takes the values stored internally on dof values of the current cell and
@@ -251,7 +261,13 @@ public:
    * by the current cell are overwritten. Thus, if a degree of freedom is
    * associated to more than one cell (as usual in continuous finite
    * elements), the values will be overwritten and only the value written last
-   * is retained.
+   * is retained. The mask can be used to suppress the write access for some
+   * of the cells contained in the current cell vectorization batch, e.g. in
+   * case of local time stepping, where some  cells are excluded from a call.
+   * A value of `true` in the bitset means that the respective lane index will
+   * be processed, whereas a value of `false` skips this index. The default
+   * setting is a bitset that contains all ones, which will write the
+   * accumulated integrals to all cells in the batch.
    *
    * If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
@@ -271,7 +287,11 @@ public:
    */
   template <typename VectorType>
   void
-  set_dof_values(VectorType &dst, const unsigned int first_index = 0) const;
+  set_dof_values(
+    VectorType &       dst,
+    const unsigned int first_index = 0,
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask =
+      std::bitset<VectorizedArray<Number>::n_array_elements>().flip()) const;
 
   //@}
 
@@ -786,9 +806,11 @@ protected:
    */
   template <typename VectorType, typename VectorOperation>
   void
-  read_write_operation(const VectorOperation &operation,
-                       VectorType *           vectors[],
-                       const bool             apply_constraints = true) const;
+  read_write_operation(
+    const VectorOperation &                                       operation,
+    VectorType *                                                  vectors[],
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask,
+    const bool apply_constraints = true) const;
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -799,8 +821,10 @@ protected:
    */
   template <typename VectorType, typename VectorOperation>
   void
-  read_write_operation_contiguous(const VectorOperation &operation,
-                                  VectorType *           vectors[]) const;
+  read_write_operation_contiguous(
+    const VectorOperation &                                       operation,
+    VectorType *                                                  vectors[],
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const;
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -3927,9 +3951,10 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
-  const VectorOperation &operation,
-  VectorType *           src[],
-  const bool             apply_constraints) const
+  const VectorOperation &                                       operation,
+  VectorType *                                                  src[],
+  const std::bitset<VectorizedArray<Number>::n_array_elements> &mask,
+  const bool apply_constraints) const
 {
   // Case 1: No MatrixFree object given, simple case because we do not need to
   // process constraints and need not care about vectorization -> go to
@@ -3960,15 +3985,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
         [cell] >=
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
     {
-      read_write_operation_contiguous(operation, src);
+      read_write_operation_contiguous(operation, src, mask);
       return;
     }
 
   // Case 3: standard operation with one index per degree of freedom -> go on
   // here
-
   constexpr unsigned int n_vectorization =
     VectorizedArray<Number>::n_array_elements;
+  Assert(mask.count() == n_vectorization,
+         ExcNotImplemented("Masking currently not implemented for "
+                           "non-contiguous DoF storage"));
+
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
   if (dof_info->index_storage_variants
@@ -4371,8 +4399,10 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::
-  read_write_operation_contiguous(const VectorOperation &operation,
-                                  VectorType *           src[]) const
+  read_write_operation_contiguous(
+    const VectorOperation &                                       operation,
+    VectorType *                                                  src[],
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const
 {
   // This functions processes the functions read_dof_values,
   // distribute_local_to_global, and set_dof_values with the same code for
@@ -4388,6 +4418,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
   const internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex ind =
     is_face ? dof_access_index :
               internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
+  const unsigned int n_lanes = mask.count();
 
   const std::vector<unsigned int> &dof_indices_cont =
     dof_info->dof_indices_contiguous[ind];
@@ -4395,8 +4426,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
   // Simple case: We have contiguous storage, so we can simply copy out the
   // data
   if (dof_info->index_storage_variants[ind][cell] ==
-      internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-        interleaved_contiguous)
+        internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+          interleaved_contiguous &&
+      n_lanes == VectorizedArray<Number>::n_array_elements)
     {
       const unsigned int dof_index =
         dof_indices_cont[cell * VectorizedArray<Number>::n_array_elements] +
@@ -4424,6 +4456,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
   // some transformations
   const unsigned int vectorization_populated =
     dof_info->n_vectorization_lanes_filled[ind][this->cell];
+
   unsigned int dof_indices[VectorizedArray<Number>::n_array_elements];
   for (unsigned int v = 0; v < vectorization_populated; ++v)
     dof_indices[v] =
@@ -4432,6 +4465,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
                                             [first_selected_component] *
         dof_info->dof_indices_interleave_strides
           [ind][cell * VectorizedArray<Number>::n_array_elements + v];
+
   for (unsigned int v = vectorization_populated;
        v < VectorizedArray<Number>::n_array_elements;
        ++v)
@@ -4439,7 +4473,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
 
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
-  if (vectorization_populated == VectorizedArray<Number>::n_array_elements)
+  if (vectorization_populated == VectorizedArray<Number>::n_array_elements &&
+      n_lanes == VectorizedArray<Number>::n_array_elements)
     {
       if (dof_info->index_storage_variants[ind][cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
@@ -4542,21 +4577,29 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
               contiguous)
           {
             if (n_components == 1 || n_fe_components == 1)
-              for (unsigned int v = 0; v < vectorization_populated; ++v)
-                for (unsigned int i = 0; i < data->dofs_per_component_on_cell;
-                     ++i)
-                  operation.process_dof(dof_indices[v] + i,
-                                        *src[comp],
-                                        values_dofs[comp][i][v]);
+              {
+                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(dof_indices[v] + i,
+                                            *src[comp],
+                                            values_dofs[comp][i][v]);
+              }
             else
-              for (unsigned int v = 0; v < vectorization_populated; ++v)
-                for (unsigned int i = 0; i < data->dofs_per_component_on_cell;
-                     ++i)
-                  operation.process_dof(dof_indices[v] + i +
-                                          comp *
-                                            data->dofs_per_component_on_cell,
-                                        *src[0],
-                                        values_dofs[comp][i][v]);
+              {
+                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(
+                        dof_indices[v] + i +
+                          comp * data->dofs_per_component_on_cell,
+                        *src[0],
+                        values_dofs[comp][i][v]);
+              }
           }
         else
           {
@@ -4568,21 +4611,29 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
                                VectorizedArray<Number>::n_array_elements + 1);
             if (n_components == 1 || n_fe_components == 1)
               for (unsigned int v = 0; v < vectorization_populated; ++v)
-                for (unsigned int i = 0; i < data->dofs_per_component_on_cell;
-                     ++i)
-                  operation.process_dof(dof_indices[v] + i * offsets[v],
-                                        *src[comp],
-                                        values_dofs[comp][i][v]);
+                {
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(dof_indices[v] + i * offsets[v],
+                                            *src[comp],
+                                            values_dofs[comp][i][v]);
+                }
             else
-              for (unsigned int v = 0; v < vectorization_populated; ++v)
-                for (unsigned int i = 0; i < data->dofs_per_component_on_cell;
-                     ++i)
-                  operation.process_dof(
-                    dof_indices[v] +
-                      (i + comp * data->dofs_per_component_on_cell) *
-                        offsets[v],
-                    *src[0],
-                    values_dofs[comp][i][v]);
+              {
+                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                  if (mask[v] == true)
+                    for (unsigned int i = 0;
+                         i < data->dofs_per_component_on_cell;
+                         ++i)
+                      operation.process_dof(
+                        dof_indices[v] +
+                          (i + comp * data->dofs_per_component_on_cell) *
+                            offsets[v],
+                        *src[0],
+                        values_dofs[comp][i][v]);
+              }
           }
       }
 }
@@ -4608,7 +4659,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_dof_values(
         get_vector_component(const_cast<VectorType &>(src), d + first_index);
 
   internal::VectorReader<Number> reader;
-  read_write_operation(reader, src_data, true);
+  read_write_operation(
+    reader,
+    src_data,
+    std::bitset<VectorizedArray<Number>::n_array_elements>().flip(),
+    true);
 
 #  ifdef DEBUG
   dof_values_initialized = true;
@@ -4636,7 +4691,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_dof_values_plain(
         get_vector_component(const_cast<VectorType &>(src), d + first_index);
 
   internal::VectorReader<Number> reader;
-  read_write_operation(reader, src_data, false);
+  read_write_operation(
+    reader,
+    src_data,
+    std::bitset<VectorizedArray<Number>::n_array_elements>().flip(),
+    false);
 
 #  ifdef DEBUG
   dof_values_initialized = true;
@@ -4649,8 +4708,10 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::
-  distribute_local_to_global(VectorType &       dst,
-                             const unsigned int first_index) const
+  distribute_local_to_global(
+    VectorType &                                                  dst,
+    const unsigned int                                            first_index,
+    const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const
 {
   Assert(dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
@@ -4667,7 +4728,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
                                                               d + first_index);
 
   internal::VectorDistributorLocalToGlobal<Number> distributor;
-  read_write_operation(distributor, dst_data);
+  read_write_operation(distributor, dst_data, mask);
 }
 
 
@@ -4676,8 +4737,9 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face>::set_dof_values(
-  VectorType &       dst,
-  const unsigned int first_index) const
+  VectorType &                                                  dst,
+  const unsigned int                                            first_index,
+  const std::bitset<VectorizedArray<Number>::n_array_elements> &mask) const
 {
   Assert(dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
@@ -4694,7 +4756,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::set_dof_values(
                                                               d + first_index);
 
   internal::VectorSetter<Number> setter;
-  read_write_operation(setter, dst_data);
+  read_write_operation(setter, dst_data, mask);
 }
 
 
