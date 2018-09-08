@@ -795,14 +795,14 @@
  *
  * Distorted cells can appear in two different ways: The original
  * @ref GlossCoarseMesh "coarse mesh" can already contain such cells,
- * or they can be created as the result of mesh refinement if the boundary
- * description in use is sufficiently irregular.
+ * or they can be created as the result of moving or distorting a mesh by a
+ * relatively large amount.
  *
  * If the appropriate flag is given upon creation of a triangulation,
  * the function Triangulation::create_triangulation, which is called
  * by the various functions in GridGenerator and GridIn (but can also
- * be called from user code, see step-14), will signal
- * the creation of coarse meshes with distorted cells by throwing an
+ * be called from user code, see step-14 and the example at the end of step-49),
+ * will signal the creation of coarse meshes with distorted cells by throwing an
  * exception of type Triangulation::DistortedCellList. There are
  * legitimate cases for creating meshes with distorted cells (in
  * particular collapsed/pinched cells) if you don't intend to assemble
@@ -820,60 +820,9 @@
  * that you can ignore this condition, you can react by doing nothing
  * with the caught exception.
  *
- * The second case in which distorted cells can appear is through mesh
- * refinement when we have curved boundaries. Consider, for example, the
- * following case where the dashed line shows the exact boundary that the
- * lower edge of the cell is supposed to approximate (let's assume for
- * simplicity that the left, top and right edges are interior edges and
- * therefore will be considered as straight; in fact, for this particular case
- * in 2d where only one side of a cell is at the boundary we have special code
- * that avoids the situation depicted, but you will get the general idea of
- * the problem that holds in 3d or if more than one side of the cell is at the
- * boundary):
- *
- * @image html distorted_2d_refinement_01.png "One cell with an edge approximating a curved boundary"
- *
- * Now, if this cell is refined, we first split all edges and place
- * new mid-points on them. For the left, top and right edge, this is
- * trivial: because they are considered straight, we just take the
- * point in the middle between the two vertices. For the lower edge,
- * the Triangulation class asks the Boundary object associated with
- * this boundary (and in particular the Boundary::new_point_on_line
- * function) where the new point should lie. The four old vertices and
- * the four new points are shown here:
- *
- * @image html distorted_2d_refinement_02.png "Cell after edge refinement"
- *
- * The last step is to compute the location of the new point in the interior
- * of the cell. By default, it is chosen as the average location (arithmetic
- * mean of the coordinates) of these 8 points (in 3d, the 26 surrounding
- * points have different weights, but the idea is the same):
- *
- * @image html distorted_2d_refinement_03.png "Cell after edge refinement"
- *
- * The problem with that is, of course, that the bottom two child cells are
- * twisted, whereas the top two children are well-shaped. While such
- * meshes can happen with sufficiently irregular boundary descriptions
- * (and if the @ref GlossCoarseMesh "coarse mesh" is entirely inadequate
- * to resolve the complexity of the boundary), the Triangulation class does not
- * know what to do in such situations unless one attaches an appropriate
- * manifold object to the cells in question (see the
- * @ref manifold "documentation module on manifolds"). Consequently, absent
- * such a manifold description or if the manifold description does not
- * provide a sufficient description of the geometry, the
- * Triangulation::execute_coarsening_and_refinement function does
- * create such meshes, but it keeps a list of cells whose children are
- * distorted. If this list is non-empty at the end of a refinement
- * step, it will throw an exception of type
- * Triangulation::DistortedCellList that contains those cells that
- * have distorted children. The caller of
- * Triangulation::execute_coarsening_and_refinement can then decide
- * what to do with this situation.
- *
- * One way to deal with this problem is to use the
- * GridTools::fix_up_distorted_child_cells function that attempts to
- * fix up exactly these cells if possible by moving around the node at
- * the center of the cell.
+ * The function GridTools::fix_up_distorted_child_cells can, in some cases,
+ * fix distorted cells on refined meshes by moving around the vertices of a
+ * distorted child cell that has an undistorted parent.
  *
  * Note that the Triangulation class does not test for the presence of
  * distorted cells by default, since the determination whether a cell
