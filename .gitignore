@@ -4,6 +4,7 @@
 # eclipse
 /.cproject
 /.project
+qtcreator/
 
 # visual studio code
 /.vscode
@@ -18,11 +19,15 @@
 *#
 
 # configuration, executable, and output files from examples
+examples/step-*/*dat
 examples/step-*/*eps
-examples/step-*/*json
 examples/step-*/*gmv
 examples/step-*/*gnuplot
+examples/step-*/*json
+examples/step-*/*png
+examples/step-*/*pvd
 examples/step-*/*svg
+examples/step-*/*tex
 examples/step-*/*visit
 examples/step-*/*vtk
 examples/step-*/*vtu
