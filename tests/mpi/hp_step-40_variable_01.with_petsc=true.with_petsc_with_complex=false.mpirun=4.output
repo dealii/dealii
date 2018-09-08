@@ -4,14 +4,12 @@ Cycle 0:
       256+256+256+256+
    Number of degrees of freedom: 4225
       1077+1056+1058+1034+
-DEAL:mpi::Solver stopped within 10 - 10 iterations
-   Solved in 10 iterations.
+DEAL:mpi::Solver stopped within 8 - 12 iterations
 
 Cycle 1:
    Number of active cells:       4096
       1024+1024+1024+1024+
    Number of degrees of freedom: 16641
       4201+4163+4155+4122+
-DEAL:mpi::Solver stopped after 11 iterations
-   Solved in 11 iterations.
+DEAL:mpi::Solver stopped within 8 - 12 iterations
 
