@@ -97,7 +97,7 @@ namespace Step40
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
-    AffineConstraints<double> constraints;
+    AffineConstraints<PetscScalar> constraints;
 
     PETScWrappers::MPI::SparseMatrix system_matrix;
     PETScWrappers::MPI::Vector       locally_relevant_solution;
@@ -159,10 +159,8 @@ namespace Step40
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             constraints);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim, PetscScalar>(), constraints);
     constraints.close();
 
     DynamicSparsityPattern csp(dof_handler.n_dofs(),
@@ -282,8 +280,8 @@ namespace Step40
                                            system_rhs,
                                            preconditioner),
                               solver_control.last_step(),
-                              10,
-                              10);
+                              8,
+                              12);
 #else
     check_solver_within_range(solver.solve(system_matrix,
                                            completely_distributed_solution,
@@ -294,9 +292,6 @@ namespace Step40
                               120,
                               260);
 #endif
-
-    pcout << "   Solved in " << solver_control.last_step() << " iterations."
-          << std::endl;
 
     constraints.distribute(completely_distributed_solution);
 
