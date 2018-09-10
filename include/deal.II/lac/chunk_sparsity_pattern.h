@@ -929,7 +929,7 @@ namespace ChunkSparsityPatternIterators
   {
     Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    return reduced_accessor.index_within_sparsity;
+    return reduced_accessor.linear_index;
   }
 
 
@@ -953,11 +953,11 @@ namespace ChunkSparsityPatternIterators
 
     if (chunk_row != other.chunk_row)
       {
-        if (reduced_accessor.index_within_sparsity ==
-            reduced_accessor.sparsity_pattern->n_nonzero_elements())
+        if (reduced_accessor.linear_index ==
+            reduced_accessor.container->n_nonzero_elements())
           return false;
-        if (other.reduced_accessor.index_within_sparsity ==
-            reduced_accessor.sparsity_pattern->n_nonzero_elements())
+        if (other.reduced_accessor.linear_index ==
+            reduced_accessor.container->n_nonzero_elements())
           return true;
 
         const unsigned int global_row = sparsity_pattern->get_chunk_size() *
@@ -973,11 +973,10 @@ namespace ChunkSparsityPatternIterators
           return false;
       }
 
-    return (reduced_accessor.index_within_sparsity <
-              other.reduced_accessor.index_within_sparsity ||
-            (reduced_accessor.index_within_sparsity ==
-               other.reduced_accessor.index_within_sparsity &&
-             chunk_col < other.chunk_col));
+    return (
+      reduced_accessor.linear_index < other.reduced_accessor.linear_index ||
+      (reduced_accessor.linear_index == other.reduced_accessor.linear_index &&
+       chunk_col < other.chunk_col));
   }
 
 
@@ -1007,8 +1006,8 @@ namespace ChunkSparsityPatternIterators
       {
         const unsigned int reduced_row = reduced_accessor.row();
         // end of row
-        if (reduced_accessor.index_within_sparsity + 1 ==
-            reduced_accessor.sparsity_pattern->rowstart[reduced_row + 1])
+        if (reduced_accessor.linear_index + 1 ==
+            reduced_accessor.container->rowstart[reduced_row + 1])
           {
             ++chunk_row;
 
@@ -1025,8 +1024,8 @@ namespace ChunkSparsityPatternIterators
             // go back to the beginning of the same reduced row but with
             // chunk_row increased by one
             else
-              reduced_accessor.index_within_sparsity =
-                reduced_accessor.sparsity_pattern->rowstart[reduced_row];
+              reduced_accessor.linear_index =
+                reduced_accessor.container->rowstart[reduced_row];
           }
         // advance within chunk
         else
