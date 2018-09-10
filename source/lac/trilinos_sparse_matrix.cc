@@ -2240,10 +2240,7 @@ namespace TrilinosWrappers
                   const MPI::Vector & V,
                   const bool          transpose_left)
     {
-#  ifdef DEAL_II_WITH_64BIT_INDICES
-      Assert(false, ExcNotImplemented())
-#  endif
-        const bool use_vector = (V.size() == inputright.m() ? true : false);
+      const bool use_vector = (V.size() == inputright.m() ? true : false);
       if (transpose_left == false)
         {
           Assert(inputleft.n() == inputright.m(),
@@ -2329,10 +2326,7 @@ namespace TrilinosWrappers
                       const SparseMatrix &B,
                       const MPI::Vector & V) const
   {
-#  ifdef DEAL_II_WITH_64BIT_INDICES
-    Assert(false, ExcNotImplemented())
-#  endif
-      internals::perform_mmult(*this, B, C, V, false);
+    internals::perform_mmult(*this, B, C, V, false);
   }
 
 
@@ -2342,10 +2336,7 @@ namespace TrilinosWrappers
                        const SparseMatrix &B,
                        const MPI::Vector & V) const
   {
-#  ifdef DEAL_II_WITH_64BIT_INDICES
-    Assert(false, ExcNotImplemented())
-#  endif
-      internals::perform_mmult(*this, B, C, V, true);
+    internals::perform_mmult(*this, B, C, V, true);
   }
 
 
