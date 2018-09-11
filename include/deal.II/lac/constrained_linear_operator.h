@@ -59,13 +59,13 @@ DEAL_II_NAMESPACE_OPEN
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain>
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
 distribute_constraints_linear_operator(
   const AffineConstraints<typename Range::value_type> &constraints,
-  const LinearOperator<Range, Domain> &                exemplar)
+  const LinearOperator<Range, Domain, Payload> &       exemplar)
 {
-  LinearOperator<Range, Domain> return_op = exemplar;
+  LinearOperator<Range, Domain, Payload> return_op = exemplar;
 
   return_op.vmult_add = [&constraints](Range &v, const Domain &u) {
     Assert(!dealii::PointerComparison::equal(&v, &u),
@@ -155,13 +155,13 @@ distribute_constraints_linear_operator(
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain>
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
 project_to_constrained_linear_operator(
   const AffineConstraints<typename Range::value_type> &constraints,
-  const LinearOperator<Range, Domain> &                exemplar)
+  const LinearOperator<Range, Domain, Payload> &       exemplar)
 {
-  LinearOperator<Range, Domain> return_op = exemplar;
+  LinearOperator<Range, Domain, Payload> return_op = exemplar;
 
   return_op.vmult_add = [&constraints](Range &v, const Domain &u) {
     const auto &locally_owned_elements = v.locally_owned_elements();
@@ -246,11 +246,11 @@ project_to_constrained_linear_operator(
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain>
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
 constrained_linear_operator(
   const AffineConstraints<typename Range::value_type> &constraints,
-  const LinearOperator<Range, Domain> &                linop)
+  const LinearOperator<Range, Domain, Payload> &       linop)
 {
   const auto C    = distribute_constraints_linear_operator(constraints, linop);
   const auto Ct   = transpose_operator(C);
@@ -293,11 +293,11 @@ constrained_linear_operator(
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
+template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Range>
 constrained_right_hand_side(
   const AffineConstraints<typename Range::value_type> &constraints,
-  const LinearOperator<Range, Domain> &                linop,
+  const LinearOperator<Range, Domain, Payload> &       linop,
   const Range &                                        right_hand_side)
 {
   PackagedOperation<Range> return_comp;
