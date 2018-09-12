@@ -1559,10 +1559,14 @@ namespace TrilinosWrappers
      *
      * Source and destination must not be the same vector.
      *
-     * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes, e.g., Vector<double> and
-     * LinearAlgebra::distributed::Vector<double>.
+     * This function can be called with several types of vector objects,
+     * namely @p VectorType can be
+     * <ul>
+     * <li> TrilinosWrappers::MPI::Vector,
+     * <li> LinearAlgebra::EpetraWrappers::Vector,
+     * <li> Vector<double>,
+     * <li> LinearAlgebra::distributed::Vector<double>.
+     * </ul>
      *
      * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
      * @p dst has to be initialized with the same IndexSet that was used for
@@ -1570,7 +1574,7 @@ namespace TrilinosWrappers
      * initialized with the same IndexSet that was used for the column indices
      * of the matrix.
      *
-     * In case of a localized Vector, this function will only work when
+     * In case of a serial vector, this function will only work when
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
      */
@@ -1585,20 +1589,8 @@ namespace TrilinosWrappers
      *
      * Source and destination must not be the same vector.
      *
-     * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes, e.g., Vector<double> and
-     * LinearAlgebra::distributed::Vector<double>.
-     *
-     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
-     * @p src has to be initialized with the same IndexSet that was used for
-     * the row indices of the matrix and the vector @p dst has to be
-     * initialized with the same IndexSet that was used for the column indices
-     * of the matrix.
-     *
-     * In case of a localized Vector, this function will only work when
-     * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, an exception will be thrown.
+     * This function can be called with several types of vector objects,
+     * see the discussion about @p VectorType in vmult().
      */
     template <typename VectorType>
     void
@@ -1610,21 +1602,8 @@ namespace TrilinosWrappers
      *
      * Source and destination must not be the same vector.
      *
-     * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes, e.g., Vector<double> and
-     * LinearAlgebra::distributed::Vector<double>.
-     *
-     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
-     * @p dst has to be initialized with the same IndexSet that was used for
-     * the row indices of the matrix and the vector @p src has to be
-     * initialized with the same IndexSet that was used for the column indices
-     * of the matrix.
-     *
-     * In case of a localized Vector, this function will only work when
-     * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, an exception will be thrown.
-     *
+     * This function can be called with several types of vector objects,
+     * see the discussion about @p VectorType in vmult().
      */
     template <typename VectorType>
     void
@@ -1637,20 +1616,8 @@ namespace TrilinosWrappers
      *
      * Source and destination must not be the same vector.
      *
-     * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes, e.g., Vector<double> and
-     * LinearAlgebra::distributed::Vector<double>.
-     *
-     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
-     * @p src has to be initialized with the same IndexSet that was used for
-     * the row indices of the matrix and the vector @p dst has to be
-     * initialized with the same IndexSet that was used for the column indices
-     * of the matrix.
-     *
-     * In case of a localized Vector, this function will only work when
-     * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, an exception will be thrown.
+     * This function can be called with several types of vector objects,
+     * see the discussion about @p VectorType in vmult().
      */
     template <typename VectorType>
     void
