@@ -6411,9 +6411,14 @@ namespace VectorTools
 
           for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
             dof_values(i) +=
-              tmp *
-              (normals[q_point] *
-               fe_values[vec].value(fe.face_to_cell_index(i, face), q_point));
+              tmp * (normals[q_point] *
+                     fe_values[vec].value(
+                       fe.face_to_cell_index(i,
+                                             face,
+                                             cell->face_orientation(face),
+                                             cell->face_flip(face),
+                                             cell->face_rotation(face)),
+                       q_point));
         }
 
       std::vector<types::global_dof_index> face_dof_indices(fe.dofs_per_face);
@@ -6424,7 +6429,13 @@ namespace VectorTools
       // Copy the computed values in the AffineConstraints only, if the degree
       // of freedom is not already constrained.
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
-        if (!(constraints.is_constrained(face_dof_indices[i])))
+        if (!(constraints.is_constrained(face_dof_indices[i])) &&
+            fe.get_nonzero_components(fe.face_to_cell_index(
+              i,
+              face,
+              cell->face_orientation(face),
+              cell->face_flip(face),
+              cell->face_rotation(face)))[first_vector_component])
           {
             constraints.add_line(face_dof_indices[i]);
 
@@ -6509,9 +6520,14 @@ namespace VectorTools
 
           for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
             dof_values_local(i) +=
-              tmp *
-              (normals[q_point] *
-               fe_values[vec].value(fe.face_to_cell_index(i, face), q_point));
+              tmp * (normals[q_point] *
+                     fe_values[vec].value(
+                       fe.face_to_cell_index(i,
+                                             face,
+                                             cell->face_orientation(face),
+                                             cell->face_flip(face),
+                                             cell->face_rotation(face)),
+                       q_point));
         }
 
       std::vector<types::global_dof_index> face_dof_indices(fe.dofs_per_face);
@@ -6520,7 +6536,13 @@ namespace VectorTools
                                         cell->active_fe_index());
 
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
-        if (projected_dofs[face_dof_indices[i]] < fe.degree)
+        if (projected_dofs[face_dof_indices[i]] < fe.degree &&
+            fe.get_nonzero_components(fe.face_to_cell_index(
+              i,
+              face,
+              cell->face_orientation(face),
+              cell->face_flip(face),
+              cell->face_rotation(face)))[first_vector_component])
           {
             dof_values[face_dof_indices[i]]     = dof_values_local(i);
             projected_dofs[face_dof_indices[i]] = fe.degree;
