@@ -2599,16 +2599,29 @@ namespace internal
                                ExcInternalError());
 
                       if (old_dof_index != numbers::invalid_dof_index)
-                        dealii::internal::DoFAccessorImplementation::
-                          Implementation::set_vertex_dof_index(
-                            dof_handler,
-                            vertex_index,
-                            fe_index,
-                            d,
-                            (indices.size() == 0) ?
-                              (new_numbers[old_dof_index]) :
-                              (new_numbers[indices.index_within_set(
-                                old_dof_index)]));
+                        {
+                          if (indices.size() == 0)
+                            dealii::internal::DoFAccessorImplementation::
+                              Implementation::set_vertex_dof_index(
+                                dof_handler,
+                                vertex_index,
+                                fe_index,
+                                d,
+                                new_numbers[old_dof_index]);
+                          else
+                            {
+                              Assert(indices.is_element(old_dof_index),
+                                     ExcInternalError());
+                              dealii::internal::DoFAccessorImplementation::
+                                Implementation::set_vertex_dof_index(
+                                  dof_handler,
+                                  vertex_index,
+                                  fe_index,
+                                  d,
+                                  new_numbers[indices.index_within_set(
+                                    old_dof_index)]);
+                            }
+                        }
                     }
                 }
             }
@@ -2639,13 +2652,22 @@ namespace internal
                     const types::global_dof_index old_dof_index =
                       cell->dof_index(d, fe_index);
                     if (old_dof_index != numbers::invalid_dof_index)
-                      cell->set_dof_index(
-                        d,
-                        (indices.size() == 0) ?
-                          (new_numbers[old_dof_index]) :
-                          (new_numbers[indices.index_within_set(
-                            old_dof_index)]),
-                        fe_index);
+                      {
+                        if (indices.size() == 0)
+                          cell->set_dof_index(d,
+                                              new_numbers[old_dof_index],
+                                              fe_index);
+                        else
+                          {
+                            Assert(indices.is_element(old_dof_index),
+                                   ExcInternalError());
+                            cell->set_dof_index(
+                              d,
+                              new_numbers[indices.index_within_set(
+                                old_dof_index)],
+                              fe_index);
+                          }
+                      }
                   }
               }
         }
@@ -2715,13 +2737,21 @@ namespace internal
                               const types::global_dof_index old_dof_index =
                                 line->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
-                                line->set_dof_index(
-                                  d,
-                                  (indices.size() == 0) ?
-                                    (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
-                                  fe_index);
+                                {
+                                  if (indices.size() == 0)
+                                    line->set_dof_index(
+                                      d, new_numbers[old_dof_index], fe_index);
+                                  else
+                                    {
+                                      Assert(indices.is_element(old_dof_index),
+                                             ExcInternalError());
+                                      line->set_dof_index(
+                                        d,
+                                        new_numbers[indices.index_within_set(
+                                          old_dof_index)],
+                                        fe_index);
+                                    }
+                                }
                             }
                         }
                     }
