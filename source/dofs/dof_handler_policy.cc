@@ -2600,6 +2600,21 @@ namespace internal
 
                       if (old_dof_index != numbers::invalid_dof_index)
                         {
+                          // In the following blocks, we first check whether
+                          // we were given an IndexSet of DoFs to touch. If not
+                          // (the first 'if' case here), then we are in the
+                          // sequential case and are allowed to touch all DoFs.
+                          //
+                          // If yes (the 'else' case), then we need to
+                          // distinguish whether the DoF whose number we want to
+                          // touch is in fact locally owned (i.e., is in the
+                          // index set) and then we can actually assign it a new
+                          // number; otherwise, we have encountered a
+                          // non-locally owned DoF for which we don't know the
+                          // new number yet and so set it to an invalid index.
+                          // This will later be fixed up after the first ghost
+                          // exchange phase when we unify hp DoFs on neighboring
+                          // cells.
                           if (indices.size() == 0)
                             dealii::internal::DoFAccessorImplementation::
                               Implementation::set_vertex_dof_index(
@@ -2610,16 +2625,23 @@ namespace internal
                                 new_numbers[old_dof_index]);
                           else
                             {
-                              Assert(indices.is_element(old_dof_index),
-                                     ExcInternalError());
-                              dealii::internal::DoFAccessorImplementation::
-                                Implementation::set_vertex_dof_index(
-                                  dof_handler,
-                                  vertex_index,
-                                  fe_index,
-                                  d,
-                                  new_numbers[indices.index_within_set(
-                                    old_dof_index)]);
+                              if (indices.is_element(old_dof_index))
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::set_vertex_dof_index(
+                                    dof_handler,
+                                    vertex_index,
+                                    fe_index,
+                                    d,
+                                    new_numbers[indices.index_within_set(
+                                      old_dof_index)]);
+                              else
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::set_vertex_dof_index(
+                                    dof_handler,
+                                    vertex_index,
+                                    fe_index,
+                                    d,
+                                    numbers::invalid_dof_index);
                             }
                         }
                     }
@@ -2653,19 +2675,36 @@ namespace internal
                       cell->dof_index(d, fe_index);
                     if (old_dof_index != numbers::invalid_dof_index)
                       {
+                        // In the following blocks, we first check whether
+                        // we were given an IndexSet of DoFs to touch. If not
+                        // (the first 'if' case here), then we are in the
+                        // sequential case and are allowed to touch all DoFs.
+                        //
+                        // If yes (the 'else' case), then we need to distinguish
+                        // whether the DoF whose number we want to touch is in
+                        // fact locally owned (i.e., is in the index set) and
+                        // then we can actually assign it a new number;
+                        // otherwise, we have encountered a non-locally owned
+                        // DoF for which we don't know the new number yet and so
+                        // set it to an invalid index. This will later be fixed
+                        // up after the first ghost exchange phase when we unify
+                        // hp DoFs on neighboring cells.
                         if (indices.size() == 0)
                           cell->set_dof_index(d,
                                               new_numbers[old_dof_index],
                                               fe_index);
                         else
                           {
-                            Assert(indices.is_element(old_dof_index),
-                                   ExcInternalError());
-                            cell->set_dof_index(
-                              d,
-                              new_numbers[indices.index_within_set(
-                                old_dof_index)],
-                              fe_index);
+                            if (indices.is_element(old_dof_index))
+                              cell->set_dof_index(
+                                d,
+                                new_numbers[indices.index_within_set(
+                                  old_dof_index)],
+                                fe_index);
+                            else
+                              cell->set_dof_index(d,
+                                                  numbers::invalid_dof_index,
+                                                  fe_index);
                           }
                       }
                   }
@@ -2738,18 +2777,39 @@ namespace internal
                                 line->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
                                 {
+                                  // In the following blocks, we first check
+                                  // whether we were given an IndexSet of DoFs
+                                  // to touch. If not (the first 'if' case
+                                  // here), then we are in the sequential case
+                                  // and are allowed to touch all DoFs.
+                                  //
+                                  // If yes (the 'else' case), then we need to
+                                  // distinguish whether the DoF whose number we
+                                  // want to touch is in fact locally owned
+                                  // (i.e., is in the index set) and then we can
+                                  // actually assign it a new number; otherwise,
+                                  // we have encountered a non-locally owned DoF
+                                  // for which we don't know the new number yet
+                                  // and so set it to an invalid index. This
+                                  // will later be fixed up after the first
+                                  // ghost exchange phase when we unify hp DoFs
+                                  // on neighboring cells.
                                   if (indices.size() == 0)
                                     line->set_dof_index(
                                       d, new_numbers[old_dof_index], fe_index);
                                   else
                                     {
-                                      Assert(indices.is_element(old_dof_index),
-                                             ExcInternalError());
-                                      line->set_dof_index(
-                                        d,
-                                        new_numbers[indices.index_within_set(
-                                          old_dof_index)],
-                                        fe_index);
+                                      if (indices.is_element(old_dof_index))
+                                        line->set_dof_index(
+                                          d,
+                                          new_numbers[indices.index_within_set(
+                                            old_dof_index)],
+                                          fe_index);
+                                      else
+                                        line->set_dof_index(
+                                          d,
+                                          numbers::invalid_dof_index,
+                                          fe_index);
                                     }
                                 }
                             }
@@ -2816,13 +2876,37 @@ namespace internal
                               const types::global_dof_index old_dof_index =
                                 line->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
-                                line->set_dof_index(
-                                  d,
-                                  (indices.size() == 0) ?
-                                    (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
-                                  fe_index);
+                                {
+                                  // In the following blocks, we first check
+                                  // whether we were given an IndexSet of DoFs
+                                  // to touch. If not (the first 'if' case
+                                  // here), then we are in the sequential case
+                                  // and are allowed to touch all DoFs.
+                                  //
+                                  // If yes (the 'else' case), then we need to
+                                  // distinguish whether the DoF whose number we
+                                  // want to touch is in fact locally owned
+                                  // (i.e., is in the index set) and then we can
+                                  // actually assign it a new number; otherwise,
+                                  // we have encountered a non-locally owned DoF
+                                  // for which we don't know the new number yet
+                                  // and so set it to an invalid index. This
+                                  // will later be fixed up after the first
+                                  // ghost exchange phase when we unify hp DoFs
+                                  // on neighboring cells.
+                                  if (indices.size() == 0)
+                                    line->set_dof_index(
+                                      d, new_numbers[old_dof_index], fe_index);
+                                  else if (indices.is_element(old_dof_index))
+                                    line->set_dof_index(
+                                      d,
+                                      new_numbers[indices.index_within_set(
+                                        old_dof_index)],
+                                      fe_index);
+                                  else
+                                    line->set_dof_index(
+                                      d, numbers::invalid_dof_index, fe_index);
+                                }
                             }
                         }
                     }
@@ -2873,13 +2957,42 @@ namespace internal
                               const types::global_dof_index old_dof_index =
                                 quad->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
-                                quad->set_dof_index(
-                                  d,
-                                  (indices.size() == 0) ?
-                                    (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
-                                  fe_index);
+                                {
+                                  // In the following blocks, we first check
+                                  // whether we were given an IndexSet of DoFs
+                                  // to touch. If not (the first 'if' case
+                                  // here), then we are in the sequential case
+                                  // and are allowed to touch all DoFs.
+                                  //
+                                  // If yes (the 'else' case), then we need to
+                                  // distinguish whether the DoF whose number we
+                                  // want to touch is in fact locally owned
+                                  // (i.e., is in the index set) and then we can
+                                  // actually assign it a new number; otherwise,
+                                  // we have encountered a non-locally owned DoF
+                                  // for which we don't know the new number yet
+                                  // and so set it to an invalid index. This
+                                  // will later be fixed up after the first
+                                  // ghost exchange phase when we unify hp DoFs
+                                  // on neighboring cells.
+                                  if (indices.size() == 0)
+                                    quad->set_dof_index(
+                                      d, new_numbers[old_dof_index], fe_index);
+                                  else
+                                    {
+                                      if (indices.is_element(old_dof_index))
+                                        quad->set_dof_index(
+                                          d,
+                                          new_numbers[indices.index_within_set(
+                                            old_dof_index)],
+                                          fe_index);
+                                      else
+                                        quad->set_dof_index(
+                                          d,
+                                          numbers::invalid_dof_index,
+                                          fe_index);
+                                    }
+                                }
                             }
                         }
                     }
@@ -5498,10 +5611,12 @@ namespace internal
                                         *dof_handler,
                                         /*check_validity=*/false);
 
-        // communicate newly assigned DoF indices to other processors
+        // Communicate newly assigned DoF indices to other processors
         // and get the same information for our own ghost cells.
         //
-        // this is the same as phase 5 in the distribute_dofs() algorithm
+        // This is the same as phase 5+6 in the distribute_dofs() algorithm,
+        // taking into account that we have to unify a few DoFs in between
+        // then communication phases if we do hp numbering
         {
           std::vector<bool> user_flags;
           triangulation->save_user_flags(user_flags);
@@ -5530,6 +5645,14 @@ namespace internal
             vertices_with_ghost_neighbors,
             triangulation->coarse_cell_to_p4est_tree_permutation,
             triangulation->p4est_tree_to_coarse_cell_permutation);
+
+          // in case of hp::DoFHandlers, we may have received valid
+          // indices of degrees of freedom that are dominated by a fe
+          // object adjacent to a ghost interface.
+          // thus, we overwrite the remaining invalid indices with
+          // the valid ones in this step.
+          Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
+            *dof_handler);
 
           communicate_dof_indices_on_marked_cells(
             *dof_handler,
