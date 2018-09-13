@@ -35,6 +35,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
+  /**
+   * A namespace for parallel implementations of vectors.
+   */
   namespace distributed
   {
     template <typename>

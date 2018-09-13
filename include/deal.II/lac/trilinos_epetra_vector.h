@@ -42,6 +42,9 @@ namespace LinearAlgebra
   template <typename Number>
   class ReadWriteVector;
 
+  /**
+   * A namespace for classes that provide wrappers for Epetra from Trilinos.
+   */
   namespace EpetraWrappers
   {
     /**
