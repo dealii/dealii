@@ -588,12 +588,10 @@ namespace LinearAlgebra
 
       if (across)
         for (unsigned int i = 0; i < local_length; ++i)
-          out << i << "->" << vector->getMap()->getGlobalElement(i) << ": "
-              << vector_1d(i) << std::endl;
-      //          out << val[i] << ' ';
+          out << vector_1d(i) << ' ';
       else
         for (unsigned int i = 0; i < local_length; ++i)
-          out << val[i] << std::endl;
+          out << vector_1d(i) << std::endl;
       out << std::endl;
 
       // restore the representation
