@@ -229,12 +229,13 @@ namespace Step52
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
                 cell_matrix(i, j) +=
-                  ((-diffusion_coefficient * fe_values.shape_grad(i, q_point) *
-                      fe_values.shape_grad(j, q_point) -
-                    absorption_cross_section *
-                      fe_values.shape_value(i, q_point) *
-                      fe_values.shape_value(j, q_point)) *
-                   fe_values.JxW(q_point));
+                  ((-diffusion_coefficient *                // (-D
+                      fe_values.shape_grad(i, q_point) *    //  * grad phi_i
+                      fe_values.shape_grad(j, q_point)      //  * grad phi_j
+                    - absorption_cross_section *            //  -Sigma
+                        fe_values.shape_value(i, q_point) * //  * phi_i
+                        fe_values.shape_value(j, q_point))  //  * phi_j)
+                   * fe_values.JxW(q_point));               // * dx
                 cell_mass_matrix(i, j) += fe_values.shape_value(i, q_point) *
                                           fe_values.shape_value(j, q_point) *
                                           fe_values.JxW(q_point);
@@ -323,8 +324,9 @@ namespace Step52
             const double source =
               get_source(time, fe_values.quadrature_point(q_point));
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_source(i) += source * fe_values.shape_value(i, q_point) *
-                                fe_values.JxW(q_point);
+              cell_source(i) += fe_values.shape_value(i, q_point) * // phi_i(x)
+                                source *                            // * S(x)
+                                fe_values.JxW(q_point);             // * dx
           }
 
         cell->get_dof_indices(local_dof_indices);
@@ -346,8 +348,8 @@ namespace Step52
   // We compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$. This
   // is done in several steps:
   //   - compute $M-\tau \frac{\partial f}{\partial y}$
-  //   - invert the matrix to get $\left(M-\tau \frac{\partial f}{\partial
-  //   y}\right)^{-1}$
+  //   - invert the matrix to get $\left(M-\tau \frac{\partial f}
+  //                                                 {\partial y}\right)^{-1}$
   //   - compute $tmp=My$
   //   - compute $z=\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp =
   //   \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} My$
