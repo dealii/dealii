@@ -214,7 +214,7 @@ ${_switch_targets}#
   IF(PERL_FOUND)
     FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} strip_comments - to strip the source files in this
-#                               directory off the documentation comments
+#                               directory off their comments; this is irreversible
 ")
   ENDIF()
   FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
