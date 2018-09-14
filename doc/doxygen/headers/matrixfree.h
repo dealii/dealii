@@ -96,8 +96,8 @@
  * number type (e.g. double or float), but also on the polynomial degree and
  * on the number of quadrature points per spatial direction. This information
  * is used to pass the loop lengths in sum factorization to the respective
- * kernels (see `include/deal.II/matrix_free/tensor_product_kernels.h` and
- * `include/deal.II/matrix_free/evaluation_kernels.h`) and ensure optimal
+ * kernels (see `tensor_product_kernels.h` and
+ * `evaluation_kernels.h`) and ensure optimal
  * efficiency. All methods that access the vectors or provide access into the
  * data fields on an individual quadrature point are inherited from
  * FEEvaluationAccess.
@@ -161,7 +161,7 @@
  * first derivative of a selected number of basis functions evaluate to
  * nonzero on a face. The associated element type is FE_DGQHermite and the
  * decision is stored on the property
- * internal::MatrixFreeFunctions::ElementType::tensor_symmetric_hermite. The
+ * internal::MatrixFreeFunctions::tensor_symmetric_hermite. The
  * decision on whether such an optimized kernel can be used is made
  * automatically inside FEFaceEvaluation::gather_evaluate() and
  * FEFaceEvaluation::integrate_scatter(). It might seem inefficient to do this
@@ -174,7 +174,7 @@
  * <h3>The data storage through the MatrixFree class</h3>
  *
  * The tasks performed by FEEvaluation and FEFaceEvaluation can be split into
- * the three categories <i>index access into vectors</i>, <i>evaluation and
+ * the three categories: <i>index access into vectors</i>, <i>evaluation and
  * integration on the unit cell</i>, and <i>operation on quadrature points
  * including the geometry evaluation</i>. This split is reflected by the major
  * data fields contained by MatrixFree, using
@@ -196,7 +196,7 @@
  * for interleaving cell and face integrals such that the access to vector
  * entries for cell and face integrals re-uses data already in caches.
  *
- * <h4>Index storage: the MatrixFreeFunctions::DoFInfo struct</h4>
+ * <h4>Index storage: the internal::MatrixFreeFunctions::DoFInfo struct</h4>
  *
  * The main purpose of the DoFInfo class is to provide the indices consumed by
  * the vector access functions FEEvaluationBase::read_dof_values() and
@@ -205,7 +205,7 @@
  * <ol>
  * <li>Indices are stored in MPI-local index space to enable direct array
  * access, rather than translating a global index into a local one. The latter
- * would be absolutely detrimental to performance.
+ * would be absolutely detrimental to performance.</li>
  * <li>The indices are stored in a field called
  * internal::MatrixFreeFunctions::DoFInfo::dof_indices, which is a long index
  * array. The access granularity in terms of a <i>cell index</i> is controlled
@@ -221,50 +221,59 @@
  * systems becomes transparent if we provide a <i>start index</i> to every
  * single component separately. Thus, the `row_starts` field is of length
  * `n_cell_batches()*VectorizedArray<Number>::n_array_elements*n_components`.
+ * </li>
  * <li> The translation between components within a system of multiple base
- * elements is controlled by the four variables `std::vector<unsigned int>
- * n_components` (components per base element), `std::vector<unsigned int>
- * start_components` (translation from the base element to the unique
- * component number), `std::vector<unsigned int> component_to_base_index`
- * (translation from unique component number to base index), and
- * `std::vector<std::vector<unsigned int> > component_dof_indices_offset`
- * (offset of the particular component's range of degrees of freedom within
- * the full list of degrees of freedom on a cell).
- * <li>Information to extract the FE index in hp adaptive computations.
+ * elements is controlled by the four variables
+ * <ol>
+ *   <li>`std::vector<unsigned int> n_components` (components per base element),
+ *     </li>
+ *   <li>`std::vector<unsigned int> start_components` (translation from the base
+ *     element to the unique component number),</li>
+ *   <li>`std::vector<unsigned int> component_to_base_index` (translation from
+ *     unique component number to base index), and </li>
+ *   <li>`std::vector<std::vector<unsigned int>> component_dof_indices_offset`
+ *    (offset of the particular component's range of degrees of freedom within
+ *    the full list of degrees of freedom on a cell).</li>
+ * </ol>
+ * </li>
+ *
+ * <li>Information to extract the FE index in hp adaptive computations.</li>
  * <li>Information about the 'first access' into a particular vector entry
  * that is used to zero out the entries in a destination vectors within the
  * MatrixFree::loop shortly before accessing them the first time. This is used
- * to avoid writing zeros to the whole vector which destroys data locality.
+ * to avoid writing zeros to the whole vector which destroys data locality.</li>
  * </ol>
  *
- * The setup of the data structures in DoFInfo is done in a function called
- * `read_dof_indices`, where we first assume a very general finite element
- * layout, be it continuous or discontinuous elements, and where we resolve
- * the constraints due to hanging nodes. This initial step is done in the
- * original ordering of cells. In a later stage, these cells will in general
- * be rearranged to reflect the order by which we go through the cells in the
- * final loop, and we also look for patterns in the DoFIndices that can be
- * utilized, such as contiguous index ranges within a cell. This reordering is
- * done to enable overlap of communication and computation with MPI (if
- * enabled) and to form better group of batches with vectorization over
- * cells. The data storage of indices is linear in this final order, and
- * arranged in DoFInfo::reorder_cells.
+ * The setup of the data structures in internal::MatrixFreeFunctions::DoFInfo
+ * is done in internal::MatrixFreeFunctions::DoFInfo::read_dof_indices, where we
+ * first assume a very general finite element layout, be it continuous or
+ * discontinuous elements, and where we resolve the constraints due to hanging
+ * nodes. This initial step is done in the original ordering of cells. In a
+ * later stage, these cells will in general be rearranged to reflect the order
+ * by which we go through the cells in the final loop, and we also look for
+ * patterns in the DoF indices that can be utilized, such as contiguous index
+ * ranges within a cell. This reordering is done to enable overlap of
+ * communication and computation with MPI (if enabled) and to form better group
+ * of batches with vectorization over cells. The data storage of indices is
+ * linear in this final order, and arranged in
+ * internal::MatrixFreeFunctions::DoFInfo::reorder_cells.
  *
  * Since the amount of data to store indices is not negligible, it is
- * interesting to reduce the amount of data for special configuration that
+ * worthwhile to reduce the amount of data for special configurations that
  * carry more structure. One example is the case of FE_DGQ where a single
  * index per cell is enough to describe all its degrees of freedom, with the
- * others coming in consecutive order. The class DoFInfo contains a special
- * field `std::vector<unsigned int> dof_indices_contiguous` that contains a
- * single number per cell. Since both cell and face integrals use different
- * access patterns and the data in this special case is small, we are better
- * off storing 3 such vectors, one for the faces decorated as `interior`
- * (index 0), one for the faces decorated as `exterior` (index 1), and one for
- * the cells (index 2), rather than using the indirection through
- * FaceInfo. There is a series of additional special storage formats available
- * in DoFInfo. We refer to the documentation of the struct
- * internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants for the
- * options implemented in deal.II and their motivation.
+ * others coming in consecutive order. The class
+ * internal::MatrixFreeFunctions::DoFInfo contains a special array of vectors
+ * internal::MatrixFreeFunctions::DoFInfo::dof_indices_contiguous that
+ * contains a single number per cell. Since both cell and face integrals use
+ * different access patterns and the data in this special case is small, we
+ * are better off storing 3 such vectors, one for the faces decorated as
+ * `interior` (index 0), one for the faces decorated as `exterior` (index 1),
+ * and one for the cells (index 2), rather than using the indirection through
+ * internal::MatrixFreeFunctions::FaceInfo. There is a series of additional
+ * special storage formats available in DoFInfo. We refer to the documentation
+ * of the struct internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants
+ * for the options implemented in deal.II and their motivation.
  *
  * Finally, the DoFInfo class also holds a shared pointer describing the
  * parallel partitioning of the vectors. Due to the restriction of
@@ -280,14 +289,16 @@
  *
  * The MatrixFree class supports multiple DoFHandler objects to be passed to
  * the MatrixFree::reinit() function. For each of these DoFHandler objects, a
- * separate DoFInfo object is created. In MatrixFree, we store an
- * `std::vector` of DoFInfo objects to account for this fact.
+ * separate internal::MatrixFreeFunctions::DoFInfo object is created. In
+ * MatrixFree, we store a `std::vector` of
+ * internal::MatrixFreeFunctions::DoFInfo objects to account for this fact.
  *
  * <h4>The internal::MatrixFreeFunctions::ShapeInfo structure</h4>
  *
  * The evaluation of one-dimensional shape functions on one-dimensional
- * quadrature points is stored in the class ShapeInfo. More precisely, we hold
- * all function values, gradients, and hessians. Furthermore, the values and
+ * quadrature points is stored in the class
+ * internal::MatrixFreeFunctions::ShapeInfo. More precisely, we hold all
+ * function values, gradients, and hessians. Furthermore, the values and
  * derivatives of shape functions on the faces, i.e., the points 0 and 1 of
  * the unit interval, are also stored. For face integrals on hanging nodes,
  * the coarser of the two adjacent cells must interpolate the values not to
@@ -302,12 +313,13 @@
  * <h4>The internal::MatrixFreeFunctions::MappingInfo structure</h4>
  *
  * The evaluated geometry information is stored in the class
- * MappingInfo. Similarly to the DoFInfo class, multiple variants are possible
- * within a single MatrixFree instance, in this case based on multiple
- * quadrature formulas. Furthermore, separate data for both cells and faces is
- * stored.  Since there is more logic involved and there are synergies between
- * the fields, the `std::vector` of fields is kept within MappingInfo. The
- * individual field is of type
+ * internal::MatrixFreeFunctions::MappingInfo. Similarly to the
+ * internal::MatrixFreeFunctions::DoFInfo class, multiple variants are
+ * possible within a single MatrixFree instance, in this case based on
+ * multiple quadrature formulas. Furthermore, separate data for both cells and
+ * faces is stored. Since there is more logic involved and there are
+ * synergies between the fields, the `std::vector` of fields is kept within
+ * internal::MatrixFreeFunctions::MappingInfo. The individual field is of type
  * internal::MatrixFreeFunctions::MappingInfoStorage and holds arrays with the
  * inverse Jacobians, the JxW values, normal vectors, normal vectors times
  * inverse Jacobians (for FEEvaluationAccess::get_normal_derivative()),
@@ -319,8 +331,8 @@
  * lengths of fields similar to what is done for DoFInfo, but it also enables
  * something we call <i>geometry compression</i>. In order to reduce the data
  * access, we detect simple geometries of cells where Jacobians are constant
- * within a cell or also across cells, using a data field
- * internal::MatrixFreeFunctions::GeometryType:
+ * within a cell or also across cells, using
+ * internal::MatrixFreeFunctions::MappingInfo::cell_type:
  *
  * <ol>
  * <li> Cartesian cells are cells where the Jacobian is diagonal and the same
@@ -347,7 +359,8 @@
  * <li> On faces, we can have the special case that the normal vector is the
  * same in all quadrature points also when the JxW values are different. This
  * is the case for faces which are flat. To reduce the data access, we keep
- * this as a third option of compressed indices in `GeometryType`. As opposed
+ * this as a third option of compressed indices in
+ * internal::MatrixFreeFunctions::GeometryType. As opposed
  * to the Cartesian and affine case where only a single field is reserved in
  * the arrays, flat faces keep a separate entry for all quadrature points (to
  * keep a single index field `data_index_offsets`), but only access the first
@@ -362,7 +375,8 @@
  * points of all cells (with many different cases).
  * </ol>
  *
- * The implementation of MappingInfo is split into cell and face parts, so the
+ * The implementation of internal::MatrixFreeFunctions::MappingInfo is split
+ * into cell and face parts, so the
  * two components can be easily held apart. What makes the code a bit awkward
  * to read is the fact that we need to batch several objects together from the
  * original scalar evaluation done in an FEValues object, that we need to
@@ -370,7 +384,8 @@
  * compression over several cells with a `std::map` for the Cartesian and
  * affine cases.
  *
- * The data computation part of MappingInfo is parallelized by tasks besides
+ * The data computation part of internal::MatrixFreeFunctions::MappingInfo is
+ * parallelized by tasks besides
  * the obvious MPI parallelization. Each processor computes the information
  * on a subrange, before the data is eventually copied into a single combined
  * data field.
@@ -395,7 +410,7 @@
  * batch of cells gets intertwined when seen from a batch of faces (where we
  * only keep faces together that have the same face index within a cell and so
  * on). The setup of the face loop, which is done in the file
- * `include/deal.II/matrix_free/face_setup_internal.h`, tries to provide face
+ * `face_setup_internal.h`, tries to provide face
  * batches that at least partly resemble the cell patches, to increase the
  * data locality. Along these lines, the face work is also interleaved with
  * cell work in the typical MatrixFree::loop context, i.e., the `cell_range`
