@@ -1540,28 +1540,13 @@ namespace TrilinosWrappers
 
 
 
-  template <typename Number>
+  template <>
   void
-  SparseMatrix::set(const size_type  row,
-                    const size_type  n_cols,
-                    const size_type *col_indices,
-                    const Number *   values,
-                    const bool       elide_zero_values)
-  {
-    std::vector<TrilinosScalar> trilinos_values(n_cols);
-    std::copy(values, values + n_cols, trilinos_values.begin());
-    this->set(
-      row, n_cols, col_indices, trilinos_values.data(), elide_zero_values);
-  }
-
-
-
-  void
-  SparseMatrix::set(const size_type       row,
-                    const size_type       n_cols,
-                    const size_type *     col_indices,
-                    const TrilinosScalar *values,
-                    const bool            elide_zero_values)
+  SparseMatrix::set<TrilinosScalar>(const size_type       row,
+                                    const size_type       n_cols,
+                                    const size_type *     col_indices,
+                                    const TrilinosScalar *values,
+                                    const bool            elide_zero_values)
   {
     AssertIndexRange(row, this->m());
 
@@ -2124,7 +2109,8 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  void
+  typename std::enable_if<
+    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
   SparseMatrix::vmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
@@ -2157,7 +2143,18 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  void
+  typename std::enable_if<
+    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  SparseMatrix::vmult(VectorType & /*dst*/, const VectorType & /*src*/) const
+  {
+    AssertThrow(false, ExcNotImplemented());
+  }
+
+
+
+  template <typename VectorType>
+  typename std::enable_if<
+    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
   SparseMatrix::Tvmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
@@ -2182,6 +2179,16 @@ namespace TrilinosWrappers
     const int ierr = matrix->Multiply(true, tril_src, tril_dst);
     Assert(ierr == 0, ExcTrilinosError(ierr));
     (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  template <typename VectorType>
+  typename std::enable_if<
+    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  SparseMatrix::Tvmult(VectorType & /*dst*/, const VectorType & /*src*/) const
+  {
+    AssertThrow(false, ExcNotImplemented());
   }
 
 
@@ -3508,10 +3515,10 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
     const dealii::LinearAlgebra::TpetraWrappers::Vector<double> &) const;
 
-  /*template void
-     SparseMatrix::vmult(
-       dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
-       const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;*/
+  template void
+  SparseMatrix::vmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
 
   template void
   SparseMatrix::vmult(
@@ -3539,6 +3546,11 @@ namespace TrilinosWrappers
 
   template void
   SparseMatrix::Tvmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+
+  template void
+  SparseMatrix::Tvmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
@@ -3563,6 +3575,11 @@ namespace TrilinosWrappers
 
   template void
   SparseMatrix::vmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+
+  template void
+  SparseMatrix::vmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
@@ -3584,6 +3601,11 @@ namespace TrilinosWrappers
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
     const dealii::LinearAlgebra::TpetraWrappers::Vector<double> &) const;
+
+  template void
+  SparseMatrix::Tvmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
 
   template void
   SparseMatrix::Tvmult_add(

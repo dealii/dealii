@@ -228,7 +228,7 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   IF (TRILINOS_WITH_MPI)
     SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
     SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
-    #SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
   ENDIF()
   IF(${DEAL_II_TRILINOS_WITH_SACADO})
     # Note: Only CMake 3.0 and greater support line continuation with the "\" character

@@ -1325,13 +1325,6 @@ namespace TrilinosWrappers
         const Number *   values,
         const bool       elide_zero_values = false);
 
-    void
-    set(const size_type       row,
-        const size_type       n_cols,
-        const size_type *     col_indices,
-        const TrilinosScalar *values,
-        const bool            elide_zero_values = false);
-
     /**
      * Add @p value to the element (<i>i,j</i>).
      *
@@ -1588,7 +1581,13 @@ namespace TrilinosWrappers
      * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
-    void
+    typename std::enable_if<std::is_same<typename VectorType::value_type,
+                                         TrilinosScalar>::value>::type
+    vmult(VectorType &dst, const VectorType &src) const;
+
+    template <typename VectorType>
+    typename std::enable_if<!std::is_same<typename VectorType::value_type,
+                                          TrilinosScalar>::value>::type
     vmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1602,7 +1601,13 @@ namespace TrilinosWrappers
      * see the discussion about @p VectorType in vmult().
      */
     template <typename VectorType>
-    void
+    typename std::enable_if<std::is_same<typename VectorType::value_type,
+                                         TrilinosScalar>::value>::type
+    Tvmult(VectorType &dst, const VectorType &src) const;
+
+    template <typename VectorType>
+    typename std::enable_if<!std::is_same<typename VectorType::value_type,
+                                          TrilinosScalar>::value>::type
     Tvmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -2992,6 +2997,32 @@ namespace TrilinosWrappers
   // Inline the set() and add() functions, since they will be called
   // frequently, and the compiler can optimize away some unnecessary loops
   // when the sizes are given at compile time.
+  template <>
+  void
+  SparseMatrix::set<TrilinosScalar>(const size_type       row,
+                                    const size_type       n_cols,
+                                    const size_type *     col_indices,
+                                    const TrilinosScalar *values,
+                                    const bool            elide_zero_values);
+
+
+
+  template <typename Number>
+  void
+  SparseMatrix::set(const size_type  row,
+                    const size_type  n_cols,
+                    const size_type *col_indices,
+                    const Number *   values,
+                    const bool       elide_zero_values)
+  {
+    std::vector<TrilinosScalar> trilinos_values(n_cols);
+    std::copy(values, values + n_cols, trilinos_values.begin());
+    this->set(
+      row, n_cols, col_indices, trilinos_values.data(), elide_zero_values);
+  }
+
+
+
   inline void
   SparseMatrix::set(const size_type      i,
                     const size_type      j,
@@ -3298,6 +3329,13 @@ namespace TrilinosWrappers
     } // namespace LinearOperatorImplementation
   }   // namespace internal
 
+  template <>
+  void
+  SparseMatrix::set<TrilinosScalar>(const size_type       row,
+                                    const size_type       n_cols,
+                                    const size_type *     col_indices,
+                                    const TrilinosScalar *values,
+                                    const bool            elide_zero_values);
 #    endif // DOXYGEN
 
 } /* namespace TrilinosWrappers */
