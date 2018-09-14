@@ -2584,7 +2584,7 @@ namespace DataOutBase
     std::ostream &                   out);
 
   /**
-   * Write the data in data_filter to a single HDF5 file containing both the
+   * Write the data in @p data_filter to a single HDF5 file containing both the
    * mesh and solution values.
    */
   template <int dim, int spacedim>
@@ -2595,9 +2595,9 @@ namespace DataOutBase
                       MPI_Comm                                 comm);
 
   /**
-   * Write the data in data_filter to HDF5 file(s). If write_mesh_file is
+   * Write the data in @p data_filter to HDF5 file(s). If @p write_mesh_file is
    * false, the mesh data will not be written and the solution file will
-   * contain only the solution values. If write_mesh_file is true and the
+   * contain only the solution values. If @p write_mesh_file is true and the
    * filenames are the same, the resulting file will contain both mesh data
    * and solution values.
    */
@@ -3051,7 +3051,7 @@ public:
    * DataOutFilter:
    *
    * @code
-   * DataOutBase::DataOutFilterFlags flags(true, true)
+   * DataOutBase::DataOutFilterFlags flags(true, true);
    * DataOutBase::DataOutFilter data_filter(flags);
    * std::vector<XDMFEntry> xdmf_entries;
    * // Filter the data and store it in data_filter
@@ -3075,12 +3075,12 @@ public:
                   MPI_Comm                      comm) const;
 
   /**
-   * Write the data in data_filter to a single HDF5 file containing both the
+   * Write the data in @p data_filter to a single HDF5 file containing both the
    * mesh and solution values. Below is an example of how to use this function
    * with the DataOutFilter:
    *
    * @code
-   * DataOutBase::DataOutFilterFlags flags(true, true)
+   * DataOutBase::DataOutFilterFlags flags(true, true);
    * DataOutBase::DataOutFilter data_filter(flags);
    * // Filter the data and store it in data_filter
    * data_out.write_filtered_data(data_filter);
