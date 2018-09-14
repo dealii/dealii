@@ -344,8 +344,8 @@ namespace LinearAlgebra
      * performance.
      */
     void
-    import(const TpetraWrappers::Vector &tpetra_vec,
-           VectorOperation::values       operation,
+    import(const TpetraWrappers::Vector<Number> &tpetra_vec,
+           VectorOperation::values               operation,
            const std::shared_ptr<const CommunicationPatternBase>
              &communication_pattern =
                std::shared_ptr<const CommunicationPatternBase>());
@@ -615,10 +615,10 @@ namespace LinearAlgebra
      * used directly.
      */
     void
-    import(const Tpetra::Vector<> &tpetra_vector,
-           const IndexSet &        locally_owned_elements,
-           VectorOperation::values operation,
-           const MPI_Comm &        mpi_comm,
+    import(const Tpetra::Vector<Number> &tpetra_vector,
+           const IndexSet &              locally_owned_elements,
+           VectorOperation::values       operation,
+           const MPI_Comm &              mpi_comm,
            const std::shared_ptr<const CommunicationPatternBase>
              &communication_pattern);
 

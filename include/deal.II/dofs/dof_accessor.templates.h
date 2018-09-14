@@ -1534,12 +1534,13 @@ namespace internal
 
 
 
-      template <typename ForwardIterator>
+      template <typename ForwardIterator, typename Number>
       static void
-      extract_subvector_to(const LinearAlgebra::TpetraWrappers::Vector &values,
-                           const types::global_dof_index *cache_begin,
-                           const types::global_dof_index *cache_end,
-                           ForwardIterator                local_values_begin)
+      extract_subvector_to(
+        const LinearAlgebra::TpetraWrappers::Vector<Number> &values,
+        const types::global_dof_index *                      cache_begin,
+        const types::global_dof_index *                      cache_end,
+        ForwardIterator                                      local_values_begin)
       {
         std::vector<unsigned int> sorted_indices_pos =
           sort_indices(cache_begin, cache_end);
@@ -1551,7 +1552,7 @@ namespace internal
         IndexSet index_set(cache_indices.back() + 1);
         index_set.add_indices(cache_indices.begin(), cache_indices.end());
         index_set.compress();
-        LinearAlgebra::ReadWriteVector<double> read_write_vector(index_set);
+        LinearAlgebra::ReadWriteVector<Number> read_write_vector(index_set);
         read_write_vector.import(values, VectorOperation::insert);
 
         // Copy the elements from read_write_vector and reorder them.

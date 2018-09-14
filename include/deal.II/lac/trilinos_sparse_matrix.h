@@ -1317,6 +1317,14 @@ namespace TrilinosWrappers
      * initialize the matrix with a sparsity pattern to fix the matrix
      * structure before inserting elements.
      */
+    template <typename Number>
+    void
+    set(const size_type  row,
+        const size_type  n_cols,
+        const size_type *col_indices,
+        const Number *   values,
+        const bool       elide_zero_values = false);
+
     void
     set(const size_type       row,
         const size_type       n_cols,

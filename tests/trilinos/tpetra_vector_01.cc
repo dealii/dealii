@@ -26,7 +26,7 @@
 
 // Check LinearAlgebra::TpetraWrappers::Vector assignment and import
 
-
+template <typename Number>
 void
 test()
 {
@@ -45,10 +45,10 @@ test()
     }
   parallel_partitioner_1.compress();
   parallel_partitioner_2.compress();
-  LinearAlgebra::TpetraWrappers::Vector a;
-  LinearAlgebra::TpetraWrappers::Vector b(parallel_partitioner_1,
-                                          MPI_COMM_WORLD);
-  LinearAlgebra::TpetraWrappers::Vector c(b);
+  LinearAlgebra::TpetraWrappers::Vector<Number> a;
+  LinearAlgebra::TpetraWrappers::Vector<Number> b(parallel_partitioner_1,
+                                                  MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<Number> c(b);
 
   AssertThrow(a.size() == 0, ExcMessage("Vector has the wrong size."));
   AssertThrow(b.size() == 10, ExcMessage("Vector has the wrong size."));
@@ -69,9 +69,9 @@ test()
     read_write_index_set.add_range(4, 10);
   read_write_index_set.compress();
 
-  LinearAlgebra::ReadWriteVector<double> read_write_1(read_write_index_set);
-  LinearAlgebra::ReadWriteVector<double> read_write_2(read_write_index_set);
-  LinearAlgebra::ReadWriteVector<double> read_write_3(read_write_index_set);
+  LinearAlgebra::ReadWriteVector<Number> read_write_1(read_write_index_set);
+  LinearAlgebra::ReadWriteVector<Number> read_write_2(read_write_index_set);
+  LinearAlgebra::ReadWriteVector<Number> read_write_3(read_write_index_set);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 6; ++i)
@@ -204,7 +204,7 @@ test()
 
   b.import(read_write_1, VectorOperation::insert);
   c.import(read_write_1, VectorOperation::insert);
-  const double val = b * c;
+  const Number val = b * c;
   AssertThrow(val == 285., ExcMessage("Problem in operator *."));
 }
 
@@ -217,7 +217,8 @@ main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-  test();
+  test<double>();
+  test<float>();
 
   deallog << "OK" << std::endl;
 

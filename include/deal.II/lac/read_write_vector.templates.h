@@ -509,10 +509,10 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
-    const Tpetra::Vector<> &vector,
-    const IndexSet &        source_elements,
-    VectorOperation::values operation,
-    const MPI_Comm &        mpi_comm,
+    const Tpetra::Vector<Number> &vector,
+    const IndexSet &              source_elements,
+    VectorOperation::values       operation,
+    const MPI_Comm &              mpi_comm,
     const std::shared_ptr<const CommunicationPatternBase>
       &communication_pattern)
   {
@@ -554,13 +554,13 @@ namespace LinearAlgebra
 
     Tpetra::Export<> tpetra_export(tpetra_comm_pattern->get_tpetra_export());
 
-    Tpetra::Vector<> target_vector(tpetra_export.getSourceMap());
+    Tpetra::Vector<Number> target_vector(tpetra_export.getSourceMap());
     target_vector.doImport(vector, tpetra_export, Tpetra::REPLACE);
 
     const auto *new_values = target_vector.getData().get();
     const auto  size       = target_vector.getLocalLength();
 
-    using size_type = std::decay<decltype(size)>::type;
+    using size_type = typename std::decay<decltype(size)>::type;
 
     Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
     AssertDimension(size, stored_elements.n_elements());
@@ -741,8 +741,8 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
-    const LinearAlgebra::TpetraWrappers::Vector &trilinos_vec,
-    VectorOperation::values                      operation,
+    const LinearAlgebra::TpetraWrappers::Vector<Number> &trilinos_vec,
+    VectorOperation::values                              operation,
     const std::shared_ptr<const CommunicationPatternBase>
       &communication_pattern)
   {

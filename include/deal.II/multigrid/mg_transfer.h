@@ -132,8 +132,8 @@ namespace internal
   };
 
 #  ifdef DEAL_II_WITH_MPI
-  template <>
-  struct MatrixSelector<dealii::LinearAlgebra::TpetraWrappers::Vector>
+  template <typename Number>
+  struct MatrixSelector<dealii::LinearAlgebra::TpetraWrappers::Vector<Number>>
   {
     using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
     using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;

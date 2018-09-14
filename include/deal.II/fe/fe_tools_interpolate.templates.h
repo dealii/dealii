@@ -513,17 +513,17 @@ namespace FETools
       AssertThrow(false, ExcNotImplemented());
     }
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
     back_interpolate(
       const DoFHandler<dim, spacedim> &,
       const AffineConstraints<
-        typename LinearAlgebra::TpetraWrappers::Vector::value_type> &,
-      const LinearAlgebra::TpetraWrappers::Vector &,
+        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
+      const LinearAlgebra::TpetraWrappers::Vector<Number> &,
       const DoFHandler<dim, spacedim> &,
       const AffineConstraints<
-        typename LinearAlgebra::TpetraWrappers::Vector::value_type> &,
-      LinearAlgebra::TpetraWrappers::Vector &)
+        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
+      LinearAlgebra::TpetraWrappers::Vector<Number> &)
     {
       AssertThrow(false, ExcNotImplemented());
     }
