@@ -223,6 +223,32 @@ public:
   };
 
   /**
+   * ARPACK mode used in dsaupd/dnaupd.
+   */
+  enum Mode : int
+  {
+    regular       = 1,
+    shift_inverse = 3
+  };
+
+  /**
+   * An enum that lists the possible choices for the BMAT argument in ARPACK
+   * which is used to specify the type of the matrix B that defines the
+   * semi-inner product for the operator OP.
+   */
+  enum WhichEigenvalueProblem : char
+  {
+    /**
+     * BMAT = 'I' -> standard eigenvalue problem $Ax = \lambda x$
+     */
+    standard = 'I',
+    /**
+     * BMAT = 'G' -> generalized eigenvalue problem $Ax = \lambda Bx$
+     */
+    generalized = 'G'
+  };
+
+  /**
    * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
@@ -233,9 +259,11 @@ public:
      * eigenvalues of largest magnitude for a non-symmetric problem).
      */
     explicit AdditionalData(
-      const unsigned int     number_of_arnoldi_vectors = 15,
-      const WhichEigenvalues eigenvalue_of_interest    = largest_magnitude,
-      const bool             symmetric                 = false);
+      const unsigned int           number_of_arnoldi_vectors = 15,
+      const WhichEigenvalues       eigenvalue_of_interest = largest_magnitude,
+      const bool                   symmetric              = false,
+      const Mode                   mode                   = shift_inverse,
+      const WhichEigenvalueProblem problem_type           = generalized);
 
     /**
      * Number of Arnoldi/Lanczos vectors. This number should be less than the
@@ -253,6 +281,16 @@ public:
      * Specify if the problem is symmetric or not.
      */
     const bool symmetric;
+
+    /**
+     * Specify ARPACK's mode of operation.
+     */
+    const Mode mode;
+
+    /**
+     * Specify whether to solve a standard or a generalized eigenvalue problem.
+     */
+    const WhichEigenvalueProblem problem_type;
   };
 
   /**
@@ -283,9 +321,10 @@ public:
   set_shift(const std::complex<double> sigma);
 
   /**
-   * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
-   * the <code>dsaupd</code> and <code>dseupd</code> or
-   * <code>dnaupd</code> and <code>dneupd</code> functions of ARPACK.
+   * Solve the generalized eigenspectrum problem $A x=\lambda B x$ or the
+   * standard eigenspectrum problem $A x = \lambda x$ by calling
+   * the <code>dsaupd</code> and <code>dseupd</code> or <code>dnaupd</code> and
+   * <code>dneupd</code> functions of ARPACK.
    *
    * The function returns a vector of eigenvalues of length <i>n</i> and a
    * vector of eigenvectors of length <i>n</i> in the symmetric case
@@ -299,8 +338,7 @@ public:
    * n-th eigenvalue has a nonzero imaginary part, Arpack needs in total n+1
    * real-valued vectors to store real and imaginary parts of the eigenvectors.
    *
-   * @param A The operator for which we want to compute eigenvalues. Actually,
-   * this parameter is entirely unused.
+   * @param A The operator for which we want to compute eigenvalues.
    *
    * @param B The inner product of the underlying space, typically the mass
    * matrix. For constrained problems, it can be a partial mass matrix, like
@@ -308,8 +346,8 @@ public:
    * function <code>vmult()</code> is used.
    *
    * @param inverse This is the possibly shifted inverse that is actually used
-   * instead of <code>A</code>. Only its function <code>vmult()</code> is
-   * used.
+   * instead of <code>A</code> when shif-invert mode is used. Only its function
+   * <code>vmult()</code> is used.
    *
    * @param eigenvalues is a vector of complex numbers in which the
    * eigenvalues are returned.
@@ -456,12 +494,16 @@ private:
 
 
 inline ArpackSolver::AdditionalData::AdditionalData(
-  const unsigned int     number_of_arnoldi_vectors,
-  const WhichEigenvalues eigenvalue_of_interest,
-  const bool             symmetric)
+  const unsigned int           number_of_arnoldi_vectors,
+  const WhichEigenvalues       eigenvalue_of_interest,
+  const bool                   symmetric,
+  const Mode                   mode,
+  const WhichEigenvalueProblem problem_type)
   : number_of_arnoldi_vectors(number_of_arnoldi_vectors)
   , eigenvalue_of_interest(eigenvalue_of_interest)
   , symmetric(symmetric)
+  , mode(mode)
+  , problem_type(problem_type)
 {
   // Check for possible options for symmetric problems
   if (symmetric)
@@ -522,7 +564,7 @@ template <typename VectorType,
           typename MatrixType2,
           typename INVERSE>
 inline void
-ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
+ArpackSolver::solve(const MatrixType1 &                system_matrix,
                     const MatrixType2 &                mass_matrix,
                     const INVERSE &                    inverse,
                     std::vector<std::complex<double>> &eigenvalues,
@@ -564,14 +606,19 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
          ArpackExcSmallNumberofArnoldiVectors(
            additional_data.number_of_arnoldi_vectors, nev));
 
-  // ARPACK mode for dsaupd/dnaupd, here only mode 3, i.e. shift-invert mode
-  int mode = 3;
+  // ARPACK mode for dsaupd/dnaupd, here only mode 1 (exact-shifting) and 3,
+  // i.e. shift-invert mode
+  int mode = additional_data.mode;
 
   // reverse communication parameter
   int ido = 0;
 
   // 'G' generalized eigenvalue problem 'I' standard eigenvalue problem
-  char bmat[2] = "G";
+  char bmat[2] = {additional_data.problem_type, '\0'};
+  Assert(
+    !((mode == 1) && (additional_data.problem_type == 'G')),
+    ExcMessage(
+      "Regular mode and generalized eigenvalue problem are incompatible."));
 
   // Specify the eigenvalues of interest, possible parameters "LA" algebraically
   // largest "SA" algebraically smallest "LM" largest magnitude "SM" smallest
@@ -634,7 +681,6 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
 
   // Set the mode of dsaupd. 1 is exact shifting, 2 is user-supplied shifts,
   // 3 is shift-invert mode, 4 is buckling mode, 5 is Cayley mode.
-
   iparam[6] = mode;
   std::vector<int> ipntr(14, 0);
 
@@ -690,6 +736,28 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
 
       switch (mode)
         {
+          case 1:
+            {
+              if (ido == -1 || ido == 1)
+                {
+                  VectorType src(eigenvectors[0]);
+                  VectorType dst(src);
+
+                  for (size_type i = 0; i < src.size(); ++i)
+                    src(i) = workd[ipntr[0] - 1 + i];
+
+                  // Multiplication with system matrix A
+                  system_matrix.vmult(dst, src);
+
+                  for (size_type i = 0; i < dst.size(); ++i)
+                    workd[ipntr[1] - 1 + i] = dst(i);
+                }
+              else
+                {
+                  Assert(false, ArpackExcArpackIdo(ido));
+                }
+              break;
+            }
           case 3:
             {
               switch (ido)
@@ -873,6 +941,7 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
           std::complex<double>(eigenvalues_real[i], eigenvalues_im[i]);
     }
 }
+
 
 
 inline SolverControl &
