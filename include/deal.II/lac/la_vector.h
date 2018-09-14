@@ -46,6 +46,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * A namespace for vector classes.
+ *
+ * This namespace contains various classes that provide wrappers to vector
+ * classes from different external libraries like Trilinos (EPetra) or PETSc
+ * and native implementations like LinearAlgebra::distributed::Vector.
+ *
+ * The different vector classes are derived from VectorSpaceVector to provide
+ * a joint interface for vector space operations, are derived from
+ * ReadWriteVector (or ReadWriteVector itself), or both. The separation of
+ * vector space operations (like norms or vector additions) through
+ * VectorSpaceVector and element access through ReadWriteVector are by design
+ * and improve performance.
+ */
 namespace LinearAlgebra
 {
   /*! @addtogroup Vectors
