@@ -18,10 +18,6 @@
 // a hp-ified version of step-11
 
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
@@ -53,6 +49,8 @@ std::ofstream logfile("output");
 
 #include <algorithm>
 #include <iostream>
+
+#include "../tests.h"
 
 
 template <int dim>
@@ -231,10 +229,8 @@ main()
 {
   try
     {
-      logfile.precision(2);
+      initlog();
       deallog << std::setprecision(2);
-
-      deallog.attach(logfile);
 
       for (unsigned int mapping_degree = 1; mapping_degree <= 3;
            ++mapping_degree)

@@ -58,9 +58,8 @@ plot(const PolynomialsRaviartThomas<dim> &poly)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   PolynomialsRaviartThomas<2> p20(0);
   PolynomialsRaviartThomas<2> p21(1);

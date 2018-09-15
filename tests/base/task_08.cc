@@ -35,8 +35,7 @@ test(int i)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   {
     Threads::new_task(test, 1);
@@ -44,7 +43,10 @@ main()
     deallog << "OK" << std::endl;
   }
 
+  std::ofstream *out_stream =
+    dynamic_cast<std::ofstream *>(&deallog.get_file_stream());
+  Assert(out_stream != nullptr, ExcInternalError());
   deallog.detach();
-  logfile.close();
+  out_stream->close();
   sort_file_contents("output");
 }

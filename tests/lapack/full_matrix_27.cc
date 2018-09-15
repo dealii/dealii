@@ -68,10 +68,8 @@ test(const unsigned int size)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   const std::vector<unsigned int> sizes = {{17, 35, 391}};
   for (const auto &s : sizes)

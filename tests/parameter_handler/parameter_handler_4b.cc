@@ -30,13 +30,12 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
 
       ParameterHandler prm;
       prm.enter_subsection("Testing");
       prm.leave_subsection();
-      prm.print_parameters(logfile, ParameterHandler::LaTeX);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::LaTeX);
     }
   catch (std::exception &exc)
     {

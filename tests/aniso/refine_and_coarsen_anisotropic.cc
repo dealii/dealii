@@ -51,7 +51,7 @@ const unsigned int max_cells = 50000;
 
 template <int dim>
 void
-test_isotropic(int type, std::ostream *logfile)
+test_isotropic(int type, std::ostream &logfile)
 {
   const RefinementCase<dim> ref_cases[7] = {
     RefinementCase<dim>::cut_x,
@@ -77,7 +77,7 @@ test_isotropic(int type, std::ostream *logfile)
   tria.reset_manifold(0);
   tria.refine_global(1);
 
-  *logfile << "cycle: 0, number of cells: " << tria.n_cells() << std::endl;
+  logfile << "cycle: 0, number of cells: " << tria.n_cells() << std::endl;
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
@@ -110,8 +110,8 @@ test_isotropic(int type, std::ostream *logfile)
           grid_out.write_eps(tria, outfile);
         }
 
-      *logfile << "cycle: " << cycle << ", number of cells: " << tria.n_cells()
-               << std::endl;
+      logfile << "cycle: " << cycle << ", number of cells: " << tria.n_cells()
+              << std::endl;
 
       if (tria.n_cells() > max_cells || cycle == max_cycle)
         break;
@@ -123,35 +123,26 @@ test_isotropic(int type, std::ostream *logfile)
 int
 main()
 {
-  std::ostream *logfile;
+  initlog();
 
-  if (single_file)
-    logfile = new std::ofstream("output");
-  else
-    logfile = &std::cout;
+  std::ostream &logfile = deallog.get_file_stream();
 
-  *logfile << std::endl
-           << "         2D" << std::endl
-           << "-----------------------" << std::endl;
+  logfile << "         2D" << std::endl
+          << "-----------------------" << std::endl;
 
-  *logfile << "HyperCube:" << std::endl;
+  logfile << "HyperCube:" << std::endl;
   test_isotropic<2>(0, logfile);
 
-  *logfile << "HyperBall:" << std::endl;
+  logfile << "HyperBall:" << std::endl;
   test_isotropic<2>(1, logfile);
 
-  *logfile << std::endl;
-  *logfile << "         3D" << std::endl
-           << "-----------------------" << std::endl;
+  logfile << std::endl;
+  logfile << "         3D" << std::endl
+          << "-----------------------" << std::endl;
 
-  *logfile << "HyperCube:" << std::endl;
+  logfile << "HyperCube:" << std::endl;
   test_isotropic<3>(0, logfile);
 
-  *logfile << "HyperBall:" << std::endl;
+  logfile << "HyperBall:" << std::endl;
   test_isotropic<3>(1, logfile);
-
-  // clear whatever is in the buffer
-  *logfile << std::flush;
-  if (single_file)
-    delete logfile;
 }

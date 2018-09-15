@@ -126,9 +126,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(8) << std::fixed;
-  deallog.attach(logfile);
 
   deallog.push("2d");
   check<2>();

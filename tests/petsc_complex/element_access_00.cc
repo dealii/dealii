@@ -60,9 +60,7 @@ test_vector(PETScWrappers::MPI::Vector &v)
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  dealii::deallog.attach(logfile);
-  dealii::deallog.depth_console(0);
+  initlog();
 
   try
     {
@@ -72,7 +70,7 @@ main(int argc, char **argv)
         test_vector(v);
 
         deallog << "vector:" << std::endl;
-        v.print(logfile);
+        v.print(deallog.get_file_stream());
       }
     }
 
@@ -104,7 +102,7 @@ main(int argc, char **argv)
       return 1;
     }
 
-  logfile << std::endl;
+  deallog.get_file_stream() << std::endl;
 
   return 0;
 }

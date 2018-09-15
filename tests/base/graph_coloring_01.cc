@@ -84,10 +84,9 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   check<2>();
 

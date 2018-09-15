@@ -157,10 +157,8 @@ test_constraints_old(FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
   FE_Q<2> fe_1(1);
   FE_Q<2> fe_2(2);

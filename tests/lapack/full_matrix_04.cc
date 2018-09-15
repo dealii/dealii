@@ -110,10 +110,8 @@ test_rect(unsigned int m, unsigned int n, const double *values)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   test_rect(4, 4, &symm[0][0]);
   test_rect(4, 3, &rect[0][0]);

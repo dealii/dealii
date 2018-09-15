@@ -117,10 +117,9 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(8);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   deallog.push("1d");
   check<1>();

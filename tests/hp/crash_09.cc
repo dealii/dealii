@@ -52,10 +52,8 @@ char logname[] = "output";
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision(3);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
 
   // create a mesh like this (viewed

@@ -18,10 +18,6 @@
 // a hp-ified version of step-4
 
 
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -49,6 +45,8 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -293,10 +291,9 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
-  logfile.precision(2);
+  initlog();
+  deallog.get_file_stream().precision(2);
   deallog << std::setprecision(2);
-
-  deallog.attach(logfile);
 
   {
     LaplaceProblem<2> laplace_problem_2d;

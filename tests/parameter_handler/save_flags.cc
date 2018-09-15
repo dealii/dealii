@@ -26,8 +26,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   ParameterHandler prm;
   prm.declare_entry("int1", "1", Patterns::Integer(), "doc 1");
@@ -60,17 +59,18 @@ main()
   prm.leave_subsection();
 
   // set a special fill char and verify that it is being used
-  logfile.fill('x');
-  logfile.width(15);
-  logfile << std::left << 42 << std::endl;
+  deallog.get_file_stream().fill('x');
+  deallog.get_file_stream().width(15);
+  deallog.get_file_stream() << std::left << 42 << std::endl;
 
   // now let ParameterHandler output its state
-  prm.print_parameters(logfile, ParameterHandler::Description);
+  prm.print_parameters(deallog.get_file_stream(),
+                       ParameterHandler::Description);
 
   // verify that the special fill char is still available (i.e., that
   // print_parameters() has saved and restored the stream flags)
-  logfile.width(15);
-  logfile << std::left << 42 << std::endl;
+  deallog.get_file_stream().width(15);
+  deallog.get_file_stream() << std::left << 42 << std::endl;
 
   return 0;
 }

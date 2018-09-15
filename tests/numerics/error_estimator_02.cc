@@ -741,8 +741,7 @@ test(const MySecondFunction<dim> &func)
 int
 main()
 {
-  std::ofstream logfile("output");
-  dealii::deallog.attach(logfile);
+  initlog();
 
   {
     NeumanBC<2> func(1.25);

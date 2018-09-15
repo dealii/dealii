@@ -64,10 +64,8 @@ test(const bool is_singular)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   test(false);
   test(true);

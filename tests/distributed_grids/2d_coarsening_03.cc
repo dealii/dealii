@@ -182,12 +182,10 @@ test(std::ostream & /*out*/)
 int
 main(int argc, char *argv[])
 {
+  initlog();
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-
   deallog.push("2d");
-  test<2>(logfile);
+  test<2>(deallog.get_file_stream());
   deallog.pop();
 }

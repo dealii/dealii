@@ -27,8 +27,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   {
     // use std::cout so that no output is saved to the logfile, because it

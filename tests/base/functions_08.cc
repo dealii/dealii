@@ -82,9 +82,7 @@ check1()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   check1<1>();
   check1<2>();

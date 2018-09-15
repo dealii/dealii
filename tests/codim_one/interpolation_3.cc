@@ -43,9 +43,6 @@
 
 #include <string>
 
-
-std::ofstream logfile("output");
-
 // Test interpolation on system of finite elements.
 
 template <int dim, int spacedim>
@@ -82,7 +79,7 @@ test(std::string filename)
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "test");
   dataout.build_patches();
-  dataout.write_vtk(logfile);
+  dataout.write_vtk(deallog.get_file_stream());
 }
 
 
@@ -90,7 +87,7 @@ test(std::string filename)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << "Test<1,2>" << std::endl;
   test<1, 2>(SOURCE_DIR "/grids/circle_2.inp");

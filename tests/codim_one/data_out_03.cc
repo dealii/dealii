@@ -39,8 +39,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 class Identity : public Function<dim>
 {
@@ -68,7 +66,7 @@ public:
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   int fe_degree      = 2;
   int mapping_degree = 2;

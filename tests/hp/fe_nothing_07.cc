@@ -185,10 +185,8 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
   deallog << "Try dim == 1" << std::flush << std::endl;
   test<1>();

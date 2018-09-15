@@ -43,8 +43,6 @@
 using namespace dealii;
 
 
-std::ofstream logfile("output");
-
 void
 test()
 {
@@ -109,7 +107,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test();
 

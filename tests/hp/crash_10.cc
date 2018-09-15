@@ -36,9 +36,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test()
@@ -101,9 +98,8 @@ test()
 int
 main()
 {
-  logfile.precision(2);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
   // this test depends on the right
   // starting value of the random

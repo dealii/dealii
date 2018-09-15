@@ -139,10 +139,8 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(3);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   test<2>();
 

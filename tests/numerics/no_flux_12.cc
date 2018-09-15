@@ -117,10 +117,9 @@ run()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(7);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(7);
+  deallog.get_file_stream().setf(std::ios::fixed);
 
   run<3>();
 }

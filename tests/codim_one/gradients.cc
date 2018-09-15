@@ -49,10 +49,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-
-
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
@@ -183,7 +179,7 @@ test(std::string filename)
   dataout.attach_triangulation(triangulation);
   dataout.add_data_vector(projected_directional_derivative, "derivative");
   dataout.build_patches();
-  dataout.write_vtk(logfile);
+  dataout.write_vtk(deallog.get_file_stream());
 }
 
 
@@ -191,8 +187,8 @@ test(std::string filename)
 int
 main()
 {
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(4);
 
   deallog << "Test <1,2>" << std::endl;
   test<1, 2>(SOURCE_DIR "/grids/circle_4.inp");

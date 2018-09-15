@@ -122,10 +122,9 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   // there used to be a bug in the cell similarity detection for the above
   // test pattern of an FE_RaviartThomas inside and FESystem, but cell

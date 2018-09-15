@@ -238,9 +238,7 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   Functions::LSingularityFunction     fl;
   Functions::LSingularityGradFunction flg;

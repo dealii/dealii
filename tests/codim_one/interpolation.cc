@@ -41,9 +41,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
-
 template <int dim, int spacedim>
 void
 test(std::string filename, unsigned int n)
@@ -82,7 +79,7 @@ test(std::string filename, unsigned int n)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int n = 1; n < 8; ++n)
     {

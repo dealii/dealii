@@ -99,10 +99,8 @@ namespace Step27
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
   Step27::MixedFECollection<1>().run();
   Step27::MixedFECollection<2>().run();

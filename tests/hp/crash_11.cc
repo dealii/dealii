@@ -18,9 +18,6 @@
 // a test where a degree of freedom was constrained multiple times,
 // but with different weights. see the hp paper for more on this
 
-char logname[] = "output";
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -52,11 +49,8 @@ char logname[] = "output";
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision(3);
-
-  deallog.attach(logfile);
-
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   // create a mesh like this (viewed
   // from top):

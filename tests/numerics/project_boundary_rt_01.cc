@@ -191,10 +191,9 @@ test_hyper_cube(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   FE_RaviartThomasNodal<2> rt21(1);
   test_hyper_cube(rt21);

@@ -34,8 +34,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 class X : public Function<dim>
 {
@@ -101,7 +99,7 @@ test(std::string filename)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<2, 3>(SOURCE_DIR "/grids/square.inp");
   test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");

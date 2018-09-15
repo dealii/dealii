@@ -34,7 +34,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
 
   Triangulation<2, 3> tria;
   GridIn<2, 3>        gi;
@@ -50,7 +50,7 @@ main()
 
 
   GridOut go;
-  go.write_ucd(tria, logfile);
+  go.write_ucd(tria, deallog.get_file_stream());
 
   return 0;
 }

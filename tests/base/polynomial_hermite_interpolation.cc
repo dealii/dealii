@@ -52,9 +52,7 @@ interpolation_conditions(const std::vector<Polynomial<double>> &polynomials)
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   interpolation_conditions(HermiteInterpolation::generate_complete_basis(6));
   plot(HermiteInterpolation::generate_complete_basis(6));

@@ -79,9 +79,8 @@ check_lge(unsigned int n)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   QTrapez<1>   trapez;
   QSimpson<1>  simpson;

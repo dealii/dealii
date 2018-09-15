@@ -108,10 +108,8 @@ test(const unsigned int m,
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   const std::vector<std::array<unsigned int, 3>> sizes = {{3, 3, 3},
                                                           {7, 7, 7},

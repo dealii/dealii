@@ -41,9 +41,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
@@ -68,7 +65,7 @@ test(std::string filename)
   DataOut<dim, DoFHandler<dim, spacedim>> dataout;
   dataout.add_data_vector(dof_handler, numbering, "numbering");
   dataout.build_patches();
-  dataout.write_vtk(logfile);
+  dataout.write_vtk(deallog.get_file_stream());
 }
 
 
@@ -76,7 +73,7 @@ test(std::string filename)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << "Test<1,2>" << std::endl;
   test<1, 2>(SOURCE_DIR "/grids/circle_2.inp");
 

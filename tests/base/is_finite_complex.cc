@@ -138,9 +138,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   // the isnan() function (which we call in is_finite()) helpfully
   // produces a floating point exception when called with a signalling

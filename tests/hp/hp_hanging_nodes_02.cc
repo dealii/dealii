@@ -50,9 +50,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 run(bool random_p, unsigned int *indx)
@@ -136,9 +133,8 @@ run_test(unsigned int *indx)
 int
 main()
 {
-  logfile.precision(8);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(8);
 
   unsigned int index[] = {1, 2, 3, 4, 5, 6, 7};
 

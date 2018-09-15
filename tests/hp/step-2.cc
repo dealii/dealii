@@ -37,9 +37,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 void make_grid(Triangulation<2> &triangulation)
 {
   const Point<2> center(1, 0);
@@ -110,9 +107,8 @@ void renumber_dofs(hp::DoFHandler<2> &dof_handler)
 int
 main()
 {
-  logfile.precision(2);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
   Triangulation<2> triangulation;
   make_grid(triangulation);

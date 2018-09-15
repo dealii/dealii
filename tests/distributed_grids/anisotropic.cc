@@ -56,6 +56,8 @@ test(std::ostream & /*out*/)
 int
 main(int argc, char *argv[])
 {
+  initlog();
+
   deal_II_exceptions::disable_abort_on_exception();
 
 #ifdef DEAL_II_WITH_MPI
@@ -65,13 +67,10 @@ main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-
   deallog.push("2d");
-  test<2>(logfile);
+  test<2>(deallog.get_file_stream());
   deallog.pop();
   deallog.push("2d");
-  test<3>(logfile);
+  test<3>(deallog.get_file_stream());
   deallog.pop();
 }

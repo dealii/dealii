@@ -51,9 +51,7 @@ test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog();
 
   try
     {
@@ -65,8 +63,8 @@ main(int argc, char **argv)
 
         // Output
         deallog << "Complex vectors: " << std::endl;
-        v.print(logfile, 0, false, true);
-        w.print(logfile, 0, false, true);
+        v.print(deallog.get_file_stream(), 0, false, true);
+        w.print(deallog.get_file_stream(), 0, false, true);
         deallog << "OK" << std::endl;
       }
     }

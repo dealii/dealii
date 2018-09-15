@@ -45,8 +45,7 @@ waiter(int i)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   worker_thread = Threads::new_thread(worker);
 
@@ -57,7 +56,10 @@ main()
   waiter_threads.join_all();
   deallog << "All waiting threads finished." << std::endl;
 
+  std::ofstream *out_stream =
+    dynamic_cast<std::ofstream *>(&deallog.get_file_stream());
+  Assert(out_stream != nullptr, ExcInternalError());
   deallog.detach();
-  logfile.close();
+  out_stream->close();
   sort_file_contents("output");
 }

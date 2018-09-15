@@ -28,8 +28,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 class BoundaryFunction : public Function<dim>
 {
@@ -72,14 +70,13 @@ test_boundary_values(const FiniteElement<dim> &fe)
   VectorTools::project_boundary_values_curl_conforming_l2(
     dof_handler, 0, boundary_function, 0, constraints);
   constraints.close();
-  constraints.print(logfile);
+  constraints.print(deallog.get_file_stream());
 }
 
 int
 main()
 {
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
 
   FE_Nedelec<2> fe_2(1);
 

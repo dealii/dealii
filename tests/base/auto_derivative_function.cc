@@ -125,9 +125,8 @@ ExactSinExp<dim>::vector_gradient(
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   const unsigned int      dim = 2;
   AutoSinExp<dim>         auto_function;

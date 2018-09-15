@@ -151,8 +151,7 @@ init_petsc_complex()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  dealii::deallog.attach(logfile);
+  initlog();
 
   try
     {

@@ -97,6 +97,7 @@ test(std::ostream & /*out*/)
 int
 main(int argc, char *argv[])
 {
+  initlog();
 #ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 #else
@@ -104,8 +105,5 @@ main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-
-  test<3>(logfile);
+  test<3>(deallog.get_file_stream());
 }

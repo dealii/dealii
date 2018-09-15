@@ -309,11 +309,9 @@ test2cells(const FiniteElement<dim> &fe_0,
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
   deallog << std::fixed;
-  deallog.attach(logfile);
-
 
   try
     {

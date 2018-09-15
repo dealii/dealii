@@ -441,10 +441,8 @@ TestPointValueHistory<dim>::output_results(unsigned int   step,
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile << std::setprecision(2);
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   TestPointValueHistory<2> test;
   test.run();

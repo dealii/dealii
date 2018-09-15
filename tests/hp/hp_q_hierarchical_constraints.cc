@@ -133,8 +133,7 @@ test(const bool apply_constrains, const unsigned int hp)
 int
 main(int argc, char *argv[])
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<2>(true, 0);
   test<2>(true, 1);

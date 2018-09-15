@@ -90,11 +90,8 @@ test(const unsigned int size, const bool reinit_square)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   // Test square matrix initialization
   test(4, true);

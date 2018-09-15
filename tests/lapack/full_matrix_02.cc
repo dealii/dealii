@@ -74,10 +74,8 @@ test(const unsigned int size, const bool nonsymmetric)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   test(4, false);
   test(4, true);

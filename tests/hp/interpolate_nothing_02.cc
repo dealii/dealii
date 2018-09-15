@@ -262,11 +262,8 @@ diffusionMechanics<dim>::run()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(3);
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   diffusionMechanics<DIMS> problem(1, 1);
   problem.run();

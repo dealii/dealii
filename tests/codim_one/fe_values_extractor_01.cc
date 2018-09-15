@@ -41,13 +41,10 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   const unsigned int dim = 1;
 

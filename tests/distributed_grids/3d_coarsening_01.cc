@@ -52,12 +52,10 @@ test(std::ostream & /*out*/)
 int
 main(int argc, char *argv[])
 {
+  initlog();
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-
   deallog.push("3d");
-  test<3>(logfile);
+  test<3>(deallog.get_file_stream());
   deallog.pop();
 }

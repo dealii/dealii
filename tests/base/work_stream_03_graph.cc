@@ -189,10 +189,7 @@ do_project()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
+  initlog();
 
   do_project();
 }

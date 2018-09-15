@@ -46,9 +46,6 @@
 #include <string>
 
 
-std::ofstream logfile("output");
-
-
 template <int dim, int spacedim>
 void
 test(std::string filename, unsigned int n)
@@ -81,7 +78,7 @@ test(std::string filename, unsigned int n)
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "numbering");
   dataout.build_patches();
-  dataout.write_vtk(logfile);
+  dataout.write_vtk(deallog.get_file_stream());
 }
 
 
@@ -89,7 +86,7 @@ test(std::string filename, unsigned int n)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int n = 1; n < 5; n++)
     {

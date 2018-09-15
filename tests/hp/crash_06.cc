@@ -105,10 +105,8 @@ test_with_wrong_face_orientation(const hp::FECollection<3> &fe)
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision(3);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   hp::FECollection<3> fe;
   for (unsigned int i = 0; i < 4; ++i)

@@ -18,10 +18,6 @@
 // a hp-ified version of step-8
 
 
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -54,6 +50,8 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -428,10 +426,9 @@ ElasticProblem<dim>::run()
 int
 main()
 {
-  logfile.precision(2);
+  initlog();
   deallog << std::setprecision(2);
-
-  deallog.attach(logfile);
+  deallog.get_file_stream().precision(2);
 
   try
     {

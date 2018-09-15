@@ -29,8 +29,7 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
 
       ParameterHandler prm;
       prm.enter_subsection("Testing testing");
@@ -68,7 +67,7 @@ main()
       // as for parameter_handler_3, but
       // use different output format
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_8.prm");
-      prm.print_parameters(logfile, ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {

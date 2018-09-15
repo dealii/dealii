@@ -27,8 +27,7 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
 
       // same as parameter_handler_3
       ParameterHandler prm;
@@ -45,7 +44,7 @@ main()
       prm.leave_subsection();
 
       // then write
-      prm.print_parameters(logfile, ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
 
       // and do it again with the opposite
       // value
@@ -54,7 +53,7 @@ main()
       prm.leave_subsection();
 
       // then write
-      prm.print_parameters(logfile, ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {

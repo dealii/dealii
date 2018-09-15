@@ -29,9 +29,8 @@ using namespace Polynomials;
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const std::vector<Polynomial<double>> p =
     Hierarchical::generate_complete_basis(10);

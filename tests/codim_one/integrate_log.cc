@@ -43,8 +43,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
 double
 test(const unsigned int n,
      const unsigned int exponent,
@@ -135,7 +133,7 @@ newton_binomial(unsigned int a, unsigned int b)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(5);
   const double a = 1, b = 5.;

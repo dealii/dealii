@@ -679,11 +679,9 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision(3);
+  initlog();
   deallog << std::setprecision(3);
 
-  deallog.attach(logfile);
   try
     {
       LaplaceProblem<3> laplace_problem_2d;

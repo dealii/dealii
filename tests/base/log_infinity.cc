@@ -23,9 +23,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   deallog << std::numeric_limits<double>::infinity() << std::endl;
   deallog << -std::numeric_limits<double>::infinity() << std::endl;
