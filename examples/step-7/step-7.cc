@@ -99,9 +99,8 @@ namespace Step7
   class SolutionBase
   {
   protected:
-    static const unsigned int                             n_source_centers = 3;
-    static const std::array<Point<dim>, n_source_centers> source_centers;
-    static const double                                   width;
+    static const std::array<Point<dim>, 3> source_centers;
+    static const double                    width;
   };
 
 
@@ -124,18 +123,14 @@ namespace Step7
   // it doesn't have to generate the variable from a template by substituting
   // <code>dim</code>, but can immediately use the following definition:
   template <>
-  const std::array<Point<1>, SolutionBase<1>::n_source_centers>
-    SolutionBase<1>::source_centers = {Point<1>(-1.0 / 3.0),
-                                       Point<1>(0.0),
-                                       Point<1>(+1.0 / 3.0)};
+  const std::array<Point<1>, 3> SolutionBase<1>::source_centers =
+    {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
 
   // Likewise, we can provide an explicit specialization for
   // <code>dim=2</code>. We place the centers for the 2d case as follows:
   template <>
-  const std::array<Point<2>, SolutionBase<2>::n_source_centers>
-    SolutionBase<2>::source_centers = {Point<2>(-0.5, +0.5),
-                                       Point<2>(-0.5, -0.5),
-                                       Point<2>(+0.5, -0.5)};
+  const std::array<Point<2>, 3> SolutionBase<2>::source_centers =
+    {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
 
   // There remains to assign a value to the half-width of the exponentials. We
   // would like to use the same value for all dimensions. In this case, we
@@ -204,7 +199,7 @@ namespace Step7
   // The only thing that is worth mentioning is that if we access elements of
   // a base class that is template dependent (in this case the elements of
   // SolutionBase&lt;dim&gt;), then the C++ language forces us to write
-  // <code>this-&gt;n_source_centers</code> (for example). Note that the
+  // <code>this-&gt;source_centers</code> (for example). Note that the
   // <code>this-&gt;</code> qualification is not necessary if the base class
   // is not template dependent, and also that the gcc compilers prior to
   // version 3.4 don't enforce this requirement of the C++ standard. The
@@ -215,9 +210,9 @@ namespace Step7
   double Solution<dim>::value(const Point<dim> &p, const unsigned int) const
   {
     double return_value = 0;
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
+    for (const auto &center : this->source_centers)
       {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - center;
         return_value +=
           std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
       }
@@ -256,9 +251,9 @@ namespace Step7
   {
     Tensor<1, dim> return_value;
 
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
+    for (const auto &center : this->source_centers)
       {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - center;
 
         // For the gradient, note that its direction is along (x-x_i), so we
         // add up multiples of this distance vector, where the factor is given
@@ -301,9 +296,9 @@ namespace Step7
                                    const unsigned int) const
   {
     double return_value = 0;
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
+    for (const auto &center : this->source_centers)
       {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - center;
 
         // The first contribution is the Laplacian:
         return_value +=
