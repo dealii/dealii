@@ -43,7 +43,8 @@ main()
 
   // go into the source dir to read files there. this
   // is necessary so that we can include files there
-  chdir(SOURCE_DIR);
+  const int chdir_return_code = chdir(SOURCE_DIR);
+  AssertThrow(chdir_return_code == 0, ExcInternalError());
   check("parameter_handler_1_include.prm");
 
   return 0;

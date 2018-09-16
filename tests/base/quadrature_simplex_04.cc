@@ -25,7 +25,7 @@
 #include "simplex.h"
 
 void
-test(int n)
+test(unsigned int n)
 {
   const unsigned int dim = 2;
 
