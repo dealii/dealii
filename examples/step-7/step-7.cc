@@ -92,9 +92,8 @@ namespace Step7
   // introduction, we choose a sum of three exponentials) and right hand side,
   // are these: the number of exponentials, their centers, and their half
   // width. We declare them in the following class. Since the number of
-  // exponentials is a constant scalar integral quantity, C++ allows its
-  // definition (i.e. assigning a value) right at the place of declaration
-  // (i.e. where we declare that such a variable exists).
+  // exponentials is a compile-time constant we use a fixed-length
+  // <code>std::array</code> to store the center points:
   template <int dim>
   class SolutionBase
   {
