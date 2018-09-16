@@ -20,6 +20,7 @@
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/std_cxx14/memory.h>
 
+#  include <deal.II/lac/read_write_vector.h>
 #  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -543,6 +544,36 @@ namespace TrilinosWrappers
       last_action = Insert;
     }
 
+
+    void
+    Vector::import(const LinearAlgebra::ReadWriteVector<double> &rwv,
+                   const VectorOperation::values                 operation)
+    {
+      Assert(
+        this->size() == rwv.size(),
+        ExcMessage(
+          "Both vectors need to have the same size for import() to work!"));
+      // TODO: a generic import() function should handle any kind of data layout
+      // in ReadWriteVector, but this function is of limited use as this class
+      // will (hopefully) be retired eventually.
+      Assert(this->locally_owned_elements() == rwv.get_stored_elements(),
+             ExcNotImplemented());
+
+      if (operation == VectorOperation::insert)
+        {
+          for (const auto idx : this->locally_owned_elements())
+            (*this)[idx] = rwv[idx];
+        }
+      else if (operation == VectorOperation::add)
+        {
+          for (const auto idx : this->locally_owned_elements())
+            (*this)[idx] += rwv[idx];
+        }
+      else
+        AssertThrow(false, ExcNotImplemented());
+
+      this->compress(operation);
+    }
 
 
     void
