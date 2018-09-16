@@ -472,11 +472,8 @@ test_interpolation(const hp::FECollection<dim> &    fe,
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision(7);
-
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog();
+  deallog.get_file_stream().precision(7);
 
   test<1>();
   test<2>();

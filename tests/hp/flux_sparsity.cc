@@ -132,8 +132,7 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   deallog.push("2d");
   check<2>();

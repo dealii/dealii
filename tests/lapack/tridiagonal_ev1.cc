@@ -47,9 +47,7 @@ test_laplacian(unsigned int n)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test_laplacian<double>(10);
   test_laplacian<double>(20);

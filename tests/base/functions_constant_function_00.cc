@@ -27,7 +27,6 @@
 
 #define MAX_DIM 3
 #define MAX_N_COMPONENT 7
-#define LOG_FILE "output"
 #define NUMBER double
 
 #define TESTEE Functions::ConstantFunction
@@ -204,6 +203,7 @@ test_n_components(const std::vector<NUMBER> &component_data)
 int
 main()
 {
+  initlog();
   // Create data for each component
 
   std::vector<NUMBER> component_data(MAX_N_COMPONENT);
@@ -211,9 +211,6 @@ main()
     NUMBER data[MAX_N_COMPONENT] = {1, 255, 32768, 98.2, 75, 7.9e+8, 6.7e-4};
     component_data.assign(data, data + MAX_N_COMPONENT);
   }
-
-  std::ofstream logfile(LOG_FILE);
-  deallog.attach(logfile);
 
   test_n_components<1, NUMBER>(component_data);
   test_n_components<2, NUMBER>(component_data);

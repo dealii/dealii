@@ -27,13 +27,12 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
 {
-  logfile << " Tria<" << dim << "," << spacedim << ">: " << std::endl;
+  deallog.get_file_stream()
+    << " Tria<" << dim << "," << spacedim << ">: " << std::endl;
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim>        gi;
   gi.attach_triangulation(tria);
@@ -52,13 +51,13 @@ test(std::string filename)
       ptria.execute_coarsening_and_refinement();
     }
 
-  ptria.write_flags(logfile);
+  ptria.write_flags(deallog.get_file_stream());
 }
 
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<2, 3>(SOURCE_DIR "/grids/square.inp");
   test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");

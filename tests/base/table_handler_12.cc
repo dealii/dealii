@@ -31,12 +31,11 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // set precision on the output
   // stream to 4 digits
-  logfile << std::setprecision(4);
+  deallog.get_file_stream() << std::setprecision(4);
 
   // but then set precision on the
   // table output to 2
@@ -45,9 +44,9 @@ main()
   table.set_precision("key", 2);
 
   // now output the table...
-  table.write_text(logfile);
+  table.write_text(deallog.get_file_stream());
   // ...and then output some other
   // number, hopefully with 4 digits
   // of precision
-  logfile << 0.123456789 << std::endl;
+  deallog.get_file_stream() << 0.123456789 << std::endl;
 }

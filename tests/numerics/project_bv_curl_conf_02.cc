@@ -34,8 +34,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 class BoundaryFunction : public Function<dim>
 {
@@ -131,8 +129,8 @@ test(unsigned order)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<2>(0);
   test<2>(1);

@@ -40,8 +40,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 test(unsigned n_refinements)
@@ -134,8 +132,7 @@ main(int argc, char *argv[])
 
   if (rank == 0)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
 
       deallog.push("2d");
       test<2>(n_refinements);

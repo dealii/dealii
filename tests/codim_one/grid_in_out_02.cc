@@ -25,8 +25,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
@@ -38,13 +36,13 @@ test(std::string filename)
   gi.read_ucd(in);
 
   GridOut grid_out;
-  grid_out.write_gnuplot(tria, logfile);
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 }
 
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<2, 3>(SOURCE_DIR "/grids/square.inp");
   test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");

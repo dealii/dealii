@@ -126,10 +126,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(4);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().setf(std::ios::fixed);
 
   deallog.push("2d");
   check<2>();

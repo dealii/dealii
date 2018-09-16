@@ -45,9 +45,6 @@
 #include <string>
 
 
-std::ofstream logfile("output");
-
-
 template <int dim, int spacedim>
 void
 test(std::string filename, unsigned int n)
@@ -78,7 +75,7 @@ test(std::string filename, unsigned int n)
   DataOut<dim, DoFHandler<dim, spacedim>> dataout;
   dataout.add_data_vector(dof_handler, projected_one, "projection");
   dataout.build_patches();
-  dataout.write_vtk(logfile);
+  dataout.write_vtk(deallog.get_file_stream());
 }
 
 
@@ -86,7 +83,7 @@ test(std::string filename, unsigned int n)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int n = 1; n < 5; n++)
     {

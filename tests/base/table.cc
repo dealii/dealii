@@ -27,10 +27,9 @@ const int entries[] = {11, 12, 13, 21, 22, 23, 31, 32, 33, 58, 65, 78,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(0);
-  deallog.attach(logfile);
 
   // a square table
   if (true)

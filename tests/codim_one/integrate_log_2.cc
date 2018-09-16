@@ -45,9 +45,6 @@
 
 using namespace std;
 
-std::ofstream logfile("output");
-
-
 // Returns the following integral: /int_0^1 x^N * ln(|x-point|/alpha) dx
 double
 log_integral(const unsigned int N, const double point, const double alpha);
@@ -55,7 +52,8 @@ log_integral(const unsigned int N, const double point, const double alpha);
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
+
   deallog << std::fixed;
   deallog << std::setprecision(10);
 

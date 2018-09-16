@@ -81,11 +81,8 @@ plot(const PolynomialsBDM<dim> &poly)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
-
 
   PolynomialsBDM<3> p31(1);
   PolynomialsBDM<3> p32(2);

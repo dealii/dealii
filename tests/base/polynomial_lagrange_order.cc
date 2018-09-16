@@ -114,9 +114,8 @@ check_lge(unsigned int n)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   deallog.push("LagrangeEquidistant");
   for (unsigned i = 8; i < 18; i += 2)

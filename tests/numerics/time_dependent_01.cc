@@ -25,9 +25,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 std::vector<bool> end_sweep_flags;
 
 
@@ -82,8 +79,8 @@ test()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   test();
 

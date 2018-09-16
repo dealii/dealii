@@ -28,10 +28,9 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
-  ConditionalOStream o(logfile, true);
+  ConditionalOStream o(deallog.get_file_stream(), true);
   o << "Yes" << std::endl;
   deallog << o.is_active() << std::endl;
 

@@ -22,17 +22,15 @@
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname);
+  initlog();
 
   if (!std::is_pod<VectorizedArray<double>>::value)
-    logfile << "Not OK because VectorizedArray<double> is not POD!"
-            << std::endl;
+    deallog.get_file_stream()
+      << "Not OK because VectorizedArray<double> is not POD!" << std::endl;
 
   if (!std::is_trivial<VectorizedArray<double>>::value)
-    logfile << "Not OK because VectorizedArray<double> is not trivial!"
-            << std::endl;
+    deallog.get_file_stream()
+      << "Not OK because VectorizedArray<double> is not trivial!" << std::endl;
 
-  logfile << "OK" << std::endl;
-  logfile.close();
+  deallog.get_file_stream() << "OK" << std::endl;
 }

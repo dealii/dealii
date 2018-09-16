@@ -164,9 +164,8 @@ check_dimensions(const std::vector<Polynomial<double>> &p)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   deallog.push("Lagrange");
   std::vector<Polynomial<double>> p;

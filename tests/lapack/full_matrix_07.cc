@@ -37,10 +37,8 @@ const double left[4][4] = {{1.75, -0.433012701892219, 0.0, 0.0},
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(1);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(1);
 
   FullMatrix<double>       A(4, 4, &left[0][0]);
   LAPACKFullMatrix<double> LA(4, 4);

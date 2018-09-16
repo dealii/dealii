@@ -33,8 +33,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
@@ -47,7 +45,7 @@ test(std::string filename)
 
   GridOut grid_out;
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 
   QTrapez<dim>                   quad;
   MappingQGeneric<dim, spacedim> mapping(1);
@@ -75,7 +73,7 @@ test(std::string filename)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<1, 2>(SOURCE_DIR "/grids/circle_1.inp");
   test<2, 3>(SOURCE_DIR "/grids/square.inp");

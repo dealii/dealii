@@ -35,9 +35,8 @@ compare(const U &u, const V &v)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   typedef Tensor<0, 1> T;
   T                    t1(13.), t2(42);

@@ -103,9 +103,8 @@ check_rt()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(0);
-  deallog.attach(logfile);
 
   deallog.push("BDM");
   check_bdm<2>();

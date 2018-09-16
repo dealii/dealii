@@ -25,10 +25,9 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(0);
-  deallog.attach(logfile);
 
   const std::string elements = "1 2 3 4 5 6";
   {

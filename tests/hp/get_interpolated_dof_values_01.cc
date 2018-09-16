@@ -104,10 +104,9 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(PRECISION);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(PRECISION);
+  deallog.get_file_stream().setf(std::ios::fixed);
 
   deal_II_exceptions::disable_abort_on_exception();
 

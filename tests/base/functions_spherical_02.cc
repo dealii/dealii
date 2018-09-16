@@ -214,9 +214,7 @@ check()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   check<3>();
 }

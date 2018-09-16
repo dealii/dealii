@@ -34,8 +34,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 void
 test()
 {
@@ -100,7 +98,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test();
 

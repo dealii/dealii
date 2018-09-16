@@ -42,9 +42,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 template <int dim, int spacedim>
 void
 test()
@@ -73,7 +70,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<1, 2>();
   test<2, 3>();

@@ -70,10 +70,8 @@ test(const unsigned int n, const unsigned int k, const NumberType eps)
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   const std::vector<std::array<unsigned int, 2>> sizes = {
     {3, 3}, {7, 7}, {51, 51}, {320, 320}, {3, 9}, {9, 7}, {10, 5}, {320, 120}};

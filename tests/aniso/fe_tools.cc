@@ -166,10 +166,9 @@ test_projection(std::ostream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(8);
 
-  test_projection<2>(logfile);
-  test_projection<3>(logfile);
+  test_projection<2>(deallog.get_file_stream());
+  test_projection<3>(deallog.get_file_stream());
 }

@@ -81,9 +81,8 @@ check_poly(const unsigned int n)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check_poly(25);
 }

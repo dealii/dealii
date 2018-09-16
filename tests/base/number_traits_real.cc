@@ -44,9 +44,8 @@ check(const number &x)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check((float)1.5);
   check((float)-1.5);

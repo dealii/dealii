@@ -204,22 +204,20 @@ check_function(const Functions::FlowFunction<dim> &f,
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   if (true)
     {
       deallog << " Functions::StokesCosine<2>" << std::endl;
       Functions::StokesCosine<2> f(1.);
-      check_function(f, 4, logfile);
+      check_function(f, 4, deallog.get_file_stream());
     }
 
   if (true)
     {
       deallog << " Functions::StokesCosine<3>" << std::endl;
       Functions::StokesCosine<3> f(1.);
-      check_function(f, 4, logfile);
+      check_function(f, 4, deallog.get_file_stream());
     }
 
   if (true)
@@ -229,27 +227,27 @@ main()
       // Use odd number of points to
       // avoid lines with
       // discontinuous derivatives.
-      check_function(f, 5, logfile);
+      check_function(f, 5, deallog.get_file_stream());
     }
 
   if (true)
     {
       deallog << "Functions::Kovasznay" << std::endl;
       Functions::Kovasznay f(10.);
-      check_function(f, 4, logfile);
+      check_function(f, 4, deallog.get_file_stream());
     }
 
   if (true)
     {
       deallog << "Functions::PoisseuilleFlow<2>" << std::endl;
       Functions::PoisseuilleFlow<2> f(.8, 10.);
-      check_function(f, 4, logfile);
+      check_function(f, 4, deallog.get_file_stream());
     }
 
   if (true)
     {
       deallog << "Functions::PoisseuilleFlow<3>" << std::endl;
       Functions::PoisseuilleFlow<3> f(.8, 10.);
-      check_function(f, 4, logfile);
+      check_function(f, 4, deallog.get_file_stream());
     }
 }

@@ -17,9 +17,6 @@
 
 // a modified version of step-27 that crashes because of circular constraints.
 
-char logname[] = "output";
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/timer.h>
@@ -674,11 +671,10 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile << std::setprecision(4);
+  initlog();
+  deallog.get_file_stream().precision(4);
   deallog << std::setprecision(4);
 
-  deallog.attach(logfile);
   try
     {
       LaplaceProblem<3> laplace_problem_2d;

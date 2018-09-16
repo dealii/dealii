@@ -120,10 +120,9 @@ test_hyper_cube()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   test_hyper_cube<2>();
   test_hyper_cube<3>();

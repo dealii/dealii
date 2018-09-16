@@ -29,8 +29,6 @@
 
 #include <string>
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
@@ -49,14 +47,14 @@ test(std::string filename)
   for (unsigned int cycle = 0; cycle < 3; ++cycle)
     {
       tria.refine_global(1);
-      grid_out.write_msh(tria, logfile);
+      grid_out.write_msh(tria, deallog.get_file_stream());
     }
 }
 
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << "Test<1,2>" << std::endl;
   test<1, 2>(SOURCE_DIR "/grids/circle_1.inp");

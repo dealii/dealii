@@ -137,11 +137,9 @@ transfer(std::ostream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(4);
 
-  transfer<2>(logfile);
-  transfer<3>(logfile);
+  transfer<2>(deallog.get_file_stream());
+  transfer<3>(deallog.get_file_stream());
 }

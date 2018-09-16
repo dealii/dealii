@@ -219,11 +219,9 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
   deallog << std::fixed;
-  deallog.attach(logfile);
-
 
   try
     {

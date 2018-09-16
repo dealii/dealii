@@ -19,9 +19,6 @@
 // constraint between degrees of freedom 3->14->17->6->3 with the algorithm
 // that is presently in make_hanging_node_constraints
 
-char logname[] = "output";
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -53,10 +50,8 @@ char logname[] = "output";
 int
 main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision(3);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
 
   // create a mesh like this:

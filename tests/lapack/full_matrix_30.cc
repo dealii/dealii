@@ -43,10 +43,8 @@ test()
 int
 main()
 {
-  const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
-  logfile.precision(5);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(5);
 
   test<double>();
 }

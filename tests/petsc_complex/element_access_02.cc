@@ -47,9 +47,7 @@ test(PETScWrappers::SparseMatrix &m)
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  dealii::deallog.attach(logfile);
-  dealii::deallog.depth_console(0);
+  initlog();
 
   try
     {
@@ -59,7 +57,7 @@ main(int argc, char **argv)
         test(m);
 
         deallog << "matrix:" << std::endl;
-        m.print(logfile);
+        m.print(deallog.get_file_stream());
       }
     }
 
@@ -90,7 +88,7 @@ main(int argc, char **argv)
       return 1;
     }
 
-  logfile << std::endl;
+  deallog.get_file_stream() << std::endl;
 
   return 0;
 }

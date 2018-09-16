@@ -182,8 +182,7 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<2>();
   test<3>();

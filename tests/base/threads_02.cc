@@ -3164,8 +3164,8 @@ struct U
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
+
   using namespace Threads;
   ThreadGroup<X<0>>         tg;
   ThreadGroup<X<0> &>       tgr;
@@ -3662,7 +3662,10 @@ main()
   tgr.join_all();
   tgcr.join_all();
 
+  std::ofstream *out_stream =
+    dynamic_cast<std::ofstream *>(&deallog.get_file_stream());
+  Assert(out_stream != nullptr, ExcInternalError());
   deallog.detach();
-  logfile.close();
+  out_stream->close();
   sort_file_contents("output");
 }

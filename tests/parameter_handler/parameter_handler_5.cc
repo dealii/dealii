@@ -28,14 +28,13 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
 
       ParameterHandler prm;
       prm.declare_entry("int", "1", Patterns::Integer());
       prm.declare_entry("int", "2", Patterns::Integer());
 
-      prm.print_parameters(logfile, ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {

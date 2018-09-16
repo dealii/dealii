@@ -56,8 +56,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 using namespace dealii;
 
 
@@ -533,9 +531,8 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   {
     deallog.push("2d");

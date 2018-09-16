@@ -25,9 +25,6 @@
 
 #include <deal.II/lac/full_matrix.h>
 
-std::ofstream logfile("output");
-
-
 template <typename number>
 void
 fill_matrix(FullMatrix<number> &A)
@@ -74,7 +71,7 @@ void display_tensor_2(Tensor<2, b> &T)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   FullMatrix<double> A1(10, 10);
   Tensor<2, 3>       T1;

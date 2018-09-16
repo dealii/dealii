@@ -34,8 +34,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 class X : public Function<dim>
 {
@@ -111,7 +109,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test();
 

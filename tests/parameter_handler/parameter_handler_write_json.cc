@@ -26,8 +26,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   ParameterHandler prm;
   prm.declare_entry("int1", "1", Patterns::Integer(), "doc 1");
@@ -60,8 +59,8 @@ main()
   prm.leave_subsection();
 
 
-  prm.print_parameters(logfile, ParameterHandler::JSON);
-  logfile << std::endl;
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::JSON);
+  deallog.get_file_stream() << std::endl;
 
   return 0;
 }

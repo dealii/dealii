@@ -82,11 +82,9 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
-
 
   deallog.push("2d_2");
   check<2, 2>();

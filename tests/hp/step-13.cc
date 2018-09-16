@@ -18,10 +18,6 @@
 // a hp-ified version of step-13
 
 
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
@@ -56,6 +52,8 @@ std::ofstream logfile("output");
 #include <iostream>
 #include <list>
 #include <sstream>
+
+#include "../tests.h"
 
 
 
@@ -810,10 +808,9 @@ main()
 {
   try
     {
-      logfile.precision(2);
+      initlog();
+      deallog.get_file_stream().precision(2);
       deallog << std::setprecision(2);
-
-      deallog.attach(logfile);
 
       solve_problem<2>("global");
       solve_problem<2>("kelly");

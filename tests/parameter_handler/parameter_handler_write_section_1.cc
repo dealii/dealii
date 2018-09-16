@@ -26,8 +26,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   ParameterHandler prm;
   prm.declare_entry("int1", "1", Patterns::Integer(), "doc 1");
@@ -55,11 +54,13 @@ main()
 
   prm.enter_subsection("ss1");
   prm.enter_subsection("Testing%testing");
-  prm.print_parameters_section(logfile, ParameterHandler::Text, 0);
+  prm.print_parameters_section(deallog.get_file_stream(),
+                               ParameterHandler::Text,
+                               0);
   prm.leave_subsection();
   prm.leave_subsection();
 
-  logfile << std::endl;
+  deallog.get_file_stream() << std::endl;
 
   return 0;
 }

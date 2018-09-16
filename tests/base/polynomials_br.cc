@@ -167,9 +167,8 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   PolynomialsBernardiRaugel<2> p_2d(1);
   check_poly_q(p_2d);

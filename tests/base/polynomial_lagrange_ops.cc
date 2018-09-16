@@ -226,9 +226,8 @@ check_poly(const Quadrature<1> &q)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   deallog.push("LagrangeEquidistant");
   for (unsigned i = 1; i < 10; i += 2)

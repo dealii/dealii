@@ -49,9 +49,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 
-
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename, unsigned int degree = 1)
@@ -118,8 +115,8 @@ test(std::string filename, unsigned int degree = 1)
 int
 main()
 {
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(4);
 
   deallog << "Test <1,2>, Q1, Q2, Q3" << std::endl;
   test<1, 2>(SOURCE_DIR "/grids/circle_4.inp", 1);

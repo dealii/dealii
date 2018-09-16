@@ -49,9 +49,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 class ExactSolution : public Function<dim>
 {
@@ -412,10 +409,8 @@ test()
 int
 main()
 {
-  logfile.precision(2);
+  initlog();
   deallog << std::setprecision(2);
-
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

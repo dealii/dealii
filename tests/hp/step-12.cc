@@ -18,9 +18,6 @@
 // a hp-ified version of step-12
 
 
-#include "../tests.h"
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/timer.h>
@@ -50,6 +47,8 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/derivative_approximation.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 
 template <int dim>
@@ -964,9 +963,8 @@ main()
 {
   try
     {
-      logfile.precision(2);
-
-      deallog.attach(logfile);
+      initlog();
+      deallog.get_file_stream().precision(2);
 
       DGMethod<2> dgmethod;
       dgmethod.run();

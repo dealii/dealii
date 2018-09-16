@@ -59,9 +59,8 @@ plot(const PolynomialsRT_Bubbles<dim> &poly)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   PolynomialsRT_Bubbles<2> p20(1);
   PolynomialsRT_Bubbles<2> p21(2);

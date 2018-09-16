@@ -98,10 +98,8 @@ check_Tsolve(SolverType &        solver,
 int
 main()
 {
-  std::ofstream logfile("output");
-  //  logfile.setf(std::ios::fixed);
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   GrowingVectorMemory<> mem;
   SolverControl         control(100, 1.e-3);

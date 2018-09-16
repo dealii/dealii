@@ -32,8 +32,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim, int spacedim>
 void
 test(std::string filename)
@@ -86,7 +84,7 @@ test(std::string filename)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test<2, 3>(SOURCE_DIR "/grids/square.inp");
   test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");

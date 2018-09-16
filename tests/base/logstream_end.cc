@@ -30,13 +30,12 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   {
     LogStream log;
 
-    log.attach(logfile);
+    log.attach(deallog.get_file_stream());
     log.log_thread_id(false);
 
     log << "This should be printed!";

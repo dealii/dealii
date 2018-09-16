@@ -116,11 +116,9 @@ main(int argc, char *argv[])
               ExcMessage("Current code works properly only with one process."));
 
   const unsigned int dim = 2;
-  std::ofstream      logfile;
   if (I_am_host)
     {
-      logfile.open("output");
-      deallog.attach(logfile);
+      initlog();
       deallog.push("2d");
     }
 

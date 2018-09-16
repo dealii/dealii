@@ -56,8 +56,6 @@
 #include <iostream>
 #include <string>
 
-std::ofstream logfile("output");
-
 template <int spacedim>
 class BEM
 {
@@ -114,8 +112,6 @@ template <int spacedim>
 void
 BEM<spacedim>::run()
 {
-  deallog.attach(logfile);
-
   ConvergenceTable table;
 
   if (spacedim == 2)
@@ -422,7 +418,7 @@ BEM<spacedim>::output_results()
     "error",
     DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
   dataout.build_patches();
-  dataout.write_vtk(logfile);
+  dataout.write_vtk(deallog.get_file_stream());
 }
 
 template <int spacedim>
@@ -445,13 +441,15 @@ BEM<spacedim>::write_grid(std::string filename)
 {
   GridOut grid_out;
   grid_out.set_flags(GridOutFlags::Ucd(true));
-  grid_out.write_ucd(tria, logfile);
-  grid_out.write_msh(tria, logfile);
+  grid_out.write_ucd(tria, deallog.get_file_stream());
+  grid_out.write_msh(tria, deallog.get_file_stream());
 }
 
 int
 main()
 {
+  initlog();
+
   BEM<2> bem;
   bem.run();
 

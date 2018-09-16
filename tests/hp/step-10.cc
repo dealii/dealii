@@ -18,10 +18,6 @@
 // a hp-ified version of step-10
 
 
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -41,6 +37,8 @@ std::ofstream logfile("output");
 #include <deal.II/hp/fe_values.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 const long double pi = 3.141592653589793238462643;
 
@@ -227,9 +225,8 @@ compute_pi_by_perimeter()
 int
 main()
 {
-  logfile.precision(6);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(6);
 
   gnuplot_output<2>();
 

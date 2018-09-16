@@ -59,9 +59,8 @@ check(const number &x)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check(std::complex<float>(1.5, 2.5));
   check(std::complex<float>(-1.5, -2.5));
