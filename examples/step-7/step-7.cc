@@ -647,16 +647,18 @@ namespace Step7
                 // The first thing that has changed is the bilinear form. It
                 // now contains the additional term from the Helmholtz
                 // equation:
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *     //
-                                         fe_values.shape_grad(j, q_point)     //
-                                       +                                      //
-                                       fe_values.shape_value(i, q_point) *    //
-                                         fe_values.shape_value(j, q_point)) * //
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) *     // grad phi_i(x_q)
+                      fe_values.shape_grad(j, q_point)     // grad phi_j(x_q)
+                    +                                      //
+                    fe_values.shape_value(i, q_point) *    // phi_i(x_q)
+                      fe_values.shape_value(j, q_point)) * // phi_j(x_q)
+                   fe_values.JxW(q_point));                // dx
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) * //
-                              rhs_values[q_point] *               //
-                              fe_values.JxW(q_point));
+
+              cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
+                              rhs_values[q_point] *               // f(x_q)
+                              fe_values.JxW(q_point));            // dx
             }
 
         // Then there is that second term on the right hand side, the contour
@@ -701,9 +703,10 @@ namespace Step7
                      fe_face_values.normal_vector(q_point));
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                    cell_rhs(i) += (neumann_value *                          //
-                                    fe_face_values.shape_value(i, q_point) * //
-                                    fe_face_values.JxW(q_point));
+                    cell_rhs(i) +=
+                      (neumann_value *                          // g(x_q)
+                       fe_face_values.shape_value(i, q_point) * // phi_i(x_q)
+                       fe_face_values.JxW(q_point));            // dx
                 }
             }
 
@@ -1000,7 +1003,7 @@ namespace Step7
                    face_number < GeometryInfo<dim>::faces_per_cell;
                    ++face_number)
                 {
-                  const auto &center = cell->face(face_number)->center();
+                  const auto center = cell->face(face_number)->center();
                   if ((std::fabs(center(0) - (-1)) < 1e-12) ||
                       (std::fabs(center(1) - (-1)) < 1e-12))
                     cell->face(face_number)->set_boundary_id(1);
