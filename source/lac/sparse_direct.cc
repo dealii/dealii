@@ -507,12 +507,14 @@ SparseDirectUMFPACK::n() const
                                            BlockVector<double> &,   \
                                            bool);                   \
   template void SparseDirectUMFPACK::initialize(const MatrixType &, \
-                                                const AdditionalData);
+                                                const AdditionalData)
 
-InstantiateUMFPACK(SparseMatrix<double>) InstantiateUMFPACK(SparseMatrix<float>)
-  InstantiateUMFPACK(SparseMatrixEZ<double>)
-    InstantiateUMFPACK(SparseMatrixEZ<float>)
-      InstantiateUMFPACK(BlockSparseMatrix<double>)
-        InstantiateUMFPACK(BlockSparseMatrix<float>)
+InstantiateUMFPACK(SparseMatrix<double>);
+InstantiateUMFPACK(SparseMatrix<float>);
+InstantiateUMFPACK(SparseMatrixEZ<double>);
+InstantiateUMFPACK(SparseMatrixEZ<float>);
+InstantiateUMFPACK(BlockSparseMatrix<double>);
+InstantiateUMFPACK(BlockSparseMatrix<float>);
 
-          DEAL_II_NAMESPACE_CLOSE
+
+DEAL_II_NAMESPACE_CLOSE
