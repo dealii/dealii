@@ -47,6 +47,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace LinearAlgebra
+{
+  // Forward declaration
+  template <typename Number>
+  class ReadWriteVector;
+} // namespace LinearAlgebra
 
 /**
  * @addtogroup TrilinosWrappers
@@ -684,6 +690,17 @@ namespace TrilinosWrappers
       import_nonlocal_data_for_fe(
         const dealii::TrilinosWrappers::SparseMatrix &matrix,
         const Vector &                                vector);
+
+      /**
+       * Imports all the elements present in the vector's IndexSet from the
+       * input vector @p rwv. VectorOperation::values @p operation is used to decide if
+       * the elements in @p rwv should be added to the current vector or replace the
+       * current elements.
+       */
+      void
+      import(const LinearAlgebra::ReadWriteVector<double> &rwv,
+             const VectorOperation::values                 operation);
+
 
       /**
        * Test for equality. This function assumes that the present vector and
