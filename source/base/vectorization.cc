@@ -17,7 +17,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1
 const unsigned int VectorizedArray<double>::n_array_elements;
 const unsigned int VectorizedArray<float>::n_array_elements;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
