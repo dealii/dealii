@@ -605,7 +605,12 @@ namespace PETScWrappers
   void
   MatrixBase::transpose()
   {
+#  if DEAL_II_PETSC_VERSION_LT(3, 8, 0)
     const PetscErrorCode ierr = MatTranspose(matrix, MAT_REUSE_MATRIX, &matrix);
+#  else
+    const PetscErrorCode ierr =
+      MatTranspose(matrix, MAT_INPLACE_MATRIX, &matrix);
+#  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
