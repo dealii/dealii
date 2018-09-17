@@ -1648,7 +1648,7 @@ namespace Step42
   //   obstacle and one neighbor $x_2$ which is not in contact. Because
   //   the update for the former will be prescribed, the hanging node constraint
   //   will have an inhomogeneity and will look like $x_0 = x_1/2 +
-  //   \text{gap}/2$. So the corresponding entries in the ride-hang-side are
+  //   \text{gap}/2$. So the corresponding entries in the right-hand-side are
   //   non-zero with a meaningless value. These values we have to set to zero.
   // - Like in step-40, we need to shuffle between vectors that do and do
   //   not have ghost elements when solving or using the solution.
