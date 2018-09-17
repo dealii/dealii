@@ -182,7 +182,13 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
   LIST(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-Og")
+  #
+  # In recent versions, gcc often eliminates too much debug information
+  # using '-Og' to be useful.
+  #
+  IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-Og")
+  ENDIF()
   #
   # If -Og is not available, fall back to -O0:
   #
