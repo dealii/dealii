@@ -58,9 +58,9 @@ test_matrix(PETScWrappers::SparseMatrix &m)
 int
 main(int argc, char **argv)
 {
-  intilog()
+  initlog();
 
-    try
+  try
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
