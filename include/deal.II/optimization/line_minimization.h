@@ -173,6 +173,135 @@ namespace LineMinimization
    * @endcode
    * It consists of a bracketing phase and a zoom phase, where @p interpolate is used.
    *
+   * Two examples of use might be as follows:
+   * In the first example, we wish to find the minimum of the function
+   * $100 * x^4 + (1-x)^2$. To find the approximate solution using line search
+   * with a polynomial fit to the curve one would perform the following steps:
+   *
+   * @code
+   *   auto func = [](const double x)
+   *   {
+   *     const double f = 100. * std::pow(x, 4) + std::pow(1. - x, 2); // Value
+   *     const double g = 400. * std::pow(x, 3) - 2. * (1. - x); // Gradient
+   *     return std::make_pair(f, g);
+   *   };
+   *
+   *   const auto fg0 = func(0);
+   *   const auto res = LineMinimization::line_search<double>(
+   *     func,
+   *     fg0.first, fg0.second,
+   *     LineMinimization::poly_fit<double>,
+   *     0.1, 0.1, 0.01, 100, 20);
+   *
+   *   const double approx_solution = res.first;
+   * @endcode
+   *
+   * In the second example, we wish to perform line search in the context of a
+   * non-linear finite element problem. What follows below is a non-optimized
+   * implementation of the back-tracking algorithm, which may be useful when
+   * the load-step size is too large. The following illustrates the basic steps
+   * necessary to utilize the scheme within the context of a global nonlinear
+   * solver:
+   *
+   * @code
+   *   // Solve some incremental linear system
+   *   const Vector<double> newton_update = solver_linear_system(...);
+   *
+   *   // Now we check to see if the suggested Newton update is a good one.
+   *   // First we define what it means to perform linesearch in the context of
+   *   // this incremental nonlinear finite element problem.
+   *   auto ls_minimization_function = [&](const double step_size)
+   *   {
+   *     // Scale the full Newton update by the proposed line search step size.
+   *     Vector<double> newton_update_trial(newton_update);
+   *     newton_update_trial *= step_size;
+   *     // Ensure that the Dirichlet constraints are correctly applied,
+   *     // irrespective of the step size
+   *     constraints.distribute(newton_update_trial);
+   *     // Now add the constribution from the previously accepted solution
+   *     // history.
+   *     const Vector<double> solution_total_trial =
+   *       get_solution_total(newton_update_trial);
+   *
+   *     // Recompute the linear system based on the trial newton update
+   *     Vector<double> system_rhs (...);
+   *     SparseMatrix<double> tangent_matrix (...);
+   *     assemble_linear_system(
+   *       tangent_matrix, system_rhs, solution_total_trial);
+   *     Vector<double> residual_trial (system_rhs);
+   *     residual_trial *= -1.0; // Residual = -RHS
+   *
+   *     // Negelect the constrained entries in the consideration
+   *     // of the function (value and gradient) to be minimized.
+   *     constraints.set_zero(residual_trial);
+   *
+   *     // Here we compute the function value according to the text given in
+   *     // section 5.1.4 of Wriggers, P., "Nonlinear finite element methods",
+   *     // 2008.
+   *     // The function value correspeonds to equ. 5.11 on p159.
+   *     const double f = 0.5 * (residual_trial * residual_trial); // Value
+   *
+   *     // However, the corresponding gradient given in eq 5.14 is wrong. The
+   *     // suggested result
+   *     // <code>const double g = -(residual_0*residual_trial);</code>
+   *     // should actually be
+   *     // $g = G(V + alpha*delta)*[ K(V + alpha*delta)*delta$.
+   *     Vector<double> tmp;
+   *     tmp.reinit(newton_update);
+   *     tangent_matrix.vmult(tmp, newton_update);
+   *     const double g = tmp * residual_trial; // Gradient
+   *
+   *     return std::make_pair(f, g);
+   *   };
+   *
+   *   // Next we can write a function to determine if taking the full Newton
+   *   // step is a good idea or not (i.e. if it offers good convergence
+   *   // characterisics). This function calls the one we defined above,
+   *   // and actually only performs the line search if an early exit
+   *   // criterion is not met.
+   *   auto perform_linesearch = [&]()
+   *   {
+   *     const auto res_0 = ls_minimization_function(0.0);
+   *     Assert(res_0.second < 0.0,
+   *            ExcMessage("Gradient should be negative. Current value: " +
+   *                        std::to_string(res_0.second)));
+   *     const auto res_1 = ls_minimization_function(1.0);
+   *
+   *     // Check to see if the minimum lies in the interval [0,1] through the
+   *     // values of the gradients at the limit points.
+   *     // If it does not, then the full step is accepted. This is discussed by
+   *     // Wriggers in the paragraph after equ. 5.14.
+   *     if (res_0.second * res_1.second > 0.0)
+   *       return 1.0;
+   *
+   *     // The values for eta, mu are chosen such that more strict convergence
+   *     // conditions are enforced.
+   *     // They should be adjusted according to the problem requirements.
+   *     const double a1        = 1.0;
+   *     const double eta       = 0.5;
+   *     const double mu        = 0.49;
+   *     const double a_max     = 1.25;
+   *     const double max_evals = 20;
+   *     const auto   res = LineMinimization::line_search<double>(
+   *       ls_minimization_function,
+   *       res_0.first, res_0.second,
+   *       LineMinimization::poly_fit<double>,
+   *       a1, eta, mu, a_max, max_evals));
+   *
+   *     return res.first; // Final stepsize
+   *   };
+   *
+   *   // Finally, we can perform the line search and adjust the Newton update
+   *   // accordingly.
+   *   const double linesearch_step_size = perform_linesearch();
+   *   if (linesearch_step_size != 1.0)
+   *   {
+   *     newton_update *= linesearch_step_size;
+   *     constraints.distribute(newton_update);
+   *   }
+   * @endcode
+   *
+   *
    * @param func A one dimensional function which returns value and derivative
    * at the given point.
    * @param f0 The function value at the origin.
