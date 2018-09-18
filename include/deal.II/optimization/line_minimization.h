@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 using namespace dealii;
 
 /**
- * A namespace for various algorithms related to minimization over line.
+ * A namespace for various algorithms related to minimization a over line.
  */
 namespace LineMinimization
 {
@@ -47,8 +47,8 @@ namespace LineMinimization
    * $f(x\_low)$ and $f(x\_hi)$ and the gradient $g(x\_low)$, return the local
    * minimizer of the quadratic interpolation function.
    *
-   * The return type is optional to fit with similar function which may
-   * not have solution for given parameters.
+   * The return type is optional to fit with similar functions that may
+   * not have a solution for given parameters.
    */
   template <typename NumberType>
   boost::optional<NumberType>
@@ -98,10 +98,8 @@ namespace LineMinimization
    * @p x_low @p x_hi @p x_rec[0] and derivatives at two points @p g_low and @p g_hi. The returned point
    * should be within the bounds @p bounds .
    *
-   * This function will first try the cubic fit (see cubic_fit ). If it's
-   * unsuccessfull or not
-   * within the provided @p bounds the quadratic fit will be performed (see quadratic_fit ). The function will
-   * fallback to bisection if quadratic fit fails.
+   * This function will first try the cubic_fit(). If it's unsuccessful or not, within the provided @p bounds,
+   * the quadratic_fit() will be performed. The function will fallback to bisection if quadratic_fit() fails.
    */
   template <typename NumberType>
   NumberType
@@ -118,7 +116,7 @@ namespace LineMinimization
 
   /**
    * Same as above but doing cubic fit with three points (see
-   * cubic_fit_three_points ).
+   * cubic_fit_three_points() ).
    */
   template <typename NumberType>
   NumberType
@@ -154,22 +152,22 @@ namespace LineMinimization
    *
    * The function returns the step size and the number of times function @p func was called.
    *
-   * @param func a one dimensional function which returns value and derivative
+   * @param func A one dimensional function which returns value and derivative
    * at the given point.
-   * @param f0 function value the origin
-   * @param g0 function derivative the origin
-   * @param interpolate a function which determines how interpolation is done
+   * @param f0 The function value at the origin.
+   * @param g0 The function derivative at the origin.
+   * @param interpolate A function which determines how interpolation is done
    * during the zoom phase. It takes values and derivatives at the current
    * interval/bracket ($f\_low$, $f\_hi$) as well as up to 5 values and
    * derivatives at previous steps. The returned value is to be provided within
    * the given bounds.
-   * @param a1 initial trial step for bracketing phase
-   * @param eta a parameter in the second Wolfe condition (curvature condition)
-   * @param mu a parameter in the first Wolfe condition (sufficient decrease)
-   * @param a_max maximum allowed step size
-   * @param max_evaluations maximum allowed number of function evaluations
-   * @param debug_output a flag to do extra debug output into deallog static
-   * object
+   * @param a1 Initial trial step for the bracketing phase.
+   * @param eta A parameter in the second Wolfe condition (curvature condition).
+   * @param mu A parameter in the first Wolfe condition (sufficient decrease).
+   * @param a_max The maximum allowed step size.
+   * @param max_evaluations The maximum allowed number of function evaluations.
+   * @param debug_output A flag to output extra debug information into the
+   * <code>deallog</code> static object.
    */
   template <typename NumberType>
   std::pair<NumberType, unsigned int>
