@@ -62,8 +62,8 @@ namespace LineMinimization
    * Given $x\_low$ and $x\_hi$ together with values of function
    * $f(x\_low)$ and $f(x\_hi)$) and its gradients ($g(x\_low)*g(x\_hi) < 0$) at
    * those points, return the local minimizer of the cubic interpolation
-   * function. That is the location where the cubic interpolation function
-   * attains its minimum.
+   * function (that is, the location where the cubic interpolation function
+   * attains its minimum value).
    *
    * The return type is optional as the real-valued solution might not exist.
    */
@@ -94,12 +94,15 @@ namespace LineMinimization
                          const NumberType f_rec);
 
   /**
-   * Return the minimizer of a polynomial using function values @p f_low @p f_hi @p f_rec[0] at three points
-   * @p x_low @p x_hi @p x_rec[0] and derivatives at two points @p g_low and @p g_hi. The returned point
-   * should be within the bounds @p bounds .
+   * Return the minimizer of a polynomial using function values @p f_low ,
+   * @p f_hi , and @p f_rec[0] at three points @p x_low , @p x_hi , and
+   * @p x_rec[0] as well as the derivatives at two points @p g_low and @p g_hi.
+   * The returned point should be within the bounds @p bounds .
    *
-   * This function will first try the cubic_fit(). If it's unsuccessful or not, within the provided @p bounds,
-   * the quadratic_fit() will be performed. The function will fallback to bisection if quadratic_fit() fails.
+   * This function will first try to perform a cubic_fit(). If its unsuccessful,
+   * or if the minimum is not within the provided @p bounds, a quadratic_fit()
+   * will be performed. The function will fallback to a bisection method if
+   * quadratic_fit() fails as well.
    */
   template <typename NumberType>
   NumberType
@@ -115,7 +118,7 @@ namespace LineMinimization
            const std::pair<NumberType, NumberType> bounds);
 
   /**
-   * Same as above but doing cubic fit with three points (see
+   * Same as poly_fit(), but performing a cubic fit with three points (see
    * cubic_fit_three_points() ).
    */
   template <typename NumberType>
@@ -138,19 +141,37 @@ namespace LineMinimization
    * f(\alpha) \le f(0) + \alpha \mu f'(0) \\
    * |f'(\alpha)| \le \eta |f'(0)|
    * \f]
-   * using one dimensional
-   * functions @p func and a function @p interpolate to choose a new point
-   * from the interval based on the function values and derivatives at its ends.
-   * @p a1 is a trial estimate of the first step.
-   * Interpolation can be done using poly_fit or poly_fit_three_points .
+   * using the one dimensional function @p func in conjunction with a function @p interpolate
+   * to choose a new point from the interval based on the function values and
+   * derivatives at its ends.
+   * The parameter @p a1 is a trial estimate of the first step.
+   * Interpolation can be done using either poly_fit() or
+   * poly_fit_three_points(), or any other function that has a similar
+   * signature.
    *
-   * The function implements Algorithms
-   * 2.6.2 and 2.6.4 on pages 34-35 in Fletcher, 2013, Practical methods of
-   * optimization. these are minor variations of the Algorithm 3.5 and 3.6 on
-   * pages 60-61 in Nocedal and Wright, Numerical optimization.
+   * The function implements Algorithms 2.6.2 and 2.6.4 on pages 34-35 in
+   * @code{.bib}
+   *   @book{Fletcher2013,
+   *   title     = {Practical methods of optimization},
+   *   publisher = {John Wiley \& Sons},
+   *   year      = {2013},
+   *   author    = {Fletcher, Roger},
+   *   isbn      = {978-0-471-49463-8},
+   *   doi       = {10.1002/9781118723203},
+   *   }
+   * @endcode
+   * These are minor variations of  Algorithms 3.5 and 3.6 on pages 60-61 in
+   * @code{.bib}
+   *   @book{Nocedal2006,
+   *   title     = {Numerical Optimization},
+   *   publisher = {Springer New York},
+   *   year      = {2006},
+   *   author    = {Jorge Nocedal and S. Wright},
+   *   address   = {233 Spring Street, New York, NY 10013, USA},
+   *   doi       = {10.1007/978-0-387-40065-5},
+   *   }
+   * @endcode
    * It consists of a bracketing phase and a zoom phase, where @p interpolate is used.
-   *
-   * The function returns the step size and the number of times function @p func was called.
    *
    * @param func A one dimensional function which returns value and derivative
    * at the given point.
@@ -168,6 +189,8 @@ namespace LineMinimization
    * @param max_evaluations The maximum allowed number of function evaluations.
    * @param debug_output A flag to output extra debug information into the
    * <code>deallog</code> static object.
+   * @return The function returns the step size and the number of times function
+   * @p func was called.
    */
   template <typename NumberType>
   std::pair<NumberType, unsigned int>
@@ -194,8 +217,12 @@ namespace LineMinimization
     const unsigned int max_evaluations = 20,
     const bool         debug_output    = false);
 
+
   // -------------------  inline and template functions ----------------
+
+
 #ifndef DOXYGEN
+
 
   template <typename NumberType>
   boost::optional<NumberType>
@@ -212,6 +239,8 @@ namespace LineMinimization
     else
       return (g1 * (x2 * x2 - x1 * x1) + 2. * (f1 - f2) * x1) / denom;
   }
+
+
 
   template <typename NumberType>
   boost::optional<NumberType>
@@ -281,6 +310,7 @@ namespace LineMinimization
 
     return x1 + (-B + std::sqrt(radical)) / (A * 3);
   }
+
 
 
   template <typename NumberType>
@@ -355,6 +385,7 @@ namespace LineMinimization
     // on safe region
     return (bounds.first + bounds.second) * 0.5;
   }
+
 
 
   template <typename NumberType>
@@ -609,7 +640,7 @@ namespace LineMinimization
     return std::make_pair(std::numeric_limits<NumberType>::signaling_NaN(), i);
   }
 
-#endif
+#endif // DOXYGEN
 
 } // namespace LineMinimization
 
