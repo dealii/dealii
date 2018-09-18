@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Usage</h3> The simplest use of this class is the following:
  * @code
  * // generate a @p SolverSelector that calls the @p SolverCG
- * SolverConrtol control;
+ * SolverControl control;
  * SolverSelector<Vector<double> > solver_selector ("cg", control);
  *
  * // generate e.g. a @p PreconditionRelaxation
