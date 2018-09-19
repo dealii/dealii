@@ -629,7 +629,7 @@ namespace Step7
 
     // Now for the main loop over all cells. This is mostly unchanged from
     // previous examples, so we only comment on the things that have changed.
-    for (const auto cell : dof_handler.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_matrix = 0.;
         cell_rhs    = 0.;
@@ -997,7 +997,7 @@ namespace Step7
             GridGenerator::hyper_cube(triangulation, -1, 1);
             triangulation.refine_global(3);
 
-            for (const auto cell : triangulation.cell_iterators())
+            for (const auto &cell : triangulation.cell_iterators())
               for (unsigned int face_number = 0;
                    face_number < GeometryInfo<dim>::faces_per_cell;
                    ++face_number)
