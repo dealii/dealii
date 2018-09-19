@@ -561,9 +561,13 @@ namespace LinearAlgebra
       else if (vector->getLocalLength() > 0)
         {
           const size_type n_indices = vector->getLocalLength();
-          auto vector_indices       = vector->getMap()->getMyGlobalIndices();
-          is.add_indices((unsigned int *)&vector_indices[0],
-                         (unsigned int *)&vector_indices[0] + n_indices);
+          std::vector<types::global_dof_index> vector_indices;
+          vector_indices.reserve(n_indices);
+          for (unsigned int i = 0; i < n_indices; ++i)
+            vector_indices.push_back(vector->getMap()->getGlobalElement(i));
+
+          is.add_indices(vector_indices.data(),
+                         vector_indices.data() + n_indices);
         }
       is.compress();
 

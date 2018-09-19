@@ -571,9 +571,9 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
       fill_index_vector(indices);
       std::vector<int> int_indices(indices.size());
       std::copy(indices.begin(), indices.end(), int_indices.begin());
+      const Teuchos::ArrayView<int> arr_view(int_indices);
       return Tpetra::Map<>(size(),
-                           (n_elements() > 0 ? int_indices.data() : nullptr),
-                           n_elements(),
+                           arr_view,
                            0,
 #  ifdef DEAL_II_WITH_MPI
                            Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))

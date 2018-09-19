@@ -25,6 +25,7 @@
 
 #    include <deal.II/lac/communication_pattern_base.h>
 
+#    include <Tpetra_Export.hpp>
 #    include <Tpetra_Import.hpp>
 
 #    include <memory>
