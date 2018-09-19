@@ -1,0 +1,4 @@
+New: extend Patterns::Tools::Convert to work with ComponentMask
+and std::unique_ptr<FunctionParser>.
+<br>
+(Denis Davydov 2018/09/19)
