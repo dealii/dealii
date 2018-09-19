@@ -1,0 +1,8 @@
+
+DEAL:parameters::Boundary conditions: 0:x,y,z*t
+DEAL::After ParameterHandler::set ==========================
+DEAL::
+DEAL:parameters::Boundary conditions: 0:x*x*x,y*y*y,z*z*z*t;1:0,x*y,t
+DEAL::Actual variables            ==========================
+DEAL::
+DEAL::0:x*x*x,y*y*y,z*z*z*t; 1:0,x*y,t

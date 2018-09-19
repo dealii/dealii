@@ -342,6 +342,13 @@ public:
   vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
   /**
+   * Return an array of function expressions (one per component), used to
+   * initialize this function.
+   */
+  const std::vector<std::string> &
+  get_expressions() const;
+
+  /**
    * @addtogroup Exceptions
    * @{
    */
