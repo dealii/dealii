@@ -58,9 +58,9 @@ namespace CUDAWrappers
        */
       template <typename CellIterator>
       void
-      setup_constraints(std::vector<unsigned int> &dof_indices,
-                        const CellIterator &       cell,
-                        unsigned int &             mask) const;
+      setup_constraints(std::vector<types::global_dof_index> &dof_indices,
+                        const CellIterator &                  cell,
+                        unsigned int &                        mask) const;
 
     private:
       /**
@@ -271,9 +271,10 @@ namespace CUDAWrappers
     template <int dim>
     template <typename CellIterator>
     void
-    HangingNodes<dim>::setup_constraints(std::vector<unsigned int> &dof_indices,
-                                         const CellIterator &       cell,
-                                         unsigned int &             mask) const
+    HangingNodes<dim>::setup_constraints(
+      std::vector<types::global_dof_index> &dof_indices,
+      const CellIterator &                  cell,
+      unsigned int &                        mask) const
     {
       mask                         = 0;
       const unsigned int n_dofs_1d = fe_degree + 1;
@@ -282,7 +283,7 @@ namespace CUDAWrappers
 
       std::vector<types::global_dof_index> neighbor_dofs(dofs_per_face);
 
-      std::vector<types::global_dof_index> lex_face_mapping =
+      const auto lex_face_mapping =
         FETools::lexicographic_to_hierarchic_numbering<dim - 1>(
           FE_Q<dim - 1>(fe_degree));
 
