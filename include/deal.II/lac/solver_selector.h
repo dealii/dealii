@@ -30,7 +30,6 @@
 #include <deal.II/lac/solver_minres.h>
 #include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -47,14 +46,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Usage</h3> The simplest use of this class is the following:
  * @code
- * // generate a @p SolverControl and a @p VectorMemory
- * SolverControl control;
- * VectorMemory<Vector<double> > memory;
- *
- * // Line 3:
  * // generate a @p SolverSelector that calls the @p SolverCG
- * SolverSelector<Vector<double> >
- *   solver_selector("cg", control, memory);
+ * SolverControl control;
+ * SolverSelector<Vector<double> > solver_selector ("cg", control);
  *
  * // generate e.g. a @p PreconditionRelaxation
  * PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
@@ -75,13 +69,13 @@ DEAL_II_NAMESPACE_OPEN
  * ...
  * @endcode
  * Assuming that in the users parameter file there exists the line
- * @verbatim
+ * @code
  * set solver = cg
- * @endverbatim
- * then `Line 3' of the above example reads
+ * @endcode
+ * then the constructor call in the above example can be written as
  * @code
  * SolverSelector<SparseMatrix<double>, Vector<double> >
- *   solver_selector(prm.get("solver"), control, memory);
+ *   solver_selector(prm.get("solver"), control);
  * @endcode
  *
  *
@@ -89,9 +83,7 @@ DEAL_II_NAMESPACE_OPEN
  * to change his program. Only in the implementation of the @p SolverSelector
  * the calling of this solver has to be added and each user with program lines
  * quoted above only needs to 'set solver = xyz' in his parameter file to get
- * access to that new solver.  :-)
- *
- * (By the way, thanks to Wolfgang for implementing the @p ParameterHandler.)
+ * access to that new solver.
  *
  * @author Ralf Hartmann, 1999
  */
@@ -108,6 +100,12 @@ public:
    * Constructor, filling in default values
    */
   SolverSelector() = default;
+
+  /**
+   * Constructor, selecting the solver @p name
+   * and the SolverControl object @p control already.
+   */
+  SolverSelector(const std::string &name, SolverControl &control);
 
   /**
    * Destructor
@@ -250,8 +248,18 @@ private:
 
 
 template <typename VectorType>
+SolverSelector<VectorType>::SolverSelector(const std::string &name,
+                                           SolverControl &    solver_control)
+  : solver_name(name)
+  , control(&solver_control)
+{}
+
+
+
+template <typename VectorType>
 SolverSelector<VectorType>::~SolverSelector()
 {}
+
 
 
 template <typename VectorType>
@@ -260,6 +268,7 @@ SolverSelector<VectorType>::select(const std::string &name)
 {
   solver_name = name;
 }
+
 
 
 template <typename VectorType>
@@ -305,6 +314,7 @@ SolverSelector<VectorType>::solve(const Matrix &        A,
 }
 
 
+
 template <typename VectorType>
 void
 SolverSelector<VectorType>::set_control(SolverControl &ctrl)
@@ -313,12 +323,14 @@ SolverSelector<VectorType>::set_control(SolverControl &ctrl)
 }
 
 
+
 template <typename VectorType>
 std::string
 SolverSelector<VectorType>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres|fgmres|minres";
 }
+
 
 
 template <typename VectorType>
@@ -330,6 +342,7 @@ SolverSelector<VectorType>::set_data(
 }
 
 
+
 template <typename VectorType>
 void
 SolverSelector<VectorType>::set_data(
@@ -337,6 +350,7 @@ SolverSelector<VectorType>::set_data(
 {
   fgmres_data = data;
 }
+
 
 
 template <typename VectorType>
@@ -348,6 +362,7 @@ SolverSelector<VectorType>::set_data(
 }
 
 
+
 template <typename VectorType>
 void
 SolverSelector<VectorType>::set_data(
@@ -355,6 +370,7 @@ SolverSelector<VectorType>::set_data(
 {
   cg_data = data;
 }
+
 
 
 template <typename VectorType>
@@ -366,6 +382,7 @@ SolverSelector<VectorType>::set_data(
 }
 
 
+
 template <typename VectorType>
 void
 SolverSelector<VectorType>::set_data(
@@ -373,7 +390,6 @@ SolverSelector<VectorType>::set_data(
 {
   bicgstab_data = data;
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 
