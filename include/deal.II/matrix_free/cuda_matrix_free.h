@@ -131,14 +131,14 @@ namespace CUDAWrappers
      */
     struct Data
     {
-      point_type *  q_points;
-      unsigned int *local_to_global;
-      Number *      inv_jacobian;
-      Number *      JxW;
-      unsigned int  n_cells;
-      unsigned int  padding_length;
-      unsigned int  row_start;
-      unsigned int *constraint_mask;
+      point_type *             q_points;
+      types::global_dof_index *local_to_global;
+      Number *                 inv_jacobian;
+      Number *                 JxW;
+      unsigned int             n_cells;
+      unsigned int             padding_length;
+      unsigned int             row_start;
+      unsigned int *           constraint_mask;
     };
 
     /**
@@ -214,59 +214,73 @@ namespace CUDAWrappers
      * over cells.
      */
     ParallelizationScheme parallelization_scheme;
+
     /**
      * Degree of the finite element used.
      */
     unsigned int fe_degree;
+
     /**
      * Number of degrees of freedom per cell.
      */
     unsigned int dofs_per_cell;
+
     /**
      * Number of constrained degrees of freedom.
      */
     unsigned int n_constrained_dofs;
+
     /**
      * Number of quadrature points per cells.
      */
     unsigned int q_points_per_cell;
+
     /**
      * Number of colors produced by the graph coloring algorithm.
      */
     unsigned int n_colors;
+
     /**
      * Number of cells in each color.
      */
     std::vector<unsigned int> n_cells;
+
     /**
      * Vector of pointers to the quadrature points associated to the cells of
      * each color.
      */
     std::vector<point_type *> q_points;
+
     /**
      * Map the position in the local vector to the position in the global
      * vector.
      */
-    std::vector<unsigned int *> local_to_global;
+    std::vector<types::global_dof_index *> local_to_global;
+
     /**
      * Vector of pointer to the inverse Jacobian associated to the cells of each
      * color.
      */
     std::vector<Number *> inv_jacobian;
+
     /**
      * Vector of pointer to the Jacobian time the weights associated to the
      * cells of each color.
      */
     std::vector<Number *> JxW;
 
-    // Constraints
-    unsigned int *              constrained_dofs;
+    // Pointer to the constrained degrees of freedom.
+    types::global_dof_index *constrained_dofs;
+
+    // Mask deciding where constraints are set on a given cell.
     std::vector<unsigned int *> constraint_mask;
+
     /**
      * Grid dimensions associated to the different colors. The grid dimensions
      * are used to launch the CUDA kernels.
      */
     std::vector<dim3> grid_dim;
+
     /**
      * Block dimensions associated to the different colors. The block dimensions
      * are used to launch the CUDA kernels.

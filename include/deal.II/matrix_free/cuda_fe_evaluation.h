@@ -168,9 +168,9 @@ namespace CUDAWrappers
     apply_quad_point_operations(const functor &func);
 
   private:
-    unsigned int *local_to_global;
-    unsigned int  n_cells;
-    unsigned int  padding_length;
+    types::global_dof_index *local_to_global;
+    unsigned int             n_cells;
+    unsigned int             padding_length;
 
     const unsigned int constraint_mask;
 
@@ -225,7 +225,7 @@ namespace CUDAWrappers
       (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
       (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
 
-    const unsigned int src_idx = local_to_global[idx];
+    const types::global_dof_index src_idx = local_to_global[idx];
     // Use the read-only data cache.
     values[idx] = __ldg(&src[src_idx]);
 
@@ -257,7 +257,7 @@ namespace CUDAWrappers
       (threadIdx.x % n_q_points_1d) +
       (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
       (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
-    const unsigned int destination_idx = local_to_global[idx];
+    const types::global_dof_index destination_idx = local_to_global[idx];
 
     dst[destination_idx] += values[idx];
   }

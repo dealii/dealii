@@ -145,23 +145,23 @@ namespace CUDAWrappers
     private:
       MatrixFree<dim, Number> *data;
       // Host data
-      std::vector<unsigned int> local_to_global_host;
-      std::vector<Point<dim>>   q_points_host;
-      std::vector<Number>       JxW_host;
-      std::vector<Number>       inv_jacobian_host;
-      std::vector<unsigned int> constraint_mask_host;
+      std::vector<types::global_dof_index> local_to_global_host;
+      std::vector<Point<dim>>              q_points_host;
+      std::vector<Number>                  JxW_host;
+      std::vector<Number>                  inv_jacobian_host;
+      std::vector<unsigned int>            constraint_mask_host;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
       // Convert the default dof numbering to a lexicographic one
-      const std::vector<unsigned int> &lexicographic_inv;
-      std::vector<unsigned int>        lexicographic_dof_indices;
-      const unsigned int               fe_degree;
-      const unsigned int               dofs_per_cell;
-      const unsigned int               q_points_per_cell;
-      const UpdateFlags &              update_flags;
-      const unsigned int               padding_length;
-      HangingNodes<dim>                hanging_nodes;
+      const std::vector<unsigned int> &    lexicographic_inv;
+      std::vector<types::global_dof_index> lexicographic_dof_indices;
+      const unsigned int                   fe_degree;
+      const unsigned int                   dofs_per_cell;
+      const unsigned int                   q_points_per_cell;
+      const UpdateFlags &                  update_flags;
+      const unsigned int                   padding_length;
+      HangingNodes<dim>                    hanging_nodes;
     };
 
 
@@ -289,7 +289,7 @@ namespace CUDAWrappers
 
       memcpy(&local_to_global_host[cell_id * padding_length],
              lexicographic_dof_indices.data(),
-             dofs_per_cell * sizeof(unsigned int));
+             dofs_per_cell * sizeof(types::global_dof_index));
 
       fe_values.reinit(cell);
 
