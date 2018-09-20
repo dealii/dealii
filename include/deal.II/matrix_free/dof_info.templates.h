@@ -1197,6 +1197,10 @@ namespace internal
                       }
                   }
           }
+      // ensure that all indices are touched at least during the last round
+      for (auto &i : touched_by)
+        if (i == numbers::invalid_unsigned_int)
+          i = task_info.cell_partition_data.back() - 1;
 
       vector_zero_range_list_index.resize(
         1 + task_info
