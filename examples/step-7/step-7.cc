@@ -122,14 +122,14 @@ namespace Step7
   // it doesn't have to generate the variable from a template by substituting
   // <code>dim</code>, but can immediately use the following definition:
   template <>
-  const std::array<Point<1>, 3> SolutionBase<1>::source_centers =
-    {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
+  const std::array<Point<1>, 3> SolutionBase<1>::source_centers = {
+    {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)}};
 
   // Likewise, we can provide an explicit specialization for
   // <code>dim=2</code>. We place the centers for the 2d case as follows:
   template <>
-  const std::array<Point<2>, 3> SolutionBase<2>::source_centers =
-    {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
+  const std::array<Point<2>, 3> SolutionBase<2>::source_centers = {
+    {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)}};
 
   // There remains to assign a value to the half-width of the exponentials. We
   // would like to use the same value for all dimensions. In this case, we
