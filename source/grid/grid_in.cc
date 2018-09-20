@@ -916,7 +916,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
 
 namespace
 {
-  template <int dim>
+  template <int dim, int spacedim>
   class Abaqus_to_UCD
   {
   public:
@@ -953,12 +953,18 @@ GridIn<dim, spacedim>::read_abaqus(std::istream &in,
                                    const bool apply_all_indicators_to_manifolds)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  Assert(dim == 2 || dim == 3, ExcNotImplemented());
+  // This implementation has only been verified for:
+  // - 2d grids with codimension 0
+  // - 3d grids with codimension 0
+  // - 3d grids with codimension 1
+  Assert((spacedim == 2 && dim == spacedim) ||
+           (spacedim == 3 && (dim == spacedim || dim == spacedim - 1)),
+         ExcNotImplemented());
   AssertThrow(in, ExcIO());
 
   // Read in the Abaqus file into an intermediate object
   // that is to be passed along to the UCD reader
-  Abaqus_to_UCD<dim> abaqus_to_ucd;
+  Abaqus_to_UCD<dim, spacedim> abaqus_to_ucd;
   abaqus_to_ucd.read_in_abaqus(in);
 
   std::stringstream in_ucd;
@@ -3220,12 +3226,12 @@ GridIn<dim, spacedim>::get_format_names()
 
 namespace
 {
-  template <int dim>
-  Abaqus_to_UCD<dim>::Abaqus_to_UCD()
+  template <int dim, int spacedim>
+  Abaqus_to_UCD<dim, spacedim>::Abaqus_to_UCD()
     : tolerance(5e-16) // Used to offset Cubit tolerance error when outputting
                        // value close to zero
   {
-    AssertThrow(dim == 2 || dim == 3, ExcNotImplemented());
+    AssertThrow(spacedim == 2 || spacedim == 3, ExcNotImplemented());
   }
 
   // Convert from a string to some other data type
@@ -3256,9 +3262,9 @@ namespace
     return number;
   }
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  Abaqus_to_UCD<dim>::read_in_abaqus(std::istream &input_stream)
+  Abaqus_to_UCD<dim, spacedim>::read_in_abaqus(std::istream &input_stream)
   {
     // References:
     // http://www.egr.msu.edu/software/abaqus/Documentation/docs/v6.7/books/usb/default.htm?startat=pt01ch02.html
@@ -3298,11 +3304,11 @@ namespace
                 if (line[0] == '*')
                   goto cont;
 
-                std::vector<double> node(dim + 1);
+                std::vector<double> node(spacedim + 1);
 
                 std::istringstream iss(line);
                 char               comma;
-                for (unsigned int i = 0; i < dim + 1; ++i)
+                for (unsigned int i = 0; i < spacedim + 1; ++i)
                   iss >> node[i] >> comma;
 
                 node_list.push_back(node);
@@ -3572,10 +3578,11 @@ namespace
       }
   }
 
-  template <int dim>
+  template <int dim, int spacedim>
   std::vector<double>
-  Abaqus_to_UCD<dim>::get_global_node_numbers(const int face_cell_no,
-                                              const int face_cell_face_no) const
+  Abaqus_to_UCD<dim, spacedim>::get_global_node_numbers(
+    const int face_cell_no,
+    const int face_cell_face_no) const
   {
     std::vector<double> quad_node_list(GeometryInfo<dim>::vertices_per_face);
 
@@ -3669,9 +3676,9 @@ namespace
     return quad_node_list;
   }
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  Abaqus_to_UCD<dim>::write_out_avs_ucd(std::ostream &output) const
+  Abaqus_to_UCD<dim, spacedim>::write_out_avs_ucd(std::ostream &output) const
   {
     // References:
     // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
@@ -3725,7 +3732,7 @@ namespace
 
         // Node coordinates
         output.setf(std::ios::scientific, std::ios::floatfield);
-        for (unsigned int jj = 1; jj < dim + 1; ++jj)
+        for (unsigned int jj = 1; jj < spacedim + 1; ++jj)
           {
             // invoke tolerance -> set points close to zero equal to zero
             if (std::abs(node_list[ii][jj]) > tolerance)
@@ -3733,7 +3740,7 @@ namespace
             else
               output << 0.0 << "\t";
           }
-        if (dim == 2)
+        if (spacedim == 2)
           output << 0.0 << "\t";
 
         output << std::endl;
