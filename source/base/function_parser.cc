@@ -42,6 +42,14 @@ namespace fparser
 DEAL_II_NAMESPACE_OPEN
 
 
+template <int dim>
+const std::vector<std::string> &
+FunctionParser<dim>::get_expressions() const
+{
+  return expressions;
+}
+
+
 
 template <int dim>
 FunctionParser<dim>::FunctionParser(const unsigned int n_components,
