@@ -39,8 +39,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-ParameterHandler::ParameterHandler()
-  : entries(new boost::property_tree::ptree())
+ParameterHandler::ParameterHandler(const bool skip_undefined)
+  : skip_undefined(skip_undefined)
+  , entries(new boost::property_tree::ptree())
 {}
 
 
@@ -2109,8 +2110,8 @@ ParameterHandler::scan_line(std::string        line,
       const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
-      AssertThrow(entries->get_child_optional(
-                    get_current_full_path(subsection)),
+      AssertThrow(skip_undefined || entries->get_child_optional(
+                                      get_current_full_path(subsection)),
                   ExcNoSubsection(current_line_n,
                                   input_filename,
                                   demangle(get_current_full_path(subsection))));
@@ -2181,12 +2182,9 @@ ParameterHandler::scan_line(std::string        line,
       // declared
       if (entries->get_optional<std::string>(path + path_separator + "value"))
         {
-          // if entry was declared:
-          // does it match the regex? if not,
-          // don't enter it into the database
-          // exception: if it contains characters
-          // which specify it as a multiple loop
-          // entry, then ignore content
+          // if entry was declared: does it match the regex? if not, don't enter
+          // it into the database exception: if it contains characters which
+          // specify it as a multiple loop entry, then ignore content
           if (entry_value.find('{') == std::string::npos)
             {
               // verify that the new value satisfies the provided pattern
@@ -2222,7 +2220,7 @@ ParameterHandler::scan_line(std::string        line,
       else
         {
           AssertThrow(
-            false,
+            skip_undefined,
             ExcCannotParseLine(current_line_n,
                                input_filename,
                                ("No entry with name <" + entry_name +
