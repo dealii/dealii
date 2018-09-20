@@ -64,6 +64,7 @@
 // the same file as the FEValues class:
 #include <deal.II/fe/fe_values.h>
 
+#include <array>
 #include <fstream>
 #include <iostream>
 
@@ -91,16 +92,14 @@ namespace Step7
   // introduction, we choose a sum of three exponentials) and right hand side,
   // are these: the number of exponentials, their centers, and their half
   // width. We declare them in the following class. Since the number of
-  // exponentials is a constant scalar integral quantity, C++ allows its
-  // definition (i.e. assigning a value) right at the place of declaration
-  // (i.e. where we declare that such a variable exists).
+  // exponentials is a compile-time constant we use a fixed-length
+  // <code>std::array</code> to store the center points:
   template <int dim>
   class SolutionBase
   {
   protected:
-    static const unsigned int n_source_centers = 3;
-    static const Point<dim>   source_centers[n_source_centers];
-    static const double       width;
+    static const std::array<Point<dim>, 3> source_centers;
+    static const double                    width;
   };
 
 
@@ -123,16 +122,14 @@ namespace Step7
   // it doesn't have to generate the variable from a template by substituting
   // <code>dim</code>, but can immediately use the following definition:
   template <>
-  const Point<1>
-    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] =
-      {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
+  const std::array<Point<1>, 3> SolutionBase<1>::source_centers = {
+    {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)}};
 
   // Likewise, we can provide an explicit specialization for
   // <code>dim=2</code>. We place the centers for the 2d case as follows:
   template <>
-  const Point<2>
-    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] =
-      {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
+  const std::array<Point<2>, 3> SolutionBase<2>::source_centers = {
+    {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)}};
 
   // There remains to assign a value to the half-width of the exponentials. We
   // would like to use the same value for all dimensions. In this case, we
@@ -201,7 +198,7 @@ namespace Step7
   // The only thing that is worth mentioning is that if we access elements of
   // a base class that is template dependent (in this case the elements of
   // SolutionBase&lt;dim&gt;), then the C++ language forces us to write
-  // <code>this-&gt;n_source_centers</code> (for example). Note that the
+  // <code>this-&gt;source_centers</code> (for example). Note that the
   // <code>this-&gt;</code> qualification is not necessary if the base class
   // is not template dependent, and also that the gcc compilers prior to
   // version 3.4 don't enforce this requirement of the C++ standard. The
@@ -212,9 +209,9 @@ namespace Step7
   double Solution<dim>::value(const Point<dim> &p, const unsigned int) const
   {
     double return_value = 0;
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
+    for (const auto &center : this->source_centers)
       {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - center;
         return_value +=
           std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
       }
@@ -253,9 +250,9 @@ namespace Step7
   {
     Tensor<1, dim> return_value;
 
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
+    for (const auto &center : this->source_centers)
       {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - center;
 
         // For the gradient, note that its direction is along (x-x_i), so we
         // add up multiples of this distance vector, where the factor is given
@@ -298,9 +295,9 @@ namespace Step7
                                    const unsigned int) const
   {
     double return_value = 0;
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
+    for (const auto &center : this->source_centers)
       {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - center;
 
         // The first contribution is the Laplacian:
         return_value +=
@@ -445,7 +442,7 @@ namespace Step7
 
     SmartPointer<const FiniteElement<dim>> fe;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -632,13 +629,10 @@ namespace Step7
 
     // Now for the main loop over all cells. This is mostly unchanged from
     // previous examples, so we only comment on the things that have changed.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        cell_matrix = 0;
-        cell_rhs    = 0;
+        cell_matrix = 0.;
+        cell_rhs    = 0.;
 
         fe_values.reinit(cell);
 
@@ -652,14 +646,18 @@ namespace Step7
                 // The first thing that has changed is the bilinear form. It
                 // now contains the additional term from the Helmholtz
                 // equation:
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) *     // grad phi_i(x_q)
+                      fe_values.shape_grad(j, q_point)     // grad phi_j(x_q)
+                    +                                      //
+                    fe_values.shape_value(i, q_point) *    // phi_i(x_q)
+                      fe_values.shape_value(j, q_point)) * // phi_j(x_q)
+                   fe_values.JxW(q_point));                // dx
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+
+              cell_rhs(i) += (fe_values.shape_value(i, q_point) * // phi_i(x_q)
+                              rhs_values[q_point] *               // f(x_q)
+                              fe_values.JxW(q_point));            // dx
             }
 
         // Then there is that second term on the right hand side, the contour
@@ -705,8 +703,9 @@ namespace Step7
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     cell_rhs(i) +=
-                      (neumann_value * fe_face_values.shape_value(i, q_point) *
-                       fe_face_values.JxW(q_point));
+                      (neumann_value *                          // g(x_q)
+                       fe_face_values.shape_value(i, q_point) * // phi_i(x_q)
+                       fe_face_values.JxW(q_point));            // dx
                 }
             }
 
@@ -998,19 +997,16 @@ namespace Step7
             GridGenerator::hyper_cube(triangulation, -1, 1);
             triangulation.refine_global(3);
 
-            typename Triangulation<dim>::cell_iterator cell =
-                                                         triangulation.begin(),
-                                                       endc =
-                                                         triangulation.end();
-            for (; cell != endc; ++cell)
+            for (const auto &cell : triangulation.cell_iterators())
               for (unsigned int face_number = 0;
                    face_number < GeometryInfo<dim>::faces_per_cell;
                    ++face_number)
-                if ((std::fabs(cell->face(face_number)->center()(0) - (-1)) <
-                     1e-12) ||
-                    (std::fabs(cell->face(face_number)->center()(1) - (-1)) <
-                     1e-12))
-                  cell->face(face_number)->set_boundary_id(1);
+                {
+                  const auto center = cell->face(face_number)->center();
+                  if ((std::fabs(center(0) - (-1)) < 1e-12) ||
+                      (std::fabs(center(1) - (-1)) < 1e-12))
+                    cell->face(face_number)->set_boundary_id(1);
+                }
           }
         else
           refine_grid();
