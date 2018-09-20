@@ -1009,6 +1009,62 @@ namespace Differentiation
         typename internal::RemoveComplexWrapper<ScalarType>::type,
         ADNumberTypeCode>::n_supported_derivative_levels;
 
+#  else
+
+    template <typename ScalarType, enum NumberTypes ADNumberTypeCode>
+    constexpr bool NumberTraits<
+      ScalarType,
+      ADNumberTypeCode,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_taped;
+
+
+    template <typename ScalarType, enum NumberTypes ADNumberTypeCode>
+    constexpr bool NumberTraits<
+      ScalarType,
+      ADNumberTypeCode,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_tapeless;
+
+
+    template <typename ScalarType, enum NumberTypes ADNumberTypeCode>
+    constexpr bool NumberTraits<
+      ScalarType,
+      ADNumberTypeCode,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_real_valued;
+
+
+    template <typename ScalarType, enum NumberTypes ADNumberTypeCode>
+    constexpr bool NumberTraits<
+      ScalarType,
+      ADNumberTypeCode,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_complex_valued;
+
+
+    template <typename ScalarType, enum NumberTypes ADNumberTypeCode>
+    constexpr unsigned int NumberTraits<
+      ScalarType,
+      ADNumberTypeCode,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::n_supported_derivative_levels;
+
 #  endif
 
 
