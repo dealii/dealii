@@ -88,13 +88,13 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(1. + read_write_1[i] == read_write_3[i],
+        AssertThrow(Number(1.) + read_write_1[i] == read_write_3[i],
                     ExcMessage("Problem in add(scalar)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(1. + read_write_1[i] == read_write_3[i],
+        AssertThrow(Number(1.) + read_write_1[i] == read_write_3[i],
                     ExcMessage("Problem in add(scalar)."));
     }
 
@@ -103,14 +103,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] ==
+        AssertThrow(Number(1.) + read_write_1[i] +
+                        Number(2.) * read_write_2[i] ==
                       read_write_3[i],
                     ExcMessage("Problem in add(scalar,Vector)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] ==
+        AssertThrow(Number(1.) + read_write_1[i] +
+                        Number(2.) * read_write_2[i] ==
                       read_write_3[i],
                     ExcMessage("Problem in add(scalar,Vector)."));
     }
@@ -122,14 +124,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] ==
+        AssertThrow(Number(4.) + Number(4.) * read_write_1[i] +
+                        Number(10.) * read_write_2[i] ==
                       read_write_3[i],
                     ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] ==
+        AssertThrow(Number(4.) + Number(4.) * read_write_1[i] +
+                        Number(10.) * read_write_2[i] ==
                       read_write_3[i],
                     ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
     }
@@ -141,14 +145,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(3. * read_write_1[i] + 2. * read_write_2[i] ==
+        AssertThrow(Number(3.) * read_write_1[i] +
+                        Number(2.) * read_write_2[i] ==
                       read_write_3[i],
                     ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(3. * read_write_1[i] + 2. * read_write_2[i] ==
+        AssertThrow(Number(3.) * read_write_1[i] +
+                        Number(2.) * read_write_2[i] ==
                       read_write_3[i],
                     ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
     }
@@ -176,28 +182,28 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(2. * read_write_2[i] == read_write_3[i],
+        AssertThrow(Number(2.) * read_write_2[i] == read_write_3[i],
                     ExcMessage("Problem in scale."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(2. * read_write_2[i] == read_write_3[i],
+        AssertThrow((Number)2. * read_write_2[i] == read_write_3[i],
                     ExcMessage("Problem in equ."));
     }
 
 
   AssertThrow(b.l1_norm() == 95., ExcMessage("Problem in l1_norm."));
 
-  const Number eps = 1e-6;
-  AssertThrow(std::fabs(b.l2_norm() - 31.3847096) < eps,
+  const double eps = 1e-6;
+  AssertThrow(std::fabs(b.l2_norm() - Number(31.3847096)) < eps,
               ExcMessage("Problem in l2_norm"));
 
   AssertThrow(b.linfty_norm() == 14., ExcMessage("Problem in linfty_norm."));
 
   a.import(read_write_1, VectorOperation::insert);
   const Number val = a.add_and_dot(2., a, b);
-  AssertThrow(val == 1530., ExcMessage("Problem in add_and_dot"));
+  AssertThrow(val == Number(1530.), ExcMessage("Problem in add_and_dot"));
 }
 
 
@@ -211,6 +217,8 @@ main(int argc, char **argv)
 
   test<double>();
   test<float>();
+  test<std::complex<double>>();
+  test<std::complex<float>>();
 
   deallog << "OK" << std::endl;
 

@@ -101,4 +101,6 @@ main(int argc, char **argv)
   MPILogInitAll log;
   test<double>();
   test<float>();
+  test<std::complex<double>>();
+  test<std::complex<float>>();
 }

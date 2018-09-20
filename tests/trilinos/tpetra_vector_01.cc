@@ -147,13 +147,13 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 6; ++i)
-        AssertThrow(2. * read_write_2[i] == read_write_3[i],
+        AssertThrow(Number(2.) * read_write_2[i] == read_write_3[i],
                     ExcMessage("Problem in operator *=."));
     }
   else
     {
       for (unsigned int i = 4; i < 10; ++i)
-        AssertThrow(2. * read_write_2[i] == read_write_3[i],
+        AssertThrow(Number(2.) * read_write_2[i] == read_write_3[i],
                     ExcMessage("Problem in operator *=."));
     }
 
@@ -162,13 +162,13 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 6; ++i)
-        AssertThrow(0.5 * read_write_2[i] == read_write_3[i],
+        AssertThrow(Number(0.5) * read_write_2[i] == read_write_3[i],
                     ExcMessage("Problem in operator /=."));
     }
   else
     {
       for (unsigned int i = 4; i < 10; ++i)
-        AssertThrow(0.5 * read_write_2[i] == read_write_3[i],
+        AssertThrow(Number(0.5) * read_write_2[i] == read_write_3[i],
                     ExcMessage("Problem in operator /=."));
     }
 
@@ -177,13 +177,15 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 6; ++i)
-        AssertThrow(2. * read_write_2[i] + read_write_1[i] == read_write_3[i],
+        AssertThrow(Number(2.) * read_write_2[i] + read_write_1[i] ==
+                      read_write_3[i],
                     ExcMessage("Problem in operator +=."));
     }
   else
     {
       for (unsigned int i = 4; i < 10; ++i)
-        AssertThrow(2. * read_write_2[i] + read_write_1[i] == read_write_3[i],
+        AssertThrow(Number(2.) * read_write_2[i] + read_write_1[i] ==
+                      read_write_3[i],
                     ExcMessage("Problem in operator +=."));
     }
 
@@ -192,20 +194,22 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 6; ++i)
-        AssertThrow(1.5 * read_write_2[i] + read_write_1[i] == read_write_3[i],
+        AssertThrow(Number(1.5) * read_write_2[i] + read_write_1[i] ==
+                      read_write_3[i],
                     ExcMessage("Problem in operator -=."));
     }
   else
     {
       for (unsigned int i = 4; i < 10; ++i)
-        AssertThrow(1.5 * read_write_2[i] + read_write_1[i] == read_write_3[i],
+        AssertThrow(Number(1.5) * read_write_2[i] + read_write_1[i] ==
+                      read_write_3[i],
                     ExcMessage("Problem in operator -=."));
     }
 
   b.import(read_write_1, VectorOperation::insert);
   c.import(read_write_1, VectorOperation::insert);
   const Number val = b * c;
-  AssertThrow(val == 285., ExcMessage("Problem in operator *."));
+  AssertThrow(val == Number(285.), ExcMessage("Problem in operator *."));
 }
 
 
@@ -219,6 +223,8 @@ main(int argc, char **argv)
 
   test<double>();
   test<float>();
+  test<std::complex<float>>();
+  test<std::complex<double>>();
 
   deallog << "OK" << std::endl;
 
