@@ -568,13 +568,13 @@ namespace Step30
                     // situation of our cell and the neighbor we want to treat
                     // only one half, so that each face is considered only
                     // once. Thus we have the additional condition, that the
-                    // cell with the higher level does the work. In the rare
-                    // case that both cells have the same level, the cell with
-                    // lower index is selected.
-                    if (!cell->neighbor_is_coarser(face_no) &&
-                        (neighbor->level() < cell->level() ||
-                         (neighbor->index() > cell->index() &&
-                          neighbor->level() == cell->level())))
+                    // cell with the higher level does the work. In case that
+                    // both cells have the same level, the cell with lower index
+                    // is selected.
+                    if (dim>1 && cell->neighbor_is_coarser(face_no) continue;
+                        if (neighbor->level() < cell->level() ||
+                              (neighbor->index() > cell->index() &&
+                               neighbor->level() == cell->level()))
                       {
                         // Here we know, that the neighbor is not coarser so we
                         // can use the usual @p neighbor_of_neighbor
@@ -582,33 +582,33 @@ namespace Step30
                         // general @p neighbor_face_no function.
                         const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 
-                        ue_vi_matrix = 0;
-                        ui_ve_matrix = 0;
-                        ue_ve_matrix = 0;
+                          ue_vi_matrix = 0;
+                          ui_ve_matrix = 0;
+                          ue_ve_matrix = 0;
 
-                        fe_v_face.reinit (cell, face_no);
-                        fe_v_face_neighbor.reinit (neighbor, neighbor2);
+                          fe_v_face.reinit (cell, face_no);
+                          fe_v_face_neighbor.reinit (neighbor, neighbor2);
 
-                        dg.assemble_face_term2(fe_v_face,
-                                               fe_v_face_neighbor,
-                                               ui_vi_matrix,
-                                               ue_vi_matrix,
-                                               ui_ve_matrix,
-                                               ue_ve_matrix);
+                          dg.assemble_face_term2(fe_v_face,
+                                                 fe_v_face_neighbor,
+                                                 ui_vi_matrix,
+                                                 ue_vi_matrix,
+                                                 ui_ve_matrix,
+                                                 ue_ve_matrix);
 
-                        neighbor->get_dof_indices (dofs_neighbor);
+                          neighbor->get_dof_indices (dofs_neighbor);
 
-                        for (unsigned int i=0; i<dofs_per_cell; ++i)
-                          for (unsigned int j=0; j<dofs_per_cell; ++j)
-                            {
-                              system_matrix.add(dofs[i], dofs_neighbor[j],
-                                                ue_vi_matrix(i,j));
-                              system_matrix.add(dofs_neighbor[i], dofs[j],
-                                                ui_ve_matrix(i,j));
-                              system_matrix.add(dofs_neighbor[i], dofs_neighbor[j],
-                                                ue_ve_matrix(i,j));
-                            }
-                      }
+                          for (unsigned int i=0; i<dofs_per_cell; ++i)
+                            for (unsigned int j=0; j<dofs_per_cell; ++j)
+                              {
+                                system_matrix.add(dofs[i], dofs_neighbor[j],
+                                                  ue_vi_matrix(i,j));
+                                system_matrix.add(dofs_neighbor[i], dofs[j],
+                                                  ui_ve_matrix(i,j));
+                                system_matrix.add(dofs_neighbor[i], dofs_neighbor[j],
+                                                  ue_ve_matrix(i,j));
+                              }
+                        }
 
                     // We do not need to consider case d), as those faces are
                     // treated 'from the other side within case b).
