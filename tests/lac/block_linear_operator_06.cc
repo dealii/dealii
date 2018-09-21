@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Tests for block_operator for opertaions with identical source destinations
+// Tests for block_operator for operations with identical source destinations
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>

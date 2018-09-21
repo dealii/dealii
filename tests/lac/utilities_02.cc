@@ -170,7 +170,7 @@ test()
     invM *
     linear_operator<LinearAlgebra::distributed::Vector<double>>(laplace) * invM;
 
-  // Do actuall work:
+  // Do actual work:
   LinearAlgebra::distributed::Vector<double> init_vector;
   mf_data->initialize_dof_vector(init_vector);
   for (auto it = init_vector.begin(); it != init_vector.end(); ++it)

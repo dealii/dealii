@@ -30,9 +30,9 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
 /*
- * The header containing the classes MeshWorker::Assember::MatrixSimple,
- * MeshWorker::Assember::MGMatrixSimple, MeshWorker::Assember::ResidualSimple,
- * and MeshWorker::Assember::SystemSimple.
+ * The header containing the classes MeshWorker::Assembler::MatrixSimple,
+ * MeshWorker::Assembler::MGMatrixSimple, MeshWorker::Assembler::ResidualSimple,
+ * and MeshWorker::Assembler::SystemSimple.
  */
 
 DEAL_II_NAMESPACE_OPEN

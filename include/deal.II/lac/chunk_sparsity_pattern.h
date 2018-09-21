@@ -669,7 +669,7 @@ public:
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals
-   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
+   * <tt>end(r)</tt>. Note also that the iterator may not be dereferenceable in
    * that case.
    */
   iterator
@@ -679,7 +679,7 @@ public:
    * Final iterator of row <tt>r</tt>. It points to the first element past the
    * end of line @p r, or past the end of the entire sparsity pattern.
    *
-   * Note that the end iterator is not necessarily dereferencable. This is in
+   * Note that the end iterator is not necessarily dereferenceable. This is in
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */

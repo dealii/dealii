@@ -1803,7 +1803,7 @@ LaplaceProblem<dim>::run()
                     << norm_rel_change_new << std::endl;
             }
 
-          // moniter relative change of norm in later stages
+          // monitor relative change of norm in later stages
           if (cycle > 1)
             {
               deallog << (norm_rel_change_new < norm_rel_change_old)
@@ -1893,7 +1893,8 @@ main(int argc, char **argv)
           problem.run();
         }
       else
-        AssertThrow(false, ExcMessage("Dimension incorect. dim can be 2 or 3"));
+        AssertThrow(false,
+                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
     }
 
 
@@ -1944,7 +1945,8 @@ main(int argc, char **argv)
           problem.run();
         }
       else
-        AssertThrow(false, ExcMessage("Dimension incorect. dim can be 2 or 3"));
+        AssertThrow(false,
+                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
     }
 
 
@@ -1994,7 +1996,8 @@ main(int argc, char **argv)
           problem.run();
         }
       else
-        AssertThrow(false, ExcMessage("Dimension incorect. dim can be 2 or 3"));
+        AssertThrow(false,
+                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
     }
   }
 }

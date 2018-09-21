@@ -348,7 +348,7 @@ namespace OpenCASCADE
   };
 
   /**
-   * Manifold description for the face of a CAD imported usign OpenCASCADE.
+   * Manifold description for the face of a CAD imported using OpenCASCADE.
    *
    * @ingroup manifold
    *

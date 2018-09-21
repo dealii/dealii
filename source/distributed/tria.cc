@@ -3800,7 +3800,7 @@ namespace parallel
       // finally, after syncing the parallel_forest with the triangulation,
       // also update the quadrant_cell_relations, which will be used for
       // repartitioning, further refinement/coarsening, and unpacking
-      // of stored or transfered data.
+      // of stored or transferred data.
       update_quadrant_cell_relations();
     }
 

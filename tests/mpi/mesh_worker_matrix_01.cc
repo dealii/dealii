@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test whether the various assember classes put the right data in the
+// Test whether the various assembler classes put the right data in the
 // right place.
 
 // This test is a modification of the test with the same name in ../integrators

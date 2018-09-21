@@ -692,7 +692,7 @@ namespace parallel
        * first child is marked with `CELL_REFINE`, whereas the others will be
        * marked with `CELL_INVALID`, which indicates that these cells will be
        * ignored by default during the packing or unpacking process. This
-       * ensures that data is only transfered once onto or from the parent
+       * ensures that data is only transferred once onto or from the parent
        * cell. If the callback is called with `CELL_REFINE`, the callback
        * will want to pack up the data on this cell into an array and store
        * it at the provided address for later unpacking in a way so that

@@ -91,8 +91,8 @@ using predicate_function =
 int
 main(int argc, char **argv)
 {
-  // Intialize MPI as required by Zoltan library used for graph coloring by this
-  // test.
+  // Initialize MPI as required by Zoltan library used for graph coloring by
+  // this test.
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   MPILogInitAll                    all;
 

@@ -313,7 +313,7 @@ namespace LinearAlgebra
       trilinos_vector() const;
 
       /**
-       * Return a (modifyable) reference to the underlying Trilinos
+       * Return a (modifiable) reference to the underlying Trilinos
        * Epetra_FEVector class.
        */
       Epetra_FEVector &

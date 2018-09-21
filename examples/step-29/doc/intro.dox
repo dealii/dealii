@@ -180,7 +180,7 @@ of the circle with center at $(0.5, d)$ and a
 radius slightly greater than $d$; this shape should lead to a focusing of the sound
 wave at the center of the circle. Varying $d$ changes the "focus" of the lens
 and affects the spatial distribution of the intensity of $u$, where our main
-concern is how well $|u|=\sqrt{v^2+w^2}$ is focussed. 
+concern is how well $|u|=\sqrt{v^2+w^2}$ is focused. 
 
 In the program below, we will implement the complex-valued Helmholtz equations
 using the formulation with split real and imaginary parts. We will also

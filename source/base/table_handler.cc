@@ -812,7 +812,7 @@ TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) const
 void
 TableHandler::clear_current_row()
 {
-  // Figure out what is the currect (max) length of the columns
+  // Figure out what is the correct (max) length of the columns
   // so that we "shave" one off.
   std::vector<internal::TableEntry>::size_type n = 0;
   for (std::map<std::string, Column>::iterator p = columns.begin();

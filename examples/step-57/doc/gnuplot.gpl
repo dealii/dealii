@@ -25,7 +25,7 @@ set style line  11 lt 1 lc rgb '#d00000' # dark red
 
 
 set output "step-57.compare-Re400.svg"
-set xlabel "horizonal velocity"
+set xlabel "horizontal velocity"
 set ylabel "y coordinate"
 set xrange [-0.5: 1.0]
 set title "horizontal velocity at x=0.5, Re=400"
@@ -37,7 +37,7 @@ plot "400-line-4.txt" using 2:1 w l title "Numerical Solution", \
 
 
 set output "step-57.compare-Re7500.svg"
-set xlabel "horizonal velocity"
+set xlabel "horizontal velocity"
 set ylabel "y coordinate"
 set xrange [-0.5: 1.0]
 set title "horizontal velocity at x=0.5, Re=7500"
@@ -49,7 +49,7 @@ plot "7500-line-4.txt" using 2:1 w l title "Numerical Solution", \
 
 
 set output "step-57.converge-Re7500.svg"
-set xlabel "horizonal velocity"
+set xlabel "horizontal velocity"
 set ylabel "y coordinate"
 set xrange [-0.5: 1.0]
 set title "horizontal velocity at x=0.5, Re=7500"

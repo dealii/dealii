@@ -156,7 +156,7 @@ namespace parallel
      * class, the following requirements have to be met:
      * <ul>
      *   <li>
-     *     The hp::DoFHandler needs to be explicitely mentioned
+     *     The hp::DoFHandler needs to be explicitly mentioned
      *     in the parallel::distributed::SolutionTransfer type, i.e.:
      *     @code
      *     parallel::distributed::SolutionsTransfer<dim, VectorType,

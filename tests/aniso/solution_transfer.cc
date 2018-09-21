@@ -106,7 +106,7 @@ transfer(std::ostream &out)
   data_out.clear_data_vectors();
   data_out.add_data_vector(solution, "solution");
   data_out.build_patches();
-  deallog << "Interpolated/tranferred solution after pure refinement"
+  deallog << "Interpolated/transferred solution after pure refinement"
           << std::endl
           << std::endl;
   data_out.write_gnuplot(out);
@@ -128,7 +128,7 @@ transfer(std::ostream &out)
   data_out.clear_data_vectors();
   data_out.add_data_vector(solution, "solution");
   data_out.build_patches();
-  deallog << "Interpolated/tranferred solution after coarsening" << std::endl
+  deallog << "Interpolated/transferred solution after coarsening" << std::endl
           << std::endl;
   data_out.write_gnuplot(out);
 }

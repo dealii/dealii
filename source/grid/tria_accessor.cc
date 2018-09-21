@@ -2517,7 +2517,7 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
    * in two iteration cycles through the map. First, existence check, then
    * returning the value.
    *
-   * 2- Using std::map::find(): This option is less readble, but theoretically
+   * 2- Using std::map::find(): This option is less readable, but theoretically
    *    faster, because it results in one iteration through std::map object.
    *
    * We decided to use the 2nd option.

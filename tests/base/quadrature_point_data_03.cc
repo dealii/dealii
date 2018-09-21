@@ -15,7 +15,7 @@
 
 
 
-// Same as quadrature_point_data_2.cc, but for different base and actuall data
+// Same as quadrature_point_data_2.cc, but for different base and actual data
 // classes.
 
 

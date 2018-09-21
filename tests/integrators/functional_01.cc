@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test whether Assember::Functional adds up correctly.
+// Test whether Assembler::Functional adds up correctly.
 
 #include <deal.II/dofs/dof_tools.h>
 
