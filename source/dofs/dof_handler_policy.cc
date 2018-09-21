@@ -2413,7 +2413,7 @@ namespace internal
         static void
         renumber_vertex_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           DoFHandler<dim, spacedim> &                 dof_handler,
           const bool                                  check_validity)
         {
@@ -2428,9 +2428,9 @@ namespace internal
                i != dof_handler.vertex_dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = (indices.size() == 0) ?
+              *i = (indices_we_care_about.size() == 0) ?
                      (new_numbers[*i]) :
-                     (new_numbers[indices.index_within_set(*i)]);
+                     (new_numbers[indices_we_care_about.index_within_set(*i)]);
             else if (check_validity)
               // if index is invalid_dof_index: check if this one
               // really is unused
@@ -2453,7 +2453,7 @@ namespace internal
         static void
         renumber_cell_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           DoFHandler<dim, spacedim> &                 dof_handler)
         {
           for (unsigned int level = 0; level < dof_handler.levels.size();
@@ -2463,9 +2463,10 @@ namespace internal
                  i != dof_handler.levels[level]->dof_object.dofs.end();
                  ++i)
               if (*i != numbers::invalid_dof_index)
-                *i = ((indices.size() == 0) ?
-                        new_numbers[*i] :
-                        new_numbers[indices.index_within_set(*i)]);
+                *i =
+                  ((indices_we_care_about.size() == 0) ?
+                     new_numbers[*i] :
+                     new_numbers[indices_we_care_about.index_within_set(*i)]);
         }
 
 
@@ -2481,7 +2482,7 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
+          const IndexSet & /*indices_we_care_about*/,
           DoFHandler<1, spacedim> & /*dof_handler*/)
         {
           // nothing to do in 1d since there are no separate faces
@@ -2493,7 +2494,7 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           DoFHandler<2, spacedim> &                   dof_handler)
         {
           // treat dofs on lines
@@ -2502,9 +2503,9 @@ namespace internal
                i != dof_handler.faces->lines.dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
+              *i = ((indices_we_care_about.size() == 0) ?
                       new_numbers[*i] :
-                      new_numbers[indices.index_within_set(*i)]);
+                      new_numbers[indices_we_care_about.index_within_set(*i)]);
         }
 
 
@@ -2513,7 +2514,7 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           DoFHandler<3, spacedim> &                   dof_handler)
         {
           // treat dofs on lines
@@ -2522,9 +2523,9 @@ namespace internal
                i != dof_handler.faces->lines.dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
+              *i = ((indices_we_care_about.size() == 0) ?
                       new_numbers[*i] :
-                      new_numbers[indices.index_within_set(*i)]);
+                      new_numbers[indices_we_care_about.index_within_set(*i)]);
 
           // treat dofs on quads
           for (std::vector<types::global_dof_index>::iterator i =
@@ -2532,9 +2533,9 @@ namespace internal
                i != dof_handler.faces->quads.dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
+              *i = ((indices_we_care_about.size() == 0) ?
                       new_numbers[*i] :
-                      new_numbers[indices.index_within_set(*i)]);
+                      new_numbers[indices_we_care_about.index_within_set(*i)]);
         }
 
 
@@ -2543,7 +2544,7 @@ namespace internal
         static void
         renumber_vertex_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           hp::DoFHandler<dim, spacedim> &             dof_handler,
           const bool                                  check_validity)
         {
@@ -2600,7 +2601,22 @@ namespace internal
 
                       if (old_dof_index != numbers::invalid_dof_index)
                         {
-                          if (indices.size() == 0)
+                          // In the following blocks, we first check whether
+                          // we were given an IndexSet of DoFs to touch. If not
+                          // (the first 'if' case here), then we are in the
+                          // sequential case and are allowed to touch all DoFs.
+                          //
+                          // If yes (the 'else' case), then we need to
+                          // distinguish whether the DoF whose number we want to
+                          // touch is in fact locally owned (i.e., is in the
+                          // index set) and then we can actually assign it a new
+                          // number; otherwise, we have encountered a
+                          // non-locally owned DoF for which we don't know the
+                          // new number yet and so set it to an invalid index.
+                          // This will later be fixed up after the first ghost
+                          // exchange phase when we unify hp DoFs on neighboring
+                          // cells.
+                          if (indices_we_care_about.size() == 0)
                             dealii::internal::DoFAccessorImplementation::
                               Implementation::set_vertex_dof_index(
                                 dof_handler,
@@ -2610,16 +2626,25 @@ namespace internal
                                 new_numbers[old_dof_index]);
                           else
                             {
-                              Assert(indices.is_element(old_dof_index),
-                                     ExcInternalError());
-                              dealii::internal::DoFAccessorImplementation::
-                                Implementation::set_vertex_dof_index(
-                                  dof_handler,
-                                  vertex_index,
-                                  fe_index,
-                                  d,
-                                  new_numbers[indices.index_within_set(
-                                    old_dof_index)]);
+                              if (indices_we_care_about.is_element(
+                                    old_dof_index))
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::set_vertex_dof_index(
+                                    dof_handler,
+                                    vertex_index,
+                                    fe_index,
+                                    d,
+                                    new_numbers[indices_we_care_about
+                                                  .index_within_set(
+                                                    old_dof_index)]);
+                              else
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::set_vertex_dof_index(
+                                    dof_handler,
+                                    vertex_index,
+                                    fe_index,
+                                    d,
+                                    numbers::invalid_dof_index);
                             }
                         }
                     }
@@ -2633,7 +2658,7 @@ namespace internal
         static void
         renumber_cell_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           hp::DoFHandler<dim, spacedim> &             dof_handler)
         {
           for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
@@ -2653,19 +2678,36 @@ namespace internal
                       cell->dof_index(d, fe_index);
                     if (old_dof_index != numbers::invalid_dof_index)
                       {
-                        if (indices.size() == 0)
+                        // In the following blocks, we first check whether
+                        // we were given an IndexSet of DoFs to touch. If not
+                        // (the first 'if' case here), then we are in the
+                        // sequential case and are allowed to touch all DoFs.
+                        //
+                        // If yes (the 'else' case), then we need to distinguish
+                        // whether the DoF whose number we want to touch is in
+                        // fact locally owned (i.e., is in the index set) and
+                        // then we can actually assign it a new number;
+                        // otherwise, we have encountered a non-locally owned
+                        // DoF for which we don't know the new number yet and so
+                        // set it to an invalid index. This will later be fixed
+                        // up after the first ghost exchange phase when we unify
+                        // hp DoFs on neighboring cells.
+                        if (indices_we_care_about.size() == 0)
                           cell->set_dof_index(d,
                                               new_numbers[old_dof_index],
                                               fe_index);
                         else
                           {
-                            Assert(indices.is_element(old_dof_index),
-                                   ExcInternalError());
-                            cell->set_dof_index(
-                              d,
-                              new_numbers[indices.index_within_set(
-                                old_dof_index)],
-                              fe_index);
+                            if (indices_we_care_about.is_element(old_dof_index))
+                              cell->set_dof_index(
+                                d,
+                                new_numbers[indices_we_care_about
+                                              .index_within_set(old_dof_index)],
+                                fe_index);
+                            else
+                              cell->set_dof_index(d,
+                                                  numbers::invalid_dof_index,
+                                                  fe_index);
                           }
                       }
                   }
@@ -2678,7 +2720,7 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
+          const IndexSet & /*indices_we_care_about*/,
           hp::DoFHandler<1, spacedim> & /*dof_handler*/)
         {
           // nothing to do in 1d since there are no separate faces -- we've
@@ -2691,7 +2733,7 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           hp::DoFHandler<2, spacedim> &               dof_handler)
         {
           const unsigned int dim = 2;
@@ -2738,18 +2780,41 @@ namespace internal
                                 line->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
                                 {
-                                  if (indices.size() == 0)
+                                  // In the following blocks, we first check
+                                  // whether we were given an IndexSet of DoFs
+                                  // to touch. If not (the first 'if' case
+                                  // here), then we are in the sequential case
+                                  // and are allowed to touch all DoFs.
+                                  //
+                                  // If yes (the 'else' case), then we need to
+                                  // distinguish whether the DoF whose number we
+                                  // want to touch is in fact locally owned
+                                  // (i.e., is in the index set) and then we can
+                                  // actually assign it a new number; otherwise,
+                                  // we have encountered a non-locally owned DoF
+                                  // for which we don't know the new number yet
+                                  // and so set it to an invalid index. This
+                                  // will later be fixed up after the first
+                                  // ghost exchange phase when we unify hp DoFs
+                                  // on neighboring cells.
+                                  if (indices_we_care_about.size() == 0)
                                     line->set_dof_index(
                                       d, new_numbers[old_dof_index], fe_index);
                                   else
                                     {
-                                      Assert(indices.is_element(old_dof_index),
-                                             ExcInternalError());
-                                      line->set_dof_index(
-                                        d,
-                                        new_numbers[indices.index_within_set(
-                                          old_dof_index)],
-                                        fe_index);
+                                      if (indices_we_care_about.is_element(
+                                            old_dof_index))
+                                        line->set_dof_index(
+                                          d,
+                                          new_numbers[indices_we_care_about
+                                                        .index_within_set(
+                                                          old_dof_index)],
+                                          fe_index);
+                                      else
+                                        line->set_dof_index(
+                                          d,
+                                          numbers::invalid_dof_index,
+                                          fe_index);
                                     }
                                 }
                             }
@@ -2770,7 +2835,7 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
+          const IndexSet &                            indices_we_care_about,
           hp::DoFHandler<3, spacedim> &               dof_handler)
         {
           const unsigned int dim = 3;
@@ -2816,13 +2881,39 @@ namespace internal
                               const types::global_dof_index old_dof_index =
                                 line->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
-                                line->set_dof_index(
-                                  d,
-                                  (indices.size() == 0) ?
-                                    (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
-                                  fe_index);
+                                {
+                                  // In the following blocks, we first check
+                                  // whether we were given an IndexSet of DoFs
+                                  // to touch. If not (the first 'if' case
+                                  // here), then we are in the sequential case
+                                  // and are allowed to touch all DoFs.
+                                  //
+                                  // If yes (the 'else' case), then we need to
+                                  // distinguish whether the DoF whose number we
+                                  // want to touch is in fact locally owned
+                                  // (i.e., is in the index set) and then we can
+                                  // actually assign it a new number; otherwise,
+                                  // we have encountered a non-locally owned DoF
+                                  // for which we don't know the new number yet
+                                  // and so set it to an invalid index. This
+                                  // will later be fixed up after the first
+                                  // ghost exchange phase when we unify hp DoFs
+                                  // on neighboring cells.
+                                  if (indices_we_care_about.size() == 0)
+                                    line->set_dof_index(
+                                      d, new_numbers[old_dof_index], fe_index);
+                                  else if (indices_we_care_about.is_element(
+                                             old_dof_index))
+                                    line->set_dof_index(
+                                      d,
+                                      new_numbers[indices_we_care_about
+                                                    .index_within_set(
+                                                      old_dof_index)],
+                                      fe_index);
+                                  else
+                                    line->set_dof_index(
+                                      d, numbers::invalid_dof_index, fe_index);
+                                }
                             }
                         }
                     }
@@ -2873,13 +2964,44 @@ namespace internal
                               const types::global_dof_index old_dof_index =
                                 quad->dof_index(d, fe_index);
                               if (old_dof_index != numbers::invalid_dof_index)
-                                quad->set_dof_index(
-                                  d,
-                                  (indices.size() == 0) ?
-                                    (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
-                                  fe_index);
+                                {
+                                  // In the following blocks, we first check
+                                  // whether we were given an IndexSet of DoFs
+                                  // to touch. If not (the first 'if' case
+                                  // here), then we are in the sequential case
+                                  // and are allowed to touch all DoFs.
+                                  //
+                                  // If yes (the 'else' case), then we need to
+                                  // distinguish whether the DoF whose number we
+                                  // want to touch is in fact locally owned
+                                  // (i.e., is in the index set) and then we can
+                                  // actually assign it a new number; otherwise,
+                                  // we have encountered a non-locally owned DoF
+                                  // for which we don't know the new number yet
+                                  // and so set it to an invalid index. This
+                                  // will later be fixed up after the first
+                                  // ghost exchange phase when we unify hp DoFs
+                                  // on neighboring cells.
+                                  if (indices_we_care_about.size() == 0)
+                                    quad->set_dof_index(
+                                      d, new_numbers[old_dof_index], fe_index);
+                                  else
+                                    {
+                                      if (indices_we_care_about.is_element(
+                                            old_dof_index))
+                                        quad->set_dof_index(
+                                          d,
+                                          new_numbers[indices_we_care_about
+                                                        .index_within_set(
+                                                          old_dof_index)],
+                                          fe_index);
+                                      else
+                                        quad->set_dof_index(
+                                          d,
+                                          numbers::invalid_dof_index,
+                                          fe_index);
+                                    }
+                                }
                             }
                         }
                     }
@@ -2907,12 +3029,12 @@ namespace internal
         template <class DoFHandlerType>
         static void
         renumber_dofs(const std::vector<types::global_dof_index> &new_numbers,
-                      const IndexSet &                            indices,
-                      DoFHandlerType &                            dof_handler,
-                      const bool check_validity)
+                      const IndexSet &indices_we_care_about,
+                      DoFHandlerType &dof_handler,
+                      const bool      check_validity)
         {
           if (DoFHandlerType::dimension == 1)
-            Assert(indices == IndexSet(0), ExcNotImplemented());
+            Assert(indices_we_care_about == IndexSet(0), ExcNotImplemented());
 
           // renumber DoF indices on vertices, cells, and faces. this
           // can be done in parallel because the respective functions
@@ -2920,14 +3042,16 @@ namespace internal
           Threads::TaskGroup<> tasks;
           tasks += Threads::new_task([&]() {
             renumber_vertex_dofs(new_numbers,
-                                 indices,
+                                 indices_we_care_about,
                                  dof_handler,
                                  check_validity);
           });
-          tasks += Threads::new_task(
-            [&]() { renumber_face_dofs(new_numbers, indices, dof_handler); });
-          tasks += Threads::new_task(
-            [&]() { renumber_cell_dofs(new_numbers, indices, dof_handler); });
+          tasks += Threads::new_task([&]() {
+            renumber_face_dofs(new_numbers, indices_we_care_about, dof_handler);
+          });
+          tasks += Threads::new_task([&]() {
+            renumber_cell_dofs(new_numbers, indices_we_care_about, dof_handler);
+          });
           tasks.join_all();
 
           // update the cache used for cell dof indices
@@ -2950,10 +3074,10 @@ namespace internal
         static void
         renumber_vertex_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<dim, spacedim> &                         dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+          const IndexSet &           indices_we_care_about,
+          DoFHandler<dim, spacedim> &dof_handler,
+          const unsigned int         level,
+          const bool                 check_validity)
         {
           Assert(level < dof_handler.get_triangulation().n_levels(),
                  ExcInternalError());
@@ -2979,13 +3103,13 @@ namespace internal
                            ExcInternalError());
 
                   if (idx != numbers::invalid_dof_index)
-                    i->set_index(
-                      level,
-                      d,
-                      dof_handler.get_fe().dofs_per_vertex,
-                      (indices.size() == 0) ?
-                        (new_numbers[idx]) :
-                        (new_numbers[indices.index_within_set(idx)]));
+                    i->set_index(level,
+                                 d,
+                                 dof_handler.get_fe().dofs_per_vertex,
+                                 (indices_we_care_about.size() == 0) ?
+                                   (new_numbers[idx]) :
+                                   (new_numbers[indices_we_care_about
+                                                  .index_within_set(idx)]));
                 }
         }
 
@@ -3002,9 +3126,9 @@ namespace internal
         static void
         renumber_cell_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<dim, spacedim> &                         dof_handler,
-          const unsigned int                                  level)
+          const IndexSet &           indices_we_care_about,
+          DoFHandler<dim, spacedim> &dof_handler,
+          const unsigned int         level)
         {
           for (std::vector<types::global_dof_index>::iterator i =
                  dof_handler.mg_levels[level]->dof_object.dofs.begin();
@@ -3013,12 +3137,14 @@ namespace internal
             {
               if (*i != numbers::invalid_dof_index)
                 {
-                  Assert((indices.size() > 0 ? indices.is_element(*i) :
-                                               (*i < new_numbers.size())),
+                  Assert((indices_we_care_about.size() > 0 ?
+                            indices_we_care_about.is_element(*i) :
+                            (*i < new_numbers.size())),
                          ExcInternalError());
-                  *i = (indices.size() == 0) ?
-                         (new_numbers[*i]) :
-                         (new_numbers[indices.index_within_set(*i)]);
+                  *i =
+                    (indices_we_care_about.size() == 0) ?
+                      (new_numbers[*i]) :
+                      (new_numbers[indices_we_care_about.index_within_set(*i)]);
                 }
             }
         }
@@ -3036,7 +3162,7 @@ namespace internal
         static void
         renumber_face_mg_dofs(
           const std::vector<types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
+          const IndexSet & /*indices_we_care_about*/,
           DoFHandler<1, spacedim> & /*dof_handler*/,
           const unsigned int /*level*/,
           const bool /*check_validity*/)
@@ -3050,10 +3176,10 @@ namespace internal
         static void
         renumber_face_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<2, spacedim> &                           dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+          const IndexSet &         indices_we_care_about,
+          DoFHandler<2, spacedim> &dof_handler,
+          const unsigned int       level,
+          const bool               check_validity)
         {
           if (dof_handler.get_fe().dofs_per_line > 0)
             {
@@ -3098,9 +3224,10 @@ namespace internal
                             cell->line(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices.size() == 0) ?
+                              ((indices_we_care_about.size() == 0) ?
                                  new_numbers[idx] :
-                                 new_numbers[indices.index_within_set(idx)]));
+                                 new_numbers[indices_we_care_about
+                                               .index_within_set(idx)]));
                         }
                       cell->line(l)->clear_user_flag();
                     }
@@ -3117,10 +3244,10 @@ namespace internal
         static void
         renumber_face_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<3, spacedim> &                           dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+          const IndexSet &         indices_we_care_about,
+          DoFHandler<3, spacedim> &dof_handler,
+          const unsigned int       level,
+          const bool               check_validity)
         {
           if (dof_handler.get_fe().dofs_per_line > 0 ||
               dof_handler.get_fe().dofs_per_quad > 0)
@@ -3165,9 +3292,10 @@ namespace internal
                             cell->line(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices.size() == 0) ?
+                              ((indices_we_care_about.size() == 0) ?
                                  new_numbers[idx] :
-                                 new_numbers[indices.index_within_set(idx)]));
+                                 new_numbers[indices_we_care_about
+                                               .index_within_set(idx)]));
                         }
                       cell->line(l)->clear_user_flag();
                     }
@@ -3203,9 +3331,10 @@ namespace internal
                             cell->quad(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices.size() == 0) ?
+                              ((indices_we_care_about.size() == 0) ?
                                  new_numbers[idx] :
-                                 new_numbers[indices.index_within_set(idx)]));
+                                 new_numbers[indices_we_care_about
+                                               .index_within_set(idx)]));
                         }
                       cell->quad(l)->clear_user_flag();
                     }
@@ -3223,10 +3352,10 @@ namespace internal
         static void
         renumber_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<dim, spacedim> &                         dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+          const IndexSet &           indices_we_care_about,
+          DoFHandler<dim, spacedim> &dof_handler,
+          const unsigned int         level,
+          const bool                 check_validity)
         {
           Assert(level < dof_handler.get_triangulation().n_global_levels(),
                  ExcInternalError());
@@ -3236,15 +3365,24 @@ namespace internal
           // work on separate data structures
           Threads::TaskGroup<> tasks;
           tasks += Threads::new_task([&]() {
-            renumber_vertex_mg_dofs(
-              new_numbers, indices, dof_handler, level, check_validity);
+            renumber_vertex_mg_dofs(new_numbers,
+                                    indices_we_care_about,
+                                    dof_handler,
+                                    level,
+                                    check_validity);
           });
           tasks += Threads::new_task([&]() {
-            renumber_face_mg_dofs(
-              new_numbers, indices, dof_handler, level, check_validity);
+            renumber_face_mg_dofs(new_numbers,
+                                  indices_we_care_about,
+                                  dof_handler,
+                                  level,
+                                  check_validity);
           });
           tasks += Threads::new_task([&]() {
-            renumber_cell_mg_dofs(new_numbers, indices, dof_handler, level);
+            renumber_cell_mg_dofs(new_numbers,
+                                  indices_we_care_about,
+                                  dof_handler,
+                                  level);
           });
           tasks.join_all();
         }
@@ -3255,7 +3393,7 @@ namespace internal
         static void
         renumber_mg_dofs(
           const std::vector<dealii::types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
+          const IndexSet & /*indices_we_care_about*/,
           hp::DoFHandler<dim, spacedim> & /*dof_handler*/,
           const unsigned int /*level*/,
           const bool /*check_validity*/)
@@ -5498,10 +5636,12 @@ namespace internal
                                         *dof_handler,
                                         /*check_validity=*/false);
 
-        // communicate newly assigned DoF indices to other processors
+        // Communicate newly assigned DoF indices to other processors
         // and get the same information for our own ghost cells.
         //
-        // this is the same as phase 5 in the distribute_dofs() algorithm
+        // This is the same as phase 5+6 in the distribute_dofs() algorithm,
+        // taking into account that we have to unify a few DoFs in between
+        // then communication phases if we do hp numbering
         {
           std::vector<bool> user_flags;
           triangulation->save_user_flags(user_flags);
@@ -5530,6 +5670,14 @@ namespace internal
             vertices_with_ghost_neighbors,
             triangulation->coarse_cell_to_p4est_tree_permutation,
             triangulation->p4est_tree_to_coarse_cell_permutation);
+
+          // in case of hp::DoFHandlers, we may have received valid
+          // indices of degrees of freedom that are dominated by a fe
+          // object adjacent to a ghost interface.
+          // thus, we overwrite the remaining invalid indices with
+          // the valid ones in this step.
+          Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
+            *dof_handler);
 
           communicate_dof_indices_on_marked_cells(
             *dof_handler,
