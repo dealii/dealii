@@ -60,6 +60,20 @@ Vector<Number>::Vector(const Vector<Number> &v)
 
 
 template <typename Number>
+void
+Vector<Number>::apply_givens_rotation(const std::array<Number, 3> &csr,
+                                      const size_type              i,
+                                      const size_type              k)
+{
+  auto &       V = *this;
+  const Number t = V(i);
+  V(i)           = csr[0] * V(i) + csr[1] * V(k);
+  V(k)           = -csr[1] * t + csr[0] * V(k);
+}
+
+
+
+template <typename Number>
 Vector<Number>::Vector(Vector<Number> &&v) noexcept
   : Subscriptor(std::move(v))
   , vec_size(v.vec_size)

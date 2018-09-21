@@ -302,6 +302,40 @@ LAPACKFullMatrix<number>::grow_or_shrink(const size_type n)
 
 template <typename number>
 void
+LAPACKFullMatrix<number>::apply_givens_rotation(
+  const std::array<number, 3> &csr,
+  const size_type              i,
+  const size_type              k,
+  const bool                   left)
+{
+  auto &A = *this;
+  // see Golub 2013 "Matrix computations", p241 5.1.9 Applying Givens
+  // Rotations but note the difference in notation, namely the sign of s: we
+  // have G * A, where G[1,1] = s
+  if (left)
+    {
+      for (size_type j = 0; j < A.n(); ++j)
+        {
+          const number t = A(i, j);
+          A(i, j)        = csr[0] * A(i, j) + csr[1] * A(k, j);
+          A(k, j)        = -csr[1] * t + csr[0] * A(k, j);
+        }
+    }
+  else
+    {
+      for (size_type j = 0; j < A.m(); ++j)
+        {
+          const number t = A(j, i);
+          A(j, i)        = csr[0] * A(j, i) + csr[1] * A(j, k);
+          A(j, k)        = -csr[1] * t + csr[0] * A(j, k);
+        }
+    }
+}
+
+
+
+template <typename number>
+void
 LAPACKFullMatrix<number>::remove_row_and_column(const size_type row,
                                                 const size_type col)
 {
