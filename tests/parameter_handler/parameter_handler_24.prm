@@ -17,4 +17,8 @@ end
 
 set Dimension = 3
 
+subsection Simple approaches will fail here
+  set Dimension = 3333
+end
+
 set That = this
