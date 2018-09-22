@@ -5483,7 +5483,7 @@ namespace VectorTools
              tol);
           tangential /= tangential.norm();
 
-          // Compute the entires of the linear system
+          // Compute the entries of the linear system
           // Note the system is symmetric so we could only compute the
           // lower/upper triangle.
           //
@@ -5680,7 +5680,7 @@ namespace VectorTools
                    q_point < fe_face_values.n_quadrature_points;
                    ++q_point)
                 {
-                  // Compute the entires of the linear system
+                  // Compute the entries of the linear system
                   // Note the system is symmetric so we could only compute the
                   // lower/upper triangle.
                   //

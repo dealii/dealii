@@ -46,7 +46,7 @@ class MappingQ;
  * Quadrature points computed using this mapping lie on the exact
  * geometrical objects, and tangent and normal vectors computed using
  * this class are tangent and normal to the underlying geometry. This
- * is in constrast with the MappingQ class, which approximates the
+ * is in contrast with the MappingQ class, which approximates the
  * geometry using a polynomial of some order, and then computes the
  * normals and tangents using the approximated surface.
  *

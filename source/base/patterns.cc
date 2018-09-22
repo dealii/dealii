@@ -871,7 +871,7 @@ namespace Patterns
         std::vector<std::string> pair =
           Utilities::split_string_list(key_value_pair, key_value_separator);
 
-        // Check that we have in fact two mathces
+        // Check that we have in fact two matches
         if (pair.size() != 2)
           return false;
 

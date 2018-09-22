@@ -31,7 +31,7 @@ test()
   for (unsigned int i = 0; i < 2; i++)
     storage.add(0.1 * (i + 1));
 
-  // 2 elemens
+  // 2 elements
   deallog << "initial:" << std::endl;
   for (unsigned int i = 0; i < storage.size(); i++)
     deallog << storage[i] << std::endl;

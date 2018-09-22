@@ -47,7 +47,7 @@ test()
     deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 
   deallog << "proc " << myid << ", n levels " << tr.n_levels() << std::endl;
-  deallog << "proc " << myid << ", n gobal levels " << tr.n_global_levels()
+  deallog << "proc " << myid << ", n global levels " << tr.n_global_levels()
           << std::endl;
 
   deallog << "begin().cell_index " << tr.begin()->index() << std::endl;

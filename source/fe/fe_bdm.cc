@@ -274,7 +274,7 @@ namespace internal
     {
       // This function sets up the values of the polynomials we want to
       // take moments with in the quadrature points. In fact, we multiply
-      // thos by the weights, such that the sum of function values and
+      // those by the weights, such that the sum of function values and
       // test_values over quadrature points yields the interpolated degree
       // of freedom.
       template <int dim>

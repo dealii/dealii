@@ -702,7 +702,7 @@ namespace TrilinosWrappers
      * not safe whenever MPI is used. For these settings, the current method
      * is the one to choose: It will store the off-processor data as an
      * additional sparsity pattern (that is then passed to the Trilinos matrix
-     * via the reinit mehtod) which can be organized in such a way that
+     * via the reinit method) which can be organized in such a way that
      * thread-safety can be ensured (as long as the user makes sure to never
      * write into the same matrix row simultaneously, of course).
      */
@@ -1100,7 +1100,7 @@ namespace TrilinosWrappers
      *
      * Note that if the given row is empty, i.e. does not contain any nonzero
      * entries, then the iterator returned by this function equals
-     * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable
+     * <tt>end(r)</tt>. Note also that the iterator may not be dereferenceable
      * in that case.
      */
     const_iterator
@@ -1110,7 +1110,7 @@ namespace TrilinosWrappers
      * Final iterator of row <tt>r</tt>. It points to the first element past
      * the end of line @p r, or past the end of the entire sparsity pattern.
      *
-     * Note that the end iterator is not necessarily dereferencable. This is
+     * Note that the end iterator is not necessarily dereferenceable. This is
      * in particular the case if it is the end iterator for the last row of a
      * matrix.
      */

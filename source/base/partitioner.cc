@@ -313,7 +313,7 @@ namespace Utilities
         import_targets_data = import_targets_temp;
       }
 
-      // now that we know how many indices each process will recieve from
+      // now that we know how many indices each process will receive from
       // ghosts, send and receive indices for import data. non-blocking receives
       // and blocking sends
       std::vector<types::global_dof_index> expanded_import_indices(

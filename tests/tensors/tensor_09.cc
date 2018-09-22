@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check generic contract variants tha allow to specify the indices which
+// check generic contract variants that allow to specify the indices which
 // will be contracted.
 
 #include <deal.II/base/tensor.h>

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test whether Assember::CellsAndFaces adds up correctly.
+// Test whether Assembler::CellsAndFaces adds up correctly.
 
 #include <deal.II/dofs/dof_tools.h>
 

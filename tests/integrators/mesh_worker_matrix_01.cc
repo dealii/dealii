@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test whether the various assember classes put the right data in the
+// Test whether the various assembler classes put the right data in the
 // right place.
 
 #include <deal.II/dofs/dof_tools.h>

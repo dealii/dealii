@@ -1909,7 +1909,7 @@ inline
     reord_2 = TensorAccessors::reordered_index_view<index_2, rank_2>(src2);
 
   // Now, reorder index_3 to the end of src1. We have to make sure to
-  // preserve the orginial ordering: index_1 has been removed. If
+  // preserve the original ordering: index_1 has been removed. If
   // index_3 > index_1, we have to use (index_3 - 1) instead:
   ReorderedIndexView<
     (index_3 < index_1 ? index_3 : index_3 - 1),
@@ -1921,7 +1921,7 @@ inline
     rank_1 > (reord_1);
 
   // Now, reorder index_4 to the end of src2. We have to make sure to
-  // preserve the orginial ordering: index_2 has been removed. If
+  // preserve the original ordering: index_2 has been removed. If
   // index_4 > index_2, we have to use (index_4 - 1) instead:
   ReorderedIndexView<
     (index_4 < index_2 ? index_4 : index_4 - 1),

@@ -136,7 +136,7 @@ transfer(std::ostream &out)
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");
   q_data_out.build_patches();
-  deallog << "Interpolated/tranferred solution after pure refinement, FE_Q"
+  deallog << "Interpolated/transferred solution after pure refinement, FE_Q"
           << std::endl
           << std::endl;
   q_data_out.write_gnuplot(out);
@@ -144,7 +144,7 @@ transfer(std::ostream &out)
   dgq_data_out.clear_data_vectors();
   dgq_data_out.add_data_vector(dgq_solution, "solution");
   dgq_data_out.build_patches();
-  deallog << "Interpolated/tranferred solution after pure refinement, FE_DGQ"
+  deallog << "Interpolated/transferred solution after pure refinement, FE_DGQ"
           << std::endl
           << std::endl;
   dgq_data_out.write_gnuplot(out);
@@ -175,7 +175,7 @@ transfer(std::ostream &out)
   q_data_out.add_data_vector(q_solution, "solution");
   q_data_out.build_patches();
   deallog
-    << "Interpolated/tranferred solution after coarsening and refinement, FE_Q"
+    << "Interpolated/transferred solution after coarsening and refinement, FE_Q"
     << std::endl
     << std::endl;
   q_data_out.write_gnuplot(out);
@@ -184,7 +184,7 @@ transfer(std::ostream &out)
   dgq_data_out.add_data_vector(dgq_solution, "solution");
   dgq_data_out.build_patches();
   deallog
-    << "Interpolated/tranferred solution after coarsening and refinement, FE_DGQ"
+    << "Interpolated/transferred solution after coarsening and refinement, FE_DGQ"
     << std::endl
     << std::endl;
   dgq_data_out.write_gnuplot(out);

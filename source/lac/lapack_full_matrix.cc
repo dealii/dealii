@@ -991,7 +991,7 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
   const types::blas_int nn = B.n();
   const types::blas_int kk = B.m();
 
-  // lapack does not have any tripple product routines, including the case of
+  // lapack does not have any triple product routines, including the case of
   // diagonal matrix in the middle, see
   // https://stackoverflow.com/questions/3548069/multiplying-three-matrices-in-blas-with-the-middle-one-being-diagonal
   // http://mathforum.org/kb/message.jspa?messageID=3546564

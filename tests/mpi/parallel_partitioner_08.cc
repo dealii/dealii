@@ -37,7 +37,7 @@ test()
   //                            ghost:      0  1  2  3     is3
   //                            subset:        1  2        is2
   //
-  // expected result udpate ghosts()
+  // expected result update ghosts()
   //
   //      rank 0 :  00 01 02 03 04 05 06 07 00 00 00 00
   //      rank 1 :  00 00 00 00 00 00 00 00 00 01 02 00

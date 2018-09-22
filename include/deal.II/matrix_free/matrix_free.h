@@ -3202,8 +3202,8 @@ namespace internal
 
 
   // A helper function to identify block vectors with many components where we
-  // should not try to overlap computations and communcation because there
-  // would be too many outstanding communcation requests. This is the base case
+  // should not try to overlap computations and communication because there
+  // would be too many outstanding communication requests. This is the base case
   // for generic vectors
   template <typename VectorStruct>
   constexpr unsigned int

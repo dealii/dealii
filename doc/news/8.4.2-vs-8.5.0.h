@@ -2039,7 +2039,7 @@ inconvenience this causes.
 
  <li>
   New: Add NURBSPatchManifold. This class is a child of ChartManifold and
-  implements a manifold descriptor for the face of a CAD imported usign
+  implements a manifold descriptor for the face of a CAD imported using
   OpenCASCADE.
   <br>
   (Mauro Bardelloni, 2016/03/09)

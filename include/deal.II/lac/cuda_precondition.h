@@ -81,7 +81,7 @@ namespace CUDAWrappers
       AdditionalData(bool use_level_analysis = true);
 
       /**
-       * Flag that determines if level informations are used when creating and
+       * Flag that determines if level information is used when creating and
        * applying the preconditioner. See the documentation for
        * cusparseSolvePolicy_t at
        * https://docs.nvidia.com/cuda/cusparse/index.html#cusparsesolvepolicy_t
@@ -296,7 +296,7 @@ namespace CUDAWrappers
       AdditionalData(bool use_level_analysis = true);
 
       /**
-       * Flag that determines if level informations are used when creating and
+       * Flag that determines if level information is used when creating and
        * applying the preconditioner. See the documentation for
        * cusparseSolvePolicy_t at
        * https://docs.nvidia.com/cuda/cusparse/index.html#cusparsesolvepolicy_t

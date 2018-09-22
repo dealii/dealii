@@ -312,7 +312,7 @@ namespace Differentiation
       /**
        * Computes the Jacobian of the vector field.
        *
-       * The Jacobian of a vector field is in essense the gradient of each
+       * The Jacobian of a vector field is in essence the gradient of each
        * dependent variable with respect to all independent variables.
        * This operation is therefore analogous to the gradient() operation
        * performed on a collection of scalar valued fields.
@@ -464,7 +464,7 @@ namespace Differentiation
       /**
        * Computes the Jacobian of the vector field.
        *
-       * The Jacobian of a vector field is in essense the gradient of each
+       * The Jacobian of a vector field is in essence the gradient of each
        * dependent variable with respect to all independent variables.
        * This operation is therefore analogous to the gradient() operation
        * performed on a collection of scalar valued fields.
@@ -687,7 +687,7 @@ namespace Differentiation
           << counts[15] << "\n"
           << "Number of 'abs' calls that can switch branch: " << counts[16]
           << "\n"
-          << "Number of parameters (doubles) interchangable without retaping: "
+          << "Number of parameters (doubles) interchangeable without retaping: "
           << counts[17] << "\n"
           << std::flush;
       }
@@ -1262,7 +1262,7 @@ namespace Differentiation
           }
 #    else
         // If ADOL-C is not configured with tapeless number reference counting
-        // then there is no way that we can guarentee that the following call
+        // then there is no way that we can guarantee that the following call
         // is safe. No comment... :-/
         adtl::setNumDir(n_directional_derivatives);
 #    endif

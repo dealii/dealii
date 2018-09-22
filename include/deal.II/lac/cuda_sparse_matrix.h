@@ -207,7 +207,7 @@ namespace CUDAWrappers
     operator*=(const Number factor);
 
     /**
-     * Divide the entrie matrix by a fixed factor.
+     * Divide the entire matrix by a fixed factor.
      */
     SparseMatrix &
     operator/=(const Number factor);

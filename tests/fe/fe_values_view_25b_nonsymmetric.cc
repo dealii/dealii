@@ -30,7 +30,7 @@
 //  d/dx1 N0 = -(1-x2)
 //  d/dx2 N0 = -(1-x1)
 // and same for other support points
-// To facilitate comparision, we use auxiliary scalar-valued FE
+// To facilitate comparison, we use auxiliary scalar-valued FE
 // and take its values and gradients. For primitive FEs we can
 // deduce which coefficient of tensor-valued shape function is
 // nonzero and compare values/gradient to the scalar-valued counterpart.

@@ -213,7 +213,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                 }
             }
 
-          // Calulate the gradient of sigma_imj_values[q][i][j] =
+          // Calculate the gradient of sigma_imj_values[q][i][j] =
           // sigma[q][i]-sigma[q][j]
           //   - this depends on the component and the direction of the
           //   corresponding edge.

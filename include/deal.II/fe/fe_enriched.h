@@ -1025,7 +1025,7 @@ namespace ColorEnriched
    * img[src="3source_fe_indices.png"]{width:25%;}</style> \endhtmlonly
    * @image html 3source_fe_indices.png "Active FE indices"
    *
-   * As discussed before, the colors of predicates are alloted using
+   * As discussed before, the colors of predicates are allotted using
    * the graph coloring algorithm. Each predicate is a node in the graph and if
    * two sub-domains share an interface, the corresponding predicates
    * should be given different colors.

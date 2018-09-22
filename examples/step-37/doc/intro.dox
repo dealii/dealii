@@ -428,7 +428,7 @@ their implementation requires knowledge of the elements of the system matrix.
 One solution is to use geometric multigrid methods as shown in step-16. They
 are known to be very fast, and they are suitable for our purpose since all
 ingredients, including the transfer between different grid levels, can be
-expressed in terms of matrix-vector products related to a colletion of
+expressed in terms of matrix-vector products related to a collection of
 cells. All one needs to do is to find a smoother that is based on
 matrix-vector products rather than all the matrix entries. One such candidate
 would be a damped Jacobi iteration that requires access to the matrix
@@ -544,7 +544,7 @@ MPI metadata for DoFs that are owned locally but needed by other
 processors. A benefit of the design of this vector class is the way ghosted
 entries are accessed. In the storage scheme of the vector, the data array
 extends beyond the processor-local part of the solution with further vector
-entries available for the ghosted degrees of freedom. This gives a continguous
+entries available for the ghosted degrees of freedom. This gives a contiguous
 index range for all locally active degrees of freedom. (Note that the index
 range depends on the exact configuration of the mesh.) Since matrix-free
 operations can be thought of doing linear algebra that is performance

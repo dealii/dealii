@@ -1387,7 +1387,7 @@ public:
    *  This is because these member variables may be initialized only
    *  on demand by derived classes, rather than being available immediately.
    *  Consequently, comparing these members would not only be costly because
-   *  these are generall big arrays, but also because their computation may
+   *  these are generally big arrays, but also because their computation may
    *  be expensive. On the other hand, derived classes for which these
    *  arrays may differ for two objects even though the above list compares
    *  as equal, will probably want to implement their own operator==()

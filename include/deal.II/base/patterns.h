@@ -1388,7 +1388,7 @@ namespace Patterns
      * container type.
      *
      * Notice that the current content of variable @p t is ignored. Its type is
-     * used to infer how to interpret the string. If the string is succesfully
+     * used to infer how to interpret the string. If the string is successfully
      * parsed, then @p t will be set to the parsed content of @p s.
      *
      * @author Luca Heltai, 2018
@@ -1853,7 +1853,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a Map pattern to convert a string to "
-                               "a Map compatbile type."));
+                               "a Map compatible type."));
         auto                     key_p = p->get_key_pattern().clone();
         auto                     val_p = p->get_value_pattern().clone();
         std::vector<std::string> vec(t.size());
@@ -1932,7 +1932,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatbile type."));
+                               "to a List compatible type."));
         auto                     base_p = p->get_base_pattern().clone();
         std::vector<std::string> vec(dim);
 
@@ -1959,7 +1959,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatbile type."));
+                               "to a List compatible type."));
 
         auto base_p = p->get_base_pattern().clone();
         T    t;
@@ -2031,7 +2031,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatbile type."));
+                               "to a List compatible type."));
 
         const auto &expressions = t->get_expressions();
         if (expressions.size() == 0)
@@ -2055,7 +2055,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatbile type."));
+                               "to a List compatible type."));
 
         const auto expressions =
           Utilities::split_string_list(s, p->get_separator());
@@ -2130,7 +2130,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatbile type."));
+                               "to a List compatible type."));
 
         auto        base_p = p->get_base_pattern().clone();
         std::string s =
@@ -2155,7 +2155,7 @@ namespace Patterns
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatbile type."));
+                               "to a List compatible type."));
 
         auto base_p = p->get_base_pattern().clone();
 

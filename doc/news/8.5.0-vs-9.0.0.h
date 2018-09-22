@@ -700,7 +700,7 @@ inconvenience this causes.
 
  <li>
   New: The tutorial step-59 shows a matrix-free solver for the Poisson
-  equation discretized with the symmetric interior penalty discontinous
+  equation discretized with the symmetric interior penalty discontinuous
   Galerkin method.
   <br>
   (Katharina Kormann, Martin Kronbichler, 2018/05/04)
@@ -1194,7 +1194,7 @@ inconvenience this causes.
 
  <li>
   New: Extend GridGenerator::extrude_triangulation to using exact slicing z-axis
-  values and reimplement the exsiting GridGenerator::extrude_triangulation using
+  values and reimplement the existing GridGenerator::extrude_triangulation using
   the newly developed overload.
   <br>
   (Weixiong Zheng, 2018/04/05)

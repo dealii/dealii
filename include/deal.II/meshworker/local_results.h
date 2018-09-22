@@ -182,9 +182,9 @@ namespace MeshWorker
    * integration. Depending on the task the mesh worker loop is performing,
    * local results can be of different types. They have in common that they
    * are the result of local integration over a cell or face. Their actual
-   * type is determined by the Assember using them. It is also the assembler
+   * type is determined by the Assembler using them. It is also the assembler
    * setting the arrays of local results to the sizes needed. Here is a list
-   * of the provided data types and the assembers using them:
+   * of the provided data types and the assemblers using them:
    *
    * <ol>
    * <li> n_values() numbers accessed with value(), and stored in the data
@@ -214,7 +214,7 @@ namespace MeshWorker
     /**
      * The number of scalar values.
      *
-     * This number is set to a nonzero value by Assember::CellsAndFaces
+     * This number is set to a nonzero value by Assembler::CellsAndFaces
      *
      */
     unsigned int
@@ -223,8 +223,8 @@ namespace MeshWorker
     /**
      * The number of vectors.
      *
-     * This number is set to a nonzero value by Assember::ResidualSimple and
-     * Assember::ResidualLocalBlocksToGlobalBlocks.
+     * This number is set to a nonzero value by Assembler::ResidualSimple and
+     * Assembler::ResidualLocalBlocksToGlobalBlocks.
      */
     unsigned int
     n_vectors() const;

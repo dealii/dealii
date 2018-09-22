@@ -176,7 +176,7 @@ namespace internal
        * Stores the index offset into the arrays @p jxw_values, @p jacobians,
        * @p normal_vectors and the second derivatives. Note that affine cells
        * have shorter fields of length 1, where the others have lengths equal
-       * to the numer of quadrature points of the given cell.
+       * to the number of quadrature points of the given cell.
        */
       AlignedVector<unsigned int> data_index_offsets;
 

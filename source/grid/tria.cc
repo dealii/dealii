@@ -3713,7 +3713,7 @@ namespace internal
         // lines and vertices. Now we have to
         // consider outer ones as well. here, we have
         // to check, whether there are other cells
-        // still needing these objects. oherwise we
+        // still needing these objects. otherwise we
         // can delete them. first for quads (and
         // their inner lines).
 

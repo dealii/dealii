@@ -86,8 +86,8 @@ using predicate_function =
 int
 main(int argc, char **argv)
 {
-  // Intialize MPI as required by Zoltan library used for graph coloring by this
-  // test.
+  // Initialize MPI as required by Zoltan library used for graph coloring by
+  // this test.
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   MPILogInitAll                    all;
 
@@ -155,7 +155,7 @@ main(int argc, char **argv)
 
       // print color predicate pairs for a cell
       // Note that here material id is used to identify cells
-      // Here (1,2) indicates predicate 2 of color 1 is relavant for cell.
+      // Here (1,2) indicates predicate 2 of color 1 is relevant for cell.
       deallog << "(color, enrichment_func_id):";
       for (auto color_predicate_pair :
            cellwise_color_predicate_map[cell->material_id()])
