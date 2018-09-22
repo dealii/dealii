@@ -195,16 +195,16 @@ namespace Step7
   // class is according to their mathematical definition and does not need
   // much explanation.
   //
-  // The only thing that is worth mentioning is that if we access elements of
-  // a base class that is template dependent (in this case the elements of
-  // SolutionBase&lt;dim&gt;), then the C++ language forces us to write
-  // <code>this-&gt;source_centers</code> (for example). Note that the
-  // <code>this-&gt;</code> qualification is not necessary if the base class
-  // is not template dependent, and also that the gcc compilers prior to
-  // version 3.4 don't enforce this requirement of the C++ standard. The
-  // reason why this is necessary is complicated; some books on C++ may
-  // explain it, so if you are interested you can look it up under the phrase
-  // <code>two-stage (name) lookup</code>.
+  // The only thing that is worth mentioning is that if we access
+  // elements of a base class that is template dependent (in this case
+  // the elements of SolutionBase&lt;dim&gt;), then the C++ language
+  // forces us to write <code>this-&gt;source_centers</code>, and
+  // similarly for other members of the base class. C++ does not
+  // require the <code>this-&gt;</code> qualification if the base
+  // class is not template dependent. The reason why this is necessary
+  // is complicated; C++ books will explain under the phrase
+  // <i>two-stage (name) lookup</i>, and there is also a lengthy
+  // description in the deal.II FAQs.
   template <int dim>
   double Solution<dim>::value(const Point<dim> &p, const unsigned int) const
   {
