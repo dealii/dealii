@@ -39,9 +39,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-ParameterHandler::ParameterHandler(const bool skip_undefined)
-  : skip_undefined(skip_undefined)
-  , entries(new boost::property_tree::ptree())
+ParameterHandler::ParameterHandler()
+  : entries(new boost::property_tree::ptree())
 {}
 
 
@@ -317,7 +316,8 @@ ParameterHandler::get_current_full_path(
 void
 ParameterHandler::parse_input(std::istream &     input,
                               const std::string &filename,
-                              const std::string &last_line)
+                              const std::string &last_line,
+                              const bool         skip_undefined)
 {
   AssertThrow(input, ExcIO());
 
@@ -346,12 +346,13 @@ ParameterHandler::parse_input(std::istream &     input,
   //
   // after unwinding the subsection stack, just re-throw the exception
   auto scan_line_or_cleanup = [this,
+                               &skip_undefined,
                                &saved_path](const std::string &line,
                                             const std::string &filename,
                                             const unsigned int line_number) {
     try
       {
-        scan_line(line, filename, line_number);
+        scan_line(line, filename, line_number, skip_undefined);
       }
     catch (...)
       {
@@ -447,23 +448,25 @@ ParameterHandler::parse_input(std::istream &     input,
 
 void
 ParameterHandler::parse_input(const std::string &filename,
-                              const std::string &last_line)
+                              const std::string &last_line,
+                              const bool         skip_undefined)
 {
   PathSearch search("PARAMETERS");
 
   std::string   openname = search.find(filename);
   std::ifstream file_stream(openname.c_str());
-  parse_input(file_stream, filename, last_line);
+  parse_input(file_stream, filename, last_line, skip_undefined);
 }
 
 
 
 void
 ParameterHandler::parse_input_from_string(const char *       s,
-                                          const std::string &last_line)
+                                          const std::string &last_line,
+                                          const bool         skip_undefined)
 {
   std::istringstream input_stream(s);
-  parse_input(input_stream, "input string", last_line);
+  parse_input(input_stream, "input string", last_line, skip_undefined);
 }
 
 
@@ -2079,7 +2082,8 @@ ParameterHandler::log_parameters_section(LogStream &out)
 void
 ParameterHandler::scan_line(std::string        line,
                             const std::string &input_filename,
-                            const unsigned int current_line_n)
+                            const unsigned int current_line_n,
+                            const bool         skip_undefined)
 {
   // save a copy for some error messages
   const std::string original_line = line;
@@ -2313,14 +2317,15 @@ MultipleParameterLoop::MultipleParameterLoop()
 void
 MultipleParameterLoop::parse_input(std::istream &     input,
                                    const std::string &filename,
-                                   const std::string &last_line)
+                                   const std::string &last_line,
+                                   const bool         skip_undefined)
 {
   AssertThrow(input, ExcIO());
 
   // Note that (to avoid infinite recursion) we have to explicitly call the
   // base class version of parse_input and *not* a wrapper (which may be
   // virtual and lead us back here)
-  ParameterHandler::parse_input(input, filename, last_line);
+  ParameterHandler::parse_input(input, filename, last_line, skip_undefined);
   init_branches();
 }
 

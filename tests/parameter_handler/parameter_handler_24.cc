@@ -24,7 +24,7 @@
 void
 check()
 {
-  ParameterHandler prm(true);
+  ParameterHandler prm;
   prm.enter_subsection("Geometry");
   prm.declare_entry("dim", "1", Patterns::Integer(1, 3));
   prm.leave_subsection();
@@ -32,7 +32,7 @@ check()
   prm.declare_entry("Dimension", "1", Patterns::Integer(1, 3));
 
   std::ifstream in(SOURCE_DIR "/parameter_handler_24.prm");
-  prm.parse_input(in, "input file");
+  prm.parse_input(in, "input file", "", true);
 
   prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
 }
