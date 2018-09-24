@@ -1328,11 +1328,8 @@ namespace Step44
 
         // Minimization function (exact)
         auto ls_minimization_function =
-          [this,
-           &residual_0,
-           &solution_delta,
-           &newton_update,
-           &tang_mtrx_norm_old](const double ss /*step size*/) {
+          [this, &solution_delta, &newton_update, &tang_mtrx_norm_old](
+            const double ss /*step size*/) {
             // Ensure that the constraints for the Dirichlet BC's are correct,
             // irrespective of the chosen step size.
             BlockVector<double> solution_delta_trial(newton_update);
@@ -1350,10 +1347,10 @@ namespace Step44
             BlockVector<double> residual_trial = this->system_rhs;
             residual_trial *= -1.0; // Residual = -RHS
 
-
             const double tang_mtrx_norm_new =
               tangent_matrix.block(0, 0).frobenius_norm();
 
+            (void)tang_mtrx_norm_new;
             if (ss != 0.0)
               Assert(tang_mtrx_norm_new != tang_mtrx_norm_old,
                      ExcInternalError());
