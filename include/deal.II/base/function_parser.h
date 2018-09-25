@@ -403,12 +403,6 @@ private:
   std::vector<std::string> var_names;
 
   /**
-   * An array of function expressions (one per component), required to
-   * initialize fp in each thread.
-   */
-  std::vector<std::string> expressions;
-
-  /**
    * Initialize fp and vars on the current thread. This function may only be
    * called once per thread. A thread can test whether the function has
    * already been called by testing whether 'fp.get().size()==0' (not
@@ -417,6 +411,12 @@ private:
   void
   init_muparser() const;
 #endif
+
+  /**
+   * An array of function expressions (one per component), required to
+   * initialize fp in each thread.
+   */
+  std::vector<std::string> expressions;
 
   /**
    * State of usability. This variable is checked every time the function is
