@@ -1,0 +1,11 @@
+
+# Listing of Parameters
+# ---------------------
+set Dimension = 3 # default: 1
+
+
+subsection Geometry
+  set dim = 2 # default: 1
+end
+
+

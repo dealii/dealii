@@ -1,0 +1,24 @@
+
+subsection Boundary conditions
+  # dimension-dependent
+  set Function expressions = 0:0,0,x*t
+end
+
+set Some other dimension dependent parameter = 1.
+
+subsection Geometry
+  set dim = 2
+  set Some unrelevant field = 22
+end
+
+subsection Linear solver
+  set Tolerance = 1e-9
+end
+
+set Dimension = 3
+
+subsection Simple approaches will fail here
+  set Dimension = 3333
+end
+
+set That = this

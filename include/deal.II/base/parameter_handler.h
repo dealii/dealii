@@ -839,6 +839,7 @@ class MultipleParameterLoop;
  * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
  * @author Alberto Sartori, 2015
  * @author David Wells, 2016
+ * @author Denis Davydov, 2018
  */
 class ParameterHandler : public Subscriptor
 {
@@ -922,6 +923,12 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
+   * If @p skip_undefined is <code>true</code>, the parameter handler
+   * will skip undefined sections and entries. This is useful for partially
+   * parsing a parameter file, for example to obtain only the spatial dimension
+   * of the problem. By default all entries and subsections are expected to be
+   * declared.
+   *
    * The function sets the value of all parameters it encounters in the
    * input file to the provided value. Parameters not explicitly listed
    * in the input file are left at the value they previously held, which
@@ -941,8 +948,9 @@ public:
    */
   virtual void
   parse_input(std::istream &     input,
-              const std::string &filename  = "input file",
-              const std::string &last_line = "");
+              const std::string &filename       = "input file",
+              const std::string &last_line      = "",
+              const bool         skip_undefined = false);
 
   /**
    * Parse the given file to provide values for known parameter fields. The
@@ -988,7 +996,9 @@ public:
    * @endcode
    */
   virtual void
-  parse_input(const std::string &filename, const std::string &last_line = "");
+  parse_input(const std::string &filename,
+              const std::string &last_line      = "",
+              const bool         skip_undefined = false);
 
   /**
    * Parse input from a string to populate known parameter fields. The lines
@@ -999,7 +1009,9 @@ public:
    * there for more information.
    */
   virtual void
-  parse_input_from_string(const char *s, const std::string &last_line = "");
+  parse_input_from_string(const char *       s,
+                          const std::string &last_line      = "",
+                          const bool         skip_undefined = false);
 
   /**
    * Parse input from an XML stream to populate known parameter fields. This
@@ -1674,11 +1686,18 @@ private:
    *
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
+   *
+   * If @p skip_undefined is <code>true</code>, the parser
+   * will skip undefined sections and entries. This is useful for partially
+   * parsing a parameter file, for example to obtain only the spatial dimension
+   * of the problem. By default all entries and subsections are expected to be
+   * declared.
    */
   void
   scan_line(std::string        line,
             const std::string &input_filename,
-            const unsigned int current_line_n);
+            const unsigned int current_line_n,
+            const bool         skip_undefined);
 
   /**
    * Print out the parameters of the subsection given by the
@@ -1970,6 +1989,12 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
+   * If @p skip_undefined is <code>true</code>, the parameter handler
+   * will skip undefined sections and entries. This is useful for partially
+   * parsing a parameter file, for example to obtain only the spatial dimension
+   * of the problem. By default all entries and subsections are expected to be
+   * declared.
+   *
    * @note This is the only overload of the three <tt>parse_input</tt>
    * functions implemented by ParameterHandler overridden with new behavior by
    * this class. This is because the other two <tt>parse_input</tt> functions
@@ -1977,8 +2002,9 @@ public:
    */
   virtual void
   parse_input(std::istream &     input,
-              const std::string &filename  = "input file",
-              const std::string &last_line = "") override;
+              const std::string &filename       = "input file",
+              const std::string &last_line      = "",
+              const bool         skip_undefined = false) override;
 
   /**
    * Overriding virtual functions which are overloaded (like
