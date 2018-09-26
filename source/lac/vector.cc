@@ -19,6 +19,11 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "vector.inst"
 
+#ifndef DEAL_II_WITH_COMPLEX_VALUES
+// instantiate for std::complex<double> since we are using it internally.
+template class Vector<std::complex<double>>;
+#endif
+
 // instantiate for integers:
 template class Vector<int>;
 template Vector<double> &Vector<double>::
@@ -45,8 +50,10 @@ template long double Vector<long double>::
 TEMPL_COPY_CONSTRUCTOR(double, float);
 TEMPL_COPY_CONSTRUCTOR(float, double);
 
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
 TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
 TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
+#endif
 
 #undef TEMPL_COPY_CONSTRUCTOR
 
@@ -59,8 +66,10 @@ TEMPL_OP_EQ(double, float);
 TEMPL_OP_EQ(float, double);
 
 
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
 TEMPL_OP_EQ(std::complex<double>, std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>, std::complex<double>);
+#endif
 
 #undef TEMPL_OP_EQ
 

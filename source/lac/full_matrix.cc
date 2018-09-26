@@ -21,6 +21,11 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "full_matrix.inst"
 
+#ifndef DEAL_II_WITH_COMPLEX_VALUES
+// instantiate for std::complex<double> because we use it internally.
+template class FullMatrix<std::complex<double>>;
+#endif
+
 // instantiate for long double manually because we use it in a few places
 // inside the library
 template class FullMatrix<long double>;
@@ -66,10 +71,12 @@ FullMatrix<long double>::add<long double>(const long double,
 TEMPL_OP_EQ(double, float);
 TEMPL_OP_EQ(float, double);
 
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
 TEMPL_OP_EQ(std::complex<double>, std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>, std::complex<double>);
 TEMPL_OP_EQ(std::complex<double>, double);
 TEMPL_OP_EQ(std::complex<float>, float);
+#endif
 
 #undef TEMPL_OP_EQ
 

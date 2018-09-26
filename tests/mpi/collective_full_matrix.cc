@@ -68,14 +68,18 @@ main(int argc, char *argv[])
       deallog.push("double");
       test<double>();
       deallog.pop();
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
       deallog.push("complex<double>");
       test<std::complex<double>>();
+#endif
       deallog.pop();
     }
   else
     {
       test<float>();
       test<double>();
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
       test<std::complex<double>>();
+#endif
     }
 }
