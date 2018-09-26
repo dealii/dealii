@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/config.h>
+#include <deal.II/base/numbers.h>
 
 #include <cmath>
 #include <complex>

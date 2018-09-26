@@ -24,7 +24,6 @@ SET(_unity_include_src
   auto_derivative_function.cc
   bounding_box.cc
   conditional_ostream.cc
-  config.cc
   convergence_table.cc
   event.cc
   exceptions.cc
@@ -46,6 +45,7 @@ SET(_unity_include_src
   mpi.cc
   multithread_info.cc
   named_selection.cc
+  numbers.cc
   parallel.cc
   parameter_handler.cc
   parameter_acceptor.cc
