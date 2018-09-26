@@ -556,9 +556,31 @@ namespace internal
                             next_free_face_slot;
 
                           // Store the two indices we will have to deal with.
+                          // We sort these so that it does not matter which of
+                          // the cells adjacent to this face we visit first. In
+                          // sequential computations, this does not matter
+                          // because the order in which we visit these cells is
+                          // deterministic and always the same. But in parallel
+                          // computations, we can get into trouble because two
+                          // processors visit the cells in different order
+                          // (because the mesh creation history on the two
+                          // processors is different), and in that case it can
+                          // happen that the order of active_fe_index values for
+                          // a given face is different on the two processes,
+                          // even though they agree on which two values need to
+                          // be stored. Since the DoF unification on faces
+                          // takes into account the order of the
+                          // active_fe_indices, this leads to quite subtle bugs.
+                          // We could fix this in the place where we do the DoF
+                          // unification on cells, but it is better to just make
+                          // sure that every process stores the exact same
+                          // information (and in the same order) on each face.
                           unsigned int active_fe_indices[2] = {
                             cell->active_fe_index(),
                             cell->neighbor(face)->active_fe_index()};
+                          if (active_fe_indices[1] < active_fe_indices[0])
+                            std::swap(active_fe_indices[0],
+                                      active_fe_indices[1]);
 
                           // Set first slot for this face to
                           // active_fe_index of this face
