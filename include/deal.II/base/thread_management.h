@@ -267,20 +267,26 @@ namespace Threads
   {
   public:
     /**
-     * Scoped lock class. When you declare an object of this type, you have to
-     * pass it a mutex, which is locked in the constructor of this class and
-     * unlocked in the destructor. The lock is thus held during the entire
-     * lifetime of this object, i.e. until the end of the present scope, which
-     * explains where the name comes from. This pattern of using locks with
-     * mutexes follows the resource-acquisition-is-initialization pattern, and
-     * was used first for mutexes by Doug Schmidt. It has the advantage that
-     * locking a mutex this way is thread-safe, i.e. when an exception is
-     * thrown between the locking and unlocking point, the destructor makes
-     * sure that the mutex is unlocked; this would not automatically be the
-     * case when you lock and unlock the mutex "by hand", i.e. using
-     * Mutex::acquire() and Mutex::release().
+     * This declaration introduces a scoped lock class. It is
+     * deprecated: use `std::lock_guard<std::mutex>` or any of the
+     * other, related classes offered by C++ instead.
+     *
+     * When you declare an object of this type, you have to pass it a
+     * mutex, which is locked in the constructor of this class and
+     * unlocked in the destructor. The lock is thus held during the
+     * entire lifetime of this object, i.e. until the end of the
+     * present scope, which explains where the name comes from. This
+     * pattern of using locks with mutexes follows the
+     * resource-acquisition-is-initialization pattern, and was used
+     * first for mutexes by Doug Schmidt. It has the advantage that
+     * locking a mutex this way is thread-safe, i.e. when an exception
+     * is thrown between the locking and unlocking point, the
+     * destructor makes sure that the mutex is unlocked; this would
+     * not automatically be the case when you lock and unlock the
+     * mutex "by hand", i.e. using Mutex::acquire() and
+     * Mutex::release().
      */
-    using ScopedLock = std::lock_guard<std::mutex>;
+    using ScopedLock DEAL_II_DEPRECATED = std::lock_guard<std::mutex>;
 
     /**
      * Default constructor.
