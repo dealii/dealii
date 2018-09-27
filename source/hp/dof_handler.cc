@@ -648,8 +648,12 @@ namespace internal
 
           reserve_space_release_space(dof_handler);
 
-          reserve_space_cells(dof_handler);
-          reserve_space_vertices(dof_handler);
+          Threads::TaskGroup<> tasks;
+          tasks +=
+            Threads::new_task(&reserve_space_cells<1, spacedim>, dof_handler);
+          tasks += Threads::new_task(&reserve_space_vertices<1, spacedim>,
+                                     dof_handler);
+          tasks.join_all();
         }
 
 
@@ -666,12 +670,14 @@ namespace internal
 
           reserve_space_release_space(dof_handler);
 
-          // FIRST CELLS AND FACES
-          reserve_space_cells(dof_handler);
-          reserve_space_faces(dof_handler);
-
-          // VERTEX DOFS
-          reserve_space_vertices(dof_handler);
+          Threads::TaskGroup<> tasks;
+          tasks +=
+            Threads::new_task(&reserve_space_cells<2, spacedim>, dof_handler);
+          tasks +=
+            Threads::new_task(&reserve_space_faces<2, spacedim>, dof_handler);
+          tasks += Threads::new_task(&reserve_space_vertices<2, spacedim>,
+                                     dof_handler);
+          tasks.join_all();
         }
 
 
@@ -690,12 +696,15 @@ namespace internal
 
           reserve_space_release_space(dof_handler);
 
-          // FIRST CELLS AND FACES
-          reserve_space_cells(dof_handler);
-          reserve_space_faces(dof_handler);
+          Threads::TaskGroup<> tasks;
+          tasks +=
+            Threads::new_task(&reserve_space_cells<3, spacedim>, dof_handler);
+          tasks +=
+            Threads::new_task(&reserve_space_faces<3, spacedim>, dof_handler);
+          tasks += Threads::new_task(&reserve_space_vertices<3, spacedim>,
+                                     dof_handler);
 
-
-          // LINE DOFS
+          // While the tasks above are running, we can turn to line dofs
 
           // the situation here is pretty much like with vertices:
           // there can be an arbitrary number of finite elements
@@ -794,9 +803,8 @@ namespace internal
                   }
             }
 
-
-          // VERTEX DOFS
-          reserve_space_vertices(dof_handler);
+          // Ensure that everything is done at this point.
+          tasks.join_all();
         }
 
 
