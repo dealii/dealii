@@ -74,7 +74,7 @@ namespace parallel
     std::shared_ptr<tbb::affinity_partitioner>
     TBBPartitioner::acquire_one_partitioner()
     {
-      dealii::Threads::Mutex::ScopedLock lock(mutex);
+      std::lock_guard<std::mutex> lock(mutex);
       if (in_use)
         return std::make_shared<tbb::affinity_partitioner>();
 
@@ -90,7 +90,7 @@ namespace parallel
     {
       if (p.get() == my_partitioner.get())
         {
-          dealii::Threads::Mutex::ScopedLock lock(mutex);
+          std::lock_guard<std::mutex> lock(mutex);
           in_use = false;
         }
     }

@@ -321,7 +321,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
       euler_dof_handler->get_fe().n_components()));
 
   {
-    Threads::Mutex::ScopedLock lock(fe_values_mutex);
+    std::lock_guard<std::mutex> lock(fe_values_mutex);
     fe_values.reinit(dof_cell);
     fe_values.get_function_values(*euler_vector, values);
   }

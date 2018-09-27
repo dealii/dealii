@@ -241,8 +241,8 @@ namespace internal
   double
   mu_rand_seed(double seed)
   {
-    static Threads::Mutex      rand_mutex;
-    Threads::Mutex::ScopedLock lock(rand_mutex);
+    static Threads::Mutex       rand_mutex;
+    std::lock_guard<std::mutex> lock(rand_mutex);
 
     static boost::random::uniform_real_distribution<> uniform_distribution(0,
                                                                            1);
@@ -262,7 +262,7 @@ namespace internal
   mu_rand()
   {
     static Threads::Mutex                             rand_mutex;
-    Threads::Mutex::ScopedLock                        lock(rand_mutex);
+    std::lock_guard<std::mutex>                       lock(rand_mutex);
     static boost::random::uniform_real_distribution<> uniform_distribution(0,
                                                                            1);
     static boost::random::mt19937                     rng(

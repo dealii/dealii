@@ -1388,7 +1388,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   Assert(property == LAPACKSupport::symmetric,
          ExcMessage("Matrix has to be symmetric for this operation."));
 
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   const bool use_values = (std::isnan(eigenvalue_limits.first) ||
                            std::isnan(eigenvalue_limits.second)) ?
@@ -1719,7 +1719,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   Assert(property == LAPACKSupport::symmetric,
          ExcMessage("Matrix has to be symmetric for this operation."));
 
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   const bool use_values = (std::isnan(eigenvalue_limits.first) ||
                            std::isnan(eigenvalue_limits.second)) ?
@@ -1956,7 +1956,7 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              ExcDimensionMismatch(grid->blacs_context,
                                   VT->grid->blacs_context));
     }
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   std::vector<NumberType> sv(std::min(n_rows, n_columns));
 
@@ -2071,7 +2071,7 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
          ExcMessage(
            "Use identical block-cyclic distribution for matrices A and B"));
 
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   if (grid->mpi_process_is_active)
     {
@@ -2223,8 +2223,8 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
   Assert(state == LAPACKSupport::cholesky,
          ExcMessage(
            "Matrix has to be in Cholesky state before calling this function."));
-  Threads::Mutex::ScopedLock lock(mutex);
-  NumberType                 rcond = 0.;
+  std::lock_guard<std::mutex> lock(mutex);
+  NumberType                  rcond = 0.;
 
   if (grid->mpi_process_is_active)
     {
@@ -2326,8 +2326,8 @@ ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
   Assert(state == LAPACKSupport::matrix ||
            state == LAPACKSupport::inverse_matrix,
          ExcMessage("norms can be called in matrix state only."));
-  Threads::Mutex::ScopedLock lock(mutex);
-  NumberType                 res = 0.;
+  std::lock_guard<std::mutex> lock(mutex);
+  NumberType                  res = 0.;
 
   if (grid->mpi_process_is_active)
     {
@@ -2387,8 +2387,8 @@ ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
          ExcMessage("norms can be called in matrix state only."));
   Assert(property == LAPACKSupport::symmetric,
          ExcMessage("Matrix has to be symmetric for this operation."));
-  Threads::Mutex::ScopedLock lock(mutex);
-  NumberType                 res = 0.;
+  std::lock_guard<std::mutex> lock(mutex);
+  NumberType                  res = 0.;
 
   if (grid->mpi_process_is_active)
     {

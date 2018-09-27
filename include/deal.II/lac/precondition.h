@@ -2308,7 +2308,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
   VectorType &      dst,
   const VectorType &src) const
 {
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
@@ -2334,7 +2334,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
   VectorType &      dst,
   const VectorType &src) const
 {
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
@@ -2360,7 +2360,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
   VectorType &      dst,
   const VectorType &src) const
 {
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
@@ -2387,7 +2387,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
   VectorType &      dst,
   const VectorType &src) const
 {
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 

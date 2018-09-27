@@ -1006,7 +1006,7 @@ namespace Polynomials
     // of this function
     // for this, acquire the lock
     // until we quit this function
-    Threads::Mutex::ScopedLock lock(coefficients_lock);
+    std::lock_guard<std::mutex> lock(coefficients_lock);
 
     // The first 2 coefficients
     // are hard-coded
@@ -1140,7 +1140,7 @@ namespace Polynomials
     // then get a pointer to the array
     // of coefficients. do that in a MT
     // safe way
-    Threads::Mutex::ScopedLock lock(coefficients_lock);
+    std::lock_guard<std::mutex> lock(coefficients_lock);
     return *recursive_coefficients[k];
   }
 

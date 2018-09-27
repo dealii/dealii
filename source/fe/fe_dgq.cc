@@ -408,7 +408,7 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
     {
-      Threads::Mutex::ScopedLock lock(this->mutex);
+      std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
@@ -488,7 +488,7 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
     {
-      Threads::Mutex::ScopedLock lock(this->mutex);
+      std::lock_guard<std::mutex> lock(this->mutex);
 
       // if matrix got updated while waiting for the lock...
       if (this->restriction[refinement_case - 1][child].n() ==

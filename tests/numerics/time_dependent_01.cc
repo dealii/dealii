@@ -39,8 +39,8 @@ public:
   virtual void
   end_sweep()
   {
-    static Threads::Mutex      mutex;
-    Threads::Mutex::ScopedLock lock(mutex);
+    static Threads::Mutex       mutex;
+    std::lock_guard<std::mutex> lock(mutex);
     end_sweep_flags[time_step_number] = true;
   }
 
