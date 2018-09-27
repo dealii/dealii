@@ -15,9 +15,9 @@
 
 #include <cell_accessor_wrapper.h>
 
+#include <boost/python.hpp>
 #include <point_wrapper.h>
 #include <triangulation_wrapper.h>
-#include <boost/python.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -398,7 +398,7 @@ namespace python
 
   void CellAccessorWrapper::set_material_id(const int material_id)
   {
-    AssertThrow(static_cast<const types::material_id>(material_id) < numbers::invalid_material_id,
+    AssertThrow(static_cast<types::material_id>(material_id) < numbers::invalid_material_id,
                 ExcMessage("material_id is too large."));
     if ((dim == 2) && (spacedim == 2))
       return internal::set_material_id<2,2>(material_id, cell_accessor);
