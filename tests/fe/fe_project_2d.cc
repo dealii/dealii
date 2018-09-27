@@ -1,3 +1,6 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2003 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -9,6 +12,8 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
+
+
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
