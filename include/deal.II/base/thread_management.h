@@ -340,9 +340,11 @@ namespace Threads
    * Class implementing a condition variable. The semantics of this class and
    * its member functions are the same as those of the POSIX functions.
    *
+   * @deprecated Use std::condition_variable instead.
+   *
    * @author Wolfgang Bangerth, 2003
    */
-  class ConditionVariable
+  class DEAL_II_DEPRECATED ConditionVariable
   {
   public:
     /**
