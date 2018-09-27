@@ -1,0 +1,7 @@
+
+DEAL::Testing FE_Q<2>(1)
+DEAL::Norm of difference: 0.00
+DEAL::
+DEAL::Testing FE_Q<3>(1)
+DEAL::Norm of difference: 0.00
+DEAL::
