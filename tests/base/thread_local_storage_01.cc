@@ -50,7 +50,7 @@ execute(int i)
   // accessed
   static Threads::Mutex m;
   {
-    Threads::Mutex::ScopedLock l(m);
+    std::lock_guard<std::mutex> l(m);
     ++counter;
   }
 

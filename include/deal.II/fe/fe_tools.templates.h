@@ -2409,7 +2409,7 @@ namespace FETools
     // operation of this function;
     // for this, acquire the lock
     // until we quit this function
-    Threads::Mutex::ScopedLock lock(
+    std::lock_guard<std::mutex> lock(
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
     Assert(
@@ -2566,7 +2566,7 @@ namespace FETools
           {
             // Make sure no other thread
             // is just adding an element
-            Threads::Mutex::ScopedLock lock(
+            std::lock_guard<std::mutex> lock(
               internal::FEToolsAddFENameHelper::fe_name_map_lock);
             AssertThrow(fe_name_map.find(name_part) != fe_name_map.end(),
                         FETools::ExcInvalidFEName(name));

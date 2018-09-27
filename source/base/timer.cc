@@ -412,7 +412,7 @@ TimerOutput::~TimerOutput()
 void
 TimerOutput::enter_subsection(const std::string &section_name)
 {
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   Assert(section_name.empty() == false, ExcMessage("Section string is empty."));
 
@@ -457,7 +457,7 @@ TimerOutput::leave_subsection(const std::string &section_name)
   Assert(!active_sections.empty(),
          ExcMessage("Cannot exit any section because none has been entered!"));
 
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   if (section_name != "")
     {
@@ -873,7 +873,7 @@ TimerOutput::enable_output()
 void
 TimerOutput::reset()
 {
-  Threads::Mutex::ScopedLock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   sections.clear();
   active_sections.clear();
   timer_all.restart();
