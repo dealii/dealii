@@ -248,18 +248,27 @@ namespace Threads
 #  ifdef DEAL_II_WITH_THREADS
 
   /**
-   * Class implementing a Mutex. Mutexes are used to lock data structures to
-   * ensure that only a single thread of execution can access them at the same
-   * time.
+   * A class implementing a <a
+   * href="https://en.wikipedia.org/wiki/Lock_(computer_science)">mutex</a>.
+   * Mutexes are used to lock data structures to ensure that only a
+   * single thread of execution can access them at the same time.
    *
-   * <h3>Copy semantics</h3>
    *
-   * When copied, the receiving object does not receive any state from the
-   * object being copied, i.e. an entirely new mutex is created. This is
-   * consistent with expectations if a mutex is used as a member variable to
-   * lock the other member variables of a class: in that case, the mutex of
-   * the copied-to object should only guard the members of the copied-to
-   * object, not the members of both the copied-to and copied-from object.
+   * <h3>Differences to std::mutex and copy semantics</h3>
+   *
+   * This class is like `std::mutex` in almost every regard and in
+   * fact is derived from `std::mutex`. The only difference is that
+   * this class is copyable when `std::mutex` is not.  Indeed, when
+   * copied, the receiving object does not copy any state from the
+   * object being copied, i.e. an entirely new mutex is created. These
+   * semantics are consistent with the common use case if a mutex is
+   * used as a member variable to lock the other member variables of a
+   * class: in that case, the mutex of the copied-to object should
+   * only guard the members of the copied-to object, not the members
+   * of both the copied-to and copied-from object. Since at the time
+   * when the class is copied, the destination's member variable is
+   * not used yet, its corresponding mutex should also remain in its
+   * original state.
    *
    * @author Wolfgang Bangerth, 2002, 2003, 2009
    */
