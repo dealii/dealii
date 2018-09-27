@@ -372,37 +372,10 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
 LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
 
 OPTION(DEAL_II_WITH_COMPLEX_VALUES
-  "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. If PETSc is built with complex scalar type, this option must be ON."
+  "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."
   ON
   )
 LIST(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
-IF(${DEAL_II_WITH_COMPLEX_VALUES})
-  SET(DEAL_II_EXPAND_COMPLEX_SCALARS 
-      "std::complex<double>"
-      "std::complex<float>"
-     )  
-  SET(DEAL_II_EXPAND_COMPLEX_VECTORS 
-      "Vector<std::complex<double> >"
-      "Vector<std::complex<float> >"
-     )
-  SET(DEAL_II_EXPAND_COMPLEX_BLOCK_VECTORS
-      "BlockVector<std::complex<double> >"
-      "BlockVector<std::complex<float> >"
-     )
-  SET(DEAL_II_EXPAND_COMPLEX_LA_VECTORS
-      "LinearAlgebra::Vector<std::complex<double> >"
-      "LinearAlgebra::Vector<std::complex<float> >"
-     )
- 
-  SET(DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_VECTORS
-      "LinearAlgebra::distributed::Vector<std::complex<double> >"
-      "LinearAlgebra::distributed::Vector<std::complex<float> >"
-     )
-  SET(DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_BLOCK_VECTORS
-      "LinearAlgebra::distributed::BlockVector<std::complex<double> >"
-      "LinearAlgebra::distributed::BlockVector<std::complex<float> >"
-     )
-ENDIF()
 
 OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"

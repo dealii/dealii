@@ -20,7 +20,8 @@ DEAL_II_NAMESPACE_OPEN
 #include "vector.inst"
 
 #ifndef DEAL_II_WITH_COMPLEX_VALUES
-// instantiate for std::complex<double> since we are using it internally.
+// instantiate for std::complex<double> since we are using it internally in
+// FESeries.
 template class Vector<std::complex<double>>;
 #endif
 

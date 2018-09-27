@@ -22,7 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 #include "full_matrix.inst"
 
 #ifndef DEAL_II_WITH_COMPLEX_VALUES
-// instantiate for std::complex<double> because we use it internally.
+// instantiate for std::complex<double> because we use it internally in
+// FESeries.
 template class FullMatrix<std::complex<double>>;
 #endif
 
