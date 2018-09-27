@@ -318,7 +318,11 @@ namespace Threads
 
     /**
      * Acquire a mutex.
+     *
+     * @deprecated This function is deprecated. Use the
+     * std::mutex::lock() function of the base class instead.
      */
+    DEAL_II_DEPRECATED
     inline void
     acquire()
     {
@@ -327,7 +331,11 @@ namespace Threads
 
     /**
      * Release the mutex again.
+     *
+     * @deprecated This function is deprecated. Use the
+     * std::mutex::unlock() function of the base class instead.
      */
+    DEAL_II_DEPRECATED
     inline void
     release()
     {
