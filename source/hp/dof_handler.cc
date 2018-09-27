@@ -712,96 +712,91 @@ namespace internal
           //
           // the algorithm we use is somewhat similar to what we do in
           // reserve_space_vertices()
-          if (true)
-            {
-              // what we do first is to set up an array in which we
-              // record whether a line is associated with any of the
-              // given fe's, by setting a bit. in a later step, we
-              // then actually allocate memory for the required dofs
-              std::vector<std::vector<bool>> line_fe_association(
-                dof_handler.fe_collection.size(),
-                std::vector<bool>(dof_handler.tria->n_raw_lines(), false));
+          {
+            // what we do first is to set up an array in which we
+            // record whether a line is associated with any of the
+            // given fe's, by setting a bit. in a later step, we
+            // then actually allocate memory for the required dofs
+            std::vector<std::vector<bool>> line_fe_association(
+              dof_handler.fe_collection.size(),
+              std::vector<bool>(dof_handler.tria->n_raw_lines(), false));
 
-              for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator
-                     cell = dof_handler.begin_active();
-                   cell != dof_handler.end();
-                   ++cell)
-                if (!cell->is_artificial())
-                  for (unsigned int l = 0;
-                       l < GeometryInfo<dim>::lines_per_cell;
-                       ++l)
-                    line_fe_association[cell->active_fe_index()]
-                                       [cell->line_index(l)] = true;
+            for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator
+                   cell = dof_handler.begin_active();
+                 cell != dof_handler.end();
+                 ++cell)
+              if (!cell->is_artificial())
+                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
+                     ++l)
+                  line_fe_association[cell->active_fe_index()]
+                                     [cell->line_index(l)] = true;
 
-              // first check which of the lines is used at all,
-              // i.e. is associated with a finite element. we do this
-              // since not all lines may actually be used, in which
-              // case we do not have to allocate any memory at all
-              std::vector<bool> line_is_used(dof_handler.tria->n_raw_lines(),
-                                             false);
-              for (unsigned int line = 0;
-                   line < dof_handler.tria->n_raw_lines();
-                   ++line)
-                for (unsigned int fe = 0; fe < dof_handler.fe_collection.size();
-                     ++fe)
-                  if (line_fe_association[fe][line] == true)
-                    {
-                      line_is_used[line] = true;
-                      break;
-                    }
-
-              // next count how much memory we actually need. for each
-              // line, we need one slot per fe to store the fe_index,
-              // plus dofs_per_line for this fe. in addition, we need
-              // one slot as the end marker for the fe_indices. at the
-              // same time already fill the line_dofs_offsets field
-              dof_handler.faces->lines.dof_offsets.resize(
-                dof_handler.tria->n_raw_lines(), numbers::invalid_unsigned_int);
-
-              unsigned int line_slots_needed = 0;
-              for (unsigned int line = 0;
-                   line < dof_handler.tria->n_raw_lines();
-                   ++line)
-                if (line_is_used[line] == true)
+            // first check which of the lines is used at all,
+            // i.e. is associated with a finite element. we do this
+            // since not all lines may actually be used, in which
+            // case we do not have to allocate any memory at all
+            std::vector<bool> line_is_used(dof_handler.tria->n_raw_lines(),
+                                           false);
+            for (unsigned int line = 0; line < dof_handler.tria->n_raw_lines();
+                 ++line)
+              for (unsigned int fe = 0; fe < dof_handler.fe_collection.size();
+                   ++fe)
+                if (line_fe_association[fe][line] == true)
                   {
-                    dof_handler.faces->lines.dof_offsets[line] =
-                      line_slots_needed;
-
-                    for (unsigned int fe = 0;
-                         fe < dof_handler.fe_collection.size();
-                         ++fe)
-                      if (line_fe_association[fe][line] == true)
-                        line_slots_needed +=
-                          dof_handler.get_fe(fe).dofs_per_line + 1;
-                    ++line_slots_needed;
+                    line_is_used[line] = true;
+                    break;
                   }
 
-              // now allocate the space we have determined we need,
-              // and set up the linked lists for each of the lines
-              dof_handler.faces->lines.dofs.resize(line_slots_needed,
-                                                   numbers::invalid_dof_index);
-              for (unsigned int line = 0;
-                   line < dof_handler.tria->n_raw_lines();
-                   ++line)
-                if (line_is_used[line] == true)
-                  {
-                    unsigned int pointer =
-                      dof_handler.faces->lines.dof_offsets[line];
-                    for (unsigned int fe = 0;
-                         fe < dof_handler.fe_collection.size();
-                         ++fe)
-                      if (line_fe_association[fe][line] == true)
-                        {
-                          // if this line uses this fe, then set the
-                          // fe_index and move the pointer ahead
-                          dof_handler.faces->lines.dofs[pointer] = fe;
-                          pointer += dof_handler.get_fe(fe).dofs_per_line + 1;
-                        }
-                    // finally place the end marker
-                    dof_handler.faces->lines.dofs[pointer] =
-                      numbers::invalid_dof_index;
-                  }
-            }
+            // next count how much memory we actually need. for each
+            // line, we need one slot per fe to store the fe_index,
+            // plus dofs_per_line for this fe. in addition, we need
+            // one slot as the end marker for the fe_indices. at the
+            // same time already fill the line_dofs_offsets field
+            dof_handler.faces->lines.dof_offsets.resize(
+              dof_handler.tria->n_raw_lines(), numbers::invalid_unsigned_int);
+
+            unsigned int line_slots_needed = 0;
+            for (unsigned int line = 0; line < dof_handler.tria->n_raw_lines();
+                 ++line)
+              if (line_is_used[line] == true)
+                {
+                  dof_handler.faces->lines.dof_offsets[line] =
+                    line_slots_needed;
+
+                  for (unsigned int fe = 0;
+                       fe < dof_handler.fe_collection.size();
+                       ++fe)
+                    if (line_fe_association[fe][line] == true)
+                      line_slots_needed +=
+                        dof_handler.get_fe(fe).dofs_per_line + 1;
+                  ++line_slots_needed;
+                }
+
+            // now allocate the space we have determined we need,
+            // and set up the linked lists for each of the lines
+            dof_handler.faces->lines.dofs.resize(line_slots_needed,
+                                                 numbers::invalid_dof_index);
+            for (unsigned int line = 0; line < dof_handler.tria->n_raw_lines();
+                 ++line)
+              if (line_is_used[line] == true)
+                {
+                  unsigned int pointer =
+                    dof_handler.faces->lines.dof_offsets[line];
+                  for (unsigned int fe = 0;
+                       fe < dof_handler.fe_collection.size();
+                       ++fe)
+                    if (line_fe_association[fe][line] == true)
+                      {
+                        // if this line uses this fe, then set the
+                        // fe_index and move the pointer ahead
+                        dof_handler.faces->lines.dofs[pointer] = fe;
+                        pointer += dof_handler.get_fe(fe).dofs_per_line + 1;
+                      }
+                  // finally place the end marker
+                  dof_handler.faces->lines.dofs[pointer] =
+                    numbers::invalid_dof_index;
+                }
+          }
 
           // Ensure that everything is done at this point.
           tasks.join_all();
