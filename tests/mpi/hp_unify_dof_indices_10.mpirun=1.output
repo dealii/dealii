@@ -1,0 +1,7 @@
+
+DEAL:0:2d::Processor: 0
+DEAL:0:2d::  n_locally_owned_dofs: 50
+DEAL:0:2d::  n_global_dofs: 50
+DEAL:0:3d::Processor: 0
+DEAL:0:3d::  n_locally_owned_dofs: 225
+DEAL:0:3d::  n_global_dofs: 225
