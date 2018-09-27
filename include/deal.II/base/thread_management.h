@@ -64,190 +64,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace Threads
 {
   /**
-   * This class is used instead of a true lock class when not using
-   * multithreading. It allows to write programs such that they start new
-   * threads and/or lock objects in multithreading mode, and use dummy thread
-   * management and synchronization classes instead when running in single-
-   * thread mode. Specifically, the new_thread() functions only call the
-   * function but wait for it to return instead of running in on another
-   * thread, and the mutexes do nothing really. The only reason to provide
-   * such a function is that the program can be compiled both in MT and non-MT
-   * mode without difference.
-   *
-   * @author Wolfgang Bangerth, 2000, 2003
-   */
-  class DummyThreadMutex
-  {
-  public:
-    /**
-     * Scoped lock class. When you declare an object of this type, you have to
-     * pass it a mutex, which is locked in the constructor of this class and
-     * unlocked in the destructor. The lock is thus held during the entire
-     * lifetime of this object, i.e. until the end of the present scope, which
-     * explains where the name comes from. This pattern of using locks with
-     * mutexes follows the resource-acquisition-is-initialization pattern, and
-     * was used first for mutexes by Doug Schmidt. It has the advantage that
-     * locking a mutex this way is thread-safe, i.e. when an exception is
-     * thrown between the locking and unlocking point, the destructor makes
-     * sure that the mutex is unlocked; this would not automatically be the
-     * case when you lock and unlock the mutex "by hand", i.e. using
-     * Mutex::acquire() and Mutex::release().
-     */
-    class ScopedLock
-    {
-    public:
-      /**
-       * Constructor. Lock the mutex. Since this is a dummy mutex class, this
-       * of course does nothing.
-       */
-      ScopedLock(DummyThreadMutex &)
-      {}
-
-      /**
-       * Destructor. Unlock the mutex. Since this is a dummy mutex class, this
-       * of course does nothing. We still don't declare it as 'default' to avoid
-       * warnings about objects of this class being unused.
-       */
-      ~ScopedLock()
-      {}
-    };
-
-    /**
-     * Simulate acquisition of the mutex. As this class does nothing really,
-     * this function does nothing as well.
-     */
-    inline void
-    acquire() const
-    {}
-
-    /**
-     * Simulate release of the mutex. As this class does nothing really, this
-     * function does nothing as well.
-     */
-    inline void
-    release() const
-    {}
-  };
-
-
-
-  /**
-   * This class is used in single threaded mode instead of a class
-   * implementing real condition variable semantics. It allows to write
-   * programs such that they start new threads and/or lock objects in
-   * multithreading mode, and use dummy thread management and synchronization
-   * classes instead when running in single-thread mode. Specifically, the
-   * new_thread() functions only call the function but wait for it to return
-   * instead of running in on another thread, and the mutexes do nothing
-   * really. The only reason to provide such a function is that the program
-   * can be compiled both in MT and non-MT mode without difference.
-   *
-   * In this particular case, just as with mutexes, the functions do nothing,
-   * and by this provide the same semantics of condition variables as in
-   * multi-threaded mode.
-   *
-   * @author Wolfgang Bangerth, 2003
-   */
-  class DummyThreadCondition
-  {
-  public:
-    /**
-     * Signal to a single listener that a condition has been met, i.e. that
-     * some data will now be available. Since in single threaded mode, this
-     * function of course does nothing.
-     */
-    inline void
-    signal() const
-    {}
-
-    /**
-     * Signal to multiple listener that a condition has been met, i.e. that
-     * some data will now be available. Since in single threaded mode, this
-     * function of course does nothing.
-     */
-    inline void
-    broadcast() const
-    {}
-
-    /**
-     * Wait for the condition to be signalled. Signal variables need to be
-     * guarded by a mutex which needs to be given to this function as an
-     * argument, see the man page of <code>posix_cond_wait</code> for a
-     * description of the mechanisms. Since in single threaded mode, this
-     * function of course does nothing, but returns immediately.
-     */
-    inline void
-    wait(DummyThreadMutex &) const
-    {}
-  };
-
-
-
-  /**
-   * This class is used instead of a true barrier class when not using
-   * multithreading. It allows to write programs such that they use the same
-   * class names in multithreading and non-MT mode and thus may be compiled
-   * with or without thread-support without the need to use conditional
-   * compilation. Since a barrier class only makes sense in non-multithread
-   * mode if only one thread is to be synchronized (otherwise, the barrier
-   * could not be left, since the one thread is waiting for some other part of
-   * the program to reach a certain point of execution), the constructor of
-   * this class throws an exception if the <code>count</code> argument
-   * denoting the number of threads that need to be synchronized is not equal
-   * to one.
-   *
-   * @author Wolfgang Bangerth, 2001
-   */
-  class DummyBarrier
-  {
-  public:
-    /**
-     * Constructor. Since barriers are only useful in single-threaded mode if
-     * the number of threads to be synchronized is one, this constructor
-     * raises an exception if the <code>count</code> argument is one.
-     */
-    DummyBarrier(const unsigned int count,
-                 const char *       name = nullptr,
-                 void *             arg  = nullptr);
-
-    /**
-     * Wait for all threads to reach this point. Since there may only be one
-     * thread, return immediately, i.e. this function is a no-op.
-     */
-    inline int
-    wait() const
-    {
-      return 0;
-    }
-
-    /**
-     * Dump the state of this object. Here: do nothing.
-     */
-    inline void
-    dump() const
-    {}
-
-    /**
-     * @addtogroup Exceptions
-     * @{
-     */
-
-    /**
-     * Exception.
-     */
-    DeclException1(
-      ExcBarrierSizeNotUseful,
-      int,
-      << "In single-thread mode, barrier sizes other than 1 are not "
-      << "useful. You gave " << arg1 << ".");
-
-    //@}
-  };
-
-
-#  ifdef DEAL_II_WITH_THREADS
-
-  /**
    * A class implementing a <a
    * href="https://en.wikipedia.org/wiki/Lock_(computer_science)">mutex</a>.
    * Mutexes are used to lock data structures to ensure that only a
@@ -452,11 +268,11 @@ namespace Threads
      * Data object storing the POSIX data which we need to call the POSIX
      * functions.
      */
-#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_t barrier;
-#    else
+#  else
     unsigned int count;
-#    endif
+#  endif
   };
 
 
@@ -468,30 +284,6 @@ namespace Threads
    *   is deprecated.
    */
   using Barrier DEAL_II_DEPRECATED = PosixThreadBarrier;
-
-#  else
-  /**
-   * In non-multithread mode, the mutex and thread management classes are
-   * aliased to dummy classes that actually do nothing, in particular not lock
-   * objects. Likewise for the barrier class.
-   */
-  using Mutex = DummyThreadMutex;
-
-  /**
-   * In non-multithread mode, the mutex and thread management classes are
-   * aliased to dummy classes that actually do nothing, in particular not lock
-   * objects. Likewise for the barrier class.
-   */
-  using ConditionVariable = DummyThreadCondition;
-
-  /**
-   * In non-multithread mode, the mutex and thread management classes are
-   * aliased to dummy classes that actually do nothing, in particular not lock
-   * objects. Likewise for the barrier class.
-   */
-  using Barrier = DummyBarrier;
-#  endif
-
 } // namespace Threads
 
 
