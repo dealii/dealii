@@ -263,7 +263,7 @@ namespace Threads
    *
    * @author Wolfgang Bangerth, 2002, 2003, 2009
    */
-  class Mutex
+  class Mutex : public std::mutex
   {
   public:
     /**
@@ -280,33 +280,7 @@ namespace Threads
      * case when you lock and unlock the mutex "by hand", i.e. using
      * Mutex::acquire() and Mutex::release().
      */
-    class ScopedLock
-    {
-    public:
-      /**
-       * Constructor. Lock the mutex.
-       */
-      ScopedLock(Mutex &m)
-        : mutex(m)
-      {
-        mutex.acquire();
-      }
-
-      /**
-       * Destructor. Unlock the mutex. Since this is a dummy mutex class, this
-       * of course does nothing.
-       */
-      ~ScopedLock()
-      {
-        mutex.release();
-      }
-
-    private:
-      /**
-       * Store the address of the mutex object.
-       */
-      Mutex &mutex;
-    };
+    using ScopedLock = std::lock_guard<std::mutex>;
 
     /**
      * Default constructor.
@@ -318,7 +292,7 @@ namespace Threads
      * is copied from the object given as argument.
      */
     Mutex(const Mutex &)
-      : mutex()
+      : std::mutex()
     {}
 
 
@@ -339,7 +313,7 @@ namespace Threads
     inline void
     acquire()
     {
-      mutex.lock();
+      this->lock();
     }
 
     /**
@@ -348,20 +322,8 @@ namespace Threads
     inline void
     release()
     {
-      mutex.unlock();
+      this->unlock();
     }
-
-  private:
-    /**
-     * Data object storing the mutex data
-     */
-    std::mutex mutex;
-
-    /**
-     * Make the class implementing condition variables a friend, since it
-     * needs to access the mutex.
-     */
-    friend class ConditionVariable;
   };
 
 
@@ -406,7 +368,7 @@ namespace Threads
     inline void
     wait(Mutex &mutex)
     {
-      std::unique_lock<std::mutex> lock(mutex.mutex, std::adopt_lock);
+      std::unique_lock<std::mutex> lock(mutex, std::adopt_lock);
       condition_variable.wait(lock);
     }
 
