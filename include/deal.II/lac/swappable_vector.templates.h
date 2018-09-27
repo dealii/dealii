@@ -131,7 +131,7 @@ SwappableVector<number>::reload()
   // possibly existing @p alert
   // calls. if not in MT mode, this
   // is a no-op
-  lock.acquire();
+  lock.lock();
 
   // if data was already preloaded,
   // then there is no more need to
@@ -150,8 +150,8 @@ SwappableVector<number>::reload()
       // release lock. the lock is
       // also released in the other
       // branch of the if-clause
-      lock.release();
-    };
+      lock.unlock();
+    }
 }
 
 
@@ -169,7 +169,7 @@ SwappableVector<number>::alert()
   // synchronize with possible other
   // invocations of this function and
   // other functions in this class
-  lock.acquire();
+  lock.lock();
 
   // calling this function multiple
   // times does no harm:
@@ -178,7 +178,7 @@ SwappableVector<number>::alert()
       // vector is active does no harm
       // either
       (this->size() != 0))
-    lock.release();
+    lock.unlock();
   else
     // data has not been preloaded so
     // far, so go on! For this, start
@@ -210,7 +210,7 @@ SwappableVector<number>::reload_vector(const bool set_flag)
   // set the flag if so required
   if (set_flag)
     data_is_preloaded = true;
-  lock.release();
+  lock.unlock();
 #endif
 }
 

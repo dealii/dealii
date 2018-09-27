@@ -1066,9 +1066,9 @@ namespace Polynomials
           }
         else if (k == 2)
           {
-            coefficients_lock.release();
+            coefficients_lock.unlock();
             compute_coefficients(1);
-            coefficients_lock.acquire();
+            coefficients_lock.lock();
 
             std::vector<double> c2(3);
 
@@ -1091,9 +1091,9 @@ namespace Polynomials
             // allow the called
             // function to acquire it
             // itself
-            coefficients_lock.release();
+            coefficients_lock.unlock();
             compute_coefficients(k - 1);
-            coefficients_lock.acquire();
+            coefficients_lock.lock();
 
             std::vector<double> ck(k + 1);
 
