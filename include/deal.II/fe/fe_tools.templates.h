@@ -1281,7 +1281,9 @@ namespace FETools
       // they're in an anonymous namespace) in order to make icc happy
       // (which otherwise reports a multiply defined symbol when linking
       // libraries for more than one space dimension together
+#ifdef DEAL_II_WITH_THREADS
       static Threads::Mutex fe_name_map_lock;
+#endif
 
       // This is the map used by FETools::get_fe_by_name and
       // FETools::add_fe_name. It is only accessed by functions in this
@@ -2404,13 +2406,15 @@ namespace FETools
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
     if (name_end < name.size())
       name.erase(name_end);
-    // first make sure that no other
-    // thread intercepts the
-    // operation of this function;
-    // for this, acquire the lock
-    // until we quit this function
+      // first make sure that no other
+      // thread intercepts the
+      // operation of this function;
+      // for this, acquire the lock
+      // until we quit this function
+#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
+#endif
 
     Assert(
       internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].find(name) ==
@@ -2566,8 +2570,10 @@ namespace FETools
           {
             // Make sure no other thread
             // is just adding an element
+#ifdef DEAL_II_WITH_THREADS
             std::lock_guard<std::mutex> lock(
               internal::FEToolsAddFENameHelper::fe_name_map_lock);
+#endif
             AssertThrow(fe_name_map.find(name_part) != fe_name_map.end(),
                         FETools::ExcInvalidFEName(name));
 

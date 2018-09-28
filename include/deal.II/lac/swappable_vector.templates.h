@@ -75,10 +75,12 @@ SwappableVector<number>::operator=(const SwappableVector<number> &v)
   if (filename != "")
     kill_file();
 
-  // if in MT mode, block all other
-  // operations. if not in MT mode,
-  // this is a no-op
+    // if in MT mode, block all other
+    // operations. if not in MT mode,
+    // this is a no-op
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(this->lock);
+#endif
 
   Vector<number>::operator=(v);
   data_is_preloaded       = false;
@@ -107,7 +109,9 @@ SwappableVector<number>::swap_out(const std::string &name)
   // if in MT mode, block all other
   // operations. if not in MT mode,
   // this is a no-op
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(this->lock);
+#endif
 
   //  check that we have not called
   //  @p alert without the respective
@@ -131,7 +135,9 @@ SwappableVector<number>::reload()
   // possibly existing @p alert
   // calls. if not in MT mode, this
   // is a no-op
+#ifdef DEAL_II_WITH_THREADS
   lock.lock();
+#endif
 
   // if data was already preloaded,
   // then there is no more need to
@@ -147,10 +153,12 @@ SwappableVector<number>::reload()
       // needed
       data_is_preloaded = false;
 
-      // release lock. the lock is
-      // also released in the other
-      // branch of the if-clause
+// release lock. the lock is
+// also released in the other
+// branch of the if-clause
+#ifdef DEAL_II_WITH_THREADS
       lock.unlock();
+#endif
     }
 }
 
@@ -225,7 +233,9 @@ SwappableVector<number>::kill_file()
   // (there should be none, but who
   // knows). if not in MT mode,
   // this is a no-op
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(this->lock);
+#endif
 
   // this is too bad: someone
   // requested the vector in advance,

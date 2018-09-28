@@ -718,7 +718,9 @@ FESystem<dim, spacedim>::get_restriction_matrix(
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
     {
+#ifdef DEAL_II_WITH_THREADS
       std::lock_guard<std::mutex> lock(this->mutex);
+#endif
 
       // check if updated while waiting for lock
       if (this->restriction[refinement_case - 1][child].n() ==
@@ -815,7 +817,9 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
   // restriction matrix
   if (this->prolongation[refinement_case - 1][child].n() == 0)
     {
+#ifdef DEAL_II_WITH_THREADS
       std::lock_guard<std::mutex> lock(this->mutex);
+#endif
 
       if (this->prolongation[refinement_case - 1][child].n() ==
           this->dofs_per_cell)

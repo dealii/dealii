@@ -73,7 +73,9 @@ namespace Functions
     // GSL functions may modify gsl_interp_accel *acc object (last argument).
     // This can only work in multithreaded applications if we lock the data
     // structures via a mutex.
+#  ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(acc_mutex);
+#  endif
 
     const double x = p[0];
     Assert(x >= interpolation_points.front() &&
@@ -94,7 +96,9 @@ namespace Functions
     // GSL functions may modify gsl_interp_accel *acc object (last argument).
     // This can only work in multithreaded applications if we lock the data
     // structures via a mutex.
+#  ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(acc_mutex);
+#  endif
 
     const double x = p[0];
     Assert(x >= interpolation_points.front() &&
@@ -118,7 +122,9 @@ namespace Functions
     // GSL functions may modify gsl_interp_accel *acc object (last argument).
     // This can only work in multithreaded applications if we lock the data
     // structures via a mutex.
+#  ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(acc_mutex);
+#  endif
 
     const double x = p[0];
     Assert(x >= interpolation_points.front() &&

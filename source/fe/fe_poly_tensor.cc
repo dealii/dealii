@@ -201,7 +201,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value_component(
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert(component < dim, ExcIndexRange(component, 0, dim));
 
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(cache_mutex);
+#endif
 
   if (cached_point != p || cached_values.size() == 0)
     {
@@ -247,7 +249,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_component(
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert(component < dim, ExcIndexRange(component, 0, dim));
 
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(cache_mutex);
+#endif
 
   if (cached_point != p || cached_grads.size() == 0)
     {
@@ -294,7 +298,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad_component(
   Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert(component < dim, ExcIndexRange(component, 0, dim));
 
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(cache_mutex);
+#endif
 
   if (cached_point != p || cached_grad_grads.size() == 0)
     {

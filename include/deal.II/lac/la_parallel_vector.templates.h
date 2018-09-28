@@ -875,7 +875,9 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_MPI
       // make this function thread safe
+#  ifdef DEAL_II_WITH_THREADS
       std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
       // allocate import_data in case it is not set up yet
       if (import_data == nullptr && partitioner->n_import_indices() > 0)
@@ -928,7 +930,9 @@ namespace LinearAlgebra
       // compress_requests.size() == 0
 
       // make this function thread safe
+#  ifdef DEAL_II_WITH_THREADS
       std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
       Assert(partitioner->n_import_indices() == 0 || import_data != nullptr,
              ExcNotInitialized());
@@ -974,8 +978,10 @@ namespace LinearAlgebra
           partitioner->n_import_indices() == 0)
         return;
 
-      // make this function thread safe
+        // make this function thread safe
+#  ifdef DEAL_II_WITH_THREADS
       std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
       // allocate import_data in case it is not set up yet
       if (import_data == nullptr && partitioner->n_import_indices() > 0)
@@ -1033,7 +1039,9 @@ namespace LinearAlgebra
       if (update_ghost_values_requests.size() > 0)
         {
           // make this function thread safe
+#  ifdef DEAL_II_WITH_THREADS
           std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number>(data.values.get() + partitioner->local_size(),
