@@ -148,19 +148,10 @@ namespace Threads
 
 
 
-#ifndef DEAL_II_WITH_THREADS
-  DummyBarrier::DummyBarrier(const unsigned int count, const char *, void *)
-  {
-    (void)count;
-    Assert(count == 1, ExcBarrierSizeNotUseful(count));
-  }
+#ifdef DEAL_II_USE_MT_POSIX
 
 
-#else
-#  ifdef DEAL_II_USE_MT_POSIX
-
-
-#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
   PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
                                          const char *,
                                          void *)
@@ -168,7 +159,7 @@ namespace Threads
     pthread_barrier_init(&barrier, nullptr, count);
   }
 
-#    else
+#  else
 
   PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
                                          const char *,
@@ -187,21 +178,21 @@ namespace Threads
                            "this class, but the rest of the threading\n"
                            "functionality is available."));
   }
-#    endif
+#  endif
 
 
 
   PosixThreadBarrier::~PosixThreadBarrier()
   {
-#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_destroy(&barrier);
-#    else
+#  else
     // unless the barrier is a no-op,
     // complain again (how did we get
     // here then?)
     if (count != 1)
       std::abort();
-#    endif
+#  endif
   }
 
 
@@ -209,9 +200,9 @@ namespace Threads
   int
   PosixThreadBarrier::wait()
   {
-#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     return pthread_barrier_wait(&barrier);
-#    else
+#  else
     // in the special case, this
     // function is a no-op. otherwise
     // complain about the missing
@@ -223,12 +214,11 @@ namespace Threads
         std::abort();
         return 1;
       };
-#    endif
+#  endif
   }
 
 
 
-#  endif
 #endif
 
 

@@ -23,22 +23,17 @@
 #  include <deal.II/base/multithread_info.h>
 #  include <deal.II/base/template_constraints.h>
 
-#  ifdef DEAL_II_WITH_THREADS
-#    include <condition_variable>
-#    include <mutex>
-#    include <thread>
-#  endif
-
+#  include <condition_variable>
 #  include <functional>
 #  include <iterator>
 #  include <list>
 #  include <memory>
+#  include <mutex>
 #  include <tuple>
 #  include <utility>
 #  include <vector>
-
-
 #  ifdef DEAL_II_WITH_THREADS
+#    include <thread>
 #    ifdef DEAL_II_USE_MT_POSIX
 #      include <pthread.h>
 #    endif
