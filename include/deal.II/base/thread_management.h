@@ -418,9 +418,12 @@ namespace Threads
    * at all). The rest of the threading functionality will be available in its
    * full extent, though, even if POSIX barriers are not available.
    *
+   * @deprecated This class is deprecated. It is easily possible to implement
+   *   its functionality with the facilities provided by C++11.
+   *
    * @author Wolfgang Bangerth, 2002
    */
-  class PosixThreadBarrier
+  class DEAL_II_DEPRECATED PosixThreadBarrier
   {
   public:
     /**
@@ -460,8 +463,11 @@ namespace Threads
   /**
    * If using POSIX functions, then alias the POSIX wrapper classes to the
    * names we use throughout the library.
+   *
+   * @deprecated Like the PosixThreadBarrier class, this `using` declaration
+   *   is deprecated.
    */
-  using Barrier = PosixThreadBarrier;
+  using Barrier DEAL_II_DEPRECATED = PosixThreadBarrier;
 
 #  else
   /**
