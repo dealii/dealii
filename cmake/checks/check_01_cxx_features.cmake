@@ -269,6 +269,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       int main()
       {
           constexpr int max = std::max(0,1);
+          (void) max;
       }
       "
       DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN)
@@ -292,6 +293,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       int main()
       {
         foo bar;
+        (void) bar;
       }
       "
       DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
@@ -339,14 +341,8 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <condition_variable>
   #include <type_traits>
 
-  // type traits functionality
-  constexpr auto m0 = std::is_trivial<double>::value;
-  constexpr auto m1 = std::is_standard_layout<double>::value;
-  constexpr auto m2 = std::is_pod<double>::value;
-
   // thread_local storage specification
-  thread_local std::array<int,3> p;
-  std::condition_variable c;
+  static thread_local std::array<int,3> p;
 
   // Check the version language macro, but skip MSVC because
   // MSVC reports 199711 even in MSVC 2017.
@@ -356,8 +352,17 @@ CHECK_CXX_SOURCE_COMPILES(
 
   int main()
   {
+    std::condition_variable c;
     p[0];
     c.notify_all();
+
+   // type traits functionality
+   constexpr auto m0 = std::is_trivial<double>::value;
+   (void) m0;
+   constexpr auto m1 = std::is_standard_layout<double>::value;
+   (void) m1;
+   constexpr auto m2 = std::is_pod<double>::value;
+   (void) m2;
   }
   "
   DEAL_II_HAVE_CXX11_FEATURES)
@@ -385,7 +390,8 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <ctype.h>
   int main ()
   {
-    char c = toupper('a');
+    int c = toupper('a');
+    (void) c;
   }
   "
   DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK)
