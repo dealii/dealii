@@ -606,42 +606,40 @@ namespace Functions
           result[0][0] = -pi2 * std::cos(numbers::PI_2 * p(0));
           break;
         case 2:
-          if (true)
-            {
-              const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                  std::cos(numbers::PI_2 * p(1));
-              const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                  std::sin(numbers::PI_2 * p(1));
-              result[0][0] = coco;
-              result[1][1] = coco;
-              // for SymmetricTensor we assign [ij] and [ji] simultaneously:
-              result[0][1] = sisi;
-            }
+          {
+            const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                std::cos(numbers::PI_2 * p(1));
+            const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                std::sin(numbers::PI_2 * p(1));
+            result[0][0] = coco;
+            result[1][1] = coco;
+            // for SymmetricTensor we assign [ij] and [ji] simultaneously:
+            result[0][1] = sisi;
+          }
           break;
         case 3:
-          if (true)
-            {
-              const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                    std::cos(numbers::PI_2 * p(1)) *
-                                    std::cos(numbers::PI_2 * p(2));
-              const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                    std::sin(numbers::PI_2 * p(1)) *
-                                    std::cos(numbers::PI_2 * p(2));
-              const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                    std::cos(numbers::PI_2 * p(1)) *
-                                    std::sin(numbers::PI_2 * p(2));
-              const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                    std::sin(numbers::PI_2 * p(1)) *
-                                    std::sin(numbers::PI_2 * p(2));
+          {
+            const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                  std::cos(numbers::PI_2 * p(1)) *
+                                  std::cos(numbers::PI_2 * p(2));
+            const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                  std::sin(numbers::PI_2 * p(1)) *
+                                  std::cos(numbers::PI_2 * p(2));
+            const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                  std::cos(numbers::PI_2 * p(1)) *
+                                  std::sin(numbers::PI_2 * p(2));
+            const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                  std::sin(numbers::PI_2 * p(1)) *
+                                  std::sin(numbers::PI_2 * p(2));
 
-              result[0][0] = cococo;
-              result[1][1] = cococo;
-              result[2][2] = cococo;
-              // for SymmetricTensor we assign [ij] and [ji] simultaneously:
-              result[0][1] = sisico;
-              result[0][2] = sicosi;
-              result[1][2] = cosisi;
-            }
+            result[0][0] = cococo;
+            result[1][1] = cococo;
+            result[2][2] = cococo;
+            // for SymmetricTensor we assign [ij] and [ji] simultaneously:
+            result[0][1] = sisico;
+            result[0][2] = sicosi;
+            result[1][2] = cosisi;
+          }
           break;
         default:
           Assert(false, ExcNotImplemented());
@@ -670,42 +668,40 @@ namespace Functions
               hessians[i][0][0] = -pi2 * std::cos(numbers::PI_2 * p(0));
               break;
             case 2:
-              if (true)
-                {
-                  const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                      std::cos(numbers::PI_2 * p(1));
-                  const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                      std::sin(numbers::PI_2 * p(1));
-                  hessians[i][0][0] = coco;
-                  hessians[i][1][1] = coco;
-                  // for SymmetricTensor we assign [ij] and [ji] simultaneously:
-                  hessians[i][0][1] = sisi;
-                }
+              {
+                const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                    std::cos(numbers::PI_2 * p(1));
+                const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                    std::sin(numbers::PI_2 * p(1));
+                hessians[i][0][0] = coco;
+                hessians[i][1][1] = coco;
+                // for SymmetricTensor we assign [ij] and [ji] simultaneously:
+                hessians[i][0][1] = sisi;
+              }
               break;
             case 3:
-              if (true)
-                {
-                  const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                        std::cos(numbers::PI_2 * p(1)) *
-                                        std::cos(numbers::PI_2 * p(2));
-                  const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                        std::sin(numbers::PI_2 * p(1)) *
-                                        std::cos(numbers::PI_2 * p(2));
-                  const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                        std::cos(numbers::PI_2 * p(1)) *
-                                        std::sin(numbers::PI_2 * p(2));
-                  const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                        std::sin(numbers::PI_2 * p(1)) *
-                                        std::sin(numbers::PI_2 * p(2));
+              {
+                const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                      std::cos(numbers::PI_2 * p(1)) *
+                                      std::cos(numbers::PI_2 * p(2));
+                const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                      std::sin(numbers::PI_2 * p(1)) *
+                                      std::cos(numbers::PI_2 * p(2));
+                const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                      std::cos(numbers::PI_2 * p(1)) *
+                                      std::sin(numbers::PI_2 * p(2));
+                const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                      std::sin(numbers::PI_2 * p(1)) *
+                                      std::sin(numbers::PI_2 * p(2));
 
-                  hessians[i][0][0] = cococo;
-                  hessians[i][1][1] = cococo;
-                  hessians[i][2][2] = cococo;
-                  // for SymmetricTensor we assign [ij] and [ji] simultaneously:
-                  hessians[i][0][1] = sisico;
-                  hessians[i][0][2] = sicosi;
-                  hessians[i][1][2] = cosisi;
-                }
+                hessians[i][0][0] = cococo;
+                hessians[i][1][1] = cococo;
+                hessians[i][2][2] = cococo;
+                // for SymmetricTensor we assign [ij] and [ji] simultaneously:
+                hessians[i][0][1] = sisico;
+                hessians[i][0][2] = sicosi;
+                hessians[i][1][2] = cosisi;
+              }
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -972,44 +968,42 @@ namespace Functions
               gradients[i][0][0] = -pi2 * std::cos(numbers::PI_2 * p(0));
               break;
             case 2:
-              if (true)
-                {
-                  const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                      std::cos(numbers::PI_2 * p(1));
-                  const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                      std::sin(numbers::PI_2 * p(1));
-                  gradients[i][0][0] = coco;
-                  gradients[i][1][1] = coco;
-                  gradients[i][0][1] = sisi;
-                  gradients[i][1][0] = sisi;
-                }
+              {
+                const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                    std::cos(numbers::PI_2 * p(1));
+                const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                    std::sin(numbers::PI_2 * p(1));
+                gradients[i][0][0] = coco;
+                gradients[i][1][1] = coco;
+                gradients[i][0][1] = sisi;
+                gradients[i][1][0] = sisi;
+              }
               break;
             case 3:
-              if (true)
-                {
-                  const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                        std::cos(numbers::PI_2 * p(1)) *
-                                        std::cos(numbers::PI_2 * p(2));
-                  const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                        std::sin(numbers::PI_2 * p(1)) *
-                                        std::cos(numbers::PI_2 * p(2));
-                  const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                        std::cos(numbers::PI_2 * p(1)) *
-                                        std::sin(numbers::PI_2 * p(2));
-                  const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                        std::sin(numbers::PI_2 * p(1)) *
-                                        std::sin(numbers::PI_2 * p(2));
+              {
+                const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                      std::cos(numbers::PI_2 * p(1)) *
+                                      std::cos(numbers::PI_2 * p(2));
+                const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                      std::sin(numbers::PI_2 * p(1)) *
+                                      std::cos(numbers::PI_2 * p(2));
+                const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
+                                      std::cos(numbers::PI_2 * p(1)) *
+                                      std::sin(numbers::PI_2 * p(2));
+                const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
+                                      std::sin(numbers::PI_2 * p(1)) *
+                                      std::sin(numbers::PI_2 * p(2));
 
-                  gradients[i][0][0] = cococo;
-                  gradients[i][1][1] = cococo;
-                  gradients[i][2][2] = cococo;
-                  gradients[i][0][1] = sisico;
-                  gradients[i][1][0] = sisico;
-                  gradients[i][0][2] = sicosi;
-                  gradients[i][2][0] = sicosi;
-                  gradients[i][1][2] = cosisi;
-                  gradients[i][2][1] = cosisi;
-                }
+                gradients[i][0][0] = cococo;
+                gradients[i][1][1] = cococo;
+                gradients[i][2][2] = cococo;
+                gradients[i][0][1] = sisico;
+                gradients[i][1][0] = sisico;
+                gradients[i][0][2] = sicosi;
+                gradients[i][2][0] = sicosi;
+                gradients[i][1][2] = cosisi;
+                gradients[i][2][1] = cosisi;
+              }
               break;
             default:
               Assert(false, ExcNotImplemented());

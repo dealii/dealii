@@ -474,27 +474,26 @@ SparseBlockVanka<number>::compute_dof_masks(
   // consecutive, with other
   // consecutive regions where we do
   // not have to do something
-  if (true)
-    {
-      unsigned int c     = 0;
-      unsigned int block = 0;
-      intervals[0].first = 0;
+  {
+    unsigned int c     = 0;
+    unsigned int block = 0;
+    intervals[0].first = 0;
 
-      for (size_type i = 0; (i < M.m()) && (block + 1 < n_blocks); ++i)
-        {
-          if (selected[i] == true)
-            ++c;
-          if (c == n_inverses_per_block)
-            {
-              intervals[block].second    = i;
-              intervals[block + 1].first = i;
-              ++block;
+    for (size_type i = 0; (i < M.m()) && (block + 1 < n_blocks); ++i)
+      {
+        if (selected[i] == true)
+          ++c;
+        if (c == n_inverses_per_block)
+          {
+            intervals[block].second    = i;
+            intervals[block + 1].first = i;
+            ++block;
 
-              c = 0;
-            }
-        }
-      intervals[n_blocks - 1].second = M.m();
-    }
+            c = 0;
+          }
+      }
+    intervals[n_blocks - 1].second = M.m();
+  }
 
   // now transfer the knowledge on
   // the splitting points into the
