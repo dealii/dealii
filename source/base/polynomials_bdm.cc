@@ -85,7 +85,9 @@ PolynomialsBDM<dim>::compute(
   // are not used by multiple threads
   // at once
   {
+#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(mutex);
+#endif
 
     p_values.resize((values.size() == 0) ? 0 : n_sub);
     p_grads.resize((grads.size() == 0) ? 0 : n_sub);

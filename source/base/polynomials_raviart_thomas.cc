@@ -80,21 +80,23 @@ PolynomialsRaviartThomas<dim>::compute(
   Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
          ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
-  // have a few scratch
-  // arrays. because we don't want to
-  // re-allocate them every time this
-  // function is called, we make them
-  // static. however, in return we
-  // have to ensure that the calls to
-  // the use of these variables is
-  // locked with a mutex. if the
-  // mutex is removed, several tests
-  // (notably
-  // deal.II/create_mass_matrix_05)
-  // will start to produce random
-  // results in multithread mode
+// have a few scratch
+// arrays. because we don't want to
+// re-allocate them every time this
+// function is called, we make them
+// static. however, in return we
+// have to ensure that the calls to
+// the use of these variables is
+// locked with a mutex. if the
+// mutex is removed, several tests
+// (notably
+// deal.II/create_mass_matrix_05)
+// will start to produce random
+// results in multithread mode
+#ifdef DEAL_II_WITH_THREADS
   static Threads::Mutex       mutex;
   std::lock_guard<std::mutex> lock(mutex);
+#endif
 
   static std::vector<double>         p_values;
   static std::vector<Tensor<1, dim>> p_grads;

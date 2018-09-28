@@ -1286,11 +1286,15 @@ namespace internal
       static constexpr unsigned int bucket_size_threading = 256;
 
       void
-      compute_row_lengths(const unsigned int           begin,
-                          const unsigned int           end,
-                          const DoFInfo &              dof_info,
+      compute_row_lengths(const unsigned int begin,
+                          const unsigned int end,
+                          const DoFInfo &    dof_info,
+#ifdef DEAL_II_WITH_THREADS
                           std::vector<Threads::Mutex> &mutexes,
-                          std::vector<unsigned int> &  row_lengths)
+#else
+                          std::vector<Threads::Mutex> &,
+#endif
+                          std::vector<unsigned int> &row_lengths)
       {
         std::vector<unsigned int> scratch;
         const unsigned int n_components = dof_info.start_components.back();
@@ -1313,8 +1317,11 @@ namespace internal
                 // that are within the range of one lock at once
                 const unsigned int next_bucket =
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
+#ifdef DEAL_II_WITH_THREADS
                 std::lock_guard<std::mutex> lock(
                   mutexes[*it / bucket_size_threading]);
+#endif
+
                 for (; it != end_unique && *it < next_bucket; ++it)
                   {
                     AssertIndexRange(*it, row_lengths.size());
@@ -1329,8 +1336,12 @@ namespace internal
                              const unsigned int               end,
                              const DoFInfo &                  dof_info,
                              const std::vector<unsigned int> &row_lengths,
-                             std::vector<Threads::Mutex> &    mutexes,
-                             dealii::SparsityPattern &        connectivity_dof)
+#ifdef DEAL_II_WITH_THREADS
+                             std::vector<Threads::Mutex> &mutexes,
+#else
+                             std::vector<Threads::Mutex> &,
+#endif
+                             dealii::SparsityPattern &connectivity_dof)
       {
         std::vector<unsigned int> scratch;
         const unsigned int n_components = dof_info.start_components.back();
@@ -1351,8 +1362,10 @@ namespace internal
               {
                 const unsigned int next_bucket =
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
+#ifdef DEAL_II_WITH_THREADS
                 std::lock_guard<std::mutex> lock(
                   mutexes[*it / bucket_size_threading]);
+#endif
                 for (; it != end_unique && *it < next_bucket; ++it)
                   if (row_lengths[*it] > 0)
                     connectivity_dof.add(*it, block);

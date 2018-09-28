@@ -477,8 +477,10 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::vmult(
 {
   AssertDimension(dst_view.size(), this->m());
   AssertDimension(src_view.size(), this->n());
+#  ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(this->mutex);
-  const unsigned int          n =
+#  endif
+  const unsigned int n =
     Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues[0].size());
   tmp_array.resize_fast(n * 2);
   constexpr int kernel_size = size > 0 ? size : 0;
@@ -545,8 +547,10 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
 {
   AssertDimension(dst_view.size(), this->n());
   AssertDimension(src_view.size(), this->m());
+#  ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(this->mutex);
-  const unsigned int          n = size > 0 ? size : eigenvalues[0].size();
+#  endif
+  const unsigned int n = size > 0 ? size : eigenvalues[0].size();
   tmp_array.resize_fast(Utilities::fixed_power<dim>(n));
   constexpr int kernel_size = size > 0 ? size : 0;
   internal::EvaluatorTensorProduct<internal::evaluate_general,

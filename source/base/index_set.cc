@@ -129,7 +129,9 @@ IndexSet::do_compress() const
   // via a mutex, so that users can call 'const' functions from threads
   // in parallel (and these 'const' functions can then call compress()
   // which itself calls the current function)
+#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(compress_mutex);
+#endif
 
   // see if any of the contiguous ranges can be merged. do not use
   // std::vector::erase in-place as it is quadratic in the number of

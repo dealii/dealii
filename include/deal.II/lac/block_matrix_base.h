@@ -1724,7 +1724,9 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
 
   // lock access to the temporary data structure to
   // allow multiple threads to call this function concurrently
+#  ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(temporary_data.mutex);
+#  endif
 
   // Resize scratch arrays
   if (temporary_data.column_indices.size() < this->n_block_cols())
@@ -1980,8 +1982,10 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
       return;
     }
 
-  // Lock scratch arrays, then resize them
+    // Lock scratch arrays, then resize them
+#  ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(temporary_data.mutex);
+#  endif
 
   if (temporary_data.column_indices.size() < this->n_block_cols())
     {
