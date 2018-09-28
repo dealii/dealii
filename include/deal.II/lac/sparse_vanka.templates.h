@@ -148,8 +148,8 @@ SparseVanka<number>::compute_inverses()
           ++thread;
 
           c = 0;
-        };
-    };
+        }
+    }
   blocking[n_threads - 1].second = matrix->m();
 
   using FunPtr =
@@ -292,7 +292,7 @@ SparseVanka<number>::apply_preconditioner(
           {
             inverses[row] = &local_matrix;
             inverses[row]->reinit(row_length, row_length);
-          };
+          }
 
         b.reinit(row_length);
         x.reinit(row_length);
@@ -491,10 +491,10 @@ SparseBlockVanka<number>::compute_dof_masks(
               ++block;
 
               c = 0;
-            };
-        };
+            }
+        }
       intervals[n_blocks - 1].second = M.m();
-    };
+    }
 
   // now transfer the knowledge on
   // the splitting points into the
@@ -511,7 +511,7 @@ SparseBlockVanka<number>::compute_dof_masks(
                         intervals[block].second - intervals[block].first,
                         true);
           break;
-        };
+        }
 
       case adaptive:
         {
@@ -556,7 +556,7 @@ SparseBlockVanka<number>::compute_dof_masks(
                 const size_type row_length = structure.row_length(row);
                 for (size_type i = 0; i < row_length; ++i)
                   ++access_count[block_number][structure.column_number(row, i)];
-              };
+              }
 
           // now we know that block @p i
           // wants to write to DoF @p j
@@ -591,16 +591,16 @@ SparseBlockVanka<number>::compute_dof_masks(
                     {
                       max_accesses     = access_count[block][row];
                       max_access_block = block;
-                    };
+                    }
                 dof_masks[max_access_block][row] = true;
-              };
+              }
 
           break;
-        };
+        }
 
       default:
         Assert(false, ExcInternalError());
-    };
+    }
 }
 
 

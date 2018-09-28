@@ -3048,7 +3048,7 @@ namespace DoFTools
               {
                 parameter_dofs[local_coarse_dof](fine_dof) = 1.;
                 break;
-              };
+              }
 
 
         // find out how many DoFs there are on the grids belonging to the
@@ -3074,12 +3074,12 @@ namespace DoFTools
                     if (fine_fe.system_to_component_index(i).first ==
                         fine_component)
                       dof_is_interesting[local_dof_indices[i]] = true;
-                };
+                }
 
             n_parameters_on_fine_grid = std::count(dof_is_interesting.begin(),
                                                    dof_is_interesting.end(),
                                                    true);
-          };
+          }
 
 
         // set up the weights mapping
@@ -3112,12 +3112,12 @@ namespace DoFTools
                       {
                         weight_mapping[local_dof_indices[i]] = next_free_index;
                         ++next_free_index;
-                      };
-                };
+                      }
+                }
 
             Assert(next_free_index == n_parameters_on_fine_grid,
                    ExcInternalError());
-          };
+          }
 
 
         // for each cell on the parameter grid: find out which degrees of
@@ -3158,7 +3158,7 @@ namespace DoFTools
             Assert((std::fabs(sum - 1) < 1.e-12) ||
                      ((coarse_fe.n_components() > 1) && (sum == 0)),
                    ExcInternalError());
-          };
+          }
 #endif
 
 
@@ -3281,7 +3281,7 @@ namespace DoFTools
           // consistency check: if this is no parameter dof on the coarse grid,
           // then the respective row must be empty!
           Assert(weights[parameter_dof].size() == 0, ExcInternalError());
-        };
+        }
 
 
 
@@ -3341,10 +3341,10 @@ namespace DoFTools
                 weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
                 constraint_line.emplace_back(representants[row], j->second);
-            };
+            }
 
           constraints.add_entries(global_dof, constraint_line);
-        };
+        }
   }
 
 
@@ -3419,8 +3419,8 @@ namespace DoFTools
                    ExcInternalError());
 
             inverse_weight_mapping[parameter_dof] = i;
-          };
-      };
+          }
+      }
 
     // next copy over weights array and replace respective numbers
     const types::global_dof_index n_rows = weight_mapping.size();
@@ -3439,8 +3439,8 @@ namespace DoFTools
             Assert(p < n_rows, ExcInternalError());
 
             transfer_representation[p][i] = j->second;
-          };
-      };
+          }
+      }
   }
 
 
