@@ -4896,23 +4896,20 @@ namespace internal
         // check whether a new level is needed we have to check for
         // this on the highest level only (on this, all used cells are
         // also active, so we only have to check for this)
-        if (true)
-          {
-            typename Triangulation<dim, spacedim>::raw_cell_iterator
-              cell =
-                triangulation.begin_active(triangulation.levels.size() - 1),
-              endc = triangulation.end();
-            for (; cell != endc; ++cell)
-              if (cell->used())
-                if (cell->refine_flag_set())
-                  {
-                    triangulation.levels.push_back(
-                      std_cxx14::make_unique<
-                        internal::TriangulationImplementation::TriaLevel<
-                          dim>>());
-                    break;
-                  }
-          }
+        {
+          typename Triangulation<dim, spacedim>::raw_cell_iterator
+            cell = triangulation.begin_active(triangulation.levels.size() - 1),
+            endc = triangulation.end();
+          for (; cell != endc; ++cell)
+            if (cell->used())
+              if (cell->refine_flag_set())
+                {
+                  triangulation.levels.push_back(
+                    std_cxx14::make_unique<
+                      internal::TriangulationImplementation::TriaLevel<dim>>());
+                  break;
+                }
+        }
 
 
         // first clear user flags and pointers of lines; we're going
@@ -5082,119 +5079,117 @@ namespace internal
 
         // first the refinement of lines.  children are stored
         // pairwise
-        if (true)
-          {
-            // only active objects can be refined further
-            typename Triangulation<dim, spacedim>::active_line_iterator
-              line = triangulation.begin_active_line(),
-              endl = triangulation.end_line();
-            typename Triangulation<dim, spacedim>::raw_line_iterator
-              next_unused_line = triangulation.begin_raw_line();
+        {
+          // only active objects can be refined further
+          typename Triangulation<dim, spacedim>::active_line_iterator
+            line = triangulation.begin_active_line(),
+            endl = triangulation.end_line();
+          typename Triangulation<dim, spacedim>::raw_line_iterator
+            next_unused_line = triangulation.begin_raw_line();
 
-            for (; line != endl; ++line)
-              if (line->user_flag_set())
-                {
-                  // this line needs to be refined
+          for (; line != endl; ++line)
+            if (line->user_flag_set())
+              {
+                // this line needs to be refined
 
-                  // find the next unused vertex and set it
-                  // appropriately
-                  while (triangulation.vertices_used[next_unused_vertex] ==
-                         true)
-                    ++next_unused_vertex;
-                  Assert(
-                    next_unused_vertex < triangulation.vertices.size(),
-                    ExcMessage(
-                      "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-                  triangulation.vertices_used[next_unused_vertex] = true;
+                // find the next unused vertex and set it
+                // appropriately
+                while (triangulation.vertices_used[next_unused_vertex] == true)
+                  ++next_unused_vertex;
+                Assert(
+                  next_unused_vertex < triangulation.vertices.size(),
+                  ExcMessage(
+                    "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                triangulation.vertices_used[next_unused_vertex] = true;
 
-                  if (spacedim == dim)
-                    {
-                      // for the case of a domain in an
-                      // equal-dimensional space we only have to treat
-                      // boundary lines differently; for interior
-                      // lines we can compute the midpoint as the mean
-                      // of the two vertices: if (line->at_boundary())
-                      triangulation.vertices[next_unused_vertex] =
-                        line->center(true);
-                    }
-                  else
-                    // however, if spacedim>dim, we always have to ask
-                    // the boundary object for its answer. We use the
-                    // same object of the cell (which was stored in
-                    // line->user_index() before) unless a manifold_id
-                    // has been set on this very line.
-                    if (line->manifold_id() == numbers::flat_manifold_id)
-                    triangulation.vertices[next_unused_vertex] =
-                      triangulation.get_manifold(line->user_index())
-                        .get_new_point_on_line(line);
-                  else
+                if (spacedim == dim)
+                  {
+                    // for the case of a domain in an
+                    // equal-dimensional space we only have to treat
+                    // boundary lines differently; for interior
+                    // lines we can compute the midpoint as the mean
+                    // of the two vertices: if (line->at_boundary())
                     triangulation.vertices[next_unused_vertex] =
                       line->center(true);
+                  }
+                else
+                  // however, if spacedim>dim, we always have to ask
+                  // the boundary object for its answer. We use the
+                  // same object of the cell (which was stored in
+                  // line->user_index() before) unless a manifold_id
+                  // has been set on this very line.
+                  if (line->manifold_id() == numbers::flat_manifold_id)
+                  triangulation.vertices[next_unused_vertex] =
+                    triangulation.get_manifold(line->user_index())
+                      .get_new_point_on_line(line);
+                else
+                  triangulation.vertices[next_unused_vertex] =
+                    line->center(true);
 
-                  // now that we created the right point, make up the
-                  // two child lines.  To this end, find a pair of
-                  // unused lines
-                  bool pair_found = false;
-                  (void)pair_found;
-                  for (; next_unused_line != endl; ++next_unused_line)
-                    if (!next_unused_line->used() &&
-                        !(++next_unused_line)->used())
-                      {
-                        // go back to the first of the two unused
-                        // lines
-                        --next_unused_line;
-                        pair_found = true;
-                        break;
-                      }
-                  Assert(pair_found, ExcInternalError());
+                // now that we created the right point, make up the
+                // two child lines.  To this end, find a pair of
+                // unused lines
+                bool pair_found = false;
+                (void)pair_found;
+                for (; next_unused_line != endl; ++next_unused_line)
+                  if (!next_unused_line->used() &&
+                      !(++next_unused_line)->used())
+                    {
+                      // go back to the first of the two unused
+                      // lines
+                      --next_unused_line;
+                      pair_found = true;
+                      break;
+                    }
+                Assert(pair_found, ExcInternalError());
 
-                  // there are now two consecutive unused lines, such
-                  // that the children of a line will be consecutive.
-                  // then set the child pointer of the present line
-                  line->set_children(0, next_unused_line->index());
+                // there are now two consecutive unused lines, such
+                // that the children of a line will be consecutive.
+                // then set the child pointer of the present line
+                line->set_children(0, next_unused_line->index());
 
-                  // set the two new lines
-                  const typename Triangulation<dim, spacedim>::raw_line_iterator
-                    children[2] = {next_unused_line, ++next_unused_line};
-                  // some tests; if any of the iterators should be
-                  // invalid, then already dereferencing will fail
-                  Assert(
-                    children[0]->used() == false,
-                    ExcMessage(
-                      "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
-                  Assert(
-                    children[1]->used() == false,
-                    ExcMessage(
-                      "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                // set the two new lines
+                const typename Triangulation<dim, spacedim>::raw_line_iterator
+                  children[2] = {next_unused_line, ++next_unused_line};
+                // some tests; if any of the iterators should be
+                // invalid, then already dereferencing will fail
+                Assert(
+                  children[0]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                Assert(
+                  children[1]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
-                  children[0]->set(
-                    internal::TriangulationImplementation ::TriaObject<1>(
-                      line->vertex_index(0), next_unused_vertex));
-                  children[1]->set(
-                    internal::TriangulationImplementation ::TriaObject<1>(
-                      next_unused_vertex, line->vertex_index(1)));
+                children[0]->set(
+                  internal::TriangulationImplementation ::TriaObject<1>(
+                    line->vertex_index(0), next_unused_vertex));
+                children[1]->set(
+                  internal::TriangulationImplementation ::TriaObject<1>(
+                    next_unused_vertex, line->vertex_index(1)));
 
-                  children[0]->set_used_flag();
-                  children[1]->set_used_flag();
-                  children[0]->clear_children();
-                  children[1]->clear_children();
-                  children[0]->clear_user_data();
-                  children[1]->clear_user_data();
-                  children[0]->clear_user_flag();
-                  children[1]->clear_user_flag();
+                children[0]->set_used_flag();
+                children[1]->set_used_flag();
+                children[0]->clear_children();
+                children[1]->clear_children();
+                children[0]->clear_user_data();
+                children[1]->clear_user_data();
+                children[0]->clear_user_flag();
+                children[1]->clear_user_flag();
 
 
-                  children[0]->set_boundary_id_internal(line->boundary_id());
-                  children[1]->set_boundary_id_internal(line->boundary_id());
+                children[0]->set_boundary_id_internal(line->boundary_id());
+                children[1]->set_boundary_id_internal(line->boundary_id());
 
-                  children[0]->set_manifold_id(line->manifold_id());
-                  children[1]->set_manifold_id(line->manifold_id());
+                children[0]->set_manifold_id(line->manifold_id());
+                children[1]->set_manifold_id(line->manifold_id());
 
-                  // finally clear flag indicating the need for
-                  // refinement
-                  line->clear_user_flag();
-                }
-          }
+                // finally clear flag indicating the need for
+                // refinement
+                line->clear_user_flag();
+              }
+        }
 
 
         // Now set up the new cells
@@ -5280,23 +5275,20 @@ namespace internal
         // check whether a new level is needed we have to check for
         // this on the highest level only (on this, all used cells are
         // also active, so we only have to check for this)
-        if (true)
-          {
-            typename Triangulation<dim, spacedim>::raw_cell_iterator
-              cell =
-                triangulation.begin_active(triangulation.levels.size() - 1),
-              endc = triangulation.end();
-            for (; cell != endc; ++cell)
-              if (cell->used())
-                if (cell->refine_flag_set())
-                  {
-                    triangulation.levels.push_back(
-                      std_cxx14::make_unique<
-                        internal::TriangulationImplementation::TriaLevel<
-                          dim>>());
-                    break;
-                  }
-          }
+        {
+          typename Triangulation<dim, spacedim>::raw_cell_iterator
+            cell = triangulation.begin_active(triangulation.levels.size() - 1),
+            endc = triangulation.end();
+          for (; cell != endc; ++cell)
+            if (cell->used())
+              if (cell->refine_flag_set())
+                {
+                  triangulation.levels.push_back(
+                    std_cxx14::make_unique<
+                      internal::TriangulationImplementation::TriaLevel<dim>>());
+                  break;
+                }
+        }
 
 
         // first clear user flags for quads and lines; we're going to
@@ -5591,91 +5583,88 @@ namespace internal
         unsigned int next_unused_vertex = 0;
 
         // first for lines
-        if (true)
-          {
-            // only active objects can be refined further
-            typename Triangulation<dim, spacedim>::active_line_iterator
-              line = triangulation.begin_active_line(),
-              endl = triangulation.end_line();
-            typename Triangulation<dim, spacedim>::raw_line_iterator
-              next_unused_line = triangulation.begin_raw_line();
+        {
+          // only active objects can be refined further
+          typename Triangulation<dim, spacedim>::active_line_iterator
+            line = triangulation.begin_active_line(),
+            endl = triangulation.end_line();
+          typename Triangulation<dim, spacedim>::raw_line_iterator
+            next_unused_line = triangulation.begin_raw_line();
 
-            for (; line != endl; ++line)
-              if (line->user_flag_set())
-                {
-                  // this line needs to be refined
+          for (; line != endl; ++line)
+            if (line->user_flag_set())
+              {
+                // this line needs to be refined
 
-                  // find the next unused vertex and set it
-                  // appropriately
-                  while (triangulation.vertices_used[next_unused_vertex] ==
-                         true)
-                    ++next_unused_vertex;
-                  Assert(
-                    next_unused_vertex < triangulation.vertices.size(),
-                    ExcMessage(
-                      "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-                  triangulation.vertices_used[next_unused_vertex] = true;
+                // find the next unused vertex and set it
+                // appropriately
+                while (triangulation.vertices_used[next_unused_vertex] == true)
+                  ++next_unused_vertex;
+                Assert(
+                  next_unused_vertex < triangulation.vertices.size(),
+                  ExcMessage(
+                    "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                triangulation.vertices_used[next_unused_vertex] = true;
 
-                  triangulation.vertices[next_unused_vertex] =
-                    line->center(true);
+                triangulation.vertices[next_unused_vertex] = line->center(true);
 
-                  // now that we created the right point, make up the
-                  // two child lines (++ takes care of the end of the
-                  // vector)
-                  next_unused_line =
-                    triangulation.faces->lines.next_free_pair_object(
-                      triangulation);
-                  Assert(next_unused_line.state() == IteratorState::valid,
-                         ExcInternalError());
+                // now that we created the right point, make up the
+                // two child lines (++ takes care of the end of the
+                // vector)
+                next_unused_line =
+                  triangulation.faces->lines.next_free_pair_object(
+                    triangulation);
+                Assert(next_unused_line.state() == IteratorState::valid,
+                       ExcInternalError());
 
-                  // now we found two consecutive unused lines, such
-                  // that the children of a line will be consecutive.
-                  // then set the child pointer of the present line
-                  line->set_children(0, next_unused_line->index());
+                // now we found two consecutive unused lines, such
+                // that the children of a line will be consecutive.
+                // then set the child pointer of the present line
+                line->set_children(0, next_unused_line->index());
 
-                  // set the two new lines
-                  const typename Triangulation<dim, spacedim>::raw_line_iterator
-                    children[2] = {next_unused_line, ++next_unused_line};
+                // set the two new lines
+                const typename Triangulation<dim, spacedim>::raw_line_iterator
+                  children[2] = {next_unused_line, ++next_unused_line};
 
-                  // some tests; if any of the iterators should be
-                  // invalid, then already dereferencing will fail
-                  Assert(
-                    children[0]->used() == false,
-                    ExcMessage(
-                      "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
-                  Assert(
-                    children[1]->used() == false,
-                    ExcMessage(
-                      "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                // some tests; if any of the iterators should be
+                // invalid, then already dereferencing will fail
+                Assert(
+                  children[0]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                Assert(
+                  children[1]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
-                  children[0]->set(
-                    internal::TriangulationImplementation ::TriaObject<1>(
-                      line->vertex_index(0), next_unused_vertex));
-                  children[1]->set(
-                    internal::TriangulationImplementation ::TriaObject<1>(
-                      next_unused_vertex, line->vertex_index(1)));
+                children[0]->set(
+                  internal::TriangulationImplementation ::TriaObject<1>(
+                    line->vertex_index(0), next_unused_vertex));
+                children[1]->set(
+                  internal::TriangulationImplementation ::TriaObject<1>(
+                    next_unused_vertex, line->vertex_index(1)));
 
-                  children[0]->set_used_flag();
-                  children[1]->set_used_flag();
-                  children[0]->clear_children();
-                  children[1]->clear_children();
-                  children[0]->clear_user_data();
-                  children[1]->clear_user_data();
-                  children[0]->clear_user_flag();
-                  children[1]->clear_user_flag();
+                children[0]->set_used_flag();
+                children[1]->set_used_flag();
+                children[0]->clear_children();
+                children[1]->clear_children();
+                children[0]->clear_user_data();
+                children[1]->clear_user_data();
+                children[0]->clear_user_flag();
+                children[1]->clear_user_flag();
 
-                  children[0]->set_boundary_id_internal(line->boundary_id());
-                  children[1]->set_boundary_id_internal(line->boundary_id());
+                children[0]->set_boundary_id_internal(line->boundary_id());
+                children[1]->set_boundary_id_internal(line->boundary_id());
 
-                  children[0]->set_manifold_id(line->manifold_id());
-                  children[1]->set_manifold_id(line->manifold_id());
+                children[0]->set_manifold_id(line->manifold_id());
+                children[1]->set_manifold_id(line->manifold_id());
 
-                  // finally clear flag
-                  // indicating the need
-                  // for refinement
-                  line->clear_user_flag();
-                }
-          }
+                // finally clear flag
+                // indicating the need
+                // for refinement
+                line->clear_user_flag();
+              }
+        }
 
 
         ///////////////////////////////////////

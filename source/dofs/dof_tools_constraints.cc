@@ -3048,38 +3048,36 @@ namespace DoFTools
               {
                 parameter_dofs[local_coarse_dof](fine_dof) = 1.;
                 break;
-              };
+              }
 
 
         // find out how many DoFs there are on the grids belonging to the
         // components we want to match
         unsigned int n_parameters_on_fine_grid = 0;
-        if (true)
-          {
-            // have a flag for each dof on the fine grid and set it to true if
-            // this is an interesting dof. finally count how many true's there
-            std::vector<bool> dof_is_interesting(fine_grid.n_dofs(), false);
-            std::vector<types::global_dof_index> local_dof_indices(
-              fine_fe.dofs_per_cell);
+        {
+          // have a flag for each dof on the fine grid and set it to true if
+          // this is an interesting dof. finally count how many true's there
+          std::vector<bool> dof_is_interesting(fine_grid.n_dofs(), false);
+          std::vector<types::global_dof_index> local_dof_indices(
+            fine_fe.dofs_per_cell);
 
-            for (typename dealii::DoFHandler<dim,
-                                             spacedim>::active_cell_iterator
-                   cell = fine_grid.begin_active();
-                 cell != fine_grid.end();
-                 ++cell)
-              if (cell->is_locally_owned())
-                {
-                  cell->get_dof_indices(local_dof_indices);
-                  for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
-                    if (fine_fe.system_to_component_index(i).first ==
-                        fine_component)
-                      dof_is_interesting[local_dof_indices[i]] = true;
-                };
+          for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
+                 cell = fine_grid.begin_active();
+               cell != fine_grid.end();
+               ++cell)
+            if (cell->is_locally_owned())
+              {
+                cell->get_dof_indices(local_dof_indices);
+                for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
+                  if (fine_fe.system_to_component_index(i).first ==
+                      fine_component)
+                    dof_is_interesting[local_dof_indices[i]] = true;
+              }
 
-            n_parameters_on_fine_grid = std::count(dof_is_interesting.begin(),
-                                                   dof_is_interesting.end(),
-                                                   true);
-          };
+          n_parameters_on_fine_grid = std::count(dof_is_interesting.begin(),
+                                                 dof_is_interesting.end(),
+                                                 true);
+        }
 
 
         // set up the weights mapping
@@ -3089,35 +3087,33 @@ namespace DoFTools
         weight_mapping.clear();
         weight_mapping.resize(n_fine_dofs, numbers::invalid_dof_index);
 
-        if (true)
-          {
-            std::vector<types::global_dof_index> local_dof_indices(
-              fine_fe.dofs_per_cell);
-            unsigned int next_free_index = 0;
-            for (typename dealii::DoFHandler<dim,
-                                             spacedim>::active_cell_iterator
-                   cell = fine_grid.begin_active();
-                 cell != fine_grid.end();
-                 ++cell)
-              if (cell->is_locally_owned())
-                {
-                  cell->get_dof_indices(local_dof_indices);
-                  for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
-                    // if this DoF is a parameter dof and has not yet been
-                    // numbered, then do so
-                    if ((fine_fe.system_to_component_index(i).first ==
-                         fine_component) &&
-                        (weight_mapping[local_dof_indices[i]] ==
-                         numbers::invalid_dof_index))
-                      {
-                        weight_mapping[local_dof_indices[i]] = next_free_index;
-                        ++next_free_index;
-                      };
-                };
+        {
+          std::vector<types::global_dof_index> local_dof_indices(
+            fine_fe.dofs_per_cell);
+          unsigned int next_free_index = 0;
+          for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
+                 cell = fine_grid.begin_active();
+               cell != fine_grid.end();
+               ++cell)
+            if (cell->is_locally_owned())
+              {
+                cell->get_dof_indices(local_dof_indices);
+                for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
+                  // if this DoF is a parameter dof and has not yet been
+                  // numbered, then do so
+                  if ((fine_fe.system_to_component_index(i).first ==
+                       fine_component) &&
+                      (weight_mapping[local_dof_indices[i]] ==
+                       numbers::invalid_dof_index))
+                    {
+                      weight_mapping[local_dof_indices[i]] = next_free_index;
+                      ++next_free_index;
+                    }
+              }
 
-            Assert(next_free_index == n_parameters_on_fine_grid,
-                   ExcInternalError());
-          };
+          Assert(next_free_index == n_parameters_on_fine_grid,
+                 ExcInternalError());
+        }
 
 
         // for each cell on the parameter grid: find out which degrees of
@@ -3158,7 +3154,7 @@ namespace DoFTools
             Assert((std::fabs(sum - 1) < 1.e-12) ||
                      ((coarse_fe.n_components() > 1) && (sum == 0)),
                    ExcInternalError());
-          };
+          }
 #endif
 
 
@@ -3281,7 +3277,7 @@ namespace DoFTools
           // consistency check: if this is no parameter dof on the coarse grid,
           // then the respective row must be empty!
           Assert(weights[parameter_dof].size() == 0, ExcInternalError());
-        };
+        }
 
 
 
@@ -3341,10 +3337,10 @@ namespace DoFTools
                 weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
                 constraint_line.emplace_back(representants[row], j->second);
-            };
+            }
 
           constraints.add_entries(global_dof, constraint_line);
-        };
+        }
   }
 
 
@@ -3419,8 +3415,8 @@ namespace DoFTools
                    ExcInternalError());
 
             inverse_weight_mapping[parameter_dof] = i;
-          };
-      };
+          }
+      }
 
     // next copy over weights array and replace respective numbers
     const types::global_dof_index n_rows = weight_mapping.size();
@@ -3439,8 +3435,8 @@ namespace DoFTools
             Assert(p < n_rows, ExcInternalError());
 
             transfer_representation[p][i] = j->second;
-          };
-      };
+          }
+      }
   }
 
 
