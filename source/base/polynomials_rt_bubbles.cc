@@ -73,10 +73,8 @@ PolynomialsRT_Bubbles<dim>::compute(
   // using a mutex to make sure they are not used by multiple threads
   // at once
   {
-#ifdef DEAL_II_WITH_THREADS
     static Threads::Mutex       mutex;
     std::lock_guard<std::mutex> lock(mutex);
-#endif
 
     static std::vector<Tensor<1, dim>> p_values;
     static std::vector<Tensor<2, dim>> p_grads;

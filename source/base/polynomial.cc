@@ -38,10 +38,8 @@ DEAL_II_NAMESPACE_OPEN
 // more fine-grained solution
 namespace
 {
-#ifdef DEAL_II_WITH_THREADS
   Threads::Mutex coefficients_lock;
-#endif
-} // namespace
+}
 
 
 
@@ -1008,9 +1006,7 @@ namespace Polynomials
     // of this function
     // for this, acquire the lock
     // until we quit this function
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(coefficients_lock);
-#endif
 
     // The first 2 coefficients
     // are hard-coded
@@ -1070,13 +1066,9 @@ namespace Polynomials
           }
         else if (k == 2)
           {
-#ifdef DEAL_II_WITH_THREADS
             coefficients_lock.unlock();
-#endif
             compute_coefficients(1);
-#ifdef DEAL_II_WITH_THREADS
             coefficients_lock.lock();
-#endif
 
             std::vector<double> c2(3);
 
@@ -1099,13 +1091,9 @@ namespace Polynomials
             // allow the called
             // function to acquire it
             // itself
-#ifdef DEAL_II_WITH_THREADS
             coefficients_lock.unlock();
-#endif
             compute_coefficients(k - 1);
-#ifdef DEAL_II_WITH_THREADS
             coefficients_lock.lock();
-#endif
 
             std::vector<double> ck(k + 1);
 
@@ -1152,9 +1140,7 @@ namespace Polynomials
     // then get a pointer to the array
     // of coefficients. do that in a MT
     // safe way
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(coefficients_lock);
-#endif
     return *recursive_coefficients[k];
   }
 

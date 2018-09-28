@@ -81,9 +81,7 @@ inline GrowingVectorMemory<VectorType>::GrowingVectorMemory(
   , current_alloc(0)
   , log_statistics(log_statistics)
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
   pool.initialize(initial_size);
 }
 
@@ -108,9 +106,7 @@ template <typename VectorType>
 inline VectorType *
 GrowingVectorMemory<VectorType>::alloc()
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   ++total_alloc;
   ++current_alloc;
@@ -140,9 +136,7 @@ template <typename VectorType>
 inline void
 GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   for (typename std::vector<entry_type>::iterator i = pool.data->begin();
        i != pool.data->end();
@@ -164,9 +158,7 @@ template <typename VectorType>
 inline void
 GrowingVectorMemory<VectorType>::release_unused_memory()
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   if (pool.data != nullptr)
     pool.data->clear();
@@ -178,9 +170,7 @@ template <typename VectorType>
 inline std::size_t
 GrowingVectorMemory<VectorType>::memory_consumption() const
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   std::size_t                                            result = sizeof(*this);
   const typename std::vector<entry_type>::const_iterator end = pool.data->end();
