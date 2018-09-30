@@ -1,0 +1,6 @@
+New: A new class Differentiation::AD::ADHelperEnergyFunctional has been
+added to help implement (incremental) variational formulations using automatic 
+differentiation. In particular, this class is designed to compute the finite 
+element residuals and their linearizations.
+<br>
+(Jean-Paul Pelteret, 2018/08/27)
