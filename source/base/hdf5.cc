@@ -359,8 +359,11 @@ namespace HDF5
 
 
     attr = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
-    H5Aread(attr, *t_type, &value);
-    H5Aclose(attr);
+    Assert(attr >= 0, ExcMessage("Error at H5Aopen"));
+    ret = H5Aread(attr, *t_type, &value);
+    Assert(ret >= 0, ExcMessage("Error at H5Aread"));
+    ret = H5Aclose(attr);
+    Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
     return value;
   }
 
@@ -372,8 +375,11 @@ namespace HDF5
     int   int_value;
     hid_t attr;
     attr = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
-    H5Aread(attr, H5T_NATIVE_INT, &int_value);
-    H5Aclose(attr);
+    Assert(attr >= 0, ExcMessage("Error at H5Aopen"));
+    ret = H5Aread(attr, H5T_NATIVE_INT, &int_value);
+    Assert(ret >= 0, ExcMessage("Error at H5Aread"));
+    ret = H5Aclose(attr);
+    Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
     // The int can be casted to a bool
     bool bool_value = (bool)int_value;
     return bool_value;
@@ -437,21 +443,26 @@ namespace HDF5
     /*
      * Create scalar attribute.
      */
-    aid  = H5Screate(H5S_SCALAR);
+    aid = H5Screate(H5S_SCALAR);
+    Assert(aid >= 0, ExcMessage("Error at H5Screate"));
     attr = H5Acreate2(*hdf5_reference,
                       attr_name.data(),
                       *t_type,
                       aid,
                       H5P_DEFAULT,
                       H5P_DEFAULT);
+    Assert(attr >= 0, ExcMessage("Error at H5Acreate2"));
 
     /*
      * Write scalar attribute.
      */
-    H5Awrite(attr, *t_type, &value);
+    ret = H5Awrite(attr, *t_type, &value);
+    Assert(ret >= 0, ExcMessage("Error at H5Awrite"));
 
-    H5Sclose(aid);
-    H5Aclose(attr);
+    ret = H5Sclose(aid);
+    Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
+    ret = H5Aclose(attr);
+    Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
   }
 
   template <>
@@ -489,9 +500,11 @@ namespace HDF5
     /*
      * Create scalar attribute.
      */
-    aid  = H5Screate(H5S_SCALAR);
+    aid = H5Screate(H5S_SCALAR);
+    Assert(aid >= 0, ExcMessage("Error at H5Screate"));
     attr = H5Acreate2(
       *hdf5_reference, attr_name.data(), t_type, aid, H5P_DEFAULT, H5P_DEFAULT);
+    Assert(attr >= 0, ExcMessage("Error at H5Acreate2"));
 
     /*
      * Write scalar attribute.
@@ -500,8 +513,10 @@ namespace HDF5
     Assert(ret >= 0, ExcInternalError());
 
     free(c_string_value);
-    H5Sclose(aid);
-    H5Aclose(attr);
+    ret = H5Sclose(aid);
+    Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
+    ret = H5Aclose(attr);
+    Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
   }
 
   DataSet::DataSet(const std::string name,
@@ -524,17 +539,22 @@ namespace HDF5
       delete pointer;
     });
 
+    // rank_ret can take a negative value if the functions
+    // H5Sget_simple_extent_ndims and H5Sget_simple_extent_dims fail. _rank is
+    // unsigned int therefore it can not be used to store the return value of
+    // H5Sget_simple_extent_ndims and H5Sget_simple_extent_dims
+    int rank_ret;
+
     *hdf5_reference = H5Dopen2(parent_group_id, name.data(), H5P_DEFAULT);
-    *dataspace      = H5Dget_space(*hdf5_reference);
-    auto rank_ret   = H5Sget_simple_extent_ndims(*dataspace);
-    // rank_ret can take a negative value if the function fails. rank is
-    // unsigned int, that is way rank_ret is used to store the return
-    // value of H5Sget_simple_extent_ndims
+    Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Dopen2"));
+    *dataspace = H5Dget_space(*hdf5_reference);
+    Assert(*dataspace >= 0, ExcMessage("Error at H5Dget_space"));
+    rank_ret = H5Sget_simple_extent_ndims(*dataspace);
     Assert(rank_ret >= 0, ExcInternalError());
     _rank         = rank_ret;
     hsize_t *dims = (hsize_t *)malloc(_rank * sizeof(hsize_t));
     rank_ret      = H5Sget_simple_extent_dims(*dataspace, dims, NULL);
-    Assert(rank_ret == static_cast<int>(_rank), ExcInternalError());
+    AssertDimension(rank_ret, static_cast<int>(_rank));
     _dimensions.assign(dims, dims + _rank);
     free(dims);
 
@@ -570,6 +590,7 @@ namespace HDF5
     });
 
     *dataspace = H5Screate_simple(_rank, dimensions.data(), NULL);
+    Assert(*dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
 
     *hdf5_reference = H5Dcreate2(parent_group_id,
                                  name.data(),
@@ -578,6 +599,7 @@ namespace HDF5
                                  H5P_DEFAULT,
                                  H5P_DEFAULT,
                                  H5P_DEFAULT);
+    Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Dcreate2"));
 
     _size = 1;
     for (auto &&dimension : dimensions)
@@ -831,19 +853,23 @@ namespace HDF5
     if (mpi)
       {
         plist = H5Pcreate(H5P_DATASET_XFER);
-        H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
       }
     else
       {
         plist = H5P_DEFAULT;
       }
 
-    H5Dwrite(*hdf5_reference,
-             *t_type,
-             H5S_ALL,
-             H5S_ALL,
-             plist,
-             internal::get_container_const_pointer<Container, number>(data));
+    ret =
+      H5Dwrite(*hdf5_reference,
+               *t_type,
+               H5S_ALL,
+               H5S_ALL,
+               plist,
+               internal::get_container_const_pointer<Container, number>(data));
+    Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
       {
@@ -856,7 +882,8 @@ namespace HDF5
                                                   &_global_no_collective_cause);
             Assert(ret >= 0, ExcInternalError());
           }
-        H5Pclose(plist);
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
   }
 
@@ -913,7 +940,8 @@ namespace HDF5
             Assert(ret >= 0,
                    ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
           }
-        H5Pclose(plist);
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
@@ -977,10 +1005,10 @@ namespace HDF5
             Assert(ret >= 0,
                    ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
           }
-        H5Pclose(plist);
+        ret = H5Pclose(plist);
         Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
-    H5Sclose(memory_dataspace);
+    ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
@@ -1041,10 +1069,10 @@ namespace HDF5
             Assert(ret >= 0,
                    ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
           }
-        H5Pclose(plist);
+        ret = H5Pclose(plist);
         Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
-    H5Sclose(memory_dataspace);
+    ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
@@ -1059,7 +1087,9 @@ namespace HDF5
     hid_t plist;
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
-    H5Sselect_none(*dataspace);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_none(*dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5PSselect_none"));
 
     if (mpi)
       {
@@ -1074,8 +1104,9 @@ namespace HDF5
     // The pointer of data can safely be NULL, see the discussion at the HDF5
     // forum:
     // https://forum.hdfgroup.org/t/parallel-i-o-does-not-support-filters-yet/884/17
-    H5Dwrite(
+    ret = H5Dwrite(
       *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, NULL);
+    Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
       {
@@ -1088,9 +1119,11 @@ namespace HDF5
                                                   &_global_no_collective_cause);
             Assert(ret >= 0, ExcInternalError());
           }
-        H5Pclose(plist);
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
-    H5Sclose(memory_dataspace);
+    ret = H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
   template <>
@@ -1236,10 +1269,12 @@ namespace HDF5
                                        H5P_DEFAULT,
                                        H5P_DEFAULT,
                                        H5P_DEFAULT);
+          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gcreate2"));
           break;
         case (Mode::open):
           *hdf5_reference =
             H5Gopen2(*(parentGroup.hdf5_reference), name.data(), H5P_DEFAULT);
+          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gopen2"));
           break;
         default:
           Assert(false, ExcInternalError());
@@ -1312,7 +1347,9 @@ namespace HDF5
         AssertThrow(false, ExcMessage("HDF5 parallel support is disabled."));
 #  endif // H5_HAVE_PARALLEL
         plist = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pset_fapl_mpio(plist, mpi_communicator, info);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_fapl_mpio(plist, mpi_communicator, info);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_fapl_mpio"));
       }
     else
       {
@@ -1324,9 +1361,11 @@ namespace HDF5
         case (Mode::create):
           *hdf5_reference =
             H5Fcreate(name.data(), H5F_ACC_TRUNC, H5P_DEFAULT, plist);
+          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fcreate"));
           break;
         case (Mode::open):
           *hdf5_reference = H5Fopen(name.data(), H5F_ACC_RDWR, plist);
+          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fopen"));
           break;
         default:
           Assert(false, ExcInternalError());
@@ -1336,7 +1375,8 @@ namespace HDF5
     if (mpi)
       {
         // Relase the HDF5 resource
-        H5Pclose(plist);
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
   }
 

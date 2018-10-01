@@ -272,7 +272,7 @@ namespace HDF5
 
   protected:
     /**
-     * HDF5 identifier for the objects File, Group and Dataset
+     * HDF5 identifier for the objects File, Group and DataSet
      */
     std::shared_ptr<hid_t> hdf5_reference;
 
