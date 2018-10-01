@@ -58,6 +58,33 @@ class SymmetricTensor;
 template <typename Number>
 class SparseMatrix;
 
+
+// Helper macro to remove const from the pointer arguments to some MPI_*
+// functions.
+//
+// This is needed as the input arguments of functions like MPI_Allgather() are
+// not marked as const in OpenMPI 1.6.5.
+#ifdef DEAL_II_WITH_MPI
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+// We are good, no casts are needed.
+#    define DEAL_II_MPI_CONST_CAST(expr) (expr)
+#  else
+
+#    include <type_traits>
+
+// This monster of a macro will:
+// 1. remove *
+// 2. remove const
+// 3. add *
+// 4. const_cast the given expression to this new type.
+#    define DEAL_II_MPI_CONST_CAST(expr)                                       \
+      const_cast<                                                              \
+        std::remove_const<std::remove_pointer<decltype(expr)>::type>::type *>( \
+        expr)
+
+#  endif
+#endif
+
 namespace Utilities
 {
   /**

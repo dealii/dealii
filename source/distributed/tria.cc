@@ -1812,7 +1812,7 @@ namespace parallel
 
         MPI_File fh;
         ierr = MPI_File_open(mpi_communicator,
-                             fname_fixed.c_str(),
+                             DEAL_II_MPI_CONST_CAST(fname_fixed.c_str()),
                              MPI_MODE_CREATE | MPI_MODE_WRONLY,
                              info,
                              &fh);
@@ -1836,9 +1836,11 @@ namespace parallel
         // it is sufficient to let only the first processor perform this task.
         if (myrank == 0)
           {
+            const unsigned int *data = sizes_fixed_cumulative.data();
+
             ierr = MPI_File_write_at(fh,
                                      0,
-                                     sizes_fixed_cumulative.data(),
+                                     DEAL_II_MPI_CONST_CAST(data),
                                      sizes_fixed_cumulative.size(),
                                      MPI_UNSIGNED,
                                      MPI_STATUS_IGNORE);
@@ -1849,12 +1851,14 @@ namespace parallel
         const unsigned int offset_fixed =
           sizes_fixed_cumulative.size() * sizeof(unsigned int);
 
+        const char *data = src_data_fixed.data();
+
         ierr = MPI_File_write_at(
           fh,
           offset_fixed +
             parallel_forest->global_first_quadrant[myrank] *
               sizes_fixed_cumulative.back(), // global position in file
-          src_data_fixed.data(),
+          DEAL_II_MPI_CONST_CAST(data),
           src_data_fixed.size(), // local buffer
           MPI_CHAR,
           MPI_STATUS_IGNORE);
@@ -1880,7 +1884,7 @@ namespace parallel
 
           MPI_File fh;
           ierr = MPI_File_open(mpi_communicator,
-                               fname_variable.c_str(),
+                               DEAL_II_MPI_CONST_CAST(fname_variable.c_str()),
                                MPI_MODE_CREATE | MPI_MODE_WRONLY,
                                info,
                                &fh);
@@ -1896,15 +1900,19 @@ namespace parallel
           AssertThrowMPI(ierr);
 
           // Write sizes of each cell into file simultaneously.
-          ierr =
-            MPI_File_write_at(fh,
-                              parallel_forest->global_first_quadrant[myrank] *
-                                sizeof(int), // global position in file
-                              src_sizes_variable.data(),
-                              src_sizes_variable.size(), // local buffer
-                              MPI_INT,
-                              MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
+          {
+            const int *data = src_sizes_variable.data();
+            ierr =
+              MPI_File_write_at(fh,
+                                parallel_forest->global_first_quadrant[myrank] *
+                                  sizeof(int), // global position in file
+                                DEAL_II_MPI_CONST_CAST(data),
+                                src_sizes_variable.size(), // local buffer
+                                MPI_INT,
+                                MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+          }
+
 
           const unsigned int offset_variable =
             parallel_forest->global_num_quadrants * sizeof(int);
@@ -1914,7 +1922,7 @@ namespace parallel
 
           // Share information among all processors.
           std::vector<unsigned int> sizes_on_all_procs(n_procs);
-          ierr = MPI_Allgather(&size_on_proc,
+          ierr = MPI_Allgather(DEAL_II_MPI_CONST_CAST(&size_on_proc),
                                1,
                                MPI_UNSIGNED,
                                sizes_on_all_procs.data(),
@@ -1929,6 +1937,8 @@ namespace parallel
                            sizes_on_all_procs.end(),
                            sizes_on_all_procs.begin());
 
+          const char *data = src_data_variable.data();
+
           // Write data consecutively into file.
           ierr = MPI_File_write_at(
             fh,
@@ -1936,7 +1946,7 @@ namespace parallel
               ((myrank == 0) ?
                  0 :
                  sizes_on_all_procs[myrank - 1]), // global position in file
-            src_data_variable.data(),
+            DEAL_II_MPI_CONST_CAST(data),
             src_data_variable.size(), // local buffer
             MPI_CHAR,
             MPI_STATUS_IGNORE);
@@ -1980,8 +1990,11 @@ namespace parallel
         AssertThrowMPI(ierr);
 
         MPI_File fh;
-        ierr = MPI_File_open(
-          mpi_communicator, fname_fixed.c_str(), MPI_MODE_RDONLY, info, &fh);
+        ierr = MPI_File_open(mpi_communicator,
+                             DEAL_II_MPI_CONST_CAST(fname_fixed.c_str()),
+                             MPI_MODE_RDONLY,
+                             info,
+                             &fh);
         AssertThrowMPI(ierr);
 
         ierr = MPI_Info_free(&info);
@@ -2042,7 +2055,7 @@ namespace parallel
 
           MPI_File fh;
           ierr = MPI_File_open(mpi_communicator,
-                               fname_variable.c_str(),
+                               DEAL_II_MPI_CONST_CAST(fname_variable.c_str()),
                                MPI_MODE_RDONLY,
                                info,
                                &fh);
@@ -2073,7 +2086,7 @@ namespace parallel
 
           // share information among all processors
           std::vector<unsigned int> sizes_on_all_procs(n_procs);
-          ierr = MPI_Allgather(&size_on_proc,
+          ierr = MPI_Allgather(DEAL_II_MPI_CONST_CAST(&size_on_proc),
                                1,
                                MPI_UNSIGNED,
                                sizes_on_all_procs.data(),
