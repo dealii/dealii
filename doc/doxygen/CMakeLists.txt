@@ -108,17 +108,6 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
   )
 
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_header.pl.in
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
-  )
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_footer.pl.in
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
-  )
-
-
 # Figure out the last copyright date of any of the deal.II source
 # files. We will use this then to set the copyright date of the
 # doxygen-generated HTML files.
@@ -136,7 +125,20 @@ FOREACH (_source ${_source_files})
     SET (_last_year "${_year}")
   ENDIF()
 ENDFOREACH()
+SET(DEAL_II_PACKAGE_YEAR ${_last_year})
 MESSAGE(STATUS "doxygen output will have copyright date ${_last_year}")
+
+
+# Put the copyright year into the correct files
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_header.pl.in
+  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
+  )
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_footer.pl.in
+  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
+  )
 
 
 #
