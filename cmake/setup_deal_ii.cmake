@@ -27,9 +27,10 @@
 # General information about deal.II:
 #
 #     DEAL_II_PACKAGE_NAME            *)
-#     DEAL_II_PACKAGE_VERSION         *)
 #     DEAL_II_PACKAGE_VENDOR          *)
 #     DEAL_II_PACKAGE_DESCRIPTION     *)
+#     DEAL_II_PACKAGE_VERSION         *)
+#     DEAL_II_PACKAGE_YEAR            *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
 #     DEAL_II_VERSION_SUBMINOR
@@ -69,9 +70,13 @@ SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR
   "The deal.II Authors <http://www.dealii.org/>"
   )
+
 SET_IF_EMPTY(DEAL_II_PACKAGE_DESCRIPTION
   "Library for solving partial differential equations with the finite element method"
   )
+
+FILE(STRINGS "${CMAKE_SOURCE_DIR}/YEAR" _year LIMIT_COUNT 1)
+SET_IF_EMPTY(DEAL_II_PACKAGE_YEAR "${_year}")
 
 FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
 SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")

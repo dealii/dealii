@@ -1,0 +1,5 @@
+Fixed: The build system now determines the current year from a file "YEAR"
+instead of querying the build environment. This is necessary for
+"reproducible builds".
+<br>
+(Matthias Maier, 2018/10/02)
