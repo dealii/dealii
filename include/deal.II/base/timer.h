@@ -910,9 +910,7 @@ private:
    * A lock that makes sure that this class gives reasonable results even when
    * used with several threads.
    */
-#ifdef DEAL_II_WITH_THREADS
   Threads::Mutex mutex;
-#endif
 };
 
 

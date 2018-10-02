@@ -27,9 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 static const char *unknown_subscriber = "unknown subscriber";
 
 
-#ifdef DEAL_II_WITH_THREADS
 std::mutex Subscriptor::mutex;
-#endif
 
 
 Subscriptor::Subscriptor()
@@ -156,9 +154,7 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 void
 Subscriptor::subscribe(const char *id) const
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   if (object_info == nullptr)
     object_info = &typeid(*this);
@@ -185,9 +181,7 @@ Subscriptor::unsubscribe(const char *id) const
   if (counter == 0)
     return;
 
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end() || it->second == 0)

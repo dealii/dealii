@@ -23,12 +23,9 @@
 
 #include <atomic>
 #include <map>
+#include <mutex>
 #include <string>
 #include <typeinfo>
-
-#ifdef DEAL_II_WITH_THREADS
-#  include <mutex>
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -250,15 +247,11 @@ private:
   void
   check_no_subscribers() const noexcept;
 
-#ifdef DEAL_II_WITH_THREADS
-
   /**
    * A mutex used to ensure data consistency when printing out the list
    * of subscribers.
    */
   static std::mutex mutex;
-
-#endif
 };
 
 //---------------------------------------------------------------------------
@@ -275,9 +268,7 @@ template <typename StreamType>
 inline void
 Subscriptor::list_subscribers(StreamType &stream) const
 {
-#ifdef DEAL_II_WITH_THREADS
   std::lock_guard<std::mutex> lock(mutex);
-#endif
 
   for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
     stream << it->second << '/' << counter << " subscriptions from \""

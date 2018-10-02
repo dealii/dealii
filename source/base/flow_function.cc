@@ -57,9 +57,7 @@ namespace Functions
 
     // guard access to the aux_*
     // variables in multithread mode
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(mutex);
-#endif
 
     for (unsigned int d = 0; d < dim + 1; ++d)
       aux_values[d].resize(n_points);
@@ -89,9 +87,7 @@ namespace Functions
 
     // guard access to the aux_*
     // variables in multithread mode
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(mutex);
-#endif
 
     for (unsigned int d = 0; d < dim + 1; ++d)
       aux_values[d].resize(n_points);
@@ -114,9 +110,7 @@ namespace Functions
 
     // guard access to the aux_*
     // variables in multithread mode
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(mutex);
-#endif
 
     for (unsigned int d = 0; d < dim + 1; ++d)
       aux_values[d].resize(n_points);
@@ -138,9 +132,7 @@ namespace Functions
 
     // guard access to the aux_*
     // variables in multithread mode
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(mutex);
-#endif
 
     for (unsigned int d = 0; d < dim + 1; ++d)
       aux_gradients[d].resize(n_points);
@@ -168,9 +160,7 @@ namespace Functions
 
     // guard access to the aux_*
     // variables in multithread mode
-#ifdef DEAL_II_WITH_THREADS
     std::lock_guard<std::mutex> lock(mutex);
-#endif
 
     for (unsigned int d = 0; d < dim + 1; ++d)
       aux_values[d].resize(n_points);
