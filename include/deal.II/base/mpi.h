@@ -47,16 +47,6 @@ using MPI_Op       = int;
 #  endif
 #endif
 
-DEAL_II_NAMESPACE_OPEN
-
-
-// Forward type declarations to allow MPI sums over tensorial types
-template <int rank, int dim, typename Number>
-class Tensor;
-template <int rank, int dim, typename Number>
-class SymmetricTensor;
-template <typename Number>
-class SparseMatrix;
 
 
 // Helper macro to remove const from the pointer arguments to some MPI_*
@@ -84,6 +74,19 @@ class SparseMatrix;
 
 #  endif
 #endif
+
+
+
+DEAL_II_NAMESPACE_OPEN
+
+
+// Forward type declarations to allow MPI sums over tensorial types
+template <int rank, int dim, typename Number>
+class Tensor;
+template <int rank, int dim, typename Number>
+class SymmetricTensor;
+template <typename Number>
+class SparseMatrix;
 
 namespace Utilities
 {
