@@ -119,6 +119,26 @@ CONFIGURE_FILE(
   )
 
 
+# Figure out the last copyright date of any of the deal.II source
+# files. We will use this then to set the copyright date of the
+# doxygen-generated HTML files.
+SET(_last_year "1997")
+FILE(GLOB _source_files
+     "${CMAKE_SOURCE_DIR}/source/*/*.cc" 
+     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h" 
+     "${CMAKE_SOURCE_DIR}/examples/*/*.cc")
+FOREACH (_source ${_source_files})
+  FILE(READ "${_source}" contents)
+  STRING(REGEX MATCH "Copyright .C. +([0-9]+ - )?([0-9]+)" _copyright ${contents})
+  STRING(REGEX MATCH "[0-9]+\$" _year ${_copyright})
+
+  IF (_year GREATER _last_year)
+    SET (_last_year "${_year}")
+  ENDIF()
+ENDFOREACH()
+MESSAGE(STATUS "doxygen output will have copyright date ${_last_year}")
+
+
 #
 # Generate header, footer and style files for doxygen.
 #
