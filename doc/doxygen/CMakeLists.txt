@@ -135,8 +135,8 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${CMAKE_COMMAND} -E touch header.html
   COMMAND ${CMAKE_COMMAND} -E touch footer.html
   COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
-  COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
-  COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
+  COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
+  COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
