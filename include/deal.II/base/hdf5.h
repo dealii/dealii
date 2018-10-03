@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,23 +41,22 @@ DEAL_II_NAMESPACE_OPEN
  * are stored as HDF5 variable-length UTF-8 strings and the complex numbers are
  * stored as HDF5 compound datatypes compatible with
  * [h5py](https://www.h5py.org/) and [numpy](http://www.numpy.org/).
- */
-// clang-format off
-/**
  *
  * This python script writes the parameters for a deal.ii simulation:
- * @code
+ * ~~~~~~~~~~~~~{.py}
  * h5_file = h5py.File('simulation.hdf5','w')
  * data = h5_file.create_group('data')
  * data.attrs['nb_frequency_points'] = 50 # int
  * data.attrs['rho'] = 2300.5 # double
  * data.attrs['save_vtk_files'] = True # bool
  * data.attrs['simulation_type'] = 'elastic_equation' # utf8 string
- * @endcode
+ * ~~~~~~~~~~~~~
  *
  * C++ deal.ii simulation with MPI HDF5:
  * @code
- * hdf5::File data_file("simulation.hdf5", MPI_COMM_WORLD, HDF5::File::Mode::open);
+ * hdf5::File data_file("simulation.hdf5",
+ *                      MPI_COMM_WORLD,
+ *                      HDF5::File::Mode::open);
  * hdf5::Group data = data_file.group("data");
  *
  * auto nb_frequency_points = data.attr<int>("nb_frequency_points");
@@ -74,15 +73,12 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * Read the simulation results with python:
- * @code
+ * ~~~~~~~~~~~~~{.py}
  * h5_file = h5py.File('simulation.hdf5','r+')
  * data = h5_file['data']
  * displacement = data['displacement'] # complex128 dtype
  * active_cells = data.attrs['degrees_of_freedom'])
- * @endcode
- */
-// clang-format on
-/**
+ * ~~~~~~~~~~~~~
  *
  * # Groups, Datasets and attributes
  * The HDF5 file is organized in
@@ -90,12 +86,12 @@ DEAL_II_NAMESPACE_OPEN
  * and
  * [datasets](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Datasets/HDF5_Datasets.htm).
  * In the most comon case the file structure is a tree. Groups can contain
- * datasets and others groups. Datasets are objects composed by a collection of
+ * datasets and other groups. Datasets are objects composed of a collection of
  * data elements which can be seen as tensors or a matrices. The methods of the
  * DataSet class have been instantiated for the types: `float`, `double`,
  * `std::complex<float>`, `std::complex<double>`, `int` and `unsigned int`.
  *
- * In addtition attributes can be attached to the root file, a group or a
+ * In addition, attributes can be attached to the root file, a group or a
  * dataset. An [HDF5
  * attribute](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Attributes/HDF5_Attributes.htm)
  * is a small meta data. The methods HDF5Object::attr(const std::string) and
@@ -127,24 +123,37 @@ DEAL_II_NAMESPACE_OPEN
  * have data to write.
  *
  * ## Write a hyperslab in parallel
- * The example below shows how to write a hyperslab.
+ * Hyperslabs are portions of datasets. A hyperslab can be a contiguous
+ * collection of points in a dataset, or it can be a regular pattern of points
+ * or blocks in a datataset.
+ *
+ * See the <a
+ * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
+ * and Data Transfer</a>  section in the HDF5 User's Guide. See as well the
+ * <a
+ * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
+ * definition</a>.
+ *
+ * The example below shows how to write a simple hyperslab. The offset defines
+ * the origin of the hyperslab in the original dataset. The dimensions parameter
+ * defines the dimensions of the data to be written.
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
- *  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
- *    {
- *      // data can be std::vector, FullMatrix or Vector
- *      FullMatrix<double> data = {...};
- *      std::vector<hsize_t> hyperslab_dimensions = {2, 5};
- *      std::vector<hsize_t> hyperslab_offset     = {0, 0};
- *      dataset.write_hyperslab(hyperslab_data,
- *                              hyperslab_offset,
- *                              hyperslab_dimensions);
- *    }
- *  else
- *    {
- *      dataset.write_none<double>();
- *    }
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ *   {
+ *     // data can be std::vector, FullMatrix or Vector
+ *     FullMatrix<double> data = {...};
+ *     std::vector<hsize_t> hyperslab_dimensions = {2, 5};
+ *     std::vector<hsize_t> hyperslab_offset     = {0, 0};
+ *     dataset.write_hyperslab(hyperslab_data,
+ *                             hyperslab_offset,
+ *                             hyperslab_dimensions);
+ *   }
+ * else
+ *   {
+ *     dataset.write_none<double>();
+ *   }
  * @endcode
  *
  * ## Write unordered data in parallel
@@ -152,43 +161,61 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
- * std::vector<hsize_t> coordinates_a = {0,
- *                                       0, // first point
- *                                       0,
- *                                       2, // second point
- *                                       3,
- *                                       4, // third point
- *                                       25,
- *                                       12}; // fourth point
- *  std::vector<double>  data_a        = {2, 3, 5, 6};
  *
- *  std::vector<hsize_t> coordinates_b = {5,
- *                                        0, // first point
- *                                        0,
- *                                        4, // second point
- *                                        5,
- *                                        4, // third point
- *                                        26,
- *                                        12}; // fourth point
- *  std::vector<double>  data_b        = {9, 4, 7, 6};
- *  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
- *    {
- *      dataset.write_selection(data_a, coordinates_a);
- *    }
- *  else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
- *    {
- *      dataset.write_selection(data_b, coordinates_b);
- *    }
- *  else
- *    {
- *      dataset.write_none<double>();
- *    }
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ *   {
+ *     std::vector<hsize_t> coordinates_a = {0,
+ *                                           0, // first point
+ *                                           0,
+ *                                           2, // second point
+ *                                           3,
+ *                                           4, // third point
+ *                                           25,
+ *                                           12}; // fourth point
+ *     std::vector<double>  data_a        = {2, 3, 5, 6};
+ *     dataset.write_selection(data_a, coordinates_a);
+ *   }
+ * else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
+ *   {
+ *     std::vector<hsize_t> coordinates_b = {5,
+ *                                           0, // first point
+ *                                           0,
+ *                                           4, // second point
+ *                                           5,
+ *                                           4, // third point
+ *                                           26,
+ *                                           12}; // fourth point
+ *     std::vector<double>  data_b        = {9, 4, 7, 6};
+ *     dataset.write_selection(data_b, coordinates_b);
+ *   }
+ * else
+ *   {
+ *     dataset.write_none<double>();
+ *   }
  * @endcode
  *
- * ## Query the type of I/O that HDF5 performed on the last parallel I/O call
- * In some cases such as when there is type conversion the HDF5 library can
- * decide to do independent I/O instead of collective I/O. The following code
- * can be used to query the I/O method.
+ * ## Query the I/O mode that HDF5 used on the last parallel I/O call
+ * The default access mode in the HDF5 C++ interface of deal.ii is collective
+ * which is typically faster since it allows MPI to do more optimization. In
+ * some cases, such as when there is type conversion, the HDF5 library can
+ * decide to do independent I/O instead of collective I/O, even if the user asks
+ * for collective I/O. See the following
+ * [article](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/)
+ *
+ * In cases where maximum performance has to be achieved, it is important to
+ * make sure that all MPI read/write operations are collective. The HDF5 library
+ * provides API routines that can be used after the read/write I/O operations to
+ * query the I/O mode. If DataSet::check_io_mode() is set to True, then after
+ * every read/write operation the HDF5 deal.ii interface calls the routines
+ * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
+ * and
+ * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
+ * The results are stored in DataSet::io_mode(),
+ * DataSet::local_no_collective_cause() and
+ * DataSet::global_no_collective_cause(). We suggest to query the I/O mode only
+ * in Debug mode because it requires calling additional HDF5 routines.
+ *
+ * The following code can be used to query the I/O method.
  * @code
  * auto dataset = group.create_dataset<double>("name", dimensions);
  * #ifdef DEBUG
@@ -196,27 +223,35 @@ DEAL_II_NAMESPACE_OPEN
  * #endif
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
- *     {
- *       dataset.write(data);
- *     }
+ *   {
+ *     dataset.write(data);
+ *   }
  * else
- *     {
- *       dataset.write_none<double>();
- *     }
+ *   {
+ *     dataset.write_none<double>();
+ *   }
  *
- * #ifdef DEBUG
- * pcout << "IO mode :" << dataset.io_mode<std::string>() << std::endl;
- * pcout << "Local no collective cause :"
- *       << dataset.local_no_collective_cause<std::string>() << std::endl;
- * pcout << "Global no collective cause :"
- *       << dataset.global_no_collective_cause<std::string>() << std::endl;
- * #endif
+ * if(dataset.check_io_mode()){
+ *   pcout << "IO mode: " << dataset.io_mode<std::string>() << std::endl;
+ *   pcout << "Local no collective cause: "
+ *         << dataset.local_no_collective_cause<std::string>() << std::endl;
+ *   pcout << "Global no collective cause: "
+ *         << dataset.global_no_collective_cause<std::string>() << std::endl;
+ * }
  * @endcode
+ *
+ * If the write operation was collective then the output should be
+ * @code
+ * IO mode: H5D_MPIO_CONTIGUOUS_COLLECTIVE
+ * Local no collective cause: H5D_MPIO_COLLECTIVE
+ * Global no collective cause: H5D_MPIO_COLLECTIVE
+ * @endcode
+ * See DataSet::io_mode(), DataSet::local_no_collective_cause() and
+ * DataSet::global_no_collective_cause() for all the possible returned codes.
  *
  * @author Daniel Garcia-Sanchez, 2018
  */
 namespace HDF5
-
 {
   /**
    * Base class for the HDF5 objects.
@@ -236,10 +271,10 @@ namespace HDF5
     };
 
     /**
-     * Reads an attribute. T can be float, double, std::complex<float>,
-     * std::complex<double>, int, unsigned int, bool or std::string. Note that
-     * the encoding of std::string is UTF8 in order to be compatible with
-     * python3.
+     * Reads an attribute. `T` can be `float`, `double`, `std::complex<float>`,
+     * `std::complex<double>`, `int`, `unsigned int`, `bool` or `std::string`.
+     * Note that the encoding of `std::string` is UTF8 in order to be compatible
+     * with python3.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -252,10 +287,10 @@ namespace HDF5
     attr(const std::string attr_name);
 
     /**
-     * Writes an attribute. T can be float, double, std::complex<float>,
-     * std::complex<double>, int, unsigned int, bool or std::string. Note that
-     * the encoding of std::string is UTF8 in order to be compatible with
-     * python3.
+     * Writes an attribute. `T` can be `float`, `double`, `std::complex<float>`,
+     * `std::complex<double>`, `int`, `unsigned int`, `bool` or `std::string`.
+     * Note that the encoding of `std::string` is UTF8 in order to be compatible
+     * with python3.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -318,8 +353,8 @@ namespace HDF5
 
   public:
     /**
-     * Reads data of the dataset. Number can be float, double,
-     * std::complex<float>, std::complex<double>, int or unsigned int.
+     * Reads data of the dataset. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -332,8 +367,8 @@ namespace HDF5
     read();
 
     /**
-     * Reads data of a subset of the dataset. Number can be float, double,
-     * std::complex<float>, std::complex<double>, int or unsigned int.
+     * Reads data of a subset of the dataset. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For example, in the case of a dataset with rank 4 a selection of 3 points
@@ -389,8 +424,8 @@ namespace HDF5
 
     /**
      * This function does not read any data, but it can contribute to a
-     * collective read call. Number can be float, double, std::complex<float>,
-     * std::complex<double>, int or unsigned int.
+     * collective read call. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -403,8 +438,8 @@ namespace HDF5
     read_none();
 
     /**
-     * Writes data in the dataset. Number can be float, double,
-     * std::complex<float>, std::complex<double>, int or unsigned int.
+     * Writes data in the dataset. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -417,8 +452,8 @@ namespace HDF5
     write(const Container<number> &data);
 
     /**
-     * Writes data to a subset of the dataset. Number can be float, double,
-     * std::complex<float>, std::complex<double>, int or unsigned int.
+     * Writes data to a subset of the dataset. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For example, in the case of a dataset with rank 4 a selection of 3 points
@@ -533,10 +568,19 @@ namespace HDF5
      * This funcion retrieves the type of I/O that was performed on the last
      * parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
-     * The return type T can be H5D_mpio_actual_io_mode_t or std::string. The
-     * type H5D_mpio_actual_io_mode_t corresponds to the value returned by
-     * H5Pget_mpio_actual_io_mode and std::string is a human readable
+     * The return type `T` can be `H5D_mpio_actual_io_mode_t` or `std::string`.
+     * The type `H5D_mpio_actual_io_mode_t` corresponds to the value returned by
+     * H5Pget_mpio_actual_io_mode and `std::string` is a human readable
      * conversion.
+     *
+     * The returned value value can be
+     * Value                          | Meaning
+     * ------------------------------ | -------
+     * H5D_MPIO_NO_COLLECTIVE         | No collective I/O was performed. Collective I/O was not requested or collective I/O isn't possible on this dataset.
+     * H5D_MPIO_CHUNK_INDEPENDENT     | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed independently.
+     * H5D_MPIO_CHUNK_COLLECTIVE      | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed collectively.
+     * H5D_MPIO_CHUNK_MIXED           | HDF5 performed one the chunk collective optimization schemes and some chunks were accessed independently, some collectively.
+     * H5D_MPIO_CONTIGUOUS_COLLECTIVE | Collective I/O was performed on a contiguous dataset.
      */
     template <typename T>
     T
@@ -546,9 +590,23 @@ namespace HDF5
      * This funcion retrieves the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type T can be uint32_t or std::string. The type uint32_t
-     * corresponds to the value returned by H5Pget_mpio_no_collective_cause and
-     * std::string is a human readable conversion.
+     * The return type `T` can be `uint32_t` or `std::string`. The type
+     * `uint32_t` corresponds to the value returned by
+     * [H5Pget_mpio_no_collective_cause](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause)
+     * and `std::string` is a human readable conversion.
+     *
+     * The returned value value can be
+     * Value                                      | Meaning
+     * ------------------------------------------ | -------
+     * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
+     * H5D_MPIO_SET_INDEPENDENT                   | Collective I/O was not performed because independent I/O was requested.
+     * H5D_MPIO_DATATYPE_CONVERSION               | Collective I/O was not performed because datatype conversions were required.
+     * H5D_MPIO_DATA_TRANSFORMS                   | Collective I/O was not performed because data transforms needed to be applied.
+     * H5D_MPIO_SET_MPIPOSIX                      | Collective I/O was not performed because the selected file driver was MPI-POSIX.
+     * H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES   | Collective I/O was not performed because one of the dataspaces was neither simple nor scalar.
+     * H5D_MPIO_POINT_SELECTIONS                  | Collective I/O was not performed because there were point selections in one of the dataspaces.
+     * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
+     * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
     template <typename T>
     T
@@ -558,28 +616,49 @@ namespace HDF5
      * This funcion retrieves the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type T can be uint32_t or std::string. The type uint32_t
-     * corresponds to the value returned by H5Pget_mpio_no_collective_cause and
-     * std::string is a human readable conversion.
+     * The return type `T` can be `uint32_t` or `std::string`. The type
+     * `uint32_t` corresponds to the value returned by
+     * H5Pget_mpio_no_collective_cause and `std::string` is a human readable
+     * conversion.
+     *
+     * The returned value value can be
+     * Value                                      | Meaning
+     * ------------------------------------------ | -------
+     * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
+     * H5D_MPIO_SET_INDEPENDENT                   | Collective I/O was not performed because independent I/O was requested.
+     * H5D_MPIO_DATATYPE_CONVERSION               | Collective I/O was not performed because datatype conversions were required.
+     * H5D_MPIO_DATA_TRANSFORMS                   | Collective I/O was not performed because data transforms needed to be applied.
+     * H5D_MPIO_SET_MPIPOSIX                      | Collective I/O was not performed because the selected file driver was MPI-POSIX.
+     * H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES   | Collective I/O was not performed because one of the dataspaces was neither simple nor scalar.
+     * H5D_MPIO_POINT_SELECTIONS                  | Collective I/O was not performed because there were point selections in one of the dataspaces.
+     * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
+     * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
     template <typename T>
     T
     global_no_collective_cause();
 
     /**
-     * This function retrieves the IO mode checking. If check_io_mode is true,
-     * then after every read and write operation in the dataset, it will be
-     * retrieved the type of I/O that was performed on the last parallel I/O
-     * call If check_io_mode is false then no checking will be performed.
+     * This function retrieves the boolean check_io_mode().
+     *
+     * In cases where maximum performance has to be achieved, it is important to
+     * make sure that all MPI read/write operations are collective. The HDF5
+     * library provides API routines that can be used after the read/write I/O
+     * operations to query the I/O mode. If check_io_mode() is set to True, then
+     * after every read/write operation the HDF5 deal.ii interface calls the
+     * routines
+     * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
+     * and
+     * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
+     * The results are stored in io_mode(), local_no_collective_cause() and
+     * global_no_collective_cause(). We suggest to query the I/O mode only in
+     * Debug mode because it requires calling additional HDF5 routines.
      */
     bool
     check_io_mode() const;
 
     /**
-     * This funcion sets the IO mode checking. If check_io_mode is true, then
-     * after every read and write operation in the dataset, it will be retrieved
-     * the type of I/O that was performed on the last parallel I/O call If
-     * check_io_mode is false then no checking will be performed.
+     * This function sets the boolean check_io_mode().
      */
     void
     check_io_mode(bool check_io_mode);
@@ -647,8 +726,8 @@ namespace HDF5
     dataset(const std::string name);
 
     /**
-     * Creates a dataset. Number can be float, double, std::complex<float>,
-     * std::complex<double>, int or unsigned int.
+     * Creates a dataset. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
@@ -662,8 +741,8 @@ namespace HDF5
                    const std::vector<hsize_t> dimensions) const;
 
     /**
-     * Creates and writes data to a dataset. Number can be float, double,
-     * std::complex<float>, std::complex<double>, int or unsigned int.
+     * Creates and writes data to a dataset. Number can be `float`, `double`,
+     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
