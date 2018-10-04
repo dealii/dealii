@@ -261,7 +261,11 @@ namespace HDF5
   class HDF5Object
   {
   protected:
-    HDF5Object(const std::string name, bool mpi);
+    /**
+     * Constructor. `string_name` is the name of the HDF5 Object. If `mpi` is
+     * True then MPI I/O is used.
+     */
+    HDF5Object(const std::string name, const bool mpi);
 
   public:
     enum class Mode

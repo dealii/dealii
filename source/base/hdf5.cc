@@ -343,7 +343,7 @@ namespace HDF5
   } // namespace internal
 
 
-  HDF5Object::HDF5Object(const std::string name, bool mpi)
+  HDF5Object::HDF5Object(const std::string name, const bool mpi)
     : name(name)
     , mpi(mpi)
   {}
