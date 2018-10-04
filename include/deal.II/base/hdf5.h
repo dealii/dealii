@@ -282,7 +282,7 @@ namespace HDF5
      */
     template <typename T>
     T
-    attr(const std::string attr_name);
+    attr(const std::string &attr_name);
 
     /**
      * Writes an attribute. `T` can be `float`, `double`, `std::complex<float>`,
@@ -298,7 +298,7 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_attr(const std::string attr_name, const T value);
+    write_attr(const std::string &attr_name, const T value);
 
 
     const std::string name;
@@ -340,14 +340,14 @@ namespace HDF5
 
   protected:
     // Open dataset
-    DataSet(const std::string name, const hid_t &parent_group_id, bool mpi);
+    DataSet(const std::string &name, const hid_t &parent_group_id, bool mpi);
 
     // Create dataset
-    DataSet(const std::string      name,
-            const hid_t &          parent_group_id,
-            std::vector<hsize_t>   dimensions,
-            std::shared_ptr<hid_t> t_type,
-            bool                   mpi);
+    DataSet(const std::string &         name,
+            const hid_t &               parent_group_id,
+            const std::vector<hsize_t> &dimensions,
+            std::shared_ptr<hid_t>      t_type,
+            const bool                  mpi);
 
   public:
     /**
@@ -392,7 +392,7 @@ namespace HDF5
      */
     template <typename number>
     std::vector<number>
-    read_selection(const std::vector<hsize_t> coordinates);
+    read_selection(const std::vector<hsize_t> &coordinates);
 
     /**
      * Reads a hyperslab from the dataset. The parameters are summarized
@@ -477,8 +477,8 @@ namespace HDF5
      */
     template <typename number>
     void
-    write_selection(const std::vector<number> &data,
-                    const std::vector<hsize_t> coordinates);
+    write_selection(const std::vector<number> & data,
+                    const std::vector<hsize_t> &coordinates);
 
     /**
      * Writes a data hyperslab to the dataset. The parameters are summarized
@@ -713,32 +713,32 @@ namespace HDF5
       open
     };
 
-    Group(const std::string name,
-          const Group &     parent_group,
-          const bool        mpi,
-          const Mode        mode);
+    Group(const std::string &name,
+          const Group &      parent_group,
+          const bool         mpi,
+          const Mode         mode);
 
     // This constructor is used by File
-    Group(const std::string name, const bool mpi);
+    Group(const std::string &name, const bool mpi);
 
   public:
     /**
      * Opens a group.
      */
     Group
-    group(const std::string name);
+    group(const std::string &name);
 
     /**
      * Creates a group.
      */
     Group
-    create_group(const std::string name);
+    create_group(const std::string &name);
 
     /**
      * Opens a dataset.
      */
     DataSet
-    dataset(const std::string name);
+    dataset(const std::string &name);
 
     /**
      * Creates a dataset. Number can be `float`, `double`,
@@ -752,8 +752,8 @@ namespace HDF5
      */
     template <typename number>
     DataSet
-    create_dataset(const std::string          name,
-                   const std::vector<hsize_t> dimensions) const;
+    create_dataset(const std::string &         name,
+                   const std::vector<hsize_t> &dimensions) const;
 
     /**
      * Creates and writes data to a dataset. Number can be `float`, `double`,
@@ -767,7 +767,7 @@ namespace HDF5
      */
     template <template <class...> class Container, typename number>
     void
-    write_dataset(const std::string name, const Container<number> &data) const;
+    write_dataset(const std::string &name, const Container<number> &data) const;
   };
 
   /**
@@ -794,23 +794,23 @@ namespace HDF5
     };
 
   private:
-    File(const std::string name,
-         const bool        mpi,
-         const MPI_Comm    mpi_communicator,
-         const Mode        mode);
+    File(const std::string &name,
+         const bool         mpi,
+         const MPI_Comm     mpi_communicator,
+         const Mode         mode);
 
   public:
     /**
      * Creates or opens a hdf5 file in parallel.
      */
-    File(const std::string name,
-         const MPI_Comm    mpi_communicator,
-         const Mode        mode = Mode::create);
+    File(const std::string &name,
+         const MPI_Comm     mpi_communicator,
+         const Mode         mode = Mode::create);
 
     /**
      * Creates or opens a hdf5 file.
      */
-    File(const std::string name, const Mode mode = Mode::create);
+    File(const std::string &name, const Mode mode = Mode::create);
   };
 } // namespace HDF5
 
