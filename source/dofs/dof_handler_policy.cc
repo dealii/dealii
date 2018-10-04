@@ -5079,7 +5079,7 @@ namespace internal
           n_locally_owned_dofs_per_processor(n_cpus);
 
         const int ierr =
-          MPI_Allgather(&n_locally_owned_dofs,
+          MPI_Allgather(DEAL_II_MPI_CONST_CAST(&n_locally_owned_dofs),
                         1,
                         DEAL_II_DOF_INDEX_MPI_TYPE,
                         n_locally_owned_dofs_per_processor.data(),

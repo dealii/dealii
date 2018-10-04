@@ -47,6 +47,39 @@ using MPI_Op       = int;
 #  endif
 #endif
 
+
+
+/** Helper macro to remove const from the pointer arguments to some MPI_*
+ * functions.
+ *
+ * This is needed as the input arguments of functions like MPI_Allgather() are
+ * not marked as const in OpenMPI 1.6.5. If using MPI 3 or newer, this macro
+ * is a NOOP, while we do the following otherwise:
+ *
+ * 1. remove * from type of @p expr
+ * 2. remove const from resulting type
+ * 3. add * to resulting type
+ * 4. const_cast the given expression @p expr to this new type.
+ */
+#ifdef DEAL_II_WITH_MPI
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+
+#    define DEAL_II_MPI_CONST_CAST(expr) (expr)
+
+#  else
+
+#    include <type_traits>
+
+#    define DEAL_II_MPI_CONST_CAST(expr)                                       \
+      const_cast<                                                              \
+        std::remove_const<std::remove_pointer<decltype(expr)>::type>::type *>( \
+        expr)
+
+#  endif
+#endif
+
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
