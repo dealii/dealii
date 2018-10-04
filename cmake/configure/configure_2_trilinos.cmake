@@ -176,12 +176,12 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
           REGEX "#define HAVE_SACADO_CXX11")
       ENDIF()
-      
+
       #
       # GCC 6.3.0 has a bug that prevents the creation of complex
       # numbers templated on Sacado::Rad::ADvar types:
       #
-      # include/c++/6.3.0/complex: In instantiation of 
+      # include/c++/6.3.0/complex: In instantiation of
       # ‘struct std::complex<Sacado::Rad::ADvar<double> >’:
       # include/c++/6.3.0/complex:206:16: error: ‘std::complex<_Tp>& std::complex<_Tp>::operator=(const std::complex<_Tp>&) [with _Tp = Sacado::Rad::ADvar<double>]’ declared to take const reference, but implicit declaration would take non-const
       #
@@ -192,11 +192,11 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
         )
-      
+
       IF(EXISTS ${SACADO_TRAD_HPP})
         LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-        PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-      
+        ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
         CHECK_CXX_SOURCE_COMPILES(
           "
           #include <Sacado_trad.hpp>

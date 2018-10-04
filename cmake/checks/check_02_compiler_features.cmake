@@ -295,9 +295,8 @@ ENDIF()
 # "warning: use of the 'deprecated' attribute is a C++14 extension" (clang in c++11 mode)
 # "warning #1292: unknown attribute "deprecated"" (icc)
 # Hence, we treat warnings as errors:
-PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS}")
-PUSH_CMAKE_REQUIRED("-Werror")
-PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
 
 # first see if the compiler accepts the attribute
 CHECK_CXX_SOURCE_COMPILES(
@@ -394,7 +393,7 @@ ENDIF()
 #
 # - Matthias Maier, 2015
 #
-PUSH_CMAKE_REQUIRED("-Werror")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
 CHECK_CXX_SOURCE_COMPILES(
   "
   _Pragma(\"GCC diagnostic push\")
@@ -423,12 +422,11 @@ RESET_CMAKE_REQUIRED()
 # Wolfgang Bangerth, Matthias Maier, Daniel Arndt, 2015, 2018
 #
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
 ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-  PUSH_CMAKE_REQUIRED("-diag-error warn")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
 ENDIF()
-PUSH_CMAKE_REQUIRED("-Werror")
-PUSH_CMAKE_REQUIRED("-fuse-ld=gold")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -fuse-ld=gold")
 CHECK_CXX_SOURCE_COMPILES(
   "
   int main() { return 0; }
