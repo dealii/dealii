@@ -118,7 +118,7 @@ test()
     }
 
 
-  LinearAlgebra::TpetraWrappers::Vector d(a);
+  LinearAlgebra::TpetraWrappers::Vector<Number> d(a);
   a.add(2., b, 3., d);
   read_write_3.import(a, VectorOperation::insert);
   if (rank == 0)
