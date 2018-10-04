@@ -268,12 +268,6 @@ namespace HDF5
     HDF5Object(const std::string name, const bool mpi);
 
   public:
-    enum class Mode
-    {
-      create,
-      open
-    };
-
     /**
      * Reads an attribute. `T` can be `float`, `double`, `std::complex<float>`,
      * `std::complex<double>`, `int`, `unsigned int`, `bool` or `std::string`.
@@ -704,10 +698,27 @@ namespace HDF5
   class Group : public HDF5Object
   {
   protected:
+    /**
+     * Group access mode
+     */
+    enum class Mode
+    {
+      /**
+       * Creates a new group
+       */
+      create,
+      /**
+       * Opens an existing group
+       */
+      open
+    };
+
     Group(const std::string name,
           const Group &     parent_group,
           const bool        mpi,
           const Mode        mode);
+
+    // This constructor is used by File
     Group(const std::string name, const bool mpi);
 
   public:
@@ -766,6 +777,22 @@ namespace HDF5
    */
   class File : public Group
   {
+  public:
+    /**
+     * File access mode
+     */
+    enum class Mode
+    {
+      /**
+       * Create file, truncate if exists
+       */
+      create,
+      /**
+       * Read/write, file must exist
+       */
+      open
+    };
+
   private:
     File(const std::string name,
          const bool        mpi,
