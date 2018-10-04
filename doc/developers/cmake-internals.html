@@ -295,7 +295,7 @@ CHECK_CXX_COMPILER_FLAG(flag variable)
     job nicely:
 
 <pre class="cmake">
-PUSH_CMAKE_REQUIRED("-Werror")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
 CHECK_CXX_SOURCE_COMPILES(...)
 RESET_CMAKE_REQUIRED()
 </pre>
