@@ -203,7 +203,7 @@ write_test(HDF5::Group &              root_group,
     std::string dataset_name("dataset_1");
     auto        dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Write): " << dataset.dimensions() << std::endl;
@@ -239,7 +239,7 @@ write_test(HDF5::Group &              root_group,
     std::string dataset_name("dataset_2");
     auto        dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Write): " << dataset.dimensions() << std::endl;
@@ -315,7 +315,7 @@ write_test(HDF5::Group &              root_group,
         std::string dataset_name("dataset_3");
         auto        dataset =
           group.create_dataset<Number>(dataset_name, dataset_dimensions);
-        dataset.check_io_mode(true);
+        dataset.query_io_mode(true);
         deallog << "Dimensions " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Write): " << dataset.dimensions() << std::endl;
@@ -337,7 +337,7 @@ write_test(HDF5::Group &              root_group,
         std::string dataset_name("dataset_3");
         auto        dataset =
           group.create_dataset<Number>(dataset_name, dataset_dimensions);
-        dataset.check_io_mode(true);
+        dataset.query_io_mode(true);
         auto data = initialize_container<Container, float>(dataset_dimensions);
         assign_data(data);
         dataset.write(data);
@@ -365,7 +365,7 @@ write_test(HDF5::Group &              root_group,
     std::string dataset_name("dataset_4");
     auto        dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Write): " << dataset.dimensions() << std::endl;
@@ -501,7 +501,7 @@ read_test(HDF5::Group root_group)
   {
     std::string dataset_name("dataset_1");
     auto        dataset = group.dataset(dataset_name);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Read): " << dataset.dimensions() << std::endl;
@@ -534,7 +534,7 @@ read_test(HDF5::Group root_group)
   {
     std::string dataset_name("dataset_2");
     auto        dataset = group.dataset(dataset_name);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Read): " << dataset.dimensions() << std::endl;
@@ -604,7 +604,7 @@ read_test(HDF5::Group root_group)
       {
         std::string dataset_name("dataset_3");
         auto        dataset = group.dataset(dataset_name);
-        dataset.check_io_mode(true);
+        dataset.query_io_mode(true);
         deallog << "Dimensions " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Read): " << dataset.dimensions() << std::endl;
@@ -638,7 +638,7 @@ read_test(HDF5::Group root_group)
   {
     std::string dataset_name("dataset_4");
     auto        dataset = group.dataset(dataset_name);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Read): " << dataset.dimensions() << std::endl;
@@ -723,7 +723,7 @@ read_test(HDF5::Group root_group)
   {
     std::string dataset_name("dataset_5");
     auto        dataset = group.dataset(dataset_name);
-    dataset.check_io_mode(true);
+    dataset.query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Read): " << dataset.dimensions() << std::endl;

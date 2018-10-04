@@ -522,7 +522,7 @@ namespace HDF5
                    const hid_t &     parent_group_id,
                    const bool        mpi)
     : HDF5Object(name, mpi)
-    , _check_io_mode(false)
+    , _query_io_mode(false)
     , _io_mode(H5D_MPIO_NO_COLLECTIVE)
     , _local_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
     , _global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
@@ -572,7 +572,7 @@ namespace HDF5
     : HDF5Object(name, mpi)
     , _rank(dimensions.size())
     , _dimensions(dimensions)
-    , _check_io_mode(false)
+    , _query_io_mode(false)
     , _io_mode(H5D_MPIO_NO_COLLECTIVE)
     , _local_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
     , _global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
@@ -639,7 +639,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcInternalError());
@@ -702,7 +702,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
@@ -767,7 +767,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
@@ -823,7 +823,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
@@ -872,7 +872,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcInternalError());
@@ -929,7 +929,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
@@ -994,7 +994,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
@@ -1058,7 +1058,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
@@ -1109,7 +1109,7 @@ namespace HDF5
 
     if (mpi)
       {
-        if (_check_io_mode)
+        if (_query_io_mode)
           {
             ret = H5Pget_mpio_actual_io_mode(plist, &_io_mode);
             Assert(ret >= 0, ExcInternalError());
@@ -1129,9 +1129,9 @@ namespace HDF5
   H5D_mpio_actual_io_mode_t
   DataSet::io_mode()
   {
-    Assert(_check_io_mode,
+    Assert(_query_io_mode,
            ExcMessage(
-             "check_io_mode() should be true in order to use io_mode()"));
+             "query_io_mode() should be true in order to use io_mode()"));
     return _io_mode;
   }
 
@@ -1141,9 +1141,9 @@ namespace HDF5
   std::string
   DataSet::io_mode()
   {
-    Assert(_check_io_mode,
+    Assert(_query_io_mode,
            ExcMessage(
-             "check_io_mode() should be true in order to use io_mode()"));
+             "query_io_mode() should be true in order to use io_mode()"));
     switch (_io_mode)
       {
         case (H5D_MPIO_NO_COLLECTIVE):
@@ -1176,9 +1176,9 @@ namespace HDF5
   DataSet::local_no_collective_cause()
   {
     Assert(
-      _check_io_mode,
+      _query_io_mode,
       ExcMessage(
-        "check_io_mode() should be true in order to use local_no_collective_cause()"));
+        "query_io_mode() should be true in order to use local_no_collective_cause()"));
     return _local_no_collective_cause;
   }
 
@@ -1189,9 +1189,9 @@ namespace HDF5
   DataSet::local_no_collective_cause()
   {
     Assert(
-      _check_io_mode,
+      _query_io_mode,
       ExcMessage(
-        "check_io_mode() should be true in order to use local_no_collective_cause()"));
+        "query_io_mode() should be true in order to use local_no_collective_cause()"));
     return internal::no_collective_cause_to_string(_local_no_collective_cause);
   }
 
@@ -1200,9 +1200,9 @@ namespace HDF5
   DataSet::global_no_collective_cause()
   {
     Assert(
-      _check_io_mode,
+      _query_io_mode,
       ExcMessage(
-        "check_io_mode() should be true in order to use global_no_collective_cause()"));
+        "query_io_mode() should be true in order to use global_no_collective_cause()"));
     return _global_no_collective_cause;
   }
 
@@ -1213,22 +1213,22 @@ namespace HDF5
   DataSet::global_no_collective_cause()
   {
     Assert(
-      _check_io_mode,
+      _query_io_mode,
       ExcMessage(
-        "check_io_mode() should be true in order to use global_no_collective_cause()"));
+        "query_io_mode() should be true in order to use global_no_collective_cause()"));
     return internal::no_collective_cause_to_string(_global_no_collective_cause);
   }
 
   bool
-  DataSet::check_io_mode() const
+  DataSet::query_io_mode() const
   {
-    return _check_io_mode;
+    return _query_io_mode;
   }
 
   void
-  DataSet::check_io_mode(bool check_io_mode)
+  DataSet::query_io_mode(bool query_io_mode)
   {
-    _check_io_mode = check_io_mode;
+    _query_io_mode = query_io_mode;
   }
 
   std::vector<hsize_t>

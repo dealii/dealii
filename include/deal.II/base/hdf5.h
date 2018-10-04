@@ -205,7 +205,7 @@ DEAL_II_NAMESPACE_OPEN
  * In cases where maximum performance has to be achieved, it is important to
  * make sure that all MPI read/write operations are collective. The HDF5 library
  * provides API routines that can be used after the read/write I/O operations to
- * query the I/O mode. If DataSet::check_io_mode() is set to True, then after
+ * query the I/O mode. If DataSet::query_io_mode() is set to True, then after
  * every read/write operation the HDF5 deal.ii interface calls the routines
  * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
  * and
@@ -219,7 +219,7 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * auto dataset = group.create_dataset<double>("name", dimensions);
  * #ifdef DEBUG
- * dataset.check_io_mode(true);
+ * dataset.query_io_mode(true);
  * #endif
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
@@ -231,7 +231,7 @@ DEAL_II_NAMESPACE_OPEN
  *     dataset.write_none<double>();
  *   }
  *
- * if(dataset.check_io_mode()){
+ * if(dataset.query_io_mode()){
  *   pcout << "IO mode: " << dataset.io_mode<std::string>() << std::endl;
  *   pcout << "Local no collective cause: "
  *         << dataset.local_no_collective_cause<std::string>() << std::endl;
@@ -639,12 +639,12 @@ namespace HDF5
     global_no_collective_cause();
 
     /**
-     * This function retrieves the boolean check_io_mode().
+     * This function retrieves the boolean query_io_mode().
      *
      * In cases where maximum performance has to be achieved, it is important to
      * make sure that all MPI read/write operations are collective. The HDF5
      * library provides API routines that can be used after the read/write I/O
-     * operations to query the I/O mode. If check_io_mode() is set to True, then
+     * operations to query the I/O mode. If query_io_mode() is set to True, then
      * after every read/write operation the HDF5 deal.ii interface calls the
      * routines
      * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
@@ -655,13 +655,13 @@ namespace HDF5
      * Debug mode because it requires calling additional HDF5 routines.
      */
     bool
-    check_io_mode() const;
+    query_io_mode() const;
 
     /**
-     * This function sets the boolean check_io_mode().
+     * This function sets the boolean query_io_mode().
      */
     void
-    check_io_mode(bool check_io_mode);
+    query_io_mode(bool query_io_mode);
 
     /**
      * This funcion returns the dimensions of the dataset.
@@ -686,7 +686,7 @@ namespace HDF5
     std::vector<hsize_t>      _dimensions;
     std::shared_ptr<hid_t>    dataspace;
     unsigned int              _size;
-    bool                      _check_io_mode;
+    bool                      _query_io_mode;
     H5D_mpio_actual_io_mode_t _io_mode;
     uint32_t                  _local_no_collective_cause;
     uint32_t                  _global_no_collective_cause;
