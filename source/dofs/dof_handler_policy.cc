@@ -221,65 +221,6 @@ namespace internal
                 }
             }
         }
-
-
-
-        /**
-         * For an object, such as a line or a quad iterator, determine
-         * the fe_index of the most dominating finite element that
-         * lives on this object.
-         *
-         * Return numbers::invalid_unsigned_int if we couldn't find one.
-         */
-        template <int dim, int spacedim, typename iterator>
-        unsigned int
-        get_most_dominating_fe_index(const iterator &object)
-        {
-          unsigned int dominating_fe_index = 0;
-          for (; dominating_fe_index < object->n_active_fe_indices();
-               ++dominating_fe_index)
-            {
-              const FiniteElement<dim, spacedim> &this_fe = object->get_fe(
-                object->nth_active_fe_index(dominating_fe_index));
-
-              FiniteElementDomination::Domination domination =
-                FiniteElementDomination::either_element_can_dominate;
-              for (unsigned int other_fe_index = 0;
-                   other_fe_index < object->n_active_fe_indices();
-                   ++other_fe_index)
-                if (other_fe_index != dominating_fe_index)
-                  {
-                    const FiniteElement<dim, spacedim> &that_fe =
-                      object->get_fe(
-                        object->nth_active_fe_index(other_fe_index));
-
-                    domination =
-                      domination & this_fe.compare_for_face_domination(that_fe);
-                  }
-
-              // see if this element is able to dominate all the other
-              // ones, and if so take it
-              if ((domination ==
-                   FiniteElementDomination::this_element_dominates) ||
-                  (domination ==
-                   FiniteElementDomination::either_element_can_dominate) ||
-                  (domination == FiniteElementDomination::no_requirements))
-                break;
-            }
-
-          // check that we have found one such fe
-          if (dominating_fe_index != object->n_active_fe_indices())
-            {
-              // return the finite element index used on it. note that
-              // only a single fe can be active on such subfaces
-              return object->nth_active_fe_index(dominating_fe_index);
-            }
-          else
-            {
-              // if we couldn't find the most dominating object
-              return numbers::invalid_unsigned_int;
-            }
-        }
       } // namespace
 
 
@@ -1020,10 +961,14 @@ namespace internal
                   // is not what we describe in the paper!.
                   if ((unique_sets_of_dofs == 2) && (dim == 2))
                     {
+                      const std::set<unsigned int> fe_indices =
+                        line->get_active_fe_indices();
+
                       // find out which is the most dominating finite element of
                       // the ones that are used on this line
                       const unsigned int most_dominating_fe_index =
-                        get_most_dominating_fe_index<dim, spacedim>(line);
+                        dof_handler.get_fe_collection()
+                          .find_face_dominating_fe_in_subset(fe_indices);
 
                       // if we found the most dominating element, then use this
                       // to eliminate some of the degrees of freedom by
@@ -1033,19 +978,12 @@ namespace internal
                       if (most_dominating_fe_index !=
                           numbers::invalid_unsigned_int)
                         {
-                          const unsigned int n_active_fe_indices =
-                            line->n_active_fe_indices();
-
                           // loop over the indices of all the finite elements
                           // that are not dominating, and identify their dofs to
                           // the most dominating one
-                          for (unsigned int f = 0; f < n_active_fe_indices; ++f)
-                            if (line->nth_active_fe_index(f) !=
-                                most_dominating_fe_index)
+                          for (const auto &other_fe_index : fe_indices)
+                            if (other_fe_index != most_dominating_fe_index)
                               {
-                                const unsigned int other_fe_index =
-                                  line->nth_active_fe_index(f);
-
                                 ensure_existence_of_dof_identities<1>(
                                   dof_handler.get_fe(most_dominating_fe_index),
                                   dof_handler.get_fe(other_fe_index),
@@ -1182,10 +1120,14 @@ namespace internal
                     quad = cell->quad(q);
                   quad->set_user_flag();
 
+                  const std::set<unsigned int> fe_indices =
+                    quad->get_active_fe_indices();
+
                   // find out which is the most dominating finite
                   // element of the ones that are used on this quad
                   const unsigned int most_dominating_fe_index =
-                    get_most_dominating_fe_index<dim, spacedim>(quad);
+                    dof_handler.get_fe_collection()
+                      .find_face_dominating_fe_in_subset(fe_indices);
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
@@ -1195,20 +1137,13 @@ namespace internal
                   // along this face/edge
                   if (most_dominating_fe_index != numbers::invalid_unsigned_int)
                     {
-                      const unsigned int n_active_fe_indices =
-                        quad->n_active_fe_indices();
-
                       // loop over the indices of all the finite
                       // elements that are not dominating, and
                       // identify their dofs to the most dominating
                       // one
-                      for (unsigned int f = 0; f < n_active_fe_indices; ++f)
-                        if (quad->nth_active_fe_index(f) !=
-                            most_dominating_fe_index)
+                      for (const auto &other_fe_index : fe_indices)
+                        if (other_fe_index != most_dominating_fe_index)
                           {
-                            const unsigned int other_fe_index =
-                              quad->nth_active_fe_index(f);
-
                             ensure_existence_of_dof_identities<2>(
                               dof_handler.get_fe(most_dominating_fe_index),
                               dof_handler.get_fe(other_fe_index),
@@ -1739,10 +1674,14 @@ namespace internal
                   // is not what we describe in the paper!.
                   if ((unique_sets_of_dofs == 2) && (dim == 2))
                     {
+                      const std::set<unsigned int> fe_indices =
+                        line->get_active_fe_indices();
+
                       // find out which is the most dominating finite element of
                       // the ones that are used on this line
                       const unsigned int most_dominating_fe_index =
-                        get_most_dominating_fe_index<dim, spacedim>(line);
+                        dof_handler.get_fe_collection()
+                          .find_face_dominating_fe_in_subset(fe_indices);
 
                       // if we found the most dominating element, then use this
                       // to eliminate some of the degrees of freedom by
@@ -1752,19 +1691,12 @@ namespace internal
                       if (most_dominating_fe_index !=
                           numbers::invalid_unsigned_int)
                         {
-                          const unsigned int n_active_fe_indices =
-                            line->n_active_fe_indices();
-
                           // loop over the indices of all the finite elements
                           // that are not dominating, and identify their dofs to
                           // the most dominating one
-                          for (unsigned int f = 0; f < n_active_fe_indices; ++f)
-                            if (line->nth_active_fe_index(f) !=
-                                most_dominating_fe_index)
+                          for (const auto &other_fe_index : fe_indices)
+                            if (other_fe_index != most_dominating_fe_index)
                               {
-                                const unsigned int other_fe_index =
-                                  line->nth_active_fe_index(f);
-
                                 ensure_existence_of_dof_identities<1>(
                                   dof_handler.get_fe(most_dominating_fe_index),
                                   dof_handler.get_fe(other_fe_index),
@@ -1884,10 +1816,14 @@ namespace internal
                     quad = cell->quad(q);
                   quad->clear_user_flag();
 
+                  const std::set<unsigned int> fe_indices =
+                    quad->get_active_fe_indices();
+
                   // find out which is the most dominating finite
                   // element of the ones that are used on this quad
                   const unsigned int most_dominating_fe_index =
-                    get_most_dominating_fe_index<dim, spacedim>(quad);
+                    dof_handler.get_fe_collection()
+                      .find_face_dominating_fe_in_subset(fe_indices);
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
@@ -1897,20 +1833,13 @@ namespace internal
                   // along this face/edge
                   if (most_dominating_fe_index != numbers::invalid_unsigned_int)
                     {
-                      const unsigned int n_active_fe_indices =
-                        quad->n_active_fe_indices();
-
                       // loop over the indices of all the finite
                       // elements that are not dominating, and
                       // identify their dofs to the most dominating
                       // one
-                      for (unsigned int f = 0; f < n_active_fe_indices; ++f)
-                        if (quad->nth_active_fe_index(f) !=
-                            most_dominating_fe_index)
+                      for (const auto &other_fe_index : fe_indices)
+                        if (other_fe_index != most_dominating_fe_index)
                           {
-                            const unsigned int other_fe_index =
-                              quad->nth_active_fe_index(f);
-
                             ensure_existence_of_dof_identities<2>(
                               dof_handler.get_fe(most_dominating_fe_index),
                               dof_handler.get_fe(other_fe_index),

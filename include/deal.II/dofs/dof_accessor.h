@@ -556,6 +556,15 @@ public:
   nth_active_fe_index(const unsigned int n) const;
 
   /**
+   * Returns all active fe indices on this object.
+   *
+   * The size of the returned set equals the number of finite elements that
+   * are active on this object.
+   */
+  std::set<unsigned int>
+  get_active_fe_indices() const;
+
+  /**
    * Return true if the finite element with given index is active on the
    * present object. For non-hp DoF accessors, this is of course the case only
    * if @p fe_index equals zero. For cells, it is the case if @p fe_index
