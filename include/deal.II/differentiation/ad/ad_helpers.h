@@ -207,7 +207,7 @@ namespace Differentiation
       /**
        * Destructor
        */
-      virtual ~ADHelperBase();
+      virtual ~ADHelperBase() = default;
 
       //@}
 
@@ -347,11 +347,11 @@ namespace Differentiation
       is_recording() const;
 
       /**
-       * Returns the tape number which is currently activated for recording or
+       * Returns the tape index which is currently activated for recording or
        * reading.
        */
       types::tape_index
-      active_tape() const;
+      active_tape_index() const;
 
       /**
        * Returns whether or not a tape number has already been used
@@ -424,10 +424,10 @@ namespace Differentiation
        * @param[in] overwrite_tape Express whether tapes are allowed to be
        * overwritten. If <tt>true</tt> then any existing tape with a given
        * @p tape_index will be destroyed and a new tape traced over it.
-       * @param[in] keep_values Determines whether the numerical values of all
-       * independent variables are recorded in the tape buffer. If true, then
-       * the tape can be immediately used to perform computations after
-       * recording is complete.
+       * @param[in] keep_independent_values Determines whether the numerical
+       * values of all independent variables are recorded in the tape buffer.
+       * If true, then the tape can be immediately used to perform computations
+       * after recording is complete.
        *
        * @note During the recording phase, no value(), gradient(), hessian(),
        * or jacobian() operations can be performed.
@@ -438,7 +438,7 @@ namespace Differentiation
       bool
       start_recording_operations(const types::tape_index tape_index,
                                  const bool              overwrite_tape = false,
-                                 const bool              keep_values    = true);
+                                 const bool keep_independent_values     = true);
 
       /**
        * Disable recording mode for a given tape. The use of this function is
@@ -469,66 +469,25 @@ namespace Differentiation
 
     protected:
       /**
-       * @name Taping
+       * @name Drivers and taping
        */
       //@{
 
       /**
-       * Index of the tape that is currently in use. It is this tape that will
-       * be recorded to or read from when performing computations using "taped"
-       * auto-differentiable numbers.
-       */
-      types::tape_index active_tape_index;
-
-      /**
-       * A collection of tapes that have been recorded to on this process.
+       * An object used to help manage stored tapes.
        *
-       * It is important to keep track of this so that one doesn't accidentally
-       * record over a tape (unless specifically instructed to) and that one
-       * doesn't try to use a tape that doesn't exist.
+       * In the event that the @p ad_type is a tapeless AD type, then the object
+       * constructed here is, effectively, a dummy one.
        */
-      static std::set<types::tape_index> registered_tapes;
+      TapedDrivers<ad_type, scalar_type> taped_driver;
 
       /**
-       * Mark whether we're going to inform taped data structures to retain
-       * the coefficients ("Taylors" in ADOL-C nomenclature) stored on the
-       * tape so that they can be evaluated again at a later stage.
+       * An object used to help manage tapeless data structures.
+       *
+       * In the event that the @p ad_type is a taped AD type, then the object
+       * constructed here is, effectively, a dummy one.
        */
-      bool keep_values;
-
-      /**
-       * Mark whether we're currently recording a tape. Dependent on the state
-       * of this flag, only a restricted set of operations are allowable.
-       */
-      bool is_recording_flag;
-
-      /**
-       * A flag indicating that we should preferentially use the user-defined
-       * taped buffer sizes as opposed to either the default values selected
-       * by the AD library (or, in the case of ADOL-C, defined in an
-       * ".adolcrc" file).
-       */
-      bool use_stored_taped_buffer_sizes;
-
-      /**
-       * ADOL-C operations buffer size.
-       */
-      types::tape_buffer_sizes obufsize;
-
-      /**
-       * ADOL-C locations buffer size.
-       */
-      types::tape_buffer_sizes lbufsize;
-
-      /**
-       * ADOL-C value buffer size.
-       */
-      types::tape_buffer_sizes vbufsize;
-
-      /**
-       * ADOL-C Taylor buffer size.
-       */
-      types::tape_buffer_sizes tbufsize;
+      TapelessDrivers<ad_type, scalar_type> tapeless_driver;
 
       /**
        * Select a tape to record to or read from.
@@ -712,24 +671,6 @@ namespace Differentiation
       void
       register_dependent_variable(const unsigned int index,
                                   const ad_type &    func);
-
-      //@}
-
-    private:
-      /**
-       * @name Miscellaneous
-       */
-      //@{
-
-      /**
-       * A counter keeping track of the number of helpers in existence.
-       *
-       * This is only important information for when we use taped number types.
-       * As the tapes are stored in some global register, they exist independent
-       * of these helpers. However, it is assumed that when all helpers go
-       * out of scope then the tapes can be written over.
-       */
-      static unsigned int n_helpers;
 
       //@}
 

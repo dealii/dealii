@@ -35,37 +35,16 @@ namespace Differentiation
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    std::set<types::tape_index>
-      ADHelperBase<ADNumberTypeCode, ScalarType>::registered_tapes;
-
-
-
-    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    unsigned int ADHelperBase<ADNumberTypeCode, ScalarType>::n_helpers = 0;
-
-
-
-    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     ADHelperBase<ADNumberTypeCode, ScalarType>::ADHelperBase(
       const unsigned int n_independent_variables,
       const unsigned int n_dependent_variables)
-      : active_tape_index(numbers::invalid_tape_index)
-      , keep_values(true)
-      , is_recording_flag(false)
-      , use_stored_taped_buffer_sizes(false)
-      , obufsize(0u)
-      , lbufsize(0u)
-      , vbufsize(0u)
-      , tbufsize(0u)
-      , independent_variable_values(
+      : independent_variable_values(
           n_independent_variables,
           dealii::internal::NumberType<scalar_type>::value(0.0))
       , registered_independent_variable_values(n_independent_variables, false)
       , registered_marked_independent_variables(n_independent_variables, false)
       , registered_marked_dependent_variables(n_dependent_variables, false)
     {
-      ++n_helpers;
-
       // Tapeless mode must be configured before any active live
       // variables are created.
       if (AD::is_tapeless_ad_number<ad_type>::value)
@@ -80,20 +59,6 @@ namespace Differentiation
       dependent_variables.resize(n_dependent_variables,
                                  dealii::internal::NumberType<ad_type>::value(
                                    0.0));
-    }
-
-
-
-    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    ADHelperBase<ADNumberTypeCode, ScalarType>::~ADHelperBase()
-    {
-      --n_helpers;
-
-      // Clear any static data when there are no more helpers in scope.
-      // This means that we've effectively marked any of these tapes to
-      // be safely overwritten.
-      if (n_helpers == 0)
-        registered_tapes.clear();
     }
 
 
@@ -148,7 +113,7 @@ namespace Differentiation
         }
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
       Assert(
@@ -182,7 +147,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(active_tape() != numbers::invalid_tape_index,
+          Assert(active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(is_recording() == true,
                  ExcMessage(
@@ -232,7 +197,7 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(active_tape() != numbers::invalid_tape_index,
+          Assert(active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
       Assert(is_recording() == false,
@@ -295,16 +260,22 @@ namespace Differentiation
     bool
     ADHelperBase<ADNumberTypeCode, ScalarType>::is_recording() const
     {
-      return is_recording_flag;
+      if (AD::is_taped_ad_number<ad_type>::value)
+        return taped_driver.is_recording();
+      else
+        return tapeless_driver.is_dependent_variable_marking_allowed();
     }
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     types::tape_index
-    ADHelperBase<ADNumberTypeCode, ScalarType>::active_tape() const
+    ADHelperBase<ADNumberTypeCode, ScalarType>::active_tape_index() const
     {
-      return active_tape_index;
+      if (AD::is_taped_ad_number<ad_type>::value)
+        return taped_driver.active_tape_index();
+      else
+        return 1;
     }
 
 
@@ -314,7 +285,10 @@ namespace Differentiation
     ADHelperBase<ADNumberTypeCode, ScalarType>::is_registered_tape(
       const types::tape_index tape_index) const
     {
-      return registered_tapes.find(tape_index) != registered_tapes.end();
+      if (AD::is_taped_ad_number<ad_type>::value)
+        return taped_driver.is_registered_tape(tape_index);
+      else
+        return true;
     }
 
 
@@ -329,19 +303,12 @@ namespace Differentiation
       // Set stream to print booleans as "true"/"false"
       stream.setf(std::ios_base::boolalpha);
 
-      stream << "Active tape index: " << active_tape_index << "\n";
-      stream << "Registered tapes: ";
-      auto it_registered_tape = registered_tapes.begin();
-      for (unsigned int i = 0; i < registered_tapes.size();
-           ++i, ++it_registered_tape)
-        stream << *it_registered_tape
-               << (i < (registered_tapes.size() - 1) ? "," : "");
-      stream << "\n";
+      stream << "Active tape index: " << active_tape_index() << "\n";
       stream << "Recording? " << is_recording() << "\n";
-      stream << "Keep values? " << keep_values << "\n";
-      stream << "Use stored tape buffer sizes? "
-             << use_stored_taped_buffer_sizes << "\n";
       stream << std::flush;
+
+      if (AD::is_taped_ad_number<ad_type>::value)
+        taped_driver.print(stream);
 
       stream << "Registered independent variables: "
              << "\n";
@@ -452,11 +419,8 @@ namespace Differentiation
           configure_tapeless_mode(new_n_independent_variables,
                                   false /*ensure_persistent_setting*/);
         }
-
-      active_tape_index = numbers::invalid_tape_index;
-      is_recording_flag = false;
-      if (clear_registered_tapes)
-        registered_tapes.clear();
+      if (AD::is_taped_ad_number<ad_type>::value)
+        taped_driver.reset(clear_registered_tapes);
 
       independent_variable_values = std::vector<scalar_type>(
         new_n_independent_variables,
@@ -521,7 +485,7 @@ namespace Differentiation
                  ExcMessage("Invalid tape index"));
           Assert(tape_index < numbers::max_tape_index,
                  ExcMessage("Tape index exceeds maximum allowable value"));
-          active_tape_index = tape_index;
+          taped_driver.activate_tape(tape_index);
           reset_registered_independent_variables();
 
           // A tape may have been defined by a different ADHelper, so in this
@@ -541,7 +505,6 @@ namespace Differentiation
         {
           Assert(ADNumberTraits<ad_type>::is_tapeless == true,
                  ExcInternalError());
-          active_tape_index = tape_index; // This is, in effect, a dummy value
         }
     }
 
@@ -550,18 +513,18 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperBase<ADNumberTypeCode, ScalarType>::set_tape_buffer_sizes(
-      const types::tape_buffer_sizes in_obufsize,
-      const types::tape_buffer_sizes in_lbufsize,
-      const types::tape_buffer_sizes in_vbufsize,
-      const types::tape_buffer_sizes in_tbufsize)
+      const types::tape_buffer_sizes obufsize,
+      const types::tape_buffer_sizes lbufsize,
+      const types::tape_buffer_sizes vbufsize,
+      const types::tape_buffer_sizes tbufsize)
     {
       // When valid for the chosen AD number type, these values will be used the
       // next time start_recording_operations() is called.
-      obufsize                      = in_obufsize;
-      lbufsize                      = in_lbufsize;
-      vbufsize                      = in_vbufsize;
-      tbufsize                      = in_tbufsize;
-      use_stored_taped_buffer_sizes = true;
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        taped_driver.set_tape_buffer_sizes(obufsize,
+                                           lbufsize,
+                                           vbufsize,
+                                           tbufsize);
     }
 
 
@@ -571,7 +534,7 @@ namespace Differentiation
     ADHelperBase<ADNumberTypeCode, ScalarType>::start_recording_operations(
       const types::tape_index tape_index,
       const bool              overwrite_tape,
-      const bool              keep)
+      const bool              keep_independent_values)
     {
       // Define this here for clarity when this flag is used later.
       const bool read_mode = false;
@@ -583,62 +546,41 @@ namespace Differentiation
               Assert(is_recording() == false,
                      ExcMessage("Already recording..."));
             }
+
+          // Check conditions to enable tracing
           if (is_registered_tape(tape_index) == false || overwrite_tape == true)
             {
-              // Register the tape...
-              registered_tapes.insert(tape_index);
-              // ... and setup the data structures for this class in the
+              // Setup the data structures for this class in the
               // appropriate manner
               activate_tape(tape_index, read_mode);
 
               // Start taping
-              if (use_stored_taped_buffer_sizes)
-                {
-                  Assert(obufsize > 0u,
-                         ExcMessage("Buffer value not initialized."));
-                  Assert(lbufsize > 0u,
-                         ExcMessage("Buffer value not initialized."));
-                  Assert(vbufsize > 0u,
-                         ExcMessage("Buffer value not initialized."));
-                  Assert(tbufsize > 0u,
-                         ExcMessage("Buffer value not initialized."));
-                  TapedDrivers<ad_type, scalar_type>::start_taping(
-                    active_tape(),
-                    keep,
-                    obufsize,
-                    lbufsize,
-                    vbufsize,
-                    tbufsize);
-
-                  // Reset this, as we don't assume that the same tape buffer
-                  // sizes are used for every tape
-                  use_stored_taped_buffer_sizes = false;
-                  obufsize                      = 0u;
-                  lbufsize                      = 0u;
-                  vbufsize                      = 0u;
-                  tbufsize                      = 0u;
-                }
-              else
-                {
-                  TapedDrivers<ad_type, scalar_type>::start_taping(
-                    active_tape(), keep);
-                }
+              taped_driver.start_taping(active_tape_index(),
+                                        keep_independent_values);
 
               // Clear the flags that state which independent and
               // dependent variables have been registered
               reset_registered_independent_variables();
               reset_registered_dependent_variables();
+            }
+          else
+            {
+              Assert(is_recording() == false,
+                     ExcMessage("Tape recording is unexpectedly still enabled."));
 
-              // Set some other flags to their indicated / required values
-              keep_values       = keep;
-              is_recording_flag = true;
+              // Now we activate the pre-recorded tape so that its immediately
+              // available for use
+              activate_recorded_tape(tape_index);
             }
         }
       else
         {
           Assert(ADNumberTraits<ad_type>::is_tapeless == true,
                  ExcInternalError());
-          is_recording_flag = true;
+
+          // Set the flag that states that we can safely mark dependent
+          // variables within this current phase of operations
+          tapeless_driver.allow_dependent_variable_marking();
 
           // Dummy call to ensure that the intuitively correct
           // value for the active tape (whether "valid" or not)
@@ -646,7 +588,7 @@ namespace Differentiation
           activate_tape(tape_index, read_mode);
         }
 
-      return is_recording_flag;
+      return is_recording();
     }
 
 
@@ -664,20 +606,8 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          // Stop taping
-          TapedDrivers<ad_type, scalar_type>::stop_taping(active_tape(),
-                                                          write_tapes_to_file);
-
-          // Now that we've turned tracing off, we've definitely
-          // stopped all tape recording.
-          is_recording_flag = false;
-
-          // If the keep_values flag is set, then we expect the user to use this
-          // tape immediately after recording it. There is therefore no need to
-          // invalidate it. However, there is now also no way to double-check
-          // that the newly recorded tape is indeed the active tape.
-          if (keep_values == false)
-            active_tape_index = numbers::invalid_tape_index;
+          // Stop tracing
+          taped_driver.stop_taping(active_tape_index(), write_tapes_to_file);
         }
       else
         {
@@ -689,12 +619,11 @@ namespace Differentiation
 
           // By changing this flag, we ensure that the we can no longer
           // legally alter the values of the dependent variables using
-          // set_independent_variable(). This is important because the value of
+          // set_dependent_variable(). This is important because the value of
           // the tapeless independent variables are set and finalized when
-          // mark_independent_variable() is called. So we cannot allow this to
-          // be done when not in the "recording" phase
-          is_recording_flag = false;
-          active_tape_index = numbers::invalid_tape_index;
+          // mark_dependent_variable() is called. So we cannot allow this to
+          // be done when not in the "recording" phase.
+          tapeless_driver.prevent_dependent_variable_marking();
         }
     }
 
@@ -713,7 +642,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(active_tape() != numbers::invalid_tape_index,
+          Assert(active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(is_recording() == true,
                  ExcMessage(
@@ -772,7 +701,7 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
 
@@ -796,7 +725,7 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
 
@@ -818,7 +747,7 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
       Assert(values.size() == this->n_independent_variables(),
@@ -862,7 +791,8 @@ namespace Differentiation
     ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::compute_energy()
       const
     {
-      if (this->keep_values == false ||
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
           ADNumberTraits<ad_type>::is_tapeless == true)
         {
           Assert(
@@ -882,7 +812,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(this->is_recording() == false,
                  ExcMessage(
@@ -893,7 +823,7 @@ namespace Differentiation
                                       this->n_independent_variables()));
 
           return TapedDrivers<ad_type, scalar_type>::value(
-            this->active_tape(), this->independent_variable_values);
+            this->active_tape_index(), this->independent_variable_values);
         }
       else
         {
@@ -915,7 +845,8 @@ namespace Differentiation
     ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::compute_residual(
       Vector<scalar_type> &gradient) const
     {
-      if (this->keep_values == false ||
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
           ADNumberTraits<ad_type>::is_tapeless == true)
         {
           Assert(
@@ -941,7 +872,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(this->is_recording() == false,
                  ExcMessage(
@@ -952,7 +883,9 @@ namespace Differentiation
                                       this->n_independent_variables()));
 
           TapedDrivers<ad_type, scalar_type>::gradient(
-            this->active_tape(), this->independent_variable_values, gradient);
+            this->active_tape_index(),
+            this->independent_variable_values,
+            gradient);
         }
       else
         {
@@ -979,7 +912,8 @@ namespace Differentiation
                "Cannot computed function Hessian: AD number type does"
                "not support the calculation of second order derivatives."));
 
-      if (this->keep_values == false)
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false))
         {
           Assert(
             this->n_registered_independent_variables() ==
@@ -1006,7 +940,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() != numbers::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(this->is_recording() == false,
                  ExcMessage(
@@ -1017,7 +951,9 @@ namespace Differentiation
                                       this->n_independent_variables()));
 
           TapedDrivers<ad_type, scalar_type>::hessian(
-            this->active_tape(), this->independent_variable_values, hessian);
+            this->active_tape_index(),
+            this->independent_variable_values,
+            hessian);
         }
       else
         {
