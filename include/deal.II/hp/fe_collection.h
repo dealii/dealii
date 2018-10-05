@@ -69,8 +69,10 @@ namespace hp
     explicit FECollection(const FiniteElement<dim, spacedim> &fe);
 
     /**
-     * Constructor. This constructor creates a FECollection from more than
-     * one finite element.
+     * Constructor. This constructor creates a FECollection from one or
+     * more finite element objects passed to the constructor. For this
+     * call to be valid, all arguments need to be of types derived
+     * from class FiniteElement<dim,spacedim>.
      */
     template <class... FETypes>
     explicit FECollection(const FETypes &... fes);
