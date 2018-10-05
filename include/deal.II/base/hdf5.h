@@ -144,7 +144,7 @@ DEAL_II_NAMESPACE_OPEN
  *   {
  *     // data can be std::vector, FullMatrix or Vector
  *     FullMatrix<double> data = {...};
- *     std::vector<hsize_t> hyperslab_dimensions = {2, 5};
+ *     std::vector<hsize_t> hyperslab_dimensions = {2, 3};
  *     std::vector<hsize_t> hyperslab_offset     = {1, 2};
  *     dataset.write_hyperslab(hyperslab_data,
  *                             hyperslab_offset,
@@ -260,6 +260,42 @@ DEAL_II_NAMESPACE_OPEN
  * See DataSet::io_mode(), DataSet::local_no_collective_cause() and
  * DataSet::global_no_collective_cause() for all the possible returned codes.
  *
+ * # Rank of the HDF5 datasets and hyperslabs
+ * The deal.ii HDF5 interface can be used to write/read data to datasets and
+ * hyperslabs of any particular rank. `FullMatrix` can only be used to
+ * write/read data to datasets and hyperslabs of rank 2. `std::vector` and
+ * `Vector` can be used to write/read data to datasets and hyperslabs of
+ * rank 1, 2, 3 and higher, the data is organized in
+ * [row-major order](https://en.wikipedia.org/wiki/Row-_and_column-major_order)
+ * which is commonly used in C and C++ matrices. We can re-write the code from
+ * the previous section using std::vector
+ * @code
+ * // Dataset of rank 2. dim_0 = 50, dim_1 = 30
+ * std::vector<hsize_t> dataset_dimensions = {50, 30};
+ * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
+ * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+ *   {
+ *     // data can be std::vector, FullMatrix or Vector
+ *     std::vector<double> data = {0,1,2,3,4,5};
+ *     // hyperslab of rank 2. dim_0 = 2 and dim_1 = 3
+ *     std::vector<hsize_t> hyperslab_dimensions = {2, 3};
+ *     std::vector<hsize_t> hyperslab_offset     = {1, 2};
+ *     dataset.write_hyperslab(hyperslab_data,
+ *                             hyperslab_offset,
+ *                             hyperslab_dimensions);
+ *   }
+ * else
+ *   {
+ *     dataset.write_none<double>();
+ *   }
+ * @endcode
+ * The previous code writes the following hyperslab matrix
+ * @code
+ * 0 1
+ * 2 3
+ * 4 5
+ * @endcode
+ *
  * @author Daniel Garcia-Sanchez, 2018
  */
 namespace HDF5
@@ -273,14 +309,14 @@ namespace HDF5
   {
   protected:
     /**
-     * Constructor. `string_name` is the name of the HDF5 Object. If `mpi` is
+     * Constructor. @p string_name is the name of the HDF5 Object. If @p mpi is
      * True then MPI I/O is used.
      */
     HDF5Object(const std::string name, const bool mpi);
 
   public:
     /**
-     * Reads an attribute. `T` can be `float`, `double`, `std::complex<float>`,
+     * Reads an attribute. @p T can be `float`, `double`, `std::complex<float>`,
      * `std::complex<double>`, `int`, `unsigned int`, `bool` or `std::string`.
      * Note that the encoding of `std::string` is UTF8 in order to be compatible
      * with python3.
@@ -296,7 +332,7 @@ namespace HDF5
     attr(const std::string &attr_name);
 
     /**
-     * Writes an attribute. `T` can be `float`, `double`, `std::complex<float>`,
+     * Writes an attribute. @p T can be `float`, `double`, `std::complex<float>`,
      * `std::complex<double>`, `int`, `unsigned int`, `bool` or `std::string`.
      * Note that the encoding of `std::string` is UTF8 in order to be compatible
      * with python3.
@@ -372,34 +408,42 @@ namespace HDF5
 
   public:
     /**
-     * Reads data of the dataset. Number can be `float`, `double`,
-     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
+     * Reads data of the dataset.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     *
+     * `Container` can be `std::vector<float>`, `std::vector<double>`,
+     * `std::vector<std::complex<float>>`, `std::vector<std::complex<double>>`,
+     * `std::vector<int>`, `std::vector<unsigned int>`, `Vector<float>`,
+     * `Vector<double>`, `Vector<std::complex<float>>`,
+     * `Vector<std::complex<double>>`, `FullMatrix<float>`,
+     * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
+     * `FullMatrix<std::complex<double>>`.
      */
     template <typename Container>
     Container
     read();
 
     /**
-     * Reads data of a subset of the dataset. Number can be `float`, `double`,
-     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
+     * Reads data of a subset of the dataset.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For example, in the case of a dataset with rank 4 a selection of 3 points
-     * will be described by a 3-by-4 array. To select the points (1,1,1,1),
-     * (14,6,12,18), and (8,22,30,22), the point selection array would be as
-     * follows:
+     * will be described by a 3-by-4 array. Note the indexing is zero-based. To
+     * select the points (1,1,1,1), (14,6,12,18), and (8,22,30,22), the point
+     * selection array would be as follows:
      *
+     * @code
      *    0  0  0  0
      *
      *   13  5 11 17
      *
      *    7 21 29 21
+     * @endcode
      *
      * <a
      * href="https://support.hdfgroup.org/newsletters/newsletter140.html">Parallel
@@ -430,11 +474,19 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
      * definition</a>.
      *
-     * Datatype conversion takes place at the time of a read or read and is
+     * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     *
+     * `Container` can be `std::vector<float>`, `std::vector<double>`,
+     * `std::vector<std::complex<float>>`, `std::vector<std::complex<double>>`,
+     * `std::vector<int>`, `std::vector<unsigned int>`, `Vector<float>`,
+     * `Vector<double>`, `Vector<std::complex<float>>`,
+     * `Vector<std::complex<double>>`, `FullMatrix<float>`,
+     * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
+     * `FullMatrix<std::complex<double>>`.
      */
     template <typename Container>
     Container
@@ -443,7 +495,7 @@ namespace HDF5
 
     /**
      * This function does not read any data, but it can contribute to a
-     * collective read call. Number can be `float`, `double`,
+     * collective read call. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -457,7 +509,7 @@ namespace HDF5
     read_none();
 
     /**
-     * Writes data in the dataset. Number can be `float`, `double`,
+     * Writes data in the dataset. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -465,26 +517,36 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     *
+     * `Container` can be `std::vector<float>`, `std::vector<double>`,
+     * `std::vector<std::complex<float>>`, `std::vector<std::complex<double>>`,
+     * `std::vector<int>`, `std::vector<unsigned int>`, `Vector<float>`,
+     * `Vector<double>`, `Vector<std::complex<float>>`,
+     * `Vector<std::complex<double>>`, `FullMatrix<float>`,
+     * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
+     * `FullMatrix<std::complex<double>>`.
      */
     template <typename Container>
     void
     write(const Container &data);
 
     /**
-     * Writes data to a subset of the dataset. Number can be `float`, `double`,
+     * Writes data to a subset of the dataset. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * The selected elements can be scattered and take any shape in the dataset.
      * For example, in the case of a dataset with rank 4 a selection of 3 points
-     * will be described by a 3-by-4 array. To select the points (1,1,1,1),
-     * (14,6,12,18), and (8,22,30,22), the point selection array would be as
-     * follows:
+     * will be described by a 3-by-4 array. Note the indexing is zero-based. To
+     * select the points (1,1,1,1), (14,6,12,18), and (8,22,30,22), the point
+     * selection array would be as follows:
      *
+     * @code
      *    0  0  0  0
      *
      *   13  5 11 17
      *
      *    7 21 29 21
+     * @endcode
      *
      * <a
      * href="https://support.hdfgroup.org/newsletters/newsletter140.html">Parallel
@@ -560,6 +622,14 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     *
+     * `Container` can be `std::vector<float>`, `std::vector<double>`,
+     * `std::vector<std::complex<float>>`, `std::vector<std::complex<double>>`,
+     * `std::vector<int>`, `std::vector<unsigned int>`, `Vector<float>`,
+     * `Vector<double>`, `Vector<std::complex<float>>`,
+     * `Vector<std::complex<double>>`, `FullMatrix<float>`,
+     * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
+     * `FullMatrix<std::complex<double>>`.
      */
     template <typename Container>
     void
@@ -572,7 +642,7 @@ namespace HDF5
 
     /**
      * This function does not write any data, but it can contribute to a
-     * collective write call. Number can be `float`, `double`,
+     * collective write call. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -589,7 +659,7 @@ namespace HDF5
      * This funcion retrieves the type of I/O that was performed on the last
      * parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
-     * The return type `T` can be `H5D_mpio_actual_io_mode_t` or `std::string`.
+     * The return type @p T can be `H5D_mpio_actual_io_mode_t` or `std::string`.
      * The type `H5D_mpio_actual_io_mode_t` corresponds to the value returned by
      * H5Pget_mpio_actual_io_mode and `std::string` is a human readable
      * conversion.
@@ -611,7 +681,7 @@ namespace HDF5
      * This funcion retrieves the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type `T` can be `uint32_t` or `std::string`. The type
+     * The return type @p T can be `uint32_t` or `std::string`. The type
      * `uint32_t` corresponds to the value returned by
      * [H5Pget_mpio_no_collective_cause](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause)
      * and `std::string` is a human readable conversion.
@@ -637,7 +707,7 @@ namespace HDF5
      * This funcion retrieves the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type `T` can be `uint32_t` or `std::string`. The type
+     * The return type @p T can be `uint32_t` or `std::string`. The type
      * `uint32_t` corresponds to the value returned by
      * H5Pget_mpio_no_collective_cause and `std::string` is a human readable
      * conversion.
@@ -764,7 +834,7 @@ namespace HDF5
     dataset(const std::string &name);
 
     /**
-     * Creates a dataset. Number can be `float`, `double`,
+     * Creates a dataset. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -779,7 +849,7 @@ namespace HDF5
                    const std::vector<hsize_t> &dimensions) const;
 
     /**
-     * Creates and writes data to a dataset. Number can be `float`, `double`,
+     * Creates and writes data to a dataset. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -787,6 +857,14 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     *
+     * `Container` can be `std::vector<float>`, `std::vector<double>`,
+     * `std::vector<std::complex<float>>`, `std::vector<std::complex<double>>`,
+     * `std::vector<int>`, `std::vector<unsigned int>`, `Vector<float>`,
+     * `Vector<double>`, `Vector<std::complex<float>>`,
+     * `Vector<std::complex<double>>`, `FullMatrix<float>`,
+     * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
+     * `FullMatrix<std::complex<double>>`.
      */
     template <typename Container>
     void

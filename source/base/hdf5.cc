@@ -99,7 +99,18 @@ namespace HDF5
       return t_type;
     }
 
-    // This function returns the pointer to the raw data of a container
+    // Several HDF5 functions such as H5Screate_simple() require a
+    // one-dimensional array that specifies the size of each dimension of the
+    // container, see:
+    // https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-CreateSimple
+    // The function get_container_dimensions returns a vector with the
+    // dimensions of the container.
+    // For a std::vector the function returns std::vector<hsize_t>{vector_size}
+    // For a Vector the function returns std::vector<hsize_t>{vector_size}
+    // For a FullMatrix the function returns std::vector<hsize_t>{rows, columns}
+    //
+    // Instead of using functions with std::enable_if, "constexpr if" from C++17
+    // could be used
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container,
@@ -130,7 +141,10 @@ namespace HDF5
     }
 
 
-    // This function returns the pointer to the raw data of a container
+    // This function returns the total size of the container.
+    // For a std::vector the function returns int(vector_size)
+    // For a Vector the function returns int(vector_size)
+    // For a FullMatrix the function returns int(rows*columns)
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container,
@@ -239,8 +253,22 @@ namespace HDF5
       return &data[0][0];
     }
 
-    // This function initializes a Container of type std::vector, Vector or
-    // FullMatrix
+    // This function initializes and returns a container of type std::vector,
+    // Vector or FullMatrix. The function does not set the values of the
+    // elements of the container. The container can store data of a HDF5 dataset
+    // or a HDF5 selection. The dimensions parameter holds the dimensions of the
+    // HDF5 dataset or selection.
+    //
+    // In the case of a std::vector, the size of the vector will be the total
+    // size given by dimensions. For example in the case of a dataset of rank 3,
+    // the dimensions are std::vector<hsize_t>{dim_0,dim_1,dim_2}. The size of
+    // the returned std::vector will be dim_0*dim_1*dim_2
+    //
+    // In the case of a dealii::Vector, the size of the returned dealii::Vector
+    // will be as well dim_0*dim_1*dim_2
+    //
+    // A FullMatrix can store only data of HDF5 datasets with rank 2. The size
+    // of the FullMatrix will be FullMatrix(dim_0,dim_2)
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container,
@@ -269,6 +297,7 @@ namespace HDF5
       Container>::type
     initialize_container(std::vector<hsize_t> dimensions)
     {
+      AssertDimension(dimensions.size(), 2);
       return Container(dimensions[0], dimensions[1]);
     }
 
@@ -277,7 +306,7 @@ namespace HDF5
     no_collective_cause_to_string(uint32_t no_collective_cause)
     {
       std::string message;
-      // The first is not a bitmask compararison, the rest are bitmask
+      // The first is not a bitmask comparison, the rest are bitmask
       // comparisons.
       // https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause
       // See H5Ppublic.h
