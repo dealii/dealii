@@ -521,8 +521,6 @@ namespace Differentiation
                  ExcMessage("Invalid tape index"));
           Assert(tape_index < numbers::max_tape_index,
                  ExcMessage("Tape index exceeds maximum allowable value"));
-          Assert(is_registered_tape(tape_index),
-                 ExcMessage("Tape number not registered"));
           active_tape_index = tape_index;
           reset_registered_independent_variables();
 
@@ -531,6 +529,8 @@ namespace Differentiation
           // current data structure have not been marked as dependents
           if (read_mode == true)
             {
+              Assert(is_registered_tape(tape_index),
+                     ExcMessage("Tape number not registered"));
               reset_registered_dependent_variables(true);
               Assert(n_registered_dependent_variables() ==
                        n_dependent_variables(),
