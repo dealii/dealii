@@ -998,7 +998,7 @@ namespace Differentiation
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately.
-      if (hessian.m() != this->n_independent_variables() &&
+      if (hessian.m() != this->n_independent_variables() ||
           hessian.n() != this->n_independent_variables())
         hessian.reinit({this->n_independent_variables(),
                         this->n_independent_variables()},
