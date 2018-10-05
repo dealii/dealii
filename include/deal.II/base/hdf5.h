@@ -134,9 +134,9 @@ DEAL_II_NAMESPACE_OPEN
  * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
  * definition</a>.
  *
- * The example below shows how to write a simple hyperslab. The offset defines
- * the origin of the hyperslab in the original dataset. The dimensions parameter
- * defines the dimensions of the data to be written.
+ * The example below shows how to write a simple rectangular hyperslab. The
+ * offset defines the origin of the hyperslab in the original dataset. The
+ * dimensions of the hyperslab are `hyperslab_dimensions = {2, 5}`.
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
@@ -145,7 +145,7 @@ DEAL_II_NAMESPACE_OPEN
  *     // data can be std::vector, FullMatrix or Vector
  *     FullMatrix<double> data = {...};
  *     std::vector<hsize_t> hyperslab_dimensions = {2, 5};
- *     std::vector<hsize_t> hyperslab_offset     = {0, 0};
+ *     std::vector<hsize_t> hyperslab_offset     = {1, 2};
  *     dataset.write_hyperslab(hyperslab_data,
  *                             hyperslab_offset,
  *                             hyperslab_dimensions);
@@ -155,6 +155,17 @@ DEAL_II_NAMESPACE_OPEN
  *     dataset.write_none<double>();
  *   }
  * @endcode
+ */
+// It is necessary to turn clang-format off in order to maintain the Doxygen
+// link
+// clang-format off
+/**
+ * The function
+ * DataSet::write_hyperslab(const Container<number> &,const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
+ * can be used to write complex hyperslabs.
+ */
+// clang-format on
+/**
  *
  * ## Write unordered data in parallel
  * The example below shows how to write a selection of data.
@@ -196,13 +207,13 @@ DEAL_II_NAMESPACE_OPEN
  *
  * ## Query the I/O mode that HDF5 used on the last parallel I/O call
  * The default access mode in the HDF5 C++ interface of deal.ii is collective
- * which is typically faster since it allows MPI to do more optimization. In
+ * which is typically faster since it allows MPI to do more optimizations. In
  * some cases, such as when there is type conversion, the HDF5 library can
  * decide to do independent I/O instead of collective I/O, even if the user asks
  * for collective I/O. See the following
  * [article](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/)
  *
- * In cases where maximum performance has to be achieved, it is important to
+ * In cases where maximum performance is a requirement, it is important to
  * make sure that all MPI read/write operations are collective. The HDF5 library
  * provides API routines that can be used after the read/write I/O operations to
  * query the I/O mode. If DataSet::query_io_mode() is set to True, then after
@@ -305,7 +316,11 @@ namespace HDF5
 
   protected:
     /**
-     * HDF5 identifier for the objects File, Group and DataSet
+     * HDF5 identifier for the objects File, Group and DataSet. The
+     * `std::share_ptr<>` pointer allows the object to be copied. For example
+     * several parts of the program can share and access the same group; when
+     * all the functions that access the group are closed, the HDF5 resources of
+     * the group will be automatically released.
      */
     std::shared_ptr<hid_t> hdf5_reference;
 
@@ -339,10 +354,16 @@ namespace HDF5
     friend class Group;
 
   protected:
-    // Open dataset
+    /**
+     * Open dataset. This is an internal constructor. The function
+     * Group::dataset() should be used to open a dataset.
+     */
     DataSet(const std::string &name, const hid_t &parent_group_id, bool mpi);
 
-    // Create dataset
+    /**
+     * Create dataset. This is an internal constructor. The function
+     * Group::create_dataset() should be used to create a dataset.
+     */
     DataSet(const std::string &         name,
             const hid_t &               parent_group_id,
             const std::vector<hsize_t> &dimensions,
@@ -486,10 +507,12 @@ namespace HDF5
      *  - Offset: The starting location for the hyperslab.
      *  - Count: The number of elements to select along each dimension.
      */
+    // It is necessary to turn clang-format off in order to maintain the Doxygen
+    // link
     // clang-format off
     /**
      *
-     * Stride and block are set to NULL. For more complex hyperslabs see
+     * Stride and block are set to NULL. For complex hyperslabs see
      * write_hyperslab(const Container<number> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
      */
     // clang-format on
