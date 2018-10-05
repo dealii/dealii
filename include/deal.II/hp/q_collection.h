@@ -63,6 +63,15 @@ namespace hp
     explicit QCollection(const Quadrature<dim> &quadrature);
 
     /**
+     * Constructor. This constructor creates a QCollection from one or
+     * more quadrature objects passed to the constructor. For this
+     * call to be valid, all arguments need to be of types derived
+     * from class Quadrature<dim>.
+     */
+    template <class... QTypes>
+    explicit QCollection(const QTypes &... quadrature_objects);
+
+    /**
      * Adds a new quadrature rule to the QCollection. In most cases, you will
      * want to add quadrature rules in the same order as the elements were
      * added to the hp::FECollection for which this quadrature rule collection
@@ -135,6 +144,24 @@ namespace hp
 
 
   /* --------------- inline functions ------------------- */
+
+  template <int dim>
+  template <class... QTypes>
+  QCollection<dim>::QCollection(const QTypes &... quadrature_objects)
+  {
+    static_assert(is_base_of_all<Quadrature<dim>, QTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from Quadrature<dim>!");
+
+    // loop over all of the given arguments and add the quadrature objects to
+    // this collection. Inlining the definition of q_pointers causes internal
+    // compiler errors on GCC 7.1.1 so we define it separately:
+    const auto q_pointers = {&quadrature_objects...};
+    for (auto p : q_pointers)
+      push_back(*p);
+  }
+
+
 
   template <int dim>
   inline unsigned int
