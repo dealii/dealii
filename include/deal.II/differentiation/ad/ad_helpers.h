@@ -1356,13 +1356,11 @@ namespace Differentiation
         local_dof_indices.size() == this->n_independent_variables(),
         ExcMessage(
           "Degree-of-freedom index vector size does not match number of independent variables"));
-#    ifdef DEBUG
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
           Assert(this->registered_independent_variable_values[i] == false,
                  ExcMessage("Independent variables already registered."));
         }
-#    endif
       set_dof_values(values, local_dof_indices);
     }
 
