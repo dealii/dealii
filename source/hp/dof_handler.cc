@@ -1305,8 +1305,7 @@ namespace hp
        MemoryConsumption::memory_consumption(*faces) +
        MemoryConsumption::memory_consumption(number_cache) +
        MemoryConsumption::memory_consumption(vertex_dofs) +
-       MemoryConsumption::memory_consumption(vertex_dof_offsets) +
-       MemoryConsumption::memory_consumption(has_children));
+       MemoryConsumption::memory_consumption(vertex_dof_offsets));
     for (unsigned int i = 0; i < levels.size(); ++i)
       mem += MemoryConsumption::memory_consumption(*levels[i]);
     mem += MemoryConsumption::memory_consumption(*faces);
@@ -1522,6 +1521,20 @@ namespace hp
                 std::ref(*this))));
     tria_listeners.push_back(this->tria->signals.create.connect(std::bind(
       &DoFHandler<dim, spacedim>::post_refinement_action, std::ref(*this))));
+
+    // Only connect the update of active fe indices if we are not using a
+    // p::d::Triangulation. In this case, the class ActiveFEIndicesTransfer
+    // has to be consulted.
+    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                       *>(&*this->tria) == nullptr)
+      {
+        tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
+          std::bind(&DoFHandler<dim, spacedim>::pre_refinement_fe_index_update,
+                    std::ref(*this))));
+        tria_listeners.push_back(this->tria->signals.post_refinement.connect(
+          std::bind(&DoFHandler<dim, spacedim>::post_refinement_fe_index_update,
+                    std::ref(*this))));
+      }
   }
 
 
@@ -1687,47 +1700,13 @@ namespace hp
   DoFHandler<dim, spacedim>::pre_refinement_action()
   {
     create_active_fe_table();
-
-    // Remember if the cells already have children. That will make the
-    // transfer of the active_fe_index to the finer levels easier.
-    Assert(has_children.size() == 0, ExcInternalError());
-    for (unsigned int i = 0; i < levels.size(); ++i)
-      {
-        const unsigned int cells_on_level = tria->n_raw_cells(i);
-        std::unique_ptr<std::vector<bool>> has_children_level(
-          new std::vector<bool>(cells_on_level));
-
-        // Check for each cell, if it has children. in 1d, we don't
-        // store refinement cases, so use the 'children' vector
-        // instead
-        if (dim == 1)
-          std::transform(tria->levels[i]->cells.children.begin(),
-                         tria->levels[i]->cells.children.end(),
-                         has_children_level->begin(),
-                         std::bind(std::not_equal_to<int>(),
-                                   std::placeholders::_1,
-                                   -1));
-        else
-          std::transform(tria->levels[i]->cells.refinement_cases.begin(),
-                         tria->levels[i]->cells.refinement_cases.end(),
-                         has_children_level->begin(),
-                         std::bind(std::not_equal_to<unsigned char>(),
-                                   std::placeholders::_1,
-                                   static_cast<unsigned char>(
-                                     RefinementCase<dim>::no_refinement)));
-
-        has_children.emplace_back(std::move(has_children_level));
-      }
   }
-
 
 
   template <int dim, int spacedim>
   void
   DoFHandler<dim, spacedim>::post_refinement_action()
   {
-    Assert(has_children.size() == levels.size(), ExcInternalError());
-
     // Normally only one level is added, but if this Triangulation
     // is created by copy_triangulation, it can be more than one level.
     while (levels.size() < tria->n_levels())
@@ -1745,55 +1724,169 @@ namespace hp
     // Resize active_fe_indices vectors. use zero indicator to extend
     for (unsigned int i = 0; i < levels.size(); ++i)
       levels[i]->active_fe_indices.resize(tria->n_raw_cells(i), 0);
+  }
 
-    // if a finite element collection has already been set, then
-    // actually try to set active_fe_indices for child cells of
-    // refined cells to the active_fe_index of the mother cell. if no
-    // finite element collection has been assigned yet, then all
-    // indicators are zero anyway, and there is no point trying to set
-    // anything (besides, we would trip over an assertion in
-    // set_active_fe_index)
+
+  template <int dim, int spacedim>
+  void
+  DoFHandler<dim, spacedim>::pre_refinement_fe_index_update()
+  {
     if (fe_collection.size() > 0)
       {
-        cell_iterator cell = begin(), endc = end();
-        for (; cell != endc; ++cell)
+        Assert(refined_cells_fe_index.empty(), ExcInternalError());
+        Assert(coarsened_cells_fe_index.empty(), ExcInternalError());
+
+        // If the underlying shared::Tria allows artificial cells,
+        // then save the current set of subdomain ids, and set
+        // subdomain ids to the "true" owner of each cell. We later
+        // restore these flags.
+        const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &(*tria)));
+
+        std::vector<types::subdomain_id> saved_subdomain_ids;
+        if (shared_tria != nullptr)
+          if (shared_tria->with_artificial_cells())
+            {
+              saved_subdomain_ids.resize(shared_tria->n_active_cells());
+
+              typename parallel::shared::Triangulation<dim, spacedim>::
+                active_cell_iterator cell = shared_tria->begin_active(),
+                                     endc = shared_tria->end();
+
+              const std::vector<types::subdomain_id> &true_subdomain_ids =
+                shared_tria->get_true_subdomain_ids_of_cells();
+
+              for (unsigned int index = 0; cell != endc; ++cell, ++index)
+                {
+                  saved_subdomain_ids[index] = cell->subdomain_id();
+                  cell->set_subdomain_id(true_subdomain_ids[index]);
+                }
+
+              // Make sure every processor knows the active_fe_indices
+              // on both its own cells and all ghost cells.
+              dealii::internal::hp::DoFHandlerImplementation::Implementation::
+                communicate_active_fe_indices(*this);
+            }
+
+        // Store active_fe_index information for all cells that will be
+        // affected by refinement/coarsening.
+        for (const auto &cell : active_cell_iterators())
           {
-            // Look if the cell got children during refinement by
-            // checking whether it has children now but didn't have
-            // children before refinement (the has_children array is
-            // set in pre-refinement action)
-            //
-            // Note: Although one level is added to the DoFHandler
-            // levels, when the triangulation got one, for the buffer
-            // has_children this new level is not required, because
-            // the cells on the finest level never have
-            // children. Hence cell->has_children () will always
-            // return false on that level, which would cause shortcut
-            // evaluation of the following expression. Thus an index
-            // error in has_children should never occur.
-            if (cell->has_children() &&
-                !(*has_children[cell->level()])[cell->index()])
+            if (cell->refine_flag_set())
               {
-                // Set active_fe_index in children to the same value
-                // as in the parent cell. we can't access the
-                // active_fe_index in the parent cell any more through
-                // cell->active_fe_index() since that function is not
-                // allowed for inactive cells, but we can access this
-                // information from the DoFLevels directly
-                //
-                // we don't have to set the active_fe_index for ghost
-                // cells -- these will be exchanged automatically
-                // upon distribute_dofs()
-                for (unsigned int i = 0; i < cell->n_children(); ++i)
-                  if (cell->child(i)->is_locally_owned())
-                    cell->child(i)->set_active_fe_index(
-                      levels[cell->level()]->active_fe_index(cell->index()));
+                // Store the active_fe_index of each cell that will be refined
+                // to and distribute it later on its children.
+                refined_cells_fe_index.push_back(
+                  {cell->id(), cell->active_fe_index()});
+              }
+            else if (cell->coarsen_flag_set())
+              {
+                // From all cells that will be coarsened, determine their parent
+                // and calculate its proper active_fe_index, so that it can be
+                // set after refinement.
+                const auto &parent = cell->parent();
+                // Check if the active_fe_index for the current cell has been
+                // determined already.
+                if (std::find_if(
+                      coarsened_cells_fe_index.cbegin(),
+                      coarsened_cells_fe_index.cend(),
+                      [&parent](
+                        const std::pair<CellId, unsigned int> &element) {
+                        return element.first == parent->id();
+                      }) == coarsened_cells_fe_index.cend())
+                  {
+                    std::set<unsigned int> fe_indices_children;
+                    for (unsigned int child_index = 0;
+                         child_index < GeometryInfo<dim>::max_children_per_cell;
+                         ++child_index)
+                      fe_indices_children.insert(
+                        parent->child(child_index)->active_fe_index());
+
+                    const unsigned int fe_index =
+                      fe_collection.find_least_dominating_fe_in_collection(
+                        fe_indices_children, /*codim=*/0);
+
+                    Assert(
+                      fe_index != numbers::invalid_unsigned_int,
+                      ExcMessage(
+                        "No FiniteElement has been found in your FECollection "
+                        "that dominates all children of a cell you are trying "
+                        "to coarsen!"));
+
+                    coarsened_cells_fe_index.push_back(
+                      {parent->id(), fe_index});
+                  }
               }
           }
-      }
 
-    // Free buffer objects
-    has_children.clear();
+        // Finally, restore current subdomain_ids.
+        if (shared_tria != nullptr)
+          if (shared_tria->with_artificial_cells())
+            {
+              typename parallel::shared::Triangulation<dim, spacedim>::
+                active_cell_iterator cell = shared_tria->begin_active(),
+                                     endc = shared_tria->end();
+
+              for (unsigned int index = 0; cell != endc; ++cell, ++index)
+                cell->set_subdomain_id(saved_subdomain_ids[index]);
+            }
+      }
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  DoFHandler<dim, spacedim>::post_refinement_fe_index_update()
+  {
+    if (fe_collection.size() > 0)
+      {
+        // Distribute active_fe_indices from all refined cells on their
+        // respective children.
+        for (auto &pair : refined_cells_fe_index)
+          {
+            typename hp::DoFHandler<dim, spacedim>::cell_iterator parent(
+              *(pair.first.to_cell(*tria)), this);
+
+            for (unsigned int child_index = 0;
+                 child_index < GeometryInfo<dim>::max_children_per_cell;
+                 ++child_index)
+              {
+                typename hp::DoFHandler<dim, spacedim>::cell_iterator child =
+                  parent->child(child_index);
+
+                if (child->is_locally_owned())
+                  {
+                    Assert(child->active(), ExcInternalError());
+                    child->set_active_fe_index(pair.second);
+                  }
+              }
+          }
+
+        // Set active_fe_indices on coarsened cells that have been determined
+        // before the actual coarsening happened.
+        for (auto &pair : coarsened_cells_fe_index)
+          {
+            typename hp::DoFHandler<dim, spacedim>::cell_iterator cell(
+              *(pair.first.to_cell(*tria)), this);
+
+            if (cell->is_locally_owned())
+              {
+                Assert(cell->active(), ExcInternalError());
+                cell->set_active_fe_index(pair.second);
+              }
+          }
+
+        // We have to distribute the information about active_fe_indices
+        // on all processors, if a parallel::shared::Triangulation
+        // has been used.
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          communicate_active_fe_indices(*this);
+
+        // Clear stored active_fe_indices.
+        refined_cells_fe_index.clear();
+        coarsened_cells_fe_index.clear();
+      }
   }
 
 

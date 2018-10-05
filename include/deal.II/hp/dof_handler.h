@@ -31,6 +31,8 @@
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
 
+#include <deal.II/grid/cell_id.h>
+
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/fe_collection.h>
@@ -122,15 +124,9 @@ namespace hp
    * circumstances. In particular, the following rules apply:
    * - Upon mesh refinement, child cells inherit the active FE index of
    *   the parent.
-   * - On the other hand, when coarsening cells, the (now active)
-   *   parent cell will not have an active FE index set and you will
-   *   have to set it explicitly before calling
-   *   hp::DoFHandler::distribute_dofs(). In particular, to avoid
-   *   stale information to be used by accident, this class deletes
-   *   the active FE index of cells that are refined after inheriting
-   *   this index to the children; this implies that if the children
-   *   are coarsened away, the old value is no longer available on the
-   *   parent cell.
+   * - When coarsening cells, the (now active) parent cell will be assigned
+   *   an active FE index that is determined from its (no longer active)
+   *   children, following the FiniteElementDomination logic.
    *
    *
    * <h3>Active FE indices and parallel meshes</h3>
@@ -158,6 +154,13 @@ namespace hp
    * See
    * @ref GlossArtificialCell "the glossary entry on artificial cells"
    * for more information.
+   *
+   * Using a parallel::distributed::Triangulation with an hp::DoFHandler
+   * requires additional attention during coarsening and refinement, since
+   * no information on active FE indices will be automatically transferred.
+   * This has to be done manually using the
+   * parallel::distributed::ActiveFEIndicesTransfer class. Consult its
+   * documentation for more information.
    *
    *
    * @ingroup dofs
@@ -1033,6 +1036,19 @@ namespace hp
     post_refinement_action();
 
     /**
+     * Functions that will be triggered through signals whenever the
+     * triangulation is modified, with the restriction that it is not
+     * a parallel::distributed::Triangulation.
+     *
+     * Here they are used to administrate the active_fe_indices during the
+     * spatial refinement.
+     */
+    void
+    pre_refinement_fe_index_update();
+    void
+    post_refinement_fe_index_update();
+
+    /**
      * Space to store the DoF numbers for the different levels. Analogous to
      * the <tt>levels[]</tt> tree of the Triangulation objects.
      */
@@ -1090,12 +1106,16 @@ namespace hp
     std::vector<unsigned int> vertex_dof_offsets;
 
     /**
-     * Array to store the information if a cell on some level has children or
-     * not. It is used by the signal slots as a persistent buffer during the
-     * refinement, i.e. from between when pre_refinement_action is called and
-     * when post_refinement_action runs.
+     * Container to temporarily store the CellID and active FE index of
+     * cells that will be refined.
      */
-    std::vector<std::unique_ptr<std::vector<bool>>> has_children;
+    std::vector<std::pair<CellId, unsigned int>> refined_cells_fe_index;
+
+    /**
+     * Container to temporarily store the CellID and active FE index of
+     * cells that will be coarsened.
+     */
+    std::vector<std::pair<CellId, unsigned int>> coarsened_cells_fe_index;
 
     /**
      * A list of connections with which this object connects to the
@@ -1202,12 +1222,6 @@ namespace hp
     if (!faces_is_nullptr)
       ar &faces;
 
-    // the same issue as above
-    const unsigned int n_has_children = has_children.size();
-    ar &               n_has_children;
-    for (unsigned int i = 0; i < n_has_children; ++i)
-      ar &has_children[i];
-
     // write out the number of triangulation cells and later check during
     // loading that this number is indeed correct; same with something that
     // identifies the policy
@@ -1234,7 +1248,6 @@ namespace hp
     // destroyed and we end up with a memory leak. consequently, first delete
     // previous content before re-loading stuff
     levels.clear();
-    has_children.clear();
     faces.reset();
 
     // some versions of gcc have trouble with loading vectors of
@@ -1255,16 +1268,6 @@ namespace hp
     ar & faces_is_nullptr;
     if (!faces_is_nullptr)
       ar &faces;
-
-    // the same issue as above
-    ar &size;
-    has_children.resize(size);
-    for (unsigned int i = 0; i < size; ++i)
-      {
-        std::unique_ptr<std::vector<bool>> has_children_on_level;
-        ar &                               has_children_on_level;
-        has_children[i] = std::move(has_children_on_level);
-      }
 
     // these are the checks that correspond to the last block in the save()
     // function
