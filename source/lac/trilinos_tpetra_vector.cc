@@ -28,8 +28,8 @@
 #    include <boost/io/ios_state.hpp>
 
 #    include <Teuchos_DefaultMpiComm.hpp>
-#    include <Tpetra_Import_decl.hpp>
-#    include <Tpetra_Map_decl.hpp>
+#    include <Tpetra_Import_def.hpp>
+#    include <Tpetra_Map_def.hpp>
 
 #    include <memory>
 
@@ -660,7 +660,6 @@ namespace LinearAlgebra
     template class Vector<double>;
     template class Vector<std::complex<float>>;
     template class Vector<std::complex<double>>;
-
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
