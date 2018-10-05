@@ -311,8 +311,18 @@ namespace Threads
    * may have created to work on tasks created using the Threads::new_task
    * functions are not counted.
    *
+   * @deprecated This function is a left-over from a time when deal.II was
+   *   in charge of creating all threads itself. But this is no longer the
+   *   case: Both deal.II itself and applications can create threads via
+   *   C++11 functions, and deal.II also relies on libraries such as the
+   *   Threading Building Blocks that can create threads when executing
+   *   certain functionality. As a consequence, we can no longer compute
+   *   an accurate number of threads currently operating, and whatever
+   *   this function returns is not accurate.
+   *
    * @ingroup threads
    */
+  DEAL_II_DEPRECATED
   unsigned int
   n_existing_threads();
 
@@ -325,8 +335,11 @@ namespace Threads
    * @todo As of now, none of our systems seems to support
    * <code>gettid</code>, so that part of the code is untested yet.
    *
+   * @deprecated Use std::thread::get_id() or std::this_thread::get_id() instead.
+   *
    * @ingroup threads
    */
+  DEAL_II_DEPRECATED
   unsigned int
   this_thread_id();
 
