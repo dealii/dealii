@@ -1,0 +1,4 @@
+New: Add inverse_Hilbert_space_filling_curve() to map points in dim-dimensional
+space to line index of the Hilbert space filling curve.
+<br>
+(Denis Davydov 2018/10/05)
