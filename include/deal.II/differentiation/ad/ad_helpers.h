@@ -107,7 +107,7 @@ namespace Differentiation
      *   ad_helper.set_tape_buffer_sizes();
      *
      *    // Select a tape number to record to
-     *   const types::tape_index tape_index = ...;
+     *   const typename Types<ad_type>::tape_index  tape_index = ...;
      *
      *   // Indicate that we are about to start tracing the operations for
      *   // function evaluation on the tape. If this tape has already been used
@@ -261,8 +261,8 @@ namespace Differentiation
        * is a taped auto-differentiable number.
        */
       void
-      print_tape_stats(const types::tape_index tape_index,
-                       std::ostream &          stream) const;
+      print_tape_stats(const typename Types<ad_type>::tape_index tape_index,
+                       std::ostream &                            stream) const;
 
       //@}
 
@@ -350,7 +350,7 @@ namespace Differentiation
        * Returns the tape index which is currently activated for recording or
        * reading.
        */
-      types::tape_index
+      typename Types<ad_type>::tape_index
       active_tape_index() const;
 
       /**
@@ -358,7 +358,8 @@ namespace Differentiation
        * or registered.
        */
       bool
-      is_registered_tape(const types::tape_index tape_index) const;
+      is_registered_tape(
+        const typename Types<ad_type>::tape_index tape_index) const;
 
       /**
        * Set the buffer sizes for the next active tape.
@@ -386,10 +387,15 @@ namespace Differentiation
        * @param[in] tbufsize ADOL-C Taylor buffer size
        */
       void
-      set_tape_buffer_sizes(const types::tape_buffer_sizes obufsize = 67108864,
-                            const types::tape_buffer_sizes lbufsize = 67108864,
-                            const types::tape_buffer_sizes vbufsize = 67108864,
-                            const types::tape_buffer_sizes tbufsize = 67108864);
+      set_tape_buffer_sizes(
+        const typename Types<ad_type>::tape_buffer_sizes obufsize = 64 * 1024 *
+                                                                    1024,
+        const typename Types<ad_type>::tape_buffer_sizes lbufsize = 64 * 1024 *
+                                                                    1024,
+        const typename Types<ad_type>::tape_buffer_sizes vbufsize = 64 * 1024 *
+                                                                    1024,
+        const typename Types<ad_type>::tape_buffer_sizes tbufsize = 64 * 1024 *
+                                                                    1024);
 
       /**
        * Enable recording mode for a given tape. The use of this function is
@@ -433,12 +439,14 @@ namespace Differentiation
        * or jacobian() operations can be performed.
        *
        * @note The chosen tape index must be greater than
-       * numbers::invalid_tape_index and less than numbers::max_tape_index.
+       * Numbers<ad_type>::invalid_tape_index and less than
+       * Numbers<ad_type>::max_tape_index.
        */
       bool
-      start_recording_operations(const types::tape_index tape_index,
-                                 const bool              overwrite_tape = false,
-                                 const bool keep_independent_values     = true);
+      start_recording_operations(
+        const typename Types<ad_type>::tape_index tape_index,
+        const bool                                overwrite_tape = false,
+        const bool keep_independent_values                       = true);
 
       /**
        * Disable recording mode for a given tape. The use of this function is
@@ -460,10 +468,12 @@ namespace Differentiation
        * @param[in] tape_index The index of the tape to be read from.
        *
        * @note The chosen tape index must be greater than
-       * numbers::invalid_tape_index and less than numbers::max_tape_index.
+       * Numbers<ad_type>::invalid_tape_index and less than
+       * Numbers<ad_type>::max_tape_index.
        */
       void
-      activate_recorded_tape(const types::tape_index tape_index);
+      activate_recorded_tape(
+        const typename Types<ad_type>::tape_index tape_index);
 
       //@}
 
@@ -502,10 +512,12 @@ namespace Differentiation
        *            read data from a preexisting tape.
        *
        * @note The chosen tape index must be greater than
-       * numbers::invalid_tape_index and less than numbers::max_tape_index.
+       * Numbers<ad_type>::invalid_tape_index and less than
+       * Numbers<ad_type>::max_tape_index.
        */
       void
-      activate_tape(const types::tape_index tape_index, const bool read_mode);
+      activate_tape(const typename Types<ad_type>::tape_index tape_index,
+                    const bool                                read_mode);
 
       //@}
 
@@ -1031,7 +1043,7 @@ namespace Differentiation
      *     // material combination:
      *
      *     // Select a tape number to record to
-     *     const types::tape_index tape_index = ...;
+     *     const typename Types<ad_type>::tape_index tape_index = ...;
      *
      *     // Indicate that we are about to start tracing the operations for
      *     // function evaluation on the tape. If this tape has already been

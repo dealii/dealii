@@ -113,7 +113,8 @@ namespace Differentiation
         }
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
       Assert(
@@ -147,7 +148,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(active_tape_index() != numbers::invalid_tape_index,
+          Assert(active_tape_index() != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(is_recording() == true,
                  ExcMessage(
@@ -197,7 +198,7 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(active_tape_index() != numbers::invalid_tape_index,
+          Assert(active_tape_index() != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
       Assert(is_recording() == false,
@@ -269,7 +270,8 @@ namespace Differentiation
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    types::tape_index
+    typename Types<
+      typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type>::tape_index
     ADHelperBase<ADNumberTypeCode, ScalarType>::active_tape_index() const
     {
       if (AD::is_taped_ad_number<ad_type>::value)
@@ -283,7 +285,7 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
     ADHelperBase<ADNumberTypeCode, ScalarType>::is_registered_tape(
-      const types::tape_index tape_index) const
+      const typename Types<ad_type>::tape_index tape_index) const
     {
       if (AD::is_taped_ad_number<ad_type>::value)
         return taped_driver.is_registered_tape(tape_index);
@@ -366,8 +368,8 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperBase<ADNumberTypeCode, ScalarType>::print_tape_stats(
-      const types::tape_index tape_index,
-      std::ostream &          stream) const
+      const typename Types<ad_type>::tape_index tape_index,
+      std::ostream &                            stream) const
     {
       if (ADNumberTraits<ad_type>::is_tapeless == true)
         return;
@@ -466,7 +468,7 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperBase<ADNumberTypeCode, ScalarType>::activate_recorded_tape(
-      const types::tape_index tape_index)
+      const typename Types<ad_type>::tape_index tape_index)
     {
       activate_tape(tape_index, true /*read_mode*/);
     }
@@ -476,14 +478,14 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperBase<ADNumberTypeCode, ScalarType>::activate_tape(
-      const types::tape_index tape_index,
-      const bool              read_mode)
+      const typename Types<ad_type>::tape_index tape_index,
+      const bool                                read_mode)
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(tape_index != numbers::invalid_tape_index,
+          Assert(tape_index != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
-          Assert(tape_index < numbers::max_tape_index,
+          Assert(tape_index < Numbers<ad_type>::max_tape_index,
                  ExcMessage("Tape index exceeds maximum allowable value"));
           taped_driver.activate_tape(tape_index);
           reset_registered_independent_variables();
@@ -513,10 +515,10 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperBase<ADNumberTypeCode, ScalarType>::set_tape_buffer_sizes(
-      const types::tape_buffer_sizes obufsize,
-      const types::tape_buffer_sizes lbufsize,
-      const types::tape_buffer_sizes vbufsize,
-      const types::tape_buffer_sizes tbufsize)
+      const typename Types<ad_type>::tape_buffer_sizes obufsize,
+      const typename Types<ad_type>::tape_buffer_sizes lbufsize,
+      const typename Types<ad_type>::tape_buffer_sizes vbufsize,
+      const typename Types<ad_type>::tape_buffer_sizes tbufsize)
     {
       // When valid for the chosen AD number type, these values will be used the
       // next time start_recording_operations() is called.
@@ -532,9 +534,9 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
     ADHelperBase<ADNumberTypeCode, ScalarType>::start_recording_operations(
-      const types::tape_index tape_index,
-      const bool              overwrite_tape,
-      const bool              keep_independent_values)
+      const typename Types<ad_type>::tape_index tape_index,
+      const bool                                overwrite_tape,
+      const bool                                keep_independent_values)
     {
       // Define this here for clarity when this flag is used later.
       const bool read_mode = false;
@@ -566,7 +568,8 @@ namespace Differentiation
           else
             {
               Assert(is_recording() == false,
-                     ExcMessage("Tape recording is unexpectedly still enabled."));
+                     ExcMessage(
+                       "Tape recording is unexpectedly still enabled."));
 
               // Now we activate the pre-recorded tape so that its immediately
               // available for use
@@ -642,7 +645,7 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(active_tape_index() != numbers::invalid_tape_index,
+          Assert(active_tape_index() != Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(is_recording() == true,
                  ExcMessage(
@@ -701,7 +704,8 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
 
@@ -725,7 +729,8 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
 
@@ -747,7 +752,8 @@ namespace Differentiation
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
         }
       Assert(values.size() == this->n_independent_variables(),
@@ -812,7 +818,8 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(this->is_recording() == false,
                  ExcMessage(
@@ -872,7 +879,8 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(this->is_recording() == false,
                  ExcMessage(
@@ -940,7 +948,8 @@ namespace Differentiation
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
-          Assert(this->active_tape_index() != numbers::invalid_tape_index,
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
                  ExcMessage("Invalid tape index"));
           Assert(this->is_recording() == false,
                  ExcMessage(
