@@ -100,79 +100,84 @@ namespace HDF5
     }
 
     // This function returns the pointer to the raw data of a container
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, std::vector<number>>::value,
+      std::is_same<Container,
+                   std::vector<typename Container::value_type>>::value,
       std::vector<hsize_t>>::type
-    get_container_dimensions(const Container<number> &data)
+    get_container_dimensions(const Container &data)
     {
       return std::vector<hsize_t>{data.size()};
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, Vector<number>>::value,
+      std::is_same<Container, Vector<typename Container::value_type>>::value,
       std::vector<hsize_t>>::type
-    get_container_dimensions(const Container<number> &data)
+    get_container_dimensions(const Container &data)
     {
       return std::vector<hsize_t>{data.size()};
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, FullMatrix<number>>::value,
+      std::is_same<Container,
+                   FullMatrix<typename Container::value_type>>::value,
       std::vector<hsize_t>>::type
-    get_container_dimensions(const Container<number> &data)
+    get_container_dimensions(const Container &data)
     {
       return std::vector<hsize_t>{data.m(), data.n()};
     }
 
 
     // This function returns the pointer to the raw data of a container
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, std::vector<number>>::value,
+      std::is_same<Container,
+                   std::vector<typename Container::value_type>>::value,
       unsigned int>::type
-    get_container_size(const Container<number> &data)
+    get_container_size(const Container &data)
     {
       return static_cast<unsigned int>(data.size());
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, Vector<number>>::value,
+      std::is_same<Container, Vector<typename Container::value_type>>::value,
       unsigned int>::type
-    get_container_size(const Container<number> &data)
+    get_container_size(const Container &data)
     {
       return static_cast<unsigned int>(data.size());
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, FullMatrix<number>>::value,
+      std::is_same<Container,
+                   FullMatrix<typename Container::value_type>>::value,
       unsigned int>::type
-    get_container_size(const Container<number> &data)
+    get_container_size(const Container &data)
     {
       return static_cast<unsigned int>(data.m() * data.n());
     }
 
     // This function returns the pointer to the raw data of a container
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, std::vector<number>>::value,
+      std::is_same<Container,
+                   std::vector<typename Container::value_type>>::value,
       void *>::type
-    get_container_pointer(Container<number> &data)
+    get_container_pointer(Container &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong
       return data.data();
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, Vector<number>>::value,
+      std::is_same<Container, Vector<typename Container::value_type>>::value,
       void *>::type
-    get_container_pointer(Container<number> &data)
+    get_container_pointer(Container &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -180,11 +185,12 @@ namespace HDF5
       return &data[0];
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, FullMatrix<number>>::value,
+      std::is_same<Container,
+                   FullMatrix<typename Container::value_type>>::value,
       void *>::type
-    get_container_pointer(Container<number> &data)
+    get_container_pointer(Container &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -195,22 +201,23 @@ namespace HDF5
     // This function returns the pointer to the raw data of a container
     // The returned pointer is const, which means that it can be used only to
     // read the data
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, std::vector<number>>::value,
+      std::is_same<Container,
+                   std::vector<typename Container::value_type>>::value,
       const void *>::type
-    get_container_const_pointer(const Container<number> &data)
+    get_container_const_pointer(const Container &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong
       return data.data();
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, Vector<number>>::value,
+      std::is_same<Container, Vector<typename Container::value_type>>::value,
       const void *>::type
-    get_container_const_pointer(const Container<number> &data)
+    get_container_const_pointer(const Container &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -219,11 +226,12 @@ namespace HDF5
     }
 
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, FullMatrix<number>>::value,
+      std::is_same<Container,
+                   FullMatrix<typename Container::value_type>>::value,
       const void *>::type
-    get_container_const_pointer(const Container<number> &data)
+    get_container_const_pointer(const Container &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -231,34 +239,37 @@ namespace HDF5
       return &data[0][0];
     }
 
-    // This function initializes a container of number type
-    template <template <class...> class Container, typename number>
+    // This function initializes a Container of type std::vector, Vector or
+    // FullMatrix
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, std::vector<number>>::value,
-      Container<number>>::type
+      std::is_same<Container,
+                   std::vector<typename Container::value_type>>::value,
+      Container>::type
     initialize_container(std::vector<hsize_t> dimensions)
     {
-      return Container<number>(std::accumulate(
+      return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, Vector<number>>::value,
-      Container<number>>::type
+      std::is_same<Container, Vector<typename Container::value_type>>::value,
+      Container>::type
     initialize_container(std::vector<hsize_t> dimensions)
     {
-      return Container<number>(std::accumulate(
+      return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
     }
 
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     typename std::enable_if<
-      std::is_same<Container<number>, FullMatrix<number>>::value,
-      Container<number>>::type
+      std::is_same<Container,
+                   FullMatrix<typename Container::value_type>>::value,
+      Container>::type
     initialize_container(std::vector<hsize_t> dimensions)
     {
-      return FullMatrix<number>(dimensions[0], dimensions[1]);
+      return Container(dimensions[0], dimensions[1]);
     }
 
     // Convert a HDF5 no_collective_cause code to a human readable string
@@ -607,15 +618,15 @@ namespace HDF5
       }
   }
 
-  template <template <class...> class Container, typename number>
-  Container<number>
+  template <typename Container>
+  Container
   DataSet::read()
   {
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    hid_t                  plist;
+    std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
+    hid_t plist;
 
-    Container<number> data =
-      internal::initialize_container<Container, number>(_dimensions);
+    Container data = internal::initialize_container<Container>(_dimensions);
 
     if (mpi)
       {
@@ -634,7 +645,7 @@ namespace HDF5
                   H5S_ALL,
                   H5S_ALL,
                   plist,
-                  internal::get_container_pointer<Container, number>(data));
+                  internal::get_container_pointer(data));
     Assert(ret >= 0, ExcInternalError());
 
     if (mpi)
@@ -722,21 +733,21 @@ namespace HDF5
     return data;
   }
 
-  template <template <class...> class Container, typename number>
-  Container<number>
+  template <typename Container>
+  Container
   DataSet::read_hyperslab(const std::vector<hsize_t> &offset,
                           const std::vector<hsize_t> &count)
   {
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    hid_t                  plist;
-    hid_t                  memory_dataspace;
+    std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
+    hid_t plist;
+    hid_t memory_dataspace;
 
     // In this particular overload of read_hyperslab the data_dimensions are
     // the same as count
     std::vector<hsize_t> data_dimensions = count;
 
-    Container<number> data =
-      internal::initialize_container<Container, number>(data_dimensions);
+    Container data = internal::initialize_container<Container>(data_dimensions);
 
     memory_dataspace =
       H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
@@ -762,7 +773,7 @@ namespace HDF5
                   memory_dataspace,
                   *dataspace,
                   plist,
-                  internal::get_container_pointer<Container, number>(data));
+                  internal::get_container_pointer(data));
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
     if (mpi)
@@ -841,13 +852,14 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
   }
 
-  template <template <class...> class Container, typename number>
+  template <typename Container>
   void
-  DataSet::write(const Container<number> &data)
+  DataSet::write(const Container &data)
   {
     AssertDimension(_size, internal::get_container_size(data));
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    hid_t                  plist;
+    std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
+    hid_t plist;
 
     if (mpi)
       {
@@ -861,13 +873,12 @@ namespace HDF5
         plist = H5P_DEFAULT;
       }
 
-    ret =
-      H5Dwrite(*hdf5_reference,
-               *t_type,
-               H5S_ALL,
-               H5S_ALL,
-               plist,
-               internal::get_container_const_pointer<Container, number>(data));
+    ret = H5Dwrite(*hdf5_reference,
+                   *t_type,
+                   H5S_ALL,
+                   H5S_ALL,
+                   plist,
+                   internal::get_container_const_pointer(data));
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -946,9 +957,9 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
   }
 
-  template <template <class...> class Container, typename number>
+  template <typename Container>
   void
-  DataSet::write_hyperslab(const Container<number> &   data,
+  DataSet::write_hyperslab(const Container &           data,
                            const std::vector<hsize_t> &offset,
                            const std::vector<hsize_t> &count)
   {
@@ -957,7 +968,8 @@ namespace HDF5
                                     1,
                                     std::multiplies<unsigned int>()),
                     internal::get_container_size(data));
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
+    std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
     // In this particular overload of write_hyperslab the data_dimensions are
     // the same as count
     std::vector<hsize_t> data_dimensions = count;
@@ -983,13 +995,12 @@ namespace HDF5
       {
         plist = H5P_DEFAULT;
       }
-    ret =
-      H5Dwrite(*hdf5_reference,
-               *t_type,
-               memory_dataspace,
-               *dataspace,
-               plist,
-               internal::get_container_const_pointer<Container, number>(data));
+    ret = H5Dwrite(*hdf5_reference,
+                   *t_type,
+                   memory_dataspace,
+                   *dataspace,
+                   plist,
+                   internal::get_container_const_pointer(data));
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -1011,16 +1022,17 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
-  template <template <class...> class Container, typename number>
+  template <typename Container>
   void
-  DataSet::write_hyperslab(const Container<number> &   data,
+  DataSet::write_hyperslab(const Container &           data,
                            const std::vector<hsize_t> &data_dimensions,
                            const std::vector<hsize_t> &offset,
                            const std::vector<hsize_t> &stride,
                            const std::vector<hsize_t> &count,
                            const std::vector<hsize_t> &block)
   {
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
+    std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
 
     hid_t memory_dataspace;
     hid_t plist;
@@ -1047,13 +1059,12 @@ namespace HDF5
       {
         plist = H5P_DEFAULT;
       }
-    ret =
-      H5Dwrite(*hdf5_reference,
-               *t_type,
-               memory_dataspace,
-               *dataspace,
-               plist,
-               internal::get_container_const_pointer<Container, number>(data));
+    ret = H5Dwrite(*hdf5_reference,
+                   *t_type,
+                   memory_dataspace,
+                   *dataspace,
+                   plist,
+                   internal::get_container_const_pointer(data));
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -1312,13 +1323,13 @@ namespace HDF5
     return DataSet(name, *hdf5_reference, dimensions, t_type, mpi);
   }
 
-  template <template <class...> class Container, typename number>
+  template <typename Container>
   void
-  Group::write_dataset(const std::string &      name,
-                       const Container<number> &data) const
+  Group::write_dataset(const std::string &name, const Container &data) const
   {
     std::vector<hsize_t> dimensions = internal::get_container_dimensions(data);
-    auto                 dataset    = create_dataset<number>(name, dimensions);
+    auto                 dataset =
+      create_dataset<typename Container::value_type>(name, dimensions);
     dataset.write(data);
   }
 
@@ -1414,9 +1425,9 @@ namespace HDF5
                                        unsigned int       value);
 
   template std::vector<int>
-  DataSet::read<std::vector, int>();
+  DataSet::read<std::vector<int>>();
   template std::vector<unsigned int>
-  DataSet::read<std::vector, unsigned int>();
+  DataSet::read<std::vector<unsigned int>>();
 
   template std::vector<int>
   DataSet::read_selection<int>(const std::vector<hsize_t> &coordinates);
@@ -1425,10 +1436,10 @@ namespace HDF5
     const std::vector<hsize_t> &coordinates);
 
   template std::vector<int>
-  DataSet::read_hyperslab<std::vector, int>(const std::vector<hsize_t> &offset,
+  DataSet::read_hyperslab<std::vector<int>>(const std::vector<hsize_t> &offset,
                                             const std::vector<hsize_t> &count);
   template std::vector<unsigned int>
-  DataSet::read_hyperslab<std::vector, unsigned int>(
+  DataSet::read_hyperslab<std::vector<unsigned int>>(
     const std::vector<hsize_t> &offset,
     const std::vector<hsize_t> &count);
 
@@ -1438,9 +1449,9 @@ namespace HDF5
   DataSet::read_none<unsigned int>();
 
   template void
-  DataSet::write<std::vector, int>(const std::vector<int> &data);
+  DataSet::write<std::vector<int>>(const std::vector<int> &data);
   template void
-  DataSet::write<std::vector, unsigned int>(
+  DataSet::write<std::vector<unsigned int>>(
     const std::vector<unsigned int> &data);
 
   template void
@@ -1452,17 +1463,17 @@ namespace HDF5
     const std::vector<hsize_t> &     coordinates);
 
   template void
-  DataSet::write_hyperslab<std::vector, int>(const std::vector<int> &    data,
+  DataSet::write_hyperslab<std::vector<int>>(const std::vector<int> &    data,
                                              const std::vector<hsize_t> &offset,
                                              const std::vector<hsize_t> &count);
   template void
-  DataSet::write_hyperslab<std::vector, unsigned int>(
+  DataSet::write_hyperslab<std::vector<unsigned int>>(
     const std::vector<unsigned int> &data,
     const std::vector<hsize_t> &     offset,
     const std::vector<hsize_t> &     count);
 
   template void
-  DataSet::write_hyperslab<std::vector, int>(
+  DataSet::write_hyperslab<std::vector<int>>(
     const std::vector<int> &    data,
     const std::vector<hsize_t> &data_dimensions,
     const std::vector<hsize_t> &offset,
@@ -1470,7 +1481,7 @@ namespace HDF5
     const std::vector<hsize_t> &count,
     const std::vector<hsize_t> &block);
   template void
-  DataSet::write_hyperslab<std::vector, unsigned int>(
+  DataSet::write_hyperslab<std::vector<unsigned int>>(
     const std::vector<unsigned int> &data,
     const std::vector<hsize_t> &     data_dimensions,
     const std::vector<hsize_t> &     offset,
@@ -1492,10 +1503,10 @@ namespace HDF5
     const std::vector<hsize_t> &dimensions) const;
 
   template void
-  Group::write_dataset<std::vector, int>(const std::string &     name,
+  Group::write_dataset<std::vector<int>>(const std::string &     name,
                                          const std::vector<int> &data) const;
   template void
-  Group::write_dataset<std::vector, unsigned int>(
+  Group::write_dataset<std::vector<unsigned int>>(
     const std::string &              name,
     const std::vector<unsigned int> &data) const;
 

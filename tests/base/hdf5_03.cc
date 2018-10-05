@@ -557,7 +557,7 @@ read_test(HDF5::Group        root_group,
     deallog << "Rank " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Read): " << dataset.rank() << std::endl;
-    Container<Number> data = dataset.read<Container, Number>();
+    Container<Number> data = dataset.read<Container<Number>>();
     deallog << "Sum " + dataset_name << " " << container_name << "<"
             << type_name << ">"
             << " (Read): " << container_sum(data) << std::endl;
@@ -591,7 +591,7 @@ read_test(HDF5::Group        root_group,
             << type_name << ">"
             << " (Read): " << dataset.rank() << std::endl;
     {
-      Container<Number> data = dataset.read<Container, Number>();
+      Container<Number> data = dataset.read<Container<Number>>();
       deallog << "Sum " + dataset_name << " " << container_name << "<"
               << type_name << ">"
               << " (Read): " << container_sum(data) << std::endl;
@@ -660,7 +660,7 @@ read_test(HDF5::Group        root_group,
         deallog << "Rank " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Read): " << dataset.rank() << std::endl;
-        Container<Number> data = dataset.read<Container, Number>();
+        Container<Number> data = dataset.read<Container<Number>>();
         deallog << "Sum " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
                 << " (Read): " << container_sum(data) << std::endl;
@@ -695,7 +695,7 @@ read_test(HDF5::Group        root_group,
             << type_name << ">"
             << " (Read): " << dataset.rank() << std::endl;
     {
-      Container<Number> data = dataset.read<Container, Number>();
+      Container<Number> data = dataset.read<Container<Number>>();
       deallog << "Sum " + dataset_name << " " << container_name << "<"
               << type_name << ">"
               << " (Read): " << container_sum(data) << std::endl;
@@ -719,7 +719,7 @@ read_test(HDF5::Group        root_group,
       const std::vector<hsize_t> hyperslab_offset_a = {0, 0};
       const std::vector<hsize_t> hyperslab_count_a  = {2, 5};
       auto                       data_a =
-        dataset.read_hyperslab<Container, Number>(hyperslab_offset_a,
+        dataset.read_hyperslab<Container<Number>>(hyperslab_offset_a,
                                                   hyperslab_count_a);
       deallog << "Hyperslab_a sum " + dataset_name << " " << container_name
               << "<" << type_name << ">"
@@ -753,7 +753,7 @@ read_test(HDF5::Group        root_group,
           if (Utilities::MPI::this_mpi_process(mpi_communicator) == mpi_idx)
             {
               data_b =
-                dataset.read_hyperslab<Container, Number>(hyperslab_offset_b,
+                dataset.read_hyperslab<Container<Number>>(hyperslab_offset_b,
                                                           hyperslab_count_b);
             }
           else

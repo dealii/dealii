@@ -66,7 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * std::vector<std::complex<double>> displacement = {...};
  *
- * auto some_data = data.write_dataset<double>("displacement", displacement);
+ * auto some_data = data.write_dataset("displacement", displacement);
  *
  * // Write the simulation metadata
  * data.write_attr("active_cells", triangulation.n_active_cells());
@@ -381,8 +381,8 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename number>
-    Container<number>
+    template <typename Container>
+    Container
     read();
 
     /**
@@ -436,8 +436,8 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename number>
-    Container<number>
+    template <typename Container>
+    Container
     read_hyperslab(const std::vector<hsize_t> &offset,
                    const std::vector<hsize_t> &count);
 
@@ -466,9 +466,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     void
-    write(const Container<number> &data);
+    write(const Container &data);
 
     /**
      * Writes data to a subset of the dataset. Number can be `float`, `double`,
@@ -531,9 +531,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     void
-    write_hyperslab(const Container<number> &   data,
+    write_hyperslab(const Container &           data,
                     const std::vector<hsize_t> &offset,
                     const std::vector<hsize_t> &count);
 
@@ -561,9 +561,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     void
-    write_hyperslab(const Container<number> &   data,
+    write_hyperslab(const Container &           data,
                     const std::vector<hsize_t> &data_dimensions,
                     const std::vector<hsize_t> &offset,
                     const std::vector<hsize_t> &stride,
@@ -788,9 +788,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <template <class...> class Container, typename number>
+    template <typename Container>
     void
-    write_dataset(const std::string &name, const Container<number> &data) const;
+    write_dataset(const std::string &name, const Container &data) const;
   };
 
   /**

@@ -20,59 +20,59 @@ for (number : REAL_AND_COMPLEX_SCALARS)
     template void   HDF5Object::write_attr<number>(const std::string &attr_name,
                                                  number             value);
 
-    template std::vector<number> DataSet::read<std::vector, number>();
-    template Vector<number>      DataSet::read<Vector, number>();
-    template FullMatrix<number>  DataSet::read<FullMatrix, number>();
+    template std::vector<number> DataSet::read<std::vector<number>>();
+    template Vector<number>      DataSet::read<Vector<number>>();
+    template FullMatrix<number>  DataSet::read<FullMatrix<number>>();
 
     template std::vector<number> DataSet::read_selection<number>(
       const std::vector<hsize_t> &coordinates);
 
-    template std::vector<number> DataSet::read_hyperslab<std::vector, number>(
+    template std::vector<number> DataSet::read_hyperslab<std::vector<number>>(
       const std::vector<hsize_t> &offset, const std::vector<hsize_t> &count);
-    template Vector<number> DataSet::read_hyperslab<Vector, number>(
+    template Vector<number> DataSet::read_hyperslab<Vector<number>>(
       const std::vector<hsize_t> &offset, const std::vector<hsize_t> &count);
-    template FullMatrix<number> DataSet::read_hyperslab<FullMatrix, number>(
+    template FullMatrix<number> DataSet::read_hyperslab<FullMatrix<number>>(
       const std::vector<hsize_t> &offset, const std::vector<hsize_t> &count);
 
     template void DataSet::read_none<number>();
 
-    template void DataSet::write<std::vector, number>(
+    template void DataSet::write<std::vector<number>>(
       const std::vector<number> &data);
-    template void DataSet::write<Vector, number>(const Vector<number> &data);
-    template void DataSet::write<FullMatrix, number>(
+    template void DataSet::write<Vector<number>>(const Vector<number> &data);
+    template void DataSet::write<FullMatrix<number>>(
       const FullMatrix<number> &data);
 
     template void DataSet::write_selection<number>(
       const std::vector<number> &data, const std::vector<hsize_t> &coordinates);
 
-    template void DataSet::write_hyperslab<std::vector, number>(
+    template void DataSet::write_hyperslab<std::vector<number>>(
       const std::vector<number> & data,
       const std::vector<hsize_t> &offset,
       const std::vector<hsize_t> &count);
-    template void DataSet::write_hyperslab<Vector, number>(
+    template void DataSet::write_hyperslab<Vector<number>>(
       const Vector<number> &      data,
       const std::vector<hsize_t> &offset,
       const std::vector<hsize_t> &count);
-    template void DataSet::write_hyperslab<FullMatrix, number>(
+    template void DataSet::write_hyperslab<FullMatrix<number>>(
       const FullMatrix<number> &  data,
       const std::vector<hsize_t> &offset,
       const std::vector<hsize_t> &count);
 
-    template void DataSet::write_hyperslab<std::vector, number>(
+    template void DataSet::write_hyperslab<std::vector<number>>(
       const std::vector<number> & data,
       const std::vector<hsize_t> &data_dimensions,
       const std::vector<hsize_t> &offset,
       const std::vector<hsize_t> &stride,
       const std::vector<hsize_t> &count,
       const std::vector<hsize_t> &block);
-    template void DataSet::write_hyperslab<Vector, number>(
+    template void DataSet::write_hyperslab<Vector<number>>(
       const Vector<number> &      data,
       const std::vector<hsize_t> &data_dimensions,
       const std::vector<hsize_t> &offset,
       const std::vector<hsize_t> &stride,
       const std::vector<hsize_t> &count,
       const std::vector<hsize_t> &block);
-    template void DataSet::write_hyperslab<FullMatrix, number>(
+    template void DataSet::write_hyperslab<FullMatrix<number>>(
       const FullMatrix<number> &  data,
       const std::vector<hsize_t> &data_dimensions,
       const std::vector<hsize_t> &offset,
@@ -85,12 +85,12 @@ for (number : REAL_AND_COMPLEX_SCALARS)
     template DataSet Group::create_dataset<number>(
       const std::string &name, const std::vector<hsize_t> &dimensions) const;
 
-    template void Group::write_dataset<std::vector, number>(
+    template void Group::write_dataset<std::vector<number>>(
       const std::string &name, const std::vector<number> &data) const;
 
-    template void Group::write_dataset<Vector, number>(
+    template void Group::write_dataset<Vector<number>>(
       const std::string &name, const Vector<number> &data) const;
 
-    template void Group::write_dataset<FullMatrix, number>(
+    template void Group::write_dataset<FullMatrix<number>>(
       const std::string &name, const FullMatrix<number> &data) const;
   }
