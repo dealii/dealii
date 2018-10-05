@@ -40,11 +40,13 @@
 // 'check_01_cpu_features.cmake', ensures that these feature are not only
 // present in the compilation unit but also working properly.
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && !defined(__AVX__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__SSE2__) && \
+  !defined(__AVX__)
 #  error \
     "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && !defined(__AVX512F__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__SSE2__) && \
+  !defined(__AVX512F__)
 #  error \
     "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
@@ -56,7 +58,7 @@
 #endif
 
 
-#ifdef __ALTIVEC__
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
 #  include <altivec.h>
 
 // altivec.h defines vector, pixel, bool, but we do not use them, so undefine
@@ -2190,10 +2192,7 @@ vectorized_transpose_and_store(const bool                    add_into,
 
 
 
-// for safety, also check that __SSE2__ is defined in case the user manually
-// set some conflicting compile flags which prevent compilation
-
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
 
 /**
  * Specialization for double and SSE2.
@@ -2890,10 +2889,10 @@ vectorized_transpose_and_store(const bool                    add_into,
 
 
 
-#endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+#endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0 && defined(__SSE2__)
 
 
-#if defined(__ALTIVEC__) && defined(__VSX__)
+#if DEAL_II_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && defined(__VSX__)
 
 template <>
 class VectorizedArray<double>
@@ -3319,7 +3318,8 @@ private:
   std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
 };
 
-#endif // ALTIVEC && VSX
+#endif // if DEAL_II_VECTORIZATION_LEVEL >=1 && defined(__ALTIVEC__) &&
+       // defined(__VSX__)
 
 
 
