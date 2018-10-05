@@ -68,7 +68,7 @@ namespace Differentiation
      * Exception denoting that ADOL-C is a required feature.
      */
     DeclExceptionMsg(
-      ExcRequiresAdolC,
+      ExcRequiresADOLC,
       "This function is only available if deal.II is compiled with ADOL-C.");
 
     /**
@@ -1212,28 +1212,28 @@ namespace Differentiation
       bool
       is_recording() const
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
         return false;
       }
 
       types::tape_index
       active_tape_index() const
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
         return numbers::invalid_tape_index;
       }
 
       bool
       keep_independent_values() const
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
         return false;
       }
 
       bool
       is_registered_tape(const types::tape_index tape_index) const
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
         return false;
       }
 
@@ -1243,43 +1243,43 @@ namespace Differentiation
                             const types::tape_buffer_sizes,
                             const types::tape_buffer_sizes)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       start_taping(const types::tape_index, const bool)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       stop_taping(const types::tape_index, const bool)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       activate_tape(const types::tape_index)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       reset(const bool)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       print(std::ostream &stream) const
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       static void
       print_tape_stats(const types::tape_index, std::ostream &)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
 
@@ -1288,7 +1288,7 @@ namespace Differentiation
       static scalar_type
       value(const types::tape_index, const std::vector<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
         return 0.0;
       }
 
@@ -1297,7 +1297,7 @@ namespace Differentiation
                const std::vector<scalar_type> &,
                Vector<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       static void
@@ -1305,7 +1305,7 @@ namespace Differentiation
               const std::vector<scalar_type> &,
               FullMatrix<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       // === Vector drivers ===
@@ -1316,7 +1316,7 @@ namespace Differentiation
              const std::vector<scalar_type> &,
              Vector<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
       static void
@@ -1325,7 +1325,7 @@ namespace Differentiation
                const std::vector<scalar_type> &,
                FullMatrix<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
     };
 
@@ -1761,7 +1761,7 @@ namespace Differentiation
                               NumberTypes::adolc_tapeless>::type
       configure_tapeless_mode(const unsigned int /*n_directional_derivatives*/)
       {
-        AssertThrow(false, ExcRequiresAdolC());
+        AssertThrow(false, ExcRequiresADOLC());
       }
 
 #  endif
