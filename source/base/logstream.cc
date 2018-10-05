@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -414,8 +415,8 @@ LogStream::get_prefixes() const
 void
 LogStream::print_line_head()
 {
-  const std::string &head   = get_prefix();
-  const unsigned int thread = Threads::this_thread_id();
+  const std::string &   head   = get_prefix();
+  const std::thread::id thread = std::this_thread::get_id();
 
   if (get_prefixes().size() <= std_depth)
     {
