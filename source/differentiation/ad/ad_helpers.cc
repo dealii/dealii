@@ -449,7 +449,7 @@ namespace Differentiation
       // variables are created.
       if (AD::is_tapeless_ad_number<ad_type>::value)
         {
-          configure_tapeless_mode(n_independent_variables,
+          configure_tapeless_mode(new_n_independent_variables,
                                   false /*ensure_persistent_setting*/);
         }
 
