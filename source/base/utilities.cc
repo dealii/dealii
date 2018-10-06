@@ -24,6 +24,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
@@ -64,8 +65,6 @@
 #  include <Teuchos_RCP.hpp>
 #endif
 
-
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -87,6 +86,184 @@ namespace Utilities
   dealii_version_string()
   {
     return DEAL_II_PACKAGE_NAME " version " DEAL_II_PACKAGE_VERSION;
+  }
+
+
+
+  template <int dim, typename Number>
+  std::vector<std::array<std::uint64_t, dim>>
+  inverse_Hilbert_space_filling_curve(
+    const std::vector<Point<dim, Number>> &points,
+    const int                              bits_per_dim)
+  {
+    using Integer = std::uint64_t;
+    // take floating point number hopefully with mantissa >= 64bit
+    using LongDouble = long double;
+
+    // return if there is nothing to do
+    if (points.size() == 0)
+      return std::vector<std::array<std::uint64_t, dim>>();
+
+    // get bounding box:
+    Point<dim, Number> bl = points[0], tr = points[0];
+    for (const auto &p : points)
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const double cid = p[d];
+          bl[d]            = std::min(cid, bl[d]);
+          tr[d]            = std::max(cid, tr[d]);
+        }
+
+    std::array<LongDouble, dim> extents;
+    for (unsigned int i = 0; i < dim; ++i)
+      {
+        extents[i] =
+          static_cast<LongDouble>(tr[i]) - static_cast<LongDouble>(bl[i]);
+        Assert(extents[i] > 0., ExcMessage("Bounding box is degenerate."));
+      }
+
+    // make sure our conversion from fractional coordinates to
+    // Integers work as expected, namely our cast (LongDouble)max_int
+    const int min_bits =
+      std::min(bits_per_dim,
+               std::min(std::numeric_limits<Integer>::digits,
+                        std::numeric_limits<LongDouble>::digits));
+
+    // based on that get the maximum integer:
+    const Integer max_int = (min_bits == std::numeric_limits<Integer>::digits ?
+                               std::numeric_limits<Integer>::max() :
+                               ((Integer)1 << min_bits) - 1);
+
+    std::vector<std::array<Integer, dim>> int_points(points.size());
+
+    for (unsigned int i = 0; i < points.size(); ++i)
+      {
+        // convert into integers:
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            const LongDouble v = (static_cast<LongDouble>(points[i][d]) -
+                                  static_cast<LongDouble>(bl[d])) /
+                                 extents[d];
+            Assert(v >= 0. && v <= 1., ExcInternalError());
+            int_points[i][d] =
+              static_cast<Integer>(v * static_cast<LongDouble>(max_int));
+          }
+      }
+
+    // note that we call this with "min_bits"
+    return inverse_Hilbert_space_filling_curve<dim>(int_points, min_bits);
+  }
+
+
+
+  template <int dim>
+  std::vector<std::array<std::uint64_t, dim>>
+  inverse_Hilbert_space_filling_curve(
+    const std::vector<std::array<std::uint64_t, dim>> &points,
+    const int                                          bits_per_dim)
+  {
+    using Integer = std::uint64_t;
+
+    std::vector<std::array<Integer, dim>> int_points(points);
+
+    std::vector<std::array<Integer, dim>> res(int_points.size());
+
+    // follow
+    // J. Skilling, Programming the Hilbert curve, AIP Conf. Proc. 707, 381
+    // (2004); http://dx.doi.org/10.1063/1.1751381 also see
+    // https://stackoverflow.com/questions/499166/mapping-n-dimensional-value-to-a-point-on-hilbert-curve
+    // https://gitlab.com/octopus-code/octopus/blob/develop/src/grid/hilbert.c
+    // https://github.com/trilinos/Trilinos/blob/master/packages/zoltan/src/hsfc/hsfc_hilbert.c
+    // (Zoltan_HSFC_InvHilbertXd)
+    // https://github.com/aditi137/Hilbert/blob/master/Hilbert/hilbert.cpp
+
+    // now we can map to 1D coordinate stored in Transpose format
+    // adopt AxestoTranspose function from the paper, that
+    // transforms in-place between geometrical axes and Hilbert transpose.
+    // Example:   b=5 bits for each of n=3 coordinates.
+    //            15-bit Hilbert integer = A B C D E F G H I J K L M N O is
+    //            stored as its Transpose
+    //                   X[0] = A D G J M                X[2]|
+    //                   X[1] = B E H K N    <------->       | /X[1]
+    //                   X[2] = C F I L O               axes |/
+    //                          high  low                    0------ X[0]
+
+    // Depth of the Hilbert curve
+    Assert(bits_per_dim <= std::numeric_limits<Integer>::digits,
+           ExcMessage("This integer type can not hold " +
+                      std::to_string(bits_per_dim) + " bits."));
+
+    const Integer M = 1 << (bits_per_dim - 1); // largest bit
+
+    for (unsigned int index = 0; index < int_points.size(); ++index)
+      {
+        auto &X = int_points[index];
+        auto &L = res[index];
+
+        // Inverse undo
+        for (Integer q = M; q > 1; q >>= 1)
+          {
+            const Integer p = q - 1;
+            for (unsigned int i = 0; i < dim; i++)
+              {
+                // invert
+                if (X[i] & q)
+                  {
+                    X[0] ^= p;
+                  }
+                // exchange
+                else
+                  {
+                    const Integer t = (X[0] ^ X[i]) & p;
+                    X[0] ^= t;
+                    X[i] ^= t;
+                  }
+              }
+          }
+
+        // Gray encode (inverse of decode)
+        for (unsigned int i = 1; i < dim; i++)
+          X[i] ^= X[i - 1];
+
+        Integer t = 0;
+        for (Integer q = M; q > 1; q >>= 1)
+          if (X[dim - 1] & q)
+            t ^= q - 1;
+        for (unsigned int i = 0; i < dim; i++)
+          X[i] ^= t;
+
+        // now we need to go from index stored in transpose format to
+        // consecutive format, which is better suited for comparators.
+        // we could interleave into some big unsigned int...
+        // https://www.forceflow.be/2013/10/07/morton-encodingdecoding-through-bit-interleaving-implementations/
+        // https://stackoverflow.com/questions/4431522/given-2-16-bit-ints-can-i-interleave-those-bits-to-form-a-single-32-bit-int
+        // ...but we would loose spatial resolution!
+
+        // interleave using brute force, follow TransposetoLine from
+        // https://github.com/aditi137/Hilbert/blob/master/Hilbert/hilbert.cpp
+        {
+          Integer      p = M;
+          unsigned int j = 0;
+          for (unsigned int i = 0; i < dim; ++i)
+            {
+              L[i] = 0;
+              // go through bits using a mask q
+              for (Integer q = M; q > 0; q >>= 1)
+                {
+                  if (X[j] & p)
+                    L[i] |= q;
+                  if (++j == dim)
+                    {
+                      j = 0;
+                      p >>= 1;
+                    }
+                }
+            }
+        }
+
+      } // end of the loop over points
+
+    return res;
   }
 
 
@@ -899,6 +1076,31 @@ namespace Utilities
   to_string<double>(double, unsigned int);
   template std::string
   to_string<long double>(long double, unsigned int);
+
+  template std::vector<std::array<std::uint64_t, 1>>
+  inverse_Hilbert_space_filling_curve<1, double>(
+    const std::vector<Point<1, double>> &,
+    const int);
+  template std::vector<std::array<std::uint64_t, 1>>
+  inverse_Hilbert_space_filling_curve<1>(
+    const std::vector<std::array<std::uint64_t, 1>> &,
+    const int);
+  template std::vector<std::array<std::uint64_t, 2>>
+  inverse_Hilbert_space_filling_curve<2, double>(
+    const std::vector<Point<2, double>> &,
+    const int);
+  template std::vector<std::array<std::uint64_t, 2>>
+  inverse_Hilbert_space_filling_curve<2>(
+    const std::vector<std::array<std::uint64_t, 2>> &,
+    const int);
+  template std::vector<std::array<std::uint64_t, 3>>
+  inverse_Hilbert_space_filling_curve<3, double>(
+    const std::vector<Point<3, double>> &,
+    const int);
+  template std::vector<std::array<std::uint64_t, 3>>
+  inverse_Hilbert_space_filling_curve<3>(
+    const std::vector<std::array<std::uint64_t, 3>> &,
+    const int);
 
 } // namespace Utilities
 

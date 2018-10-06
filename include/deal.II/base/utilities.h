@@ -52,6 +52,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declare Point
+template <int dim, typename Number>
+class Point;
 
 /**
  * A namespace for utility functions that are not particularly specific to
@@ -71,6 +74,34 @@ namespace Utilities
    */
   std::string
   dealii_version_string();
+
+  /**
+   * Assign to each point in @p points an index using the Hilbert space filling curve.
+   * To that end, a bounding box for @p points will be determined, based on which their
+   * integer coordinates are calculated.
+   * The linear index is given as a dim-collection of bits, from high to low.
+   * This is done in order to keep the maximum resolution in terms of bit depth
+   * along each axis. Note that this dim-integer index can still be easily used
+   * for sorting and ordering, for example using the lexicographic ordering of
+   * tuples of integers.
+   *
+   * The depth of the Hilbert curve (i.e. the number of bits per dimension) by
+   * default is equal to <code>64</code>.
+   */
+  template <int dim, typename Number>
+  std::vector<std::array<std::uint64_t, dim>>
+  inverse_Hilbert_space_filling_curve(
+    const std::vector<Point<dim, Number>> &points,
+    const int                              bits_per_dim = 64);
+
+  /**
+   * Same as above, but for points in integer coordinates.
+   */
+  template <int dim>
+  std::vector<std::array<std::uint64_t, dim>>
+  inverse_Hilbert_space_filling_curve(
+    const std::vector<std::array<std::uint64_t, dim>> &points,
+    const int                                          bits_per_dim = 64);
 
   /**
    * Convert a number @p value to a string, with as many digits as given to
