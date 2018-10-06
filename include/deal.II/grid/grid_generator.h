@@ -1305,10 +1305,10 @@ namespace GridGenerator
    */
   template <int dim, int spacedim>
   void
-  replicate_triangulation (const Triangulation<dim, spacedim> &basic_tria,
-                           const std::array<Point<spacedim>, 2> &diagonals,
-                           const std::array<unsigned int, dim> &repetitions,
-                           Triangulation<dim, spacedim> &result);
+  replicate_triangulation(const Triangulation<dim, spacedim> &  basic_tria,
+                          const std::array<Point<spacedim>, 2> &diagonals,
+                          const std::array<unsigned int, dim> & repetitions,
+                          Triangulation<dim, spacedim> &        result);
 
   /**
    * Given the two triangulations specified as the first two arguments, create
