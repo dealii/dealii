@@ -84,6 +84,8 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
       }"
       ADOLC_ADOUBLE_OSTREAM_CHECK)
 
+    RESET_CMAKE_REQUIRED()
+
     IF(NOT ADOLC_DOUBLE_CAST_CHECK)
       MESSAGE(STATUS
         "Could not find a sufficient ADOL-C installation: "
