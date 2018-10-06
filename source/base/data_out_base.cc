@@ -405,22 +405,22 @@ namespace DataOutBase
     write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
                                     Table<2,Number>                         &data_vectors)
     {
-      // unlike in the main function, we
-      // don't have here the data_names
-      // field, so we initialize it with
-      // the number of data sets in the
-      // first patch. the equivalence of
-      // these two definitions is checked
-      // in the main function.
+      // If there is nothing to write, just return
+      if (patches.size() == 0)
+        return;
 
-      // we have to take care, however, whether the
-      // points are appended to the end of the
-      // patch->data table
-      const unsigned int n_data_sets
-        =patches[0].points_are_available ? (patches[0].data.n_rows() - spacedim) : patches[0].data.n_rows();
+      // unlike in the main function, we don't have here the data_names field,
+      // so we initialize it with the number of data sets in the first patch.
+      // the equivalence of these two definitions is checked in the main
+      // function.
 
-      Assert (data_vectors.size()[0] == n_data_sets,
-              ExcInternalError());
+      // we have to take care, however, whether the points are appended to the
+      // end of the patch->data table
+      const unsigned int n_data_sets = patches[0].points_are_available ?
+                                       (patches[0].data.n_rows() - spacedim) :
+                                       patches[0].data.n_rows();
+
+      Assert(data_vectors.size()[0] == n_data_sets, ExcInternalError());
 
       // loop over all patches
       unsigned int next_value = 0;
@@ -6845,20 +6845,16 @@ void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &
   Threads::Task<> reorder_task;
 
 #ifndef DEAL_II_WITH_MPI
-  // verify that there are indeed
-  // patches to be written out. most
-  // of the times, people just forget
-  // to call build_patches when there
-  // are no patches, so a warning is
-  // in order. that said, the
-  // assertion is disabled if we
-  // support MPI since then it can
-  // happen that on the coarsest
-  // mesh, a processor simply has no
-  // cells it actually owns, and in
-  // that case it is legit if there
-  // are no patches
-  Assert (patches.size() > 0, ExcNoPatches());
+  // verify that there are indeed patches to be written out. most of the times,
+  // people just forget to call build_patches when there are no patches, so a
+  // warning is in order. that said, the assertion is disabled if we support MPI
+  // since then it can happen that on the coarsest mesh, a processor simply has
+  // no cells it actually owns, and in that case it is legit if there are no
+  // patches
+  Assert(patches.size() > 0, ExcNoPatches());
+#else
+  if (patches.size() == 0)
+    return;
 #endif
 
   compute_sizes<dim,spacedim>(patches, n_node, n_cell);
