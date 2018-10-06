@@ -51,14 +51,16 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
 {
-  subscriptor.check_no_subscribers();
+  for (auto validity_ptr : subscriptor.validity_pointers)
+    *validity_ptr = false;
 }
 
 
 
 Subscriptor::~Subscriptor()
 {
-  check_no_subscribers();
+  for (auto validity_ptr : validity_pointers)
+    *validity_ptr = false;
   object_info = nullptr;
 }
 
@@ -133,7 +135,6 @@ Subscriptor::check_no_subscribers() const noexcept
 Subscriptor &
 Subscriptor::operator=(const Subscriptor &s)
 {
-  check_no_subscribers();
   object_info = s.object_info;
   return *this;
 }
@@ -143,8 +144,8 @@ Subscriptor::operator=(const Subscriptor &s)
 Subscriptor &
 Subscriptor::operator=(Subscriptor &&s) noexcept
 {
-  check_no_subscribers();
-  s.check_no_subscribers();
+  for (auto validity_ptr : s.validity_pointers)
+    *validity_ptr = false;
   object_info = s.object_info;
   return *this;
 }
@@ -152,7 +153,7 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 
 void
-Subscriptor::subscribe(const char *id) const
+Subscriptor::subscribe(bool *const validity, const char *id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -165,14 +166,16 @@ Subscriptor::subscribe(const char *id) const
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end())
     counter_map.insert(map_value_type(name, 1U));
-
   else
     it->second++;
+
+  *validity = true;
+  validity_pointers.push_back(validity);
 }
 
 
 void
-Subscriptor::unsubscribe(const char *id) const
+Subscriptor::unsubscribe(bool *const validity, const char *id) const
 {
   const char *name = (id != nullptr) ? id : unknown_subscriber;
   AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
@@ -195,6 +198,18 @@ Subscriptor::unsubscribe(const char *id) const
       --counter;
       it->second--;
     }
+
+  auto validity_ptr_it =
+    std::find(validity_pointers.begin(), validity_pointers.end(), validity);
+  if (validity_ptr_it == validity_pointers.end())
+    {
+      AssertNothrow(
+        validity_ptr_it != validity_pointers.end(),
+        ExcMessage(
+          "This Subscriptor object does not know anything about the supplied pointer!"));
+    }
+  else
+    validity_pointers.erase(validity_ptr_it);
 }
 
 

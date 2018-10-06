@@ -26,6 +26,7 @@
 #include <mutex>
 #include <string>
 #include <typeinfo>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -33,28 +34,29 @@ DEAL_II_NAMESPACE_OPEN
  * Handling of subscriptions.
  *
  * This class, as a base class, allows to keep track of other objects using a
- * specific object. It is used, when an object, given to a constructor by
- * reference, is stored. Then, the original object may not be deleted before
- * the dependent object is deleted. You can assert this constraint by letting
- * the object passed be derived from this class and let the user subscribe()
- * to this object. The destructor the used object inherits from the
- * Subscriptor class then will lead to an error when destruction is attempted
- * while there are still subscriptions.
+ * specific object. It is used to avoid that pointers that point to an object of
+ * a class derived from Subscriptor are referenced after that object has been
+ * invalidated. Here, invalidation is assumend to happen when the object is
+ * moved from or destroyed.
+ * The mechanism works as follows: The member function subscribe() accepts a
+ * pointer to a boolean that is modified on invalidation. The object that owns
+ * this pointer (usually an object of class type SmartPointer) is then expected
+ * to check the state of the boolean before trying to access this class.
  *
  * The utility of this class is even enhanced by providing identifying strings
- * to the functions subscribe() and unsubscribe(). In case of a hanging
- * subscription during destruction, this string will be listed in the
- * exception's message. These strings are represented as <code>const char
- * *</code> pointers since the underlying buffer comes from (and is managed
- * by) the run-time type information system: more exactly, these pointers are
- * the result the function call <code>typeid(x).name()</code> where
+ * to the functions subscribe() and unsubscribe(). These strings are represented
+ * as <code>const char</code> pointers since the underlying buffer comes from
+ * (and is managed by) the run-time type information system: more exactly, these
+ * pointers are the result the function call <code>typeid(x).name()</code> where
  * <code>x</code> is some object. Therefore, the pointers provided to
  * subscribe() and to unsubscribe() must be the same. Strings with equal
  * contents will not be recognized to be the same. The handling in
  * SmartPointer will take care of this.
+ * The current subscribers to this class can be obtained by calling
+ * list_subscribers().
  *
  * @ingroup memory
- * @author Guido Kanschat, 1998 - 2005
+ * @author Guido Kanschat, Daniel Arndt, 1998 - 2005, 2018
  */
 class Subscriptor
 {
@@ -95,28 +97,26 @@ public:
   operator=(const Subscriptor &);
 
   /**
-   * Move assignment operator.
-   *
-   * Asserts that the counter for the moved object is zero.
+   * Move assignment operator. Only invalidates the object moved from.
    */
   Subscriptor &
   operator=(Subscriptor &&) noexcept;
 
   /**
-   * Subscribes a user of the object. The subscriber may be identified by text
-   * supplied as <tt>identifier</tt>.
+   * Subscribes a user of the object by storing the pointer @p validity. The
+   * subscriber may be identified by text supplied as @p identifier.
    */
   void
-  subscribe(const char *identifier = nullptr) const;
+  subscribe(bool *const validity, const char *identifier = nullptr) const;
 
   /**
    * Unsubscribes a user from the object.
    *
-   * @note The <tt>identifier</tt> must be the <b>same pointer</b> as the one
-   * supplied to subscribe(), not just the same text.
+   * @note The @p identifier and the @p validity pointer must be the same as
+   * the one supplied to subscribe().
    */
   void
-  unsubscribe(const char *identifier = nullptr) const;
+  unsubscribe(bool *const validity, const char *identifier = nullptr) const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to
@@ -222,6 +222,12 @@ private:
    * string supplied to subscribe().
    */
   mutable std::map<const char *, unsigned int> counter_map;
+
+  /**
+   * In this vector, we store pointers to the validity bool in the SmartPointer
+   * objects that subscribe to this class.
+   */
+  mutable std::vector<bool *> validity_pointers;
 
   /**
    * Pointer to the typeinfo object of this object, from which we can later
