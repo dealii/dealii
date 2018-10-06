@@ -381,7 +381,7 @@ namespace HDF5
   };
 
   /**
-   * This class implements a HDF5 DataSet.
+   * This class implements an HDF5 DataSet.
    *
    * @author Daniel Garcia-Sanchez, 2018
    */
@@ -761,7 +761,7 @@ namespace HDF5
     dimensions() const;
 
     /**
-     * This funcion returns the total size of the dataset.
+     * This funcion returns the total number of elements in the dataset.
      */
     unsigned int
     size() const;
@@ -784,7 +784,7 @@ namespace HDF5
   };
 
   /**
-   * This class implements a HDF5 Group
+   * This class implements an HDF5 Group
    *
    * @author Daniel Garcia-Sanchez, 2018
    */
@@ -805,13 +805,23 @@ namespace HDF5
        */
       open
     };
-
+    /**
+     * This constructor creates or opens a group depending on the value of
+     * @p mode. The group will be placed insided the group @p parent_group. The
+     * parameter @p mpi defines if the the I/O operations are serial or
+     * parallel. This is an internal constructor, the functions group() and
+     * create_group() should be used to open or create a group.
+     */
     Group(const std::string &name,
           const Group &      parent_group,
           const bool         mpi,
           const Mode         mode);
 
-    // This constructor is used by File
+    /**
+     * Internal constructor used by File. The constructor sets the protected
+     * const members of HDF5Group: @p name and @p mpi. It does not create or
+     * open a Group.
+     */
     Group(const std::string &name, const bool mpi);
 
   public:
@@ -872,7 +882,7 @@ namespace HDF5
   };
 
   /**
-   * This class implements a HDF5 Group
+   * This class implements an HDF5 File
    *
    * @author Daniel Garcia-Sanchez, 2018
    */
@@ -895,6 +905,13 @@ namespace HDF5
     };
 
   private:
+    /**
+     * Delegation internal constructor.
+     * File(const std::string &, const MPI_Comm, const Mode);
+     * and
+     * File(const std::string &, const Mode)
+     * should be used to open or create HDF5 files.
+     */
     File(const std::string &name,
          const bool         mpi,
          const MPI_Comm     mpi_communicator,
@@ -902,14 +919,20 @@ namespace HDF5
 
   public:
     /**
-     * Creates or opens a hdf5 file in parallel.
+     * Creates or opens an HDF5 file in parallel using MPI. This requires that
+     * deal.ii and HDF5 were compiled with MPI support. It creates or opens a
+     * HDF5 file depending on the value of @p mode. @p mpi_communicator
+     * defines the processes that participate in this call; `MPI_COMM_WORLD` is
+     * a common value for the MPI communicator.
      */
     File(const std::string &name,
          const MPI_Comm     mpi_communicator,
          const Mode         mode = Mode::create);
 
     /**
-     * Creates or opens a hdf5 file.
+     * Creates or opens a hdf5 file for serial operations. This call does not
+     * require MPI support. It creates or opens a HDF5 file depending on the
+     * value of @p mode.
      */
     File(const std::string &name, const Mode mode = Mode::create);
   };
