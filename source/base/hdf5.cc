@@ -37,6 +37,12 @@ namespace HDF5
     // This function gives the HDF5 datatype corresponding to the C++ type. In
     // the case of std::complex types the HDF5 handlers are automatically freed
     // using the destructor of std::shared_ptr.
+    // std::shared_ptr is used instead of std::unique_ptr because the destructor
+    // of std::shared_ptr doesn't have to be defined in the template argument.
+    // In the other hand, the destructor of std::unique has to be defined in the
+    // template argument. Native types such as H5T_NATIVE_DOUBLE does not
+    // require a constructor, but compound types such as std::complex<double>
+    // require a destructor to free the HDF5 resources.
     template <typename number>
     std::shared_ptr<hid_t>
     get_hdf5_datatype()
@@ -44,23 +50,19 @@ namespace HDF5
       std::shared_ptr<hid_t> t_type;
       if (std::is_same<number, float>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t);
-          *t_type = H5T_NATIVE_FLOAT;
+          return std::make_shared<hid_t>(H5T_NATIVE_FLOAT);
         }
       else if (std::is_same<number, double>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t);
-          *t_type = H5T_NATIVE_DOUBLE;
+          return std::make_shared<hid_t>(H5T_NATIVE_DOUBLE);
         }
       else if (std::is_same<number, int>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t);
-          *t_type = H5T_NATIVE_INT;
+          return std::make_shared<hid_t>(H5T_NATIVE_INT);
         }
       else if (std::is_same<number, unsigned int>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t);
-          *t_type = H5T_NATIVE_UINT;
+          return std::make_shared<hid_t>(H5T_NATIVE_UINT);
         }
       else if (std::is_same<number, std::complex<float>>::value)
         {
@@ -76,6 +78,7 @@ namespace HDF5
           //  imaginary [1] parts.
           H5Tinsert(*t_type, "r", 0, H5T_NATIVE_FLOAT);
           H5Tinsert(*t_type, "i", sizeof(float), H5T_NATIVE_FLOAT);
+          return t_type;
         }
       else if (std::is_same<number, std::complex<double>>::value)
         {
@@ -91,11 +94,11 @@ namespace HDF5
           //  imaginary [1] parts.
           H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
           H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
+          return t_type;
         }
-      else
-        {
-          Assert(false, ExcInternalError());
-        }
+
+      // The function should not reach this point
+      Assert(false, ExcInternalError());
       return t_type;
     }
 
