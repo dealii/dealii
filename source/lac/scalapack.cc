@@ -2739,7 +2739,22 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
                                                   1,
                                                   n_mpi_processes);
 
-  const int MB = n_rows, NB = std::ceil((double)n_columns / n_mpi_processes);
+  const int MB = n_rows;
+  /*
+   * If the ratio n_columns/n_mpi_processes is smaller than the column block
+   * size of the original matrix, the redistribution and saving of the matrix
+   * requires a significant amount of MPI communication. Therefore, it is better
+   * to set a minimum value for the block size NB, causing only
+   * ceil(n_columns/NB) processes being actively involved in saving the matrix.
+   * Example: A 2*10^9 x 400 matrix is distributed on a 80 x 5 process grid
+   * using block size 32. Instead of distributing the matrix on a 1 x 400
+   * process grid with a row block size of 2*10^9 and a column block size of 1,
+   * the minimum value for NB yields that only ceil(400/32)=13 processes will be
+   * writing the matrix to disk.
+   */
+  const int NB = std::max((int)std::ceil((double)n_columns / n_mpi_processes),
+                          column_block_size);
+
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
   copy_to(tmp);
 
@@ -3155,7 +3170,10 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
                                                   1,
                                                   n_mpi_processes);
 
-  const int MB = n_rows, NB = std::ceil((double)n_columns / n_mpi_processes);
+  const int MB = n_rows;
+  // for the choice of NB see explanation in save_parallel()
+  const int NB = std::max((int)std::ceil((double)n_columns / n_mpi_processes),
+                          column_block_size);
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
 
   // get pointer to data held by the process
