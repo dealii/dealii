@@ -1576,6 +1576,9 @@ namespace TrilinosWrappers
      * initialized with the same IndexSet that was used for the column indices
      * of the matrix.
      *
+     * This function will be called when the underlying number type for the
+     * matrix object and the one one for the vector object are the same.
+     *
      * In case of a serial vector, this function will only work when
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
@@ -1585,6 +1588,11 @@ namespace TrilinosWrappers
                                          TrilinosScalar>::value>::type
     vmult(VectorType &dst, const VectorType &src) const;
 
+    /**
+     * Same as the function above for the case that the underlying number type
+     * for the matrix object and the one for the vector object do not coincide.
+     * This case is not implemented. Calling it will result in an runtime error.
+     */
     template <typename VectorType>
     typename std::enable_if<!std::is_same<typename VectorType::value_type,
                                           TrilinosScalar>::value>::type
@@ -1599,12 +1607,20 @@ namespace TrilinosWrappers
      *
      * This function can be called with several types of vector objects,
      * see the discussion about @p VectorType in vmult().
+     *
+     * This function will be called when the underlying number type for the
+     * matrix object and the one one for the vector object are the same.
      */
     template <typename VectorType>
     typename std::enable_if<std::is_same<typename VectorType::value_type,
                                          TrilinosScalar>::value>::type
     Tvmult(VectorType &dst, const VectorType &src) const;
 
+    /**
+     * Same as the function above for the case that the underlying number type
+     * for the matrix object and the one for the vector object do not coincide.
+     * This case is not implemented. Calling it will result in an runtime error.
+     */
     template <typename VectorType>
     typename std::enable_if<!std::is_same<typename VectorType::value_type,
                                           TrilinosScalar>::value>::type

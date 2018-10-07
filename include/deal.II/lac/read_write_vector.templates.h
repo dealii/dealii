@@ -565,30 +565,33 @@ namespace LinearAlgebra
     Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
     AssertDimension(size, stored_elements.n_elements());
 
-    if (operation == VectorOperation::insert)
+    switch (operation)
       {
-        for (size_type i = 0; i < size; ++i)
-          values[i] = new_values[i];
-      }
-    else if (operation == VectorOperation::add)
-      {
-        for (size_type i = 0; i < size; ++i)
-          values[i] += new_values[i];
-      }
-    else if (operation == VectorOperation::min)
-      {
-        for (size_type i = 0; i < size; ++i)
-          if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+        case VectorOperation::insert:
+          for (size_type i = 0; i < size; ++i)
             values[i] = new_values[i];
+          break;
+
+        case VectorOperation::add:
+          for (size_type i = 0; i < size; ++i)
+            values[i] += new_values[i];
+          break;
+
+        case VectorOperation::min:
+          for (size_type i = 0; i < size; ++i)
+            if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+              values[i] = new_values[i];
+          break;
+
+        case VectorOperation::max:
+          for (size_type i = 0; i < size; ++i)
+            if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+              values[i] = new_values[i];
+          break;
+
+        default:
+          AssertThrow(false, ExcNotImplemented());
       }
-    else if (operation == VectorOperation::max)
-      {
-        for (size_type i = 0; i < size; ++i)
-          if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
-            values[i] = new_values[i];
-      }
-    else
-      AssertThrow(false, ExcNotImplemented());
   }
 
 

@@ -993,6 +993,8 @@ namespace Utilities
       return communicator;
     }
 
+
+
     const Epetra_Comm &
     comm_self()
     {
