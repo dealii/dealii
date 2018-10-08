@@ -49,7 +49,8 @@ using MPI_Op       = int;
 
 
 
-/** Helper macro to remove const from the pointer arguments to some MPI_*
+/**
+ * Helper macro to remove const from the pointer arguments to some MPI_*
  * functions.
  *
  * This is needed as the input arguments of functions like MPI_Allgather() are
@@ -70,10 +71,9 @@ using MPI_Op       = int;
 
 #    include <type_traits>
 
-#    define DEAL_II_MPI_CONST_CAST(expr)                                       \
-      const_cast<                                                              \
-        std::remove_const<std::remove_pointer<decltype(expr)>::type>::type *>( \
-        expr)
+#    define DEAL_II_MPI_CONST_CAST(expr)     \
+      const_cast<typename std::remove_const< \
+        typename std::remove_pointer<decltype(expr)>::type>::type *>(expr)
 
 #  endif
 #endif
