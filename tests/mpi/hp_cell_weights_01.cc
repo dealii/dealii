@@ -26,6 +26,8 @@
 // freedom on all cells of the corresponding subdomain.
 // We employ a large proportionality factor on our weighting function
 // to neglect the standard weight of '1000' per cell.
+//
+// This test works on a parallel::distributed::Triangulation.
 
 
 #include <deal.II/distributed/active_fe_indices_transfer.h>
@@ -67,7 +69,7 @@ test()
   parallel::distributed::ActiveFEIndicesTransfer<dim> feidx_transfer(dh);
   feidx_transfer.prepare_for_transfer();
 
-  parallel::distributed::CellWeights<dim> cell_weights(dh);
+  parallel::CellWeights<dim> cell_weights(dh);
   cell_weights.register_ndofs_weighting(100000);
 
 
