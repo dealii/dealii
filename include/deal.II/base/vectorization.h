@@ -40,11 +40,13 @@
 // 'check_01_cpu_features.cmake', ensures that these feature are not only
 // present in the compilation unit but also working properly.
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && !defined(__AVX__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__SSE2__) && \
+  !defined(__AVX__)
 #  error \
     "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && !defined(__AVX512F__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__SSE2__) && \
+  !defined(__AVX512F__)
 #  error \
     "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
@@ -55,6 +57,17 @@
 #  include <emmintrin.h>
 #endif
 
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
+#  include <altivec.h>
+
+// altivec.h defines vector, pixel, bool, but we do not use them, so undefine
+// them before they make trouble
+#  undef vector
+#  undef pixel
+#  undef bool
+
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2179,10 +2192,7 @@ vectorized_transpose_and_store(const bool                    add_into,
 
 
 
-// for safety, also check that __SSE2__ is defined in case the user manually
-// set some conflicting compile flags which prevent compilation
-
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
 
 /**
  * Specialization for double and SSE2.
@@ -2879,7 +2889,438 @@ vectorized_transpose_and_store(const bool                    add_into,
 
 
 
-#endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+#endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0 && defined(__SSE2__)
+
+
+#if DEAL_II_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && defined(__VSX__)
+
+template <>
+class VectorizedArray<double>
+{
+public:
+  /**
+   * This gives the number of vectors collected in this class.
+   */
+  static const unsigned int n_array_elements = 2;
+
+  /**
+   * This function assigns a scalar to this class.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator=(const double x)
+  {
+    data = vec_splats(x);
+    return *this;
+  }
+
+  /**
+   * Access operator. The component must be either 0 or 1.
+   */
+  DEAL_II_ALWAYS_INLINE
+  double &operator[](const unsigned int comp)
+  {
+    AssertIndexRange(comp, 2);
+    return *(reinterpret_cast<double *>(&data) + comp);
+  }
+
+  /**
+   * Constant access operator.
+   */
+  DEAL_II_ALWAYS_INLINE
+  const double &operator[](const unsigned int comp) const
+  {
+    AssertIndexRange(comp, 2);
+    return *(reinterpret_cast<const double *>(&data) + comp);
+  }
+
+  /**
+   * Addition.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator+=(const VectorizedArray &vec)
+  {
+    data = vec_add(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Subtraction.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator-=(const VectorizedArray &vec)
+  {
+    data = vec_sub(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Multiplication.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator*=(const VectorizedArray &vec)
+  {
+    data = vec_mul(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Division.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator/=(const VectorizedArray &vec)
+  {
+    data = vec_div(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Load @p n_array_elements from memory into the calling class, starting at
+   * the given address.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  load(const double *ptr)
+  {
+    data = vec_vsx_ld(0, ptr);
+  }
+
+  /**
+   * Write the content of the calling class into memory in form of @p
+   * n_array_elements to the given address.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  store(double *ptr) const
+  {
+    vec_vsx_st(data, 0, ptr);
+  }
+
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  streaming_store(double *ptr) const
+  {
+    store(ptr);
+  }
+
+  /** @copydoc VectorizedArray<Number>::gather()
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  gather(const double *base_ptr, const unsigned int *offsets)
+  {
+    for (unsigned int i = 0; i < 2; ++i)
+      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+  }
+
+  /** @copydoc VectorizedArray<Number>::scatter
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  scatter(const unsigned int *offsets, double *base_ptr) const
+  {
+    for (unsigned int i = 0; i < 2; ++i)
+      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+  }
+
+  /**
+   * Actual data field. Since this class represents a POD data type, it
+   * remains public.
+   */
+  __vector double data;
+
+private:
+  /**
+   * Return the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_sqrt() const
+  {
+    VectorizedArray res;
+    res.data = vec_sqrt(data);
+    return res;
+  }
+
+  /**
+   * Return the absolute value of this field. Not for use in user code. Use
+   * abs(x) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_abs() const
+  {
+    VectorizedArray res;
+    res.data = vec_abs(data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_max(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vec_max(data, other.data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_min(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vec_min(data, other.data);
+    return res;
+  }
+
+  /**
+   * Make a few functions friends.
+   */
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::sqrt(const VectorizedArray<Number2> &);
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::abs(const VectorizedArray<Number2> &);
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+};
+
+
+
+template <>
+class VectorizedArray<float>
+{
+public:
+  /**
+   * This gives the number of vectors collected in this class.
+   */
+  static const unsigned int n_array_elements = 4;
+
+  /**
+   * This function assigns a scalar to this class.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator=(const float x)
+  {
+    data = vec_splats(x);
+    return *this;
+  }
+
+  /**
+   * Access operator. The component must be between 0 and 3.
+   */
+  DEAL_II_ALWAYS_INLINE
+  float &operator[](const unsigned int comp)
+  {
+    AssertIndexRange(comp, 4);
+    return *(reinterpret_cast<float *>(&data) + comp);
+  }
+
+  /**
+   * Constant access operator.
+   */
+  DEAL_II_ALWAYS_INLINE
+  const float &operator[](const unsigned int comp) const
+  {
+    AssertIndexRange(comp, 4);
+    return *(reinterpret_cast<const float *>(&data) + comp);
+  }
+
+  /**
+   * Addition.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator+=(const VectorizedArray &vec)
+  {
+    data = vec_add(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Subtraction.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator-=(const VectorizedArray &vec)
+  {
+    data = vec_sub(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Multiplication.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator*=(const VectorizedArray &vec)
+  {
+    data = vec_mul(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Division.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray &
+  operator/=(const VectorizedArray &vec)
+  {
+    data = vec_div(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Load @p n_array_elements from memory into the calling class, starting at
+   * the given address.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  load(const float *ptr)
+  {
+    data = vec_vsx_ld(0, ptr);
+  }
+
+  /**
+   * Write the content of the calling class into memory in form of @p
+   * n_array_elements to the given address.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  store(float *ptr) const
+  {
+    vec_vsx_st(data, 0, ptr);
+  }
+
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  streaming_store(float *ptr) const
+  {
+    store(ptr);
+  }
+
+  /** @copydoc VectorizedArray<Number>::gather()
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  gather(const float *base_ptr, const unsigned int *offsets)
+  {
+    for (unsigned int i = 0; i < 4; ++i)
+      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+  }
+
+  /** @copydoc VectorizedArray<Number>::scatter
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  scatter(const unsigned int *offsets, float *base_ptr) const
+  {
+    for (unsigned int i = 0; i < 4; ++i)
+      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+  }
+
+  /**
+   * Actual data field. Since this class represents a POD data type, it
+   * remains public.
+   */
+  __vector float data;
+
+private:
+  /**
+   * Return the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_sqrt() const
+  {
+    VectorizedArray res;
+    res.data = vec_sqrt(data);
+    return res;
+  }
+
+  /**
+   * Return the absolute value of this field. Not for use in user code. Use
+   * abs(x) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_abs() const
+  {
+    VectorizedArray res;
+    res.data = vec_abs(data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_max(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vec_max(data, other.data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
+   */
+  DEAL_II_ALWAYS_INLINE
+  VectorizedArray
+  get_min(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vec_min(data, other.data);
+    return res;
+  }
+
+  /**
+   * Make a few functions friends.
+   */
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::sqrt(const VectorizedArray<Number2> &);
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::abs(const VectorizedArray<Number2> &);
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2>
+  friend VectorizedArray<Number2>
+  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+};
+
+#endif // if DEAL_II_VECTORIZATION_LEVEL >=1 && defined(__ALTIVEC__) &&
+       // defined(__VSX__)
+
 
 
 /**

@@ -27,6 +27,7 @@
 #   DEAL_II_HAVE_SSE2                    *)
 #   DEAL_II_HAVE_AVX                     *)
 #   DEAL_II_HAVE_AVX512                  *)
+#   DEAL_II_HAVE_ALTIVEC                 *)
 #   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #   DEAL_II_HAVE_OPENMP_SIMD             *)
 #   DEAL_II_OPENMP_SIMD_PRAGMA
@@ -72,7 +73,7 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   # CMAKE_REQUIRED_FLAGS changes..
   #
   UNSET_IF_CHANGED(CHECK_CPU_FEATURES_FLAGS_SAVED "${CMAKE_REQUIRED_FLAGS}"
-    DEAL_II_HAVE_SSE2 DEAL_II_HAVE_AVX DEAL_II_HAVE_AVX512
+    DEAL_II_HAVE_SSE2 DEAL_II_HAVE_AVX DEAL_II_HAVE_AVX512 DEAL_II_HAVE_ALTIVEC
     )
 
   CHECK_CXX_SOURCE_RUNS(
@@ -202,6 +203,48 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_AVX512)
+
+  CHECK_CXX_SOURCE_RUNS(
+    "
+    #ifndef __ALTIVEC__
+    #error \"__ALTIVEC__ flag not set, no support for Altivec\"
+    #endif
+    #include <altivec.h>
+    #undef vector
+    #undef pixel
+    #undef bool
+    int main()
+    {
+    __vector double a, b, data1, data2;
+    const int n_vectors = sizeof(a)/sizeof(double);
+    double * ptr = reinterpret_cast<double*>(&a);
+    ptr[0] = (volatile double)(1.0);
+    for (int i=1; i<n_vectors; ++i)
+      ptr[i] = 0.0;
+    b = vec_splats ((volatile double)(2.25));
+    data1 = vec_add (a, b);
+    data2 = vec_mul (b, data1);
+    ptr = reinterpret_cast<double*>(&data2);
+    unsigned int return_value = 0;
+    if (ptr[0] != 7.3125)
+      return_value += 1;
+    for (int i=1; i<n_vectors; ++i)
+      if (ptr[i] != 5.0625)
+        return_value += 2;
+    b = vec_splats ((volatile double)(-1.0));
+    data1 = vec_abs(vec_mul (b, data2));
+    vec_vsx_st(data1, 0, ptr);
+    b = vec_vsx_ld(0, ptr);
+    ptr = reinterpret_cast<double*>(&b);
+    if (ptr[0] != 7.3125)
+      return_value += 4;
+    for (int i=1; i<n_vectors; ++i)
+      if (ptr[i] != 5.0625)
+        return_value += 8;
+    return return_value;
+    }
+    "
+    DEAL_II_HAVE_ALTIVEC)
 ENDIF()
 
 IF(DEAL_II_HAVE_AVX512)
@@ -212,6 +255,10 @@ ELSEIF(DEAL_II_HAVE_SSE2)
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
 ELSE()
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
+ENDIF()
+
+IF(DEAL_II_HAVE_ALTIVEC)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
 ENDIF()
 
 
