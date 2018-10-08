@@ -157,8 +157,9 @@ namespace parallel
                 fe_indices_children.insert(
                   cell->child(child_index)->active_fe_index());
 
-              fe_index = dof_handler->get_fe().find_least_face_dominating_fe(
-                fe_indices_children);
+              fe_index = dof_handler->get_fe()
+                           .find_least_face_dominating_fe_in_collection(
+                             fe_indices_children);
 
               Assert(fe_index != numbers::invalid_unsigned_int,
                      ExcMessage(

@@ -277,7 +277,7 @@ namespace hp
      *
      * If the function is not able to find a finite element that satisfies
      * the description above, the function
-     * returns numbers::invalid_unsigned_int . An example would go like this:
+     * returns numbers::invalid_unsigned_int. An example would go like this:
      * If the FECollection consists of `{FE_Nothing
      * x FE_Nothing, FE_Q(1)xFE_Q(2), FE_Q(2)xFE_Q(1)}` with @p fes as `{1}`,
      * the function will not find a most dominating element as the default
@@ -289,6 +289,16 @@ namespace hp
      * numbers::invalid_unsigned_int.
      */
     unsigned int
+    find_least_face_dominating_fe_in_collection(
+      const std::set<unsigned int> &fes) const;
+
+    /**
+     * @copydoc FECollection::find_least_face_dominating_fe_in_collection()
+     *
+     * @deprecated This function has been renamed. Use
+     * hp::FECollection::find_least_face_dominating_fe_in_collection() instead.
+     */
+    DEAL_II_DEPRECATED unsigned int
     find_least_face_dominating_fe(const std::set<unsigned int> &fes) const;
 
     /**

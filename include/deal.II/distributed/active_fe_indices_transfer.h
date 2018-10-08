@@ -42,7 +42,7 @@ namespace parallel
      * a refined cell inherit the `active_fe_index` from their parent. If
      * cells get coarsened into one, the latter will get the least dominating
      * `active_fe_index` amongst its children, as determined by the function
-     * hp::FECollection::find_least_face_dominating_fe().
+     * hp::FECollection::find_least_face_dominating_fe_in_collection().
      *
      * @note If you use more than one object to attach data to a
      * parallel::distributed::Triangulation at the same time (e.g. a
