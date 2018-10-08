@@ -810,7 +810,11 @@ namespace Utilities
           case 0:
             return "disabled";
           case 1:
+#ifdef __ALTIVEC__
+            return "AltiVec";
+#else
             return "SSE2";
+#endif
           case 2:
             return "AVX";
           case 3:
