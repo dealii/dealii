@@ -88,10 +88,10 @@ namespace CUDAWrappers
       void
       transpose_subface_index(unsigned int &subface) const;
 
-      typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
-      typedef
-        typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
-      const unsigned int                               n_raw_lines;
+      using cell_iterator = typename DoFHandler<dim>::cell_iterator;
+      using active_cell_iterator =
+        typename DoFHandler<dim>::active_cell_iterator;
+      const unsigned int n_raw_lines;
       std::vector<std::vector<std::pair<cell_iterator, unsigned int>>>
                                        line_to_cells;
       const std::vector<unsigned int> &lexicographic_mapping;

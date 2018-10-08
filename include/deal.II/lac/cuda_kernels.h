@@ -39,7 +39,7 @@ namespace LinearAlgebra
     {
       using ::dealii::CUDAWrappers::block_size;
       using ::dealii::CUDAWrappers::chunk_size;
-      typedef types::global_dof_index size_type;
+      using size_type = types::global_dof_index;
 
       /**
        * Multiply each entry of @p val of size @p N by @p a.

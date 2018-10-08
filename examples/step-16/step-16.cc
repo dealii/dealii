@@ -380,13 +380,12 @@ namespace Step16
   {
     MappingQ1<dim> mapping;
 
-    typedef decltype(dof_handler.begin_active()) Iterator;
-
-    auto cell_worker = [&](const Iterator &  cell,
-                           ScratchData<dim> &scratch_data,
-                           CopyData &        copy_data) {
-      this->cell_worker(cell, scratch_data, copy_data);
-    };
+    auto cell_worker =
+      [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
+          ScratchData<dim> &                                    scratch_data,
+          CopyData &                                            copy_data) {
+        this->cell_worker(cell, scratch_data, copy_data);
+      };
 
     auto copier = [&](const CopyData &cd) {
       this->constraints.distribute_local_to_global(cd.cell_matrix,
@@ -449,13 +448,12 @@ namespace Step16
         boundary_constraints[level].close();
       }
 
-    typedef decltype(dof_handler.begin_mg()) Iterator;
-
-    auto cell_worker = [&](const Iterator &  cell,
-                           ScratchData<dim> &scratch_data,
-                           CopyData &        copy_data) {
-      this->cell_worker(cell, scratch_data, copy_data);
-    };
+    auto cell_worker =
+      [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
+          ScratchData<dim> &                                    scratch_data,
+          CopyData &                                            copy_data) {
+        this->cell_worker(cell, scratch_data, copy_data);
+      };
 
     auto copier = [&](const CopyData &cd) {
       boundary_constraints[cd.level].distribute_local_to_global(
