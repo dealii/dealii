@@ -380,7 +380,7 @@ namespace Step16
   {
     MappingQ1<dim> mapping;
 
-    typedef decltype(dof_handler.begin_active()) Iterator;
+    using Iterator = decltype(this->dof_handler.begin_active());
 
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
@@ -449,7 +449,7 @@ namespace Step16
         boundary_constraints[level].close();
       }
 
-    typedef decltype(dof_handler.begin_mg()) Iterator;
+    using Iterator = decltype(this->dof_handler.begin_mg());
 
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,

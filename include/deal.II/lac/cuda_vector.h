@@ -70,7 +70,7 @@ namespace LinearAlgebra
       /**
        * Move constructor.
        */
-      Vector(Vector<Number> &&) = default;
+      Vector(Vector<Number> &&) noexcept = default;
 
       /**
        * Constructor. Set dimension to @p n and initialize all elements with
@@ -94,7 +94,7 @@ namespace LinearAlgebra
        * Move assignment operator.
        */
       Vector &
-      operator=(Vector<Number> &&v) = default;
+      operator=(Vector<Number> &&v) noexcept = default;
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could do
