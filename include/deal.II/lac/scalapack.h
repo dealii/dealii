@@ -137,6 +137,20 @@ public:
       LAPACKSupport::Property::symmetric);
 
   /**
+   * Constructor for a general rectangular matrix that is read from
+   * the file @p filename and distributed using the grid @p process_grid.
+   *
+   * Loads the matrix from file @p filename using HDF5.
+   * In case that deal.II was built without HDF5
+   * a call to this function will cause an exception to be thrown.
+   */
+  ScaLAPACKMatrix(
+    const std::string &                                       filename,
+    const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+    const size_type row_block_size    = 32,
+    const size_type column_block_size = 32);
+
+  /**
    * Destructor
    */
   ~ScaLAPACKMatrix() override = default;

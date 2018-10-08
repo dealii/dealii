@@ -117,6 +117,100 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
 
 template <typename NumberType>
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
+  const std::string &                                       filename,
+  const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+  const size_type                                           row_block_size,
+  const size_type                                           column_block_size)
+  : uplo('L')
+  , // for non-symmetric matrices this is not needed
+  first_process_row(0)
+  , first_process_column(0)
+  , submatrix_row(1)
+  , submatrix_column(1)
+{
+#  ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  (void)process_grid;
+  (void)row_block_size;
+  (void)column_block_size;
+  Assert(
+    false,
+    ExcMessage(
+      "This function is only available when deal.II is configured with HDF5"));
+#  else
+
+  const unsigned int this_mpi_process(
+    Utilities::MPI::this_mpi_process(process_grid->mpi_communicator));
+
+  // Before reading the content from disk the root process determines the
+  // dimensions of the matrix. Subsequently, memory is allocated by a call to
+  // reinit() and the matrix is loaded by a call to load().
+  if (this_mpi_process == 0)
+    {
+      herr_t status = 0;
+
+      // open file in read-only mode
+      hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+      AssertThrow(file >= 0, ExcIO());
+
+      // get data set in file
+      hid_t dataset = H5Dopen2(file, "/matrix", H5P_DEFAULT);
+      AssertThrow(dataset >= 0, ExcIO());
+
+      // determine file space
+      hid_t filespace = H5Dget_space(dataset);
+
+      // get number of dimensions in data set
+      int rank = H5Sget_simple_extent_ndims(filespace);
+      AssertThrow(rank == 2, ExcIO());
+      hsize_t dims[2];
+      status = H5Sget_simple_extent_dims(filespace, dims, nullptr);
+      AssertThrow(status >= 0, ExcIO());
+
+      // due to ScaLAPACK's column-major memory layout the dimensions are
+      // swapped
+      n_rows    = dims[1];
+      n_columns = dims[0];
+
+      // close/release resources
+      status = H5Sclose(filespace);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Dclose(dataset);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Fclose(file);
+      AssertThrow(status >= 0, ExcIO());
+    }
+  int ierr = MPI_Bcast(&n_rows,
+                       1,
+                       Utilities::MPI::internal::mpi_type_id(&n_rows),
+                       0 /*from root*/,
+                       process_grid->mpi_communicator);
+  AssertThrowMPI(ierr);
+
+  ierr = MPI_Bcast(&n_columns,
+                   1,
+                   Utilities::MPI::internal::mpi_type_id(&n_columns),
+                   0 /*from root*/,
+                   process_grid->mpi_communicator);
+  AssertThrowMPI(ierr);
+
+  // the property will be overwritten by the subsequent call to load()
+  reinit(n_rows,
+         n_columns,
+         process_grid,
+         row_block_size,
+         column_block_size,
+         LAPACKSupport::Property::general);
+
+  load(filename.c_str());
+
+#  endif // DEAL_II_WITH_HDF5
+}
+
+
+
+template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::reinit(
   const size_type                                           n_rows_,
