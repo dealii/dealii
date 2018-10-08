@@ -102,6 +102,8 @@ namespace HDF5
       return t_type;
     }
 
+
+
     // Several HDF5 functions such as H5Screate_simple() require a
     // one-dimensional array that specifies the size of each dimension of the
     // container, see:
@@ -124,6 +126,8 @@ namespace HDF5
       return std::vector<hsize_t>{data.size()};
     }
 
+
+
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
@@ -132,6 +136,8 @@ namespace HDF5
     {
       return std::vector<hsize_t>{data.size()};
     }
+
+
 
     template <typename Container>
     typename std::enable_if<
@@ -142,6 +148,7 @@ namespace HDF5
     {
       return std::vector<hsize_t>{data.m(), data.n()};
     }
+
 
 
     // This function returns the total size of the container.
@@ -158,6 +165,8 @@ namespace HDF5
       return static_cast<unsigned int>(data.size());
     }
 
+
+
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
@@ -166,6 +175,8 @@ namespace HDF5
     {
       return static_cast<unsigned int>(data.size());
     }
+
+
 
     template <typename Container>
     typename std::enable_if<
@@ -176,6 +187,8 @@ namespace HDF5
     {
       return static_cast<unsigned int>(data.m() * data.n());
     }
+
+
 
     // This function returns the pointer to the raw data of a container
     template <typename Container>
@@ -190,6 +203,8 @@ namespace HDF5
       return data.data();
     }
 
+
+
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
@@ -201,6 +216,8 @@ namespace HDF5
       // Use the first element of FullMatrix to get the pointer to the raw data
       return &data[0];
     }
+
+
 
     template <typename Container>
     typename std::enable_if<
@@ -214,6 +231,8 @@ namespace HDF5
       // Use the first element of FullMatrix to get the pointer to the raw data
       return &data[0][0];
     }
+
+
 
     // This function returns the pointer to the raw data of a container
     // The returned pointer is const, which means that it can be used only to
@@ -230,6 +249,8 @@ namespace HDF5
       return data.data();
     }
 
+
+
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
@@ -241,6 +262,7 @@ namespace HDF5
       // Use the first element of FullMatrix to get the pointer to the raw data
       return &*data.begin();
     }
+
 
 
     template <typename Container>
@@ -255,6 +277,8 @@ namespace HDF5
       // Use the first element of FullMatrix to get the pointer to the raw data
       return &data[0][0];
     }
+
+
 
     // This function initializes and returns a container of type std::vector,
     // Vector or FullMatrix. The function does not set the values of the
@@ -283,6 +307,8 @@ namespace HDF5
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
     }
 
+
+
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
@@ -292,6 +318,8 @@ namespace HDF5
       return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
     }
+
+
 
     template <typename Container>
     typename std::enable_if<
@@ -303,6 +331,8 @@ namespace HDF5
       AssertDimension(dimensions.size(), 2);
       return Container(dimensions[0], dimensions[1]);
     }
+
+
 
     // Convert a HDF5 no_collective_cause code to a human readable string
     std::string
@@ -365,10 +395,13 @@ namespace HDF5
   } // namespace internal
 
 
+
   HDF5Object::HDF5Object(const std::string name, const bool mpi)
     : name(name)
     , mpi(mpi)
   {}
+
+
 
   template <typename T>
   T
@@ -388,6 +421,8 @@ namespace HDF5
     return value;
   }
 
+
+
   template <>
   bool
   HDF5Object::attr(const std::string &attr_name)
@@ -405,6 +440,8 @@ namespace HDF5
     bool bool_value = (bool)int_value;
     return bool_value;
   }
+
+
 
   template <>
   std::string
@@ -452,6 +489,8 @@ namespace HDF5
     return string_value;
   }
 
+
+
   template <typename T>
   void
   HDF5Object::write_attr(const std::string &attr_name, const T value)
@@ -485,6 +524,8 @@ namespace HDF5
     ret = H5Aclose(attr);
     Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
   }
+
+
 
   template <>
   void
@@ -540,6 +581,8 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
   }
 
+
+
   DataSet::DataSet(const std::string &name,
                    const hid_t &      parent_group_id,
                    const bool         mpi)
@@ -586,6 +629,8 @@ namespace HDF5
       }
   }
 
+
+
   DataSet::DataSet(const std::string &         name,
                    const hid_t &               parent_group_id,
                    const std::vector<hsize_t> &dimensions,
@@ -628,6 +673,8 @@ namespace HDF5
         _size *= dimension;
       }
   }
+
+
 
   template <typename Container>
   Container
@@ -676,6 +723,8 @@ namespace HDF5
 
     return data;
   }
+
+
 
   template <typename number>
   std::vector<number>
@@ -744,6 +793,8 @@ namespace HDF5
     return data;
   }
 
+
+
   template <typename Container>
   Container
   DataSet::read_hyperslab(const std::vector<hsize_t> &offset,
@@ -809,6 +860,8 @@ namespace HDF5
     return data;
   }
 
+
+
   template <typename number>
   void
   DataSet::read_none()
@@ -863,6 +916,8 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
   }
 
+
+
   template <typename Container>
   void
   DataSet::write(const Container &data)
@@ -907,6 +962,8 @@ namespace HDF5
         Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
   }
+
+
 
   template <typename number>
   void
@@ -967,6 +1024,8 @@ namespace HDF5
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
   }
+
+
 
   template <typename Container>
   void
@@ -1033,6 +1092,8 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
+
+
   template <typename Container>
   void
   DataSet::write_hyperslab(const Container &           data,
@@ -1097,6 +1158,8 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
+
+
   template <typename number>
   void
   DataSet::write_none()
@@ -1147,6 +1210,8 @@ namespace HDF5
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
   }
 
+
+
   template <>
   H5D_mpio_actual_io_mode_t
   DataSet::io_mode()
@@ -1193,6 +1258,8 @@ namespace HDF5
     return std::string("Internal error");
   }
 
+
+
   template <>
   uint32_t
   DataSet::local_no_collective_cause()
@@ -1216,6 +1283,8 @@ namespace HDF5
         "query_io_mode() should be true in order to use local_no_collective_cause()"));
     return internal::no_collective_cause_to_string(_local_no_collective_cause);
   }
+
+
 
   template <>
   uint32_t
@@ -1241,11 +1310,15 @@ namespace HDF5
     return internal::no_collective_cause_to_string(_global_no_collective_cause);
   }
 
+
+
   bool
   DataSet::query_io_mode() const
   {
     return _query_io_mode;
   }
+
+
 
   void
   DataSet::query_io_mode(bool query_io_mode)
@@ -1253,11 +1326,15 @@ namespace HDF5
     _query_io_mode = query_io_mode;
   }
 
+
+
   std::vector<hsize_t>
   DataSet::dimensions() const
   {
     return _dimensions;
   }
+
+
 
   unsigned int
   DataSet::size() const
@@ -1265,11 +1342,15 @@ namespace HDF5
     return _size;
   }
 
+
+
   unsigned int
   DataSet::rank() const
   {
     return _rank;
   }
+
+
 
   Group::Group(const std::string &name,
                const Group &      parentGroup,
@@ -1303,9 +1384,13 @@ namespace HDF5
       }
   }
 
+
+
   Group::Group(const std::string &name, const bool mpi)
     : HDF5Object(name, mpi)
   {}
+
+
 
   Group
   Group::group(const std::string &name)
@@ -1313,17 +1398,23 @@ namespace HDF5
     return Group(name, *this, mpi, Mode::open);
   }
 
+
+
   Group
   Group::create_group(const std::string &name)
   {
     return Group(name, *this, mpi, Mode::create);
   }
 
+
+
   DataSet
   Group::dataset(const std::string &name)
   {
     return DataSet(name, *hdf5_reference, mpi);
   }
+
+
 
   template <typename number>
   DataSet
@@ -1333,6 +1424,8 @@ namespace HDF5
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
     return DataSet(name, *hdf5_reference, dimensions, t_type, mpi);
   }
+
+
 
   template <typename Container>
   void
@@ -1401,15 +1494,21 @@ namespace HDF5
       }
   }
 
+
+
   File::File(const std::string &name,
              const MPI_Comm     mpi_communicator,
              const Mode         mode)
     : File(name, true, mpi_communicator, mode)
   {}
 
+
+
   File::File(const std::string &name, const Mode mode)
     : File(name, false, MPI_COMM_NULL, mode)
   {}
+
+
 
 #  ifndef DOXYGEN
 
