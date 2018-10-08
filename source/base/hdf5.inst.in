@@ -16,9 +16,10 @@
 
 for (number : REAL_AND_COMPLEX_SCALARS)
   {
-    template number HDF5Object::attr<number>(const std::string &attr_name);
-    template void   HDF5Object::write_attr<number>(const std::string &attr_name,
-                                                 number             value);
+    template number HDF5Object::get_attribute<number>(
+      const std::string &attr_name);
+    template void HDF5Object::set_attribute<number>(
+      const std::string &attr_name, number value);
 
     template std::vector<number> DataSet::read<std::vector<number>>();
     template Vector<number>      DataSet::read<Vector<number>>();

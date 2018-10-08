@@ -59,17 +59,17 @@ DEAL_II_NAMESPACE_OPEN
  *                      HDF5::File::Mode::open);
  * hdf5::Group data = data_file.group("data");
  *
- * auto nb_frequency_points = data.attr<int>("nb_frequency_points");
- * auto rho = data.attr<double>("rho");
- * auto save_vtk_files = data.attr<bool>("save_vtk_files");
- * auto simulation_type = data.attr<std::string>("simulation_type");
+ * auto nb_frequency_points = data.get_attribute<int>("nb_frequency_points");
+ * auto rho = data.get_attribute<double>("rho");
+ * auto save_vtk_files = data.get_attribute<bool>("save_vtk_files");
+ * auto simulation_type = data.get_attribute<std::string>("simulation_type");
  *
  * std::vector<std::complex<double>> displacement = {...};
  *
  * auto some_data = data.write_dataset("displacement", displacement);
  *
  * // Write the simulation metadata
- * data.write_attr("active_cells", triangulation.n_active_cells());
+ * data.set_attribute("active_cells", triangulation.n_active_cells());
  * @endcode
  *
  * Read the simulation results with python:
@@ -94,10 +94,11 @@ DEAL_II_NAMESPACE_OPEN
  * In addition, attributes can be attached to the root file, a group or a
  * dataset. An [HDF5
  * attribute](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Attributes/HDF5_Attributes.htm)
- * is a small meta data. The methods HDF5Object::attr(const std::string) and
- * HDF5Object::write_attr(const std::string, const T) have been instantiated for
- * the types: `float`, `double`, `std::complex<float>`, `std::complex<double>`,
- * `int`, `unsigned int`, `bool`, and `std::string`.
+ * is a small meta data. The methods
+ * HDF5Object::get_attribute(const std::string) and
+ * HDF5Object::set_attribute(const std::string, const T) have
+ * been instantiated for the types: `float`, `double`, `std::complex<float>`,
+ * `std::complex<double>`, `int`, `unsigned int`, `bool`, and `std::string`.
  *
  * Below an example code can be found. Note that, if the group already exists
  * the method Group::group(std::string) should be used instead of
@@ -105,11 +106,12 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * HDF5::File data_file(filename, HDF5::File::Mode::create);
  * double double_attribute = 2.2;
- * data_file.write_attr("double_attribute", double attribute);
+ * data_file.set_attribute("double_attribute", double attribute);
  * auto group = data_file.create_group("group");
- * group.write_attr("simulation_type", std::string("elastic_equation"));
+ * group.set_attribute("simulation_type", std::string("elastic_equation"));
  * auto dataset = group.create_dataset<double>("dataset_name", dimensions);
- * dataset.write_attr("complex_double_attribute", std::complex<double>(2,2.3));
+ * dataset.set_attribute("complex_double_attribute",
+ *                       std::complex<double>(2,2.3));
  * @endcode
  *
  * # MPI I/O
@@ -223,8 +225,8 @@ DEAL_II_NAMESPACE_OPEN
  * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
  * The results are stored in DataSet::io_mode(),
  * DataSet::local_no_collective_cause() and
- * DataSet::global_no_collective_cause(). We suggest to query the I/O mode only
- * in Debug mode because it requires calling additional HDF5 routines.
+ * DataSet::get_global_no_collective_cause(). We suggest to query the I/O mode
+ * only in Debug mode because it requires calling additional HDF5 routines.
  *
  * The following code can be used to query the I/O method.
  * @code
@@ -247,7 +249,8 @@ DEAL_II_NAMESPACE_OPEN
  *   pcout << "Local no collective cause: "
  *         << dataset.local_no_collective_cause<std::string>() << std::endl;
  *   pcout << "Global no collective cause: "
- *         << dataset.global_no_collective_cause<std::string>() << std::endl;
+ *         << dataset.get_global_no_collective_cause<std::string>() <<
+ * std::endl;
  * }
  * @endcode
  *
@@ -258,7 +261,8 @@ DEAL_II_NAMESPACE_OPEN
  * Global no collective cause: H5D_MPIO_COLLECTIVE
  * @endcode
  * See DataSet::io_mode(), DataSet::local_no_collective_cause() and
- * DataSet::global_no_collective_cause() for all the possible returned codes.
+ * DataSet::get_global_no_collective_cause() for all the possible returned
+ * codes.
  *
  * # Rank of the HDF5 datasets and hyperslabs
  * The deal.ii HDF5 interface can be used to write/read data to datasets and
@@ -329,7 +333,7 @@ namespace HDF5
      */
     template <typename T>
     T
-    attr(const std::string &attr_name);
+    get_attribute(const std::string &attr_name);
 
     /**
      * Writes an attribute. @p T can be `float`, `double`, `std::complex<float>`,
@@ -345,7 +349,7 @@ namespace HDF5
      */
     template <typename T>
     void
-    write_attr(const std::string &attr_name, const T value);
+    set_attribute(const std::string &attr_name, const T value);
 
 
     const std::string name;
@@ -675,7 +679,7 @@ namespace HDF5
      */
     template <typename T>
     T
-    io_mode();
+    get_io_mode();
 
     /**
      * This funcion retrieves the local causes that broke collective I/O on the
@@ -701,7 +705,7 @@ namespace HDF5
      */
     template <typename T>
     T
-    local_no_collective_cause();
+    get_local_no_collective_cause();
 
     /**
      * This funcion retrieves the global causes that broke collective I/O on the
@@ -727,60 +731,102 @@ namespace HDF5
      */
     template <typename T>
     T
-    global_no_collective_cause();
+    get_global_no_collective_cause();
 
     /**
-     * This function retrieves the boolean query_io_mode().
+     * This function retrieves the boolean query_io_mode.
      *
      * In cases where maximum performance has to be achieved, it is important to
      * make sure that all MPI read/write operations are collective. The HDF5
      * library provides API routines that can be used after the read/write I/O
-     * operations to query the I/O mode. If query_io_mode() is set to True, then
+     * operations to query the I/O mode. If query_io_mode is set to true, then
      * after every read/write operation the HDF5 deal.ii interface calls the
      * routines
      * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
      * and
      * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
-     * The results are stored in io_mode(), local_no_collective_cause() and
-     * global_no_collective_cause(). We suggest to query the I/O mode only in
+     * The results are stored in io_mode, local_no_collective_cause and
+     * global_no_collective_cause. We suggest to query the I/O mode only in
      * Debug mode because it requires calling additional HDF5 routines.
      */
     bool
-    query_io_mode() const;
+    get_query_io_mode() const;
 
     /**
      * This function sets the boolean query_io_mode().
      */
     void
-    query_io_mode(bool query_io_mode);
+    set_query_io_mode(bool query_io_mode);
 
     /**
      * This funcion returns the dimensions of the dataset.
      */
     std::vector<hsize_t>
-    dimensions() const;
+    get_dimensions() const;
 
     /**
      * This funcion returns the total number of elements in the dataset.
      */
     unsigned int
-    size() const;
+    get_size() const;
 
     /**
      * This funcion returns the rank of the dataset.
      */
     unsigned int
-    rank() const;
+    get_rank() const;
 
   private:
-    unsigned int              _rank;
-    std::vector<hsize_t>      _dimensions;
-    std::shared_ptr<hid_t>    dataspace;
-    unsigned int              _size;
-    bool                      _query_io_mode;
-    H5D_mpio_actual_io_mode_t _io_mode;
-    uint32_t                  _local_no_collective_cause;
-    uint32_t                  _global_no_collective_cause;
+    /**
+     * Rank of the DataSet
+     */
+    unsigned int rank;
+
+    /**
+     * This vector dimensions is a one-dimensional array of size rank specifying
+     * the size of each dimension of the dataset.
+     */
+    std::vector<hsize_t> dimensions;
+
+    /**
+     * HDF5 dataspace identifier
+     */
+    std::shared_ptr<hid_t> dataspace;
+
+    /**
+     * Total number of elements in the dataset.
+     */
+    unsigned int size;
+
+    /**
+     * If query_io_mode is set to true, then after every read/write operation
+     * the HDF5 deal.ii interface calls the routines
+     * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
+     * and
+     * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
+     * The results are stored in io_mode, local_no_collective_cause and
+     * global_no_collective_cause.
+     */
+    bool query_io_mode;
+
+    /**
+     * I/O mode that was performed on the last parallel I/O call.
+     */
+    H5D_mpio_actual_io_mode_t io_mode;
+
+    /**
+     * Local causes that broke collective I/O on the
+     * last parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
+     */
+    uint32_t local_no_collective_cause;
+
+    /**
+     * Global causes that broke collective I/O on the
+     * last parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
+     */
+    uint32_t global_no_collective_cause;
   };
 
   /**

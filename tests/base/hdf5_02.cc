@@ -36,23 +36,24 @@ test()
     const double       root_double       = 6.234542e3;
     const int          root_int          = -56;
     const unsigned int root_unsigned_int = 22;
-    data_file.write_attr("root_float", root_float);
-    data_file.write_attr("root_double", root_double);
-    data_file.write_attr("root_int", root_int);
-    data_file.write_attr("root_unsigned_int", root_unsigned_int);
-    data_file.write_attr("root_total",
-                         (root_float + root_double) * root_int *
-                           root_unsigned_int);
+    data_file.set_attribute("root_float", root_float);
+    data_file.set_attribute("root_double", root_double);
+    data_file.set_attribute("root_int", root_int);
+    data_file.set_attribute("root_unsigned_int", root_unsigned_int);
+    data_file.set_attribute("root_total",
+                            (root_float + root_double) * root_int *
+                              root_unsigned_int);
 
     // Create attributes attached to a group
     auto                      test_group = data_file.create_group("test_group");
     const std::complex<float> group_complex_float   = {2.45681934e5, 45e2};
     const std::complex<double> group_complex_double = {6.234542e3, 2};
-    test_group.write_attr("group_complex_float", group_complex_float);
-    test_group.write_attr("group_complex_double", group_complex_double);
-    test_group.write_attr("group_complex_total",
-                          group_complex_float * group_complex_double);
-    test_group.write_attr("group_string", std::string("test_string_attribute"));
+    test_group.set_attribute("group_complex_float", group_complex_float);
+    test_group.set_attribute("group_complex_double", group_complex_double);
+    test_group.set_attribute("group_complex_total",
+                             group_complex_float * group_complex_double);
+    test_group.set_attribute("group_string",
+                             std::string("test_string_attribute"));
 
     // Create attributes attached to a dataset
     const std::vector<hsize_t> dimensions = {50, 30};
@@ -60,46 +61,51 @@ test()
     auto test_dataset =
       test_group.create_dataset<double>("test_dataset", dimensions);
 
-    test_dataset.write_attr("dataset_double", 20.2);
-    test_dataset.write_attr("dataset_string",
-                            std::string("test_dataset_attribute"));
+    test_dataset.set_attribute("dataset_double", 20.2);
+    test_dataset.set_attribute("dataset_string",
+                               std::string("test_dataset_attribute"));
   }
 
   // Read data
   {
     // Read attributes attached to the root
     HDF5::File data_file(filename, MPI_COMM_WORLD, HDF5::File::Mode::open);
-    auto       root_float  = data_file.attr<float>("root_float");
-    auto       root_double = data_file.attr<double>("root_double");
-    auto       root_int    = data_file.attr<int>("root_int");
-    auto root_unsigned_int = data_file.attr<unsigned int>("root_unsigned_int");
+    auto       root_float  = data_file.get_attribute<float>("root_float");
+    auto       root_double = data_file.get_attribute<double>("root_double");
+    auto       root_int    = data_file.get_attribute<int>("root_int");
+    auto       root_unsigned_int =
+      data_file.get_attribute<unsigned int>("root_unsigned_int");
     // calculated and read should be the same
     deallog << "root_total calculated:"
             << (root_float + root_double) * root_int * root_unsigned_int
             << std::endl;
-    deallog << "root_total read:" << data_file.attr<double>("root_total")
-            << std::endl;
+    deallog << "root_total read:"
+            << data_file.get_attribute<double>("root_total") << std::endl;
 
     // Read attributes attached to a group
     auto test_group = data_file.group("test_group");
     auto group_complex_float =
-      test_group.attr<std::complex<float>>("group_complex_float");
+      test_group.get_attribute<std::complex<float>>("group_complex_float");
     auto group_complex_double =
-      test_group.attr<std::complex<double>>("group_complex_double");
+      test_group.get_attribute<std::complex<double>>("group_complex_double");
     deallog << "group_complex_total calculated:"
             << (group_complex_float * group_complex_double) << std::endl;
     deallog << "group_complex_total read:"
-            << test_group.attr<std::complex<double>>("group_complex_total")
+            << test_group.get_attribute<std::complex<double>>(
+                 "group_complex_total")
             << std::endl;
     deallog << "group_string read:"
-            << test_group.attr<std::string>("group_string") << std::endl;
+            << test_group.get_attribute<std::string>("group_string")
+            << std::endl;
 
     // Read attributes attached to a dataset
     auto test_dataset = test_group.dataset("test_dataset");
     deallog << "dataset_double read:"
-            << test_dataset.attr<double>("dataset_double") << std::endl;
+            << test_dataset.get_attribute<double>("dataset_double")
+            << std::endl;
     deallog << "dataset_string read:"
-            << test_dataset.attr<std::string>("dataset_string") << std::endl;
+            << test_dataset.get_attribute<std::string>("dataset_string")
+            << std::endl;
   }
 }
 
