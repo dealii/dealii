@@ -1170,7 +1170,7 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
 }
 
 
-
+#ifdef DEAL_II_WITH_MUPARSER
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const std::string                                 push_forward_expression,
@@ -1198,7 +1198,7 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   push_forward_function = pf;
   pull_back_function    = pb;
 }
-
+#endif
 
 
 template <int dim, int spacedim, int chartdim>
@@ -1232,6 +1232,7 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
   // function (owns_pointers == false) or that the newly generated manifold
   // creates internally the push_forward and pull_back functions using the same
   // expressions that were used to construct this class (own_pointers == true).
+#ifdef DEAL_II_WITH_MUPARSER
   if (owns_pointers == true)
     {
       return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
@@ -1245,6 +1246,7 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
         finite_difference_step);
     }
   else
+#endif
     return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
       *push_forward_function,
       *pull_back_function,

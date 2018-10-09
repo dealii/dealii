@@ -16,18 +16,18 @@
 #ifndef dealii_function_parser_h
 #define dealii_function_parser_h
 
-
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/auto_derivative_function.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/thread_local_storage.h>
+#ifdef DEAL_II_WITH_MUPARSER
+#  include <deal.II/base/auto_derivative_function.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/point.h>
+#  include <deal.II/base/tensor.h>
+#  include <deal.II/base/thread_local_storage.h>
 
-#include <map>
-#include <memory>
-#include <vector>
+#  include <map>
+#  include <memory>
+#  include <vector>
 
 namespace mu
 {
@@ -368,7 +368,6 @@ public:
   //@}
 
 private:
-#ifdef DEAL_II_WITH_MUPARSER
   /**
    * Place for the variables for each thread
    */
@@ -410,7 +409,6 @@ private:
    */
   void
   init_muparser() const;
-#endif
 
   /**
    * An array of function expressions (one per component), required to
@@ -456,5 +454,5 @@ FunctionParser<dim>::default_variable_names()
 
 
 DEAL_II_NAMESPACE_CLOSE
-
+#endif
 #endif
