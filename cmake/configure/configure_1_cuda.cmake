@@ -77,6 +77,7 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDMACRO()
     _cuda_ensure_feature_off(8 DEAL_II_WITH_CXX14)
     _cuda_ensure_feature_off(9 DEAL_II_WITH_CXX17)
+    _cuda_ensure_feature_off(10 DEAL_II_WITH_CXX17)
 
 
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
