@@ -1573,16 +1573,7 @@ LaplaceProblem<dim>::solve()
   SolverControl solver_control(prm.max_iterations, prm.tolerance, false, false);
   PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
 
-  // choose preconditioner
-#define amg
-#ifdef amg
-  PETScWrappers::PreconditionBoomerAMG::AdditionalData additional_data;
-  additional_data.symmetric_operator = true;
-  PETScWrappers::PreconditionBoomerAMG preconditioner(system_matrix,
-                                                      additional_data);
-#else
-  PETScWrappers::PreconditionJacobi preconditioner(system_matrix);
-#endif
+  PETScWrappers::PreconditionSOR preconditioner(system_matrix);
 
   cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
