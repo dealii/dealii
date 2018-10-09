@@ -13,10 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/parsed_function.h>
-#include <deal.II/base/utilities.h>
+#ifdef DEAL_II_WITH_MUPARSER
 
-#include <cstdio>
+#  include <deal.II/base/parsed_function.h>
+#  include <deal.II/base/utilities.h>
+
+#  include <cstdio>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -196,3 +198,5 @@ namespace Functions
   template class ParsedFunction<3>;
 } // namespace Functions
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

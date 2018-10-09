@@ -938,17 +938,6 @@ namespace StandardExceptions
     "find a valid NetCDF library.");
 
   /**
-   * This function requires support for the FunctionParser library.
-   */
-  DeclExceptionMsg(
-    ExcNeedsFunctionparser,
-    "You are attempting to use functionality that is only available "
-    "if deal.II was configured to use the function parser which "
-    "relies on the muparser library, but cmake did not "
-    "find a valid muparser library on your system and also did "
-    "not choose the one that comes bundled with deal.II.");
-
-  /**
    * This function requires support for the Assimp library.
    */
   DeclExceptionMsg(

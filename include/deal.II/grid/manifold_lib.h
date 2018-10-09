@@ -498,6 +498,7 @@ public:
     const Tensor<1, chartdim> &periodicity = Tensor<1, chartdim>(),
     const double               tolerance   = 1e-10);
 
+#ifdef DEAL_II_WITH_MUPARSER
   /**
    * Expressions constructor. Takes the expressions of the push_forward
    * function of spacedim components, and of the pull_back function of @p
@@ -524,6 +525,7 @@ public:
       FunctionParser<spacedim>::default_variable_names(),
     const double tolerance = 1e-10,
     const double h         = 1e-8);
+#endif
 
   /**
    * If needed, we delete the pointers we own.
@@ -576,10 +578,12 @@ public:
   pull_back(const Point<spacedim> &space_point) const override;
 
 private:
+#ifdef DEAL_II_WITH_MUPARSER
   /**
    * Constants for the FunctionParser classes.
    */
   const typename FunctionParser<spacedim>::ConstMap const_map;
+#endif
 
   /**
    * Pointer to the push_forward function.

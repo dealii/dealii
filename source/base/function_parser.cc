@@ -13,31 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
-#include <deal.II/base/function_parser.h>
-#include <deal.II/base/patterns.h>
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/utilities.h>
-
-#include <deal.II/lac/vector.h>
-
-#include <boost/random.hpp>
-
-#include <cmath>
-#include <map>
-
 #ifdef DEAL_II_WITH_MUPARSER
-#  include <muParser.h>
-#else
+#  include <deal.II/base/function_parser.h>
+#  include <deal.II/base/patterns.h>
+#  include <deal.II/base/thread_management.h>
+#  include <deal.II/base/utilities.h>
 
+#  include <deal.II/lac/vector.h>
 
+#  include <boost/random.hpp>
 
-namespace fparser
-{
-  class FunctionParser
-  {};
-} // namespace fparser
-#endif
+#  include <cmath>
+#  include <map>
+
+#    include <muParser.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -96,7 +85,6 @@ template <int dim>
 FunctionParser<dim>::~FunctionParser() = default;
 
 
-#ifdef DEAL_II_WITH_MUPARSER
 
 template <int dim>
 void
@@ -492,50 +480,6 @@ FunctionParser<dim>::vector_value(const Point<dim> &p,
     values(component) = fp.get()[component]->Eval();
 }
 
-#else
-
-
-template <int dim>
-void
-FunctionParser<dim>::initialize(const std::string &,
-                                const std::vector<std::string> &,
-                                const std::map<std::string, double> &,
-                                const bool)
-{
-  Assert(false, ExcNeedsFunctionparser());
-}
-
-template <int dim>
-void
-FunctionParser<dim>::initialize(const std::string &,
-                                const std::string &,
-                                const std::map<std::string, double> &,
-                                const bool)
-{
-  Assert(false, ExcNeedsFunctionparser());
-}
-
-
-
-template <int dim>
-double
-FunctionParser<dim>::value(const Point<dim> &, unsigned int) const
-{
-  Assert(false, ExcNeedsFunctionparser());
-  return 0.;
-}
-
-
-template <int dim>
-void
-FunctionParser<dim>::vector_value(const Point<dim> &, Vector<double> &) const
-{
-  Assert(false, ExcNeedsFunctionparser());
-}
-
-
-#endif
-
 // Explicit Instantiations.
 
 template class FunctionParser<1>;
@@ -543,3 +487,4 @@ template class FunctionParser<2>;
 template class FunctionParser<3>;
 
 DEAL_II_NAMESPACE_CLOSE
+#endif
