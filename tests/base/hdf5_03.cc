@@ -231,17 +231,14 @@ write_test(HDF5::Group &              root_group,
             << " (Write): " << container_sum(data) << std::endl;
     pcout << "IO mode " + dataset_name << " " << container_name << "<"
           << type_name << ">"
-          << " (Write): " << dataset.template get_io_mode<std::string>()
-          << std::endl;
+          << " (Write): " << dataset.get_io_mode() << std::endl;
     pcout << "Local no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template get_local_no_collective_cause<std::string>()
+          << " (Write): " << dataset.get_local_no_collective_cause()
           << std::endl;
     pcout << "Global no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template get_global_no_collective_cause<std::string>()
+          << " (Write): " << dataset.get_global_no_collective_cause()
           << std::endl;
   }
 
@@ -316,17 +313,14 @@ write_test(HDF5::Group &              root_group,
             << std::endl;
     pcout << "IO mode " + dataset_name << " " << container_name << "<"
           << type_name << ">"
-          << " (Write): " << dataset.template get_io_mode<std::string>()
-          << std::endl;
+          << " (Write): " << dataset.get_io_mode() << std::endl;
     pcout << "Local no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template get_local_no_collective_cause<std::string>()
+          << " (Write): " << dataset.get_local_no_collective_cause()
           << std::endl;
     pcout << "Global no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template get_global_no_collective_cause<std::string>()
+          << " (Write): " << dataset.get_global_no_collective_cause()
           << std::endl;
   }
 
@@ -383,17 +377,14 @@ write_test(HDF5::Group &              root_group,
                 << " (Write): " << container_sum(data) << std::endl;
         pcout << "IO mode " + dataset_name << " " << container_name << "<"
               << type_name << ">"
-              << " (Write): " << dataset.template get_io_mode<std::string>()
-              << std::endl;
+              << " (Write): " << dataset.get_io_mode() << std::endl;
         pcout << "Local no collective cause " + dataset_name << " "
               << container_name << "<" << type_name << ">"
-              << " (Write): "
-              << dataset.template get_local_no_collective_cause<std::string>()
+              << " (Write): " << dataset.get_local_no_collective_cause()
               << std::endl;
         pcout << "Global no collective cause " + dataset_name << " "
               << container_name << "<" << type_name << ">"
-              << " (Write): "
-              << dataset.template get_global_no_collective_cause<std::string>()
+              << " (Write): " << dataset.get_global_no_collective_cause()
               << std::endl;
       }
   }
@@ -478,17 +469,14 @@ write_test(HDF5::Group &              root_group,
             << " (Write): " << container_sum(hyperslab_data_b) << std::endl;
     pcout << "IO mode " + dataset_name << " " << container_name << "<"
           << type_name << ">"
-          << " (Write): " << dataset.template get_io_mode<std::string>()
-          << std::endl;
+          << " (Write): " << dataset.get_io_mode() << std::endl;
     pcout << "Local no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template get_local_no_collective_cause<std::string>()
+          << " (Write): " << dataset.get_local_no_collective_cause()
           << std::endl;
     pcout << "Global no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Write): "
-          << dataset.template get_global_no_collective_cause<std::string>()
+          << " (Write): " << dataset.get_global_no_collective_cause()
           << std::endl;
   }
 }
@@ -563,17 +551,14 @@ read_test(HDF5::Group        root_group,
             << " (Read): " << container_sum(data) << std::endl;
     pcout << "IO mode " + dataset_name << " " << container_name << "<"
           << type_name << ">"
-          << " (Read): " << dataset.template get_io_mode<std::string>()
-          << std::endl;
+          << " (Read): " << dataset.get_io_mode() << std::endl;
     pcout << "Local no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Read): "
-          << dataset.template get_local_no_collective_cause<std::string>()
+          << " (Read): " << dataset.get_local_no_collective_cause()
           << std::endl;
     pcout << "Global no collective cause " + dataset_name << " "
           << container_name << "<" << type_name << ">"
-          << " (Read): "
-          << dataset.template get_global_no_collective_cause<std::string>()
+          << " (Read): " << dataset.get_global_no_collective_cause()
           << std::endl;
   }
 
@@ -597,17 +582,14 @@ read_test(HDF5::Group        root_group,
               << " (Read): " << container_sum(data) << std::endl;
       pcout << "IO mode " + dataset_name << " " << container_name << "<"
             << type_name << ">"
-            << " (Read): " << dataset.template get_io_mode<std::string>()
-            << std::endl;
+            << " (Read): " << dataset.get_io_mode() << std::endl;
       pcout << "Local no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_local_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_local_no_collective_cause()
             << std::endl;
       pcout << "Global no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_global_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_global_no_collective_cause()
             << std::endl;
     }
 
@@ -627,17 +609,14 @@ read_test(HDF5::Group        root_group,
               << data_a[2] << ", " << data_a[3] << std::endl;
       pcout << "IO mode " + dataset_name << " " << container_name << "<"
             << type_name << ">"
-            << " (Read): " << dataset.template get_io_mode<std::string>()
-            << std::endl;
+            << " (Read): " << dataset.get_io_mode() << std::endl;
       pcout << "Local no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_local_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_local_no_collective_cause()
             << std::endl;
       pcout << "Global no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_global_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_global_no_collective_cause()
             << std::endl;
     }
   }
@@ -666,17 +645,14 @@ read_test(HDF5::Group        root_group,
                 << " (Read): " << container_sum(data) << std::endl;
         pcout << "IO mode " + dataset_name << " " << container_name << "<"
               << type_name << ">"
-              << " (Read): " << dataset.template get_io_mode<std::string>()
-              << std::endl;
+              << " (Read): " << dataset.get_io_mode() << std::endl;
         pcout << "Local no collective cause " + dataset_name << " "
               << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template get_local_no_collective_cause<std::string>()
+              << " (Read): " << dataset.get_local_no_collective_cause()
               << std::endl;
         pcout << "Global no collective cause " + dataset_name << " "
               << container_name << "<" << type_name << ">"
-              << " (Read): "
-              << dataset.template get_global_no_collective_cause<std::string>()
+              << " (Read): " << dataset.get_global_no_collective_cause()
               << std::endl;
       }
   }
@@ -701,17 +677,14 @@ read_test(HDF5::Group        root_group,
               << " (Read): " << container_sum(data) << std::endl;
       pcout << "IO mode " + dataset_name << " " << container_name << "<"
             << type_name << ">"
-            << " (Read): " << dataset.template get_io_mode<std::string>()
-            << std::endl;
+            << " (Read): " << dataset.get_io_mode() << std::endl;
       pcout << "Local no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_local_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_local_no_collective_cause()
             << std::endl;
       pcout << "Global no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_global_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_global_no_collective_cause()
             << std::endl;
     }
 
@@ -726,17 +699,14 @@ read_test(HDF5::Group        root_group,
               << " (Read): " << container_sum(data_a) << std::endl;
       pcout << "IO mode " + dataset_name << " " << container_name << "<"
             << type_name << ">"
-            << " (Read): " << dataset.template get_io_mode<std::string>()
-            << std::endl;
+            << " (Read): " << dataset.get_io_mode() << std::endl;
       pcout << "Local no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_local_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_local_no_collective_cause()
             << std::endl;
       pcout << "Global no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_global_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_global_no_collective_cause()
             << std::endl;
     }
 
@@ -766,17 +736,14 @@ read_test(HDF5::Group        root_group,
               << " (Read): " << container_sum(data_b) << std::endl;
       pcout << "IO mode " + dataset_name << " " << container_name << "<"
             << type_name << ">"
-            << " (Read): " << dataset.template get_io_mode<std::string>()
-            << std::endl;
+            << " (Read): " << dataset.get_io_mode() << std::endl;
       pcout << "Local no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_local_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_local_no_collective_cause()
             << std::endl;
       pcout << "Global no collective cause " + dataset_name << " "
             << container_name << "<" << type_name << ">"
-            << " (Read): "
-            << dataset.template get_global_no_collective_cause<std::string>()
+            << " (Read): " << dataset.get_global_no_collective_cause()
             << std::endl;
     }
   }

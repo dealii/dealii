@@ -1213,19 +1213,6 @@ namespace HDF5
 
 
 
-  template <>
-  H5D_mpio_actual_io_mode_t
-  DataSet::get_io_mode()
-  {
-    Assert(query_io_mode,
-           ExcMessage(
-             "query_io_mode should be true in order to use get_io_mode"));
-    return io_mode;
-  }
-
-
-
-  template <>
   std::string
   DataSet::get_io_mode()
   {
@@ -1260,20 +1247,17 @@ namespace HDF5
 
 
 
-  template <>
-  uint32_t
-  DataSet::get_local_no_collective_cause()
+  H5D_mpio_actual_io_mode_t
+  DataSet::get_io_mode_as_hdf5_type()
   {
-    Assert(
-      query_io_mode,
-      ExcMessage(
-        "query_io_mode should be true in order to use get_local_no_collective_cause()"));
-    return local_no_collective_cause;
+    Assert(query_io_mode,
+           ExcMessage(
+             "query_io_mode should be true in order to use get_io_mode"));
+    return io_mode;
   }
 
 
 
-  template <>
   std::string
   DataSet::get_local_no_collective_cause()
   {
@@ -1286,20 +1270,18 @@ namespace HDF5
 
 
 
-  template <>
   uint32_t
-  DataSet::get_global_no_collective_cause()
+  DataSet::get_local_no_collective_cause_as_hdf5_type()
   {
     Assert(
       query_io_mode,
       ExcMessage(
-        "query_io_mode should be true in order to use get_global_no_collective_cause()"));
-    return global_no_collective_cause;
+        "query_io_mode should be true in order to use get_local_no_collective_cause()"));
+    return local_no_collective_cause;
   }
 
 
 
-  template <>
   std::string
   DataSet::get_global_no_collective_cause()
   {
@@ -1310,6 +1292,17 @@ namespace HDF5
     return internal::no_collective_cause_to_string(global_no_collective_cause);
   }
 
+
+
+  uint32_t
+  DataSet::get_global_no_collective_cause_as_hdf5_type()
+  {
+    Assert(
+      query_io_mode,
+      ExcMessage(
+        "query_io_mode should be true in order to use get_global_no_collective_cause()"));
+    return global_no_collective_cause;
+  }
 
 
   bool

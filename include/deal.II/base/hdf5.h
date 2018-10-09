@@ -261,7 +261,7 @@ DEAL_II_NAMESPACE_OPEN
  * Global no collective cause: H5D_MPIO_COLLECTIVE
  * @endcode
  * See DataSet::io_mode(), DataSet::local_no_collective_cause() and
- * DataSet::get_global_no_collective_cause() for all the possible returned
+ * DataSet::get_global_no_collective_cause() for all the possible return
  * codes.
  *
  * # Rank of the HDF5 datasets and hyperslabs
@@ -370,16 +370,16 @@ namespace HDF5
     const bool mpi;
 
     /**
-     * Returned value of the last HDF5 C library call.
+     * Return value of the last HDF5 C library call.
      *
      * The HDF5 calls return a non-negative value if successful; otherwise they
      * return a negative value.
      *
      * Calls such as
      * [H5DWrite](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write)
-     * use this variable to store the returned value. Other calls such as
+     * use this variable to store the return value. Other calls such as
      * [H5Pcreate](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-Create)
-     * don't use this variable to store the returned value.
+     * don't use this variable to store the return value.
      */
     herr_t ret;
   };
@@ -660,15 +660,11 @@ namespace HDF5
     write_none();
 
     /**
-     * This funcion retrieves the type of I/O that was performed on the last
+     * This funcion returns the I/O mode that was used on the last
      * parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
-     * The return type @p T can be `H5D_mpio_actual_io_mode_t` or `std::string`.
-     * The type `H5D_mpio_actual_io_mode_t` corresponds to the value returned by
-     * H5Pget_mpio_actual_io_mode and `std::string` is a human readable
-     * conversion.
      *
-     * The returned value value can be
+     * The return value is a `std::string` and can be
      * Value                          | Meaning
      * ------------------------------ | -------
      * H5D_MPIO_NO_COLLECTIVE         | No collective I/O was performed. Collective I/O was not requested or collective I/O isn't possible on this dataset.
@@ -677,20 +673,35 @@ namespace HDF5
      * H5D_MPIO_CHUNK_MIXED           | HDF5 performed one the chunk collective optimization schemes and some chunks were accessed independently, some collectively.
      * H5D_MPIO_CONTIGUOUS_COLLECTIVE | Collective I/O was performed on a contiguous dataset.
      */
-    template <typename T>
-    T
+    std::string
     get_io_mode();
 
     /**
-     * This funcion retrieves the local causes that broke collective I/O on the
+     * This funcion returns the I/O mode that was used on the last
+     * parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
+     * The return type is `H5D_mpio_actual_io_mode_t` which corresponds to the
+     * value returned by H5Pget_mpio_actual_io_mode.
+     *
+     * The return value can be
+     * Value                          | Meaning
+     * ------------------------------ | -------
+     * H5D_MPIO_NO_COLLECTIVE         | No collective I/O was performed. Collective I/O was not requested or collective I/O isn't possible on this dataset.
+     * H5D_MPIO_CHUNK_INDEPENDENT     | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed independently.
+     * H5D_MPIO_CHUNK_COLLECTIVE      | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed collectively.
+     * H5D_MPIO_CHUNK_MIXED           | HDF5 performed one the chunk collective optimization schemes and some chunks were accessed independently, some collectively.
+     * H5D_MPIO_CONTIGUOUS_COLLECTIVE | Collective I/O was performed on a contiguous dataset.
+     */
+    H5D_mpio_actual_io_mode_t
+    get_io_mode_as_hdf5_type();
+
+
+    /**
+     * This funcion returns the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type @p T can be `uint32_t` or `std::string`. The type
-     * `uint32_t` corresponds to the value returned by
-     * [H5Pget_mpio_no_collective_cause](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause)
-     * and `std::string` is a human readable conversion.
      *
-     * The returned value value can be
+     * The return value is a string and can be
      * Value                                      | Meaning
      * ------------------------------------------ | -------
      * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
@@ -703,20 +714,38 @@ namespace HDF5
      * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
      * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
-    template <typename T>
-    T
+    std::string
     get_local_no_collective_cause();
+
+    /**
+     * This funcion returns the local causes that broke collective I/O on the
+     * last parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
+     * The return type is `uint32_t` and corresponds to the value returned by
+     * [H5Pget_mpio_no_collective_cause](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
+     *
+     * The return value can be
+     * Value                                      | Meaning
+     * ------------------------------------------ | -------
+     * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
+     * H5D_MPIO_SET_INDEPENDENT                   | Collective I/O was not performed because independent I/O was requested.
+     * H5D_MPIO_DATATYPE_CONVERSION               | Collective I/O was not performed because datatype conversions were required.
+     * H5D_MPIO_DATA_TRANSFORMS                   | Collective I/O was not performed because data transforms needed to be applied.
+     * H5D_MPIO_SET_MPIPOSIX                      | Collective I/O was not performed because the selected file driver was MPI-POSIX.
+     * H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES   | Collective I/O was not performed because one of the dataspaces was neither simple nor scalar.
+     * H5D_MPIO_POINT_SELECTIONS                  | Collective I/O was not performed because there were point selections in one of the dataspaces.
+     * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
+     * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
+     */
+    uint32_t
+    get_local_no_collective_cause_as_hdf5_type();
 
     /**
      * This funcion retrieves the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type @p T can be `uint32_t` or `std::string`. The type
-     * `uint32_t` corresponds to the value returned by
-     * H5Pget_mpio_no_collective_cause and `std::string` is a human readable
-     * conversion.
      *
-     * The returned value value can be
+     * The return value is a std::string and can be
      * Value                                      | Meaning
      * ------------------------------------------ | -------
      * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
@@ -729,12 +758,34 @@ namespace HDF5
      * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
      * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
-    template <typename T>
-    T
+    std::string
     get_global_no_collective_cause();
 
     /**
-     * This function retrieves the boolean query_io_mode.
+     * This funcion returns the global causes that broke collective I/O on the
+     * last parallel I/O call. See <a
+     * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
+     * The return type is `uint32_t` and corresponds to the value returned by
+     * H5Pget_mpio_no_collective_cause.
+     *
+     * The return value value can be
+     * Value                                      | Meaning
+     * ------------------------------------------ | -------
+     * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
+     * H5D_MPIO_SET_INDEPENDENT                   | Collective I/O was not performed because independent I/O was requested.
+     * H5D_MPIO_DATATYPE_CONVERSION               | Collective I/O was not performed because datatype conversions were required.
+     * H5D_MPIO_DATA_TRANSFORMS                   | Collective I/O was not performed because data transforms needed to be applied.
+     * H5D_MPIO_SET_MPIPOSIX                      | Collective I/O was not performed because the selected file driver was MPI-POSIX.
+     * H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES   | Collective I/O was not performed because one of the dataspaces was neither simple nor scalar.
+     * H5D_MPIO_POINT_SELECTIONS                  | Collective I/O was not performed because there were point selections in one of the dataspaces.
+     * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
+     * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
+     */
+    uint32_t
+    get_global_no_collective_cause_as_hdf5_type();
+
+    /**
+     * This function returns the boolean query_io_mode.
      *
      * In cases where maximum performance has to be achieved, it is important to
      * make sure that all MPI read/write operations are collective. The HDF5
@@ -753,13 +804,15 @@ namespace HDF5
     get_query_io_mode() const;
 
     /**
-     * This function sets the boolean query_io_mode().
+     * This function sets the boolean query_io_mode.
      */
     void
     set_query_io_mode(bool query_io_mode);
 
     /**
-     * This funcion returns the dimensions of the dataset.
+     * This funcion returns the dimensions of the dataset. The vector dimensions
+     * is a one-dimensional array of size rank specifying the size of each
+     * dimension of the dataset.
      */
     std::vector<hsize_t>
     get_dimensions() const;
@@ -783,13 +836,13 @@ namespace HDF5
     unsigned int rank;
 
     /**
-     * This vector dimensions is a one-dimensional array of size rank specifying
-     * the size of each dimension of the dataset.
+     * The vector `dimensions` is a one-dimensional array of size rank
+     * specifying the size of each dimension of the dataset.
      */
     std::vector<hsize_t> dimensions;
 
     /**
-     * HDF5 dataspace identifier
+     * HDF5 dataspace identifier.
      */
     std::shared_ptr<hid_t> dataspace;
 
