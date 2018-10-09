@@ -102,10 +102,10 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
 template <typename NumberType>
 ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
-  const size_type                                          size,
-  const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-  const size_type                                          block_size,
-  const LAPACKSupport::Property                            property)
+  const size_type                                           size,
+  const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+  const size_type                                           block_size,
+  const LAPACKSupport::Property                             property)
   : ScaLAPACKMatrix<NumberType>(size,
                                 size,
                                 process_grid,
@@ -194,10 +194,10 @@ ScaLAPACKMatrix<NumberType>::reinit(
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::reinit(
-  const size_type                                          size,
-  const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-  const size_type                                          block_size,
-  const LAPACKSupport::Property                            property)
+  const size_type                                           size,
+  const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+  const size_type                                           block_size,
+  const LAPACKSupport::Property                             property)
 {
   reinit(size, size, process_grid, block_size, block_size, property);
 }

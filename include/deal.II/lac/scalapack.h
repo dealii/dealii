@@ -130,10 +130,10 @@ public:
    * using the process grid in @p process_grid.
    */
   ScaLAPACKMatrix(
-    const size_type                                          size,
-    const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-    const size_type                                          block_size = 32,
-    const LAPACKSupport::Property                            property =
+    const size_type                                           size,
+    const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+    const size_type                                           block_size = 32,
+    const LAPACKSupport::Property                             property =
       LAPACKSupport::Property::symmetric);
 
   /**
@@ -158,8 +158,8 @@ public:
    * Initialize the square matrix of size @p size and distributed using the grid @p process_grid.
    */
   void
-  reinit(const size_type                                          size,
-         const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+  reinit(const size_type                                           size,
+         const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
          const size_type               block_size = 32,
          const LAPACKSupport::Property property =
            LAPACKSupport::Property::symmetric);
