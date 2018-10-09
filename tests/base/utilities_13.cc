@@ -113,12 +113,17 @@ test3()
                             ((Integer)1 << min_bits) - 1);
 
   // make sure conversion is within bounds:
-  const std::vector<Number> points = {0.2, 0.7};
-  for (const auto &v : points)
-    {
-      const Integer i = (Integer)(v * (Number)max);
-      Assert(i > 0 && i < max, ExcInternalError());
-    }
+  {
+    const Number  v = 0.2;
+    const Integer i = (Integer)(v * (Number)max);
+    Assert(i > 0 && i < max, ExcInternalError());
+  }
+
+  {
+    const Number  v = 0.7;
+    const Integer i = (Integer)(v * (Number)max);
+    Assert(i > 0 && i < max, ExcInternalError());
+  }
 
   {
     const Number  v = 0.;
