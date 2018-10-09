@@ -141,5 +141,5 @@ main()
   test1();
   test2();
 
-  test3<std::uint64_t, long double>();
+  test3<std::int64_t, long double>();
 }
