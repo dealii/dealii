@@ -405,6 +405,48 @@ DynamicSparsityPattern::symmetrize()
 
 
 
+void
+DynamicSparsityPattern::compute_Tmmult_pattern(const SparsityPattern &sp_A,
+                                               const SparsityPattern &sp_B)
+{
+  Assert(sp_A.n_rows() == sp_B.n_rows(),
+         ExcDimensionMismatch(sp_A.n_rows(), sp_B.n_rows()));
+
+  this->reinit(sp_A.n_cols(), sp_B.n_cols());
+  // we will go through all the
+  // rows in the matrix A, and for each column in a row we add the whole
+  // row of matrix B with that row number. This means that we will insert
+  // a lot of entries to each row, which is best handled by the
+  // DynamicSparsityPattern class.
+  for (size_type i = 0; i < sp_A.n_rows(); ++i)
+    {
+      const size_type *      rows     = &sp_A.colnums[sp_A.rowstart[i]];
+      const size_type *const end_rows = &sp_A.colnums[sp_A.rowstart[i + 1]];
+      // cast away constness to conform with dsp.add_entries interface
+      size_type *new_cols =
+        const_cast<size_type *>(&sp_B.colnums[sp_B.rowstart[i]]);
+      size_type *end_new_cols =
+        const_cast<size_type *>(&sp_B.colnums[sp_B.rowstart[i + 1]]);
+
+      if (sp_B.n_rows() == sp_B.n_cols())
+        ++new_cols;
+
+      for (; rows != end_rows; ++rows)
+        {
+          const size_type row = *rows;
+
+          // if B has a diagonal, need to add that manually. this way,
+          // we maintain sortedness.
+          if (sp_B.n_rows() == sp_B.n_cols())
+            this->add(row, i);
+
+          this->add_entries(row, new_cols, end_new_cols, true);
+        }
+    }
+}
+
+
+
 template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
 DynamicSparsityPattern::compute_mmult_pattern(
