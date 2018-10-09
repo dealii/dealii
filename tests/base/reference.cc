@@ -125,10 +125,10 @@ main()
   // an ExcNotUsed and aborts the program. BUT, this is a unit test and so,
   // aborting on exception is disabled and we continue execution.
   // Unfortunately, this triggers a "use after scope" memory access error
-  // when finally "Test R" goes out of scope and tries to unsubsribe from D
-  // that already got destructed.
+  // when finally "Test R" goes out of scope and tries to unsubscribe from
+  // D that already got destroyed.
   //
-  // Work around this issue by creating a sentinel that gets destructed
+  // Work around this issue by creating a sentinel that gets destroyed
   // after D but before "Test R" that simply resets the SmartPointer.
   Sentinel<Test, Test> sentinel(r);
 
