@@ -127,7 +127,8 @@ DEAL_II_NAMESPACE_OPEN
  * ## Write a hyperslab in parallel
  * Hyperslabs are portions of datasets. A hyperslab can be a contiguous
  * collection of points in a dataset, or it can be a regular pattern of points
- * or blocks in a datataset.
+ * or blocks in a datataset. Hyperslabs are equivalent to python numpy and h5py
+ * [slices](http://docs.h5py.org/en/latest/high/dataset.html#reading-writing-data).
  *
  * See the <a
  * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
@@ -299,6 +300,14 @@ DEAL_II_NAMESPACE_OPEN
  * 2 3
  * 4 5
  * @endcode
+ *
+ * # HDF5 and thread safety
+ * By default HDF5 is not thread-safe. The HDF5 library can be configured to be
+ * thread-safe, see [the HDF5
+ * documentation](https://support.hdfgroup.org/HDF5/faq/threadsafe.html). The
+ * thread-safe HDF5 version serializes the API but does not provide any level of
+ * concurrency. To achieve high parallel performance with HDF5, we advice to use
+ * HDF5 with MPI.
  *
  * @author Daniel Garcia-Sanchez, 2018
  */
