@@ -41,7 +41,7 @@ namespace HDF5
     // of std::shared_ptr doesn't have to be defined in the template argument.
     // In the other hand, the destructor of std::unique has to be defined in the
     // template argument. Native types such as H5T_NATIVE_DOUBLE does not
-    // require a constructor, but compound types such as std::complex<double>
+    // require a destructor, but compound types such as std::complex<double>
     // require a destructor to free the HDF5 resources.
     template <typename number>
     std::shared_ptr<hid_t>
@@ -407,9 +407,9 @@ namespace HDF5
   T
   HDF5Object::get_attribute(const std::string &attr_name)
   {
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
-    T                      value;
-    hid_t                  attr;
+    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    T                            value;
+    hid_t                        attr;
 
 
     attr = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
@@ -495,9 +495,9 @@ namespace HDF5
   void
   HDF5Object::set_attribute(const std::string &attr_name, const T value)
   {
-    hid_t                  attr;
-    hid_t                  aid;
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
+    hid_t                        attr;
+    hid_t                        aid;
+    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<T>();
 
 
     /*
@@ -681,7 +681,7 @@ namespace HDF5
   Container
   DataSet::read()
   {
-    std::shared_ptr<hid_t> t_type =
+    const std::shared_ptr<hid_t> t_type =
       internal::get_hdf5_datatype<typename Container::value_type>();
     hid_t plist;
 
@@ -734,9 +734,9 @@ namespace HDF5
     Assert(coordinates.size() % rank == 0,
            ExcMessage(
              "The dimension of coordinates has to be divisible by the rank"));
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    hid_t                  plist;
-    hid_t                  memory_dataspace;
+    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
+    hid_t                        plist;
+    hid_t                        memory_dataspace;
 
     std::vector<hsize_t> data_dimensions{
       static_cast<hsize_t>(coordinates.size() / rank)};
@@ -801,7 +801,7 @@ namespace HDF5
   DataSet::read_hyperslab(const std::vector<hsize_t> &offset,
                           const std::vector<hsize_t> &count)
   {
-    std::shared_ptr<hid_t> t_type =
+    const std::shared_ptr<hid_t> t_type =
       internal::get_hdf5_datatype<typename Container::value_type>();
     hid_t plist;
     hid_t memory_dataspace;
@@ -867,8 +867,8 @@ namespace HDF5
   void
   DataSet::read_none()
   {
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    std::vector<hsize_t>   data_dimensions = {0};
+    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
+    const std::vector<hsize_t>   data_dimensions = {0};
 
     hid_t memory_dataspace;
     hid_t plist;
@@ -924,7 +924,7 @@ namespace HDF5
   DataSet::write(const Container &data)
   {
     AssertDimension(size, internal::get_container_size(data));
-    std::shared_ptr<hid_t> t_type =
+    const std::shared_ptr<hid_t> t_type =
       internal::get_hdf5_datatype<typename Container::value_type>();
     hid_t plist;
 
@@ -972,8 +972,8 @@ namespace HDF5
                            const std::vector<hsize_t> &coordinates)
   {
     AssertDimension(coordinates.size(), data.size() * rank);
-    std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    std::vector<hsize_t>   data_dimensions = {data.size()};
+    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
+    const std::vector<hsize_t>   data_dimensions = {data.size()};
 
     hid_t memory_dataspace;
     hid_t plist;
@@ -1039,11 +1039,11 @@ namespace HDF5
                                     1,
                                     std::multiplies<unsigned int>()),
                     internal::get_container_size(data));
-    std::shared_ptr<hid_t> t_type =
+    const std::shared_ptr<hid_t> t_type =
       internal::get_hdf5_datatype<typename Container::value_type>();
     // In this particular overload of write_hyperslab the data_dimensions are
     // the same as count
-    std::vector<hsize_t> data_dimensions = count;
+    const std::vector<hsize_t> data_dimensions = count;
 
     hid_t memory_dataspace;
     hid_t plist;
@@ -1104,7 +1104,7 @@ namespace HDF5
                            const std::vector<hsize_t> &count,
                            const std::vector<hsize_t> &block)
   {
-    std::shared_ptr<hid_t> t_type =
+    const std::shared_ptr<hid_t> t_type =
       internal::get_hdf5_datatype<typename Container::value_type>();
 
     hid_t memory_dataspace;
