@@ -302,6 +302,33 @@ namespace hp
     find_least_face_dominating_fe(const std::set<unsigned int> &fes) const;
 
     /**
+     * Try to find a most face dominating finite element inside the subset of
+     * fe_indices @p fes as part of this FECollection. For example, if an
+     * FECollection consists of `{FE_Q(1),FE_Q(2),FE_Q(3),FE_Q(4)}` elements
+     * and we are looking for the most face dominating finite element among the
+     * last two elements of this collection (i.e., @p fes is `{2,3}`), then the
+     * answer is FE_Q(3) and therefore this function will return its index in
+     * the FECollection, namely `2`.
+     *
+     * This function differs from find_least_face_dominating_fe() in such a way
+     * that it looks for the most dominating finite element within the given
+     * subset @p fes, instead of finding a finite element in the whole
+     * FECollection that dominates all elements of the subset @p fes.
+     *
+     * For the purpose of this function by domination we consider either
+     * FiniteElementDomination::Domination::this_element_dominates or
+     * FiniteElementDomination::Domination::either_element_can_dominate;
+     * therefore the element can dominate itself. Thus, if an FECollection
+     * contains `{FE_Q(1),FE_Q(2),FE_Q(3),FE_Q(4)}` and @p fes only has
+     * a single element `{3}`, then the function returns 3.
+     *
+     * If the function is not able to find a finite element, the function
+     * returns numbers::invalid_unsigned_int.
+     */
+    unsigned int
+    find_face_dominating_fe_in_subset(const std::set<unsigned int> &fes) const;
+
+    /**
      * Return a component mask with as many elements as this object has vector
      * components and of which exactly the one component is true that
      * corresponds to the given argument.

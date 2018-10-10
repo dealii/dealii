@@ -105,6 +105,52 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim, spacedim>::find_face_dominating_fe_in_subset(
+    const std::set<unsigned int> &fes) const
+  {
+    for (auto it = fes.cbegin(); it != fes.cend(); ++it)
+      AssertIndexRange(*it, finite_elements.size());
+
+    // If the set of elements to be dominated contains only a single element X,
+    // then by definition the dominating set contains this single element
+    // (because each element can dominate itself).
+    // There may also be others, in which case we'll check if any of these
+    // elements is able to dominate all others. If one was found, we stop
+    // looking further and return the dominating element.
+    if (fes.size() == 1)
+      return *fes.begin();
+
+    // loop over all finite elements given in the subset
+    // and check which one dominates the whole subset
+    for (const auto &current_fe : fes)
+      {
+        FiniteElementDomination::Domination domination =
+          FiniteElementDomination::either_element_can_dominate;
+
+        for (const auto &other_fe : fes)
+          if (other_fe != current_fe)
+            domination =
+              domination &
+              finite_elements[current_fe]->compare_for_face_domination(
+                *finite_elements[other_fe]);
+
+        // see if this element is able to dominate all the other
+        // ones, and if so take it
+        if ((domination == FiniteElementDomination::this_element_dominates) ||
+            (domination ==
+             FiniteElementDomination::either_element_can_dominate) ||
+            (domination == FiniteElementDomination::no_requirements))
+          return current_fe;
+      }
+
+    // if we couldn't find the most dominating object
+    return numbers::invalid_unsigned_int;
+  }
+
+
+
+  template <int dim, int spacedim>
   FECollection<dim, spacedim>::FECollection(
     const FiniteElement<dim, spacedim> &fe)
   {

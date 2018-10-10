@@ -1324,6 +1324,29 @@ namespace internal
 
 
       /**
+       * Returns all active fe indices on a given vertex.
+       *
+       * The size of the returned set equals the number of finite elements that
+       * are active on this vertex.
+       */
+      template <int dim, int spacedim>
+      static std::set<unsigned int>
+      get_active_vertex_fe_indices(
+        const dealii::hp::DoFHandler<dim, spacedim> &dof_handler,
+        const unsigned int                           vertex_index)
+      {
+        std::set<unsigned int> active_fe_indices;
+        for (unsigned int i = 0;
+             i < n_active_vertex_fe_indices(dof_handler, vertex_index);
+             ++i)
+          active_fe_indices.insert(
+            nth_active_vertex_fe_index(dof_handler, vertex_index, i));
+        return active_fe_indices;
+      }
+
+
+
+      /**
        * Return whether a particular finite element index is active on the
        * specified vertex.
        */
@@ -1616,6 +1639,19 @@ DoFAccessor<dim, DoFHandlerType, level_dof_access>::nth_active_fe_index(
                         this->present_index,
                         n,
                         std::integral_constant<int, dim>());
+}
+
+
+
+template <int dim, typename DoFHandlerType, bool level_dof_access>
+inline std::set<unsigned int>
+DoFAccessor<dim, DoFHandlerType, level_dof_access>::get_active_fe_indices()
+  const
+{
+  std::set<unsigned int> active_fe_indices;
+  for (unsigned int i = 0; i < n_active_fe_indices(); ++i)
+    active_fe_indices.insert(nth_active_fe_index(i));
+  return active_fe_indices;
 }
 
 

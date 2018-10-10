@@ -1258,14 +1258,14 @@ namespace ColorEnriched
        * Each time we build constraints at the
        * interface between two different FE_Enriched, we look for the least
        * dominating FE via
-       * hp::FECollection< dim, spacedim
-       * >::find_least_face_dominating_fe_in_collection(). If we don't take
-       * further actions, we may find a dominating FE that is too restrictive,
-       * i.e. enriched FE consisting of only FE_Nothing. New elements needs to
-       * be added to FECollection object to help find the correct enriched FE
-       * underlying the spaces in the adjacent cells. This is done by creating
-       * an appropriate set in fe_sets and a call to the function
-       * make_fe_collection_from_colored_enrichments at a later stage.
+       * hp::FECollection<dim,
+       * spacedim>::find_least_face_dominating_fe_in_collection(). If we don't
+       * take further actions, we may find a dominating FE that is too
+       * restrictive, i.e. enriched FE consisting of only FE_Nothing. New
+       * elements needs to be added to FECollection object to help find the
+       * correct enriched FE underlying the spaces in the adjacent cells. This
+       * is done by creating an appropriate set in fe_sets and a call to the
+       * function make_fe_collection_from_colored_enrichments at a later stage.
        *
        * Consider a domain with three predicates and hence with three different
        * enrichment functions. Let the enriched finite element of a cell with
