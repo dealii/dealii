@@ -15,7 +15,7 @@
 
 
 /* clang-format off */
-// test the results of FECollection::find_least_face_dominating_fe(), namely for:
+// test the results of FECollection::find_least_face_dominating_fe_in_collection(), namely for:
 //   {Q1, Q2, Q3, Q4}             with {2,3} => Q3          2
 //   {Q1xQ1, Q2xQ2, Q3xQ4, Q4xQ3} with {2,3} => Q2xQ2       1
 //   {Q1xQ1, Q3xQ4, Q4xQ3}        with {1,2} => Q1xQ1       0
@@ -53,7 +53,8 @@ test()
     fe_collection.push_back(FE_Q<dim>(2));
     fe_collection.push_back(FE_Q<dim>(3));
     fe_collection.push_back(FE_Q<dim>(4));
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 
   // {Q1xQ1, Q2xQ2, Q3xQ4, Q4xQ3}
@@ -63,7 +64,8 @@ test()
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(2), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(3), 1, FE_Q<dim>(4), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(3), 1));
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 
   // {Q1xQ1, Q3xQ4, Q4xQ3}
@@ -75,7 +77,8 @@ test()
     std::set<unsigned int> fes;
     fes.insert(1);
     fes.insert(2);
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 
   // {0x0, 0x0, Q1x0, 0xQ1}
@@ -89,7 +92,8 @@ test()
       FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1));
     fe_collection.push_back(
       FESystem<dim>(FE_Nothing<dim>(), 1, FE_Q<dim>(1), 1));
-    const unsigned int ind = fe_collection.find_least_face_dominating_fe(fes);
+    const unsigned int ind =
+      fe_collection.find_least_face_dominating_fe_in_collection(fes);
     if (ind == numbers::invalid_unsigned_int)
       deallog << "numbers::invalid_unsigned_int" << std::endl;
     else
@@ -108,7 +112,8 @@ test()
       FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(1, true), 1));
     fe_collection.push_back(
       FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Q<dim>(1), 1));
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 
 
@@ -119,7 +124,8 @@ test()
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1));
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 
   // {Q4xQ4, Q5xQ5, Q3xQ4, Q4xQ3}
@@ -129,7 +135,8 @@ test()
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(5), 1, FE_Q<dim>(5), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(3), 1, FE_Q<dim>(4), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(3), 1));
-    const unsigned int ind = fe_collection.find_least_face_dominating_fe(fes);
+    const unsigned int ind =
+      fe_collection.find_least_face_dominating_fe_in_collection(fes);
     if (ind == numbers::invalid_unsigned_int)
       deallog << "numbers::invalid_unsigned_int" << std::endl;
     else
@@ -145,7 +152,8 @@ test()
     fe_collection.push_back(FE_Q<dim>(3));
     std::set<unsigned int> fes;
     fes.insert(3);
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 
   // {Q3, Q4, Q1, Q1}
@@ -155,7 +163,8 @@ test()
     fe_collection.push_back(FE_Q<dim>(4));
     fe_collection.push_back(FE_Q<dim>(1));
     fe_collection.push_back(FE_Q<dim>(1));
-    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+    deallog << fe_collection.find_least_face_dominating_fe_in_collection(fes)
+            << std::endl;
   }
 }
 

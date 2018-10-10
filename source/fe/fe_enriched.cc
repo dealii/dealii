@@ -1258,13 +1258,13 @@ namespace ColorEnriched
        * Each time we build constraints at the
        * interface between two different FE_Enriched, we look for the least
        * dominating FE via
-       * hp::FECollection< dim, spacedim >::find_least_face_dominating_fe().
-       * If we don't take further actions, we may find a dominating FE that
-       * is too restrictive, i.e. enriched FE consisting of only FE_Nothing.
-       * New elements needs to be added to FECollection object to help
-       * find the correct enriched FE underlying the spaces in the
-       * adjacent cells. This is done by creating an appropriate
-       * set in fe_sets and a call to the function
+       * hp::FECollection< dim, spacedim
+       * >::find_least_face_dominating_fe_in_collection(). If we don't take
+       * further actions, we may find a dominating FE that is too restrictive,
+       * i.e. enriched FE consisting of only FE_Nothing. New elements needs to
+       * be added to FECollection object to help find the correct enriched FE
+       * underlying the spaces in the adjacent cells. This is done by creating
+       * an appropriate set in fe_sets and a call to the function
        * make_fe_collection_from_colored_enrichments at a later stage.
        *
        * Consider a domain with three predicates and hence with three different
@@ -1275,7 +1275,7 @@ namespace ColorEnriched
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
        * found as the least dominating finite element for the two cells by
        * DoFTools::make_hanging_node_constraints using a call to the function
-       * hp::FECollection::find_least_face_dominating_fe.
+       * hp::FECollection::find_least_face_dominating_fe_in_collection.
        * Denoting the fe set in adjacent cells as {1,3} and {2,3}, this
        * implies that an fe set {3} needs to be added! Based on the
        * predicate configuration, this may not be automatically done without

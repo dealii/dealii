@@ -24,9 +24,12 @@ namespace hp
 {
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim, spacedim>::find_least_face_dominating_fe(
+  FECollection<dim, spacedim>::find_least_face_dominating_fe_in_collection(
     const std::set<unsigned int> &fes) const
   {
+    for (auto it = fes.cbegin(); it != fes.cend(); ++it)
+      AssertIndexRange(*it, finite_elements.size());
+
     // If the set of elements to be dominated contains only a single element X,
     // then by definition the dominating set contains this single element X
     // (because each element can dominate itself). There may also be others,
@@ -39,27 +42,18 @@ namespace hp
     if (fes.size() == 1)
       return *fes.begin();
 
-    const hp::FECollection<dim, spacedim> &fe_collection = *this;
-    std::set<unsigned int>                 candidate_fes;
+    std::set<unsigned int> candidate_fes;
 
     // first loop over all FEs and check which can dominate those given in @p fes:
-    for (unsigned int cur_fe = 0; cur_fe < fe_collection.size(); cur_fe++)
+    for (unsigned int cur_fe = 0; cur_fe < finite_elements.size(); ++cur_fe)
       {
         FiniteElementDomination::Domination domination =
           FiniteElementDomination::no_requirements;
         // check if cur_fe can dominate all FEs in @p fes:
-        for (std::set<unsigned int>::const_iterator it = fes.begin();
-             it != fes.end();
-             ++it)
-          {
-            Assert(*it < fe_collection.size(),
-                   ExcIndexRangeType<unsigned int>(*it,
-                                                   0,
-                                                   fe_collection.size()));
-            domination =
-              domination & fe_collection[cur_fe].compare_for_face_domination(
-                             fe_collection[*it]);
-          }
+        for (const auto &other_fe : fes)
+          domination =
+            domination & finite_elements[cur_fe]->compare_for_face_domination(
+                           *finite_elements[other_fe]);
 
         // if we found dominating element, keep them in a set.
         if (
@@ -75,30 +69,37 @@ namespace hp
         return *candidate_fes.begin();
       }
     else
-      for (std::set<unsigned int>::const_iterator it = candidate_fes.begin();
-           it != candidate_fes.end();
-           ++it)
+      for (const auto &current_fe : candidate_fes)
         {
           FiniteElementDomination::Domination domination =
             FiniteElementDomination::no_requirements;
-          for (std::set<unsigned int>::const_iterator ito =
-                 candidate_fes.begin();
-               ito != candidate_fes.end();
-               ++ito)
-            if (it != ito)
-              {
-                domination =
-                  domination & fe_collection[*it].compare_for_face_domination(
-                                 fe_collection[*ito]);
-              }
 
-          if (
-            domination == FiniteElementDomination::other_element_dominates ||
-            domination == FiniteElementDomination::either_element_can_dominate /*covers cases like candidate_fes={Q1,Q1}*/)
-            return *it;
+          for (const auto &other_fe : candidate_fes)
+            if (current_fe != other_fe)
+              domination =
+                domination &
+                finite_elements[current_fe]->compare_for_face_domination(
+                  *finite_elements[other_fe]);
+
+          if ((domination ==
+               FiniteElementDomination::other_element_dominates) ||
+              (domination ==
+               FiniteElementDomination::either_element_can_dominate
+               /*covers cases like candidate_fes={Q1,Q1}*/))
+            return current_fe;
         }
     // We couldn't find the FE, return invalid_unsigned_int :
     return numbers::invalid_unsigned_int;
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim, spacedim>::find_least_face_dominating_fe(
+    const std::set<unsigned int> &fes) const
+  {
+    return find_least_face_dominating_fe_in_collection(fes);
   }
 
 

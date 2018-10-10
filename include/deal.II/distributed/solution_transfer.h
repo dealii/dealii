@@ -187,8 +187,8 @@ namespace parallel
      * unpacked later with the same index on its children. If cells get
      * coarsened into one, data will be packed on the latter with the least
      * dominating `active_fe_index` amongst its children, as determined by the
-     * function hp::FECollection::find_least_face_dominating_fe(), and unpacked
-     * later on the same cell with the same index.
+     * function hp::FECollection::find_least_face_dominating_fe_in_collection(),
+     * and unpacked on the same cell with the same index.
      *
      * Code snippets to demonstrate the usage of the
      * parallel::distributed::SolutionTransfer class with hp::DoFHandler
