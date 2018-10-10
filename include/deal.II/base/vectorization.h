@@ -51,9 +51,10 @@
     "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 // AVX, AVX-512
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && \
+  (defined(__AVX__) || defined(__AVX512F__)) // AVX, AVX-512
 #  include <immintrin.h>
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL == 1 // SSE2
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL == 1 && defined(__SSE2__) // SSE2
 #  include <emmintrin.h>
 #endif
 
@@ -2892,7 +2893,8 @@ vectorized_transpose_and_store(const bool                    add_into,
 #endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0 && defined(__SSE2__)
 
 
-#if DEAL_II_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && defined(__VSX__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && \
+  defined(__VSX__)
 
 template <>
 class VectorizedArray<double>
