@@ -1129,6 +1129,7 @@ private:
   friend class ChunkSparseMatrix;
 
   friend class ChunkSparsityPattern;
+  friend class DynamicSparsityPattern;
 
   /**
    * Also give access to internal details to the iterator/accessor classes.

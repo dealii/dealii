@@ -1145,39 +1145,10 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
       C.clear();
       sp_C.reinit(0, 0, 0);
 
-      // create a sparsity pattern for the matrix. we will go through all the
-      // rows in the matrix A, and for each column in a row we add the whole
-      // row of matrix B with that row number. This means that we will insert
-      // a lot of entries to each row, which is best handled by the
-      // DynamicSparsityPattern class.
+      // create a sparsity pattern for the matrix.
       {
-        DynamicSparsityPattern dsp(n(), B.n());
-        for (size_type i = 0; i < sp_A.n_rows(); ++i)
-          {
-            const size_type *      rows = &sp_A.colnums[sp_A.rowstart[i]];
-            const size_type *const end_rows =
-              &sp_A.colnums[sp_A.rowstart[i + 1]];
-            // cast away constness to conform with dsp.add_entries interface
-            size_type *new_cols =
-              const_cast<size_type *>(&sp_B.colnums[sp_B.rowstart[i]]);
-            size_type *end_new_cols =
-              const_cast<size_type *>(&sp_B.colnums[sp_B.rowstart[i + 1]]);
-
-            if (sp_B.n_rows() == sp_B.n_cols())
-              ++new_cols;
-
-            for (; rows != end_rows; ++rows)
-              {
-                const size_type row = *rows;
-
-                // if B has a diagonal, need to add that manually. this way,
-                // we maintain sortedness.
-                if (sp_B.n_rows() == sp_B.n_cols())
-                  dsp.add(row, i);
-
-                dsp.add_entries(row, new_cols, end_new_cols, true);
-              }
-          }
+        DynamicSparsityPattern dsp;
+        dsp.compute_Tmmult_pattern(sp_A, sp_B);
         sp_C.copy_from(dsp);
       }
 
