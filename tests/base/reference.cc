@@ -60,6 +60,29 @@ public:
 };
 
 
+// A sentinel that stores a reference to a SmartPointer and resets the
+// Smartpointer in its destructor.
+
+template <typename T, typename P>
+class Sentinel
+{
+public:
+  Sentinel(SmartPointer<T, P> &smart_pointer)
+    : smart_pointer_(smart_pointer)
+  {}
+
+  ~Sentinel()
+  {
+    // This assumes that the first object stored in SmartPointer is a raw
+    // pointer T*
+    *reinterpret_cast<T **>(&smart_pointer_) = nullptr;
+  }
+
+private:
+  SmartPointer<T, P> &smart_pointer_;
+};
+
+
 int
 main()
 {
@@ -94,9 +117,21 @@ main()
   // Now try if subscriptor works
   Test c("C");
   r = &c;
+
+  // We have to dance a happy little dance here:
+  //
+  // In our case the object D defined below will go out of scope before the
+  // smartpointer "Test R" does. Under normal circumstances this triggers
+  // an ExcNotUsed and aborts the program. BUT, this is a unit test and so,
+  // aborting on exception is disabled and we continue execution.
+  // Unfortunately, this triggers a "use after scope" memory access error
+  // when finally "Test R" goes out of scope and tries to unsubscribe from
+  // D that already got destroyed.
+  //
+  // Work around this issue by creating a sentinel that gets destroyed
+  // after D but before "Test R" that simply resets the SmartPointer.
+  Sentinel<Test, Test> sentinel(r);
+
   Test d("D");
   r = &d;
-  // Destruction of "Test R" will cause a spurious ExcNotUsed here,
-  // since D was deleted first. This shows up in address sanitizers
-  // as stack-use-after-scope, but we can't do anything about it.
 }
