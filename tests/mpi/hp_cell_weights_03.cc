@@ -17,8 +17,8 @@
 
 // Cell Weights Test
 // -----------------
-// Create a larger 8x8(x8) grid, on which all cells are associated with
-// a Q1 element, besides the very first one which has a Q7 element.
+// Create a 4x4(x4) grid, on which all cells are associated with a Q1
+// element besides the very first one, which has a Q5 element.
 // We choose a cell weighting algorithm based on the number of degrees
 // of freedom and check if load is balanced as expected after
 // repartitioning the triangulation. The expected accumulated weight on
@@ -27,18 +27,13 @@
 // We employ a large proportionality factor on our weighting function
 // to neglect the standard weight of '1000' per cell.
 //
-// This test works on a parallel::distributed::Triangulation.
-//
-// This test runs on a larger domain with a Lagrangian element of higher
-// order, compared to the previous one. If we would have used a Q7
-// element on the smaller grid, load balancing would fail in such a way
-// that the second (last) processor owns the whole domain -- p4est wants
-// to 'cut' its tree on a parent branch that does not exist in this case.
+// This test works on a parallel::shared::Triangulation with METIS
+// as a partitioner. Cell weighting with ZOLTAN was not available
+// during the time this test was written.
 
 
-#include <deal.II/distributed/active_fe_indices_transfer.h>
 #include <deal.II/distributed/cell_weights.h>
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -53,27 +48,28 @@ template <int dim>
 void
 test()
 {
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    ::Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::Settings::partition_metis);
 
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(3);
+  tria.refine_global(2);
 
   // Apply ndof cell weights.
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim>(1));
-  fe_collection.push_back(FE_Q<dim>(7));
+  fe_collection.push_back(FE_Q<dim>(5));
 
   hp::DoFHandler<dim> dh(tria);
   // default: active_fe_index = 0
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
-      if (cell->id().to_string() == "0_3:000")
+      if (cell->id().to_string() == "0_2:00")
         cell->set_active_fe_index(1);
   dh.distribute_dofs(fe_collection);
 
-
-  parallel::distributed::ActiveFEIndicesTransfer<dim> feidx_transfer(dh);
-  feidx_transfer.prepare_for_transfer();
 
   parallel::CellWeights<dim> cell_weights(dh);
   cell_weights.register_ndofs_weighting(100000);
@@ -90,8 +86,8 @@ test()
   }
 
 
-  tria.repartition();
-  feidx_transfer.unpack();
+  // we didn't mark any cells, but we want to repartition our domain
+  tria.execute_coarsening_and_refinement();
   dh.distribute_dofs(fe_collection);
 
 
