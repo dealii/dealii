@@ -40,57 +40,26 @@ DEAL_II_NAMESPACE_OPEN
  *
  * ScaLAPACK assumes that matrices are distributed according to the
  * block-cyclic decomposition scheme. An $M$ by $N$ matrix is first decomposed
- * into $MB$ by $NB$ blocks which are then uniformly distributed across
- * the 2D process grid $p*q \le Np$, where $p,q$ are grid dimensions and
- * $Np$ is the total number of processes.
+ * into $\lceil M / MB \rceil$ by $\lceil N / NB \rceil$ blocks which are then
+ * uniformly distributed across the 2D process grid with $p q \le Np$ processes,
+ * where $p,q$ are grid dimensions and $Np$ is the total number of processes.
+ * The parameters MB and NB are referred to as row and column block size and
+ * determine the granularity of the block-cyclic distribution.
  *
- * For example, a global real symmetric matrix of size $9\times 9$ is stored in
- * upper storage mode with block sizes 4 × 4:
- * @code
- *                0                       1                2
- *     ┌                                                       ┐
- *     | -6.0  0.0  0.0  0.0  |   0.0 -2.0 -2.0  0.0  |   -2.0 |
- *     |   .  -6.0 -2.0  0.0  |  -2.0 -4.0  0.0 -4.0  |   -2.0 |
- * 0   |   .    .  -6.0 -2.0  |  -2.0  0.0  2.0  0.0  |    6.0 |
- *     |   .    .    .  -6.0  |   2.0  0.0  2.0  0.0  |    2.0 |
- *     | ---------------------|-----------------------|------- |
- *     |   .    .    .    .   |  -8.0 -4.0  0.0 -2.0  |    0.0 |
- *     |   .    .    .    .   |    .  -6.0  0.0 -4.0  |   -6.0 |
- * 1   |   .    .    .    .   |    .    .  -4.0  0.0  |    0.0 |
- *     |   .    .    .    .   |    .    .    .  -4.0  |   -4.0 |
- *     | ---------------------|-----------------------|------- |
- * 2   |   .    .    .    .   |    .    .    .    .   |  -16.0 |
- *     └                                                       ┘
- * @endcode
- * may be distributed using the 2x2 process grid:
- * @code
- *      |   0 2   |   1
- * -----| ------- |-----
- * 0    |   P00   |  P01
- * 2    |         |
- * -----| ------- |-----
- * 1    |   P10   |  P11
- * @endcode
- * with the following local arrays:
- * @code
- * p,q  |             0              |           1
- * -----|----------------------------|----------------------
- *      | -6.0  0.0  0.0  0.0  -2.0  |   0.0 -2.0 -2.0  0.0
- *      |   .  -6.0 -2.0  0.0  -2.0  |  -2.0 -4.0  0.0 -4.0
- *  0   |   .    .  -6.0 -2.0   6.0  |  -2.0  0.0  2.0  0.0
- *      |   .    .    .  -6.0   2.0  |   2.0  0.0  2.0  0.0
- *      |   .    .    .    .  -16.0  |    .    .    .    .
- * -----|----------------------------|----------------------
- *      |   .    .    .    .    0.0  |  -8.0 -4.0  0.0 -2.0
- *      |   .    .    .    .   -6.0  |    .  -6.0  0.0 -4.0
- *  1   |   .    .    .    .    0.0  |    .    .  -4.0  0.0
- *      |   .    .    .    .   -4.0  |    .    .    .  -4.0
- * @endcode
- * Note how processes $(0,0)$ and $(1,0)$ of the process grid store an
- * extra column to represent the last column of the original matrix that
- * did not fit the decomposition into $4\times 4$ sub-blocks.
+ * In the following the block-cyclic distribution of a $10 \times 9$ matrix
+ * onto a $3\times 3$ Cartesian process grid with block sizes
+ * $\text{MB}=\text{NB}=2$ is displayed.
  *
- * The choice of the block size is a compromise between a sufficiently large
+ * \htmlonly <style>div.image
+ * img[src="scalapack_block_cycling.png" align="left"]{width:15%;}</style>
+ * \endhtmlonly
+ * @image html scalapack_block_cycling.png "Block-Cyclic Distribution"
+ *
+ * Note that the odd number of columns of the local matrices owned by the
+ * processes P2, P5 and P8 accounts for $N=9$ not being an integral multiple of
+ * $\text{NB}=2$.
+ *
+ * The choice of the block sizes is a compromise between a sufficiently large
  * size for efficient local/serial BLAS, but one that is also small enough to
  * achieve good parallel load balance.
  *
@@ -116,6 +85,10 @@ public:
   /**
    * Constructor for a rectangular matrix with @p n_rows and @p n_cols
    * and distributed using the grid @p process_grid.
+   *
+   * The parameters @p row_block_size and @p column_block_size are the block sizes used
+   * for the block-cyclic distribution of the matrix.
+   * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
    */
   ScaLAPACKMatrix(
     const size_type                                           n_rows,
@@ -128,6 +101,11 @@ public:
   /**
    * Constructor for a square matrix of size @p size, and distributed
    * using the process grid in @p process_grid.
+   *
+   * The parameter @p block_size is used for the block-cyclic distribution of the matrix.
+   * An identical block size is used for the rows and columns of the matrix.
+   * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
+   *
    */
   ScaLAPACKMatrix(
     const size_type                                           size,
@@ -143,6 +121,10 @@ public:
    * Loads the matrix from file @p filename using HDF5.
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.
+   *
+   * The parameters @p row_block_size and @p column_block_size are the block sizes used
+   * for the block-cyclic distribution of the matrix.
+   * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
    */
   ScaLAPACKMatrix(
     const std::string &                                       filename,
@@ -158,6 +140,10 @@ public:
   /**
    * Initialize the rectangular matrix with @p n_rows and @p n_cols
    * and distributed using the grid @p process_grid.
+   *
+   * The parameters @p row_block_size and @p column_block_size are the block sizes used
+   * for the block-cyclic distribution of the matrix.
+   * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
    */
   void
   reinit(
@@ -170,6 +156,10 @@ public:
 
   /**
    * Initialize the square matrix of size @p size and distributed using the grid @p process_grid.
+   *
+   * The parameter @p block_size is used for the block-cyclic distribution of the matrix.
+   * An identical block size is used for the rows and columns of the matrix.
+   * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
    */
   void
   reinit(const size_type                                           size,
