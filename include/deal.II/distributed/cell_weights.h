@@ -32,15 +32,15 @@ namespace parallel
    * or by refinement/coarsening, cells will be distributed amongst all
    * subdomains to achieve an equally balanced workload. If the workload per
    * cell varies, which is in general the case for hp::DoFHandler objects, we
-   * can take those into account by introducing individual weights for
+   * can take that into account by introducing individual weights for
    * different cells.
    *
-   * This class allows to consult the FiniteElement, that it associated with
-   * each cell by the hp::DoFHandler, to determine the weight of the cell for
-   * load balancing. One can choose from predefined weighting algorithms
-   * provided by this class or provide a custom one. The chosen weighting
-   * function will be connected to the corresponding signal of the linked
-   * parallel::Triangulation via callback.
+   * This class allows computing these weights for load balancing by
+   * consulting the FiniteElement that is associated with each cell of
+   * a hp::DoFHandler. One can choose from predefined weighting
+   * algorithms provided by this class or provide a custom one. The
+   * chosen weighting function will be connected to the corresponding
+   * signal of the linked parallel::Triangulation via callback.
    *
    * An object of this class needs to exist for every DoFHandler associated
    * with the Triangulation we work on to achieve satisfying work balancing
