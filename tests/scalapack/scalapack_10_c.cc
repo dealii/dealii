@@ -63,64 +63,64 @@ test()
     size, size, grid, block_size, block_size);
 
   scalapack_matrix.set_property(LAPACKSupport::Property::diagonal);
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_property() ==
                 scalapack_matrix_copy.get_property(),
               ExcInternalError());
 
   scalapack_matrix.set_property(LAPACKSupport::Property::general);
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_property() ==
                 scalapack_matrix_copy.get_property(),
               ExcInternalError());
 
   scalapack_matrix.set_property(LAPACKSupport::Property::hessenberg);
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_property() ==
                 scalapack_matrix_copy.get_property(),
               ExcInternalError());
 
   scalapack_matrix.set_property(LAPACKSupport::Property::lower_triangular);
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_property() ==
                 scalapack_matrix_copy.get_property(),
               ExcInternalError());
 
   scalapack_matrix.set_property(LAPACKSupport::Property::symmetric);
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_property() ==
                 scalapack_matrix_copy.get_property(),
               ExcInternalError());
 
   scalapack_matrix.set_property(LAPACKSupport::Property::upper_triangular);
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_property() ==
                 scalapack_matrix_copy.get_property(),
               ExcInternalError());
 
   // after construction the matrix state is LAPACKSupport::State::unusable
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_state() == scalapack_matrix_copy.get_state(),
               ExcInternalError());
 
   // the assignment operator changes the state to LAPACKSupport::State::matrix
   scalapack_matrix = full;
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_state() == scalapack_matrix_copy.get_state(),
               ExcInternalError());
@@ -128,8 +128,8 @@ test()
   // calling invert changes the state to LAPACKSupport::inverse_matrix
   scalapack_matrix.set_property(LAPACKSupport::Property::symmetric);
   scalapack_matrix.invert();
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
   std::remove(filename.c_str());
   AssertThrow(scalapack_matrix.get_state() == scalapack_matrix_copy.get_state(),
               ExcInternalError());

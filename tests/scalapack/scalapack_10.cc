@@ -60,8 +60,8 @@ test(const unsigned int size, const unsigned int block_size)
     size, size, grid, block_size, block_size);
 
   scalapack_matrix = full;
-  scalapack_matrix.save(filename.c_str());
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename);
+  scalapack_matrix_copy.load(filename);
 
   FullMatrix<NumberType> copy(size);
   scalapack_matrix_copy.copy_to(copy);

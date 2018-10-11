@@ -72,11 +72,11 @@ test(const unsigned int size, const unsigned int block_size)
   matrix     = full;
   matrix_one = full;
 
-  matrix.save(filename_parallel.c_str());
-  matrix_one.save(filename_serial.c_str());
+  matrix.save(filename_parallel);
+  matrix_one.save(filename_serial);
 
-  matrix.load(filename_serial.c_str());
-  matrix_one.load(filename_parallel.c_str());
+  matrix.load(filename_serial);
+  matrix_one.load(filename_parallel);
 
   std::remove(filename_serial.c_str());
   std::remove(filename_parallel.c_str());
