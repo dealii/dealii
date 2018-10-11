@@ -966,6 +966,13 @@ inconvenience this causes.
 <ol>
 
  <li>
+  New: A new tutorial program, step-60, shows how to deal with non-matching discretizations using 
+  Distributed Lagrange Multipliers. 
+  <br>
+  (Luca Heltai, Giovanni Alzetta, 2018/05/07)
+ </li>
+
+ <li>
   New: Gmsh::create_triangulation_from_boundary_curve is a new method that constructs a grid from an
   OpenCASCADE TopoDS_Edge object. It offers the reverse functionality of the method
   OpenCASCADE::create_curves_from_triangulation_boundary().
