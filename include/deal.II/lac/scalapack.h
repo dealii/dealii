@@ -467,6 +467,17 @@ public:
    * and <tt>chunk_size.second</tt> the number of columns.
    */
   void
+  save(const std::string &                          filename,
+       const std::pair<unsigned int, unsigned int> &chunk_size =
+         std::make_pair(numbers::invalid_unsigned_int,
+                        numbers::invalid_unsigned_int)) const;
+
+  /**
+   * Same as above but takes a filename as a <code>char</code> pointer.
+   *
+   * @deprecated This function is deprecated. Use the one taking <code>std::string</code> instead.
+   */
+  DEAL_II_DEPRECATED void
   save(const char *                                 filename,
        const std::pair<unsigned int, unsigned int> &chunk_size =
          std::make_pair(numbers::invalid_unsigned_int,
@@ -484,6 +495,14 @@ public:
    * and distribute the content to the other processes subsequently.
    */
   void
+  load(const std::string &filename);
+
+  /**
+   * Same as above but takes a filename as a <code>char</code> pointer.
+   *
+   * @deprecated This function is deprecated. Use the one taking <code>std::string</code> instead.
+   */
+  DEAL_II_DEPRECATED void
   load(const char *filename);
 
   /**
@@ -867,7 +886,7 @@ private:
    * using serial routines
    */
   void
-  save_serial(const char *                                 filename,
+  save_serial(const std::string &                          filename,
               const std::pair<unsigned int, unsigned int> &chunk_size) const;
 
   /*
@@ -875,14 +894,14 @@ private:
    * using serial routines
    */
   void
-  load_serial(const char *filename);
+  load_serial(const std::string &filename);
 
   /*
    * Stores the distributed matrix in @p filename
    * using parallel routines
    */
   void
-  save_parallel(const char *                                 filename,
+  save_parallel(const std::string &                          filename,
                 const std::pair<unsigned int, unsigned int> &chunk_size) const;
 
   /*
@@ -890,7 +909,7 @@ private:
    * using parallel routines
    */
   void
-  load_parallel(const char *filename);
+  load_parallel(const std::string &filename);
 
   /**
    * Since ScaLAPACK operations notoriously change the meaning of the matrix

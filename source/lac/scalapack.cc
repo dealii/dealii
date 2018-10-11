@@ -2610,7 +2610,7 @@ namespace internal
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::save(
-  const char *                                 filename,
+  const std::string &                          filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
@@ -2651,8 +2651,19 @@ ScaLAPACKMatrix<NumberType>::save(
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::save_serial(
+ScaLAPACKMatrix<NumberType>::save(
   const char *                                 filename,
+  const std::pair<unsigned int, unsigned int> &chunk_size) const
+{
+  save(std::string(filename), chunk_size);
+}
+
+
+
+template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::save_serial(
+  const std::string &                          filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
@@ -2687,7 +2698,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
 
       // create a new file using default properties
       hid_t file_id =
-        H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+        H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
       // modify dataset creation properties, i.e. enable chunking
       hsize_t chunk_dims[2];
@@ -2809,7 +2820,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::save_parallel(
-  const char *                                 filename,
+  const std::string &                          filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
@@ -2865,8 +2876,9 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
   AssertThrow(status >= 0, ExcIO());
 
   // create a new file collectively and release property list identifier
-  hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
-  status        = H5Pclose(plist_id);
+  hid_t file_id =
+    H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+  status = H5Pclose(plist_id);
   AssertThrow(status >= 0, ExcIO());
 
   // As ScaLAPACK, and therefore the class ScaLAPACKMatrix, uses column-major
@@ -2967,7 +2979,8 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
   if (tmp.grid->this_mpi_process == 0)
     {
       // open file using default properties
-      hid_t file_id_reopen = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+      hid_t file_id_reopen =
+        H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
       // create HDF5 enum type for LAPACKSupport::State and
       // LAPACKSupport::Property
@@ -3041,7 +3054,7 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::load(const char *filename)
+ScaLAPACKMatrix<NumberType>::load(const std::string &filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
@@ -3062,7 +3075,16 @@ ScaLAPACKMatrix<NumberType>::load(const char *filename)
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
+ScaLAPACKMatrix<NumberType>::load(const char *filename)
+{
+  load(std::string(filename));
+}
+
+
+
+template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
@@ -3093,7 +3115,7 @@ ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
       herr_t status;
 
       // open the file in read-only mode
-      hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+      hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
       // open the dataset in the file
       hid_t dataset_id = H5Dopen2(file_id, "/matrix", H5P_DEFAULT);
@@ -3240,7 +3262,7 @@ ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
+ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
@@ -3282,7 +3304,7 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 
   // open file collectively in read-only mode and release property list
   // identifier
-  hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, plist_id);
+  hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, plist_id);
   status        = H5Pclose(plist_id);
   AssertThrow(status >= 0, ExcIO());
 

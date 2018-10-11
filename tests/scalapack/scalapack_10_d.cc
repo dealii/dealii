@@ -62,7 +62,7 @@ test(const unsigned int size, const unsigned int block_size)
     size, size, grid_1, block_size, block_size);
 
   scalapack_matrix_1 = full;
-  scalapack_matrix_1.save(filename.c_str());
+  scalapack_matrix_1.save(filename);
 
   ScaLAPACKMatrix<NumberType> scalapack_matrix(filename,
                                                grid,

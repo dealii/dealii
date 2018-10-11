@@ -59,8 +59,8 @@ test(const std::pair<unsigned int, unsigned int> &size,
     size.first, size.second, grid, block_size, block_size);
 
   scalapack_matrix = full;
-  scalapack_matrix.save(filename.c_str(), chunk_size);
-  scalapack_matrix_copy.load(filename.c_str());
+  scalapack_matrix.save(filename, chunk_size);
+  scalapack_matrix_copy.load(filename);
 
   FullMatrix<NumberType> copy(size.first, size.second);
   scalapack_matrix_copy.copy_to(copy);
