@@ -975,9 +975,14 @@ FE_Enriched<dim, spacedim>::hp_quad_dof_identities(
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Enriched<dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FE_Enriched<dim, spacedim>::compare_for_domination(
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int                  codim) const
 {
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+
+  // vertex/line/face/cell domination
+  // --------------------------------
   // need to decide which element constrain another.
   // for example Q(2) dominate Q(4) and thus some DoFs of Q(4) will be
   // constrained. If we have Q(2) and Q(4)+POU, then it's clear that Q(2)
@@ -985,14 +990,14 @@ FE_Enriched<dim, spacedim>::compare_for_face_domination(
   // However, we need to check for situations like Q(4) vs Q(2)+POU.
   // In that case the domination for the underlying FEs should be the other way,
   // but this implies that we can't constrain POU dofs to make the field
-  // continuous. In that case, through an error
+  // continuous. In that case, throw an error
 
   // if it's also enriched, do domination based on each one's FESystem
   if (const FE_Enriched<dim, spacedim> *fe_enr_other =
         dynamic_cast<const FE_Enriched<dim, spacedim> *>(&fe_other))
     {
-      return fe_system->compare_for_face_domination(
-        fe_enr_other->get_fe_system());
+      return fe_system->compare_for_domination(fe_enr_other->get_fe_system(),
+                                               codim);
     }
   else
     {
@@ -1000,6 +1005,7 @@ FE_Enriched<dim, spacedim>::compare_for_face_domination(
       return FiniteElementDomination::neither_element_dominates;
     }
 }
+
 
 template <int dim, int spacedim>
 const FullMatrix<double> &
@@ -1258,8 +1264,7 @@ namespace ColorEnriched
        * Each time we build constraints at the
        * interface between two different FE_Enriched, we look for the least
        * dominating FE via
-       * hp::FECollection<dim,
-       * spacedim>::find_least_face_dominating_fe_in_collection(). If we don't
+       * hp::FECollection::find_least_dominating_fe_in_collection(). If we don't
        * take further actions, we may find a dominating FE that is too
        * restrictive, i.e. enriched FE consisting of only FE_Nothing. New
        * elements needs to be added to FECollection object to help find the
@@ -1275,7 +1280,7 @@ namespace ColorEnriched
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
        * found as the least dominating finite element for the two cells by
        * DoFTools::make_hanging_node_constraints using a call to the function
-       * hp::FECollection::find_least_face_dominating_fe_in_collection.
+       * hp::FECollection::find_least_dominating_fe_in_collection().
        * Denoting the fe set in adjacent cells as {1,3} and {2,3}, this
        * implies that an fe set {3} needs to be added! Based on the
        * predicate configuration, this may not be automatically done without

@@ -263,18 +263,6 @@ public:
   hp_quad_dof_identities(
     const FiniteElement<dim, spacedim> &fe_other) const override;
 
-  /**
-   * Return whether this element dominates the one given as argument when they
-   * meet at a common face, whether it is the other way around, whether
-   * neither dominates, or if either could dominate.
-   *
-   * For a definition of domination, see FiniteElementDomination::Domination
-   * and in particular the
-   * @ref hp_paper "hp paper".
-   */
-  virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
   //@}
 
   /**

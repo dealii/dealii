@@ -505,33 +505,35 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities(
 
 template <int dim>
 FiniteElementDomination::Domination
-FE_RaviartThomasNodal<dim>::compare_for_face_domination(
-  const FiniteElement<dim> &fe_other) const
+FE_RaviartThomasNodal<dim>::compare_for_domination(
+  const FiniteElement<dim> &fe_other,
+  const unsigned int        codim) const
 {
-  if (const FE_RaviartThomasNodal<dim> *fe_q_other =
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+  (void)codim;
+
+  // vertex/line/face/cell domination
+  // --------------------------------
+  if (const FE_RaviartThomasNodal<dim> *fe_rt_nodal_other =
         dynamic_cast<const FE_RaviartThomasNodal<dim> *>(&fe_other))
     {
-      if (this->degree < fe_q_other->degree)
+      if (this->degree < fe_rt_nodal_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
+      else if (this->degree == fe_rt_nodal_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (const FE_Nothing<dim> *fe_q_other =
+  else if (const FE_Nothing<dim> *fe_nothing =
              dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
-      if (fe_q_other->is_dominating())
-        {
-          return FiniteElementDomination::other_element_dominates;
-        }
+      if (fe_nothing->is_dominating())
+        return FiniteElementDomination::other_element_dominates;
       else
-        {
-          // FE_Nothing has no degrees of freedom and is typically
-          // used in a context where there are no continuity
-          // requirements along the interface
-          return FiniteElementDomination::no_requirements;
-        }
+        // the FE_Nothing has no degrees of freedom and it is typically used
+        // in a context where we don't require any continuity along the
+        // interface
+        return FiniteElementDomination::no_requirements;
     }
 
   Assert(false, ExcNotImplemented());

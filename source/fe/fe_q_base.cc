@@ -887,51 +887,6 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_quad_dof_identities(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
-FiniteElementDomination::Domination
-FE_Q_Base<PolynomialType, dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe_other) const
-{
-  if (const FE_Q_Base<PolynomialType, dim, spacedim> *fe_q_other =
-        dynamic_cast<const FE_Q_Base<PolynomialType, dim, spacedim> *>(
-          &fe_other))
-    {
-      if (this->degree < fe_q_other->degree)
-        return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
-        return FiniteElementDomination::either_element_can_dominate;
-      else
-        return FiniteElementDomination::other_element_dominates;
-    }
-  else if (const FE_Nothing<dim, spacedim> *fe_nothing =
-             dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
-    {
-      if (fe_nothing->is_dominating())
-        {
-          return FiniteElementDomination::other_element_dominates;
-        }
-      else
-        {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
-          return FiniteElementDomination::no_requirements;
-        }
-    }
-  else if ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other) !=
-            nullptr) ||
-           (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr))
-    {
-      // there are no requirements between continuous and
-      // discontinuous elements
-      return FiniteElementDomination::no_requirements;
-    }
-
-  Assert(false, ExcNotImplemented());
-  return FiniteElementDomination::neither_element_dominates;
-}
-
-
 //---------------------------------------------------------------------------
 // Auxiliary functions
 //---------------------------------------------------------------------------

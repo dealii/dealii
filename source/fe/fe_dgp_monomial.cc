@@ -17,6 +17,7 @@
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
 
 #include <sstream>
@@ -390,15 +391,42 @@ FE_DGPMonomial<dim>::hp_quad_dof_identities(
 
 template <int dim>
 FiniteElementDomination::Domination
-FE_DGPMonomial<dim>::compare_for_face_domination(
-  const FiniteElement<dim> &fe_other) const
+FE_DGPMonomial<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
+                                            const unsigned int codim) const
 {
-  // check whether both are discontinuous
-  // elements, see
-  // the description of
-  // FiniteElementDomination::Domination
-  if (dynamic_cast<const FE_DGPMonomial<dim> *>(&fe_other) != nullptr)
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+
+  // vertex/line/face domination
+  // ---------------------------
+  if (codim > 0)
+    // this is a discontinuous element, so by definition there will
+    // be no constraints wherever this element comes together with
+    // any other kind of element
     return FiniteElementDomination::no_requirements;
+
+  // cell domination
+  // ---------------
+  if (const FE_DGPMonomial<dim> *fe_monomial_other =
+        dynamic_cast<const FE_DGPMonomial<dim> *>(&fe_other))
+    {
+      if (this->degree < fe_monomial_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_monomial_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_Nothing<dim> *fe_nothing =
+             dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
+    {
+      if (fe_nothing->is_dominating())
+        return FiniteElementDomination::other_element_dominates;
+      else
+        // the FE_Nothing has no degrees of freedom and it is typically used
+        // in a context where we don't require any continuity along the
+        // interface
+        return FiniteElementDomination::no_requirements;
+    }
 
   Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;

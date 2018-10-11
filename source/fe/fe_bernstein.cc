@@ -21,6 +21,7 @@
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_bernstein.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
@@ -278,9 +279,24 @@ FE_Bernstein<dim, spacedim>::hp_quad_dof_identities(
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Bernstein<dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FE_Bernstein<dim, spacedim>::compare_for_domination(
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int                  codim) const
 {
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+
+  // vertex/line/face domination
+  // (if fe_other is derived from FE_DGQ)
+  // ------------------------------------
+  if (codim > 0)
+    if (dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe_other) != nullptr)
+      // there are no requirements between continuous and discontinuous elements
+      return FiniteElementDomination::no_requirements;
+
+  // vertex/line/face domination
+  // (if fe_other is not derived from FE_DGQ)
+  // & cell domination
+  // ----------------------------------------
   if (const FE_Bernstein<dim, spacedim> *fe_b_other =
         dynamic_cast<const FE_Bernstein<dim, spacedim> *>(&fe_other))
     {
@@ -291,20 +307,16 @@ FE_Bernstein<dim, spacedim>::compare_for_face_domination(
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (const FE_Nothing<dim> *fe_nothing =
-             dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
+  else if (const FE_Nothing<dim, spacedim> *fe_nothing =
+             dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
     {
       if (fe_nothing->is_dominating())
-        {
-          return FiniteElementDomination::other_element_dominates;
-        }
+        return FiniteElementDomination::other_element_dominates;
       else
-        {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
-          return FiniteElementDomination::no_requirements;
-        }
+        // the FE_Nothing has no degrees of freedom and it is typically used
+        // in a context where we don't require any continuity along the
+        // interface
+        return FiniteElementDomination::no_requirements;
     }
 
   Assert(false, ExcNotImplemented());

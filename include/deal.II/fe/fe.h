@@ -1356,10 +1356,31 @@ public:
    * For a definition of domination, see FiniteElementDomination::Domination
    * and in particular the
    * @ref hp_paper "hp paper".
+   *
+   * @deprecated Use compare_for_domination() with `codim=1` instead.
+   */
+  DEAL_II_DEPRECATED virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const final;
+
+  /**
+   * Return whether this element dominates another one given as argument
+   * @p fe_other, whether it is the other way around, whether neither dominates,
+   * or if either could dominate. The @p codim parameter describes the codimension
+   * of the investigated subspace and specifies that it is subject to this
+   * comparison. For example, if `codim==0` then this function compares which
+   * element dominates at the cell level. If `codim==1`, then the elements are
+   * compared at faces, i.e., the comparison happens between the function spaces
+   * of the two finite elements as restricted to a face. Larger values of
+   * `codim` work correspondingly.
+   *
+   * For a definition of domination, see FiniteElementDomination::Domination
+   * and in particular the
+   * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const;
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int                  codim = 0) const;
 
   //@}
 

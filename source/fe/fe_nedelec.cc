@@ -2274,9 +2274,14 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
 
 template <int dim>
 FiniteElementDomination::Domination
-FE_Nedelec<dim>::compare_for_face_domination(
-  const FiniteElement<dim> &fe_other) const
+FE_Nedelec<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
+                                        const unsigned int        codim) const
 {
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+  (void)codim;
+
+  // vertex/line/face/cell domination
+  // --------------------------------
   if (const FE_Nedelec<dim> *fe_nedelec_other =
         dynamic_cast<const FE_Nedelec<dim> *>(&fe_other))
     {
@@ -2290,29 +2295,13 @@ FE_Nedelec<dim>::compare_for_face_domination(
   else if (const FE_Nothing<dim> *fe_nothing =
              dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
-      // TODO: ???
-      // the FE_Nothing has no
-      // degrees of
-      // freedom. nevertheless, we
-      // say that the FE_Q element
-      // dominates so that we don't
-      // have to force the FE_Q side
-      // to become a zero function
-      // and rather allow the
-      // function to be discontinuous
-      // along the interface
-      //      return FiniteElementDomination::other_element_dominates;
       if (fe_nothing->is_dominating())
-        {
-          return FiniteElementDomination::other_element_dominates;
-        }
+        return FiniteElementDomination::other_element_dominates;
       else
-        {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
-          return FiniteElementDomination::no_requirements;
-        }
+        // the FE_Nothing has no degrees of freedom and it is typically used
+        // in a context where we don't require any continuity along the
+        // interface
+        return FiniteElementDomination::no_requirements;
     }
 
   Assert(false, ExcNotImplemented());

@@ -2245,9 +2245,14 @@ FESystem<dim, spacedim>::hp_quad_dof_identities(
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FESystem<dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FESystem<dim, spacedim>::compare_for_domination(
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int                  codim) const
 {
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+
+  // vertex/line/face/cell domination
+  // --------------------------------
   // at present all we can do is to compare with other FESystems that have the
   // same number of components and bases
   if (const FESystem<dim, spacedim> *fe_sys_other =
@@ -2274,8 +2279,8 @@ FESystem<dim, spacedim>::compare_for_face_domination(
           // for this pair of base elements, check who dominates and combine
           // with previous result
           const FiniteElementDomination::Domination base_domination =
-            (this->base_element(b).compare_for_face_domination(
-              fe_sys_other->base_element(b)));
+            (this->base_element(b).compare_for_domination(
+              fe_sys_other->base_element(b), codim));
           domination = domination & base_domination;
         }
 

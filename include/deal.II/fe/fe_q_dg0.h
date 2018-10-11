@@ -302,6 +302,13 @@ public:
   virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
+  /**
+   * @copydoc FiniteElement::compare_for_domination()
+   */
+  virtual FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int codim = 0) const override final;
+
 private:
   /**
    * Return the restriction_is_additive flags. Only the last component is
