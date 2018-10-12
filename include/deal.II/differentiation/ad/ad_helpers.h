@@ -789,10 +789,10 @@ namespace Differentiation
 
       /**
        * Register the complete set of independent variables $\mathbf{X}$ that
-       * represent the local degree-of-freedom values.
+       * represent the local degree of freedom values.
        *
        * @param[in] dof_values A vector field associated with local
-       * degree-of-freedom values on the current finite element. These define
+       * degree of freedom values on the current finite element. These define
        * the values of all independent variables. When considering taped AD
        * numbers with branching functions, to avoid potential issues with branch
        * switching it may be a good idea to choose these values close or equal
@@ -809,7 +809,7 @@ namespace Differentiation
 
       /**
        * Register the complete set of independent variables $\mathbf{X}$ that
-       * represent the local degree-of-freedom values.
+       * represent the local degree of freedom values.
        *
        * @param[in] values A global field from which the values of all
        * independent variables will be extracted. This typically will be the
@@ -819,8 +819,8 @@ namespace Differentiation
        * potential issues with branch switching it may be a good idea to choose
        * these values close or equal to those that will be later evaluated and
        * linearized around.
-       * @param[in] local_dof_indices A vector of degree-of-freedom indices from
-       * which to extract the local degree-of-freedom values. This would
+       * @param[in] local_dof_indices A vector of degree of freedom indices from
+       * which to extract the local degree of freedom values. This would
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
        * @note For taped AD numbers, this operation is only valid in recording mode.
@@ -832,7 +832,7 @@ namespace Differentiation
         const std::vector<dealii::types::global_dof_index> &local_dof_indices);
 
       /**
-       * Returns the complete set of degree-of-freedom values as represented by
+       * Returns the complete set of degree of freedom values as represented by
        * auto-differentiable numbers. These are the independent
        * variables $\mathbf{X}$ about which the solution is linearized.
        *
@@ -846,7 +846,7 @@ namespace Differentiation
        * register_independent_variable().
        *
        * @return An array of auto-differentiable type numbers representing the
-       * local degree-of-freedom values.
+       * local degree of freedom values.
        *
        * @note For taped AD numbers, this operation is only valid in recording mode.
        */
@@ -861,7 +861,7 @@ namespace Differentiation
       //@{
 
       /*
-       * Returns the complete set of degree-of-freedom values of
+       * Returns the complete set of degree of freedom values of
        * auto-differentiable number type. These store the same scalar values as
        * the independent variables $\mathbf{X}$ about which the solution is
        * linearized.
@@ -872,7 +872,7 @@ namespace Differentiation
        * the values set with register_dof_values().
        *
        * @return An array of auto-differentiable type numbers representing the
-       * local degree-of-freedom values.
+       * local degree of freedom values.
        *
        * @note This function is not typically used within the context of automatic
        * differentation computations, but can make performing substutitions in
@@ -895,7 +895,7 @@ namespace Differentiation
        * linearization point.
        *
        * @param[in] dof_values A vector field associated with local
-       * degree-of-freedom values on the current finite element. These define
+       * degree of freedom values on the current finite element. These define
        * the values of all independent variables.
        *
        * @note The input value type must correspond to this class's @p scalar_type.
@@ -918,8 +918,8 @@ namespace Differentiation
        *
        * @param[in] values A vector field from which the values of all
        * independent variables is to be extracted.
-       * @param[in] local_dof_indices A vector of degree-of-freedom indices from
-       * which to extract the local degree-of-freedom values. This would
+       * @param[in] local_dof_indices A vector of degree of freedom indices from
+       * which to extract the local degree of freedom values. This would
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
        * @note If the keep flag has been set when
@@ -1060,7 +1060,7 @@ namespace Differentiation
      *       // First, we set the values for all DoFs.
      *       ad_helper.register_dof_values(solution, local_dof_indices);
      *
-     *       // Then we get the complete set of degree-of-freedom values as
+     *       // Then we get the complete set of degree of freedom values as
      *       // represented by auto-differentiable numbers. The operations
      *       // performed with these variables are tracked by the AD library
      *       // from this point until stop_recording_operations() is called.
@@ -1068,7 +1068,7 @@ namespace Differentiation
      *         = ad_helper.get_sensitive_dof_values();
      *
      *       // Then we do some problem specific tasks, the first being to
-     *       // compute all values, gradients etc. based on sensitive AD DoF
+     *       // compute all values, gradients, etc. based on sensitive AD DoF
      *       // values. Here we are fetching the displacement gradients at each
      *       // quadrature point.
      *       std::vector<Tensor<2, dim, ADNumberType>> Grad_u(
@@ -1089,7 +1089,8 @@ namespace Differentiation
      *         const Tensor<2, dim, ADNumberType> F =
      *           unit_symmetric_tensor<dim>() + Grad_u[q_point];
      *         Assert(numbers::value_is_greater_than(determinant(F), 0.0),
-     *                ExcMessage("Negative jacobian detected!"));
+     *                ExcMessage("Negative determinant of the deformation "
+     *                           "gradient detected!"));
      *
      *         // Add contribution of the internal energy:
      *         // Integrate the stored energy density function with the current
@@ -1099,8 +1100,10 @@ namespace Differentiation
      *
      *       // Add contribution from external energy:
      *       // Loop over faces and accumulate external energy into cell
-     *       // total energy
-     *       // energy_ad += ...
+     *       // total energy.
+     *       for (unsigned int face : ...)
+     *         if (cell->face(face)->at_boundary())
+     *           energy_ad += ...
      *
      *       // Register the definition of the total cell energy
      *       ad_helper.register_energy_functional(energy_ad);
@@ -1132,6 +1135,10 @@ namespace Differentiation
      *     ad_helper.compute_linearization(cell_matrix);
      *   }
      * @endcode
+     *
+     * In most use cases, and in particular in the code example shown above,
+     * the number of independent variables equals the number of
+     * <code>dofs_per_cell</code> for the used finite element.
      *
      * @warning ADOL-C does not support the standard threading models used by
      * deal.II, so this class should @b not be embedded within a multithreaded
@@ -1212,22 +1219,22 @@ namespace Differentiation
 
       /**
        * Evaluation of the total scalar energy functional for a chosen set of
-       * degree-of-freedom values, i.e.
+       * degree of freedom values, i.e.
        * @f[
        *   \Psi(\mathbf{X}) \vert_{\mathbf{X}}
        * @f]
        *
-       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
        * ADHelperCellLevelBase::set_dof_values().
        *
        * @return The value of the energy functional at the evaluation point
-       * corresponding to a chosen set of local degree-of freedom values.
+       * corresponding to a chosen set of local degree of freedom values.
        */
       scalar_type
       compute_energy() const;
 
       /**
-       * Evaluation of the residual for a chosen set of degree-of-freedom
+       * Evaluation of the residual for a chosen set of degree of freedom
        * values. Underlying this is the computation of the gradient (first
        * derivative) of the scalar function $\Psi$ with respect to all
        * independent variables, i.e.
@@ -1237,12 +1244,12 @@ namespace Differentiation
        * \Big\vert_{\mathbf{X}}
        * @f]
        *
-       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
        * ADHelperCellLevelBase::set_dof_values().
        *
        * @param[out] residual A Vector object, for which the value for each
        * entry represents the residual value for the corresponding local
-       * degree-of freedom. The output @p residual vector has a length
+       * degree of freedom. The output @p residual vector has a length
        * corresponding to @p n_independent_variables.
        */
       void
@@ -1250,7 +1257,7 @@ namespace Differentiation
 
       /**
        * Computes the linearization of the residual vector around a chosen set
-       * of degree-of-freedom values. Underlying this is the computation of the
+       * of degree of freedom values. Underlying this is the computation of the
        * Hessian (second derivative) of the scalar function $\Psi$ with respect
        * to all independent variables, i.e.
        * @f[
@@ -1260,7 +1267,7 @@ namespace Differentiation
        * \otimes \partial\mathbf{X}} \Big\vert_{\mathbf{X}}
        * @f]
        *
-       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
        * ADHelperCellLevelBase::set_dof_values().
        *
        * @param[out] linearization A FullMatrix representing the linearization
@@ -1275,6 +1282,300 @@ namespace Differentiation
       //@}
 
     }; // class ADHelperEnergyFunctional
+
+
+
+    /**
+     * A helper class that facilitates the evaluation and automated
+     * linearization of a vector of functions that represents a residual vector
+     * (as computed from some corresponding local degree of freedom values).
+     * This class would typically be used to compute the linearization of a
+     * residual vector defined on the level of a cell, or for local
+     * nonlinear equations.
+     *
+     * An example of its usage in the case of a residual linearization
+     * might be as follows (in this case we'll compute the
+     * linearization of a finite-strain magneto-elastic solid from the residual,
+     * as constructed from the Piola-Kirchoff stress and magnetic induction
+     * assuming the magnetic scalar potential formulation):
+     *
+     * @code
+     *   // Existing data structures:
+     *   Vector<double> solution (...); // Or another vector type
+     *   std::vector<types::global_dof_index> local_dof_indices (...);
+     *   const FEValuesExtractors::Vector u_fe (...);
+     *   const FEValuesExtractors::Scalar msp_fe (...);
+     *   const unsigned int u_block (...);
+     *   const unsigned int msp_block (...);
+     *   FEValues<dim> fe_values (...);
+     *   const unsigned int n_q_points (...);
+     *   FullMatrix<double> cell_matrix (...);
+     *   Vector<double> cell_rhs (...);
+     *
+     *   // Assembly loop:
+     *   for (auto cell & : ...)
+     *   {
+     *     cell->get_dof_indices(local_dof_indices);
+     *     const unsigned int n_independent_variables
+     *       = local_dof_indices.size();
+     *     const unsigned int n_dependent_variables
+     *       = local_dof_indices.size();
+     *
+     *     // Create some aliases for the AD helper.
+     *     // In this example, we strictly assume that we're using tapeless
+     *     // AD types, and so the AD_typecode used in the template argument
+     *     // must refer to one of these types. See the example for the
+     *     // ADHelperEnergyFunctional for details on how to extend
+     *     // support to taped AD numbers.
+     *     using ADHelper = AD::ADHelperEnergyFunctional<...>;
+     *     using ADNumberType = typename ADHelper::ad_type;
+     *
+     *     // Create and initialize an instance of the helper class.
+     *     ADHelper ad_helper(n_independent_variables,n_dependent_variables);
+     *
+     *     // Initialize the local data structures for assembly.
+     *     // This is also taken care of by the ADHelper, so this step could
+     *     // be skipped.
+     *     cell_rhs.reinit(n_dependent_variables);
+     *     cell_matrix.reinit(n_independent_variables,n_dependent_variables);
+     *
+     *     // This next code block corresponds to the "recording" phase, where
+     *     // the operations performed with the AD numbers are tracked and
+     *     // differentiation is performed.
+     *     {
+     *       // First, we set the values for all DoFs.
+     *       ad_helper.register_dof_values(solution, local_dof_indices);
+     *
+     *       // Then we get the complete set of degree of freedom values as
+     *       // represented by auto-differentiable numbers. The operations
+     *       // performed with these variables are tracked by the AD library
+     *       // from this point until stop_recording_operations() is called.
+     *       const std::vector<ADNumberType> dof_values_ad
+     *         = ad_helper.get_sensitive_dof_values();
+     *
+     *       // Then we do some problem specific tasks, the first being to
+     *       // compute all values, gradients, etc. based on sensitive AD DoF
+     *       // values. Here we are fetching the displacement gradients at each
+     *       // quadrature point, as well as the gradients of the magnetic
+     *       // scalar potential field.
+     *       std::vector<Tensor<2, dim, ADNumberType>> Grad_u(
+     *         n_q_points, Tensor<2, dim, ADNumberType>());
+     *       std::vector<Tensor<1, dim, ADNumberType>> Grad_msp(
+     *         n_q_points, Tensor<1, dim, ADNumberType>());
+     *       fe_values[u_fe].get_function_gradients_from_local_dof_values(
+     *         dof_values_ad, Grad_u);
+     *       fe_values[msp_fe].get_function_gradients_from_local_dof_values(
+     *         dof_values_ad, Grad_msp);
+     *
+     *       // This variable stores the cell residual vector contributions.
+     *       // IMPORTANT: Note that each entry is hand-initialized with a value
+     *       // of zero. This is a highly recommended practise, as some AD
+     *       // numbers appear not to safely initialize their internal data
+     *       // structures.
+     *       std::vector<ADNumberType> residual_ad (
+     *         n_dependent_variables, ADNumberType(0.0));
+     *
+     *       // Compute the cell total residual
+     *       //   = (internal + external) contributions
+     *       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+     *       {
+     *         // Calculate the deformation gradient and magnetic field at this
+     *         // quadrature point
+     *         const Tensor<2, dim, ADNumberType> F =
+     *           unit_symmetric_tensor<dim>() + Grad_u[q_point];
+     *         const Tensor<1, dim, ADNumberType> H = -Grad_msp[q_point];
+     *         Assert(numbers::value_is_greater_than(determinant(F), 0.0),
+     *                ExcMessage("Negative determinant of the deformation "
+     *                           "gradient detected!"));
+     *
+     *         // Extract some configuration dependent variables from our
+     *         // nonlinear constitutive law for the current quadrature point.
+     *         // In this way they only have to be computed once per quadrature
+     *         // point.
+     *         const SymmetricTensor<2,dim,ad_type> S = get_S(F,H);
+     *         const Tensor<1,dim,ad_type>          B = get_B(F,H);
+     *
+     *         // Define some position-dependent aliases, to make the assembly
+     *         // process easier to follow.
+     *         const double JxW = fe_values.JxW(q_point);
+     *
+     *         // Add contribution of the internal forces:
+     *         // Note that we assemble the residual contribution directly
+     *         // as it is this vector that is to be automatically linearized.
+     *         for (unsigned int I = 0; I < n_dofs_per_cell; ++I)
+     *         {
+     *           // Determine the component and block associated with
+     *           // the I'th local degree of freedom.
+     *           const unsigned int block_I =
+     *             fe.system_to_base_index(I).first.first;
+     *
+     *           if (block_I == u_block) // u-terms
+     *           {
+     *             // Variation of the Green-Lagrange strain tensor
+     *             // associated with the I'th vector-valued basis function.
+     *             const SymmetricTensor<2,dim,double> dE_I
+     *               = symmetrize(transpose(F)
+     *               * fe_values[u_fe].gradient(I,q_point));
+     *
+     *             residual_ad[I] += (dE_I*S) * JxW;
+     *           }
+     *           else if (block_I == msp_block)
+     *           {
+     *             // Variation of the magnetic field vector associated with
+     *             // the I'th scalar-valued basis function
+     *             const Tensor<1,dim,double> dH_I
+     *               = -fe_values[msp_fe].gradient(I, q_point);
+     *
+     *             residual_ad[I] -= (dH_I*B) * JxW;
+     *           }
+     *         }
+     *       }
+     *
+     *       // Add contribution from external sources. If these contributions
+     *       // are also solution dependent then they will also be consistently
+     *       // linearized.
+     *       // Loop over faces and accumulate external contributions into the
+     *       // cell total residual.
+     *       for (unsigned int face : ...)
+     *         if (cell->face(face)->at_boundary())
+     *           residual_ad[I] += ...
+     *
+     *       // Register the definition of the cell residual
+     *       ad_helper.register_residual_vector(residual_ad);
+     *     }
+     *
+     *     // Compute the residual values and their Jacobian at the
+     *     // evaluation point
+     *     ad_helper.compute_residual(cell_rhs);
+     *     cell_rhs *= -1.0; // RHS = - residual
+     *     ad_helper.compute_linearization(cell_matrix);
+     *   }
+     * @endcode
+     *
+     * In most use cases, and in particular in the code example shown above,
+     * both the number of independent and dependent variables equals the
+     * number of <code>dofs_per_cell</code> for the used finite element.
+     *
+     * @warning ADOL-C does not support the standard threading models used by
+     * deal.II, so this class should @b not be embedded within a multithreaded
+     * function when using ADOL-C number types. It is, however, suitable for use
+     * in both serial and MPI routines.
+     *
+     * @author Jean-Paul Pelteret, 2016, 2017, 2018
+     */
+    template <enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType = double>
+    class ADHelperResidualLinearisation
+      : public ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>
+    {
+    public:
+      /**
+       * Type definition for the floating point number type that is used in,
+       * and results from, all computations.
+       */
+      using scalar_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+
+      /**
+       * Type definition for the auto-differentiation number type that is used
+       * in all computations.
+       */
+      using ad_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+
+      /**
+       * @name Constructor / destructor
+       */
+      //@{
+
+      /**
+       * The constructor for the class.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{r}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{r}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{r}$, i.e. the dimension of the
+       * image space.
+       */
+      ADHelperResidualLinearisation(const unsigned int n_independent_variables,
+                                    const unsigned int n_dependent_variables);
+
+      /**
+       * Destructor
+       */
+      virtual ~ADHelperResidualLinearisation() = default;
+
+      //@}
+
+      /**
+       * @name Dependent variables
+       */
+      //@{
+
+      /**
+       * Register the definition of the cell residual vector
+       * $\mathbf{r}(\mathbf{X})$.
+       *
+       * @param[in] residual A vector of recorded functions that defines the
+       * residual. The components of this vector represents the dependent
+       * variables.
+       *
+       * @note For this class that expects only vector fields of dependent
+       * variables, this function must only be called once per tape.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      void
+      register_residual_vector(const std::vector<ad_type> &residual);
+
+      /**
+       * Evaluation of the residual for a chosen set of degree of freedom
+       * values. This corresponds to the computation of the residual vector,
+       * i.e.
+       * @f[
+       *   \mathbf{r}(\mathbf{X}) \vert_{\mathbf{X}}
+       * @f]
+       *
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
+       * ADHelperCellLevelBase::set_dof_values().
+       *
+       * @param[out] residual A Vector object, for which the value for each
+       * entry represents the residual value for the corresponding local
+       * degree of freedom. The output @p residual vector has a length
+       * corresponding to @p n_dependent_variables.
+       */
+      virtual void
+      compute_residual(Vector<scalar_type> &residual) const override;
+
+      /**
+       * Computes the linearization of the residual vector around a chosen set
+       * of degree of freedom values. Underlying this is the computation of the
+       * gradient (first derivative) of the residual vector $\mathbf{r}$ with
+       * respect to all independent variables, i.e.
+       * @f[
+       *   \frac{\partial\mathbf{r}(\mathbf{X})}{\partial\mathbf{X}}
+       * @f]
+       *
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
+       * ADHelperCellLevelBase::set_dof_values().
+       *
+       * @param[out] linearization A FullMatrix representing the linearization
+       * of the residual vector. The output @p linearization matrix has
+       * dimensions corresponding to
+       * <code>n_dependent_variables</code>$\times$<code>n_independent_variables</code>.
+       */
+      virtual void
+      compute_linearization(
+        FullMatrix<scalar_type> &linearization) const override;
+
+      //@}
+
+    }; // class ADHelperResidualLinearisation
 
 
   } // namespace AD
@@ -1308,7 +1609,7 @@ namespace Differentiation
       Assert(
         local_dof_indices.size() == this->n_independent_variables(),
         ExcMessage(
-          "Degree-of-freedom index vector size does not match number of independent variables"));
+          "Degree of freedom index vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
           Assert(this->registered_independent_variable_values[i] == false,

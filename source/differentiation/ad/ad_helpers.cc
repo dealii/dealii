@@ -872,7 +872,8 @@ namespace Differentiation
           "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
-      // we'll be overwriting them immediately.
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::gradient().
       if (gradient.size() != this->n_independent_variables())
         gradient.reinit(this->n_independent_variables(),
                         true /*omit_zeroing_entries*/);
@@ -939,7 +940,8 @@ namespace Differentiation
           "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
-      // we'll be overwriting them immediately.
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::hessian().
       if (hessian.m() != this->n_independent_variables() ||
           hessian.n() != this->n_independent_variables())
         hessian.reinit({this->n_independent_variables(),
@@ -973,6 +975,152 @@ namespace Differentiation
                  ExcInternalError());
           TapelessDrivers<ad_type, scalar_type>::hessian(
             this->independent_variables, this->dependent_variables, hessian);
+        }
+    }
+
+
+    /* ------------------- ADHelperResidualLinearisation ------------------- */
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+      ADHelperResidualLinearisation(const unsigned int n_independent_variables,
+                                    const unsigned int n_dependent_variables)
+      : ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>(
+          n_independent_variables,
+          n_dependent_variables)
+    {}
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+      register_residual_vector(const std::vector<ad_type> &residual)
+    {
+      Assert(residual.size() == this->n_dependent_variables(),
+             ExcMessage(
+               "Vector size does not match number of dependent variables"));
+      for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
+        ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+          i, residual[i]);
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+      compute_residual(Vector<scalar_type> &values) const
+    {
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::values().
+      if (values.size() != this->n_dependent_variables())
+        values.reinit(this->n_dependent_variables(),
+                      true /*omit_zeroing_entries*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute values while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          TapedDrivers<ad_type, scalar_type>::values(
+            this->active_tape_index(),
+            this->n_dependent_variables(),
+            this->independent_variable_values,
+            values);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          TapelessDrivers<ad_type, scalar_type>::values(
+            this->dependent_variables, values);
+        }
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+      compute_linearization(FullMatrix<scalar_type> &jacobian) const
+    {
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::jacobian().
+      if (jacobian.m() != this->n_dependent_variables() ||
+          jacobian.n() != this->n_independent_variables())
+        jacobian.reinit({this->n_dependent_variables(),
+                         this->n_independent_variables()},
+                        true /*omit_default_initialization*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute hessian while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          TapedDrivers<ad_type, scalar_type>::jacobian(
+            this->active_tape_index(),
+            this->n_dependent_variables(),
+            this->independent_variable_values,
+            jacobian);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcInternalError());
+          TapelessDrivers<ad_type, scalar_type>::jacobian(
+            this->independent_variables, this->dependent_variables, jacobian);
         }
     }
 
