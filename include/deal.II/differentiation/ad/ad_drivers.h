@@ -165,21 +165,21 @@ namespace Differentiation
       //@{
 
       /**
-       * Returns whether or not this class is tracking calculations performed
+       * Return whether or not this class is tracking calculations performed
        * with its marked independent variables.
        */
       bool
       is_recording() const;
 
       /**
-       * Returns the tape number which is currently activated for recording or
+       * Return the tape number which is currently activated for recording or
        * reading.
        */
       typename Types<ADNumberType>::tape_index
       active_tape_index() const;
 
       /**
-       * Returns whether or not a tape number has already been used
+       * Return whether or not a tape number has already been used
        * or registered.
        */
       bool
@@ -187,7 +187,7 @@ namespace Differentiation
         const typename Types<ADNumberType>::tape_index tape_index) const;
 
       /**
-       * Returns whether or not the numerical values of all independent
+       * Return whether or not the numerical values of all independent
        * variables are recorded in the tape buffer.
        */
       bool
@@ -285,7 +285,7 @@ namespace Differentiation
       reset(const bool clear_registered_tapes);
 
       /**
-       * Prints the status of all queriable data. Exactly what is printed and
+       * Print the status of all queriable data. Exactly what is printed and
        * its format depends on the @p ad_type, as is determined by the
        * @p ADNumberTypeCode template parameter.
        *
@@ -315,7 +315,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Computes the value of the scalar field.
+       * Compute the value of the scalar field.
        *
        * @param[in] active_tape_index The index of the tape on which the
        *            dependent function is recorded.
@@ -329,7 +329,7 @@ namespace Differentiation
             const std::vector<ScalarType> &independent_variables);
 
       /**
-       * Computes the gradient of the scalar field with respect to all
+       * Compute the gradient of the scalar field with respect to all
        * independent variables.
        *
        * @param[in] active_tape_index The index of the tape on which the
@@ -347,7 +347,7 @@ namespace Differentiation
                Vector<ScalarType> &           gradient);
 
       /**
-       * Computes the Hessian of the scalar field with respect to all
+       * Compute the Hessian of the scalar field with respect to all
        * independent variables.
        *
        * @param[in] active_tape_index The index of the tape on which the
@@ -372,7 +372,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Computes the values of the vector field.
+       * Compute the values of the vector field.
        *
        * @param[in] active_tape_index The index of the tape on which the
        *            dependent function is recorded.
@@ -390,7 +390,7 @@ namespace Differentiation
              Vector<ScalarType> &           values);
 
       /**
-       * Computes the Jacobian of the vector field.
+       * Compute the Jacobian of the vector field.
        *
        * The Jacobian of a vector field is in essence the gradient of each
        * dependent variable with respect to all independent variables.
@@ -503,7 +503,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Computes the value of the scalar field.
+       * Compute the value of the scalar field.
        *
        * @param[in] dependent_variables The dependent variables whose values are
        *            to be extracted.
@@ -514,7 +514,7 @@ namespace Differentiation
       value(const std::vector<ADNumberType> &dependent_variables);
 
       /**
-       * Computes the gradient of the scalar field with respect to all
+       * Compute the gradient of the scalar field with respect to all
        * independent variables.
        *
        * @param[in] independent_variables The independent variables whose
@@ -532,7 +532,7 @@ namespace Differentiation
                Vector<ScalarType> &             gradient);
 
       /**
-       * Computes the Hessian of the scalar field with respect to all
+       * Compute the Hessian of the scalar field with respect to all
        * independent variables.
        *
        * @param[in] independent_variables The independent variables whose
@@ -557,7 +557,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Computes the values of the vector field.
+       * Compute the values of the vector field.
        *
        * @param[in] dependent_variables The dependent variables whose Hessians
        *            are to be extracted.
@@ -570,7 +570,7 @@ namespace Differentiation
              Vector<ScalarType> &             values);
 
       /**
-       * Computes the Jacobian of the vector field.
+       * Compute the Jacobian of the vector field.
        *
        * The Jacobian of a vector field is in essence the gradient of each
        * dependent variable with respect to all independent variables.

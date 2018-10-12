@@ -77,7 +77,7 @@ namespace hp
       const MappingCollection<dim, spacedim> &mapping_collection);
 
     /**
-     * Adds a new mapping to the MappingCollection. Generally, you will
+     * Add a new mapping to the MappingCollection. Generally, you will
      * want to use the same order for mappings as for the elements of
      * the hp::FECollection object you use. However, the same
      * considerations as discussed with the hp::QCollection::push_back()

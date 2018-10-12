@@ -108,8 +108,8 @@ namespace internal
       std::vector<unsigned int> lexicographic_numbering;
 
       /**
-       * Holds the one-dimensional embedding (prolongation) matrix from mother
-       * element to all the children.
+       * This variable holds the one-dimensional embedding (prolongation) matrix
+       * from mother element to all the children.
        */
       std::vector<Number> prolongation_matrix_1d;
     };

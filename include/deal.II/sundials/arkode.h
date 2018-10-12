@@ -489,12 +489,12 @@ namespace SUNDIALS
       unsigned int maximum_non_linear_iterations;
 
       /**
-       * Specifies that the implicit portion of the problem is linear.
+       * Specify whether the implicit portion of the problem is linear.
        */
       bool implicit_function_is_linear;
 
       /**
-       * Specifies that the implicit portion of the problem is linear and time
+       * Specify whether the implicit portion of the problem is linear and time
        * independent.
        */
       bool implicit_function_is_time_independent;

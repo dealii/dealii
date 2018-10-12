@@ -29,11 +29,12 @@ DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
   /**
-   * Defines a quadrature formula for integration over an oriented surface,
-   * $\hat{S}$, immersed in the unit cell. By immersed it is meant that the
-   * surface may intersect the unit cell in an arbitrary way. The quadrature
-   * formula is described by a set of quadrature points, $\hat{x}_q$, weights,
-   * $w_q$, and normalized surface normals, $\hat{n}_q$.
+   * This class defines a quadrature formula for integration over an
+   * oriented surface, $\hat{S}$, immersed in the unit cell. By
+   * immersed it is meant that the surface may intersect the unit cell
+   * in an arbitrary way. The quadrature formula is described by a set
+   * of quadrature points, $\hat{x}_q$, weights, $w_q$, and normalized
+   * surface normals, $\hat{n}_q$.
    *
    * We typically want to compute surface integrals in real space.
    * A surface $S$ intersecting a cell $K$ in real space, can be mapped onto a

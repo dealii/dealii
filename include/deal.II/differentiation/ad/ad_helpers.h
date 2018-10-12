@@ -217,21 +217,21 @@ namespace Differentiation
       //@{
 
       /**
-       * Returns the number of independent variables that this object expects to
+       * Return the number of independent variables that this object expects to
        * work with. This is the dimension of the domain space.
        */
       std::size_t
       n_independent_variables() const;
 
       /**
-       * Returns the number of dependent variables that this object expects to
+       * Return the number of dependent variables that this object expects to
        * operate on. This is the dimension of the image space.
        */
       std::size_t
       n_dependent_variables() const;
 
       /**
-       * Prints the status of all queryable data. Exactly what is printed and
+       * Print the status of all queryable data. Exactly what is printed and
        * its format depends on the @p ad_type, as is determined by the
        * @p ADNumberTypeCode template parameter.
        *
@@ -242,7 +242,7 @@ namespace Differentiation
       print(std::ostream &stream) const;
 
       /**
-       * Prints the values currently assigned to the independent variables.
+       * Print the values currently assigned to the independent variables.
        *
        * @param[in] stream The output stream to which the values are to be
        * written.
@@ -251,7 +251,7 @@ namespace Differentiation
       print_values(std::ostream &stream) const;
 
       /**
-       * Prints the statistics regarding the usage of the tapes.
+       * Print the statistics regarding the usage of the tapes.
        *
        * @param[in] tape_index The index of the tape to get the statistics of.
        * @param[out] stream The output stream to which the values are to be
@@ -340,21 +340,21 @@ namespace Differentiation
             const bool clear_registered_tapes = true);
 
       /**
-       * Returns whether or not this class is tracking calculations performed
+       * Return whether or not this class is tracking calculations performed
        * with its marked independent variables.
        */
       bool
       is_recording() const;
 
       /**
-       * Returns the tape index which is currently activated for recording or
+       * Return the tape index which is currently activated for recording or
        * reading.
        */
       typename Types<ad_type>::tape_index
       active_tape_index() const;
 
       /**
-       * Returns whether or not a tape number has already been used
+       * Return whether or not a tape number has already been used
        * or registered.
        */
       bool
@@ -832,7 +832,7 @@ namespace Differentiation
         const std::vector<dealii::types::global_dof_index> &local_dof_indices);
 
       /**
-       * Returns the complete set of degree of freedom values as represented by
+       * Return the complete set of degree of freedom values as represented by
        * auto-differentiable numbers. These are the independent
        * variables $\mathbf{X}$ about which the solution is linearized.
        *
@@ -861,7 +861,7 @@ namespace Differentiation
       //@{
 
       /*
-       * Returns the complete set of degree of freedom values of
+       * Return the complete set of degree of freedom values of
        * auto-differentiable number type. These store the same scalar values as
        * the independent variables $\mathbf{X}$ about which the solution is
        * linearized.
@@ -943,7 +943,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Computes the value of the residual vector field
+       * Compute the value of the residual vector field
        * $\mathbf{r}(\mathbf{X})$.
        *
        * @param[out] residual A Vector object with the value for each component
@@ -960,7 +960,7 @@ namespace Differentiation
       compute_residual(Vector<scalar_type> &residual) const = 0;
 
       /**
-       * Computes the gradient (first derivative) of the residual vector field
+       * Compute the gradient (first derivative) of the residual vector field
        * with respect to all independent variables, i.e.
        * @f[
        *   \frac{\partial\mathbf{r}(\mathbf{X})}{\partial\mathbf{X}}
@@ -1256,7 +1256,7 @@ namespace Differentiation
       compute_residual(Vector<scalar_type> &residual) const override;
 
       /**
-       * Computes the linearization of the residual vector around a chosen set
+       * Compute the linearization of the residual vector around a chosen set
        * of degree of freedom values. Underlying this is the computation of the
        * Hessian (second derivative) of the scalar function $\Psi$ with respect
        * to all independent variables, i.e.
@@ -1553,7 +1553,7 @@ namespace Differentiation
       compute_residual(Vector<scalar_type> &residual) const override;
 
       /**
-       * Computes the linearization of the residual vector around a chosen set
+       * Compute the linearization of the residual vector around a chosen set
        * of degree of freedom values. Underlying this is the computation of the
        * gradient (first derivative) of the residual vector $\mathbf{r}$ with
        * respect to all independent variables, i.e.
