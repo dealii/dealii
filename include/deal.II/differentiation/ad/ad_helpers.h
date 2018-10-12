@@ -1465,7 +1465,7 @@ namespace Differentiation
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperResidualLinearisation
+    class ADHelperResidualLinearization
       : public ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>
     {
     public:
@@ -1502,13 +1502,13 @@ namespace Differentiation
        * be the number of outputs $\mathbf{r}$, i.e. the dimension of the
        * image space.
        */
-      ADHelperResidualLinearisation(const unsigned int n_independent_variables,
+      ADHelperResidualLinearization(const unsigned int n_independent_variables,
                                     const unsigned int n_dependent_variables);
 
       /**
        * Destructor
        */
-      virtual ~ADHelperResidualLinearisation() = default;
+      virtual ~ADHelperResidualLinearization() = default;
 
       //@}
 
@@ -1575,7 +1575,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperResidualLinearisation
+    }; // class ADHelperResidualLinearization
 
 
   } // namespace AD

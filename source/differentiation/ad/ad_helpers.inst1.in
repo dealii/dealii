@@ -45,13 +45,13 @@ for (number : REAL_SCALARS)
     template
     class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,number>;
 
-    // -------------------------- ADHelperResidualLinearisation ----------------------
+    // -------------------------- ADHelperResidualLinearization ----------------------
 
     template
-    class ADHelperResidualLinearisation<NumberTypes::adolc_taped,number>;
+    class ADHelperResidualLinearization<NumberTypes::adolc_taped,number>;
 
     template
-    class ADHelperResidualLinearisation<NumberTypes::adolc_tapeless,number>;
+    class ADHelperResidualLinearization<NumberTypes::adolc_tapeless,number>;
 
     \}
     \}
@@ -89,13 +89,13 @@ for ()
     template
     class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
-    // -------------------------- ADHelperResidualLinearisation ----------------------
+    // -------------------------- ADHelperResidualLinearization ----------------------
 
     template
-    class ADHelperResidualLinearisation<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    class ADHelperResidualLinearization<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
 
     template
-    class ADHelperResidualLinearisation<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+    class ADHelperResidualLinearization<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
 
     \}

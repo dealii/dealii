@@ -979,13 +979,13 @@ namespace Differentiation
     }
 
 
-    /* ------------------- ADHelperResidualLinearisation ------------------- */
+    /* ------------------- ADHelperResidualLinearization ------------------- */
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
-      ADHelperResidualLinearisation(const unsigned int n_independent_variables,
+    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
+      ADHelperResidualLinearization(const unsigned int n_independent_variables,
                                     const unsigned int n_dependent_variables)
       : ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>(
           n_independent_variables,
@@ -996,7 +996,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
       register_residual_vector(const std::vector<ad_type> &residual)
     {
       Assert(residual.size() == this->n_dependent_variables(),
@@ -1011,7 +1011,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
       compute_residual(Vector<scalar_type> &values) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -1067,7 +1067,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperResidualLinearisation<ADNumberTypeCode, ScalarType>::
+    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
       compute_linearization(FullMatrix<scalar_type> &jacobian) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
