@@ -144,8 +144,8 @@ protected:
   std::vector<std::shared_ptr<BlockSparseMatrix<double>>> prolongation_matrices;
 
   /**
-   * Holds the mapping for the <tt>copy_to/from_mg</tt>-functions. The data is
-   * first the global index, then the level index.
+   * This variable holds the mapping for the <tt>copy_to/from_mg</tt>-functions.
+   * The data is first the global index, then the level index.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int>>>
     copy_to_and_from_indices;

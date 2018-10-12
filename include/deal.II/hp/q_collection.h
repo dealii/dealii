@@ -72,7 +72,7 @@ namespace hp
     explicit QCollection(const QTypes &... quadrature_objects);
 
     /**
-     * Adds a new quadrature rule to the QCollection. In most cases, you will
+     * Add a new quadrature rule to the QCollection. In most cases, you will
      * want to add quadrature rules in the same order as the elements were
      * added to the hp::FECollection for which this quadrature rule collection
      * is meant. If done this way, the hp::FEValues objects with which you will

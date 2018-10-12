@@ -190,10 +190,10 @@ private:
   unsigned int n_child_cell_dofs;
 
   /**
-   * Holds the indices for cells on a given level, extracted from DoFHandler
-   * for fast access. All DoF indices on a given level are stored as a plain
-   * array (since this class assumes constant DoFs per cell). To index into
-   * this array, use the cell number times dofs_per_cell.
+   * This variable holds the indices for cells on a given level, extracted from
+   * DoFHandler for fast access. All DoF indices on a given level are stored as
+   * a plain array (since this class assumes constant DoFs per cell). To index
+   * into this array, use the cell number times dofs_per_cell.
    *
    * This array first is arranged such that all locally owned level cells come
    * first (found in the variable n_owned_level_cells) and then other cells
@@ -215,13 +215,13 @@ private:
   std::vector<unsigned int> n_owned_level_cells;
 
   /**
-   * Holds the one-dimensional embedding (prolongation) matrix from mother
-   * element to all the children.
+   * This variable holds the one-dimensional embedding (prolongation) matrix
+   * from mother element to all the children.
    */
   AlignedVector<VectorizedArray<Number>> prolongation_matrix_1d;
 
   /**
-   * Holds the temporary values for the tensor evaluation
+   * This variable holds the temporary values for the tensor evaluation
    */
   mutable AlignedVector<VectorizedArray<Number>> evaluation_data;
 
