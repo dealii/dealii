@@ -789,10 +789,10 @@ namespace Differentiation
 
       /**
        * Register the complete set of independent variables $\mathbf{X}$ that
-       * represent the local degree-of-freedom values.
+       * represent the local degree of freedom values.
        *
        * @param[in] dof_values A vector field associated with local
-       * degree-of-freedom values on the current finite element. These define
+       * degree of freedom values on the current finite element. These define
        * the values of all independent variables. When considering taped AD
        * numbers with branching functions, to avoid potential issues with branch
        * switching it may be a good idea to choose these values close or equal
@@ -809,7 +809,7 @@ namespace Differentiation
 
       /**
        * Register the complete set of independent variables $\mathbf{X}$ that
-       * represent the local degree-of-freedom values.
+       * represent the local degree of freedom values.
        *
        * @param[in] values A global field from which the values of all
        * independent variables will be extracted. This typically will be the
@@ -819,8 +819,8 @@ namespace Differentiation
        * potential issues with branch switching it may be a good idea to choose
        * these values close or equal to those that will be later evaluated and
        * linearized around.
-       * @param[in] local_dof_indices A vector of degree-of-freedom indices from
-       * which to extract the local degree-of-freedom values. This would
+       * @param[in] local_dof_indices A vector of degree of freedom indices from
+       * which to extract the local degree of freedom values. This would
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
        * @note For taped AD numbers, this operation is only valid in recording mode.
@@ -832,7 +832,7 @@ namespace Differentiation
         const std::vector<dealii::types::global_dof_index> &local_dof_indices);
 
       /**
-       * Returns the complete set of degree-of-freedom values as represented by
+       * Returns the complete set of degree of freedom values as represented by
        * auto-differentiable numbers. These are the independent
        * variables $\mathbf{X}$ about which the solution is linearized.
        *
@@ -846,7 +846,7 @@ namespace Differentiation
        * register_independent_variable().
        *
        * @return An array of auto-differentiable type numbers representing the
-       * local degree-of-freedom values.
+       * local degree of freedom values.
        *
        * @note For taped AD numbers, this operation is only valid in recording mode.
        */
@@ -861,7 +861,7 @@ namespace Differentiation
       //@{
 
       /*
-       * Returns the complete set of degree-of-freedom values of
+       * Returns the complete set of degree of freedom values of
        * auto-differentiable number type. These store the same scalar values as
        * the independent variables $\mathbf{X}$ about which the solution is
        * linearized.
@@ -872,7 +872,7 @@ namespace Differentiation
        * the values set with register_dof_values().
        *
        * @return An array of auto-differentiable type numbers representing the
-       * local degree-of-freedom values.
+       * local degree of freedom values.
        *
        * @note This function is not typically used within the context of automatic
        * differentation computations, but can make performing substutitions in
@@ -895,7 +895,7 @@ namespace Differentiation
        * linearization point.
        *
        * @param[in] dof_values A vector field associated with local
-       * degree-of-freedom values on the current finite element. These define
+       * degree of freedom values on the current finite element. These define
        * the values of all independent variables.
        *
        * @note The input value type must correspond to this class's @p scalar_type.
@@ -918,8 +918,8 @@ namespace Differentiation
        *
        * @param[in] values A vector field from which the values of all
        * independent variables is to be extracted.
-       * @param[in] local_dof_indices A vector of degree-of-freedom indices from
-       * which to extract the local degree-of-freedom values. This would
+       * @param[in] local_dof_indices A vector of degree of freedom indices from
+       * which to extract the local degree of freedom values. This would
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
        * @note If the keep flag has been set when
@@ -1602,7 +1602,7 @@ namespace Differentiation
       Assert(
         local_dof_indices.size() == this->n_independent_variables(),
         ExcMessage(
-          "Degree-of-freedom index vector size does not match number of independent variables"));
+          "Degree of freedom index vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
           Assert(this->registered_independent_variable_values[i] == false,
