@@ -872,7 +872,8 @@ namespace Differentiation
           "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
-      // we'll be overwriting them immediately.
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::gradient().
       if (gradient.size() != this->n_independent_variables())
         gradient.reinit(this->n_independent_variables(),
                         true /*omit_zeroing_entries*/);
@@ -939,7 +940,8 @@ namespace Differentiation
           "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
-      // we'll be overwriting them immediately.
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::hessian().
       if (hessian.m() != this->n_independent_variables() ||
           hessian.n() != this->n_independent_variables())
         hessian.reinit({this->n_independent_variables(),
@@ -1027,7 +1029,8 @@ namespace Differentiation
              ExcMessage("Not all dependent variables have been registered."));
 
       // We can neglect correctly initializing the entries as
-      // we'll be overwriting them immediately.
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::values().
       if (values.size() != this->n_dependent_variables())
         values.reinit(this->n_dependent_variables(),
                       true /*omit_zeroing_entries*/);
@@ -1082,7 +1085,8 @@ namespace Differentiation
              ExcMessage("Not all dependent variables have been registered."));
 
       // We can neglect correctly initializing the entries as
-      // we'll be overwriting them immediately.
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::jacobian().
       if (jacobian.m() != this->n_dependent_variables() ||
           jacobian.n() != this->n_independent_variables())
         jacobian.reinit({this->n_dependent_variables(),
