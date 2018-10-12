@@ -33,6 +33,7 @@
 #ifdef DEAL_II_WITH_ADOLC
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <adolc/adolc_fatalerror.h>
 #  include <adolc/drivers/drivers.h>
 #  include <adolc/internal/usrparms.h>
 #  include <adolc/taping.h>
@@ -880,49 +881,17 @@ namespace Differentiation
       is_registered_tape(
         const typename Types<ADNumberType>::tape_index tape_index) const
       {
-        // Sigh... This is a mess :-/
-        // The most succinct way to get this piece of information, would be to
-        // use the getTapeInfos() function, but would come at the expense of
-        // creating an inactive tape data within ADOL-C's global store. For
-        // hints as to why this is the way it is, see the getTapeInfos()
-        // function in
-        // https://gitlab.com/adol-c/adol-c/blob/master/ADOL-C/src/tape_handling.cpp
-        // An alternative solution would be to manually access the tape data;
-        // see the removeTape() function in
-        // https://gitlab.com/adol-c/adol-c/blob/master/ADOL-C/src/tape_handling.cpp
-        // with the consideration of the #defines in
-        // https://gitlab.com/adol-c/adol-c/blob/master/ADOL-C/src/taping_p.h
-        // as to how this would be performed.
-        // Doing things "manually" (the second way) without creating the
-        // additional data object would be a lot more work...
-        //
-        // Both of the above solutions would be possible IF ADOL-C exposed
-        // this data object or a method to access it to the outside world.
-        // But they don't :-(
-        // Instead, what we'll have to do is get the statistics for this tape
-        // and make our own determination as to whether or not this tape exists.
-        // This effectively executes the first solution, with even more
-        // overhead! If the tape is in existence, we can assume that it should a
-        // non-zero number of dependent and independent variables. Those are
-        // stored in the zeroth and first entries of the statistics vector.
-        //
-        // But, oh wait... Surprise! This will trigger an error if the tape
-        // doesn't exist at all! So lets first check their tape info cache to
-        // see if the tape REALLY exists (i.e. has been touched, even if nothing
-        // has been written to it) before trying to access it. It'll only take
-        // an O(n) search, but at this point who really cares about efficiency?
-        const std::vector<typename Types<ADNumberType>::tape_index>
-                   registered_tape_indices = get_registered_tape_indices();
-        const auto it = std::find(registered_tape_indices.begin(),
-                                  registered_tape_indices.end(),
-                                  tape_index);
-        if (it == registered_tape_indices.end())
-          return false;
-
-        std::vector<std::size_t> counts(STAT_SIZE);
-        ::tapestats(tape_index, counts.data());
-        Assert(counts.size() >= 2, ExcInternalError());
-        return counts.data()[0] > 0 && counts.data()[1] > 0;
+        // See https://gitlab.com/adol-c/adol-c/issues/11#note_108341333
+        try
+          {
+            std::vector<std::size_t> counts(STAT_SIZE);
+            ::tapestats(tape_index, counts.data());
+            return true;
+          }
+        catch (const ::FatalError &exc)
+          {
+            return false;
+          }
       }
 
       void
