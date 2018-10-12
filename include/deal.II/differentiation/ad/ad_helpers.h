@@ -1060,7 +1060,7 @@ namespace Differentiation
      *       // First, we set the values for all DoFs.
      *       ad_helper.register_dof_values(solution, local_dof_indices);
      *
-     *       // Then we get the complete set of degree-of-freedom values as
+     *       // Then we get the complete set of degree of freedom values as
      *       // represented by auto-differentiable numbers. The operations
      *       // performed with these variables are tracked by the AD library
      *       // from this point until stop_recording_operations() is called.
@@ -1068,7 +1068,7 @@ namespace Differentiation
      *         = ad_helper.get_sensitive_dof_values();
      *
      *       // Then we do some problem specific tasks, the first being to
-     *       // compute all values, gradients etc. based on sensitive AD DoF
+     *       // compute all values, gradients, etc. based on sensitive AD DoF
      *       // values. Here we are fetching the displacement gradients at each
      *       // quadrature point.
      *       std::vector<Tensor<2, dim, ADNumberType>> Grad_u(
@@ -1089,7 +1089,8 @@ namespace Differentiation
      *         const Tensor<2, dim, ADNumberType> F =
      *           unit_symmetric_tensor<dim>() + Grad_u[q_point];
      *         Assert(numbers::value_is_greater_than(determinant(F), 0.0),
-     *                ExcMessage("Negative jacobian detected!"));
+     *                ExcMessage("Negative determinant of the deformation "
+     *                           "gradient detected!"));
      *
      *         // Add contribution of the internal energy:
      *         // Integrate the stored energy density function with the current
@@ -1099,8 +1100,10 @@ namespace Differentiation
      *
      *       // Add contribution from external energy:
      *       // Loop over faces and accumulate external energy into cell
-     *       // total energy
-     *       // energy_ad += ...
+     *       // total energy.
+     *       for (unsigned int face : ...)
+     *         if (cell->face(face)->at_boundary())
+     *           energy_ad += ...
      *
      *       // Register the definition of the total cell energy
      *       ad_helper.register_energy_functional(energy_ad);
@@ -1132,6 +1135,10 @@ namespace Differentiation
      *     ad_helper.compute_linearization(cell_matrix);
      *   }
      * @endcode
+     *
+     * In most use cases, and in particular in the code example shown above,
+     * the number of independent variables equals the number of
+     * <code>dofs_per_cell</code> for the used finite element.
      *
      * @warning ADOL-C does not support the standard threading models used by
      * deal.II, so this class should @b not be embedded within a multithreaded
@@ -1212,22 +1219,22 @@ namespace Differentiation
 
       /**
        * Evaluation of the total scalar energy functional for a chosen set of
-       * degree-of-freedom values, i.e.
+       * degree of freedom values, i.e.
        * @f[
        *   \Psi(\mathbf{X}) \vert_{\mathbf{X}}
        * @f]
        *
-       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
        * ADHelperCellLevelBase::set_dof_values().
        *
        * @return The value of the energy functional at the evaluation point
-       * corresponding to a chosen set of local degree-of freedom values.
+       * corresponding to a chosen set of local degree of freedom values.
        */
       scalar_type
       compute_energy() const;
 
       /**
-       * Evaluation of the residual for a chosen set of degree-of-freedom
+       * Evaluation of the residual for a chosen set of degree of freedom
        * values. Underlying this is the computation of the gradient (first
        * derivative) of the scalar function $\Psi$ with respect to all
        * independent variables, i.e.
@@ -1237,12 +1244,12 @@ namespace Differentiation
        * \Big\vert_{\mathbf{X}}
        * @f]
        *
-       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
        * ADHelperCellLevelBase::set_dof_values().
        *
        * @param[out] residual A Vector object, for which the value for each
        * entry represents the residual value for the corresponding local
-       * degree-of freedom. The output @p residual vector has a length
+       * degree of freedom. The output @p residual vector has a length
        * corresponding to @p n_independent_variables.
        */
       void
@@ -1250,7 +1257,7 @@ namespace Differentiation
 
       /**
        * Computes the linearization of the residual vector around a chosen set
-       * of degree-of-freedom values. Underlying this is the computation of the
+       * of degree of freedom values. Underlying this is the computation of the
        * Hessian (second derivative) of the scalar function $\Psi$ with respect
        * to all independent variables, i.e.
        * @f[
@@ -1260,7 +1267,7 @@ namespace Differentiation
        * \otimes \partial\mathbf{X}} \Big\vert_{\mathbf{X}}
        * @f]
        *
-       * The values at the evaluation point $\mathbf{X}$ are by calling
+       * The values at the evaluation point $\mathbf{X}$ are obtained by calling
        * ADHelperCellLevelBase::set_dof_values().
        *
        * @param[out] linearization A FullMatrix representing the linearization
