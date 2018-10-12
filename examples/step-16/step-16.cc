@@ -449,9 +449,9 @@ namespace Step16
       }
 
     auto cell_worker =
-      [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
-          ScratchData<dim> &                                    scratch_data,
-          CopyData &                                            copy_data) {
+      [&](const typename DoFHandler<dim>::level_cell_iterator &cell,
+          ScratchData<dim> &                                   scratch_data,
+          CopyData &                                           copy_data) {
         this->cell_worker(cell, scratch_data, copy_data);
       };
 
