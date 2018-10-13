@@ -1264,8 +1264,7 @@ namespace Differentiation
       }
 
       bool
-      is_registered_tape(
-        const typename Types<ADNumberType>::tape_index tape_index) const
+      is_registered_tape(const typename Types<ADNumberType>::tape_index) const
       {
         AssertThrow(false, ExcRequiresADOLC());
         return false;
@@ -1306,7 +1305,7 @@ namespace Differentiation
       }
 
       void
-      print(std::ostream &stream) const
+      print(std::ostream &) const
       {
         AssertThrow(false, ExcRequiresADOLC());
       }
