@@ -81,7 +81,7 @@ test()
     (++dof_handler.begin_active())->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 

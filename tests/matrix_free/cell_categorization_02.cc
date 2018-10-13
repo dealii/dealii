@@ -86,7 +86,7 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs();
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.close();
 
   MGConstrainedDoFs mg_constrained_dofs;

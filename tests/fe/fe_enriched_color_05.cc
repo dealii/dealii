@@ -99,7 +99,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
   std::cout << "n_cells: " << dof_handler.get_triangulation().n_active_cells()
             << std::endl;
 
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   constraints.clear();
   dealii::DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
