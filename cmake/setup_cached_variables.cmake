@@ -49,6 +49,7 @@
 # Components and miscellaneous options:
 #
 #     DEAL_II_WITH_64BIT_INDICES
+#     DEAL_II_WITH_COMPLEX_VALUES
 #     DEAL_II_DOXYGEN_USE_MATHJAX
 #     DEAL_II_COMPILE_EXAMPLES
 #     DEAL_II_CPACK_BUNDLE_NAME
@@ -369,6 +370,12 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
   OFF
   )
 LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
+
+OPTION(DEAL_II_WITH_COMPLEX_VALUES
+  "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."
+  ON
+  )
+LIST(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
 
 OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"

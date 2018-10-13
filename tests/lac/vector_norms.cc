@@ -125,7 +125,9 @@ main()
   check_norms<float>();
   check_norms<double>();
   check_norms<long double>();
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
   check_complex_norms<double>();
   check_complex_norms<float>();
+#endif
   deallog << "OK" << std::endl;
 }

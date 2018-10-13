@@ -280,7 +280,9 @@ TridiagonalMatrix<number>::
 
 template class TridiagonalMatrix<float>;
 template class TridiagonalMatrix<double>;
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
 template class TridiagonalMatrix<std::complex<float>>;
 template class TridiagonalMatrix<std::complex<double>>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

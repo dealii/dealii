@@ -70,6 +70,8 @@ main()
   check<float>();
   check<double>();
   check<long double>();
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
   check<std::complex<double>>();
+#endif
   deallog << "OK" << std::endl;
 }

@@ -148,8 +148,10 @@ namespace internals
 
   SCRATCH_INITIALIZER(double, d);
   SCRATCH_INITIALIZER(float, f);
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
   SCRATCH_INITIALIZER(std::complex<double>, cd);
   SCRATCH_INITIALIZER(std::complex<float>, cf);
+#endif
 #undef SCRATCH_INITIALIZER
 } // namespace internals
 

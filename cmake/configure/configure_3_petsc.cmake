@@ -94,6 +94,25 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
+    # If PETSc is compiled with complex scalar type we need to have support
+    # for complex values within deal.II as well.
+    #
+    IF( PETSC_WITH_COMPLEX AND NOT DEAL_II_WITH_COMPLEX_VALUES )
+        MESSAGE(STATUS "The PETSc configuration is incompatible with the deal.II configuration: "
+        "PETSc is compiled with complex scalar type. "
+        "This requires support for complex values in deal.II as well."
+        )
+      SET(PETSC_ADDITIONAL_ERROR_STRING
+        ${PETSC_ADDITIONAL_ERROR_STRING}
+        "The PETSc configuration is incompatible with the deal.II configuration:\n"
+        "PETSc is compiled with complex scalar type. "
+        "This requires support for complex values in deal.II as well.\n"
+        "  DEAL_II_WITH_COMPLEX_VALUES = ${DEAL_II_WITH_COMPLEX_VALUES}\n"
+        "  PETSC_WITH_COMPLEX = (${PETSC_WITH_COMPLEX})\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
     CHECK_MPI_INTERFACE(PETSC ${var})
   ENDIF()
 ENDMACRO()
