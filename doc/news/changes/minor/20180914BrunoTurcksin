@@ -1,0 +1,5 @@
+New: Add options in ARPACK solver to solve a standard eigenvalue problem and use
+the regular mode instead of the shift-and-invert mode
+<br>
+(Damien Lebrun-Grandie and Bruno Turcksin, 2018/09/14)
+
