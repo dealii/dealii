@@ -30,16 +30,16 @@ main()
 
   deallog.push("Double");
   {
-    test_physics<2, double, AD::NumberTypes::adolc_taped>();
-    test_physics<3, double, AD::NumberTypes::adolc_taped>();
+    test_physics<2, double, AD::NumberTypes::sacado_dfad>();
+    test_physics<3, double, AD::NumberTypes::sacado_dfad>();
     deallog << "OK" << std::endl;
   }
   deallog.pop();
 
   deallog.push("Float");
   {
-    test_physics<2, float, AD::NumberTypes::adolc_taped>();
-    test_physics<3, float, AD::NumberTypes::adolc_taped>();
+    test_physics<2, float, AD::NumberTypes::sacado_dfad>();
+    test_physics<3, float, AD::NumberTypes::sacado_dfad>();
     deallog << "OK" << std::endl;
   }
   deallog.pop();
