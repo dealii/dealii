@@ -1,0 +1,23 @@
+
+DEAL:0::Constraints
+    0 = 0.468750
+    1 = -0.0162380
+    22 = 0.431250
+    23 = -0.00541266
+DEAL:0::OK
+
+DEAL:1::Constraints
+DEAL:1::OK
+
+
+DEAL:2::Constraints
+    76 = 0.431250
+    77 = 0.00541266
+    94 = 0.468750
+    95 = 0.0162380
+DEAL:2::OK
+
+
+DEAL:3::Constraints
+DEAL:3::OK
+

@@ -6621,7 +6621,7 @@ namespace VectorTools
                    dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
-              if (cell->at_boundary())
+              if (cell->at_boundary() && cell->is_locally_owned())
                 for (unsigned int face = 0;
                      face < GeometryInfo<dim>::faces_per_cell;
                      ++face)
@@ -6694,7 +6694,7 @@ namespace VectorTools
                    dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
-              if (cell->at_boundary())
+              if (cell->at_boundary() && cell->is_locally_owned())
                 for (unsigned int face = 0;
                      face < GeometryInfo<dim>::faces_per_cell;
                      ++face)
@@ -6801,7 +6801,7 @@ namespace VectorTools
                    dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
-              if (cell->at_boundary())
+              if (cell->at_boundary() && cell->is_locally_owned())
                 for (unsigned int face = 0;
                      face < GeometryInfo<dim>::faces_per_cell;
                      ++face)
@@ -6859,7 +6859,7 @@ namespace VectorTools
                    dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
-              if (cell->at_boundary())
+              if (cell->at_boundary() && cell->is_locally_owned())
                 for (unsigned int face = 0;
                      face < GeometryInfo<dim>::faces_per_cell;
                      ++face)
