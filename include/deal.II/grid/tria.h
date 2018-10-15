@@ -1484,8 +1484,8 @@ public:
        do_not_produce_unrefined_islands),
 
     /**
-     * This flag includes all the above ones and therefore combines all
-     * smoothing algorithms implemented with the exception of anisotropic
+     * This flag includes all the above ones (therefore combines all
+     * smoothing algorithms implemented), with the exception of anisotropic
      * smoothing.
      */
     maximum_smoothing = 0xffff ^ allow_anisotropic_smoothing
