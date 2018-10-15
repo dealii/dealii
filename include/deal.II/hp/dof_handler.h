@@ -928,14 +928,23 @@ namespace hp
     create_active_fe_table();
 
     /**
-     * Functions that will be triggered through signals whenever the
-     * triangulation is modified.
+     * A function that will be triggered through a triangulation
+     * signal just before the triangulation is modified.
      *
-     * Here they are used to administrate the active_fe_fields during the
-     * spatial refinement.
+     * The function that stores the active_fe_flags of all cells that will
+     * be refined or coarsened before the refinement happens, so that
+     * they can be set again after refinement.
      */
     void
     pre_refinement_action();
+
+    /**
+     * A function that will be triggered through a triangulation
+     * signal just after the triangulation is modified.
+     *
+     * The function that restores the active_fe_flags of all cells that
+     * were refined.
+     */
     void
     post_refinement_action();
 
