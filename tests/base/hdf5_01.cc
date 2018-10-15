@@ -45,13 +45,17 @@ test()
                               root_unsigned_int);
 
     // Create attributes attached to a group
-    auto                      test_group = data_file.create_group("test_group");
-    const std::complex<float> group_complex_float   = {2.45681934e5, 45e2};
+    auto test_group = data_file.create_group("test_group");
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+    const std::complex<float>  group_complex_float  = {2.45681934e5, 45e2};
     const std::complex<double> group_complex_double = {6.234542e3, 2};
     test_group.set_attribute("group_complex_float", group_complex_float);
     test_group.set_attribute("group_complex_double", group_complex_double);
     test_group.set_attribute("group_complex_total",
                              group_complex_float * group_complex_double);
+#endif
+
     test_group.set_attribute("group_string",
                              std::string("test_string_attribute"));
 
@@ -84,6 +88,8 @@ test()
 
     // Read attributes attached to a group
     auto test_group = data_file.group("test_group");
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
     auto group_complex_float =
       test_group.get_attribute<std::complex<float>>("group_complex_float");
     auto group_complex_double =
@@ -94,6 +100,8 @@ test()
             << test_group.get_attribute<std::complex<double>>(
                  "group_complex_total")
             << std::endl;
+#endif
+
     deallog << "group_string read:"
             << test_group.get_attribute<std::string>("group_string")
             << std::endl;

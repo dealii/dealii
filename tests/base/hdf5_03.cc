@@ -780,6 +780,8 @@ main(int argc, char **argv)
                                         dataset_dimensions,
                                         mpi_communicator,
                                         pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<std::vector, std::complex<float>>(data_file,
                                                      dataset_dimensions,
                                                      mpi_communicator,
@@ -788,6 +790,8 @@ main(int argc, char **argv)
                                                       dataset_dimensions,
                                                       mpi_communicator,
                                                       pcout);
+#endif
+
         write_test<std::vector, int>(data_file,
                                      dataset_dimensions,
                                      mpi_communicator,
@@ -804,6 +808,8 @@ main(int argc, char **argv)
                                        dataset_dimensions,
                                        mpi_communicator,
                                        pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<FullMatrix, std::complex<float>>(data_file,
                                                     dataset_dimensions,
                                                     mpi_communicator,
@@ -812,6 +818,8 @@ main(int argc, char **argv)
                                                      dataset_dimensions,
                                                      mpi_communicator,
                                                      pcout);
+#endif
+
         write_test<Vector, float>(data_file,
                                   dataset_dimensions,
                                   mpi_communicator,
@@ -820,6 +828,8 @@ main(int argc, char **argv)
                                    dataset_dimensions,
                                    mpi_communicator,
                                    pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<Vector, std::complex<float>>(data_file,
                                                 dataset_dimensions,
                                                 mpi_communicator,
@@ -828,6 +838,7 @@ main(int argc, char **argv)
                                                  dataset_dimensions,
                                                  mpi_communicator,
                                                  pcout);
+#endif
       }
 
       {
@@ -836,32 +847,43 @@ main(int argc, char **argv)
                              HDF5::File::Mode::open);
         read_test<std::vector, float>(data_file, mpi_communicator, pcout);
         read_test<std::vector, double>(data_file, mpi_communicator, pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<std::vector, std::complex<float>>(data_file,
                                                     mpi_communicator,
                                                     pcout);
         read_test<std::vector, std::complex<double>>(data_file,
                                                      mpi_communicator,
                                                      pcout);
+#endif
+
         read_test<std::vector, int>(data_file, mpi_communicator, pcout);
         read_test<std::vector, unsigned int>(data_file,
                                              mpi_communicator,
                                              pcout);
         read_test<FullMatrix, float>(data_file, mpi_communicator, pcout);
         read_test<FullMatrix, double>(data_file, mpi_communicator, pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<FullMatrix, std::complex<float>>(data_file,
                                                    mpi_communicator,
                                                    pcout);
         read_test<FullMatrix, std::complex<double>>(data_file,
                                                     mpi_communicator,
                                                     pcout);
+#endif
+
         read_test<Vector, float>(data_file, mpi_communicator, pcout);
         read_test<Vector, double>(data_file, mpi_communicator, pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<Vector, std::complex<float>>(data_file,
                                                mpi_communicator,
                                                pcout);
         read_test<Vector, std::complex<double>>(data_file,
                                                 mpi_communicator,
                                                 pcout);
+#endif
       }
     }
   catch (std::exception &exc)

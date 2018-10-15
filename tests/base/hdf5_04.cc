@@ -734,40 +734,62 @@ main()
 
         write_test<std::vector, float>(data_file, dataset_dimensions);
         write_test<std::vector, double>(data_file, dataset_dimensions);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<std::vector, std::complex<float>>(data_file,
                                                      dataset_dimensions);
         write_test<std::vector, std::complex<double>>(data_file,
                                                       dataset_dimensions);
+#endif
+
         write_test<std::vector, int>(data_file, dataset_dimensions);
         write_test<std::vector, unsigned int>(data_file, dataset_dimensions);
         write_test<FullMatrix, float>(data_file, dataset_dimensions);
         write_test<FullMatrix, double>(data_file, dataset_dimensions);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<FullMatrix, std::complex<float>>(data_file,
                                                     dataset_dimensions);
         write_test<FullMatrix, std::complex<double>>(data_file,
                                                      dataset_dimensions);
+#endif
+
         write_test<Vector, float>(data_file, dataset_dimensions);
         write_test<Vector, double>(data_file, dataset_dimensions);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<Vector, std::complex<float>>(data_file, dataset_dimensions);
         write_test<Vector, std::complex<double>>(data_file, dataset_dimensions);
+#endif
       }
 
       {
         HDF5::File data_file(filename, HDF5::File::Mode::open);
         read_test<std::vector, float>(data_file);
         read_test<std::vector, double>(data_file);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<std::vector, std::complex<float>>(data_file);
         read_test<std::vector, std::complex<double>>(data_file);
+#endif
+
         read_test<std::vector, int>(data_file);
         read_test<std::vector, unsigned int>(data_file);
         read_test<FullMatrix, float>(data_file);
         read_test<FullMatrix, double>(data_file);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<FullMatrix, std::complex<float>>(data_file);
         read_test<FullMatrix, std::complex<double>>(data_file);
+#endif
+
         read_test<Vector, float>(data_file);
         read_test<Vector, double>(data_file);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<Vector, std::complex<float>>(data_file);
         read_test<Vector, std::complex<double>>(data_file);
+#endif
       }
     }
   catch (std::exception &exc)
