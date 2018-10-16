@@ -47,6 +47,8 @@ SET(_unity_include_src
   fe_raviart_thomas_nodal.cc
   fe_rt_bubbles.cc
   fe_series.cc
+  fe_series_fourier.cc
+  fe_series_legendre.cc
   fe_system.cc
   fe_enriched.cc
   fe_tools.cc
@@ -110,6 +112,8 @@ SET(_inst
   fe_raviart_thomas.inst.in
   fe_raviart_thomas_nodal.inst.in
   fe_rt_bubbles.inst.in
+  fe_series_fourier.inst.in
+  fe_series_legendre.inst.in
   fe_system.inst.in
   fe_enriched.inst.in
   fe_tools.inst.in
