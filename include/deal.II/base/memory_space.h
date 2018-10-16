@@ -47,24 +47,6 @@ namespace MemorySpace
 
 
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
-  /**
-   * Deleter for unique/shared pointer pointing to an array allocated on the
-   * device.
-   */
-  template <typename Number>
-  void
-  deleter_device_array(Number *ptr) noexcept
-  {
-    const cudaError_t cuda_error_code = cudaFree(ptr);
-    (void)cuda_error_code;
-    AssertNothrow(cuda_error_code == cudaSuccess,
-                  ExcCudaError(cudaGetErrorString(cuda_error_code)));
-  }
-#endif
-
-
-
   /**
    * Data structure
    */
@@ -172,7 +154,7 @@ namespace MemorySpace
   {
     MemorySpaceData()
       : values(nullptr, &free)
-      , values_dev(nullptr, deleter_device_array<Number>)
+      , values_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
     {}
 
     void

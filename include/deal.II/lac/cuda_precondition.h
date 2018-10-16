@@ -23,7 +23,7 @@
 
 #include <memory>
 
-#ifdef DEAL_II_WITH_CUDA
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 
 DEAL_II_NAMESPACE_OPEN
 
