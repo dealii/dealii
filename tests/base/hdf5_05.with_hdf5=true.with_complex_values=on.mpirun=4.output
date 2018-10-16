@@ -1,0 +1,27 @@
+
+DEAL::Write tests for double datasets
+DEAL::Dimensions dataset_1<double> (Write): 5 3
+DEAL::Size dataset_1<double> (Write): 15
+DEAL::Rank dataset_1<double> (Write): 2
+DEAL::Data dataset_1<double> (Write): [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+DEAL::Write tests for std::complex<double> datasets
+DEAL::Dimensions dataset_1<std::complex<double>> (Write): 5 3
+DEAL::Size dataset_1<std::complex<double>> (Write): 15
+DEAL::Rank dataset_1<std::complex<double>> (Write): 2
+DEAL::Data dataset_1<std::complex<double>> (Write): [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (7,0), (8,0), (9,0), (10,0), (11,0), (12,0), (13,0), (14,0)]
+DEAL::Read tests for double datasets
+DEAL::Dimensions dataset_1<double> (Read): 5 3
+DEAL::Size dataset_1<double> (Read): 15
+DEAL::Rank dataset_1<double> (Read): 2
+DEAL::Data dataset_1<double> (Read): [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11], [12, 13, 14]]
+DEAL::Column vector dataset_1<double> (Read): [7, 10, 13]
+DEAL::Row vector dataset_1<double> (Read): [9, 10, 11]
+DEAL::Sub-matrix dataset_1<double> (Read): [[3, 4, 5], [6, 7, 8]]
+DEAL::Read tests for std::complex<double> datasets
+DEAL::Dimensions dataset_1<std::complex<double>> (Read): 5 3
+DEAL::Size dataset_1<std::complex<double>> (Read): 15
+DEAL::Rank dataset_1<std::complex<double>> (Read): 2
+DEAL::Data dataset_1<std::complex<double>> (Read): [[(0,0), (1,0), (2,0)], [(3,0), (4,0), (5,0)], [(6,0), (7,0), (8,0)], [(9,0), (10,0), (11,0)], [(12,0), (13,0), (14,0)]]
+DEAL::Column vector dataset_1<std::complex<double>> (Read): [(7,0), (10,0), (13,0)]
+DEAL::Row vector dataset_1<std::complex<double>> (Read): [(9,0), (10,0), (11,0)]
+DEAL::Sub-matrix dataset_1<std::complex<double>> (Read): [[(3,0), (4,0), (5,0)], [(6,0), (7,0), (8,0)]]
