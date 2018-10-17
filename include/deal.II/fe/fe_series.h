@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ namespace FESeries
    *
    * @author Denis Davydov, 2016.
    */
-  template <int dim>
+  template <int dim, int spacedim = dim>
   class Fourier : public Subscriptor
   {
   public:
@@ -98,9 +98,9 @@ namespace FESeries
      * used to integrate the expansion for each FiniteElement
      * in @p fe_collection.
      */
-    Fourier(const unsigned int           size_in_each_direction,
-            const hp::FECollection<dim> &fe_collection,
-            const hp::QCollection<dim> & q_collection);
+    Fourier(const unsigned int                     size_in_each_direction,
+            const hp::FECollection<dim, spacedim> &fe_collection,
+            const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p fourier_coefficients of the cell vector field given by
@@ -116,19 +116,12 @@ namespace FESeries
     /**
      * hp::FECollection for which transformation matrices will be calculated.
      */
-    SmartPointer<const hp::FECollection<dim>> fe_collection;
+    SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
 
     /**
      * hp::QCollection used in calculation of transformation matrices.
      */
     SmartPointer<const hp::QCollection<dim>> q_collection;
-
-    /**
-     * Ensure that the transformation matrix for FiniteElement index
-     * @p fe_index is calculated. If not, calculate it.
-     */
-    void
-    ensure_existence(const unsigned int fe_index);
 
     /**
      * Angular frequencies $ 2 \pi {\bf k} $ .
@@ -189,7 +182,7 @@ namespace FESeries
    *
    * @author Denis Davydov, 2016.
    */
-  template <int dim>
+  template <int dim, int spacedim = dim>
   class Legendre : public Subscriptor
   {
   public:
@@ -200,9 +193,9 @@ namespace FESeries
      * used to integrate the expansion for each FiniteElement
      * in @p fe_collection.
      */
-    Legendre(const unsigned int           size_in_each_direction,
-             const hp::FECollection<dim> &fe_collection,
-             const hp::QCollection<dim> & q_collection);
+    Legendre(const unsigned int                     size_in_each_direction,
+             const hp::FECollection<dim, spacedim> &fe_collection,
+             const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p legendre_coefficients of the cell vector field given by
@@ -223,19 +216,12 @@ namespace FESeries
     /**
      * hp::FECollection for which transformation matrices will be calculated.
      */
-    SmartPointer<const hp::FECollection<dim>> fe_collection;
+    SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
 
     /**
      * hp::QCollection used in calculation of transformation matrices.
      */
     SmartPointer<const hp::QCollection<dim>> q_collection;
-
-    /**
-     * Ensure that the transformation matrix for FiniteElement index
-     * @p fe_index is calculated. If not, calculate it.
-     */
-    void
-    ensure_existence(const unsigned int fe_index);
 
     /**
      * Transformation matrices for each FiniteElement.
